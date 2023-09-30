@@ -1,0 +1,17 @@
+{
+	"author": {
+		"name": "Oscar Palmér",
+		"url": "https://oscarpalmer.se"
+	},
+	"description": "Sweet little atomic goodies…",
+	"devDependencies": {},
+	"files": [],
+	"keywords": [],
+	"license": "MIT",
+	"name": "@oscarpalmer/atoms",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/oscarpalmer/atoms.git"
+	},
+	"version": "0.1.0"
+}
