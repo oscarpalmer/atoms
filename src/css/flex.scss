@@ -1,0 +1,47 @@
+.fill {
+	flex: 1;
+}
+
+.flow,
+.stack {
+	display: flex;
+}
+
+.flow {
+	flex-flow: row wrap;
+	gap: var(--flow-gap, 1rem);
+	align-items: center;
+
+	&-large {
+		gap: calc(2 * var(--flow-gap, 1rem));
+	}
+
+	&-reverse {
+		flex-flow: row-reverse wrap-reverse;
+	}
+
+	&-small {
+		gap: calc(0.5 * var(--flow-gap, 1rem));
+	}
+
+	&-spaced {
+		justify-content: space-between;
+	}
+}
+
+.stack {
+	flex-flow: column nowrap;
+	gap: var(--stack-gap, 1rem);
+
+	&-large {
+		gap: calc(2 * var(--stack-gap, 1rem));
+	}
+
+	&-reverse {
+		flex-flow: column-reverse nowrap;
+	}
+
+	&-small {
+		gap: calc(0.5 * var(--stack-gap, 1rem));
+	}
+}

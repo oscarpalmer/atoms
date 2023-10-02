@@ -4,14 +4,56 @@
 		"url": "https://oscarpalmer.se"
 	},
 	"description": "Sweet little atomic goodies…",
-	"devDependencies": {},
-	"files": [],
+	"devDependencies": {
+		"@rollup/plugin-typescript": "^11.1",
+		"bun": "^1.0",
+		"prettier": "^3.0",
+		"rollup": "^3.29",
+		"sass": "^1.68",
+		"typescript": "^5.2",
+		"xo": "^0.56"
+	},
+	"files": [
+		"dist",
+		"src",
+		"types"
+	],
 	"keywords": [],
 	"license": "MIT",
+	"main": "./dist/js/index.js",
+	"module": "./dist/js/index.js",
 	"name": "@oscarpalmer/atoms",
+	"prettier": {
+		"arrowParens": "avoid",
+		"bracketSpacing": false,
+		"singleQuote": true,
+		"switchIndent": true,
+		"trailingComma": "all",
+		"useTabs": true
+	},
 	"repository": {
 		"type": "git",
 		"url": "git+https://github.com/oscarpalmer/atoms.git"
 	},
-	"version": "0.1.0"
+	"scripts": {
+		"build": "npm run build:css && npm run build:js",
+		"build:css": "npx sass ./src/css:./dist/css --style=compressed --no-source-map",
+		"build:js": "npx rollup -c",
+		"types": "npx tsc ./src/js/index.ts --declaration --declarationDir ./types --emitDeclarationOnly",
+		"watch:css": "npx sass ./src/css:./dist/css --style=compressed --no-source-map --watch",
+		"watch:js": "npx rollup -c -w"
+	},
+	"type": "module",
+	"types": "./types/index.d.ts",
+	"version": "0.2.0",
+	"xo": {
+		"envs": [
+			"browser"
+		],
+		"prettier": true,
+		"rules": {
+			"import/extensions": "off",
+			"import/no-cycle": "off"
+		}
+	}
 }

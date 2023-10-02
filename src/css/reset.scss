@@ -1,0 +1,316 @@
+/*! https://github.com/oscarpalmer/atoms */
+/**
+ * Reset
+ * ========================
+ * 
+ * A reset I use for a lot of personal stuff, and elsewhere, of course.
+ * It's a mix of a few different resets mixed together with some of my own ideas.
+ *
+ * When rules are explained, such comments will be suffixed with one ore more square brackets
+ * with a two-letter code, all of which are listed below. My own code is "OP", which are my initials.
+ *
+ * - Andy Bell's "A (more) Modern CSS Reset" [AB]
+ *   https://andy-bell.co.uk/a-more-modern-css-reset/
+ *
+ * - CSS Remedy [CR]
+ *   https://github.com/jensimmons/cssremedy
+ *
+ * - RESS [RS]
+ *   https://github.com/filipelinhares/ress
+ *
+ * - Sanitize.css [SE]
+ *   https://github.com/csstools/sanitize.css
+ */
+
+/**
+ * Catch-alls
+ */
+
+* {
+	padding: 0;
+	margin: 0;
+	box-sizing: border-box;
+	background-repeat: no-repeat;
+}
+
+::before,
+::after {
+	box-sizing: inherit;
+	text-decoration: inherit;
+	vertical-align: inherit;
+}
+
+/**
+ * Document
+ */
+
+:where(:root) {
+	font-family: system-ui, sans-serif;
+	font-size: 100%;
+	line-height: 1.5;
+	-moz-text-size-adjust: none; // Prevent text size inflation (e.g., after orientation change) [AB][RE][SE]
+	-webkit-text-size-adjust: none; // ditto
+	text-size-adjust: none; // ditto
+	-moz-tab-size: 4;
+	tab-size: 4;
+	-webkit-tap-highlight-color: transparent; // Remove the gray highlight on active links in IE 10 [SE]
+}
+
+:where(body) {
+	min-height: 100vh;
+	font-size: 1rem;
+}
+
+/**
+ * Attributes
+ */
+
+:where([disabled], [aria-disabled='true' i]) {
+	cursor: default;
+}
+
+:where([hidden]) {
+	display: none;
+}
+
+:where([aria-busy='true' i]) {
+	cursor: progress;
+}
+
+:where([aria-controls]) {
+	cursor: pointer;
+}
+
+/**
+ * General
+ */
+
+:where(a) {
+	background-color: transparent; // Remove the gray background on active links in IE10 [RS]
+}
+
+:where(abbr[title]) {
+	border-bottom: none; // Remove the bottom border in Chrome 57 [RS]
+	text-decoration: underline; // Add the correct text decoration in Safari [RS][SE]
+	text-decoration: underline dotted; // ditto
+}
+
+:where(b, strong) {
+	font-weight: bolder; // Add the correct font weight in Chrome, Edge, and Safari [RS][SE]
+}
+
+:where(button, h1, h2, h3, h4, h5, h6, input, label, legend) {
+	line-height: 1.125;
+}
+
+:where(button, input, optgroup, select, textarea) {
+	font: inherit; // Correct the font inheritance in Firefox, Edge, and Safari [RS][SE]
+}
+
+:where(button, [type='button' i], [type='reset' i], [type='submit' i]) {
+	-webkit-appearance: button; // Correct the inability to style clickable types in iOS [RS][SE]
+	cursor: pointer;
+}
+
+:where(button, select) {
+	text-transform: none; // Undo transformation in Firefox 40+ and IE11 [RS]
+}
+
+:where(button) {
+	overflow: visible; // Address 'overflow' set to 'hidden' in IE8–11 [RS]
+}
+
+:where(code, kbd, pre, samp) {
+	font-family: monospace, monospace; // Specify the font family of code elements [RS][SE]
+	font-size: 1em; // Correct the odd 'em' font sizing in all browsers [RS][SE]
+}
+
+:where(details > summary:first-of-type) {
+	display: list-item; // Add the correct display in Safari [SE]
+}
+
+:where(dl, ol, ul) :where(dl, ol, ul) {
+	margin: 0; // Remove the margin on nested lists in Chrome, Edge, and Safari [SE]
+}
+
+:where(h1, h2, h3, h4, h5, h6) {
+	text-wrap: balance;
+}
+
+:where(hr) {
+	height: 0; // Add the correct box sizing in Firefox [CR][RS][SE]
+	overflow: visible; // Show the overflow in Edge and IE [CR][RS]
+	border-style: solid;
+	border-width: 1px 0 0;
+	color: inherit; // Correct the inheritance of border colour in Firefox [CR][RS][SE]
+}
+
+:where(nav) :where(ol, ul) {
+	list-style-type: none;
+	padding: 0;
+}
+
+:where(nav li)::before {
+	content: '\200B'; // Prevent VoiceOver from ignoring list semantics in Safari [SE]
+	float: left;
+}
+
+:where(pre) {
+	overflow: auto; // Prevent overflow of the container in all browsers [SE]
+	white-space: pre-wrap; // Overflow by default is bad… [CR]
+}
+
+:where(small) {
+	font-size: 0.875rem;
+}
+
+:where(sub, sup) {
+	vertical-align: baseline;
+	font-size: 0.75rem;
+	line-height: 0;
+	position: relative;
+}
+
+:where(sub) {
+	bottom: -0.25em;
+}
+
+:where(sup) {
+	top: -0.5em;
+}
+
+:where(table) {
+	border-collapse: collapse;
+	border-color: currentColor; // Correct table border colour in Chrome, Edge, and Safari [SE]
+	text-indent: 0; // Remove text indentation from table contents in Chrome, Edge, and Safari [RS][SE]
+}
+
+/**
+ * Form-related
+ */
+
+:where(button, input, select, textarea) {
+	padding: 0.25em 0.5em; // Change the inconsistent appearance in all browsers
+	background-color: transparent; // ditto
+	border: 1px solid WindowFrame; // ditto
+	color: inherit; // ditto
+	font: inherit; // Add typography inheritance in all browsers [SE]
+	letter-spacing: inherit; // ditto
+}
+
+:where(fieldset) {
+	border: 1px solid darkgrey; // Change the inconsistent appearance in all browsers [SE]
+}
+
+:where(optgroup) {
+	font-weight: bold; // Restore the font weight unset by previous rules [RS]
+}
+
+:where(progress) {
+	vertical-align: baseline; // Add the correct vertical alignment in Chrome, Edge, and Firefox [RS][SE]
+}
+
+:where(select) {
+	-webkit-appearance: none; // Change the inconsistent appearance in all browsers [SE]
+	appearance: none; // ditto
+	padding-right: 1em; // ditto
+	background: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='4'%3E%3Cpath d='M4 0h6L7 4'/%3E%3C/svg%3E")
+		no-repeat right center / 1em; // ditto
+	border-radius: 0; // ditto
+}
+
+:where(select[multiple]) {
+	background-image: none; // Don't show the arrow for multiple choice selects [SE]
+}
+
+select::-ms-expand {
+	display: none; // Hide in IE11+ [RS]
+}
+
+select::-ms-value {
+	color: currentColor; // Set text colour in IE11+ [RS]
+}
+
+:where(textarea) {
+	overflow: auto; // Allow overflow in IE11+ [RS]
+	resize: vertical; // Change the resize direction in all browsers [RS][SE]
+}
+
+:where([type='color' i], [type='range' i]) {
+	border-width: 0; // Remove the border and padding in all browsers [SE]
+	padding: 0; // ditto
+}
+
+:where([type='search' i]) {
+	-webkit-appearance: textfield; // Correct the odd appearance in Chrome, Edge, and Safari [RS][SE]
+	outline-offset: -2px; // Correct the outline style in Safari [RS][SE]
+}
+
+::-webkit-file-upload-button {
+	-webkit-appearance: button; // Correct the inability to style upload buttons in iOS and Safari [RS][SE]
+	color: inherit;
+	font: inherit;
+}
+
+::-webkit-inner-spin-button,
+::-webkit-outer-spin-button {
+	height: auto; // Correct the cursor style of increment and decrement buttons in Safari [RS][SE]
+}
+
+::-webkit-input-placeholder {
+	color: inherit; // Correct the text style of placeholders in Chrome, Edge, and Safari. [SE]
+	opacity: 0.54; // ditto
+}
+
+::-webkit-search-decoration {
+	-webkit-appearance: none; // Remove the inner padding in Chrome, Edge, and Safari on macOS [SE]
+}
+
+/**
+ * Media-related
+ */
+
+:where(audio, canvas, embed, iframe, img, object, picture, svg, video) {
+	max-width: 100%;
+	vertical-align: middle;
+}
+
+:where(audio, canvas, embed, iframe, img, object, svg, video) {
+	display: block;
+}
+
+:where(audio) {
+	width: 100%; // Better default width [CR]
+}
+
+:where(audio:not([controls])) {
+	display: none;
+}
+
+:where(canvas, img, svg, video) {
+	height: auto; // Maintain aspect ratios [CR]
+}
+
+:where(iframe) {
+	border-style: none;
+}
+
+:where(img) {
+	border-style: none; // Remove the border on images inside links in IE 10 and earlier [CR]
+}
+
+:where(picture) {
+	display: contents; // Remove the unnecessary wrapping 'picture', while maintaining contents [CR]
+}
+
+:where(source) {
+	display: none; // Source elements have nothing to display, so we hide them entirely [CR]
+}
+
+:where(svg) {
+	overflow: hidden; // Hide the overflow in IE 10 and earlier [CR]
+}
+
+:where(svg:not([fill])) {
+	fill: currentColor;
+}
