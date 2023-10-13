@@ -1,3 +1,26 @@
+$alignmentOrigins: (c: 'content', i: 'items', s: 'self');
+$alignmentValues: (c: 'center', fe: 'flex-end', fs: 'flex-start', s: 'stretch');
+$justificationValues: (sa: 'space-around', sb: 'space-between', se: 'space-evenly');
+$types: (a: 'align', j: 'justify');
+
+@each $typeKey, $typeValue in $types {
+	@each $alignmentOriginKey, $alignmentOriginValue in $alignmentOrigins {
+		.#{$typeKey}#{$alignmentOriginKey} {
+			@each $alignmentValueKey, $alignmentValueValue in $alignmentValues {
+				&-#{$alignmentValueKey} {
+					#{$typeValue}-#{$alignmentOriginValue}: #{$alignmentValueValue}
+				}
+			}
+		}
+	}
+
+	@each $justificationValueKey, $justificationValueValue in $justificationValues {
+		.#{$typeKey}c-#{$justificationValueKey} {
+			#{$typeValue}-content: #{$justificationValueValue}
+		}
+	}
+}
+
 .fill {
 	flex: 1;
 }
@@ -16,6 +39,10 @@
 		gap: calc(2 * var(--flow-gap, 1rem));
 	}
 
+	&-nowrap {
+		flex-wrap: nowrap;
+	}
+
 	&-reverse {
 		flex-flow: row-reverse wrap-reverse;
 	}
@@ -24,8 +51,8 @@
 		gap: calc(0.5 * var(--flow-gap, 1rem));
 	}
 
-	&-spaced {
-		justify-content: space-between;
+	&-nogap {
+		gap: 0;
 	}
 }
 
@@ -43,5 +70,9 @@
 
 	&-small {
 		gap: calc(0.5 * var(--stack-gap, 1rem));
+	}
+
+	&-nogap {
+		gap: 0;
 	}
 }
