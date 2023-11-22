@@ -308,7 +308,7 @@ select::-ms-value {
 }
 
 [hidden] {
-	display: none;
+	display: none !important;
 }
 
 :where([aria-busy='true' i]) {

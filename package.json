@@ -7,11 +7,18 @@
 	"devDependencies": {
 		"@rollup/plugin-typescript": "^11.1",
 		"bun": "^1.0",
-		"prettier": "^3.0",
-		"rollup": "^3.29",
-		"sass": "^1.68",
-		"typescript": "^5.2",
+		"prettier": "^3.1",
+		"rollup": "^4.5",
+		"sass": "^1.69",
+		"typescript": "^5.3",
 		"xo": "^0.56"
+	},
+	"exports": {
+		".": {
+			"types": "./types/index.d.ts",
+			"import": "./dist/blixt.js"
+		},
+		"./package.json": "./package.json"
 	},
 	"files": [
 		"dist",
@@ -37,15 +44,15 @@
 	},
 	"scripts": {
 		"build": "npm run build:css && npm run build:js",
-		"build:css": "npx sass ./src/css:./dist/css --style=compressed --no-source-map",
+		"build:css": "npx sass ./src/css:./dist/css --no-source-map",
 		"build:js": "npx rollup -c",
 		"types": "npx tsc ./src/js/index.ts --declaration --declarationDir ./types --emitDeclarationOnly",
-		"watch:css": "npx sass ./src/css:./dist/css --style=compressed --no-source-map --watch",
+		"watch:css": "npx sass ./src/css:./dist/css --no-source-map --watch",
 		"watch:js": "npx rollup -c -w"
 	},
 	"type": "module",
 	"types": "./types/index.d.ts",
-	"version": "0.3.0",
+	"version": "0.4.0",
 	"xo": {
 		"envs": [
 			"browser"

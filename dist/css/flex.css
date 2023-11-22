@@ -1,1 +1,148 @@
-.ac-c{align-content:center}.ac-fe{align-content:flex-end}.ac-fs{align-content:flex-start}.ac-s{align-content:stretch}.ai-c{align-items:center}.ai-fe{align-items:flex-end}.ai-fs{align-items:flex-start}.ai-s{align-items:stretch}.as-c{align-self:center}.as-fe{align-self:flex-end}.as-fs{align-self:flex-start}.as-s{align-self:stretch}.ac-sa{align-content:space-around}.ac-sb{align-content:space-between}.ac-se{align-content:space-evenly}.jc-c{justify-content:center}.jc-fe{justify-content:flex-end}.jc-fs{justify-content:flex-start}.jc-s{justify-content:stretch}.ji-c{justify-items:center}.ji-fe{justify-items:flex-end}.ji-fs{justify-items:flex-start}.ji-s{justify-items:stretch}.js-c{justify-self:center}.js-fe{justify-self:flex-end}.js-fs{justify-self:flex-start}.js-s{justify-self:stretch}.jc-sa{justify-content:space-around}.jc-sb{justify-content:space-between}.jc-se{justify-content:space-evenly}.fill{flex:1}.flow,.stack{display:flex}.flow{flex-flow:row wrap;gap:var(--flow-gap, 1rem);align-items:center}.flow-large{gap:calc(2*var(--flow-gap, 1rem))}.flow-nowrap{flex-wrap:nowrap}.flow-reverse{flex-flow:row-reverse wrap-reverse}.flow-small{gap:calc(.5*var(--flow-gap, 1rem))}.flow-nogap{gap:0}.stack{flex-flow:column nowrap;gap:var(--stack-gap, 1rem)}.stack-large{gap:calc(2*var(--stack-gap, 1rem))}.stack-reverse{flex-flow:column-reverse nowrap}.stack-small{gap:calc(.5*var(--stack-gap, 1rem))}.stack-nogap{gap:0}
+.fill {
+  flex: 1;
+}
+
+.flow,
+.stack {
+  display: flex;
+}
+
+.flow {
+  flex-flow: row wrap;
+  gap: var(--flow-gap, 1rem);
+  align-items: center;
+}
+.flow-large {
+  gap: calc(2 * var(--flow-gap, 1rem));
+}
+.flow-nowrap {
+  flex-wrap: nowrap;
+}
+.flow-reverse {
+  flex-flow: row-reverse wrap-reverse;
+}
+.flow-small {
+  gap: calc(0.5 * var(--flow-gap, 1rem));
+}
+.flow-nogap {
+  gap: 0;
+}
+
+.stack {
+  flex-flow: column nowrap;
+  gap: var(--stack-gap, 1rem);
+}
+.stack-large {
+  gap: calc(2 * var(--stack-gap, 1rem));
+}
+.stack-reverse {
+  flex-flow: column-reverse nowrap;
+}
+.stack-small {
+  gap: calc(0.5 * var(--stack-gap, 1rem));
+}
+.stack-nogap {
+  gap: 0;
+}
+
+.ac-c {
+  align-content: center;
+}
+.ac-fe {
+  align-content: flex-end;
+}
+.ac-fs {
+  align-content: flex-start;
+}
+.ac-s {
+  align-content: stretch;
+}
+
+.ai-c {
+  align-items: center;
+}
+.ai-fe {
+  align-items: flex-end;
+}
+.ai-fs {
+  align-items: flex-start;
+}
+.ai-s {
+  align-items: stretch;
+}
+
+.as-c {
+  align-self: center;
+}
+.as-fe {
+  align-self: flex-end;
+}
+.as-fs {
+  align-self: flex-start;
+}
+.as-s {
+  align-self: stretch;
+}
+
+.ac-sa {
+  align-content: space-around;
+}
+
+.ac-sb {
+  align-content: space-between;
+}
+
+.ac-se {
+  align-content: space-evenly;
+}
+
+.jc-c {
+  justify-content: center;
+}
+.jc-fe {
+  justify-content: flex-end;
+}
+.jc-fs {
+  justify-content: flex-start;
+}
+.jc-s {
+  justify-content: stretch;
+}
+
+.ji-c {
+  justify-items: center;
+}
+.ji-fe {
+  justify-items: flex-end;
+}
+.ji-fs {
+  justify-items: flex-start;
+}
+.ji-s {
+  justify-items: stretch;
+}
+
+.js-c {
+  justify-self: center;
+}
+.js-fe {
+  justify-self: flex-end;
+}
+.js-fs {
+  justify-self: flex-start;
+}
+.js-s {
+  justify-self: stretch;
+}
+
+.jc-sa {
+  justify-content: space-around;
+}
+
+.jc-sb {
+  justify-content: space-between;
+}
+
+.jc-se {
+  justify-content: space-evenly;
+}

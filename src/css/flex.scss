@@ -1,26 +1,3 @@
-$alignmentOrigins: (c: 'content', i: 'items', s: 'self');
-$alignmentValues: (c: 'center', fe: 'flex-end', fs: 'flex-start', s: 'stretch');
-$justificationValues: (sa: 'space-around', sb: 'space-between', se: 'space-evenly');
-$types: (a: 'align', j: 'justify');
-
-@each $typeKey, $typeValue in $types {
-	@each $alignmentOriginKey, $alignmentOriginValue in $alignmentOrigins {
-		.#{$typeKey}#{$alignmentOriginKey} {
-			@each $alignmentValueKey, $alignmentValueValue in $alignmentValues {
-				&-#{$alignmentValueKey} {
-					#{$typeValue}-#{$alignmentOriginValue}: #{$alignmentValueValue}
-				}
-			}
-		}
-	}
-
-	@each $justificationValueKey, $justificationValueValue in $justificationValues {
-		.#{$typeKey}c-#{$justificationValueKey} {
-			#{$typeValue}-content: #{$justificationValueValue}
-		}
-	}
-}
-
 .fill {
 	flex: 1;
 }
@@ -74,5 +51,28 @@ $types: (a: 'align', j: 'justify');
 
 	&-nogap {
 		gap: 0;
+	}
+}
+
+$alignmentOrigins: (c: 'content', i: 'items', s: 'self');
+$alignmentValues: (c: 'center', fe: 'flex-end', fs: 'flex-start', s: 'stretch');
+$justificationValues: (sa: 'space-around', sb: 'space-between', se: 'space-evenly');
+$types: (a: 'align', j: 'justify');
+
+@each $typeKey, $typeValue in $types {
+	@each $alignmentOriginKey, $alignmentOriginValue in $alignmentOrigins {
+		.#{$typeKey}#{$alignmentOriginKey} {
+			@each $alignmentValueKey, $alignmentValueValue in $alignmentValues {
+				&-#{$alignmentValueKey} {
+					#{$typeValue}-#{$alignmentOriginValue}: #{$alignmentValueValue}
+				}
+			}
+		}
+	}
+
+	@each $justificationValueKey, $justificationValueValue in $justificationValues {
+		.#{$typeKey}c-#{$justificationValueKey} {
+			#{$typeValue}-content: #{$justificationValueValue}
+		}
 	}
 }
