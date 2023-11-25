@@ -16,7 +16,7 @@
 	"exports": {
 		".": {
 			"types": "./types/index.d.ts",
-			"import": "./dist/atoms.js"
+			"import": "./dist/js/atoms.js"
 		},
 		"./package.json": "./package.json"
 	},
@@ -53,7 +53,7 @@
 	},
 	"type": "module",
 	"types": "./types/index.d.ts",
-	"version": "0.5.1",
+	"version": "0.5.2",
 	"xo": {
 		"envs": [
 			"browser"
