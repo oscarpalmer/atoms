@@ -16,7 +16,7 @@
 	"exports": {
 		".": {
 			"types": "./types/index.d.ts",
-			"import": "./dist/index.js"
+			"import": "./dist/atoms.js"
 		},
 		"./package.json": "./package.json"
 	},
@@ -27,8 +27,8 @@
 	],
 	"keywords": [],
 	"license": "MIT",
-	"main": "./dist/js/index.js",
-	"module": "./dist/js/index.js",
+	"main": "./dist/js/atoms.js",
+	"module": "./dist/js/atoms.js",
 	"name": "@oscarpalmer/atoms",
 	"prettier": {
 		"arrowParens": "avoid",
@@ -53,7 +53,7 @@
 	},
 	"type": "module",
 	"types": "./types/index.d.ts",
-	"version": "0.5.0",
+	"version": "0.5.1",
 	"xo": {
 		"envs": [
 			"browser"
