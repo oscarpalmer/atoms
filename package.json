@@ -16,7 +16,7 @@
 	"exports": {
 		".": {
 			"types": "./types/index.d.ts",
-			"import": "./dist/blixt.js"
+			"import": "./dist/index.js"
 		},
 		"./package.json": "./package.json"
 	},
@@ -43,16 +43,17 @@
 		"url": "git+https://github.com/oscarpalmer/atoms.git"
 	},
 	"scripts": {
-		"build": "npm run build:css && npm run build:js",
+		"build": "npm run build:css && npm run build:js && npm run types",
 		"build:css": "npx sass ./src/css:./dist/css --no-source-map",
-		"build:js": "npx rollup -c",
+		"build:js": "npx bun build ./src/js/index.ts --outfile ./dist/js/atoms.js",
+		"test": "npx bun test --coverage",
 		"types": "npx tsc ./src/js/index.ts --declaration --declarationDir ./types --emitDeclarationOnly",
 		"watch:css": "npx sass ./src/css:./dist/css --no-source-map --watch",
-		"watch:js": "npx rollup -c -w"
+		"watch:js": "npx bun build ./src/js/index.ts --outfile ./dist/js/atoms.js --watch"
 	},
 	"type": "module",
 	"types": "./types/index.d.ts",
-	"version": "0.4.0",
+	"version": "0.5.0",
 	"xo": {
 		"envs": [
 			"browser"
