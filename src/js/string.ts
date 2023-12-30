@@ -1,5 +1,3 @@
-import {isNullable} from './value';
-
 const uuidTemplate = '10000000-1000-4000-8000-100000000000';
 
 /**
@@ -27,5 +25,9 @@ export function getString(value: unknown): string {
 export function isNullableOrWhitespace(
 	value: unknown,
 ): value is undefined | null | '' {
-	return isNullable(value) || getString(value).trim().length === 0;
+	return (
+		value === undefined ||
+		value === null ||
+		getString(value).trim().length === 0
+	);
 }

@@ -5,13 +5,10 @@
 	},
 	"description": "Sweet little atomic goodies…",
 	"devDependencies": {
-		"@rollup/plugin-typescript": "^11.1",
+		"@biomejs/biome": "^1.4",
 		"bun": "^1.0",
-		"prettier": "^3.1",
-		"rollup": "^4.5",
 		"sass": "^1.69",
-		"typescript": "^5.3",
-		"xo": "^0.56"
+		"typescript": "^5.3"
 	},
 	"exports": {
 		".": {
@@ -30,38 +27,20 @@
 	"main": "./dist/js/atoms.js",
 	"module": "./dist/js/atoms.js",
 	"name": "@oscarpalmer/atoms",
-	"prettier": {
-		"arrowParens": "avoid",
-		"bracketSpacing": false,
-		"singleQuote": true,
-		"switchIndent": true,
-		"trailingComma": "all",
-		"useTabs": true
-	},
 	"repository": {
 		"type": "git",
 		"url": "git+https://github.com/oscarpalmer/atoms.git"
 	},
 	"scripts": {
-		"build": "npm run build:css && npm run build:js && npm run types",
-		"build:css": "npx sass ./src/css:./dist/css --no-source-map",
-		"build:js": "npx bun build ./src/js/index.ts --outfile ./dist/js/atoms.js",
-		"test": "npx bun test --coverage",
-		"types": "npx tsc ./src/js/index.ts --declaration --declarationDir ./types --emitDeclarationOnly",
-		"watch:css": "npx sass ./src/css:./dist/css --no-source-map --watch",
-		"watch:js": "npx bun build ./src/js/index.ts --outfile ./dist/js/atoms.js --watch"
+		"build": "bun run build:css && bun run build:js && bun run types",
+		"build:css": "bunx sass ./src/css:./dist/css --no-source-map",
+		"build:js": "bunx bun build ./src/js/index.ts --outfile ./dist/js/atoms.js",
+		"test": "bun test --coverage",
+		"types": "bunx tsc -p ./tsconfig.json",
+		"watch:css": "bunx sass ./src/css:./dist/css --no-source-map --watch",
+		"watch:js": "bun build ./src/js/index.ts --outfile ./dist/js/atoms.js --watch"
 	},
 	"type": "module",
 	"types": "./types/index.d.ts",
-	"version": "0.5.2",
-	"xo": {
-		"envs": [
-			"browser"
-		],
-		"prettier": true,
-		"rules": {
-			"import/extensions": "off",
-			"import/no-cycle": "off"
-		}
-	}
+	"version": "0.6.0"
 }

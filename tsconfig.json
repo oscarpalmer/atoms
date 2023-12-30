@@ -4,16 +4,20 @@
 		"allowJs": true,
 		"allowSyntheticDefaultImports": true,
 		"composite": true,
+		"declaration": true,
+		"declarationDir": "./types",
 		"downlevelIteration": true,
+		"emitDeclarationOnly": true,
 		"forceConsistentCasingInFileNames": true,
 		"jsx": "react-jsx",
-		"lib": ["ESNext"],
+		"lib": ["DOM", "DOM.Iterable", "ESNext"],
 		"module": "esnext",
 		"moduleDetection": "force",
 		"moduleResolution": "bundler",
-		"noEmit": true,
+		"rootDir": "./src/js",
 		"skipLibCheck": true,
 		"strict": true,
-		"target": "ESNext"
-	}
+		"target": "esnext"
+	},
+	"exclude": ["dist", "node_modules", "test", "types", "www"]
 }
