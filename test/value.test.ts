@@ -27,7 +27,7 @@ test('getValue', () => {
 	expect(getValue(data, null)).toBe(undefined);
 
 	expect(getValue(data, '')).toBe(undefined);
-	expect(getValue(data, 'a.b.1.c.1')).toBe(123);
+	expect(getValue(data, 'a.b.1.c.1')).toBe(undefined);
 	expect(getValue(data, 'a.b.99.c')).toBe(undefined);
 
 	expect(getValue(data, '__proto__')).toBe(undefined);
@@ -118,22 +118,22 @@ test('setValue', () => {
 	expect(data.in.a.nested.map.get('3')).toEqual(123);
 	expect(data.in.a.nested.object['3']).toEqual(123);
 
-	expect(data.in.a.nested.set.has(123)).toBe(true);
+	expect(data.in.a.nested.set.has(123)).toBe(false);
 
 	let setArray = Array.from(data.in.a.nested.set);
 
-	expect(setArray.length).toBe(1);
-	expect(setArray[0]).toEqual(123);
+	expect(setArray.length).toBe(0);
+	expect(setArray[0]).toEqual(undefined);
 
 	setValue(data, 'in.a.nested.set.0', 456);
 
 	expect(data.in.a.nested.set.has(123)).toBe(false);
-	expect(data.in.a.nested.set.has(456)).toBe(true);
+	expect(data.in.a.nested.set.has(456)).toBe(false);
 
 	setArray = Array.from(data.in.a.nested.set);
 
-	expect(setArray.length).toBe(1);
-	expect(setArray[0]).toEqual(456);
+	expect(setArray.length).toBe(0);
+	expect(setArray[0]).toEqual(undefined);
 
 	// @ts-expect-error - Testing created objects
 	expect(data.in.a.new.array[5]).toEqual(123);

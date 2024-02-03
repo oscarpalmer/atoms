@@ -45,104 +45,104 @@
   gap: 0;
 }
 
-.ac-c {
+.flex-ac-c {
   align-content: center;
 }
-.ac-fe {
+.flex-ac-fe {
   align-content: flex-end;
 }
-.ac-fs {
+.flex-ac-fs {
   align-content: flex-start;
 }
-.ac-s {
+.flex-ac-s {
   align-content: stretch;
 }
 
-.ai-c {
+.flex-ai-c {
   align-items: center;
 }
-.ai-fe {
+.flex-ai-fe {
   align-items: flex-end;
 }
-.ai-fs {
+.flex-ai-fs {
   align-items: flex-start;
 }
-.ai-s {
+.flex-ai-s {
   align-items: stretch;
 }
 
-.as-c {
+.flex-as-c {
   align-self: center;
 }
-.as-fe {
+.flex-as-fe {
   align-self: flex-end;
 }
-.as-fs {
+.flex-as-fs {
   align-self: flex-start;
 }
-.as-s {
+.flex-as-s {
   align-self: stretch;
 }
 
-.ac-sa {
+.flex-ac-sa {
   align-content: space-around;
 }
 
-.ac-sb {
+.flex-ac-sb {
   align-content: space-between;
 }
 
-.ac-se {
+.flex-ac-se {
   align-content: space-evenly;
 }
 
-.jc-c {
+.flex-jc-c {
   justify-content: center;
 }
-.jc-fe {
+.flex-jc-fe {
   justify-content: flex-end;
 }
-.jc-fs {
+.flex-jc-fs {
   justify-content: flex-start;
 }
-.jc-s {
+.flex-jc-s {
   justify-content: stretch;
 }
 
-.ji-c {
+.flex-ji-c {
   justify-items: center;
 }
-.ji-fe {
+.flex-ji-fe {
   justify-items: flex-end;
 }
-.ji-fs {
+.flex-ji-fs {
   justify-items: flex-start;
 }
-.ji-s {
+.flex-ji-s {
   justify-items: stretch;
 }
 
-.js-c {
+.flex-js-c {
   justify-self: center;
 }
-.js-fe {
+.flex-js-fe {
   justify-self: flex-end;
 }
-.js-fs {
+.flex-js-fs {
   justify-self: flex-start;
 }
-.js-s {
+.flex-js-s {
   justify-self: stretch;
 }
 
-.jc-sa {
+.flex-jc-sa {
   justify-content: space-around;
 }
 
-.jc-sb {
+.flex-jc-sb {
   justify-content: space-between;
 }
 
-.jc-se {
+.flex-jc-se {
   justify-content: space-evenly;
 }

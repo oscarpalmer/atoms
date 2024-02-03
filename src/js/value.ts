@@ -22,10 +22,6 @@ function _getValue(data: ValueObject, key: string): unknown {
 		return data.get(key as never);
 	}
 
-	if (data instanceof Set) {
-		return Array.from(data)[key as never];
-	}
-
 	return data[key as never];
 }
 
@@ -39,39 +35,8 @@ function _setValue(data: ValueObject, key: string, value: unknown): void {
 
 	if (data instanceof Map) {
 		data.set(key as never, value);
-	} else if (data instanceof Set) {
-		_setValueInSet(data, key, value);
 	} else {
 		data[key as never] = value as never;
-	}
-}
-
-/**
- * - Internal function to set a value in a `Set`
- * - If key is not a valid index or if it is greater than or equal to the length of the set, we simply append it to the set
- * - If the index is less than the size of the set, we convert the set to an array, splice the value into the array, and then convert the array back to a set
- */
-function _setValueInSet(data: Set<unknown>, key: string, value: unknown): void {
-	const index = numberExpression.test(key) ? Number.parseInt(key, 10) : -1;
-
-	if (index === -1 || index >= data.size) {
-		data.add(value);
-
-		return;
-	}
-
-	const array = Array.from(data);
-
-	array.splice(index, 1, value);
-
-	data.clear();
-
-	const {length} = array;
-
-	let position = Number(length);
-
-	while (position--) {
-		data.add(array[length - position - 1]);
 	}
 }
 
@@ -97,7 +62,7 @@ export function getValue(data: ValueObject, key: Key): unknown {
 	while (position--) {
 		value = _getValue(value, parts[position]) as ValueObject;
 
-		if (value === undefined) {
+		if (value == null) {
 			break;
 		}
 	}
@@ -116,7 +81,7 @@ export function isArrayOrObject(value: unknown): value is ArrayOrObject {
  * Is the value undefined or null?
  */
 export function isNullable(value: unknown): value is undefined | null {
-	return value === undefined || value === null;
+	return value == null;
 }
 
 /**

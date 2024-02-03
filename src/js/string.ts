@@ -16,7 +16,11 @@ export function createUuid(): string {
  * Get the string value from any value
  */
 export function getString(value: unknown): string {
-	return typeof value === 'string' ? value : String(value);
+	return typeof value === 'string'
+		? value
+		: typeof value?.toString === 'function'
+		  ? value.toString()
+		  : String(value);
 }
 
 /**
@@ -25,9 +29,5 @@ export function getString(value: unknown): string {
 export function isNullableOrWhitespace(
 	value: unknown,
 ): value is undefined | null | '' {
-	return (
-		value === undefined ||
-		value === null ||
-		getString(value).trim().length === 0
-	);
+	return value == null || getString(value).trim().length === 0;
 }

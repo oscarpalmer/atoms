@@ -5,9 +5,10 @@
 	},
 	"description": "Sweet little atomic goodies…",
 	"devDependencies": {
-		"@biomejs/biome": "^1.4",
+		"@biomejs/biome": "^1.5",
+		"@happy-dom/global-registrator": "^13.3",
 		"bun": "^1.0",
-		"sass": "^1.69",
+		"sass": "^1.70",
 		"typescript": "^5.3"
 	},
 	"exports": {
@@ -17,11 +18,7 @@
 		},
 		"./package.json": "./package.json"
 	},
-	"files": [
-		"dist",
-		"src",
-		"types"
-	],
+	"files": ["dist", "src", "types"],
 	"keywords": [],
 	"license": "MIT",
 	"main": "./dist/js/atoms.js",
@@ -35,12 +32,12 @@
 		"build": "bun run build:css && bun run build:js && bun run types",
 		"build:css": "bunx sass ./src/css:./dist/css --no-source-map",
 		"build:js": "bunx bun build ./src/js/index.ts --outfile ./dist/js/atoms.js",
-		"test": "bun test --coverage",
+		"test": "bun test --preload ./test/_preload.ts --coverage",
 		"types": "bunx tsc -p ./tsconfig.json",
 		"watch:css": "bunx sass ./src/css:./dist/css --no-source-map --watch",
 		"watch:js": "bun build ./src/js/index.ts --outfile ./dist/js/atoms.js --watch"
 	},
 	"type": "module",
 	"types": "./types/index.d.ts",
-	"version": "0.6.0"
+	"version": "0.7.0"
 }

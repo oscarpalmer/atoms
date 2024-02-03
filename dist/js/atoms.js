@@ -1,12 +1,105 @@
+// src/js/element.ts
+function findParentElement(origin, selector) {
+  if (origin == null || selector == null) {
+    return;
+  }
+  function matches(element) {
+    return typeof selector === "string" ? element.matches?.(selector) ?? false : typeof selector === "function" ? selector(element) : false;
+  }
+  if (matches(origin)) {
+    return origin;
+  }
+  let parent = origin.parentElement;
+  while (parent != null && !matches(parent)) {
+    if (parent === document.body) {
+      return;
+    }
+    parent = parent.parentElement;
+  }
+  return parent ?? undefined;
+}
+function getElementUnderPointer(all) {
+  const elements = Array.from(document.querySelectorAll(":hover")).filter((element) => {
+    const style = window.getComputedStyle(element);
+    return element.tagName !== "HEAD" && (typeof all === "boolean" && all ? true : style.pointerEvents !== "none" && style.visibility !== "hidden");
+  });
+  return elements[elements.length - 1];
+}
+// src/js/event.ts
+function getPosition(event) {
+  let x;
+  let y;
+  if (event instanceof MouseEvent) {
+    x = event.clientX;
+    y = event.clientY;
+  } else if (event instanceof TouchEvent) {
+    x = event.touches[0]?.clientX;
+    y = event.touches[0]?.clientY;
+  }
+  return typeof x === "number" && typeof y === "number" ? { x, y } : undefined;
+}
+var supportsTouch = (() => {
+  let value = false;
+  try {
+    if ("matchMedia" in window) {
+      const media = matchMedia("(pointer: coarse)");
+      if (typeof media?.matches === "boolean") {
+        value = media.matches;
+      }
+    }
+    if (!value) {
+      value = "ontouchstart" in window || navigator.maxTouchPoints > 0 || (navigator.msMaxTouchPoints ?? 0) > 0;
+    }
+  } catch {
+    value = false;
+  }
+  return value;
+})();
+// src/js/number.ts
+function clampNumber(value, min, max) {
+  return Math.min(Math.max(getNumber(value), getNumber(min)), getNumber(max));
+}
+function getNumber(value) {
+  if (typeof value === "number") {
+    return value;
+  }
+  if (typeof value === "symbol") {
+    return NaN;
+  }
+  let parsed = value?.valueOf?.() ?? value;
+  if (typeof parsed === "object") {
+    parsed = parsed?.toString() ?? parsed;
+  }
+  if (typeof parsed !== "string") {
+    return parsed == null ? NaN : typeof parsed === "number" ? parsed : +parsed;
+  }
+  if (zeroPattern.test(parsed)) {
+    return 0;
+  }
+  const trimmed = parsed.trim();
+  if (trimmed.length === 0) {
+    return NaN;
+  }
+  const isBinary = binaryPattern.test(trimmed);
+  if (isBinary || octalPattern.test(trimmed)) {
+    return parseInt(trimmed.slice(2), isBinary ? 2 : 8);
+  }
+  return +(hexadecimalPattern.test(trimmed) ? trimmed : trimmed.replace(separatorPattern, ""));
+}
+var binaryPattern = /^0b[01]+$/i;
+var hexadecimalPattern = /^0x[0-9a-f]+$/i;
+var octalPattern = /^0o[0-7]+$/i;
+var separatorPattern = /_/g;
+var zeroPattern = /^\s*0+\s*$/;
 // src/js/string.ts
 function createUuid() {
   return uuidTemplate.replace(/[018]/g, (substring) => (substring ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> substring / 4).toString(16));
 }
 function getString(value) {
-  return typeof value === "string" ? value : String(value);
+  return typeof value === "string" ? value : typeof value?.toString === "function" ? value.toString() : String(value);
 }
 function isNullableOrWhitespace(value) {
-  return value === undefined || value === null || getString(value).trim().length === 0;
+  return value == null || getString(value).trim().length === 0;
 }
 var uuidTemplate = "10000000-1000-4000-8000-100000000000";
 // src/js/value.ts
@@ -17,9 +110,6 @@ var _getValue = function(data, key) {
   if (data instanceof Map) {
     return data.get(key);
   }
-  if (data instanceof Set) {
-    return Array.from(data)[key];
-  }
   return data[key];
 };
 var _setValue = function(data, key, value) {
@@ -28,25 +118,8 @@ var _setValue = function(data, key, value) {
   }
   if (data instanceof Map) {
     data.set(key, value);
-  } else if (data instanceof Set) {
-    _setValueInSet(data, key, value);
   } else {
     data[key] = value;
-  }
-};
-var _setValueInSet = function(data, key, value) {
-  const index = numberExpression.test(key) ? Number.parseInt(key, 10) : -1;
-  if (index === -1 || index >= data.size) {
-    data.add(value);
-    return;
-  }
-  const array = Array.from(data);
-  array.splice(index, 1, value);
-  data.clear();
-  const { length } = array;
-  let position = Number(length);
-  while (position--) {
-    data.add(array[length - position - 1]);
   }
 };
 function getValue(data, key) {
@@ -58,7 +131,7 @@ function getValue(data, key) {
   let value = data;
   while (position--) {
     value = _getValue(value, parts[position]);
-    if (value === undefined) {
+    if (value == null) {
       break;
     }
   }
@@ -68,7 +141,7 @@ function isArrayOrObject(value) {
   return constructors.has(value?.constructor?.name);
 }
 function isNullable(value) {
-  return value === undefined || value === null;
+  return value == null;
 }
 function isObject(value) {
   return value?.constructor?.name === objectConstructor;
@@ -100,6 +173,7 @@ var objectConstructor = "Object";
 var constructors = new Set(["Array", objectConstructor]);
 var numberExpression = /^\d+$/;
 export {
+  supportsTouch,
   setValue,
   isObject,
   isNullableOrWhitespace,
@@ -107,5 +181,10 @@ export {
   isArrayOrObject,
   getValue,
   getString,
-  createUuid
+  getPosition,
+  getNumber,
+  getElementUnderPointer,
+  findParentElement,
+  createUuid,
+  clampNumber
 };
