@@ -18,10 +18,10 @@ function findParentElement(origin, selector) {
   }
   return parent ?? undefined;
 }
-function getElementUnderPointer(all) {
+function getElementUnderPointer(skipIgnore) {
   const elements = Array.from(document.querySelectorAll(":hover")).filter((element) => {
     const style = window.getComputedStyle(element);
-    return element.tagName !== "HEAD" && (typeof all === "boolean" && all ? true : style.pointerEvents !== "none" && style.visibility !== "hidden");
+    return element.tagName !== "HEAD" && (typeof skipIgnore === "boolean" && skipIgnore ? true : style.pointerEvents !== "none" && style.visibility !== "hidden");
   });
   return elements[elements.length - 1];
 }

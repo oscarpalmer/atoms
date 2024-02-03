@@ -6,6 +6,6 @@ export declare function findParentElement(origin: Element, selector: string | ((
 /**
  * - Get the most specific element under the pointer
  * - Ignores elements with `pointer-events: none` and `visibility: hidden`
- * - If `all` is `true`, all elements under the pointer are returned
+ * - If `skipIgnore` is `true`, no elements are ignored
  */
-export declare function getElementUnderPointer(all?: boolean): Element | undefined;
+export declare function getElementUnderPointer(skipIgnore?: boolean): Element | undefined;

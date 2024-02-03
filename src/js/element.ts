@@ -38,16 +38,18 @@ export function findParentElement(
 /**
  * - Get the most specific element under the pointer
  * - Ignores elements with `pointer-events: none` and `visibility: hidden`
- * - If `all` is `true`, all elements under the pointer are returned
+ * - If `skipIgnore` is `true`, no elements are ignored
  */
-export function getElementUnderPointer(all?: boolean): Element | undefined {
+export function getElementUnderPointer(
+	skipIgnore?: boolean,
+): Element | undefined {
 	const elements = Array.from(document.querySelectorAll(':hover')).filter(
 		element => {
 			const style = window.getComputedStyle(element);
 
 			return (
 				element.tagName !== 'HEAD' &&
-				(typeof all === 'boolean' && all
+				(typeof skipIgnore === 'boolean' && skipIgnore
 					? true
 					: style.pointerEvents !== 'none' && style.visibility !== 'hidden')
 			);
