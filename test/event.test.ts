@@ -1,6 +1,6 @@
 import {expect, test} from 'bun:test';
 import {getPosition} from '../src/js/event';
-import {supportsTouch} from '../src/js/touch';
+import supportsTouch from '../src/js/touch';
 
 test('getPosition', () => {
 	const event = new MouseEvent('click', {
