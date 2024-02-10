@@ -5,16 +5,15 @@ export type GenericObject = Record<string, unknown>;
 export type Key = number | string;
 export type ValueObject = ArrayOrObject | Map<unknown, unknown> | Set<unknown>;
 
-const badProperties = new Set(['__proto__', 'constructor', 'prototype']);
-const objectConstructor = 'Object';
-const constructors = new Set(['Array', objectConstructor]);
-const numberExpression = /^\d+$/;
-
 /**
  * Internal function to get a value from an object
  */
 function _getValue(data: ValueObject, key: string): unknown {
-	if (typeof data !== 'object' || data === null || badProperties.has(key)) {
+	if (
+		typeof data !== 'object' ||
+		data === null ||
+		/^(__proto__|constructor|prototype)$/i.test(key)
+	) {
 		return undefined;
 	}
 
@@ -29,7 +28,11 @@ function _getValue(data: ValueObject, key: string): unknown {
  * Internal function to set a value in an object
  */
 function _setValue(data: ValueObject, key: string, value: unknown): void {
-	if (typeof data !== 'object' || data === null || badProperties.has(key)) {
+	if (
+		typeof data !== 'object' ||
+		data === null ||
+		/^(__proto__|constructor|prototype)$/i.test(key)
+	) {
 		return;
 	}
 
@@ -74,7 +77,7 @@ export function getValue(data: ValueObject, key: Key): unknown {
  * Is the value an array or a generic object?
  */
 export function isArrayOrObject(value: unknown): value is ArrayOrObject {
-	return constructors.has((value as ArrayOrObject)?.constructor?.name);
+	return /^(array|object)$/i.test((value as ArrayOrObject)?.constructor?.name);
 }
 
 /**
@@ -88,7 +91,7 @@ export function isNullable(value: unknown): value is undefined | null {
  * Is the value a generic object?
  */
 export function isObject(value: unknown): value is GenericObject {
-	return (value as GenericObject)?.constructor?.name === objectConstructor;
+	return (value as GenericObject)?.constructor?.name === 'Object';
 }
 
 /**
@@ -127,7 +130,7 @@ export function setValue<Model extends ValueObject>(
 		let next = _getValue(target, key);
 
 		if (typeof next !== 'object' || next === null) {
-			next = numberExpression.test(parts[position - 1]) ? [] : {};
+			next = /^\d+$/.test(parts[position - 1]) ? [] : {};
 
 			target[key] = next as never;
 		}

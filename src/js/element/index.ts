@@ -1,8 +1,5 @@
 type TextDirection = 'ltr' | 'rtl';
 
-const directionPattern = /^(ltr|rtl)$/i;
-const headPattern = /^head$/i;
-
 /**
  * - Find the parent element that matches the selector
  * - Matches may be found by a query string or a callback
@@ -50,7 +47,7 @@ export function getElementUnderPointer(
 ): Element | undefined {
 	const elements = Array.from(document.querySelectorAll(':hover')).filter(
 		element => {
-			if (headPattern.test(element.tagName)) {
+			if (/^head$/i.test(element.tagName)) {
 				return false;
 			}
 
@@ -70,10 +67,10 @@ export function getElementUnderPointer(
  * Get the text direction of an element
  */
 export function getTextDirection(element: Element): TextDirection {
-	const attribute = element.getAttribute('dir');
+	const direction = element.getAttribute('dir');
 
-	if (attribute !== null && directionPattern.test(attribute)) {
-		return attribute.toLowerCase() as TextDirection;
+	if (direction !== null && /^(ltr|rtl)$/i.test(direction)) {
+		return direction.toLowerCase() as TextDirection;
 	}
 
 	return (

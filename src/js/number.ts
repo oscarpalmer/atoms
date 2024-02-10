@@ -1,8 +1,3 @@
-const binaryPattern = /^0b[01]+$/i;
-const hexadecimalPattern = /^0x[0-9a-f]+$/i;
-const octalPattern = /^0o[0-7]+$/i;
-const separatorPattern = /_/g;
-const zeroPattern = /^\s*0+\s*$/;
 
 /**
  * Clamps a number between a minimum and maximum value
@@ -34,7 +29,7 @@ export function getNumber(value: unknown): number {
 		return parsed == null ? NaN : typeof parsed === 'number' ? parsed : +parsed;
 	}
 
-	if (zeroPattern.test(parsed)) {
+	if (/^\s*0+\s*$/.test(parsed)) {
 		return 0;
 	}
 
@@ -44,13 +39,11 @@ export function getNumber(value: unknown): number {
 		return NaN;
 	}
 
-	const isBinary = binaryPattern.test(trimmed);
+	const isBinary = /^0b[01]+$/i.test(trimmed);
 
-	if (isBinary || octalPattern.test(trimmed)) {
+	if (isBinary || /^0o[0-7]+$/i.test(trimmed)) {
 		return parseInt(trimmed.slice(2), isBinary ? 2 : 8);
 	}
 
-	return +(hexadecimalPattern.test(trimmed)
-		? trimmed
-		: trimmed.replace(separatorPattern, ''));
+	return +(/^0x[0-9a-f]+$/i.test(trimmed) ? trimmed : trimmed.replace(/_/g, ''));
 }
