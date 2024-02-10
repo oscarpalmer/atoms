@@ -1,40 +1,7 @@
-type NavigatorWithMsMaxTouchPoints = Navigator & {
-	msMaxTouchPoints: number;
-};
-
 type Position = {
 	x: number;
 	y: number;
 };
-
-/**
- * Does the browser support touch events?
- */
-export const supportsTouch = (() => {
-	let value = false;
-
-	try {
-		if ('matchMedia' in window) {
-			const media = matchMedia('(pointer: coarse)');
-
-			if (typeof media?.matches === 'boolean') {
-				value = media.matches;
-			}
-		}
-
-		if (!value) {
-			value =
-				'ontouchstart' in window ||
-				navigator.maxTouchPoints > 0 ||
-				((navigator as NavigatorWithMsMaxTouchPoints).msMaxTouchPoints ?? 0) >
-					0;
-		}
-	} catch {
-		value = false;
-	}
-
-	return value;
-})();
 
 /**
  * Get the X- and Y-coordinates from a pointer event

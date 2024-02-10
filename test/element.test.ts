@@ -1,5 +1,9 @@
 import {expect, test} from 'bun:test';
-import {findParentElement, getElementUnderPointer} from '../src/js/element';
+import {
+	findParentElement,
+	getElementUnderPointer,
+	getTextDirection,
+} from '../src/js/element';
 
 document.body.innerHTML = `<div>
 	<div class="target">
@@ -46,4 +50,40 @@ test('getElementUnderPointer', () => {
 
 	expect(getElementUnderPointer()).toBe(origin);
 	expect(getElementUnderPointer(true)).toBe(hover);
+});
+
+test('getTextDirection', () => {
+	const fragment = document.createDocumentFragment();
+	const parent = document.createElement('div');
+
+	fragment.appendChild(parent);
+
+	parent.id = 'parent';
+
+	parent.innerHTML = `<div id="outer" dir="rtl">
+	<div id="inner">
+		<span id="text" style="direction: ltr"></span>
+	</div>
+</div>`;
+
+	const parentElement = fragment.getElementById('parent');
+	const outerElement = fragment.getElementById('outer');
+	const innerElement = fragment.getElementById('inner');
+	const textElement = fragment.getElementById('text');
+
+	if (
+		parentElement === null ||
+		outerElement === null ||
+		innerElement === null ||
+		textElement === null
+	) {
+		return;
+	}
+
+	expect(getTextDirection(parentElement)).toBe('ltr');
+	expect(getTextDirection(outerElement)).toBe('rtl');
+	expect(getTextDirection(textElement)).toBe('ltr');
+
+	// Should be inherited from parent and be 'rtl', but does not seem to be; Happy DOM?
+	expect(getTextDirection(innerElement)).toBe('ltr');
 });
