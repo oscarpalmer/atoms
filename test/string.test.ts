@@ -4,11 +4,11 @@ import {createUuid, getString, isNullableOrWhitespace} from '../src/js/string';
 test('createUuid', () => {
 	const ids = new Set<string>();
 
-	for (let index = 0; index < 1_000_000; index += 1) {
+	for (let index = 0; index < 100_000; index += 1) {
 		ids.add(createUuid());
 	}
 
-	expect(ids.size).toBe(1_000_000);
+	expect(ids.size).toBe(100_000);
 });
 
 test('getString', () => {

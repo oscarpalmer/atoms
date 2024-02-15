@@ -14,40 +14,66 @@
 	"exports": {
 		".": {
 			"types": "./types/index.d.ts",
-			"import": "./dist/js/atoms.js"
+			"import": "./dist/js/index.js"
+		},
+		"./element": {
+			"types": "./types/element/index.d.ts",
+			"import": "./dist/js/element.index.js"
+		},
+		"./event": {
+			"types": "./types/event.d.ts",
+			"import": "./dist/js/event.js"
 		},
 		"./focusable": {
 			"types": "./types/element/focusable.d.ts",
 			"import": "./dist/js/focusable.js"
 		},
+		"./number": {
+			"types": "./types/number.d.ts",
+			"import": "./dist/js/number.js"
+		},
+		"./string": {
+			"types": "./types/string.d.ts",
+			"import": "./dist/js/string.js"
+		},
 		"./supports-touch": {
 			"types": "./types/touch.d.ts",
 			"import": "./dist/js/touch.js"
 		},
+		"./timer": {
+			"types": "./types/timer.d.ts",
+			"import": "./dist/js/timer.js"
+		},
+		"./value": {
+			"types": "./types/value.d.ts",
+			"import": "./dist/js/value.js"
+		},
 		"./package.json": "./package.json"
 	},
-	"files": ["dist", "src", "types"],
+	"files": [
+		"dist",
+		"src",
+		"types"
+	],
 	"keywords": [],
 	"license": "MIT",
-	"main": "./dist/js/atoms.js",
-	"module": "./dist/js/atoms.js",
-	"name": "@oscarpalmer/atoms",
+	"main": "./dist/js/index.js",
+	"module": "./dist/js/index.js",
+	"name": "@oscarpalmer/index",
 	"repository": {
 		"type": "git",
 		"url": "git+https://github.com/oscarpalmer/atoms.git"
 	},
 	"scripts": {
-		"build": "bun run build:css && bun run build:js && bun run build:js-focusable && bun run build:js-touch && bun run types",
+		"build": "bun run build:css && bun run build:js && bun run types",
 		"build:css": "bunx sass ./src/css:./dist/css --no-source-map",
-		"build:js": "bunx bun build ./src/js/index.ts --outfile ./dist/js/atoms.js",
-		"build:js-focusable": "bunx bun build ./src/js/element/focusable.ts --outfile ./dist/js/focusable.js",
-		"build:js-touch": "bunx bun build ./src/js/touch.ts --outfile ./dist/js/touch.js",
+		"build:js": "bunx bun ./.bun.ts",
 		"test": "bun test --preload ./test/_preload.ts --coverage",
 		"types": "bunx tsc -p ./tsconfig.json",
 		"watch:css": "bunx sass ./src/css:./dist/css --no-source-map --watch",
-		"watch:js": "bun build ./src/js/index.ts --outfile ./dist/js/atoms.js --watch"
+		"watch:js": "bun build ./src/js/index.ts --outfile ./dist/js/index.js --watch"
 	},
 	"type": "module",
 	"types": "./types/index.d.ts",
-	"version": "0.9.1"
+	"version": "0.10.0"
 }

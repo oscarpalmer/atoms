@@ -1,7 +1,14 @@
+type Selector = string | Element | Element[] | NodeList;
 type TextDirection = 'ltr' | 'rtl';
+/**
+ * - Find elements that match the selector
+ * - `context` is optional and defaults to `document`
+ */
+export declare function findElements(selector: Selector, context?: Selector): Element[];
 /**
  * - Find the parent element that matches the selector
  * - Matches may be found by a query string or a callback
+ * - If no match is found, `undefined` is returned
  */
 export declare function findParentElement(origin: Element, selector: string | ((element: Element) => boolean)): Element | undefined;
 /**

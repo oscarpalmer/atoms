@@ -1,5 +1,6 @@
 import {expect, test} from 'bun:test';
 import {
+	findElements,
 	findParentElement,
 	getElementUnderPointer,
 	getTextDirection,
@@ -10,10 +11,26 @@ document.body.innerHTML = `<div>
 		<div hidden>
 			<div id="origin">
 				<span id="hover" style="pointer-events: none"></span>
+				<!-- This is a comment -->
 			</div>
 		</div>
 	</div>
 </div>`;
+
+test('findElements', () => {
+	const elements = findElements('.target');
+
+	expect(elements.length).toBe(1);
+	expect(elements[0].classList.contains('target')).toBe(true);
+
+	const origin = findElements('#origin', '.target');
+
+	expect(origin.length).toBe(1);
+
+	const children = findElements('*', origin);
+
+	expect(children.length).toBe(1);
+});
 
 test('findParentElement', () => {
 	const hidden = document.querySelector('[hidden]');

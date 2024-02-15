@@ -1,8 +1,50 @@
+type Selector = string | Element | Element[] | NodeList;
+
 type TextDirection = 'ltr' | 'rtl';
+
+/**
+ * - Find elements that match the selector
+ * - `context` is optional and defaults to `document`
+ */
+export function findElements(
+	selector: Selector,
+	context?: Selector,
+): Element[] {
+	const contexts = context === undefined ? [document] : findElements(context);
+
+	const elements: Element[] = [];
+
+	if (typeof selector === 'string') {
+		for (const context of contexts) {
+			elements.push(
+				...Array.from((context as Element).querySelectorAll(selector) ?? []),
+			);
+		}
+
+		return elements;
+	}
+
+	const nodes =
+		Array.isArray(selector) || selector instanceof NodeList
+			? selector
+			: [selector];
+
+	for (const node of nodes) {
+		if (
+			node instanceof Element &&
+			contexts.some(context => context.contains(node))
+		) {
+			elements.push(node);
+		}
+	}
+
+	return elements;
+}
 
 /**
  * - Find the parent element that matches the selector
  * - Matches may be found by a query string or a callback
+ * - If no match is found, `undefined` is returned
  */
 export function findParentElement(
 	origin: Element,
