@@ -1,5 +1,7 @@
 import * as fs from 'fs/promises';
 
+const isMjs = process.argv.includes('--mjs');
+
 async function getFiles(path: string): Promise<string[]> {
 	const entries = await fs.readdir(path, {withFileTypes: true});
 
@@ -19,6 +21,8 @@ async function getFiles(path: string): Promise<string[]> {
 getFiles('./src/js/').then(files =>
 	Bun.build({
 		entrypoints: files,
+		external: isMjs ? ['*'] : [],
+		naming: isMjs ? '[dir]/[name].mjs' : undefined,
 		outdir: './dist/js',
 		root: './src/js',
 	}),

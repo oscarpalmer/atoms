@@ -13,40 +13,58 @@
 	},
 	"exports": {
 		".": {
-			"types": "./types/index.d.ts",
-			"import": "./dist/js/index.js"
+			"bun": "./src/js/index.ts",
+			"import": "./dist/js/index.js",
+			"require": "./dist/js/index.js",
+			"types": "./types/index.d.ts"
 		},
 		"./element": {
-			"types": "./types/element/index.d.ts",
-			"import": "./dist/js/element.index.js"
+			"bun": "./src/js/element/index.ts",
+			"import": "./dist/js/element.index.mjs",
+			"require": "./dist/js/element.index.js",
+			"types": "./types/element/index.d.ts"
 		},
 		"./event": {
-			"types": "./types/event.d.ts",
-			"import": "./dist/js/event.js"
+			"bun": "./src/js/event.ts",
+			"import": "./dist/js/event.mjs",
+			"require": "./dist/js/event.js",
+			"types": "./types/event.d.ts"
 		},
 		"./focusable": {
-			"types": "./types/element/focusable.d.ts",
-			"import": "./dist/js/focusable.js"
+			"bun": "./src/js/focusable.ts",
+			"import": "./dist/js/focusable.mjs",
+			"require": "./dist/js/focusable.js",
+			"types": "./types/element/focusable.d.ts"
 		},
 		"./number": {
-			"types": "./types/number.d.ts",
-			"import": "./dist/js/number.js"
+			"bun": "./src/js/number.ts",
+			"import": "./dist/js/number.mjs",
+			"require": "./dist/js/number.js",
+			"types": "./types/number.d.ts"
 		},
 		"./string": {
-			"types": "./types/string.d.ts",
-			"import": "./dist/js/string.js"
+			"bun": "./src/js/string.ts",
+			"import": "./dist/js/string.mjs",
+			"require": "./dist/js/string.js",
+			"types": "./types/string.d.ts"
 		},
 		"./supports-touch": {
-			"types": "./types/touch.d.ts",
-			"import": "./dist/js/touch.js"
+			"bun": "./src/js/touch.ts",
+			"import": "./dist/js/touch.mjs",
+			"require": "./dist/js/touch.js",
+			"types": "./types/touch.d.ts"
 		},
 		"./timer": {
-			"types": "./types/timer.d.ts",
-			"import": "./dist/js/timer.js"
+			"bun": "./src/js/timer.ts",
+			"import": "./dist/js/timer.mjs",
+			"require": "./dist/js/timer.js",
+			"types": "./types/timer.d.ts"
 		},
 		"./value": {
-			"types": "./types/value.d.ts",
-			"import": "./dist/js/value.js"
+			"bun": "./src/js/value.ts",
+			"import": "./dist/js/value.mjs",
+			"require": "./dist/js/value.js",
+			"types": "./types/value.d.ts"
 		},
 		"./package.json": "./package.json"
 	},
@@ -65,9 +83,10 @@
 		"url": "git+https://github.com/oscarpalmer/atoms.git"
 	},
 	"scripts": {
-		"build": "bun run build:css && bun run build:js && bun run types",
+		"build": "bun run build:css && bun run build:js && bun run build:mjs && bun run types",
 		"build:css": "bunx sass ./src/css:./dist/css --no-source-map",
 		"build:js": "bunx bun ./.bun.ts",
+		"build:mjs": "bunx bun ./.bun.ts --mjs",
 		"test": "bun test --preload ./test/_preload.ts --coverage",
 		"types": "bunx tsc -p ./tsconfig.json",
 		"watch:css": "bunx sass ./src/css:./dist/css --no-source-map --watch",
@@ -75,5 +94,5 @@
 	},
 	"type": "module",
 	"types": "./types/index.d.ts",
-	"version": "0.10.0"
+	"version": "0.11.0"
 }
