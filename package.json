@@ -59,7 +59,7 @@
 	"license": "MIT",
 	"main": "./dist/js/index.js",
 	"module": "./dist/js/index.js",
-	"name": "@oscarpalmer/index",
+	"name": "@oscarpalmer/atoms",
 	"repository": {
 		"type": "git",
 		"url": "git+https://github.com/oscarpalmer/atoms.git"
