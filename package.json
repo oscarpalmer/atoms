@@ -20,8 +20,8 @@
 		},
 		"./element": {
 			"bun": "./src/js/element/index.ts",
-			"import": "./dist/js/element.index.mjs",
-			"require": "./dist/js/element.index.js",
+			"import": "./dist/js/element/index.mjs",
+			"require": "./dist/js/element/index.js",
 			"types": "./types/element/index.d.ts"
 		},
 		"./event": {
@@ -31,9 +31,9 @@
 			"types": "./types/event.d.ts"
 		},
 		"./focusable": {
-			"bun": "./src/js/focusable.ts",
-			"import": "./dist/js/focusable.mjs",
-			"require": "./dist/js/focusable.js",
+			"bun": "./src/js/element/focusable.ts",
+			"import": "./dist/js/element/focusable.mjs",
+			"require": "./dist/js/element/focusable.js",
 			"types": "./types/element/focusable.d.ts"
 		},
 		"./number": {
@@ -94,5 +94,5 @@
 	},
 	"type": "module",
 	"types": "./types/index.d.ts",
-	"version": "0.11.0"
+	"version": "0.11.1"
 }
