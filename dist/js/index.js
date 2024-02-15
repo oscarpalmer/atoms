@@ -111,52 +111,17 @@ function getNumber(value) {
 // src/js/timer.ts
 function repeat(callback, options) {
   const count = typeof options?.count === "number" ? options.count : Infinity;
-  return timer(callback, { ...{ count }, ...options ?? {} }).start();
+  return new Timer(callback, { ...options ?? {}, ...{ count } }).start();
 }
-var timer = function(callback, config) {
-  const options = {
-    afterCallback: typeof config.afterCallback === "function" ? config.afterCallback : undefined,
-    callback,
-    count: typeof config.count === "number" && config.count >= 1 ? config.count : 1,
-    interval: typeof config.interval === "number" && config.interval >= 0 ? config.interval : 0
-  };
-  const state = {
-    active: false
-  };
-  const timer2 = Object.create(null);
-  Object.defineProperties(timer2, {
-    active: {
-      get() {
-        return state.active;
-      }
-    },
-    restart: {
-      value() {
-        return work("restart", timer2, state, options);
-      }
-    },
-    start: {
-      value() {
-        return work("start", timer2, state, options);
-      }
-    },
-    stop: {
-      value() {
-        return work("stop", timer2, state, options);
-      }
-    }
-  });
-  return timer2;
-};
 function wait(callback, time) {
-  return timer(callback, {
+  return new Timer(callback, {
     count: 1,
     interval: time
   }).start();
 }
-var work = function(type, timer2, state, options) {
-  if (type === "start" && timer2.active || type === "stop" && !timer2.active) {
-    return timer2;
+var work = function(type, timer, state, options) {
+  if (type === "start" && timer.active || type === "stop" && !timer.active) {
+    return timer;
   }
   const { afterCallback, callback, count, interval } = options;
   if (typeof state.frame === "number") {
@@ -166,7 +131,7 @@ var work = function(type, timer2, state, options) {
   if (type === "stop") {
     state.active = false;
     state.frame = undefined;
-    return timer2;
+    return timer;
   }
   state.active = true;
   const isRepeated = count > 0;
@@ -198,8 +163,34 @@ var work = function(type, timer2, state, options) {
     state.frame = requestAnimationFrame(step);
   }
   state.frame = requestAnimationFrame(step);
-  return timer2;
+  return timer;
 };
+
+class Timer {
+  get active() {
+    return this.state.active;
+  }
+  constructor(callback, options) {
+    this.options = {
+      afterCallback: options.afterCallback,
+      callback,
+      count: typeof options.count === "number" && options.count > 0 ? options.count : 1,
+      interval: typeof options.interval === "number" && options.interval >= 0 ? options.interval : 0
+    };
+    this.state = {
+      active: false
+    };
+  }
+  restart() {
+    return work("restart", this, this.state, this.options);
+  }
+  start() {
+    return work("start", this, this.state, this.options);
+  }
+  stop() {
+    return work("stop", this, this.state, this.options);
+  }
+}
 
 // src/js/element/index.ts
 function findElements(selector, context) {

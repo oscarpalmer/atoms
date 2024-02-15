@@ -25,25 +25,6 @@ type Options = {
 	interval?: number;
 };
 
-type Timer = {
-	/**
-	 * Is the timer running?
-	 */
-	get active(): boolean;
-	/**
-	 * Restarts the timer
-	 */
-	restart: () => Timer;
-	/**
-	 * Starts the timer
-	 */
-	start: () => Timer;
-	/**
-	 * Stops the timer
-	 */
-	stop: () => Timer;
-};
-
 type TimerOptions = {
 	afterCallback?: AfterCallback;
 	callback: IndexedCallback;
@@ -59,6 +40,61 @@ type TimerState = {
 type WorkType = 'restart' | 'start' | 'stop';
 
 /**
+ * A timer that can be started, stopped, and restarted as neeeded
+ */
+class Timer {
+	private declare readonly state: TimerState;
+	private declare readonly options: TimerOptions;
+
+	/**
+	 * Is the timer running?
+	 */
+	get active(): boolean {
+		return this.state.active;
+	}
+
+	constructor(callback: IndexedCallback, options: Options) {
+		this.options = {
+			afterCallback: options.afterCallback,
+			callback,
+			count:
+				typeof options.count === 'number' && options.count > 0
+					? options.count
+					: 1,
+			interval:
+				typeof options.interval === 'number' && options.interval >= 0
+					? options.interval
+					: 0,
+		};
+
+		this.state = {
+			active: false,
+		};
+	}
+
+	/**
+	 * Restarts the timer
+	 */
+	restart(): Timer {
+		return work('restart', this, this.state, this.options);
+	}
+
+	/**
+	 * Starts the timer
+	 */
+	start(): Timer {
+		return work('start', this, this.state, this.options);
+	}
+
+	/**
+	 * Stops the timer
+	 */
+	stop(): Timer {
+		return work('stop', this, this.state, this.options);
+	}
+}
+
+/**
  * - Creates a timer which calls a callback after a certain amount of time, and repeats it a certain amount of times, with an optional callback after it's finished (or stopped)
  * - `options.count` defaults to `Infinity`
  * - `options.time` defaults to `0`
@@ -70,54 +106,7 @@ export function repeat(
 ): Timer {
 	const count = typeof options?.count === 'number' ? options.count : Infinity;
 
-	return timer(callback, {...{count}, ...(options ?? {})}).start();
-}
-
-function timer(callback: IndexedCallback, config: Options): Timer {
-	const options: TimerOptions = {
-		afterCallback:
-			typeof config.afterCallback === 'function'
-				? config.afterCallback
-				: undefined,
-		callback,
-		count:
-			typeof config.count === 'number' && config.count >= 1 ? config.count : 1,
-		interval:
-			typeof config.interval === 'number' && config.interval >= 0
-				? config.interval
-				: 0,
-	};
-
-	const state: TimerState = {
-		active: false,
-	};
-
-	const timer = Object.create(null);
-
-	Object.defineProperties(timer, {
-		active: {
-			get() {
-				return state.active;
-			},
-		},
-		restart: {
-			value() {
-				return work('restart', timer, state, options);
-			},
-		},
-		start: {
-			value() {
-				return work('start', timer, state, options);
-			},
-		},
-		stop: {
-			value() {
-				return work('stop', timer, state, options);
-			},
-		},
-	});
-
-	return timer;
+	return new Timer(callback, {...(options ?? {}), ...{count}}).start();
 }
 
 /**
@@ -125,7 +114,7 @@ function timer(callback: IndexedCallback, config: Options): Timer {
  * - `time` defaults to `0`
  */
 export function wait(callback: () => void, time?: number): Timer {
-	return timer(callback, {
+	return new Timer(callback, {
 		count: 1,
 		interval: time,
 	}).start();

@@ -94,5 +94,5 @@
 	},
 	"type": "module",
 	"types": "./types/index.d.ts",
-	"version": "0.11.1"
+	"version": "0.12.0"
 }
