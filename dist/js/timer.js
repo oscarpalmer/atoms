@@ -83,5 +83,6 @@ class Timer {
 }
 export {
   wait,
-  repeat
+  repeat,
+  Timer
 };

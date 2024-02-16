@@ -25,7 +25,7 @@ type Options = {
 /**
  * A timer that can be started, stopped, and restarted as neeeded
  */
-declare class Timer {
+export declare class Timer {
     private readonly state;
     private readonly options;
     /**

@@ -42,7 +42,7 @@ type WorkType = 'restart' | 'start' | 'stop';
 /**
  * A timer that can be started, stopped, and restarted as neeeded
  */
-class Timer {
+export class Timer {
 	private declare readonly state: TimerState;
 	private declare readonly options: TimerOptions;
 

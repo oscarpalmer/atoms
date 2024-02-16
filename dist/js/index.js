@@ -277,5 +277,6 @@ export {
   findParentElement,
   findElements,
   createUuid,
-  clampNumber
+  clampNumber,
+  Timer
 };
