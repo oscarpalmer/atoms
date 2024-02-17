@@ -18,12 +18,14 @@ async function getFiles(path: string): Promise<string[]> {
 	return files;
 }
 
-getFiles('./src/js/').then(files =>
-	Bun.build({
-		entrypoints: files,
-		external: isMjs ? ['*'] : [],
-		naming: isMjs ? '[dir]/[name].mjs' : undefined,
-		outdir: './dist/js',
-		root: './src/js',
-	}),
-);
+getFiles('./src/js/').then(async files => {
+	for (const file of files) {
+		await Bun.build({
+			entrypoints: [file],
+			external: isMjs ? ['*'] : [],
+			naming: isMjs ? '[dir]/[name].mjs' : undefined,
+			outdir: './dist/js',
+			root: './src/js',
+		});
+	}
+});

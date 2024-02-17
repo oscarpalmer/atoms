@@ -1,7 +1,4 @@
 // src/js/string.ts
-function createUuid() {
-  return "10000000-1000-4000-8000-100000000000".replace(/[018]/g, (substring) => (substring ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> substring / 4).toString(16));
-}
 function getString(value) {
   return typeof value === "string" ? value : typeof value?.toString === "function" ? value.toString() : String(value);
 }
@@ -33,11 +30,10 @@ function getValue(data, key) {
   if (typeof data !== "object" || data === null || isNullableOrWhitespace(key)) {
     return;
   }
-  const parts = getString(key).split(".").reverse();
-  let position = parts.length;
+  const parts = getString(key).split(".");
   let value = data;
-  while (position--) {
-    value = _getValue(value, parts[position]);
+  for (const part of parts) {
+    value = _getValue(value, part);
     if (value == null) {
       break;
     }
@@ -51,25 +47,23 @@ function isNullable(value) {
   return value == null;
 }
 function isObject(value) {
-  return value?.constructor?.name === "Object";
+  return /^object$/i.test(value?.constructor?.name);
 }
 function setValue(data, key, value) {
   if (typeof data !== "object" || data === null || isNullableOrWhitespace(key)) {
     return data;
   }
-  const parts = getString(key).split(".").reverse();
-  let position = parts.length;
+  const parts = getString(key).split(".");
   let target = data;
-  while (position--) {
-    const key2 = parts[position];
-    if (position === 0) {
-      _setValue(target, key2, value);
+  for (const part of parts) {
+    if (parts.indexOf(part) === parts.length - 1) {
+      _setValue(target, part, value);
       break;
     }
-    let next = _getValue(target, key2);
+    let next = _getValue(target, part);
     if (typeof next !== "object" || next === null) {
-      next = /^\d+$/.test(parts[position - 1]) ? [] : {};
-      target[key2] = next;
+      next = /^\d+$/.test(part) ? [] : {};
+      target[part] = next;
     }
     target = next;
   }

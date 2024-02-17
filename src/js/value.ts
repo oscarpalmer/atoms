@@ -57,13 +57,12 @@ export function getValue(data: ValueObject, key: Key): unknown {
 		return undefined;
 	}
 
-	const parts = getString(key).split('.').reverse();
+	const parts = getString(key).split('.');
 
-	let position = parts.length;
 	let value = data;
 
-	while (position--) {
-		value = _getValue(value, parts[position]) as ValueObject;
+	for (const part of parts) {
+		value = _getValue(value, part) as ValueObject;
 
 		if (value == null) {
 			break;
@@ -91,7 +90,7 @@ export function isNullable(value: unknown): value is undefined | null {
  * Is the value a generic object?
  */
 export function isObject(value: unknown): value is GenericObject {
-	return (value as GenericObject)?.constructor?.name === 'Object';
+	return /^object$/i.test((value as GenericObject)?.constructor?.name);
 }
 
 /**
@@ -113,26 +112,23 @@ export function setValue<Model extends ValueObject>(
 		return data;
 	}
 
-	const parts = getString(key).split('.').reverse();
+	const parts = getString(key).split('.');
 
-	let position = parts.length;
 	let target: ValueObject = data;
 
-	while (position--) {
-		const key = parts[position] as never;
-
-		if (position === 0) {
-			_setValue(target, key, value);
+	for (const part of parts) {
+		if (parts.indexOf(part) === parts.length - 1) {
+			_setValue(target, part, value);
 
 			break;
 		}
 
-		let next = _getValue(target, key);
+		let next = _getValue(target, part);
 
 		if (typeof next !== 'object' || next === null) {
-			next = /^\d+$/.test(parts[position - 1]) ? [] : {};
+			next = /^\d+$/.test(part) ? [] : {};
 
-			target[key] = next as never;
+			target[part as never] = next as never;
 		}
 
 		target = next as ValueObject;

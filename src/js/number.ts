@@ -9,6 +9,7 @@ export function clampNumber(value: number, min: number, max: number): number {
 /**
  * - Gets the number value from an unknown value
  * - Returns `NaN` if the value is `undefined`, `null`, or cannot be parsed
+ * - Based on Lodash :-)
  */
 export function getNumber(value: unknown): number {
 	if (typeof value === 'number') {
@@ -45,5 +46,7 @@ export function getNumber(value: unknown): number {
 		return parseInt(trimmed.slice(2), isBinary ? 2 : 8);
 	}
 
-	return +(/^0x[0-9a-f]+$/i.test(trimmed) ? trimmed : trimmed.replace(/_/g, ''));
+	return +(/^0x[0-9a-f]+$/i.test(trimmed)
+		? trimmed
+		: trimmed.replace(/_/g, ''));
 }

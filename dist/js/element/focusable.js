@@ -18,11 +18,7 @@ var _getValidElements = function(type, parent, filters) {
   }
   const indiced = [];
   const zeroed = [];
-  const { length } = items;
-  let position = Number(length);
-  while (position--) {
-    const index = length - position - 1;
-    const item = items[index];
+  for (const item of items) {
     if (item.tabIndex === 0) {
       zeroed.push(item.element);
     } else {
