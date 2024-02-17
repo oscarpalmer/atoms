@@ -1,5 +1,8 @@
 import {expect, test} from 'bun:test';
 import {
+	$,
+	$$,
+	findElement,
 	findElements,
 	findParentElement,
 	getElementUnderPointer,
@@ -17,6 +20,21 @@ document.body.innerHTML = `<div>
 	</div>
 </div>`;
 
+test('findElement', () => {
+	const target = findElement('.target');
+
+	expect(target).toBeInstanceOf(HTMLDivElement);
+	expect(target?.classList.contains('target') ?? false).toBe(true);
+
+	const origin = findElement('#origin', '.target');
+
+	expect(origin).toBeInstanceOf(HTMLDivElement);
+
+	const child = $('*', origin);
+
+	expect(child).toBeInstanceOf(HTMLSpanElement);
+});
+
 test('findElements', () => {
 	const elements = findElements('.target');
 
@@ -27,7 +45,7 @@ test('findElements', () => {
 
 	expect(origin.length).toBe(1);
 
-	const children = findElements('*', origin);
+	const children = $$('*', origin);
 
 	expect(children.length).toBe(1);
 });

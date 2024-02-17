@@ -1,4 +1,7 @@
 // src/js/element/index.ts
+function findElement(selector, context) {
+  return findElements(selector, context)[0];
+}
 function findElements(selector, context) {
   const contexts = context === undefined ? [document] : findElements(context);
   const elements = [];
@@ -56,5 +59,8 @@ export {
   getTextDirection,
   getElementUnderPointer,
   findParentElement,
-  findElements
+  findElements,
+  findElement,
+  findElements as $$,
+  findElement as $
 };

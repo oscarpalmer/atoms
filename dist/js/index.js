@@ -1,4 +1,7 @@
 // src/js/element/index.ts
+function findElement(selector, context) {
+  return findElements(selector, context)[0];
+}
 function findElements(selector, context) {
   const contexts = context === undefined ? [document] : findElements(context);
   const elements = [];
@@ -268,7 +271,10 @@ export {
   getElementUnderPointer,
   findParentElement,
   findElements,
+  findElement,
   createUuid,
   clampNumber,
-  Timer
+  Timer,
+  findElements as $$,
+  findElement as $
 };

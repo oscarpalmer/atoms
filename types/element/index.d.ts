@@ -1,6 +1,11 @@
 type Selector = string | Element | Element[] | NodeList;
 type TextDirection = 'ltr' | 'rtl';
 /**
+ * - Find the first element that matches the selector
+ * - `context` is optional and defaults to `document`
+ */
+export declare function findElement(selector: Selector, context?: Selector): Element | undefined;
+/**
  * - Find elements that match the selector
  * - `context` is optional and defaults to `document`
  */
@@ -21,4 +26,4 @@ export declare function getElementUnderPointer(skipIgnore?: boolean): Element | 
  * Get the text direction of an element
  */
 export declare function getTextDirection(element: Element): TextDirection;
-export {};
+export { findElement as $, findElements as $$ } from '.';

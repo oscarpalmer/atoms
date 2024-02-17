@@ -3,6 +3,17 @@ type Selector = string | Element | Element[] | NodeList;
 type TextDirection = 'ltr' | 'rtl';
 
 /**
+ * - Find the first element that matches the selector
+ * - `context` is optional and defaults to `document`
+ */
+export function findElement(
+	selector: Selector,
+	context?: Selector,
+): Element | undefined {
+	return findElements(selector, context)[0];
+}
+
+/**
  * - Find elements that match the selector
  * - `context` is optional and defaults to `document`
  */
@@ -119,3 +130,5 @@ export function getTextDirection(element: Element): TextDirection {
 		getComputedStyle?.(element)?.direction === 'rtl' ? 'rtl' : 'ltr'
 	) as TextDirection;
 }
+
+export {findElement as $, findElements as $$} from '.';
