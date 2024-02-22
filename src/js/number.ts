@@ -1,9 +1,27 @@
-
 /**
- * Clamps a number between a minimum and maximum value
+ * - Clamps a number between a minimum and maximum value
+ * - If `loop` is `true`, when the value is less than the minimum, it will be clamped as the maximum, and vice versa
  */
-export function clampNumber(value: number, min: number, max: number): number {
-	return Math.min(Math.max(getNumber(value), getNumber(min)), getNumber(max));
+export function clamp(
+	value: number,
+	min: number,
+	max: number,
+	loop?: boolean,
+): number {
+	const maxNumber = getNumber(max);
+	const minNumber = getNumber(min);
+	const valueNumber = getNumber(value);
+	const shouldLoop = loop === true;
+
+	if (valueNumber < minNumber) {
+		return shouldLoop ? maxNumber : minNumber;
+	}
+
+	return valueNumber > maxNumber
+		? shouldLoop
+			? minNumber
+			: maxNumber
+		: valueNumber;
 }
 
 /**

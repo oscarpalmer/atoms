@@ -1,5 +1,5 @@
 // src/js/event.ts
-function getEventPosition(event) {
+function getPosition(event) {
   let x;
   let y;
   if (event instanceof MouseEvent) {
@@ -12,5 +12,5 @@ function getEventPosition(event) {
   return typeof x === "number" && typeof y === "number" ? { x, y } : undefined;
 }
 export {
-  getEventPosition
+  getPosition
 };

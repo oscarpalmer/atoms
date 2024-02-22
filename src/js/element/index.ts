@@ -26,9 +26,13 @@ export function findElements(
 	const elements: Element[] = [];
 
 	if (typeof selector === 'string') {
-		for (const context of contexts) {
+		const {length} = contexts;
+
+		let index = 0;
+
+		for (; index < length; index += 1) {
 			elements.push(
-				...Array.from((context as Element).querySelectorAll(selector) ?? []),
+				...Array.from((contexts[index] as Element).querySelectorAll(selector) ?? []),
 			);
 		}
 
@@ -40,7 +44,13 @@ export function findElements(
 			? selector
 			: [selector];
 
-	for (const node of nodes) {
+	const {length} = nodes;
+
+	let index = 0;
+
+	for (; index < length; index += 1) {
+		const node = nodes[index];
+
 		if (
 			node instanceof Element &&
 			contexts.some(context => context.contains(node))

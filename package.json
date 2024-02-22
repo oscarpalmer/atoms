@@ -18,6 +18,12 @@
 			"require": "./dist/js/index.js",
 			"types": "./types/index.d.ts"
 		},
+		"./array": {
+			"bun": "./src/js/array.ts",
+			"import": "./dist/js/array.mjs",
+			"require": "./dist/js/array.js",
+			"types": "./types/array.d.ts"
+		},
 		"./element": {
 			"bun": "./src/js/element/index.ts",
 			"import": "./dist/js/element/index.mjs",
@@ -93,5 +99,5 @@
 	},
 	"type": "module",
 	"types": "./types/index.d.ts",
-	"version": "0.14.0"
+	"version": "0.15.0"
 }

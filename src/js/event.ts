@@ -6,7 +6,7 @@ type Position = {
 /**
  * Get the X- and Y-coordinates from a pointer event
  */
-export function getEventPosition(
+export function getPosition(
 	event: MouseEvent | TouchEvent,
 ): Position | undefined {
 	let x: number | undefined;

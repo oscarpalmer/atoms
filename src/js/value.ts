@@ -17,11 +17,7 @@ function _getValue(data: ValueObject, key: string): unknown {
 		return undefined;
 	}
 
-	if (data instanceof Map) {
-		return data.get(key as never);
-	}
-
-	return data[key as never];
+	return data instanceof Map ? data.get(key as never) : data[key as never];
 }
 
 /**
@@ -59,10 +55,13 @@ export function getValue(data: ValueObject, key: Key): unknown {
 
 	const parts = getString(key).split('.');
 
+	const {length} = parts;
+
+	let index = 0;
 	let value = data;
 
-	for (const part of parts) {
-		value = _getValue(value, part) as ValueObject;
+	for (; index < length; index += 1) {
+		value = _getValue(value, parts[index]) as ValueObject;
 
 		if (value == null) {
 			break;
@@ -99,11 +98,11 @@ export function isObject(value: unknown): value is GenericObject {
  * - If a part of the path does not exist, it will be created, either as an array or a generic object, depending on the key
  * - Returns the original object
  */
-export function setValue<Model extends ValueObject>(
-	data: Model,
+export function setValue<T extends ValueObject>(
+	data: T,
 	key: Key,
 	value: unknown,
-): Model {
+): T {
 	if (
 		typeof data !== 'object' ||
 		data === null ||
@@ -114,9 +113,14 @@ export function setValue<Model extends ValueObject>(
 
 	const parts = getString(key).split('.');
 
+	const {length} = parts;
+
+	let index = 0;
 	let target: ValueObject = data;
 
-	for (const part of parts) {
+	for (; index < length; index += 1) {
+		const part = parts[index];
+
 		if (parts.indexOf(part) === parts.length - 1) {
 			_setValue(target, part, value);
 

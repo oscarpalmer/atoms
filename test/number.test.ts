@@ -1,13 +1,16 @@
 import {expect, test} from 'bun:test';
-import {clampNumber, getNumber} from '../src/js/number';
+import {clamp, getNumber} from '../src/js/number';
 
-test('clampNumber', () => {
+test('clamp', () => {
 	const max = 20;
 	const min = 10;
 
-	expect(clampNumber(max - min, min, max)).toBe(max - min);
-	expect(clampNumber(min - min, min, max)).toBe(min);
-	expect(clampNumber(max + max, min, max)).toBe(max);
+	expect(clamp(max - min, min, max)).toBe(max - min);
+	expect(clamp(min - min, min, max)).toBe(min);
+	expect(clamp(max + max, min, max)).toBe(max);
+
+	expect(clamp(min - min, min, max, true)).toBe(max);
+	expect(clamp(max + max, min, max, true)).toBe(min);
 });
 
 test('getNumber', () => {

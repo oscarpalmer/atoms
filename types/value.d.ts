@@ -26,4 +26,4 @@ export declare function isObject(value: unknown): value is GenericObject;
  * - If a part of the path does not exist, it will be created, either as an array or a generic object, depending on the key
  * - Returns the original object
  */
-export declare function setValue<Model extends ValueObject>(data: Model, key: Key, value: unknown): Model;
+export declare function setValue<T extends ValueObject>(data: T, key: Key, value: unknown): T;

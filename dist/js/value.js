@@ -11,10 +11,7 @@ var _getValue = function(data, key) {
   if (typeof data !== "object" || data === null || /^(__proto__|constructor|prototype)$/i.test(key)) {
     return;
   }
-  if (data instanceof Map) {
-    return data.get(key);
-  }
-  return data[key];
+  return data instanceof Map ? data.get(key) : data[key];
 };
 var _setValue = function(data, key, value) {
   if (typeof data !== "object" || data === null || /^(__proto__|constructor|prototype)$/i.test(key)) {
@@ -31,9 +28,11 @@ function getValue(data, key) {
     return;
   }
   const parts = getString(key).split(".");
+  const { length } = parts;
+  let index = 0;
   let value = data;
-  for (const part of parts) {
-    value = _getValue(value, part);
+  for (;index < length; index += 1) {
+    value = _getValue(value, parts[index]);
     if (value == null) {
       break;
     }
@@ -54,8 +53,11 @@ function setValue(data, key, value) {
     return data;
   }
   const parts = getString(key).split(".");
+  const { length } = parts;
+  let index = 0;
   let target = data;
-  for (const part of parts) {
+  for (;index < length; index += 1) {
+    const part = parts[index];
     if (parts.indexOf(part) === parts.length - 1) {
       _setValue(target, part, value);
       break;

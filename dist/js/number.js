@@ -1,6 +1,13 @@
 // src/js/number.ts
-function clampNumber(value, min, max) {
-  return Math.min(Math.max(getNumber(value), getNumber(min)), getNumber(max));
+function clamp(value, min, max, loop) {
+  const maxNumber = getNumber(max);
+  const minNumber = getNumber(min);
+  const valueNumber = getNumber(value);
+  const shouldLoop = loop === true;
+  if (valueNumber < minNumber) {
+    return shouldLoop ? maxNumber : minNumber;
+  }
+  return valueNumber > maxNumber ? shouldLoop ? minNumber : maxNumber : valueNumber;
 }
 function getNumber(value) {
   if (typeof value === "number") {
@@ -31,5 +38,5 @@ function getNumber(value) {
 }
 export {
   getNumber,
-  clampNumber
+  clamp
 };

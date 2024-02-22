@@ -1,3 +1,4 @@
+export * from './array';
 export * from './element';
 export * from './event';
 export * from './number';

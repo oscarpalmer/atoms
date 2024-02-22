@@ -4,7 +4,11 @@ import {createUuid, getString, isNullableOrWhitespace} from '../src/js/string';
 test('createUuid', () => {
 	const ids = new Set<string>();
 
-	for (let index = 0; index < 100_000; index += 1) {
+	const length = 100_000;
+
+	let index = 0;
+
+	for (; index < length; index += 1) {
 		ids.add(createUuid());
 	}
 

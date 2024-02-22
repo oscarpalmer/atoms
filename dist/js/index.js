@@ -1,3 +1,118 @@
+// src/js/number.ts
+function clamp(value, min, max, loop) {
+  const maxNumber = getNumber(max);
+  const minNumber = getNumber(min);
+  const valueNumber = getNumber(value);
+  const shouldLoop = loop === true;
+  if (valueNumber < minNumber) {
+    return shouldLoop ? maxNumber : minNumber;
+  }
+  return valueNumber > maxNumber ? shouldLoop ? minNumber : maxNumber : valueNumber;
+}
+function getNumber(value) {
+  if (typeof value === "number") {
+    return value;
+  }
+  if (typeof value === "symbol") {
+    return NaN;
+  }
+  let parsed = value?.valueOf?.() ?? value;
+  if (typeof parsed === "object") {
+    parsed = parsed?.toString() ?? parsed;
+  }
+  if (typeof parsed !== "string") {
+    return parsed == null ? NaN : typeof parsed === "number" ? parsed : +parsed;
+  }
+  if (/^\s*0+\s*$/.test(parsed)) {
+    return 0;
+  }
+  const trimmed = parsed.trim();
+  if (trimmed.length === 0) {
+    return NaN;
+  }
+  const isBinary = /^0b[01]+$/i.test(trimmed);
+  if (isBinary || /^0o[0-7]+$/i.test(trimmed)) {
+    return parseInt(trimmed.slice(2), isBinary ? 2 : 8);
+  }
+  return +(/^0x[0-9a-f]+$/i.test(trimmed) ? trimmed : trimmed.replace(/_/g, ""));
+}
+
+// src/js/array.ts
+var _getCallback = function(value) {
+  if (typeof value === "function") {
+    return value;
+  }
+  const isString = typeof value === "string";
+  if (!isString && typeof value !== "number") {
+    return;
+  }
+  return isString && value.includes(".") ? undefined : (item) => item[value];
+};
+function chunk(array, size) {
+  const chunks = [];
+  const chunkSize = getNumber(size);
+  let remaining = Number(array.length);
+  while (remaining > 0) {
+    chunks.push(array.splice(0, chunkSize));
+    remaining -= chunkSize;
+  }
+  return chunks;
+}
+function exists(array, value, key) {
+  const callback = _getCallback(key);
+  if (callback === undefined) {
+    return array.indexOf(value) > -1;
+  }
+  const needle = typeof value === "object" && value !== null ? callback(value) : value;
+  const { length } = array;
+  let index = 0;
+  for (;index < length; index += 1) {
+    if (callback(array[index]) === needle) {
+      return true;
+    }
+  }
+  return false;
+}
+function groupBy(array, key) {
+  const keyCallback = _getCallback(key);
+  if (keyCallback === undefined) {
+    return {};
+  }
+  const grouped = {};
+  const { length } = array;
+  let index = 0;
+  for (;index < length; index += 1) {
+    const item = array[index];
+    const value = keyCallback(item);
+    if (value in grouped) {
+      grouped[value].push(item);
+    } else {
+      grouped[value] = [item];
+    }
+  }
+  return grouped;
+}
+function unique(array, key) {
+  const keyCallback = _getCallback(key);
+  const { length } = array;
+  if (keyCallback === undefined && length >= 100) {
+    return Array.from(new Set(array));
+  }
+  const result = [];
+  const values = keyCallback === undefined ? result : [];
+  let index = 0;
+  for (;index < length; index += 1) {
+    const item = array[index];
+    const value = keyCallback?.(item) ?? item;
+    if (values.indexOf(value) === -1) {
+      if (values !== result) {
+        values.push(value);
+      }
+      result.push(item);
+    }
+  }
+  return result;
+}
 // src/js/element/index.ts
 function findElement(selector, context) {
   return findElements(selector, context)[0];
@@ -6,13 +121,18 @@ function findElements(selector, context) {
   const contexts = context === undefined ? [document] : findElements(context);
   const elements = [];
   if (typeof selector === "string") {
-    for (const context2 of contexts) {
-      elements.push(...Array.from(context2.querySelectorAll(selector) ?? []));
+    const { length: length2 } = contexts;
+    let index2 = 0;
+    for (;index2 < length2; index2 += 1) {
+      elements.push(...Array.from(contexts[index2].querySelectorAll(selector) ?? []));
     }
     return elements;
   }
   const nodes = Array.isArray(selector) || selector instanceof NodeList ? selector : [selector];
-  for (const node of nodes) {
+  const { length } = nodes;
+  let index = 0;
+  for (;index < length; index += 1) {
+    const node = nodes[index];
     if (node instanceof Element && contexts.some((context2) => context2.contains(node))) {
       elements.push(node);
     }
@@ -56,7 +176,7 @@ function getTextDirection(element) {
   return getComputedStyle?.(element)?.direction === "rtl" ? "rtl" : "ltr";
 }
 // src/js/event.ts
-function getEventPosition(event) {
+function getPosition(event) {
   let x;
   let y;
   if (event instanceof MouseEvent) {
@@ -67,37 +187,6 @@ function getEventPosition(event) {
     y = event.touches[0]?.clientY;
   }
   return typeof x === "number" && typeof y === "number" ? { x, y } : undefined;
-}
-// src/js/number.ts
-function clampNumber(value, min, max) {
-  return Math.min(Math.max(getNumber(value), getNumber(min)), getNumber(max));
-}
-function getNumber(value) {
-  if (typeof value === "number") {
-    return value;
-  }
-  if (typeof value === "symbol") {
-    return NaN;
-  }
-  let parsed = value?.valueOf?.() ?? value;
-  if (typeof parsed === "object") {
-    parsed = parsed?.toString() ?? parsed;
-  }
-  if (typeof parsed !== "string") {
-    return parsed == null ? NaN : typeof parsed === "number" ? parsed : +parsed;
-  }
-  if (/^\s*0+\s*$/.test(parsed)) {
-    return 0;
-  }
-  const trimmed = parsed.trim();
-  if (trimmed.length === 0) {
-    return NaN;
-  }
-  const isBinary = /^0b[01]+$/i.test(trimmed);
-  if (isBinary || /^0o[0-7]+$/i.test(trimmed)) {
-    return parseInt(trimmed.slice(2), isBinary ? 2 : 8);
-  }
-  return +(/^0x[0-9a-f]+$/i.test(trimmed) ? trimmed : trimmed.replace(/_/g, ""));
 }
 // src/js/string.ts
 function createUuid() {
@@ -197,10 +286,7 @@ var _getValue = function(data, key) {
   if (typeof data !== "object" || data === null || /^(__proto__|constructor|prototype)$/i.test(key)) {
     return;
   }
-  if (data instanceof Map) {
-    return data.get(key);
-  }
-  return data[key];
+  return data instanceof Map ? data.get(key) : data[key];
 };
 var _setValue = function(data, key, value) {
   if (typeof data !== "object" || data === null || /^(__proto__|constructor|prototype)$/i.test(key)) {
@@ -217,9 +303,11 @@ function getValue(data, key) {
     return;
   }
   const parts = getString(key).split(".");
+  const { length } = parts;
+  let index = 0;
   let value = data;
-  for (const part of parts) {
-    value = _getValue(value, part);
+  for (;index < length; index += 1) {
+    value = _getValue(value, parts[index]);
     if (value == null) {
       break;
     }
@@ -240,8 +328,11 @@ function setValue(data, key, value) {
     return data;
   }
   const parts = getString(key).split(".");
+  const { length } = parts;
+  let index = 0;
   let target = data;
-  for (const part of parts) {
+  for (;index < length; index += 1) {
+    const part = parts[index];
     if (parts.indexOf(part) === parts.length - 1) {
       _setValue(target, part, value);
       break;
@@ -257,23 +348,27 @@ function setValue(data, key, value) {
 }
 export {
   wait,
+  unique,
   setValue,
   repeat,
   isObject,
   isNullableOrWhitespace,
   isNullable,
   isArrayOrObject,
+  groupBy,
   getValue,
   getTextDirection,
   getString,
+  getPosition,
   getNumber,
-  getEventPosition,
   getElementUnderPointer,
   findParentElement,
   findElements,
   findElement,
+  exists,
   createUuid,
-  clampNumber,
+  clamp,
+  chunk,
   Timer,
   findElements as $$,
   findElement as $

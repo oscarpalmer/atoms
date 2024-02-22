@@ -87,7 +87,13 @@ function _getValidElements(
 	const indiced: Array<Array<FocusableElement>> = [];
 	const zeroed: Array<FocusableElement> = [];
 
-	for (const item of items) {
+	const {length} = items;
+
+	let index = 0;
+
+	for (; index < length; index += 1) {
+		const item = items[index];
+
 		if (item.tabIndex === 0) {
 			zeroed.push(item.element);
 		} else {
@@ -128,7 +134,13 @@ function _isDisabledFromFieldset(element: FocusableElement): boolean {
 		if (parent instanceof HTMLFieldSetElement && parent.disabled) {
 			const children = Array.from(parent.children);
 
-			for (const child of children) {
+			const {length} = children;
+
+			let index = 0;
+
+			for (; index < length; index += 1) {
+				const child = children[index];
+
 				if (child instanceof HTMLLegendElement) {
 					return parent.matches('fieldset[disabled] *')
 						? true

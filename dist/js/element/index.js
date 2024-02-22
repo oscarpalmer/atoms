@@ -6,13 +6,18 @@ function findElements(selector, context) {
   const contexts = context === undefined ? [document] : findElements(context);
   const elements = [];
   if (typeof selector === "string") {
-    for (const context2 of contexts) {
-      elements.push(...Array.from(context2.querySelectorAll(selector) ?? []));
+    const { length: length2 } = contexts;
+    let index2 = 0;
+    for (;index2 < length2; index2 += 1) {
+      elements.push(...Array.from(contexts[index2].querySelectorAll(selector) ?? []));
     }
     return elements;
   }
   const nodes = Array.isArray(selector) || selector instanceof NodeList ? selector : [selector];
-  for (const node of nodes) {
+  const { length } = nodes;
+  let index = 0;
+  for (;index < length; index += 1) {
+    const node = nodes[index];
     if (node instanceof Element && contexts.some((context2) => context2.contains(node))) {
       elements.push(node);
     }

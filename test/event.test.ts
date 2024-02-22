@@ -1,8 +1,8 @@
 import {expect, test} from 'bun:test';
-import {getEventPosition} from '../src/js/event';
+import {getPosition} from '../src/js/event';
 import supportsTouch from '../src/js/touch';
 
-test('getEventPosition', () => {
+test('getPosition', () => {
 	const event = new MouseEvent('click', {
 		clientX: 10,
 		clientY: 20,
@@ -19,8 +19,8 @@ test('getEventPosition', () => {
 		],
 	});
 
-	const position = getEventPosition(event);
-	const touchPosition = getEventPosition(touchEvent);
+	const position = getPosition(event);
+	const touchPosition = getPosition(touchEvent);
 
 	expect(position?.x).toBe(10);
 	expect(position?.y).toBe(20);
@@ -29,10 +29,10 @@ test('getEventPosition', () => {
 	expect(touchPosition?.y).toBe(10);
 
 	// @ts-expect-error Testing invalid input
-	expect(getEventPosition(123)).toBeUndefined();
+	expect(getPosition(123)).toBeUndefined();
 
 	// @ts-expect-error Testing invalid input
-	expect(getEventPosition([])).toBeUndefined();
+	expect(getPosition([])).toBeUndefined();
 });
 
 test('supportsTouch', () => {
