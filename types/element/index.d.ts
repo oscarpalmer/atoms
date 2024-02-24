@@ -1,12 +1,13 @@
-type Selector = string | Element | Element[] | NodeList;
+type Selector = string | Document | Element | Element[] | NodeList;
 type TextDirection = 'ltr' | 'rtl';
 /**
  * - Find the first element that matches the selector
  * - `context` is optional and defaults to `document`
  */
-export declare function findElement(selector: Selector, context?: Selector): Element | undefined;
+export declare function findElement(selector: string, context?: Selector): Element | undefined;
 /**
  * - Find elements that match the selector
+ * - If `selector` is a node or a list of nodes, they are filtered and returned
  * - `context` is optional and defaults to `document`
  */
 export declare function findElements(selector: Selector, context?: Selector): Element[];

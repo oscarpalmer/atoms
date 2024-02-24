@@ -1,6 +1,18 @@
 /**
+ * Is the number between a minimum and maximum value?
+ */
+export function between(value: number, min: number, max: number): boolean {
+	return (
+		[max, min, value].every(v => typeof v === 'number') &&
+		value >= min &&
+		value <= max
+	);
+}
+
+/**
  * - Clamps a number between a minimum and maximum value
  * - If `loop` is `true`, when the value is less than the minimum, it will be clamped as the maximum, and vice versa
+ * - Returns `NaN` if any of the values are not numbers
  */
 export function clamp(
 	value: number,
@@ -8,20 +20,17 @@ export function clamp(
 	max: number,
 	loop?: boolean,
 ): number {
-	const maxNumber = getNumber(max);
-	const minNumber = getNumber(min);
-	const valueNumber = getNumber(value);
-	const shouldLoop = loop === true;
-
-	if (valueNumber < minNumber) {
-		return shouldLoop ? maxNumber : minNumber;
+	if ([max, min, value].some(v => typeof v !== 'number')) {
+		return NaN;
 	}
 
-	return valueNumber > maxNumber
-		? shouldLoop
-			? minNumber
-			: maxNumber
-		: valueNumber;
+	const shouldLoop = loop === true;
+
+	if (value < min) {
+		return shouldLoop ? max : min;
+	}
+
+	return value > max ? (shouldLoop ? min : max) : value;
 }
 
 /**

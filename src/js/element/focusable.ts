@@ -1,27 +1,12 @@
 // Based on https://github.com/focus-trap/tabbable :-)
 
 type ElementWithTabIndex = {
-	element: FocusableElement;
+	element: Element;
 	tabIndex: number;
 };
 
 type Filter = (item: ElementWithTabIndex) => boolean;
-type FocusableElement = HTMLElement | SVGElement;
-type GetType = 'focusable' | 'tabbable';
-type InertElement = FocusableElement & {inert: boolean};
-type TabbableElement = FocusableElement;
-
-const audioDetailsVideoPattern = /^(audio|details|video)$/i;
-const booleanPattern = /^(|true)$/i;
-
-const focusableFilters: Filter[] = [
-	_isDisabled,
-	_isInert,
-	_isHidden,
-	_isSummarised,
-];
-
-const inputPattern = /^(button|input|select|textarea)$/i;
+type InertElement = Element & {inert: boolean};
 
 const selector = [
 	'[contenteditable]:not([contenteditable="false"])',
@@ -39,53 +24,53 @@ const selector = [
 	.map(selector => `${selector}:not([inert])`)
 	.join(',');
 
-const summaryPattern = /^summary$/i;
-
-const tabbableFilters: Filter[] = [
-	_isNotTabbable,
-	_isNotTabbableRadio,
-	...focusableFilters,
-];
-
-function _getItem(
-	type: GetType,
-	element: FocusableElement,
-): ElementWithTabIndex {
+function _getItem(element: Element, tabbable: boolean): ElementWithTabIndex {
 	return {
 		element,
-		tabIndex: type === 'focusable' ? -1 : _getTabIndex(element),
+		tabIndex: tabbable ? _getTabIndex(element) : -1,
 	};
 }
 
-function _getTabIndex(element: FocusableElement): number {
+function _getFocusableFilters(): Filter[] {
+	return [_isDisabled, _isInert, _isHidden, _isSummarised];
+}
+
+function _getTabbableFilters(): Filter[] {
+	return [_isNotTabbable, _isNotTabbableRadio, ..._getFocusableFilters()];
+}
+
+function _getTabIndex(element: Element): number {
+	const tabIndex = (element as HTMLElement)?.tabIndex ?? -1;
+
 	if (
-		element.tabIndex < 0 &&
-		(audioDetailsVideoPattern.test(element.tagName) || _isEditable(element)) &&
+		tabIndex < 0 &&
+		(/^(audio|details|video)$/i.test(element.tagName) ||
+			_isEditable(element)) &&
 		!_hasTabIndex(element)
 	) {
 		return 0;
 	}
 
-	return element.tabIndex;
+	return tabIndex;
 }
 
 function _getValidElements(
-	type: GetType,
 	parent: Element,
 	filters: Filter[],
-): Array<FocusableElement> {
+	tabbable: boolean,
+): Array<Element> {
 	const items: ElementWithTabIndex[] = Array.from(
 		parent.querySelectorAll(selector),
 	)
-		.map(element => _getItem(type, element as FocusableElement))
+		.map(element => _getItem(element, tabbable))
 		.filter(item => !filters.some(filter => filter(item)));
 
-	if (type === 'focusable') {
+	if (!tabbable) {
 		return items.map(item => item.element);
 	}
 
-	const indiced: Array<Array<FocusableElement>> = [];
-	const zeroed: Array<FocusableElement> = [];
+	const indiced: Array<Array<Element>> = [];
+	const zeroed: Array<Element> = [];
 
 	const {length} = items;
 
@@ -107,7 +92,7 @@ function _getValidElements(
 	return [...indiced.flat(), ...zeroed];
 }
 
-function _hasTabIndex(element: FocusableElement): boolean {
+function _hasTabIndex(element: Element): boolean {
 	return !Number.isNaN(
 		Number.parseInt(element.getAttribute('tabindex') as string, 10),
 	);
@@ -115,7 +100,7 @@ function _hasTabIndex(element: FocusableElement): boolean {
 
 function _isDisabled(item: ElementWithTabIndex): boolean {
 	if (
-		inputPattern.test(item.element.tagName) &&
+		/^(button|input|select|textarea)$/i.test(item.element.tagName) &&
 		_isDisabledFromFieldset(item.element)
 	) {
 		return true;
@@ -127,7 +112,7 @@ function _isDisabled(item: ElementWithTabIndex): boolean {
 	);
 }
 
-function _isDisabledFromFieldset(element: FocusableElement): boolean {
+function _isDisabledFromFieldset(element: Element): boolean {
 	let parent = element.parentElement;
 
 	while (parent !== null) {
@@ -158,7 +143,7 @@ function _isDisabledFromFieldset(element: FocusableElement): boolean {
 }
 
 function _isEditable(element: Element): boolean {
-	return booleanPattern.test(element.getAttribute('contenteditable') as string);
+	return /^(|true)$/i.test(element.getAttribute('contenteditable') as string);
 }
 
 function _isHidden(item: ElementWithTabIndex) {
@@ -195,10 +180,10 @@ function _isHidden(item: ElementWithTabIndex) {
 function _isInert(item: ElementWithTabIndex): boolean {
 	return (
 		((item.element as InertElement).inert ?? false) ||
-		booleanPattern.test(item.element.getAttribute('inert') as string) ||
+		/^(|true)$/i.test(item.element.getAttribute('inert') as string) ||
 		(item.element.parentElement !== null &&
 			_isInert({
-				element: item.element.parentElement as FocusableElement,
+				element: item.element.parentElement,
 				tabIndex: -1,
 			}))
 	);
@@ -240,13 +225,17 @@ function _isSummarised(item: ElementWithTabIndex) {
 	return (
 		item.element instanceof HTMLDetailsElement &&
 		Array.from(item.element.children).some(child =>
-			summaryPattern.test(child.tagName),
+			/^summary$/i.test(child.tagName),
 		)
 	);
 }
 
-function _isValidElement(element: Element, filters: Filter[]): boolean {
-	const item = _getItem('focusable', element as FocusableElement);
+function _isValidElement(
+	element: Element,
+	filters: Filter[],
+	tabbable: boolean,
+): boolean {
+	const item = _getItem(element, tabbable);
 
 	return !filters.some(filter => filter(item));
 }
@@ -254,27 +243,27 @@ function _isValidElement(element: Element, filters: Filter[]): boolean {
 /**
  * Get a list of focusable elements within a parent element
  */
-export function getFocusableElements(parent: Element): FocusableElement[] {
-	return _getValidElements('focusable', parent, focusableFilters);
+export function getFocusableElements(parent: Element): Element[] {
+	return _getValidElements(parent, _getFocusableFilters(), false);
 }
 
 /**
  * Get a list of tabbable elements within a parent element
  */
-export function getTabbableElements(parent: Element): TabbableElement[] {
-	return _getValidElements('tabbable', parent, tabbableFilters);
+export function getTabbableElements(parent: Element): Element[] {
+	return _getValidElements(parent, _getTabbableFilters(), true);
 }
 
 /**
  * Is the element focusable?
  */
 export function isFocusableElement(element: Element): boolean {
-	return _isValidElement(element, focusableFilters);
+	return _isValidElement(element, _getFocusableFilters(), false);
 }
 
 /**
  * Is the element tabbable?
  */
 export function isTabbableElement(element: Element): boolean {
-	return _isValidElement(element, tabbableFilters);
+	return _isValidElement(element, _getTabbableFilters(), true);
 }

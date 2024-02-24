@@ -1,7 +1,8 @@
-import {getNumber} from './number';
 import {Key} from './value';
 
 type KeyCallback<T> = (item: T) => Key;
+
+type InsertType = 'push' | 'splice';
 
 function _getCallback<T>(
 	value: Key | KeyCallback<T> | undefined,
@@ -13,7 +14,7 @@ function _getCallback<T>(
 	const isString = typeof value === 'string';
 
 	if (!isString && typeof value !== 'number') {
-		return undefined;
+		return;
 	}
 
 	return isString && value.includes('.')
@@ -21,14 +22,49 @@ function _getCallback<T>(
 		: (item: T): Key => item[value as never];
 }
 
+function _insertValues<T>(
+	type: InsertType,
+	array: T[],
+	values: T[],
+	start: number,
+	deleteCount: number,
+): unknown {
+	const chunked = chunk(values).reverse();
+	const {length} = chunked;
+
+	let index = 0;
+	let returned: T[] | undefined;
+
+	for (; index < length; index += 1) {
+		const result = array.splice(
+			start,
+			index === 0 ? deleteCount : 0,
+			...chunked[index],
+		);
+
+		if (returned === undefined) {
+			returned = result;
+		}
+	}
+
+	return type === 'splice' ? returned : array.length;
+}
+
 /**
  * Chunks an array into smaller arrays of a specified size
  */
-export function chunk<T>(array: T[], size: number): T[][] {
-	const chunks: T[][] = [];
-	const chunkSize = getNumber(size);
+export function chunk<T>(array: T[], size?: number): T[][] {
+	const {length} = array;
 
-	let remaining = Number(array.length);
+	const chunkSize = typeof size === 'number' && size > 0 ? size : 32_000;
+
+	if (length <= chunkSize) {
+		return [array];
+	}
+
+	const chunks: T[][] = [];
+
+	let remaining = Number(length);
 
 	while (remaining > 0) {
 		chunks.push(array.splice(0, chunkSize));
@@ -104,6 +140,35 @@ export function groupBy<T>(
 	}
 
 	return grouped;
+}
+
+/**
+ * - Inserts values into an array at a specified index
+ * - Uses chunking to avoid stack overflow
+ */
+export function insert<T>(array: T[], index: number, values: T[]): void {
+	_insertValues('splice', array, values, index, 0);
+}
+
+/**
+ * - Pushes values to the end of an array
+ * - Uses chunking to avoid stack overflow
+ */
+export function push<T>(array: T[], values: T[]): number {
+	return _insertValues('push', array, values, array.length, 0) as number;
+}
+
+/**
+ * - Splices values into an array and returns any removed values
+ * - Uses chunking to avoid stack overflow
+ */
+export function splice<T>(
+	array: T[],
+	start: number,
+	deleteCount: number,
+	values: T[],
+): T[] {
+	return _insertValues('splice', array, values, start, deleteCount) as T[];
 }
 
 /**

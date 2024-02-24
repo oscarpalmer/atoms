@@ -1,42 +1,3 @@
-// src/js/number.ts
-function clamp(value, min, max, loop) {
-  const maxNumber = getNumber(max);
-  const minNumber = getNumber(min);
-  const valueNumber = getNumber(value);
-  const shouldLoop = loop === true;
-  if (valueNumber < minNumber) {
-    return shouldLoop ? maxNumber : minNumber;
-  }
-  return valueNumber > maxNumber ? shouldLoop ? minNumber : maxNumber : valueNumber;
-}
-function getNumber(value) {
-  if (typeof value === "number") {
-    return value;
-  }
-  if (typeof value === "symbol") {
-    return NaN;
-  }
-  let parsed = value?.valueOf?.() ?? value;
-  if (typeof parsed === "object") {
-    parsed = parsed?.toString() ?? parsed;
-  }
-  if (typeof parsed !== "string") {
-    return parsed == null ? NaN : typeof parsed === "number" ? parsed : +parsed;
-  }
-  if (/^\s*0+\s*$/.test(parsed)) {
-    return 0;
-  }
-  const trimmed = parsed.trim();
-  if (trimmed.length === 0) {
-    return NaN;
-  }
-  const isBinary = /^0b[01]+$/i.test(trimmed);
-  if (isBinary || /^0o[0-7]+$/i.test(trimmed)) {
-    return parseInt(trimmed.slice(2), isBinary ? 2 : 8);
-  }
-  return +(/^0x[0-9a-f]+$/i.test(trimmed) ? trimmed : trimmed.replace(/_/g, ""));
-}
-
 // src/js/array.ts
 var _getCallback = function(value) {
   if (typeof value === "function") {
@@ -48,10 +9,27 @@ var _getCallback = function(value) {
   }
   return isString && value.includes(".") ? undefined : (item) => item[value];
 };
+var _insertValues = function(type, array, values, start, deleteCount) {
+  const chunked = chunk(values).reverse();
+  const { length } = chunked;
+  let index = 0;
+  let returned;
+  for (;index < length; index += 1) {
+    const result = array.splice(start, index === 0 ? deleteCount : 0, ...chunked[index]);
+    if (returned === undefined) {
+      returned = result;
+    }
+  }
+  return type === "splice" ? returned : array.length;
+};
 function chunk(array, size) {
+  const { length } = array;
+  const chunkSize = typeof size === "number" && size > 0 ? size : 32000;
+  if (length <= chunkSize) {
+    return [array];
+  }
   const chunks = [];
-  const chunkSize = getNumber(size);
-  let remaining = Number(array.length);
+  let remaining = Number(length);
   while (remaining > 0) {
     chunks.push(array.splice(0, chunkSize));
     remaining -= chunkSize;
@@ -92,6 +70,15 @@ function groupBy(array, key) {
   }
   return grouped;
 }
+function insert(array, index, values) {
+  _insertValues("splice", array, values, index, 0);
+}
+function push(array, values) {
+  return _insertValues("push", array, values, array.length, 0);
+}
+function splice(array, start, deleteCount, values) {
+  return _insertValues("splice", array, values, start, deleteCount);
+}
 function unique(array, key) {
   const keyCallback = _getCallback(key);
   const { length } = array;
@@ -114,30 +101,47 @@ function unique(array, key) {
   return result;
 }
 // src/js/element/index.ts
-function findElement(selector, context) {
-  return findElements(selector, context)[0];
-}
-function findElements(selector, context) {
-  const contexts = context === undefined ? [document] : findElements(context);
-  const elements = [];
+var _findElements = function(selector, context, single) {
+  const callback = single ? document.querySelector : document.querySelectorAll;
+  const contexts = context == null ? [document] : _findElements(context, undefined, false);
+  const result = [];
   if (typeof selector === "string") {
     const { length: length2 } = contexts;
     let index2 = 0;
     for (;index2 < length2; index2 += 1) {
-      elements.push(...Array.from(contexts[index2].querySelectorAll(selector) ?? []));
+      const value = callback.call(contexts[index2], selector);
+      if (single && value != null) {
+        return value;
+      }
+      if (!single) {
+        result.push(...Array.from(value));
+      }
     }
-    return elements;
+    return single ? undefined : result.filter((value, index3, array) => array.indexOf(value) === index3);
   }
   const nodes = Array.isArray(selector) || selector instanceof NodeList ? selector : [selector];
   const { length } = nodes;
   let index = 0;
   for (;index < length; index += 1) {
     const node = nodes[index];
-    if (node instanceof Element && contexts.some((context2) => context2.contains(node))) {
-      elements.push(node);
+    const element = node instanceof Document ? node.body : node instanceof Element ? node : undefined;
+    if (element == null) {
+      continue;
+    }
+    if (context == null || contexts.some((context2) => context2.contains(node))) {
+      if (single) {
+        return element;
+      }
+      result.push(element);
     }
   }
-  return elements;
+  return single ? undefined : result.filter((value, index2, array) => array.indexOf(value) === index2);
+};
+function findElement(selector, context) {
+  return _findElements(selector, context, true);
+}
+function findElements(selector, context) {
+  return _findElements(selector, context, false);
 }
 function findParentElement(origin, selector) {
   if (origin == null || selector == null) {
@@ -188,12 +192,57 @@ function getPosition(event) {
   }
   return typeof x === "number" && typeof y === "number" ? { x, y } : undefined;
 }
+// src/js/number.ts
+function between(value, min, max) {
+  return [max, min, value].every((v) => typeof v === "number") && value >= min && value <= max;
+}
+function clamp(value, min, max, loop) {
+  if ([max, min, value].some((v) => typeof v !== "number")) {
+    return NaN;
+  }
+  const shouldLoop = loop === true;
+  if (value < min) {
+    return shouldLoop ? max : min;
+  }
+  return value > max ? shouldLoop ? min : max : value;
+}
+function getNumber(value) {
+  if (typeof value === "number") {
+    return value;
+  }
+  if (typeof value === "symbol") {
+    return NaN;
+  }
+  let parsed = value?.valueOf?.() ?? value;
+  if (typeof parsed === "object") {
+    parsed = parsed?.toString() ?? parsed;
+  }
+  if (typeof parsed !== "string") {
+    return parsed == null ? NaN : typeof parsed === "number" ? parsed : +parsed;
+  }
+  if (/^\s*0+\s*$/.test(parsed)) {
+    return 0;
+  }
+  const trimmed = parsed.trim();
+  if (trimmed.length === 0) {
+    return NaN;
+  }
+  const isBinary = /^0b[01]+$/i.test(trimmed);
+  if (isBinary || /^0o[0-7]+$/i.test(trimmed)) {
+    return parseInt(trimmed.slice(2), isBinary ? 2 : 8);
+  }
+  return +(/^0x[0-9a-f]+$/i.test(trimmed) ? trimmed : trimmed.replace(/_/g, ""));
+}
 // src/js/string.ts
 function createUuid() {
   return "10000000-1000-4000-8000-100000000000".replace(/[018]/g, (substring) => (substring ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> substring / 4).toString(16));
 }
 function getString(value) {
-  return typeof value === "string" ? value : typeof value?.toString === "function" ? value.toString() : String(value);
+  if (typeof value === "string") {
+    return value;
+  }
+  const result = value?.toString?.() ?? value;
+  return result?.toString?.() ?? String(result);
 }
 function isNullableOrWhitespace(value) {
   return value == null || getString(value).trim().length === 0;
@@ -349,12 +398,15 @@ function setValue(data, key, value) {
 export {
   wait,
   unique,
+  splice,
   setValue,
   repeat,
+  push,
   isObject,
   isNullableOrWhitespace,
   isNullable,
   isArrayOrObject,
+  insert,
   groupBy,
   getValue,
   getTextDirection,
@@ -369,6 +421,7 @@ export {
   createUuid,
   clamp,
   chunk,
+  between,
   Timer,
   findElements as $$,
   findElement as $

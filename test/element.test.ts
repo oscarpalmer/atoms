@@ -48,6 +48,11 @@ test('findElements', () => {
 	const children = $$('*', origin);
 
 	expect(children.length).toBe(1);
+
+	expect(
+		// @ts-expect-error Testing invalid input
+		findElements([123, 'a', document.body, ...origin, ...children]).length,
+	).toBe(3);
 });
 
 test('findParentElement', () => {

@@ -1,29 +1,20 @@
-type Selector = string | Element | Element[] | NodeList;
+type Selector = string | Document | Element | Element[] | NodeList;
 
 type TextDirection = 'ltr' | 'rtl';
 
-/**
- * - Find the first element that matches the selector
- * - `context` is optional and defaults to `document`
- */
-export function findElement(
+function _findElements(
 	selector: Selector,
-	context?: Selector,
-): Element | undefined {
-	return findElements(selector, context)[0];
-}
+	context: Selector | undefined,
+	single: boolean,
+): Element | Element[] | undefined {
+	const callback = single ? document.querySelector : document.querySelectorAll;
 
-/**
- * - Find elements that match the selector
- * - `context` is optional and defaults to `document`
- */
-export function findElements(
-	selector: Selector,
-	context?: Selector,
-): Element[] {
-	const contexts = context === undefined ? [document] : findElements(context);
+	const contexts =
+		context == null
+			? [document]
+			: (_findElements(context, undefined, false) as Element[]);
 
-	const elements: Element[] = [];
+	const result: Element[] = [];
 
 	if (typeof selector === 'string') {
 		const {length} = contexts;
@@ -31,12 +22,23 @@ export function findElements(
 		let index = 0;
 
 		for (; index < length; index += 1) {
-			elements.push(
-				...Array.from((contexts[index] as Element).querySelectorAll(selector) ?? []),
-			);
+			const value = callback.call(contexts[index], selector) as
+				| Element
+				| Element[]
+				| null;
+
+			if (single && value != null) {
+				return value;
+			}
+
+			if (!single) {
+				result.push(...Array.from(value as Element[]));
+			}
 		}
 
-		return elements;
+		return single
+			? undefined
+			: result.filter((value, index, array) => array.indexOf(value) === index);
 	}
 
 	const nodes =
@@ -51,15 +53,52 @@ export function findElements(
 	for (; index < length; index += 1) {
 		const node = nodes[index];
 
-		if (
-			node instanceof Element &&
-			contexts.some(context => context.contains(node))
-		) {
-			elements.push(node);
+		const element =
+			node instanceof Document
+				? node.body
+				: node instanceof Element
+				  ? node
+				  : undefined;
+
+		if (element == null) {
+			continue;
+		}
+
+		if (context == null || contexts.some(context => context.contains(node))) {
+			if (single) {
+				return element;
+			}
+
+			result.push(element);
 		}
 	}
 
-	return elements;
+	return single
+		? undefined
+		: result.filter((value, index, array) => array.indexOf(value) === index);
+}
+
+/**
+ * - Find the first element that matches the selector
+ * - `context` is optional and defaults to `document`
+ */
+export function findElement(
+	selector: string,
+	context?: Selector,
+): Element | undefined {
+	return _findElements(selector, context, true) as never;
+}
+
+/**
+ * - Find elements that match the selector
+ * - If `selector` is a node or a list of nodes, they are filtered and returned
+ * - `context` is optional and defaults to `document`
+ */
+export function findElements(
+	selector: Selector,
+	context?: Selector,
+): Element[] {
+	return _findElements(selector, context, false) as never;
 }
 
 /**
@@ -72,7 +111,7 @@ export function findParentElement(
 	selector: string | ((element: Element) => boolean),
 ): Element | undefined {
 	if (origin == null || selector == null) {
-		return undefined;
+		return;
 	}
 
 	function matches(element: Element): boolean {
@@ -91,7 +130,7 @@ export function findParentElement(
 
 	while (parent != null && !matches(parent)) {
 		if (parent === document.body) {
-			return undefined;
+			return;
 		}
 
 		parent = parent.parentElement;

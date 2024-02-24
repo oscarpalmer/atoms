@@ -16,11 +16,13 @@ export function createUuid(): string {
  * Get the string value from any value
  */
 export function getString(value: unknown): string {
-	return typeof value === 'string'
-		? value
-		: typeof value?.toString === 'function'
-		  ? value.toString()
-		  : String(value);
+	if (typeof value === 'string') {
+		return value;
+	}
+
+	const result = value?.toString?.() ?? value;
+
+	return result?.toString?.() ?? String(result);
 }
 
 /**

@@ -1,32 +1,3 @@
-// src/js/number.ts
-function getNumber(value) {
-  if (typeof value === "number") {
-    return value;
-  }
-  if (typeof value === "symbol") {
-    return NaN;
-  }
-  let parsed = value?.valueOf?.() ?? value;
-  if (typeof parsed === "object") {
-    parsed = parsed?.toString() ?? parsed;
-  }
-  if (typeof parsed !== "string") {
-    return parsed == null ? NaN : typeof parsed === "number" ? parsed : +parsed;
-  }
-  if (/^\s*0+\s*$/.test(parsed)) {
-    return 0;
-  }
-  const trimmed = parsed.trim();
-  if (trimmed.length === 0) {
-    return NaN;
-  }
-  const isBinary = /^0b[01]+$/i.test(trimmed);
-  if (isBinary || /^0o[0-7]+$/i.test(trimmed)) {
-    return parseInt(trimmed.slice(2), isBinary ? 2 : 8);
-  }
-  return +(/^0x[0-9a-f]+$/i.test(trimmed) ? trimmed : trimmed.replace(/_/g, ""));
-}
-
 // src/js/array.ts
 var _getCallback = function(value) {
   if (typeof value === "function") {
@@ -38,10 +9,27 @@ var _getCallback = function(value) {
   }
   return isString && value.includes(".") ? undefined : (item) => item[value];
 };
+var _insertValues = function(type, array, values, start, deleteCount) {
+  const chunked = chunk(values).reverse();
+  const { length } = chunked;
+  let index = 0;
+  let returned;
+  for (;index < length; index += 1) {
+    const result = array.splice(start, index === 0 ? deleteCount : 0, ...chunked[index]);
+    if (returned === undefined) {
+      returned = result;
+    }
+  }
+  return type === "splice" ? returned : array.length;
+};
 function chunk(array, size) {
+  const { length } = array;
+  const chunkSize = typeof size === "number" && size > 0 ? size : 32000;
+  if (length <= chunkSize) {
+    return [array];
+  }
   const chunks = [];
-  const chunkSize = getNumber(size);
-  let remaining = Number(array.length);
+  let remaining = Number(length);
   while (remaining > 0) {
     chunks.push(array.splice(0, chunkSize));
     remaining -= chunkSize;
@@ -82,6 +70,15 @@ function groupBy(array, key) {
   }
   return grouped;
 }
+function insert(array, index, values) {
+  _insertValues("splice", array, values, index, 0);
+}
+function push(array, values) {
+  return _insertValues("push", array, values, array.length, 0);
+}
+function splice(array, start, deleteCount, values) {
+  return _insertValues("splice", array, values, start, deleteCount);
+}
 function unique(array, key) {
   const keyCallback = _getCallback(key);
   const { length } = array;
@@ -105,6 +102,9 @@ function unique(array, key) {
 }
 export {
   unique,
+  splice,
+  push,
+  insert,
   groupBy,
   exists,
   chunk

@@ -1,28 +1,45 @@
 // src/js/element/index.ts
-function findElement(selector, context) {
-  return findElements(selector, context)[0];
-}
-function findElements(selector, context) {
-  const contexts = context === undefined ? [document] : findElements(context);
-  const elements = [];
+var _findElements = function(selector, context, single) {
+  const callback = single ? document.querySelector : document.querySelectorAll;
+  const contexts = context == null ? [document] : _findElements(context, undefined, false);
+  const result = [];
   if (typeof selector === "string") {
     const { length: length2 } = contexts;
     let index2 = 0;
     for (;index2 < length2; index2 += 1) {
-      elements.push(...Array.from(contexts[index2].querySelectorAll(selector) ?? []));
+      const value = callback.call(contexts[index2], selector);
+      if (single && value != null) {
+        return value;
+      }
+      if (!single) {
+        result.push(...Array.from(value));
+      }
     }
-    return elements;
+    return single ? undefined : result.filter((value, index3, array) => array.indexOf(value) === index3);
   }
   const nodes = Array.isArray(selector) || selector instanceof NodeList ? selector : [selector];
   const { length } = nodes;
   let index = 0;
   for (;index < length; index += 1) {
     const node = nodes[index];
-    if (node instanceof Element && contexts.some((context2) => context2.contains(node))) {
-      elements.push(node);
+    const element = node instanceof Document ? node.body : node instanceof Element ? node : undefined;
+    if (element == null) {
+      continue;
+    }
+    if (context == null || contexts.some((context2) => context2.contains(node))) {
+      if (single) {
+        return element;
+      }
+      result.push(element);
     }
   }
-  return elements;
+  return single ? undefined : result.filter((value, index2, array) => array.indexOf(value) === index2);
+};
+function findElement(selector, context) {
+  return _findElements(selector, context, true);
+}
+function findElements(selector, context) {
+  return _findElements(selector, context, false);
 }
 function findParentElement(origin, selector) {
   if (origin == null || selector == null) {

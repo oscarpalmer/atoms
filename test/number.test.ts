@@ -1,5 +1,17 @@
 import {expect, test} from 'bun:test';
-import {clamp, getNumber} from '../src/js/number';
+import {between, clamp, getNumber} from '../src/js/number';
+
+test('between', () => {
+	const max = 20;
+	const min = 10;
+
+	expect(between(max - min, min, max)).toBe(true);
+	expect(between(min, min, max)).toBe(true);
+	expect(between(max, min, max)).toBe(true);
+
+	// @ts-expect-error Testing bad input
+	expect(between(undefined, min, max)).toBe(false);
+});
 
 test('clamp', () => {
 	const max = 20;
@@ -11,6 +23,9 @@ test('clamp', () => {
 
 	expect(clamp(min - min, min, max, true)).toBe(max);
 	expect(clamp(max + max, min, max, true)).toBe(min);
+
+	// @ts-expect-error Testing bad input
+	expect(clamp(undefined, min, max)).toBeNaN();
 });
 
 test('getNumber', () => {

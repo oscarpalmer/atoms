@@ -14,7 +14,7 @@ function _getValue(data: ValueObject, key: string): unknown {
 		data === null ||
 		/^(__proto__|constructor|prototype)$/i.test(key)
 	) {
-		return undefined;
+		return;
 	}
 
 	return data instanceof Map ? data.get(key as never) : data[key as never];
@@ -50,7 +50,7 @@ export function getValue(data: ValueObject, key: Key): unknown {
 		data === null ||
 		isNullableOrWhitespace(key)
 	) {
-		return undefined;
+		return;
 	}
 
 	const parts = getString(key).split('.');

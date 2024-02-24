@@ -1,6 +1,10 @@
 // src/js/string.ts
 function getString(value) {
-  return typeof value === "string" ? value : typeof value?.toString === "function" ? value.toString() : String(value);
+  if (typeof value === "string") {
+    return value;
+  }
+  const result = value?.toString?.() ?? value;
+  return result?.toString?.() ?? String(result);
 }
 function isNullableOrWhitespace(value) {
   return value == null || getString(value).trim().length === 0;

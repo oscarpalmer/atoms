@@ -1,19 +1,26 @@
 // src/js/element/focusable.ts
-var _getItem = function(type, element) {
+var _getItem = function(element, tabbable) {
   return {
     element,
-    tabIndex: type === "focusable" ? -1 : _getTabIndex(element)
+    tabIndex: tabbable ? _getTabIndex(element) : -1
   };
 };
+var _getFocusableFilters = function() {
+  return [_isDisabled, _isInert, _isHidden, _isSummarised];
+};
+var _getTabbableFilters = function() {
+  return [_isNotTabbable, _isNotTabbableRadio, ..._getFocusableFilters()];
+};
 var _getTabIndex = function(element) {
-  if (element.tabIndex < 0 && (audioDetailsVideoPattern.test(element.tagName) || _isEditable(element)) && !_hasTabIndex(element)) {
+  const tabIndex = element?.tabIndex ?? -1;
+  if (tabIndex < 0 && (/^(audio|details|video)$/i.test(element.tagName) || _isEditable(element)) && !_hasTabIndex(element)) {
     return 0;
   }
-  return element.tabIndex;
+  return tabIndex;
 };
-var _getValidElements = function(type, parent, filters) {
-  const items = Array.from(parent.querySelectorAll(selector)).map((element) => _getItem(type, element)).filter((item) => !filters.some((filter) => filter(item)));
-  if (type === "focusable") {
+var _getValidElements = function(parent, filters, tabbable) {
+  const items = Array.from(parent.querySelectorAll(selector)).map((element) => _getItem(element, tabbable)).filter((item) => !filters.some((filter) => filter(item)));
+  if (!tabbable) {
     return items.map((item) => item.element);
   }
   const indiced = [];
@@ -37,7 +44,7 @@ var _hasTabIndex = function(element) {
   return !Number.isNaN(Number.parseInt(element.getAttribute("tabindex"), 10));
 };
 var _isDisabled = function(item) {
-  if (inputPattern.test(item.element.tagName) && _isDisabledFromFieldset(item.element)) {
+  if (/^(button|input|select|textarea)$/i.test(item.element.tagName) && _isDisabledFromFieldset(item.element)) {
     return true;
   }
   return (item.element.disabled ?? false) || item.element.getAttribute("aria-disabled") === "true";
@@ -62,7 +69,7 @@ var _isDisabledFromFieldset = function(element) {
   return false;
 };
 var _isEditable = function(element) {
-  return booleanPattern.test(element.getAttribute("contenteditable"));
+  return /^(|true)$/i.test(element.getAttribute("contenteditable"));
 };
 var _isHidden = function(item) {
   if ((item.element.hidden ?? false) || item.element instanceof HTMLInputElement && item.element.type === "hidden") {
@@ -81,7 +88,7 @@ var _isHidden = function(item) {
   return height === 0 && width === 0;
 };
 var _isInert = function(item) {
-  return (item.element.inert ?? false) || booleanPattern.test(item.element.getAttribute("inert")) || item.element.parentElement !== null && _isInert({
+  return (item.element.inert ?? false) || /^(|true)$/i.test(item.element.getAttribute("inert")) || item.element.parentElement !== null && _isInert({
     element: item.element.parentElement,
     tabIndex: -1
   });
@@ -100,33 +107,24 @@ var _isNotTabbableRadio = function(item) {
   return checked !== undefined && checked !== item.element;
 };
 var _isSummarised = function(item) {
-  return item.element instanceof HTMLDetailsElement && Array.from(item.element.children).some((child) => summaryPattern.test(child.tagName));
+  return item.element instanceof HTMLDetailsElement && Array.from(item.element.children).some((child) => /^summary$/i.test(child.tagName));
 };
-var _isValidElement = function(element, filters) {
-  const item = _getItem("focusable", element);
+var _isValidElement = function(element, filters, tabbable) {
+  const item = _getItem(element, tabbable);
   return !filters.some((filter) => filter(item));
 };
 function getFocusableElements(parent) {
-  return _getValidElements("focusable", parent, focusableFilters);
+  return _getValidElements(parent, _getFocusableFilters(), false);
 }
 function getTabbableElements(parent) {
-  return _getValidElements("tabbable", parent, tabbableFilters);
+  return _getValidElements(parent, _getTabbableFilters(), true);
 }
 function isFocusableElement(element) {
-  return _isValidElement(element, focusableFilters);
+  return _isValidElement(element, _getFocusableFilters(), false);
 }
 function isTabbableElement(element) {
-  return _isValidElement(element, tabbableFilters);
+  return _isValidElement(element, _getTabbableFilters(), true);
 }
-var audioDetailsVideoPattern = /^(audio|details|video)$/i;
-var booleanPattern = /^(|true)$/i;
-var focusableFilters = [
-  _isDisabled,
-  _isInert,
-  _isHidden,
-  _isSummarised
-];
-var inputPattern = /^(button|input|select|textarea)$/i;
 var selector = [
   '[contenteditable]:not([contenteditable="false"])',
   "[tabindex]:not(slot)",
@@ -140,12 +138,6 @@ var selector = [
   "textarea",
   "video[controls]"
 ].map((selector2) => `${selector2}:not([inert])`).join(",");
-var summaryPattern = /^summary$/i;
-var tabbableFilters = [
-  _isNotTabbable,
-  _isNotTabbableRadio,
-  ...focusableFilters
-];
 export {
   isTabbableElement,
   isFocusableElement,

@@ -1,13 +1,16 @@
 // src/js/number.ts
+function between(value, min, max) {
+  return [max, min, value].every((v) => typeof v === "number") && value >= min && value <= max;
+}
 function clamp(value, min, max, loop) {
-  const maxNumber = getNumber(max);
-  const minNumber = getNumber(min);
-  const valueNumber = getNumber(value);
-  const shouldLoop = loop === true;
-  if (valueNumber < minNumber) {
-    return shouldLoop ? maxNumber : minNumber;
+  if ([max, min, value].some((v) => typeof v !== "number")) {
+    return NaN;
   }
-  return valueNumber > maxNumber ? shouldLoop ? minNumber : maxNumber : valueNumber;
+  const shouldLoop = loop === true;
+  if (value < min) {
+    return shouldLoop ? max : min;
+  }
+  return value > max ? shouldLoop ? min : max : value;
 }
 function getNumber(value) {
   if (typeof value === "number") {
@@ -38,5 +41,6 @@ function getNumber(value) {
 }
 export {
   getNumber,
-  clamp
+  clamp,
+  between
 };
