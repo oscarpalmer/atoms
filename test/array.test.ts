@@ -2,7 +2,10 @@ import {expect, test} from 'bun:test';
 import {
 	chunk,
 	exists,
+	filter,
+	find,
 	groupBy,
+	indexOf,
 	insert,
 	push,
 	splice,
@@ -30,11 +33,87 @@ test('exists', () => {
 		{id: 4, name: 'David'},
 	];
 
-	const existsByCallback = exists(complex, 3, item => item.id);
-	const existsByKey = exists(complex, 3, 'id');
+	const existsByKeyCallback = exists(complex, 3, item => item.id);
+	const existsByKeyValue = exists(complex, 3, 'id');
 
-	expect(existsByCallback).toEqual(true);
-	expect(existsByKey).toEqual(true);
+	expect(existsByKeyCallback).toEqual(true);
+	expect(existsByKeyValue).toEqual(true);
+
+	const existsByValueCallback = exists(complex, item => item.id === 3);
+
+	expect(existsByValueCallback).toEqual(true);
+});
+
+test('filter', () => {
+	const simple = [1, 2, 3, 4];
+
+	expect(filter(simple, 2)).toEqual([2]);
+	expect(filter(simple, 5)).toEqual([]);
+
+	const complex = [
+		{id: 1, name: 'Alice'},
+		{id: 2, name: 'Bob'},
+		{id: 3, name: 'Charlie'},
+		{id: 4, name: 'David'},
+	];
+
+	const filterByKeyValue = filter(complex, 3, 'id');
+	const filterByKeyCallback = filter(complex, 3, item => item.id);
+
+	expect(filterByKeyValue).toEqual([{id: 3, name: 'Charlie'}]);
+	expect(filterByKeyCallback).toEqual([{id: 3, name: 'Charlie'}]);
+
+	const filterByValueCallback = filter(complex, item => item.id === 3);
+
+	expect(filterByValueCallback).toEqual([{id: 3, name: 'Charlie'}]);
+});
+
+test('find', () => {
+	const simple = [1, 2, 3, 4];
+
+	expect(find(simple, 2)).toBe(2);
+	expect(find(simple, 5)).toBeUndefined();
+
+	const complex = [
+		{id: 1, name: 'Alice'},
+		{id: 2, name: 'Bob'},
+		{id: 3, name: 'Charlie'},
+		{id: 4, name: 'David'},
+	];
+
+	const findByKeyCallback = find(complex, item => item.id === 3);
+	const findByKeyValue = find(complex, 3, 'id');
+
+	expect(findByKeyCallback).toEqual({id: 3, name: 'Charlie'});
+	expect(findByKeyValue).toEqual({id: 3, name: 'Charlie'});
+
+	const findByValueCallback = find(complex, item => item.id === 3);
+
+	expect(findByValueCallback).toEqual({id: 3, name: 'Charlie'});
+});
+
+test('indexOf', () => {
+	const simple = [1, 2, 3, 4];
+
+	expect(indexOf(simple, 2)).toBe(1);
+	expect(indexOf(simple, 5)).toBe(-1);
+
+	const complex = [
+		{id: 1, name: 'Alice'},
+		{id: 2, name: 'Bob'},
+		{id: 3, name: 'Charlie'},
+		{id: 4, name: 'David'},
+	];
+
+	const indexOfByKeyCallback = indexOf(complex, 3, item => item.id);
+	const indexOfByKeyValue = indexOf(complex, 3, 'id');
+
+	expect(indexOfByKeyCallback).toEqual(2);
+	expect(indexOfByKeyValue).toEqual(2);
+
+	const indexOfByValueCallback = indexOf(complex, item => item.id === 3);
+
+	expect(indexOfByValueCallback).toEqual(2);
 });
 
 test('groupBy', () => {
@@ -131,6 +210,10 @@ test('unique', () => {
 
 	expect(unique(simple)).toEqual([1, 2, 3, 4]);
 
+	const large = Array.from({length: 1_000}, (_, i) => i % 2 === 0);
+
+	expect(unique(large).length).toEqual(2);
+
 	const complex = [
 		{id: 1, name: 'Alice'},
 		{id: 2, name: 'Bob'},
@@ -148,10 +231,9 @@ test('unique', () => {
 		{id: 4, name: 'David'},
 	];
 
-	const uniqueByCallback = unique(complex, item => item.id);
-	const uniqueByKey = unique(complex, 'id');
+	const uniqueByKeyCallback = unique(complex, item => item.id);
+	const uniqueByKeyValue = unique(complex, 'id');
 
-	expect(uniqueByCallback).toEqual(result);
-	expect(uniqueByKey).toEqual(result);
-	expect(uniqueByCallback).toEqual(uniqueByKey);
+	expect(uniqueByKeyCallback).toEqual(result);
+	expect(uniqueByKeyValue).toEqual(result);
 });

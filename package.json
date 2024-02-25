@@ -42,6 +42,12 @@
 			"require": "./dist/js/number.js",
 			"types": "./types/number.d.ts"
 		},
+		"./object": {
+			"bun": "./src/js/object.ts",
+			"import": "./dist/js/object.mjs",
+			"require": "./dist/js/object.js",
+			"types": "./types/object.d.ts"
+		},
 		"./string": {
 			"bun": "./src/js/string.ts",
 			"import": "./dist/js/string.mjs",
@@ -86,12 +92,12 @@
 		"build": "bun run build:css && bun run build:js && bun run types",
 		"build:css": "bunx sass ./src/css:./dist/css --no-source-map",
 		"build:js": "bunx bun ./.bun.ts && bunx bun ./.bun.ts --mjs",
-		"test": "bun test --preload ./test/_preload.ts --coverage",
+		"test": "bun test",
 		"types": "bunx tsc -p ./tsconfig.json",
 		"watch:css": "bunx sass ./src/css:./dist/css --no-source-map --watch",
 		"watch:js": "bun build ./src/js/index.ts --outfile ./dist/js/index.js --watch"
 	},
 	"type": "module",
 	"types": "./types/index.d.ts",
-	"version": "0.16.0"
+	"version": "0.17.0"
 }

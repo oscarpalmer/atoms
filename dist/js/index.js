@@ -1,13 +1,65 @@
 // src/js/array.ts
-var _getCallback = function(value) {
-  if (typeof value === "function") {
-    return value;
+var _getCallbacks = function(bool, key) {
+  if (typeof bool === "function") {
+    return { bool };
   }
-  const isString = typeof value === "string";
-  if (!isString && typeof value !== "number") {
+  if (typeof key === "function") {
+    return { key };
+  }
+  const isString = typeof key === "string";
+  if (!isString && typeof key !== "number" || isString && key.includes(".")) {
     return;
   }
-  return isString && value.includes(".") ? undefined : (item) => item[value];
+  return {
+    key: (item) => item?.[key]
+  };
+};
+var _findValue = function(type, array, value, key) {
+  const callbacks = _getCallbacks(value, key);
+  if (callbacks?.bool === undefined && callbacks?.key === undefined) {
+    return type === "index" ? array.indexOf(value) : array.find((item) => item === value);
+  }
+  if (callbacks.bool !== undefined) {
+    const index2 = array.findIndex(callbacks.bool);
+    return type === "index" ? index2 : index2 > -1 ? array[index2] : undefined;
+  }
+  const { length } = array;
+  let index = 0;
+  for (;index < length; index += 1) {
+    const item = array[index];
+    if (callbacks.key?.(item) === value) {
+      return type === "index" ? index : item;
+    }
+  }
+  return type === "index" ? -1 : undefined;
+};
+var _findValues = function(type, array, value, key) {
+  const callbacks = _getCallbacks(value, key);
+  const { length } = array;
+  if (type === "unique" && callbacks?.key === undefined && length >= 100) {
+    return Array.from(new Set(array));
+  }
+  if (typeof callbacks?.bool === "function") {
+    return array.filter(callbacks.bool);
+  }
+  if (type === "all" && key === undefined) {
+    return array.filter((item) => item === value);
+  }
+  const hasCallback = typeof callbacks?.key === "function";
+  const result = [];
+  const values = hasCallback ? [] : result;
+  let index = 0;
+  for (;index < length; index += 1) {
+    const item = array[index];
+    const itemValue = hasCallback ? callbacks.key?.(item) : item;
+    if (type === "all" && itemValue === value || type === "unique" && values.indexOf(itemValue) === -1) {
+      if (values !== result) {
+        values.push(itemValue);
+      }
+      result.push(item);
+    }
+  }
+  return result;
 };
 var _insertValues = function(type, array, values, start, deleteCount) {
   const chunked = chunk(values).reverse();
@@ -37,23 +89,17 @@ function chunk(array, size) {
   return chunks;
 }
 function exists(array, value, key) {
-  const callback = _getCallback(key);
-  if (callback === undefined) {
-    return array.indexOf(value) > -1;
-  }
-  const needle = typeof value === "object" && value !== null ? callback(value) : value;
-  const { length } = array;
-  let index = 0;
-  for (;index < length; index += 1) {
-    if (callback(array[index]) === needle) {
-      return true;
-    }
-  }
-  return false;
+  return _findValue("index", array, value, key) > -1;
+}
+function filter(array, value, key) {
+  return _findValues("all", array, value, key);
+}
+function find(array, value, key) {
+  return _findValue("value", array, value, key);
 }
 function groupBy(array, key) {
-  const keyCallback = _getCallback(key);
-  if (keyCallback === undefined) {
+  const callbacks = _getCallbacks(undefined, key);
+  if (callbacks?.key === undefined) {
     return {};
   }
   const grouped = {};
@@ -61,7 +107,7 @@ function groupBy(array, key) {
   let index = 0;
   for (;index < length; index += 1) {
     const item = array[index];
-    const value = keyCallback(item);
+    const value = callbacks.key(item);
     if (value in grouped) {
       grouped[value].push(item);
     } else {
@@ -69,6 +115,9 @@ function groupBy(array, key) {
     }
   }
   return grouped;
+}
+function indexOf(array, value, key) {
+  return _findValue("index", array, value, key);
 }
 function insert(array, index, values) {
   _insertValues("splice", array, values, index, 0);
@@ -80,25 +129,7 @@ function splice(array, start, deleteCount, values) {
   return _insertValues("splice", array, values, start, deleteCount);
 }
 function unique(array, key) {
-  const keyCallback = _getCallback(key);
-  const { length } = array;
-  if (keyCallback === undefined && length >= 100) {
-    return Array.from(new Set(array));
-  }
-  const result = [];
-  const values = keyCallback === undefined ? result : [];
-  let index = 0;
-  for (;index < length; index += 1) {
-    const item = array[index];
-    const value = keyCallback?.(item) ?? item;
-    if (values.indexOf(value) === -1) {
-      if (values !== result) {
-        values.push(value);
-      }
-      result.push(item);
-    }
-  }
-  return result;
+  return _findValues("unique", array, undefined, key);
 }
 // src/js/element/index.ts
 var _findElements = function(selector, context, single) {
@@ -247,6 +278,104 @@ function getString(value) {
 function isNullableOrWhitespace(value) {
   return value == null || getString(value).trim().length === 0;
 }
+
+// src/js/value.ts
+var _getValue = function(data, key) {
+  if (typeof data !== "object" || data === null || /^(__proto__|constructor|prototype)$/i.test(key)) {
+    return;
+  }
+  return data instanceof Map ? data.get(key) : data[key];
+};
+var _setValue = function(data, key, value) {
+  if (typeof data !== "object" || data === null || /^(__proto__|constructor|prototype)$/i.test(key)) {
+    return;
+  }
+  if (data instanceof Map) {
+    data.set(key, value);
+  } else {
+    data[key] = value;
+  }
+};
+function getValue(data, key) {
+  if (typeof data !== "object" || data === null || isNullableOrWhitespace(key)) {
+    return;
+  }
+  const parts = getString(key).split(".");
+  const { length } = parts;
+  let index = 0;
+  let value = data;
+  for (;index < length; index += 1) {
+    value = _getValue(value, parts[index]);
+    if (value == null) {
+      break;
+    }
+  }
+  return value;
+}
+function isArrayOrObject(value) {
+  return /^(array|object)$/i.test(value?.constructor?.name);
+}
+function isNullable(value) {
+  return value == null;
+}
+function isObject(value) {
+  return /^object$/i.test(value?.constructor?.name);
+}
+function setValue(data, key, value) {
+  if (typeof data !== "object" || data === null || isNullableOrWhitespace(key)) {
+    return data;
+  }
+  const parts = getString(key).split(".");
+  const { length } = parts;
+  let index = 0;
+  let target = data;
+  for (;index < length; index += 1) {
+    const part = parts[index];
+    if (parts.indexOf(part) === parts.length - 1) {
+      _setValue(target, part, value);
+      break;
+    }
+    let next = _getValue(target, part);
+    if (typeof next !== "object" || next === null) {
+      next = /^\d+$/.test(part) ? [] : {};
+      target[part] = next;
+    }
+    target = next;
+  }
+  return data;
+}
+
+// src/js/object.ts
+function clone(value2) {
+  return structuredClone(value2);
+}
+function merge(...values) {
+  if (values.length === 0) {
+    return {};
+  }
+  const actual = values.filter(isArrayOrObject);
+  const result = actual.every(Array.isArray) ? [] : {};
+  const { length: itemsLength } = actual;
+  let itemIndex = 0;
+  for (;itemIndex < itemsLength; itemIndex += 1) {
+    const item = actual[itemIndex];
+    const isArray = Array.isArray(item);
+    const keys = isArray ? undefined : Object.keys(item);
+    const keysLength = isArray ? item.length : keys.length;
+    let keyIndex = 0;
+    for (;keyIndex < keysLength; keyIndex += 1) {
+      const key = keys?.[keyIndex] ?? keyIndex;
+      const next = item[key];
+      const previous = result[key];
+      if (isArrayOrObject(previous) && isArrayOrObject(next)) {
+        result[key] = merge(previous, next);
+      } else {
+        result[key] = next;
+      }
+    }
+  }
+  return result;
+}
 // src/js/timer.ts
 function repeat(callback, options) {
   const count = typeof options?.count === "number" ? options.count : Infinity;
@@ -330,71 +459,6 @@ class Timer {
     return work("stop", this, this.state, this.options);
   }
 }
-// src/js/value.ts
-var _getValue = function(data, key) {
-  if (typeof data !== "object" || data === null || /^(__proto__|constructor|prototype)$/i.test(key)) {
-    return;
-  }
-  return data instanceof Map ? data.get(key) : data[key];
-};
-var _setValue = function(data, key, value) {
-  if (typeof data !== "object" || data === null || /^(__proto__|constructor|prototype)$/i.test(key)) {
-    return;
-  }
-  if (data instanceof Map) {
-    data.set(key, value);
-  } else {
-    data[key] = value;
-  }
-};
-function getValue(data, key) {
-  if (typeof data !== "object" || data === null || isNullableOrWhitespace(key)) {
-    return;
-  }
-  const parts = getString(key).split(".");
-  const { length } = parts;
-  let index = 0;
-  let value = data;
-  for (;index < length; index += 1) {
-    value = _getValue(value, parts[index]);
-    if (value == null) {
-      break;
-    }
-  }
-  return value;
-}
-function isArrayOrObject(value) {
-  return /^(array|object)$/i.test(value?.constructor?.name);
-}
-function isNullable(value) {
-  return value == null;
-}
-function isObject(value) {
-  return /^object$/i.test(value?.constructor?.name);
-}
-function setValue(data, key, value) {
-  if (typeof data !== "object" || data === null || isNullableOrWhitespace(key)) {
-    return data;
-  }
-  const parts = getString(key).split(".");
-  const { length } = parts;
-  let index = 0;
-  let target = data;
-  for (;index < length; index += 1) {
-    const part = parts[index];
-    if (parts.indexOf(part) === parts.length - 1) {
-      _setValue(target, part, value);
-      break;
-    }
-    let next = _getValue(target, part);
-    if (typeof next !== "object" || next === null) {
-      next = /^\d+$/.test(part) ? [] : {};
-      target[part] = next;
-    }
-    target = next;
-  }
-  return data;
-}
 export {
   wait,
   unique,
@@ -402,11 +466,13 @@ export {
   setValue,
   repeat,
   push,
+  merge,
   isObject,
   isNullableOrWhitespace,
   isNullable,
   isArrayOrObject,
   insert,
+  indexOf,
   groupBy,
   getValue,
   getTextDirection,
@@ -417,8 +483,11 @@ export {
   findParentElement,
   findElements,
   findElement,
+  find,
+  filter,
   exists,
   createUuid,
+  clone,
   clamp,
   chunk,
   between,

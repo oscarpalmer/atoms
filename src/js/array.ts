@@ -1,25 +1,126 @@
-import {Key} from './value';
+import {GenericObject, Key} from './value';
 
-type KeyCallback<T> = (item: T) => Key;
+type BooleanCallback<T> = (item: T, index: number, array: T[]) => boolean;
+
+type Callbacks<T> = {
+	bool?: BooleanCallback<T>;
+	key?: KeyCallback<T>;
+};
+
+type FindType = 'index' | 'value';
 
 type InsertType = 'push' | 'splice';
 
-function _getCallback<T>(
-	value: Key | KeyCallback<T> | undefined,
-): KeyCallback<T> | undefined {
-	if (typeof value === 'function') {
-		return value;
+type KeyCallback<T> = (item: T) => Key;
+
+function _getCallbacks<T>(
+	bool: unknown,
+	key: unknown,
+): Callbacks<T> | undefined {
+	if (typeof bool === 'function') {
+		return {bool: bool as BooleanCallback<T>};
 	}
 
-	const isString = typeof value === 'string';
+	if (typeof key === 'function') {
+		return {key: key as KeyCallback<T>};
+	}
 
-	if (!isString && typeof value !== 'number') {
+	const isString = typeof key === 'string';
+
+	if (
+		(!isString && typeof key !== 'number') ||
+		(isString && key.includes('.'))
+	) {
 		return;
 	}
 
-	return isString && value.includes('.')
-		? undefined
-		: (item: T): Key => item[value as never];
+	return {
+		key: (item: T) => (item as GenericObject)?.[key as string] as Key,
+	};
+}
+
+function _findValue<T1, T2 = T1>(
+	type: FindType,
+	array: T1[],
+	value: T2 | BooleanCallback<T1>,
+	key?: Key | KeyCallback<T1>,
+): unknown {
+	const callbacks = _getCallbacks(value, key);
+
+	if (callbacks?.bool === undefined && callbacks?.key === undefined) {
+		return type === 'index'
+			? array.indexOf(value as T1)
+			: array.find(item => item === value);
+	}
+
+	if (callbacks.bool !== undefined) {
+		const index = array.findIndex(callbacks.bool);
+
+		return type === 'index' ? index : index > -1 ? array[index] : undefined;
+	}
+
+	const {length} = array;
+
+	let index = 0;
+
+	for (; index < length; index += 1) {
+		const item = array[index];
+
+		if (callbacks.key?.(item) === value) {
+			return type === 'index' ? index : item;
+		}
+	}
+
+	return type === 'index' ? -1 : undefined;
+}
+
+function _findValues<T1, T2 = T1>(
+	type: 'all' | 'unique',
+	array: T1[],
+	value: T2 | BooleanCallback<T1>,
+	key?: Key | KeyCallback<T1>,
+): T1[] {
+	const callbacks = _getCallbacks(value, key);
+
+	const {length} = array;
+
+	if (type === 'unique' && callbacks?.key === undefined && length >= 100) {
+		return Array.from(new Set(array));
+	}
+
+	if (typeof callbacks?.bool === 'function') {
+		return array.filter(callbacks.bool);
+	}
+
+	if (type === 'all' && key === undefined) {
+		return array.filter(item => item === value);
+	}
+
+	const hasCallback = typeof callbacks?.key === 'function';
+
+	const result: T1[] = [];
+
+	const values: unknown[] = hasCallback ? [] : result;
+
+	let index = 0;
+
+	for (; index < length; index += 1) {
+		const item = array[index];
+		const itemValue = hasCallback ? callbacks.key?.(item) : item;
+
+		if (
+			(type === 'all' && itemValue === value) ||
+			(type === 'unique' && values.indexOf(itemValue) === -1)
+		) {
+			if (values !== result) {
+				values.push(itemValue);
+			}
+
+			result.push(item);
+		}
+	}
+
+	return result;
 }
 
 function _insertValues<T>(
@@ -76,37 +177,90 @@ export function chunk<T>(array: T[], size?: number): T[][] {
 }
 
 /**
- * Does the value exist in the array?
- * - `key` is optional and can be used to specify a key or callback for finding a key for comparisons
- * - If `key` is not provided, the item itself is used for comparisons
+ * Does the value exist in array?
+ */
+export function exists<T1, T2>(
+	array: T1[],
+	value: T2 | BooleanCallback<T1>,
+): boolean;
+
+/**
+ * - Does the value exist in array?
+ * - Use `key` to find a comparison value to match with `value`
  */
 export function exists<T1, T2 = T1>(
 	array: T1[],
 	value: T2,
+	key: Key | KeyCallback<T1>,
+): boolean;
+
+/**
+ * Does the value exist in array?
+ */
+export function exists<T1, T2 = T1>(
+	array: T1[],
+	value: T2 | BooleanCallback<T1>,
 	key?: Key | KeyCallback<T1>,
 ): boolean {
-	const callback = _getCallback(key);
+	return (_findValue('index', array, value, key) as number) > -1;
+}
 
-	if (callback === undefined) {
-		return array.indexOf(value as never) > -1;
-	}
+/**
+ * Returns a filtered array of items matching `value`
+ */
+export function filter<T1, T2>(
+	array: T1[],
+	value: T2 | BooleanCallback<T1>,
+): T1[];
 
-	const needle =
-		typeof value === 'object' && value !== null
-			? callback(value as never)
-			: value;
+/**
+ * - Returns a filtered array of items
+ * - Use `key` to find a comparison value to match with `value`
+ */
+export function filter<T1, T2 = T1>(
+	array: T1[],
+	value: T2,
+	key: Key | KeyCallback<T1>,
+): T1[];
 
-	const {length} = array;
+/**
+ * Returns a filtered array of items
+ */
+export function filter<T1, T2 = T1>(
+	array: T1[],
+	value: T2 | BooleanCallback<T1>,
+	key?: Key | KeyCallback<T1>,
+): T1[] {
+	return _findValues('all', array, value, key);
+}
 
-	let index = 0;
+/**
+ * Returns the first item matching `value`, or `undefined` if no match is found
+ */
+export function find<T1, T2>(
+	array: T1[],
+	value: T2 | BooleanCallback<T1>,
+): T1 | undefined;
 
-	for (; index < length; index += 1) {
-		if (callback(array[index]) === needle) {
-			return true;
-		}
-	}
+/**
+ * - Returns the first matching item, or `undefined` if no match is found
+ * - Use `key` to find a comparison value to match with `value`
+ */
+export function find<T1, T2 = T1>(
+	array: T1[],
+	value: T2,
+	key: Key | KeyCallback<T1>,
+): T1 | undefined;
 
-	return false;
+/**
+ * - Returns the first matching item, or `undefined` if no match is found
+ */
+export function find<T1, T2 = T1>(
+	array: T1[],
+	value: T2 | BooleanCallback<T1>,
+	key?: Key | KeyCallback<T1>,
+): T1 | undefined {
+	return _findValue('value', array, value, key) as T1 | undefined;
 }
 
 /**
@@ -114,11 +268,11 @@ export function exists<T1, T2 = T1>(
  */
 export function groupBy<T>(
 	array: T[],
-	key: Key | ((item: T) => Key),
+	key: Key | KeyCallback<T>,
 ): Record<Key, T[]> {
-	const keyCallback = _getCallback(key) as KeyCallback<T>;
+	const callbacks = _getCallbacks(undefined, key);
 
-	if (keyCallback === undefined) {
+	if (callbacks?.key === undefined) {
 		return {};
 	}
 
@@ -130,7 +284,7 @@ export function groupBy<T>(
 
 	for (; index < length; index += 1) {
 		const item = array[index];
-		const value = keyCallback(item);
+		const value = callbacks.key(item);
 
 		if (value in grouped) {
 			grouped[value].push(item);
@@ -140,6 +294,35 @@ export function groupBy<T>(
 	}
 
 	return grouped;
+}
+
+/**
+ * Returns the index for the first item matching `value`, or `-1` if no match is found
+ */
+export function indexOf<T1, T2>(
+	array: T1[],
+	value: T2 | BooleanCallback<T1>,
+): number;
+
+/**
+ * - Returns the index for the first matching item, or `-1` if no match is found
+ * - Use `key` to find a comparison value to match with `value`
+ */
+export function indexOf<T1, T2 = T1>(
+	array: T1[],
+	value: T2,
+	key: Key | KeyCallback<T1>,
+): number;
+
+/**
+ * Returns the index of the first matching item, or `-1` if no match is found
+ */
+export function indexOf<T1, T2 = T1>(
+	array: T1[],
+	value: T2 | BooleanCallback<T1>,
+	key?: Key | KeyCallback<T1>,
+): number {
+	return _findValue('index', array, value, key) as number;
 }
 
 /**
@@ -172,38 +355,19 @@ export function splice<T>(
 }
 
 /**
- * - Returns a new array with unique items
- * - `key` is optional and can be used to specify a key or callback for finding a key for uniqueness
- * - If `key` is not provided, the item itself is used for comparisons
- * - Inspired by Lodash :-)
+ * Returns an array of unique items
  */
-export function unique<T>(array: T[], key?: Key | ((item: T) => Key)): T[] {
-	const keyCallback = _getCallback(key);
+export function unique<T>(array: T[]): T[];
 
-	const {length} = array;
+/**
+ * - Returns an array of unique items
+ * - Use `key` to find a comparison value to match with `value`
+ */
+export function unique<T>(array: T[], key: Key | KeyCallback<T>): T[];
 
-	if (keyCallback === undefined && length >= 100) {
-		return Array.from(new Set(array));
-	}
-
-	const result: T[] = [];
-
-	const values: unknown[] = keyCallback === undefined ? result : [];
-
-	let index = 0;
-
-	for (; index < length; index += 1) {
-		const item = array[index];
-		const value = keyCallback?.(item) ?? item;
-
-		if (values.indexOf(value) === -1) {
-			if (values !== result) {
-				values.push(value);
-			}
-
-			result.push(item);
-		}
-	}
-
-	return result;
+/**
+ * Returns an array of unique items
+ */
+export function unique<T>(array: T[], key?: Key | KeyCallback<T>): T[] {
+	return _findValues('unique', array, undefined, key);
 }
