@@ -36,8 +36,10 @@ export function merge<T = ArrayOrObject>(...values: T[]): T {
 			const next = item[key];
 			const previous = result[key];
 
-			if (isArrayOrObject(previous) && isArrayOrObject(next)) {
-				result[key] = merge(previous as never, next);
+			if (isArrayOrObject(next)) {
+				result[key] = isArrayOrObject(previous)
+					? merge(previous, next)
+					: merge(next);
 			} else {
 				result[key] = next;
 			}

@@ -367,14 +367,46 @@ function merge(...values) {
       const key = keys?.[keyIndex] ?? keyIndex;
       const next = item[key];
       const previous = result[key];
-      if (isArrayOrObject(previous) && isArrayOrObject(next)) {
-        result[key] = merge(previous, next);
+      if (isArrayOrObject(next)) {
+        result[key] = isArrayOrObject(previous) ? merge(previous, next) : merge(next);
       } else {
         result[key] = next;
       }
     }
   }
   return result;
+}
+// src/js/proxy.ts
+var _createProxy = function(blob, value3) {
+  if (!isArrayOrObject(value3) || _isProxy(value3)) {
+    return value3;
+  }
+  const isArray = Array.isArray(value3);
+  const proxyBlob = blob ?? new ProxyBlob;
+  const proxyValue = new Proxy(isArray ? [] : {}, {});
+  Object.defineProperty(proxyValue, "$", {
+    value: proxyBlob
+  });
+  const keys = isArray ? undefined : Object.keys(value3);
+  const size = (isArray ? value3 : keys)?.length ?? 0;
+  let index = 0;
+  for (;index < size; index += 1) {
+    const key = isArray ? index : keys[index];
+    proxyValue[key] = _createProxy(proxyBlob, value3[key]);
+  }
+  return proxyValue;
+};
+var _isProxy = function(value3) {
+  return value3?.$ instanceof ProxyBlob;
+};
+function proxy(value3) {
+  if (!isArrayOrObject(value3)) {
+    throw new Error("Proxy value must be an array or object");
+  }
+  return _createProxy(undefined, value3);
+}
+
+class ProxyBlob {
 }
 // src/js/timer.ts
 function repeat(callback, options) {
@@ -466,6 +498,7 @@ export {
   setValue,
   repeat,
   push,
+  proxy,
   merge,
   isObject,
   isNullableOrWhitespace,
