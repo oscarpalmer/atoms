@@ -42,12 +42,6 @@
 			"require": "./dist/js/number.js",
 			"types": "./types/number.d.ts"
 		},
-		"./object": {
-			"bun": "./src/js/object.ts",
-			"import": "./dist/js/object.mjs",
-			"require": "./dist/js/object.js",
-			"types": "./types/object.d.ts"
-		},
 		"./proxy": {
 			"bun": "./src/js/proxy.ts",
 			"import": "./dist/js/proxy.mjs",

@@ -22,13 +22,13 @@ function _createProxy<T extends ArrayOrObject>(
 		value: proxyBlob,
 	});
 
-	const keys = isArray ? undefined : Object.keys(value);
-	const size = (isArray ? value : keys)?.length ?? 0;
+	const keys =  Object.keys(value);
+	const size = keys.length ?? 0;
 
 	let index = 0;
 
 	for (; index < size; index += 1) {
-		const key = isArray ? index : (keys as string[])[index];
+		const key = keys[index];
 
 		proxyValue[key as never] = _createProxy(proxyBlob, value[key as never]);
 	}

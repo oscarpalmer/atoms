@@ -14,11 +14,11 @@ var _createProxy = function(blob, value2) {
   Object.defineProperty(proxyValue, "$", {
     value: proxyBlob
   });
-  const keys = isArray ? undefined : Object.keys(value2);
-  const size = (isArray ? value2 : keys)?.length ?? 0;
+  const keys = Object.keys(value2);
+  const size = keys.length ?? 0;
   let index = 0;
   for (;index < size; index += 1) {
-    const key = isArray ? index : keys[index];
+    const key = keys[index];
     proxyValue[key] = _createProxy(proxyBlob, value2[key]);
   }
   return proxyValue;

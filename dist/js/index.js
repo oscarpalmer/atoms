@@ -280,6 +280,42 @@ function isNullableOrWhitespace(value) {
 }
 
 // src/js/value.ts
+var _getDiffs = function(first, second, prefix) {
+  const changes = [];
+  const checked = new Set;
+  let outer = 0;
+  for (;outer < 2; outer += 1) {
+    const value = outer === 0 ? first : second;
+    if (!isArrayOrObject(value)) {
+      continue;
+    }
+    const keys = Object.keys(value);
+    const size = keys.length;
+    let inner = 0;
+    for (;inner < size; inner += 1) {
+      const key = keys[inner];
+      if (checked.has(key)) {
+        continue;
+      }
+      const from = first?.[key];
+      const to = second?.[key];
+      if (!Object.is(from, to)) {
+        const prefixed = _getKey(prefix, key);
+        changes.push({
+          from,
+          to,
+          key: prefixed
+        });
+        changes.push(..._getDiffs(from, to, prefixed));
+      }
+      checked.add(key);
+    }
+  }
+  return changes;
+};
+var _getKey = function(...parts) {
+  return parts.filter((part) => part !== undefined).join(".");
+};
 var _getValue = function(data, key) {
   if (typeof data !== "object" || data === null || /^(__proto__|constructor|prototype)$/i.test(key)) {
     return;
@@ -296,18 +332,49 @@ var _setValue = function(data, key, value) {
     data[key] = value;
   }
 };
-function getValue(data, key) {
-  if (typeof data !== "object" || data === null || isNullableOrWhitespace(key)) {
-    return;
+function clone(value) {
+  return structuredClone(value);
+}
+function diff(first, second) {
+  const result = {
+    original: {
+      from: first,
+      to: second
+    },
+    type: "partial",
+    values: {}
+  };
+  const same = Object.is(first, second);
+  const firstIsArrayOrObject = isArrayOrObject(first);
+  const secondIsArrayOrObject = isArrayOrObject(second);
+  if (same || !firstIsArrayOrObject && !secondIsArrayOrObject) {
+    result.type = same ? "none" : "full";
+    return result;
   }
+  if (firstIsArrayOrObject !== secondIsArrayOrObject) {
+    result.type = "full";
+  }
+  const diffs = _getDiffs(first, second);
+  const { length } = diffs;
+  if (length === 0) {
+    result.type = "none";
+  }
+  let index = 0;
+  for (;index < length; index += 1) {
+    const diff2 = diffs[index];
+    result.values[diff2.key] = { from: diff2.from, to: diff2.to };
+  }
+  return result;
+}
+function get(data, key) {
   const parts = getString(key).split(".");
   const { length } = parts;
   let index = 0;
-  let value = data;
+  let value = typeof data === "object" ? data ?? {} : {};
   for (;index < length; index += 1) {
     value = _getValue(value, parts[index]);
     if (value == null) {
-      break;
+      return;
     }
   }
   return value;
@@ -321,14 +388,37 @@ function isNullable(value) {
 function isObject(value) {
   return /^object$/i.test(value?.constructor?.name);
 }
-function setValue(data, key, value) {
-  if (typeof data !== "object" || data === null || isNullableOrWhitespace(key)) {
-    return data;
+function merge(...values) {
+  if (values.length === 0) {
+    return {};
   }
+  const actual = values.filter(isArrayOrObject);
+  const result = actual.every(Array.isArray) ? [] : {};
+  const { length } = actual;
+  let itemIndex = 0;
+  for (;itemIndex < length; itemIndex += 1) {
+    const item = actual[itemIndex];
+    const keys = Object.keys(item);
+    const size = keys.length;
+    let keyIndex = 0;
+    for (;keyIndex < size; keyIndex += 1) {
+      const key = keys[keyIndex];
+      const next = item[key];
+      const previous = result[key];
+      if (isArrayOrObject(next)) {
+        result[key] = isArrayOrObject(previous) ? merge(previous, next) : merge(next);
+      } else {
+        result[key] = next;
+      }
+    }
+  }
+  return result;
+}
+function set(data, key, value) {
   const parts = getString(key).split(".");
   const { length } = parts;
   let index = 0;
-  let target = data;
+  let target = typeof data === "object" ? data ?? {} : {};
   for (;index < length; index += 1) {
     const part = parts[index];
     if (parts.indexOf(part) === parts.length - 1) {
@@ -345,65 +435,34 @@ function setValue(data, key, value) {
   return data;
 }
 
-// src/js/object.ts
-function clone(value2) {
-  return structuredClone(value2);
-}
-function merge(...values) {
-  if (values.length === 0) {
-    return {};
-  }
-  const actual = values.filter(isArrayOrObject);
-  const result = actual.every(Array.isArray) ? [] : {};
-  const { length: itemsLength } = actual;
-  let itemIndex = 0;
-  for (;itemIndex < itemsLength; itemIndex += 1) {
-    const item = actual[itemIndex];
-    const isArray = Array.isArray(item);
-    const keys = isArray ? undefined : Object.keys(item);
-    const keysLength = isArray ? item.length : keys.length;
-    let keyIndex = 0;
-    for (;keyIndex < keysLength; keyIndex += 1) {
-      const key = keys?.[keyIndex] ?? keyIndex;
-      const next = item[key];
-      const previous = result[key];
-      if (isArrayOrObject(next)) {
-        result[key] = isArrayOrObject(previous) ? merge(previous, next) : merge(next);
-      } else {
-        result[key] = next;
-      }
-    }
-  }
-  return result;
-}
 // src/js/proxy.ts
-var _createProxy = function(blob, value3) {
-  if (!isArrayOrObject(value3) || _isProxy(value3)) {
-    return value3;
+var _createProxy = function(blob, value2) {
+  if (!isArrayOrObject(value2) || _isProxy(value2)) {
+    return value2;
   }
-  const isArray = Array.isArray(value3);
+  const isArray = Array.isArray(value2);
   const proxyBlob = blob ?? new ProxyBlob;
   const proxyValue = new Proxy(isArray ? [] : {}, {});
   Object.defineProperty(proxyValue, "$", {
     value: proxyBlob
   });
-  const keys = isArray ? undefined : Object.keys(value3);
-  const size = (isArray ? value3 : keys)?.length ?? 0;
+  const keys = Object.keys(value2);
+  const size = keys.length ?? 0;
   let index = 0;
   for (;index < size; index += 1) {
-    const key = isArray ? index : keys[index];
-    proxyValue[key] = _createProxy(proxyBlob, value3[key]);
+    const key = keys[index];
+    proxyValue[key] = _createProxy(proxyBlob, value2[key]);
   }
   return proxyValue;
 };
-var _isProxy = function(value3) {
-  return value3?.$ instanceof ProxyBlob;
+var _isProxy = function(value2) {
+  return value2?.$ instanceof ProxyBlob;
 };
-function proxy(value3) {
-  if (!isArrayOrObject(value3)) {
+function proxy(value2) {
+  if (!isArrayOrObject(value2)) {
     throw new Error("Proxy value must be an array or object");
   }
-  return _createProxy(undefined, value3);
+  return _createProxy(undefined, value2);
 }
 
 class ProxyBlob {
@@ -495,7 +554,7 @@ export {
   wait,
   unique,
   splice,
-  setValue,
+  set,
   repeat,
   push,
   proxy,
@@ -507,18 +566,19 @@ export {
   insert,
   indexOf,
   groupBy,
-  getValue,
   getTextDirection,
   getString,
   getPosition,
   getNumber,
   getElementUnderPointer,
+  get,
   findParentElement,
   findElements,
   findElement,
   find,
   filter,
   exists,
+  diff,
   createUuid,
   clone,
   clamp,
