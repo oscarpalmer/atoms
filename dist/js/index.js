@@ -290,9 +290,9 @@ var _getDiffs = function(first, second, prefix) {
       continue;
     }
     const keys = Object.keys(value);
-    const size = keys.length;
+    const { length } = keys;
     let inner = 0;
-    for (;inner < size; inner += 1) {
+    for (;inner < length; inner += 1) {
       const key = keys[inner];
       if (checked.has(key)) {
         continue;
@@ -417,11 +417,12 @@ function merge(...values) {
 function set(data, key, value) {
   const parts = getString(key).split(".");
   const { length } = parts;
+  const lastIndex = length - 1;
   let index = 0;
   let target = typeof data === "object" ? data ?? {} : {};
   for (;index < length; index += 1) {
     const part = parts[index];
-    if (parts.indexOf(part) === parts.length - 1) {
+    if (parts.indexOf(part) === lastIndex) {
       _setValue(target, part, value);
       break;
     }
@@ -436,27 +437,34 @@ function set(data, key, value) {
 }
 
 // src/js/proxy.ts
-var _createProxy = function(blob, value2) {
-  if (!isArrayOrObject(value2) || _isProxy(value2)) {
+var _createProxy = function(existing, value2) {
+  if (!isArrayOrObject(value2) || _isProxy(value2) && value2.$ === existing) {
     return value2;
   }
   const isArray = Array.isArray(value2);
-  const proxyBlob = blob ?? new ProxyBlob;
-  const proxyValue = new Proxy(isArray ? [] : {}, {});
-  Object.defineProperty(proxyValue, "$", {
-    value: proxyBlob
+  const proxy = new Proxy(isArray ? [] : {}, {
+    get(target, property) {
+      return property === "$" ? manager : Reflect.get(target, property);
+    },
+    set(target, property, value3) {
+      return property === "$" || Reflect.set(target, property, _createProxy(manager, value3));
+    }
+  });
+  const manager = existing ?? new Manager(proxy);
+  Object.defineProperty(proxy, "$", {
+    value: manager
   });
   const keys = Object.keys(value2);
-  const size = keys.length ?? 0;
+  const { length } = keys;
   let index = 0;
-  for (;index < size; index += 1) {
+  for (;index < length; index += 1) {
     const key = keys[index];
-    proxyValue[key] = _createProxy(proxyBlob, value2[key]);
+    proxy[key] = value2[key];
   }
-  return proxyValue;
+  return proxy;
 };
 var _isProxy = function(value2) {
-  return value2?.$ instanceof ProxyBlob;
+  return value2?.$ instanceof Manager;
 };
 function proxy(value2) {
   if (!isArrayOrObject(value2)) {
@@ -465,7 +473,14 @@ function proxy(value2) {
   return _createProxy(undefined, value2);
 }
 
-class ProxyBlob {
+class Manager {
+  owner;
+  constructor(owner) {
+    this.owner = owner;
+  }
+  clone() {
+    return clone(merge(this.owner));
+  }
 }
 // src/js/timer.ts
 function repeat(callback, options) {

@@ -1,49 +1,73 @@
-import {ArrayOrObject, GenericObject, isArrayOrObject} from './value';
+import {
+	ArrayOrObject,
+	GenericObject,
+	clone,
+	isArrayOrObject,
+	merge,
+} from './value';
 
-class ProxyBlob {}
+class Manager<T extends ArrayOrObject = GenericObject> {
+	constructor(readonly owner: Proxied<T>) {}
 
-type ProxyValue = {
-	$: ProxyBlob;
-};
+	clone(): Proxied<T> {
+		return clone(merge(this.owner)) as Proxied<T>;
+	}
+}
+
+export type Proxied<T extends ArrayOrObject = GenericObject> = {
+	$: Manager<T>;
+} & T;
 
 function _createProxy<T extends ArrayOrObject>(
-	blob: ProxyBlob | undefined,
+	existing: Manager | undefined,
 	value: T,
-): T {
-	if (!isArrayOrObject(value) || _isProxy(value)) {
+): unknown {
+	if (!isArrayOrObject(value) || (_isProxy(value) && value.$ === existing)) {
 		return value;
 	}
 
 	const isArray = Array.isArray(value);
-	const proxyBlob = blob ?? new ProxyBlob();
-	const proxyValue = new Proxy(isArray ? [] : {}, {});
 
-	Object.defineProperty(proxyValue, '$', {
-		value: proxyBlob,
+	const proxy = new Proxy(isArray ? [] : {}, {
+		get(target, property) {
+			return property === '$' ? manager : Reflect.get(target, property);
+		},
+		set(target, property, value) {
+			return (
+				property === '$' ||
+				Reflect.set(target, property, _createProxy(manager, value))
+			);
+		},
+	}) as Proxied;
+
+	const manager = existing ?? new Manager(proxy);
+
+	Object.defineProperty(proxy, '$', {
+		value: manager,
 	});
 
-	const keys =  Object.keys(value);
-	const size = keys.length ?? 0;
+	const keys = Object.keys(value);
+	const {length} = keys;
 
 	let index = 0;
 
-	for (; index < size; index += 1) {
+	for (; index < length; index += 1) {
 		const key = keys[index];
 
-		proxyValue[key as never] = _createProxy(proxyBlob, value[key as never]);
+		proxy[key as never] = value[key as never];
 	}
 
-	return proxyValue as T;
+	return proxy;
 }
 
-function _isProxy(value: unknown): value is ProxyValue {
-	return (value as GenericObject)?.$ instanceof ProxyBlob;
+function _isProxy(value: unknown): value is Proxied {
+	return (value as Proxied)?.$ instanceof Manager;
 }
 
-export function proxy<T extends ArrayOrObject>(value: T): T {
+export function proxy<T extends ArrayOrObject>(value: T): Proxied<T> {
 	if (!isArrayOrObject(value)) {
 		throw new Error('Proxy value must be an array or object');
 	}
 
-	return _createProxy(undefined, value);
+	return _createProxy(undefined, value) as Proxied<T>;
 }

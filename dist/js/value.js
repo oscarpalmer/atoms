@@ -18,9 +18,9 @@ var _getDiffs = function(first, second, prefix) {
       continue;
     }
     const keys = Object.keys(value);
-    const size = keys.length;
+    const { length } = keys;
     let inner = 0;
-    for (;inner < size; inner += 1) {
+    for (;inner < length; inner += 1) {
       const key = keys[inner];
       if (checked.has(key)) {
         continue;
@@ -145,11 +145,12 @@ function merge(...values) {
 function set(data, key, value) {
   const parts = getString(key).split(".");
   const { length } = parts;
+  const lastIndex = length - 1;
   let index = 0;
   let target = typeof data === "object" ? data ?? {} : {};
   for (;index < length; index += 1) {
     const part = parts[index];
-    if (parts.indexOf(part) === parts.length - 1) {
+    if (parts.indexOf(part) === lastIndex) {
       _setValue(target, part, value);
       break;
     }

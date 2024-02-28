@@ -43,11 +43,11 @@ function _getDiffs(
 		}
 
 		const keys = Object.keys(value);
-		const size = keys.length;
+		const {length} = keys;
 
 		let inner = 0;
 
-		for (; inner < size; inner += 1) {
+		for (; inner < length; inner += 1) {
 			const key = keys[inner];
 
 			if (checked.has(key)) {
@@ -264,6 +264,7 @@ export function set<T extends ValueObject>(
 ): T {
 	const parts = getString(key).split('.');
 	const {length} = parts;
+	const lastIndex = length - 1;
 
 	let index = 0;
 	let target: ValueObject = typeof data === 'object' ? data ?? {} : {};
@@ -271,7 +272,7 @@ export function set<T extends ValueObject>(
 	for (; index < length; index += 1) {
 		const part = parts[index];
 
-		if (parts.indexOf(part) === parts.length - 1) {
+		if (parts.indexOf(part) === lastIndex) {
 			_setValue(target, part, value);
 
 			break;
