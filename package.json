@@ -36,6 +36,12 @@
 			"require": "./dist/js/element/focusable.js",
 			"types": "./types/element/focusable.d.ts"
 		},
+		"./is": {
+			"bun": "./src/js/is.ts",
+			"import": "./dist/js/is.mjs",
+			"require": "./dist/js/is.js",
+			"types": "./types/is.d.ts"
+		},
 		"./number": {
 			"bun": "./src/js/number.ts",
 			"import": "./dist/js/number.mjs",
@@ -99,5 +105,5 @@
 	},
 	"type": "module",
 	"types": "./types/index.d.ts",
-	"version": "0.20.0"
+	"version": "0.21.0"
 }

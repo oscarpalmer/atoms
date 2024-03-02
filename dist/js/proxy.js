@@ -1,15 +1,24 @@
+// src/js/is.ts
+function isArrayOrPlainObject(value) {
+  return Array.isArray(value) || isPlainObject(value);
+}
+function isPlainObject(value) {
+  if (typeof value !== "object" || value === null) {
+    return false;
+  }
+  const prototype = Object.getPrototypeOf(value);
+  return (prototype === null || prototype === Object.prototype || Object.getPrototypeOf(prototype) === null) && !(Symbol.toStringTag in value) && !(Symbol.iterator in value);
+}
+
 // src/js/value.ts
 function clone(value) {
   return structuredClone(value);
-}
-function isArrayOrObject(value) {
-  return /^(array|object)$/i.test(value?.constructor?.name);
 }
 function merge(...values) {
   if (values.length === 0) {
     return {};
   }
-  const actual = values.filter(isArrayOrObject);
+  const actual = values.filter((value) => isArrayOrPlainObject(value));
   const result = actual.every(Array.isArray) ? [] : {};
   const { length } = actual;
   let itemIndex = 0;
@@ -22,8 +31,8 @@ function merge(...values) {
       const key = keys[keyIndex];
       const next = item[key];
       const previous = result[key];
-      if (isArrayOrObject(next)) {
-        result[key] = isArrayOrObject(previous) ? merge(previous, next) : merge(next);
+      if (isArrayOrPlainObject(next)) {
+        result[key] = isArrayOrPlainObject(previous) ? merge(previous, next) : merge(next);
       } else {
         result[key] = next;
       }
@@ -34,7 +43,7 @@ function merge(...values) {
 
 // src/js/proxy.ts
 var _createProxy = function(existing, value2) {
-  if (!isArrayOrObject(value2) || _isProxy(value2) && value2.$ === existing) {
+  if (!isArrayOrPlainObject(value2) || _isProxy(value2) && value2.$ === existing) {
     return value2;
   }
   const isArray = Array.isArray(value2);
@@ -63,7 +72,7 @@ var _isProxy = function(value2) {
   return value2?.$ instanceof Manager;
 };
 function proxy(value2) {
-  if (!isArrayOrObject(value2)) {
+  if (!isArrayOrPlainObject(value2)) {
     throw new Error("Proxy value must be an array or object");
   }
   return _createProxy(undefined, value2);

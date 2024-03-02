@@ -9,11 +9,7 @@ function getString(value) {
   const result = value?.toString?.() ?? value;
   return result?.toString?.() ?? String(result);
 }
-function isNullableOrWhitespace(value) {
-  return value == null || getString(value).trim().length === 0;
-}
 export {
-  isNullableOrWhitespace,
   getString,
   createUuid
 };

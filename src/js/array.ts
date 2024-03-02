@@ -1,4 +1,5 @@
-import {GenericObject, Key} from './value';
+import {PlainObject} from './is';
+import {Key} from './value';
 
 type BooleanCallback<T> = (item: T, index: number, array: T[]) => boolean;
 
@@ -35,7 +36,7 @@ function _getCallbacks<T>(
 	}
 
 	return {
-		key: (item: T) => (item as GenericObject)?.[key as string] as Key,
+		key: (item: T) => (item as PlainObject)?.[key as string] as Key,
 	};
 }
 

@@ -24,12 +24,3 @@ export function getString(value: unknown): string {
 
 	return result?.toString?.() ?? String(result);
 }
-
-/**
- * Is the value undefined, null, or an empty string?
- */
-export function isNullableOrWhitespace(
-	value: unknown,
-): value is undefined | null | '' {
-	return value == null || getString(value).trim().length === 0;
-}

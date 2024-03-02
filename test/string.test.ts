@@ -1,5 +1,5 @@
 import {expect, test} from 'bun:test';
-import {createUuid, getString, isNullableOrWhitespace} from '../src/js/string';
+import {createUuid, getString} from '../src/js/string';
 
 test('createUuid', () => {
 	const ids = new Set<string>();
@@ -27,19 +27,4 @@ test('getString', () => {
 	expect(getString({})).toBe('[object Object]');
 	expect(getString([])).toBe('');
 	expect(getString([1, 2, 3])).toBe('1,2,3');
-});
-
-test('isNullableOrWhitespace', () => {
-	expect(isNullableOrWhitespace(undefined)).toBe(true);
-	expect(isNullableOrWhitespace(null)).toBe(true);
-	expect(isNullableOrWhitespace('')).toBe(true);
-	expect(isNullableOrWhitespace(' ')).toBe(true);
-	expect(isNullableOrWhitespace('test')).toBe(false);
-	expect(isNullableOrWhitespace(0)).toBe(false);
-	expect(isNullableOrWhitespace(1)).toBe(false);
-	expect(isNullableOrWhitespace(true)).toBe(false);
-	expect(isNullableOrWhitespace(false)).toBe(false);
-	expect(isNullableOrWhitespace({})).toBe(false);
-	expect(isNullableOrWhitespace([])).toBe(true);
-	expect(isNullableOrWhitespace([1, 2, 3])).toBe(false);
 });

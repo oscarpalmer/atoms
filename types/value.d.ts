@@ -1,4 +1,4 @@
-export type ArrayOrObject = unknown[] | GenericObject;
+import { ArrayOrPlainObject } from './is';
 export type DiffType = 'full' | 'none' | 'partial';
 export type DiffResult<T1 = unknown, T2 = T1> = {
     original: DiffValue<T1, T2>;
@@ -9,13 +9,22 @@ export type DiffValue<T1 = unknown, T2 = T1> = {
     from: T1;
     to: T2;
 };
-export type GenericObject = Record<string, unknown>;
 export type Key = number | string;
-export type ValueObject = ArrayOrObject | Map<unknown, unknown>;
+export type ValueObject = ArrayOrPlainObject | Map<unknown, unknown>;
 /**
  * Clones any kind of value
  */
 export declare function clone<T>(value: T): T;
+/**
+ * - Find the differences between two values
+ * - Returns an object holding the result:
+ * 	- `original` holds the original values
+ * 	- `type` is the type of difference:
+ * 		- `full` if the values are completely different
+ * 		- `none` if the values are the same
+ * 		- `partial` if the values are partially different
+ * 	- `values` holds the differences with dot-notation keys
+ */
 export declare function diff<T1 = unknown, T2 = T1>(first: T1, second: T2): DiffResult<T1, T2>;
 /**
  * - Get the value from an object using a key path
@@ -24,21 +33,9 @@ export declare function diff<T1 = unknown, T2 = T1>(first: T1, second: T2): Diff
  */
 export declare function get(data: ValueObject, key: Key): unknown;
 /**
- * Is the value an array or a generic object?
- */
-export declare function isArrayOrObject(value: unknown): value is ArrayOrObject;
-/**
- * Is the value undefined or null?
- */
-export declare function isNullable(value: unknown): value is undefined | null;
-/**
- * Is the value a generic object?
- */
-export declare function isObject(value: unknown): value is GenericObject;
-/**
  * Merges multiple arrays or objects into a single one
  */
-export declare function merge<T = ArrayOrObject>(...values: T[]): T;
+export declare function merge<T = ArrayOrPlainObject>(...values: T[]): T;
 /**
  * - Set the value in an object using a key path
  * - You can set a nested value by using dot notation, e.g., `foo.bar.baz`

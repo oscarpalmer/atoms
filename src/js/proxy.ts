@@ -1,12 +1,7 @@
-import {
-	ArrayOrObject,
-	GenericObject,
-	clone,
-	isArrayOrObject,
-	merge,
-} from './value';
+import {ArrayOrPlainObject, PlainObject, isArrayOrPlainObject} from './is';
+import {clone, merge} from './value';
 
-class Manager<T extends ArrayOrObject = GenericObject> {
+class Manager<T extends ArrayOrPlainObject = PlainObject> {
 	constructor(readonly owner: Proxied<T>) {}
 
 	clone(): Proxied<T> {
@@ -14,15 +9,18 @@ class Manager<T extends ArrayOrObject = GenericObject> {
 	}
 }
 
-export type Proxied<T extends ArrayOrObject = GenericObject> = {
+export type Proxied<T extends ArrayOrPlainObject = PlainObject> = {
 	$: Manager<T>;
 } & T;
 
-function _createProxy<T extends ArrayOrObject>(
+function _createProxy<T extends ArrayOrPlainObject>(
 	existing: Manager | undefined,
 	value: T,
 ): unknown {
-	if (!isArrayOrObject(value) || (_isProxy(value) && value.$ === existing)) {
+	if (
+		!isArrayOrPlainObject(value) ||
+		(_isProxy(value) && value.$ === existing)
+	) {
 		return value;
 	}
 
@@ -64,8 +62,8 @@ function _isProxy(value: unknown): value is Proxied {
 	return (value as Proxied)?.$ instanceof Manager;
 }
 
-export function proxy<T extends ArrayOrObject>(value: T): Proxied<T> {
-	if (!isArrayOrObject(value)) {
+export function proxy<T extends PlainObject>(value: T): Proxied<T> {
+	if (!isArrayOrPlainObject(value)) {
 		throw new Error('Proxy value must be an array or object');
 	}
 

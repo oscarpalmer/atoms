@@ -1,6 +1,6 @@
+import {chunk} from './array';
+import {ArrayOrPlainObject, PlainObject, isArrayOrPlainObject} from './is';
 import {getString} from './string';
-
-export type ArrayOrObject = unknown[] | GenericObject;
 
 export type DiffType = 'full' | 'none' | 'partial';
 
@@ -15,15 +15,13 @@ export type DiffValue<T1 = unknown, T2 = T1> = {
 	to: T2;
 };
 
-export type GenericObject = Record<string, unknown>;
-
 export type Key = number | string;
 
 type KeyedDiffValue = {
 	key: string;
 } & DiffValue;
 
-export type ValueObject = ArrayOrObject | Map<unknown, unknown>;
+export type ValueObject = ArrayOrPlainObject | Map<unknown, unknown>;
 
 function _getDiffs(
 	first: unknown,
@@ -38,7 +36,7 @@ function _getDiffs(
 	for (; outer < 2; outer += 1) {
 		const value = outer === 0 ? first : second;
 
-		if (!isArrayOrObject(value)) {
+		if (!value) {
 			continue;
 		}
 
@@ -66,7 +64,9 @@ function _getDiffs(
 					key: prefixed,
 				});
 
-				changes.push(..._getDiffs(from, to, prefixed));
+				if (isArrayOrPlainObject(from) && isArrayOrPlainObject(to)) {
+					changes.push(..._getDiffs(from, to, prefixed));
+				}
 			}
 
 			checked.add(key);
@@ -121,6 +121,16 @@ export function clone<T>(value: T): T {
 	return structuredClone(value);
 }
 
+/**
+ * - Find the differences between two values
+ * - Returns an object holding the result:
+ * 	- `original` holds the original values
+ * 	- `type` is the type of difference:
+ * 		- `full` if the values are completely different
+ * 		- `none` if the values are the same
+ * 		- `partial` if the values are partially different
+ * 	- `values` holds the differences with dot-notation keys
+ */
 export function diff<T1 = unknown, T2 = T1>(
 	first: T1,
 	second: T2,
@@ -136,8 +146,8 @@ export function diff<T1 = unknown, T2 = T1>(
 
 	const same = Object.is(first, second);
 
-	const firstIsArrayOrObject = isArrayOrObject(first);
-	const secondIsArrayOrObject = isArrayOrObject(second);
+	const firstIsArrayOrObject = isArrayOrPlainObject(first);
+	const secondIsArrayOrObject = isArrayOrPlainObject(second);
 
 	if (same || (!firstIsArrayOrObject && !secondIsArrayOrObject)) {
 		result.type = same ? 'none' : 'full';
@@ -191,36 +201,18 @@ export function get(data: ValueObject, key: Key): unknown {
 }
 
 /**
- * Is the value an array or a generic object?
- */
-export function isArrayOrObject(value: unknown): value is ArrayOrObject {
-	return /^(array|object)$/i.test((value as ArrayOrObject)?.constructor?.name);
-}
-
-/**
- * Is the value undefined or null?
- */
-export function isNullable(value: unknown): value is undefined | null {
-	return value == null;
-}
-
-/**
- * Is the value a generic object?
- */
-export function isObject(value: unknown): value is GenericObject {
-	return /^object$/i.test((value as GenericObject)?.constructor?.name);
-}
-
-/**
  * Merges multiple arrays or objects into a single one
  */
-export function merge<T = ArrayOrObject>(...values: T[]): T {
+export function merge<T = ArrayOrPlainObject>(...values: T[]): T {
 	if (values.length === 0) {
 		return {} as T;
 	}
 
-	const actual = values.filter(isArrayOrObject) as GenericObject[];
-	const result = (actual.every(Array.isArray) ? [] : {}) as GenericObject;
+	const actual = values.filter(value =>
+		isArrayOrPlainObject(value),
+	) as PlainObject[];
+
+	const result = (actual.every(Array.isArray) ? [] : {}) as PlainObject;
 
 	const {length} = actual;
 
@@ -238,8 +230,8 @@ export function merge<T = ArrayOrObject>(...values: T[]): T {
 			const next = item[key];
 			const previous = result[key];
 
-			if (isArrayOrObject(next)) {
-				result[key] = isArrayOrObject(previous)
+			if (isArrayOrPlainObject(next)) {
+				result[key] = isArrayOrPlainObject(previous)
 					? merge(previous, next)
 					: merge(next);
 			} else {

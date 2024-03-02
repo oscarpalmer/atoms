@@ -1,14 +1,5 @@
 import {expect, test} from 'bun:test';
-import {
-	clone,
-	diff,
-	get,
-	isArrayOrObject,
-	isNullable,
-	isObject,
-	merge,
-	set,
-} from '../src/js/value';
+import {clone, diff, get, merge, set} from '../src/js/value';
 
 type Diffable = {
 	numbers: number[];
@@ -166,51 +157,6 @@ test('get', () => {
 	expect(get(data, 'prototype')).toBe(undefined);
 });
 
-test('isArrayOrObject', () => {
-	expect(isArrayOrObject(undefined)).toBe(false);
-	expect(isArrayOrObject(null)).toBe(false);
-	expect(isArrayOrObject('')).toBe(false);
-	expect(isArrayOrObject(' ')).toBe(false);
-	expect(isArrayOrObject('test')).toBe(false);
-	expect(isArrayOrObject(0)).toBe(false);
-	expect(isArrayOrObject(1)).toBe(false);
-	expect(isArrayOrObject(true)).toBe(false);
-	expect(isArrayOrObject(false)).toBe(false);
-	expect(isArrayOrObject({})).toBe(true);
-	expect(isArrayOrObject([])).toBe(true);
-	expect(isArrayOrObject([1, 2, 3])).toBe(true);
-});
-
-test('isNullable', () => {
-	expect(isNullable(undefined)).toBe(true);
-	expect(isNullable(null)).toBe(true);
-	expect(isNullable('')).toBe(false);
-	expect(isNullable(' ')).toBe(false);
-	expect(isNullable('test')).toBe(false);
-	expect(isNullable(0)).toBe(false);
-	expect(isNullable(1)).toBe(false);
-	expect(isNullable(true)).toBe(false);
-	expect(isNullable(false)).toBe(false);
-	expect(isNullable({})).toBe(false);
-	expect(isNullable([])).toBe(false);
-	expect(isNullable([1, 2, 3])).toBe(false);
-});
-
-test('isObject', () => {
-	expect(isObject(undefined)).toBe(false);
-	expect(isObject(null)).toBe(false);
-	expect(isObject('')).toBe(false);
-	expect(isObject(' ')).toBe(false);
-	expect(isObject('test')).toBe(false);
-	expect(isObject(0)).toBe(false);
-	expect(isObject(1)).toBe(false);
-	expect(isObject(true)).toBe(false);
-	expect(isObject(false)).toBe(false);
-	expect(isObject([])).toBe(false);
-	expect(isObject([1, 2, 3])).toBe(false);
-	expect(isObject({})).toBe(true);
-});
-
 test('merge', () => {
 	const first: Mergeable = {
 		age: 99,
@@ -278,7 +224,6 @@ test('set', () => {
 	set(data, 'in.a.nested.set.3', 123);
 	set(data, 'in.a.new.array.5', 123);
 
-	// @ts-expect-error - Testing never
 	expect(data.in.a.nested.array[3]).toEqual(123);
 	expect(data.in.a.nested.map.get('3')).toEqual(123);
 	expect(data.in.a.nested.object['3']).toEqual(123);

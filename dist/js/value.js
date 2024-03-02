@@ -7,6 +7,18 @@ function getString(value) {
   return result?.toString?.() ?? String(result);
 }
 
+// src/js/is.ts
+function isArrayOrPlainObject(value) {
+  return Array.isArray(value) || isPlainObject(value);
+}
+function isPlainObject(value) {
+  if (typeof value !== "object" || value === null) {
+    return false;
+  }
+  const prototype = Object.getPrototypeOf(value);
+  return (prototype === null || prototype === Object.prototype || Object.getPrototypeOf(prototype) === null) && !(Symbol.toStringTag in value) && !(Symbol.iterator in value);
+}
+
 // src/js/value.ts
 var _getDiffs = function(first, second, prefix) {
   const changes = [];
@@ -14,7 +26,7 @@ var _getDiffs = function(first, second, prefix) {
   let outer = 0;
   for (;outer < 2; outer += 1) {
     const value = outer === 0 ? first : second;
-    if (!isArrayOrObject(value)) {
+    if (!value) {
       continue;
     }
     const keys = Object.keys(value);
@@ -34,7 +46,9 @@ var _getDiffs = function(first, second, prefix) {
           to,
           key: prefixed
         });
-        changes.push(..._getDiffs(from, to, prefixed));
+        if (isArrayOrPlainObject(from) && isArrayOrPlainObject(to)) {
+          changes.push(..._getDiffs(from, to, prefixed));
+        }
       }
       checked.add(key);
     }
@@ -73,8 +87,8 @@ function diff(first, second) {
     values: {}
   };
   const same = Object.is(first, second);
-  const firstIsArrayOrObject = isArrayOrObject(first);
-  const secondIsArrayOrObject = isArrayOrObject(second);
+  const firstIsArrayOrObject = isArrayOrPlainObject(first);
+  const secondIsArrayOrObject = isArrayOrPlainObject(second);
   if (same || !firstIsArrayOrObject && !secondIsArrayOrObject) {
     result.type = same ? "none" : "full";
     return result;
@@ -107,20 +121,11 @@ function get(data, key) {
   }
   return value;
 }
-function isArrayOrObject(value) {
-  return /^(array|object)$/i.test(value?.constructor?.name);
-}
-function isNullable(value) {
-  return value == null;
-}
-function isObject(value) {
-  return /^object$/i.test(value?.constructor?.name);
-}
 function merge(...values) {
   if (values.length === 0) {
     return {};
   }
-  const actual = values.filter(isArrayOrObject);
+  const actual = values.filter((value) => isArrayOrPlainObject(value));
   const result = actual.every(Array.isArray) ? [] : {};
   const { length } = actual;
   let itemIndex = 0;
@@ -133,8 +138,8 @@ function merge(...values) {
       const key = keys[keyIndex];
       const next = item[key];
       const previous = result[key];
-      if (isArrayOrObject(next)) {
-        result[key] = isArrayOrObject(previous) ? merge(previous, next) : merge(next);
+      if (isArrayOrPlainObject(next)) {
+        result[key] = isArrayOrPlainObject(previous) ? merge(previous, next) : merge(next);
       } else {
         result[key] = next;
       }
@@ -166,9 +171,6 @@ function set(data, key, value) {
 export {
   set,
   merge,
-  isObject,
-  isNullable,
-  isArrayOrObject,
   get,
   diff,
   clone
