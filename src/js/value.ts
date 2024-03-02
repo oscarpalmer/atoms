@@ -58,15 +58,20 @@ function _getDiffs(
 			if (!Object.is(from, to)) {
 				const prefixed = _getKey(prefix, key);
 
-				changes.push({
+				const change = {
 					from,
 					to,
 					key: prefixed,
-				});
+				};
 
-				if (isArrayOrPlainObject(from) && isArrayOrPlainObject(to)) {
-					changes.push(..._getDiffs(from, to, prefixed));
+				const nested = isArrayOrPlainObject(from) || isArrayOrPlainObject(to);
+				const diffs = nested ? _getDiffs(from, to, prefixed) : [];
+
+				if (!nested || (nested && diffs.length > 0)) {
+					changes.push(change);
 				}
+
+				changes.push(...diffs);
 			}
 
 			checked.add(key);

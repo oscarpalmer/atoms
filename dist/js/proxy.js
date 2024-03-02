@@ -1,3 +1,12 @@
+// src/js/string.ts
+function getString(value) {
+  if (typeof value === "string") {
+    return value;
+  }
+  const result = value?.toString?.() ?? value;
+  return result?.toString?.() ?? String(result);
+}
+
 // src/js/is.ts
 function isArrayOrPlainObject(value) {
   return Array.isArray(value) || isPlainObject(value);
@@ -11,8 +20,99 @@ function isPlainObject(value) {
 }
 
 // src/js/value.ts
+var _getDiffs = function(first, second, prefix) {
+  const changes = [];
+  const checked = new Set;
+  let outer = 0;
+  for (;outer < 2; outer += 1) {
+    const value = outer === 0 ? first : second;
+    if (!value) {
+      continue;
+    }
+    const keys = Object.keys(value);
+    const { length } = keys;
+    let inner = 0;
+    for (;inner < length; inner += 1) {
+      const key = keys[inner];
+      if (checked.has(key)) {
+        continue;
+      }
+      const from = first?.[key];
+      const to = second?.[key];
+      if (!Object.is(from, to)) {
+        const prefixed = _getKey(prefix, key);
+        const change = {
+          from,
+          to,
+          key: prefixed
+        };
+        const nested = isArrayOrPlainObject(from) || isArrayOrPlainObject(to);
+        const diffs = nested ? _getDiffs(from, to, prefixed) : [];
+        if (!nested || nested && diffs.length > 0) {
+          changes.push(change);
+        }
+        changes.push(...diffs);
+      }
+      checked.add(key);
+    }
+  }
+  return changes;
+};
+var _getKey = function(...parts) {
+  return parts.filter((part) => part !== undefined).join(".");
+};
+var _getValue = function(data, key) {
+  if (typeof data !== "object" || data === null || /^(__proto__|constructor|prototype)$/i.test(key)) {
+    return;
+  }
+  return data instanceof Map ? data.get(key) : data[key];
+};
 function clone(value) {
   return structuredClone(value);
+}
+function diff(first, second) {
+  const result = {
+    original: {
+      from: first,
+      to: second
+    },
+    type: "partial",
+    values: {}
+  };
+  const same = Object.is(first, second);
+  const firstIsArrayOrObject = isArrayOrPlainObject(first);
+  const secondIsArrayOrObject = isArrayOrPlainObject(second);
+  if (same || !firstIsArrayOrObject && !secondIsArrayOrObject) {
+    result.type = same ? "none" : "full";
+    return result;
+  }
+  if (firstIsArrayOrObject !== secondIsArrayOrObject) {
+    result.type = "full";
+  }
+  const diffs = _getDiffs(first, second);
+  const { length } = diffs;
+  if (length === 0) {
+    result.type = "none";
+  }
+  let index = 0;
+  for (;index < length; index += 1) {
+    const diff2 = diffs[index];
+    result.values[diff2.key] = { from: diff2.from, to: diff2.to };
+  }
+  return result;
+}
+function get(data, key) {
+  const parts = getString(key).split(".");
+  const { length } = parts;
+  let index = 0;
+  let value = typeof data === "object" ? data ?? {} : {};
+  for (;index < length; index += 1) {
+    value = _getValue(value, parts[index]);
+    if (value == null) {
+      return;
+    }
+  }
+  return value;
 }
 function merge(...values) {
   if (values.length === 0) {
@@ -52,7 +152,17 @@ var _createProxy = function(existing, value2) {
       return property === "$" ? manager : Reflect.get(target, property);
     },
     set(target, property, value3) {
-      return property === "$" || Reflect.set(target, property, _createProxy(manager, value3));
+      if (property === "$") {
+        return true;
+      }
+      const isSubscribed = manager.subscribed;
+      const original = isSubscribed && !cloned.has(manager) ? clone(merge(manager.owner)) : undefined;
+      const actual = _createProxy(manager, value3);
+      const result = Reflect.set(target, property, actual);
+      if (result && isSubscribed) {
+        _onChange(manager, original);
+      }
+      return result;
     }
   });
   const manager = existing ?? new Manager(proxy);
@@ -68,25 +178,93 @@ var _createProxy = function(existing, value2) {
   }
   return proxy;
 };
+var _emit = function(manager) {
+  const difference = diff(cloned.get(manager) ?? {}, clone(merge(manager.owner)));
+  const keys = Object.keys(difference.values);
+  const { length } = keys;
+  let index = 0;
+  for (;index < length; index += 1) {
+    const key = keys[index];
+    const subscribers = manager.subscribers.get(key);
+    if (subscribers === undefined || subscribers.size === 0) {
+      continue;
+    }
+    const { from } = difference.values[key];
+    const to = get(manager.owner, key);
+    for (const subscriber of subscribers) {
+      subscriber(to, from);
+    }
+  }
+  cloned.delete(manager);
+};
 var _isProxy = function(value2) {
   return value2?.$ instanceof Manager;
 };
+var _onChange = function(manager, value2) {
+  cancelAnimationFrame(frames.get(manager));
+  if (!cloned.has(manager)) {
+    cloned.set(manager, value2);
+  }
+  frames.set(manager, requestAnimationFrame(() => {
+    _emit(manager);
+  }));
+};
+function cloneProxy(proxy) {
+  if (!_isProxy(proxy)) {
+    throw new Error("Value must be a proxy");
+  }
+  return proxy.$.clone();
+}
 function proxy(value2) {
   if (!isArrayOrPlainObject(value2)) {
     throw new Error("Proxy value must be an array or object");
   }
   return _createProxy(undefined, value2);
 }
+function subscribe(proxy2, key, subscriber) {
+  if (_isProxy(proxy2)) {
+    proxy2.$.on(key, subscriber);
+  }
+}
+function unsubscribe(proxy2, key, subscriber) {
+  if (_isProxy(proxy2)) {
+    proxy2.$.off(key, subscriber);
+  }
+}
 
 class Manager {
   owner;
+  count = 0;
+  subscribers = new Map;
+  get subscribed() {
+    return this.count > 0;
+  }
   constructor(owner) {
     this.owner = owner;
   }
   clone() {
-    return clone(merge(this.owner));
+    return _createProxy(undefined, clone(merge(this.owner)));
+  }
+  off(key, subscriber) {
+    if (this.subscribers.get(key)?.delete(subscriber) ?? false) {
+      this.count -= 1;
+    }
+  }
+  on(key, subscriber) {
+    let subscribers = this.subscribers.get(key);
+    if (subscribers === undefined) {
+      subscribers = new Set;
+      this.subscribers.set(key, subscribers);
+    }
+    subscribers.add(subscriber);
+    this.count += 1;
   }
 }
+var cloned = new Map;
+var frames = new Map;
 export {
-  proxy
+  unsubscribe,
+  subscribe,
+  proxy,
+  cloneProxy
 };

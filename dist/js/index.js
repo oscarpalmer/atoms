@@ -310,14 +310,17 @@ var _getDiffs = function(first, second, prefix) {
       const to = second?.[key];
       if (!Object.is(from, to)) {
         const prefixed = _getKey(prefix, key);
-        changes.push({
+        const change = {
           from,
           to,
           key: prefixed
-        });
-        if (isArrayOrPlainObject(from) && isArrayOrPlainObject(to)) {
-          changes.push(..._getDiffs(from, to, prefixed));
+        };
+        const nested = isArrayOrPlainObject(from) || isArrayOrPlainObject(to);
+        const diffs = nested ? _getDiffs(from, to, prefixed) : [];
+        if (!nested || nested && diffs.length > 0) {
+          changes.push(change);
         }
+        changes.push(...diffs);
       }
       checked.add(key);
     }
@@ -449,7 +452,17 @@ var _createProxy = function(existing, value2) {
       return property === "$" ? manager : Reflect.get(target, property);
     },
     set(target, property, value3) {
-      return property === "$" || Reflect.set(target, property, _createProxy(manager, value3));
+      if (property === "$") {
+        return true;
+      }
+      const isSubscribed = manager.subscribed;
+      const original = isSubscribed && !cloned.has(manager) ? clone(merge(manager.owner)) : undefined;
+      const actual = _createProxy(manager, value3);
+      const result = Reflect.set(target, property, actual);
+      if (result && isSubscribed) {
+        _onChange(manager, original);
+      }
+      return result;
     }
   });
   const manager = existing ?? new Manager(proxy);
@@ -465,25 +478,90 @@ var _createProxy = function(existing, value2) {
   }
   return proxy;
 };
+var _emit = function(manager) {
+  const difference = diff(cloned.get(manager) ?? {}, clone(merge(manager.owner)));
+  const keys = Object.keys(difference.values);
+  const { length } = keys;
+  let index = 0;
+  for (;index < length; index += 1) {
+    const key = keys[index];
+    const subscribers = manager.subscribers.get(key);
+    if (subscribers === undefined || subscribers.size === 0) {
+      continue;
+    }
+    const { from } = difference.values[key];
+    const to = get(manager.owner, key);
+    for (const subscriber of subscribers) {
+      subscriber(to, from);
+    }
+  }
+  cloned.delete(manager);
+};
 var _isProxy = function(value2) {
   return value2?.$ instanceof Manager;
 };
+var _onChange = function(manager, value2) {
+  cancelAnimationFrame(frames.get(manager));
+  if (!cloned.has(manager)) {
+    cloned.set(manager, value2);
+  }
+  frames.set(manager, requestAnimationFrame(() => {
+    _emit(manager);
+  }));
+};
+function cloneProxy(proxy) {
+  if (!_isProxy(proxy)) {
+    throw new Error("Value must be a proxy");
+  }
+  return proxy.$.clone();
+}
 function proxy(value2) {
   if (!isArrayOrPlainObject(value2)) {
     throw new Error("Proxy value must be an array or object");
   }
   return _createProxy(undefined, value2);
 }
+function subscribe(proxy2, key, subscriber) {
+  if (_isProxy(proxy2)) {
+    proxy2.$.on(key, subscriber);
+  }
+}
+function unsubscribe(proxy2, key, subscriber) {
+  if (_isProxy(proxy2)) {
+    proxy2.$.off(key, subscriber);
+  }
+}
 
 class Manager {
   owner;
+  count = 0;
+  subscribers = new Map;
+  get subscribed() {
+    return this.count > 0;
+  }
   constructor(owner) {
     this.owner = owner;
   }
   clone() {
-    return clone(merge(this.owner));
+    return _createProxy(undefined, clone(merge(this.owner)));
+  }
+  off(key, subscriber) {
+    if (this.subscribers.get(key)?.delete(subscriber) ?? false) {
+      this.count -= 1;
+    }
+  }
+  on(key, subscriber) {
+    let subscribers = this.subscribers.get(key);
+    if (subscribers === undefined) {
+      subscribers = new Set;
+      this.subscribers.set(key, subscribers);
+    }
+    subscribers.add(subscriber);
+    this.count += 1;
   }
 }
+var cloned = new Map;
+var frames = new Map;
 // src/js/timer.ts
 function repeat(callback, options) {
   const count = typeof options?.count === "number" ? options.count : Infinity;
@@ -569,7 +647,9 @@ class Timer {
 }
 export {
   wait,
+  unsubscribe,
   unique,
+  subscribe,
   splice,
   set,
   repeat,
@@ -593,6 +673,7 @@ export {
   exists,
   diff,
   createUuid,
+  cloneProxy,
   clone,
   clamp,
   chunk,
