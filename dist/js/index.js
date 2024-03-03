@@ -562,6 +562,71 @@ class Manager {
 }
 var cloned = new Map;
 var frames = new Map;
+// src/js/signal.ts
+var _getter = function(instance) {
+  const last = running[running.length - 1];
+  if (last !== undefined) {
+    let instanceEffects = effects.get(instance);
+    if (instanceEffects === undefined) {
+      instanceEffects = new Set;
+      effects.set(instance, instanceEffects);
+    }
+    instanceEffects.add(last);
+  }
+  return values.get(instance);
+};
+var _setter = function(instance, value2) {
+  if (Object.is(value2, values.get(instance))) {
+    return;
+  }
+  values.set(instance, value2);
+  cancelAnimationFrame(frames2.get(instance));
+  frames2.set(instance, requestAnimationFrame(() => {
+    const instanceEffects = effects.get(instance) ?? new Set;
+    for (const effect of instanceEffects) {
+      effect();
+    }
+    frames2.delete(instance);
+  }));
+};
+function computed(callback) {
+  return new Computed(callback);
+}
+function effect(callback) {
+  running.push(callback);
+  callback();
+  running.splice(running.indexOf(callback), 1);
+}
+function signal(value2) {
+  return new Signal(value2);
+}
+
+class Computed {
+  get value() {
+    return _getter(this);
+  }
+  constructor(callback) {
+    effect(() => {
+      _setter(this, callback());
+    });
+  }
+}
+
+class Signal {
+  get value() {
+    return _getter(this);
+  }
+  set value(value2) {
+    _setter(this, value2);
+  }
+  constructor(value2) {
+    this.value = value2;
+  }
+}
+var effects = new WeakMap;
+var frames2 = new WeakMap;
+var running = [];
+var values = new WeakMap;
 // src/js/timer.ts
 function repeat(callback, options) {
   const count = typeof options?.count === "number" ? options.count : Infinity;
@@ -651,6 +716,7 @@ export {
   unique,
   subscribe,
   splice,
+  signal,
   set,
   repeat,
   push,
@@ -671,8 +737,10 @@ export {
   find,
   filter,
   exists,
+  effect,
   diff,
   createUuid,
+  computed,
   cloneProxy,
   clone,
   clamp,

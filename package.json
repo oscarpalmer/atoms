@@ -54,6 +54,12 @@
 			"require": "./dist/js/proxy.js",
 			"types": "./types/proxy.d.ts"
 		},
+		"./signal": {
+			"bun": "./src/js/signal.ts",
+			"import": "./dist/js/signal.mjs",
+			"require": "./dist/js/signal.js",
+			"types": "./types/signal.d.ts"
+		},
 		"./string": {
 			"bun": "./src/js/string.ts",
 			"import": "./dist/js/string.mjs",
@@ -105,5 +111,5 @@
 	},
 	"type": "module",
 	"types": "./types/index.d.ts",
-	"version": "0.22.0"
+	"version": "0.23.0"
 }
