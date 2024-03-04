@@ -27,4 +27,4 @@ export declare function getElementUnderPointer(skipIgnore?: boolean): Element | 
  * Get the text direction of an element
  */
 export declare function getTextDirection(element: Element): TextDirection;
-export { findElement as $, findElements as $$ } from '.';
+export { findElement as $, findElements as $$ };

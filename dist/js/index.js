@@ -566,67 +566,124 @@ var frames = new Map;
 var _getter = function(instance) {
   const last = running[running.length - 1];
   if (last !== undefined) {
-    let instanceEffects = effects.get(instance);
-    if (instanceEffects === undefined) {
-      instanceEffects = new Set;
-      effects.set(instance, instanceEffects);
-    }
-    instanceEffects.add(last);
+    instance._effects.add(last);
+    last._values.add(instance);
   }
-  return values.get(instance);
+  return instance._value;
 };
-var _setter = function(instance, value2) {
-  if (Object.is(value2, values.get(instance))) {
+var _setter = function(instance, value2, run) {
+  if (!run && Object.is(value2, instance._value)) {
     return;
   }
-  values.set(instance, value2);
-  cancelAnimationFrame(frames2.get(instance));
-  frames2.set(instance, requestAnimationFrame(() => {
-    const instanceEffects = effects.get(instance) ?? new Set;
-    for (const effect of instanceEffects) {
-      effect();
+  instance._value = value2;
+  cancelAnimationFrame(instance._frame);
+  if (!instance._active) {
+    return;
+  }
+  instance._frame = requestAnimationFrame(() => {
+    for (const effect of instance._effects) {
+      effect._callback();
     }
-    frames2.delete(instance);
-  }));
+    instance._frame = undefined;
+  });
 };
 function computed(callback) {
   return new Computed(callback);
 }
 function effect(callback) {
-  running.push(callback);
-  callback();
-  running.splice(running.indexOf(callback), 1);
+  return new Effect(callback);
 }
 function signal(value2) {
   return new Signal(value2);
 }
 
-class Computed {
+class Value {
+  _active = true;
+  _effects = new Set;
+  _frame;
+  peek() {
+    return this._value;
+  }
+  toJSON() {
+    return this.value;
+  }
+  toString() {
+    return String(this.value);
+  }
+}
+
+class Computed extends Value {
+  _effect;
   get value() {
     return _getter(this);
   }
   constructor(callback) {
-    effect(() => {
-      _setter(this, callback());
+    super();
+    this._effect = effect(() => {
+      _setter(this, callback(), false);
     });
+  }
+  run() {
+    this._effect.run();
+  }
+  stop() {
+    this._effect.stop();
   }
 }
 
-class Signal {
+class Effect {
+  _callback;
+  _active = false;
+  _values = new Set;
+  constructor(_callback) {
+    this._callback = _callback;
+    this.run();
+  }
+  run() {
+    if (this._active) {
+      return;
+    }
+    this._active = true;
+    const index = running.push(this) - 1;
+    this._callback();
+    running.splice(index, 1);
+  }
+  stop() {
+    if (!this._active) {
+      return;
+    }
+    this._active = false;
+    for (const value2 of this._values) {
+      value2._effects.delete(this);
+    }
+    this._values.clear();
+  }
+}
+
+class Signal extends Value {
+  _value;
   get value() {
     return _getter(this);
   }
   set value(value2) {
-    _setter(this, value2);
+    _setter(this, value2, false);
   }
-  constructor(value2) {
-    this.value = value2;
+  constructor(_value) {
+    super();
+    this._value = _value;
+  }
+  run() {
+    if (this._active) {
+      return;
+    }
+    this._active = true;
+    _setter(this, this._value, true);
+  }
+  stop() {
+    this._active = false;
   }
 }
-var effects = new WeakMap;
-var frames2 = new WeakMap;
 var running = [];
-var values = new WeakMap;
 // src/js/timer.ts
 function repeat(callback, options) {
   const count = typeof options?.count === "number" ? options.count : Infinity;

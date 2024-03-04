@@ -180,4 +180,4 @@ export function getTextDirection(element: Element): TextDirection {
 	) as TextDirection;
 }
 
-export {findElement as $, findElements as $$} from '.';
+export {findElement as $, findElements as $$};
