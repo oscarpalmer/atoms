@@ -106,7 +106,19 @@ export declare function computed<T>(callback: () => T): Computed<T>;
  */
 export declare function effect(callback: () => void): Effect;
 /**
+ * Is the value a computed, reactive value?
+ */
+export declare function isComputed(value: unknown): value is Computed<unknown>;
+/**
+ * Is the value a reactive effect?
+ */
+export declare function isEffect(value: unknown): value is Effect;
+/**
+ * Is the value a reactive value?
+ */
+export declare function isSignal(value: unknown): value is Signal<unknown>;
+/**
  * Creates a reactive value
  */
 export declare function signal<T>(value: T): Signal<T>;
-export {};
+export type { Computed, Effect, Signal };

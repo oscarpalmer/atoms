@@ -5,7 +5,6 @@ export declare function between(value: number, min: number, max: number): boolea
 /**
  * - Clamps a number between a minimum and maximum value
  * - If `loop` is `true`, when the value is less than the minimum, it will be clamped as the maximum, and vice versa
- * - Returns `NaN` if any of the values are not numbers
  */
 export declare function clamp(value: number, min: number, max: number, loop?: boolean): number;
 /**

@@ -228,8 +228,31 @@ export function effect(callback: () => void): Effect {
 }
 
 /**
+ * Is the value a computed, reactive value?
+ */
+export function isComputed(value: unknown): value is Computed<unknown> {
+	return value instanceof Computed;
+}
+
+/**
+ * Is the value a reactive effect?
+ */
+export function isEffect(value: unknown): value is Effect {
+	return value instanceof Effect;
+}
+
+/**
+ * Is the value a reactive value?
+ */
+export function isSignal(value: unknown): value is Signal<unknown> {
+	return value instanceof Signal;
+}
+
+/**
  * Creates a reactive value
  */
 export function signal<T>(value: T): Signal<T> {
 	return new Signal(value);
 }
+
+export type {Computed, Effect, Signal};

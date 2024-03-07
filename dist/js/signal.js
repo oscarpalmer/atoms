@@ -29,6 +29,15 @@ function computed(callback) {
 function effect(callback) {
   return new Effect(callback);
 }
+function isComputed(value) {
+  return value instanceof Computed;
+}
+function isEffect(value) {
+  return value instanceof Effect;
+}
+function isSignal(value) {
+  return value instanceof Signal;
+}
 function signal(value) {
   return new Signal(value);
 }
@@ -122,6 +131,9 @@ class Signal extends Value {
 var running = [];
 export {
   signal,
+  isSignal,
+  isEffect,
+  isComputed,
   effect,
   computed
 };

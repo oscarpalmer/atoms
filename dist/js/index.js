@@ -225,17 +225,13 @@ function getPosition(event) {
 }
 // src/js/number.ts
 function between(value, min, max) {
-  return [max, min, value].every((v) => typeof v === "number") && value >= min && value <= max;
+  return value >= min && value <= max;
 }
 function clamp(value, min, max, loop) {
-  if ([max, min, value].some((v) => typeof v !== "number")) {
-    return NaN;
-  }
-  const shouldLoop = loop === true;
   if (value < min) {
-    return shouldLoop ? max : min;
+    return loop === true ? max : min;
   }
-  return value > max ? shouldLoop ? min : max : value;
+  return value > max ? loop === true ? min : max : value;
 }
 function getNumber(value) {
   if (typeof value === "number") {
@@ -593,6 +589,15 @@ function computed(callback) {
 function effect(callback) {
   return new Effect(callback);
 }
+function isComputed(value2) {
+  return value2 instanceof Computed;
+}
+function isEffect(value2) {
+  return value2 instanceof Effect;
+}
+function isSignal(value2) {
+  return value2 instanceof Signal;
+}
 function signal(value2) {
   return new Signal(value2);
 }
@@ -779,6 +784,9 @@ export {
   push,
   proxy,
   merge,
+  isSignal,
+  isEffect,
+  isComputed,
   insert,
   indexOf,
   groupBy,

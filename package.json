@@ -94,7 +94,7 @@
 	"keywords": [],
 	"license": "MIT",
 	"main": "./dist/js/index.js",
-	"module": "./dist/js/index.js",
+	"module": "./dist/js/index.mjs",
 	"name": "@oscarpalmer/atoms",
 	"repository": {
 		"type": "git",
@@ -111,5 +111,5 @@
 	},
 	"type": "module",
 	"types": "./types/index.d.ts",
-	"version": "0.24.0"
+	"version": "0.25.0"
 }
