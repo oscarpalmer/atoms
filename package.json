@@ -5,11 +5,11 @@
 	},
 	"description": "Sweet little atomic goodies…",
 	"devDependencies": {
-		"@biomejs/biome": "^1.5",
-		"@happy-dom/global-registrator": "^13.5",
+		"@biomejs/biome": "^1.6",
+		"@happy-dom/global-registrator": "^13.7",
 		"bun": "^1.0",
 		"sass": "^1.71",
-		"typescript": "^5.3"
+		"typescript": "^5.4"
 	},
 	"exports": {
 		"./array": {
@@ -111,5 +111,5 @@
 	},
 	"type": "module",
 	"types": "./types/index.d.ts",
-	"version": "0.25.0"
+	"version": "0.26.0"
 }

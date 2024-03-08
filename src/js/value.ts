@@ -23,6 +23,30 @@ type KeyedDiffValue = {
 
 export type ValueObject = ArrayOrPlainObject | Map<unknown, unknown>;
 
+function _cloneNested(value: ArrayOrPlainObject): ArrayOrPlainObject {
+	const cloned = Array.isArray(value) ? [] : {};
+	const keys = Object.keys(value);
+	const {length} = keys;
+
+	let index = 0;
+
+	for (; index < length; index += 1) {
+		const key = keys[index];
+
+		cloned[key as never] = clone(value[key as never]);
+	}
+
+	return cloned;
+}
+
+function _cloneRegularExpression(value: RegExp): RegExp {
+	const cloned = new RegExp(value.source, value.flags);
+
+	cloned.lastIndex = value.lastIndex;
+
+	return cloned;
+}
+
 function _getDiffs(
 	first: unknown,
 	second: unknown,
@@ -123,7 +147,38 @@ function _setValue(data: ValueObject, key: string, value: unknown): void {
  * Clones any kind of value
  */
 export function clone<T>(value: T): T {
-	return structuredClone(value);
+	switch (true) {
+		case value == null:
+		case typeof value === 'function':
+			return value;
+
+		case typeof value === 'bigint':
+			return BigInt(value) as T;
+
+		case typeof value === 'boolean':
+			return Boolean(value) as T;
+
+		case typeof value === 'number':
+			return Number(value) as T;
+
+		case typeof value === 'string':
+			return String(value) as T;
+
+		case typeof value === 'symbol':
+			return Symbol(value.description) as T;
+
+		case value instanceof Node:
+			return value.cloneNode(true) as T;
+
+		case value instanceof RegExp:
+			return _cloneRegularExpression(value) as T;
+
+		case isArrayOrPlainObject(value):
+			return _cloneNested(value) as T;
+
+		default:
+			return structuredClone(value);
+	}
 }
 
 /**

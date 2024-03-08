@@ -29,8 +29,13 @@
 * {
 	padding: 0;
 	margin: 0;
-	box-sizing: border-box;
 	background-repeat: no-repeat;
+}
+
+*,
+*::after,
+*::before {
+	box-sizing: border-box;
 }
 
 ::before,
@@ -67,6 +72,8 @@
 
 :where(a) {
 	background-color: transparent; // Remove the gray background on active links in IE10 [RS]
+	text-decoration-skip-ink: auto;
+	text-underline-offset: .125em;
 }
 
 :where(abbr[title]) {
@@ -197,8 +204,7 @@
 	-webkit-appearance: none; // Change the inconsistent appearance in all browsers [SE]
 	appearance: none; // ditto
 	padding-right: 1em; // ditto
-	background: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='4'%3E%3Cpath d='M4 0h6L7 4'/%3E%3C/svg%3E")
-		no-repeat right center / 1em; // ditto
+	background: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='4'%3E%3Cpath d='M4 0h6L7 4'/%3E%3C/svg%3E") no-repeat right center / 1em; // ditto
 	border-radius: 0; // ditto
 }
 
@@ -303,7 +309,7 @@ select::-ms-value {
  * Attributes
  */
 
- :where([disabled], [aria-disabled='true' i]) {
+:where([disabled], [aria-disabled='true' i]) {
 	cursor: default;
 }
 

@@ -1,5 +1,12 @@
 import {expect, test} from 'bun:test';
-import {computed, effect, signal} from '../src/js/signal';
+import {
+	computed,
+	effect,
+	isComputed,
+	isEffect,
+	isSignal,
+	signal,
+} from '../src/js/signal';
 import {wait} from '../src/js/timer';
 
 test('computed', done => {
@@ -65,6 +72,25 @@ test('effect', done => {
 			});
 		});
 	});
+});
+
+test('is', () => {
+	let value = 0;
+
+	const sig = signal(1);
+	const com = computed(() => sig.value ** 2);
+
+	const fx = effect(() => {
+		value += com.value;
+	});
+
+	expect(isComputed(com)).toBe(true);
+	expect(isEffect(fx)).toBe(true);
+	expect(isSignal(sig)).toBe(true);
+
+	expect(isComputed(sig)).toBe(false);
+	expect(isEffect(com)).toBe(false);
+	expect(isSignal(fx)).toBe(false);
 });
 
 test('signal', done => {

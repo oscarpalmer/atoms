@@ -1,19 +1,8 @@
-.sr {
-	&-focusable,
-	&-only {
-		position: absolute !important;
-	}
-
-	&-focusable:not(:focus):not(:focus-within),
-	&-only {
-		width: 1px !important;
-		height: 1px !important;
-		padding: 0 !important;
-		margin: -1px !important;
-		clip: rect(1px, 1px 1px, 1px) !important;
-		clip-path: inset(50%) !important;
-		overflow: hidden !important;
-		border: 0 !important;
-		white-space: nowrap !important;
-	}
+.visually-hidden:not(:active):not(:focus):not(:focus-within) {
+	width: 1px !important;
+	height: 1px !important;
+	clip: rect(1px, 1px 1px, 1px) !important;
+	clip-path: inset(50%) !important;
+	overflow: hidden !important;
+	white-space: nowrap !important;
 }

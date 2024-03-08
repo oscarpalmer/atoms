@@ -20,6 +20,22 @@ function isPlainObject(value) {
 }
 
 // src/js/value.ts
+var _cloneNested = function(value) {
+  const cloned = Array.isArray(value) ? [] : {};
+  const keys = Object.keys(value);
+  const { length } = keys;
+  let index = 0;
+  for (;index < length; index += 1) {
+    const key = keys[index];
+    cloned[key] = clone(value[key]);
+  }
+  return cloned;
+};
+var _cloneRegularExpression = function(value) {
+  const cloned = new RegExp(value.source, value.flags);
+  cloned.lastIndex = value.lastIndex;
+  return cloned;
+};
 var _getDiffs = function(first, second, prefix) {
   const changes = [];
   const checked = new Set;
@@ -68,7 +84,29 @@ var _getValue = function(data, key) {
   return data instanceof Map ? data.get(key) : data[key];
 };
 function clone(value) {
-  return structuredClone(value);
+  switch (true) {
+    case value == null:
+    case typeof value === "function":
+      return value;
+    case typeof value === "bigint":
+      return BigInt(value);
+    case typeof value === "boolean":
+      return Boolean(value);
+    case typeof value === "number":
+      return Number(value);
+    case typeof value === "string":
+      return String(value);
+    case typeof value === "symbol":
+      return Symbol(value.description);
+    case value instanceof Node:
+      return value.cloneNode(true);
+    case value instanceof RegExp:
+      return _cloneRegularExpression(value);
+    case isArrayOrPlainObject(value):
+      return _cloneNested(value);
+    default:
+      return structuredClone(value);
+  }
 }
 function diff(first, second) {
   const result = {
