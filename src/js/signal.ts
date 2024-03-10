@@ -1,16 +1,19 @@
 type InternalEffect = {
 	_callback: () => void;
-	_values: Set<InternalValue>;
+	_values: Set<InternalReactive>;
 };
 
-type InternalValue = {
+type InternalReactive = {
 	_active: boolean;
 	_effects: Set<InternalEffect>;
 	_frame: number | undefined;
 	_value: unknown;
 };
 
-abstract class Value<T = unknown> {
+/**
+ * The base class for reactive values
+ */
+abstract class Reactive<T = unknown> {
 	protected _active = true;
 	protected _effects = new Set<InternalEffect>();
 	protected _frame: number | undefined;
@@ -56,22 +59,20 @@ abstract class Value<T = unknown> {
 /**
  * A computed, reactive value
  */
-class Computed<T> extends Value<T> {
+class Computed<T> extends Reactive<T> {
 	private readonly _effect: Effect;
 
 	/**
 	 * @inheritdoc
 	 */
 	get value(): T {
-		return _getter(this as never) as T;
+		return getValue(this as never) as T;
 	}
 
 	constructor(callback: () => T) {
 		super();
 
-		this._effect = effect(() => {
-			_setter(this as never, callback(), false);
-		});
+		this._effect = effect(() => setValue(this as never, callback(), false));
 	}
 
 	/**
@@ -94,7 +95,7 @@ class Computed<T> extends Value<T> {
  */
 class Effect {
 	private _active = false;
-	private readonly _values = new Set<InternalValue>();
+	private readonly _values = new Set<InternalReactive>();
 
 	constructor(private readonly _callback: () => void) {
 		this.run();
@@ -110,11 +111,11 @@ class Effect {
 
 		this._active = true;
 
-		const index = running.push(this as never) - 1;
+		const index = effects.push(this as never) - 1;
 
 		this._callback();
 
-		running.splice(index, 1);
+		effects.splice(index, 1);
 	}
 
 	/**
@@ -138,19 +139,19 @@ class Effect {
 /**
  * A reactive value
  */
-class Signal<T> extends Value<T> {
+class Signal<T> extends Reactive<T> {
 	/**
 	 * @inheritdoc
 	 */
 	get value(): T {
-		return _getter(this as never) as T;
+		return getValue(this as never) as T;
 	}
 
 	/**
 	 * Sets the value
 	 */
 	set value(value: T) {
-		_setter(this as never, value, false);
+		setValue(this as never, value, false);
 	}
 
 	constructor(protected readonly _value: T) {
@@ -167,7 +168,7 @@ class Signal<T> extends Value<T> {
 
 		this._active = true;
 
-		_setter(this as never, this._value, true);
+		setValue(this as never, this._value, true);
 	}
 
 	/**
@@ -178,10 +179,24 @@ class Signal<T> extends Value<T> {
 	}
 }
 
-const running: InternalEffect[] = [];
+const effects: InternalEffect[] = [];
 
-function _getter(instance: InternalValue): unknown {
-	const last = running[running.length - 1];
+/**
+ * Creates a computed, reactive value
+ */
+export function computed<T>(callback: () => T): Computed<T> {
+	return new Computed(callback);
+}
+
+/**
+ * Creates a reactive effect
+ */
+export function effect(callback: () => void): Effect {
+	return new Effect(callback);
+}
+
+function getValue(instance: InternalReactive): unknown {
+	const last = effects[effects.length - 1];
 
 	if (last !== undefined) {
 		instance._effects.add(last);
@@ -191,7 +206,32 @@ function _getter(instance: InternalValue): unknown {
 	return instance._value;
 }
 
-function _setter<T>(instance: InternalValue, value: T, run: boolean): void {
+/**
+ * Is the value a computed, reactive value?
+ */
+export function isComputed(value: unknown): value is Computed<unknown> {
+	return value instanceof Computed;
+}
+
+/**
+ * Is the value a reactive effect?
+ */
+export function isEffect(value: unknown): value is Effect {
+	return value instanceof Effect;
+}
+
+export function isReactive(value: unknown): value is Reactive<unknown> {
+	return value instanceof Reactive;
+}
+
+/**
+ * Is the value a reactive value?
+ */
+export function isSignal(value: unknown): value is Signal<unknown> {
+	return value instanceof Signal;
+}
+
+function setValue<T>(instance: InternalReactive, value: T, run: boolean): void {
 	if (!run && Object.is(value, instance._value)) {
 		return;
 	}
@@ -214,45 +254,10 @@ function _setter<T>(instance: InternalValue, value: T, run: boolean): void {
 }
 
 /**
- * Creates a computed, reactive value
- */
-export function computed<T>(callback: () => T): Computed<T> {
-	return new Computed(callback);
-}
-
-/**
- * Creates a reactive effect
- */
-export function effect(callback: () => void): Effect {
-	return new Effect(callback);
-}
-
-/**
- * Is the value a computed, reactive value?
- */
-export function isComputed(value: unknown): value is Computed<unknown> {
-	return value instanceof Computed;
-}
-
-/**
- * Is the value a reactive effect?
- */
-export function isEffect(value: unknown): value is Effect {
-	return value instanceof Effect;
-}
-
-/**
- * Is the value a reactive value?
- */
-export function isSignal(value: unknown): value is Signal<unknown> {
-	return value instanceof Signal;
-}
-
-/**
  * Creates a reactive value
  */
 export function signal<T>(value: T): Signal<T> {
 	return new Signal(value);
 }
 
-export type {Computed, Effect, Signal};
+export type {Computed, Effect, Reactive, Signal};

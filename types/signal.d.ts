@@ -1,14 +1,17 @@
 type InternalEffect = {
     _callback: () => void;
-    _values: Set<InternalValue>;
+    _values: Set<InternalReactive>;
 };
-type InternalValue = {
+type InternalReactive = {
     _active: boolean;
     _effects: Set<InternalEffect>;
     _frame: number | undefined;
     _value: unknown;
 };
-declare abstract class Value<T = unknown> {
+/**
+ * The base class for reactive values
+ */
+declare abstract class Reactive<T = unknown> {
     protected _active: boolean;
     protected _effects: Set<InternalEffect>;
     protected _frame: number | undefined;
@@ -41,7 +44,7 @@ declare abstract class Value<T = unknown> {
 /**
  * A computed, reactive value
  */
-declare class Computed<T> extends Value<T> {
+declare class Computed<T> extends Reactive<T> {
     private readonly _effect;
     /**
      * @inheritdoc
@@ -77,7 +80,7 @@ declare class Effect {
 /**
  * A reactive value
  */
-declare class Signal<T> extends Value<T> {
+declare class Signal<T> extends Reactive<T> {
     protected readonly _value: T;
     /**
      * @inheritdoc
@@ -113,6 +116,7 @@ export declare function isComputed(value: unknown): value is Computed<unknown>;
  * Is the value a reactive effect?
  */
 export declare function isEffect(value: unknown): value is Effect;
+export declare function isReactive(value: unknown): value is Reactive<unknown>;
 /**
  * Is the value a reactive value?
  */
@@ -121,4 +125,4 @@ export declare function isSignal(value: unknown): value is Signal<unknown>;
  * Creates a reactive value
  */
 export declare function signal<T>(value: T): Signal<T>;
-export type { Computed, Effect, Signal };
+export type { Computed, Effect, Reactive, Signal };

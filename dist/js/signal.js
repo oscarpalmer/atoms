@@ -1,13 +1,31 @@
 // src/js/signal.ts
-var _getter = function(instance) {
-  const last = running[running.length - 1];
+function computed(callback) {
+  return new Computed(callback);
+}
+function effect(callback) {
+  return new Effect(callback);
+}
+var getValue = function(instance) {
+  const last = effects[effects.length - 1];
   if (last !== undefined) {
     instance._effects.add(last);
     last._values.add(instance);
   }
   return instance._value;
 };
-var _setter = function(instance, value, run) {
+function isComputed(value) {
+  return value instanceof Computed;
+}
+function isEffect(value) {
+  return value instanceof Effect;
+}
+function isReactive(value) {
+  return value instanceof Reactive;
+}
+function isSignal(value) {
+  return value instanceof Signal;
+}
+var setValue = function(instance, value, run) {
   if (!run && Object.is(value, instance._value)) {
     return;
   }
@@ -17,32 +35,17 @@ var _setter = function(instance, value, run) {
     return;
   }
   instance._frame = requestAnimationFrame(() => {
-    for (const effect of instance._effects) {
-      effect._callback();
+    for (const effect2 of instance._effects) {
+      effect2._callback();
     }
     instance._frame = undefined;
   });
 };
-function computed(callback) {
-  return new Computed(callback);
-}
-function effect(callback) {
-  return new Effect(callback);
-}
-function isComputed(value) {
-  return value instanceof Computed;
-}
-function isEffect(value) {
-  return value instanceof Effect;
-}
-function isSignal(value) {
-  return value instanceof Signal;
-}
 function signal(value) {
   return new Signal(value);
 }
 
-class Value {
+class Reactive {
   _active = true;
   _effects = new Set;
   _frame;
@@ -57,16 +60,14 @@ class Value {
   }
 }
 
-class Computed extends Value {
+class Computed extends Reactive {
   _effect;
   get value() {
-    return _getter(this);
+    return getValue(this);
   }
   constructor(callback) {
     super();
-    this._effect = effect(() => {
-      _setter(this, callback(), false);
-    });
+    this._effect = effect(() => setValue(this, callback(), false));
   }
   run() {
     this._effect.run();
@@ -89,9 +90,9 @@ class Effect {
       return;
     }
     this._active = true;
-    const index = running.push(this) - 1;
+    const index = effects.push(this) - 1;
     this._callback();
-    running.splice(index, 1);
+    effects.splice(index, 1);
   }
   stop() {
     if (!this._active) {
@@ -105,13 +106,13 @@ class Effect {
   }
 }
 
-class Signal extends Value {
+class Signal extends Reactive {
   _value;
   get value() {
-    return _getter(this);
+    return getValue(this);
   }
   set value(value) {
-    _setter(this, value, false);
+    setValue(this, value, false);
   }
   constructor(_value) {
     super();
@@ -122,16 +123,17 @@ class Signal extends Value {
       return;
     }
     this._active = true;
-    _setter(this, this._value, true);
+    setValue(this, this._value, true);
   }
   stop() {
     this._active = false;
   }
 }
-var running = [];
+var effects = [];
 export {
   signal,
   isSignal,
+  isReactive,
   isEffect,
   isComputed,
   effect,
