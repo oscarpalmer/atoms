@@ -225,7 +225,7 @@ export function isEffect(value: unknown): value is Effect {
  * Is the value a reactive value?
  */
 export function isReactive(value: unknown): value is Reactive<unknown> {
-	return value instanceof Reactive;
+	return value instanceof Computed || value instanceof Signal;
 }
 
 /**

@@ -35,7 +35,7 @@ function isEffect(value) {
   return value instanceof Effect;
 }
 function isReactive(value) {
-  return value instanceof Reactive;
+  return value instanceof Computed || value instanceof Signal;
 }
 function isSignal(value) {
   return value instanceof Signal;

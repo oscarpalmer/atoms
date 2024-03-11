@@ -632,7 +632,7 @@ function isEffect(value2) {
   return value2 instanceof Effect;
 }
 function isReactive(value2) {
-  return value2 instanceof Reactive;
+  return value2 instanceof Computed || value2 instanceof Signal;
 }
 function isSignal(value2) {
   return value2 instanceof Signal;
