@@ -54,6 +54,12 @@
 			"require": "./dist/js/proxy.js",
 			"types": "./types/proxy.d.ts"
 		},
+		"./queue": {
+			"bun": "./src/js/queue.ts",
+			"import": "./dist/js/queue.mjs",
+			"require": "./dist/js/queue.js",
+			"types": "./types/queue.d.ts"
+		},
 		"./signal": {
 			"bun": "./src/js/signal.ts",
 			"import": "./dist/js/signal.mjs",
@@ -111,5 +117,5 @@
 	},
 	"type": "module",
 	"types": "./types/index.d.ts",
-	"version": "0.27.0"
+	"version": "0.28.0"
 }

@@ -1,3 +1,18 @@
+// src/js/queue.ts
+function queue(callback) {
+  queued.add(callback);
+  if (queued.size > 0) {
+    queueMicrotask(() => {
+      const callbacks = Array.from(queued);
+      queued.clear();
+      for (const callback2 of callbacks) {
+        callback2();
+      }
+    });
+  }
+}
+var queued = new Set;
+
 // src/js/signal.ts
 function computed(callback) {
   return new Computed(callback);
@@ -5,13 +20,13 @@ function computed(callback) {
 function effect(callback) {
   return new Effect(callback);
 }
-var getValue = function(instance) {
-  const last = effects[effects.length - 1];
-  if (last !== undefined) {
-    instance._effects.add(last);
-    last._values.add(instance);
+var getValue = function(reactive) {
+  const effect2 = effects[effects.length - 1];
+  if (effect2 !== undefined) {
+    reactive._effects.add(effect2);
+    effect2._reactives.add(reactive);
   }
-  return instance._value;
+  return reactive._value;
 };
 function isComputed(value) {
   return value instanceof Computed;
@@ -25,21 +40,16 @@ function isReactive(value) {
 function isSignal(value) {
   return value instanceof Signal;
 }
-var setValue = function(instance, value, run) {
-  if (!run && Object.is(value, instance._value)) {
+var setValue = function(reactive, value, run) {
+  if (!run && Object.is(value, reactive._value)) {
     return;
   }
-  instance._value = value;
-  cancelAnimationFrame(instance._frame);
-  if (!instance._active) {
-    return;
-  }
-  instance._frame = requestAnimationFrame(() => {
-    for (const effect2 of instance._effects) {
-      effect2._callback();
+  reactive._value = value;
+  if (reactive._active) {
+    for (const effect2 of reactive._effects) {
+      queue(effect2._callback);
     }
-    instance._frame = undefined;
-  });
+  }
 };
 function signal(value) {
   return new Signal(value);
@@ -48,7 +58,6 @@ function signal(value) {
 class Reactive {
   _active = true;
   _effects = new Set;
-  _frame;
   peek() {
     return this._value;
   }
@@ -80,7 +89,7 @@ class Computed extends Reactive {
 class Effect {
   _callback;
   _active = false;
-  _values = new Set;
+  _reactives = new Set;
   constructor(_callback) {
     this._callback = _callback;
     this.run();
@@ -99,10 +108,10 @@ class Effect {
       return;
     }
     this._active = false;
-    for (const value of this._values) {
+    for (const value of this._reactives) {
       value._effects.delete(this);
     }
-    this._values.clear();
+    this._reactives.clear();
   }
 }
 

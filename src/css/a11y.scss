@@ -1,8 +1,12 @@
-.visually-hidden:not(:active):not(:focus):not(:focus-within) {
-	width: 1px !important;
-	height: 1px !important;
-	clip: rect(1px, 1px 1px, 1px) !important;
-	clip-path: inset(50%) !important;
-	overflow: hidden !important;
-	white-space: nowrap !important;
+.visually-hidden {
+	position: absolute !important;
+
+	&:not(:active):not(:focus):not(:focus-within) {
+		width: 1px !important;
+		height: 1px !important;
+		clip: rect(1px, 1px 1px, 1px) !important;
+		clip-path: inset(50%) !important;
+		overflow: hidden !important;
+		white-space: nowrap !important;
+	}
 }

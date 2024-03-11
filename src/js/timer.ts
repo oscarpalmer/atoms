@@ -104,7 +104,10 @@ export function repeat(
 	callback: (index: number) => void,
 	options?: Options,
 ): Timer {
-	const count = typeof options?.count === 'number' ? options.count : Infinity;
+	const count =
+		typeof options?.count === 'number'
+			? options.count
+			: Number.POSITIVE_INFINITY;
 
 	return new Timer(callback, {...(options ?? {}), ...{count}}).start();
 }

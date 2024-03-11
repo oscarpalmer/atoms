@@ -19,6 +19,21 @@ function isPlainObject(value) {
   return (prototype === null || prototype === Object.prototype || Object.getPrototypeOf(prototype) === null) && !(Symbol.toStringTag in value) && !(Symbol.iterator in value);
 }
 
+// src/js/queue.ts
+function queue(callback) {
+  queued.add(callback);
+  if (queued.size > 0) {
+    queueMicrotask(() => {
+      const callbacks = Array.from(queued);
+      queued.clear();
+      for (const callback2 of callbacks) {
+        callback2();
+      }
+    });
+  }
+}
+var queued = new Set;
+
 // src/js/value.ts
 var _cloneNested = function(value) {
   const cloned = Array.isArray(value) ? [] : {};
@@ -239,13 +254,10 @@ var _isProxy = function(value2) {
   return value2?.$ instanceof Manager;
 };
 var _onChange = function(manager, value2) {
-  cancelAnimationFrame(frames.get(manager));
   if (!cloned.has(manager)) {
     cloned.set(manager, value2);
   }
-  frames.set(manager, requestAnimationFrame(() => {
-    _emit(manager);
-  }));
+  queue(manager.emitter);
 };
 function cloneProxy(proxy) {
   if (!_isProxy(proxy)) {
@@ -279,6 +291,9 @@ class Manager {
   }
   constructor(owner) {
     this.owner = owner;
+    this.emitter = function() {
+      _emit(this);
+    }.bind(this);
   }
   clone() {
     return _createProxy(undefined, clone(merge(this.owner)));
@@ -299,7 +314,6 @@ class Manager {
   }
 }
 var cloned = new Map;
-var frames = new Map;
 export {
   unsubscribe,
   subscribe,

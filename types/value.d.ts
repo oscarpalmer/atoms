@@ -1,4 +1,4 @@
-import { ArrayOrPlainObject } from './is';
+import { type ArrayOrPlainObject } from './is';
 export type DiffType = 'full' | 'none' | 'partial';
 export type DiffResult<T1 = unknown, T2 = T1> = {
     original: DiffValue<T1, T2>;

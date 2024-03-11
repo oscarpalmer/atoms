@@ -1,12 +1,14 @@
+import {queue} from './queue';
+
 type InternalEffect = {
+	_active: boolean;
 	_callback: () => void;
-	_values: Set<InternalReactive>;
+	_reactives: Set<InternalReactive>;
 };
 
 type InternalReactive = {
 	_active: boolean;
 	_effects: Set<InternalEffect>;
-	_frame: number | undefined;
 	_value: unknown;
 };
 
@@ -16,7 +18,6 @@ type InternalReactive = {
 abstract class Reactive<T = unknown> {
 	protected _active = true;
 	protected _effects = new Set<InternalEffect>();
-	protected _frame: number | undefined;
 	protected declare _value: T;
 
 	/**
@@ -95,7 +96,7 @@ class Computed<T> extends Reactive<T> {
  */
 class Effect {
 	private _active = false;
-	private readonly _values = new Set<InternalReactive>();
+	private readonly _reactives = new Set<InternalReactive>();
 
 	constructor(private readonly _callback: () => void) {
 		this.run();
@@ -128,11 +129,11 @@ class Effect {
 
 		this._active = false;
 
-		for (const value of this._values) {
+		for (const value of this._reactives) {
 			value._effects.delete(this as never);
 		}
 
-		this._values.clear();
+		this._reactives.clear();
 	}
 }
 
@@ -195,15 +196,15 @@ export function effect(callback: () => void): Effect {
 	return new Effect(callback);
 }
 
-function getValue(instance: InternalReactive): unknown {
-	const last = effects[effects.length - 1];
+function getValue(reactive: InternalReactive): unknown {
+	const effect = effects[effects.length - 1];
 
-	if (last !== undefined) {
-		instance._effects.add(last);
-		last._values.add(instance);
+	if (effect !== undefined) {
+		reactive._effects.add(effect);
+		effect._reactives.add(reactive);
 	}
 
-	return instance._value;
+	return reactive._value;
 }
 
 /**
@@ -220,6 +221,9 @@ export function isEffect(value: unknown): value is Effect {
 	return value instanceof Effect;
 }
 
+/**
+ * Is the value a reactive value?
+ */
 export function isReactive(value: unknown): value is Reactive<unknown> {
 	return value instanceof Reactive;
 }
@@ -231,26 +235,18 @@ export function isSignal(value: unknown): value is Signal<unknown> {
 	return value instanceof Signal;
 }
 
-function setValue<T>(instance: InternalReactive, value: T, run: boolean): void {
-	if (!run && Object.is(value, instance._value)) {
+function setValue<T>(reactive: InternalReactive, value: T, run: boolean): void {
+	if (!run && Object.is(value, reactive._value)) {
 		return;
 	}
 
-	instance._value = value;
+	reactive._value = value;
 
-	cancelAnimationFrame(instance._frame as never);
-
-	if (!instance._active) {
-		return;
-	}
-
-	instance._frame = requestAnimationFrame(() => {
-		for (const effect of instance._effects) {
-			effect._callback();
+	if (reactive._active) {
+		for (const effect of reactive._effects) {
+			queue(effect._callback);
 		}
-
-		instance._frame = undefined;
-	});
+	}
 }
 
 /**

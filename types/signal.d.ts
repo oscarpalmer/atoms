@@ -1,11 +1,11 @@
 type InternalEffect = {
+    _active: boolean;
     _callback: () => void;
-    _values: Set<InternalReactive>;
+    _reactives: Set<InternalReactive>;
 };
 type InternalReactive = {
     _active: boolean;
     _effects: Set<InternalEffect>;
-    _frame: number | undefined;
     _value: unknown;
 };
 /**
@@ -14,7 +14,6 @@ type InternalReactive = {
 declare abstract class Reactive<T = unknown> {
     protected _active: boolean;
     protected _effects: Set<InternalEffect>;
-    protected _frame: number | undefined;
     protected _value: T;
     /**
      * The current value
@@ -66,7 +65,7 @@ declare class Computed<T> extends Reactive<T> {
 declare class Effect {
     private readonly _callback;
     private _active;
-    private readonly _values;
+    private readonly _reactives;
     constructor(_callback: () => void);
     /**
      * Starts and runs the effect, if it was stopped
@@ -116,6 +115,9 @@ export declare function isComputed(value: unknown): value is Computed<unknown>;
  * Is the value a reactive effect?
  */
 export declare function isEffect(value: unknown): value is Effect;
+/**
+ * Is the value a reactive value?
+ */
 export declare function isReactive(value: unknown): value is Reactive<unknown>;
 /**
  * Is the value a reactive value?

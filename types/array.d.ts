@@ -1,4 +1,4 @@
-import { Key } from './value';
+import type { Key } from './value';
 type BooleanCallback<T> = (item: T, index: number, array: T[]) => boolean;
 type KeyCallback<T> = (item: T) => Key;
 /**

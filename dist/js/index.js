@@ -284,6 +284,21 @@ function isPlainObject(value) {
   return (prototype === null || prototype === Object.prototype || Object.getPrototypeOf(prototype) === null) && !(Symbol.toStringTag in value) && !(Symbol.iterator in value);
 }
 
+// src/js/queue.ts
+function queue(callback) {
+  queued.add(callback);
+  if (queued.size > 0) {
+    queueMicrotask(() => {
+      const callbacks = Array.from(queued);
+      queued.clear();
+      for (const callback2 of callbacks) {
+        callback2();
+      }
+    });
+  }
+}
+var queued = new Set;
+
 // src/js/value.ts
 var _cloneNested = function(value) {
   const cloned = Array.isArray(value) ? [] : {};
@@ -535,13 +550,10 @@ var _isProxy = function(value2) {
   return value2?.$ instanceof Manager;
 };
 var _onChange = function(manager, value2) {
-  cancelAnimationFrame(frames.get(manager));
   if (!cloned.has(manager)) {
     cloned.set(manager, value2);
   }
-  frames.set(manager, requestAnimationFrame(() => {
-    _emit(manager);
-  }));
+  queue(manager.emitter);
 };
 function cloneProxy(proxy) {
   if (!_isProxy(proxy)) {
@@ -575,6 +587,9 @@ class Manager {
   }
   constructor(owner) {
     this.owner = owner;
+    this.emitter = function() {
+      _emit(this);
+    }.bind(this);
   }
   clone() {
     return _createProxy(undefined, clone(merge(this.owner)));
@@ -595,7 +610,6 @@ class Manager {
   }
 }
 var cloned = new Map;
-var frames = new Map;
 // src/js/signal.ts
 function computed(callback) {
   return new Computed(callback);
@@ -603,13 +617,13 @@ function computed(callback) {
 function effect(callback) {
   return new Effect(callback);
 }
-var getValue = function(instance) {
-  const last = effects[effects.length - 1];
-  if (last !== undefined) {
-    instance._effects.add(last);
-    last._values.add(instance);
+var getValue = function(reactive) {
+  const effect2 = effects[effects.length - 1];
+  if (effect2 !== undefined) {
+    reactive._effects.add(effect2);
+    effect2._reactives.add(reactive);
   }
-  return instance._value;
+  return reactive._value;
 };
 function isComputed(value2) {
   return value2 instanceof Computed;
@@ -623,21 +637,16 @@ function isReactive(value2) {
 function isSignal(value2) {
   return value2 instanceof Signal;
 }
-var setValue = function(instance, value2, run) {
-  if (!run && Object.is(value2, instance._value)) {
+var setValue = function(reactive, value2, run) {
+  if (!run && Object.is(value2, reactive._value)) {
     return;
   }
-  instance._value = value2;
-  cancelAnimationFrame(instance._frame);
-  if (!instance._active) {
-    return;
-  }
-  instance._frame = requestAnimationFrame(() => {
-    for (const effect2 of instance._effects) {
-      effect2._callback();
+  reactive._value = value2;
+  if (reactive._active) {
+    for (const effect2 of reactive._effects) {
+      queue(effect2._callback);
     }
-    instance._frame = undefined;
-  });
+  }
 };
 function signal(value2) {
   return new Signal(value2);
@@ -646,7 +655,6 @@ function signal(value2) {
 class Reactive {
   _active = true;
   _effects = new Set;
-  _frame;
   peek() {
     return this._value;
   }
@@ -678,7 +686,7 @@ class Computed extends Reactive {
 class Effect {
   _callback;
   _active = false;
-  _values = new Set;
+  _reactives = new Set;
   constructor(_callback) {
     this._callback = _callback;
     this.run();
@@ -697,10 +705,10 @@ class Effect {
       return;
     }
     this._active = false;
-    for (const value2 of this._values) {
+    for (const value2 of this._reactives) {
       value2._effects.delete(this);
     }
-    this._values.clear();
+    this._reactives.clear();
   }
 }
 
@@ -730,7 +738,7 @@ class Signal extends Reactive {
 var effects = [];
 // src/js/timer.ts
 function repeat(callback, options) {
-  const count = typeof options?.count === "number" ? options.count : Infinity;
+  const count = typeof options?.count === "number" ? options.count : Number.POSITIVE_INFINITY;
   return new Timer(callback, { ...options ?? {}, ...{ count } }).start();
 }
 function wait(callback, time) {
@@ -820,6 +828,7 @@ export {
   signal,
   set,
   repeat,
+  queue,
   push,
   proxy,
   merge,

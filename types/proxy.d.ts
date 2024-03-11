@@ -1,4 +1,4 @@
-import { ArrayOrPlainObject, PlainObject } from './is';
+import { type ArrayOrPlainObject, type PlainObject } from './is';
 export type Subscriber<T1 = unknown, T2 = T1> = (to: T1, from: T2) => void;
 /**
  * Clones and creates a new proxy

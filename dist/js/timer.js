@@ -1,6 +1,6 @@
 // src/js/timer.ts
 function repeat(callback, options) {
-  const count = typeof options?.count === "number" ? options.count : Infinity;
+  const count = typeof options?.count === "number" ? options.count : Number.POSITIVE_INFINITY;
   return new Timer(callback, { ...options ?? {}, ...{ count } }).start();
 }
 function wait(callback, time) {

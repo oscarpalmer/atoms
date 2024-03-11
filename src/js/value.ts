@@ -1,5 +1,8 @@
-import {chunk} from './array';
-import {ArrayOrPlainObject, PlainObject, isArrayOrPlainObject} from './is';
+import {
+	type ArrayOrPlainObject,
+	type PlainObject,
+	isArrayOrPlainObject,
+} from './is';
 import {getString} from './string';
 
 export type DiffType = 'full' | 'none' | 'partial';

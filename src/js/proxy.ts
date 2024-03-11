@@ -1,16 +1,26 @@
-import {ArrayOrPlainObject, PlainObject, isArrayOrPlainObject} from './is';
+import {
+	type ArrayOrPlainObject,
+	type PlainObject,
+	isArrayOrPlainObject,
+} from './is';
+import {queue} from './queue';
 import {clone, diff, get, merge} from './value';
 
 class Manager<T extends ArrayOrPlainObject = PlainObject> {
 	private count = 0;
 
+	declare readonly emitter: () => void;
 	readonly subscribers = new Map<string, Set<Subscriber>>();
 
 	get subscribed(): boolean {
 		return this.count > 0;
 	}
 
-	constructor(readonly owner: Proxied<T>) {}
+	constructor(readonly owner: Proxied<T>) {
+		this.emitter = function (this: Manager<T>) {
+			_emit(this as never);
+		}.bind(this);
+	}
 
 	clone(): T {
 		return _createProxy(undefined, clone(merge(this.owner))) as T;
@@ -47,7 +57,6 @@ type Proxied<T extends ArrayOrPlainObject = PlainObject> = {
 export type Subscriber<T1 = unknown, T2 = T1> = (to: T1, from: T2) => void;
 
 const cloned = new Map<Manager, unknown>();
-const frames = new Map<Manager, number>();
 
 function _createProxy<T extends ArrayOrPlainObject>(
 	existing: Manager | undefined,
@@ -144,18 +153,11 @@ function _isProxy(value: unknown): value is Proxied {
 }
 
 function _onChange(manager: Manager, value: unknown): void {
-	cancelAnimationFrame(frames.get(manager) as number);
-
 	if (!cloned.has(manager)) {
 		cloned.set(manager, value);
 	}
 
-	frames.set(
-		manager,
-		requestAnimationFrame(() => {
-			_emit(manager);
-		}),
-	);
+	queue(manager.emitter);
 }
 
 /**
