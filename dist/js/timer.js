@@ -25,8 +25,11 @@ var work = function(type, timer, state, options) {
   }
   state.active = true;
   const isRepeated = count > 0;
-  const milliseconds = 16.666666666666668;
   let index = 0;
+  let total = count * interval;
+  if (total < milliseconds) {
+    total = milliseconds;
+  }
   let start;
   function step(timestamp) {
     if (!state.active) {
@@ -34,14 +37,13 @@ var work = function(type, timer, state, options) {
     }
     start ??= timestamp;
     const elapsed = timestamp - start;
-    const maximum = elapsed + milliseconds;
-    const minimum = elapsed - milliseconds;
-    if (minimum < interval && interval < maximum) {
+    const finished = elapsed >= total;
+    if (finished || elapsed - 2 < interval && interval < elapsed + 2) {
       if (state.active) {
         callback(isRepeated ? index : undefined);
       }
       index += 1;
-      if (index < count) {
+      if (!finished && index < count) {
         start = undefined;
       } else {
         state.active = false;
@@ -55,6 +57,7 @@ var work = function(type, timer, state, options) {
   state.frame = requestAnimationFrame(step);
   return timer;
 };
+var milliseconds = 0;
 
 class Timer {
   get active() {
@@ -81,6 +84,18 @@ class Timer {
     return work("stop", this, this.state, this.options);
   }
 }
+(() => {
+  let start;
+  function fn(time) {
+    if (start === undefined) {
+      start = time;
+      requestAnimationFrame(fn);
+    } else {
+      milliseconds = time - start;
+    }
+  }
+  requestAnimationFrame(fn);
+})();
 export {
   wait,
   repeat,

@@ -21,18 +21,25 @@ function isPlainObject(value) {
 
 // src/js/queue.ts
 function queue(callback) {
-  queued.add(callback);
-  if (queued.size > 0) {
+  _atomic_queued.add(callback);
+  if (_atomic_queued.size > 0) {
     queueMicrotask(() => {
-      const callbacks = Array.from(queued);
-      queued.clear();
+      const callbacks = Array.from(_atomic_queued);
+      _atomic_queued.clear();
       for (const callback2 of callbacks) {
         callback2();
       }
     });
   }
 }
-var queued = new Set;
+if (globalThis._atomic_effects === undefined) {
+  const queued = new Set;
+  Object.defineProperty(globalThis, "_atomic_queued", {
+    get() {
+      return queued;
+    }
+  });
+}
 
 // src/js/value.ts
 var _cloneNested = function(value) {

@@ -1,17 +1,24 @@
 // src/js/queue.ts
 function queue(callback) {
-  queued.add(callback);
-  if (queued.size > 0) {
+  _atomic_queued.add(callback);
+  if (_atomic_queued.size > 0) {
     queueMicrotask(() => {
-      const callbacks = Array.from(queued);
-      queued.clear();
+      const callbacks = Array.from(_atomic_queued);
+      _atomic_queued.clear();
       for (const callback2 of callbacks) {
         callback2();
       }
     });
   }
 }
-var queued = new Set;
+if (globalThis._atomic_effects === undefined) {
+  const queued = new Set;
+  Object.defineProperty(globalThis, "_atomic_queued", {
+    get() {
+      return queued;
+    }
+  });
+}
 
 // src/js/signal.ts
 function computed(callback) {
@@ -21,7 +28,7 @@ function effect(callback) {
   return new Effect(callback);
 }
 var getValue = function(reactive) {
-  const effect2 = effects[effects.length - 1];
+  const effect2 = _atomic_effects[_atomic_effects.length - 1];
   if (effect2 !== undefined) {
     reactive._effects.add(effect2);
     effect2._reactives.add(reactive);
@@ -29,16 +36,19 @@ var getValue = function(reactive) {
   return reactive._value;
 };
 function isComputed(value) {
-  return value instanceof Computed;
+  return isInstance(/^computed$/i, value);
 }
 function isEffect(value) {
-  return value instanceof Effect;
+  return isInstance(/^effect$/i, value);
 }
+var isInstance = function(expression, value) {
+  return expression.test(value?.constructor?.name ?? "") && value.atomic === true;
+};
 function isReactive(value) {
-  return value instanceof Computed || value instanceof Signal;
+  return isComputed(value) || isSignal(value);
 }
 function isSignal(value) {
-  return value instanceof Signal;
+  return isInstance(/^signal$/i, value);
 }
 var setValue = function(reactive, value, run) {
   if (!run && Object.is(value, reactive._value)) {
@@ -54,8 +64,27 @@ var setValue = function(reactive, value, run) {
 function signal(value) {
   return new Signal(value);
 }
+if (globalThis._atomic_effects === undefined) {
+  const effects = [];
+  Object.defineProperty(globalThis, "_atomic_effects", {
+    get() {
+      return effects;
+    }
+  });
+}
 
-class Reactive {
+class Atomic {
+  constructor() {
+    Object.defineProperty(this, "atomic", {
+      value: true
+    });
+  }
+}
+
+class Reactive extends Atomic {
+  constructor() {
+    super(...arguments);
+  }
   _active = true;
   _effects = new Set;
   peek() {
@@ -86,11 +115,12 @@ class Computed extends Reactive {
   }
 }
 
-class Effect {
+class Effect extends Atomic {
   _callback;
   _active = false;
   _reactives = new Set;
   constructor(_callback) {
+    super();
     this._callback = _callback;
     this.run();
   }
@@ -99,9 +129,9 @@ class Effect {
       return;
     }
     this._active = true;
-    const index = effects.push(this) - 1;
+    const index = _atomic_effects.push(this) - 1;
     this._callback();
-    effects.splice(index, 1);
+    _atomic_effects.splice(index, 1);
   }
   stop() {
     if (!this._active) {
@@ -138,7 +168,6 @@ class Signal extends Reactive {
     this._active = false;
   }
 }
-var effects = [];
 export {
   signal,
   isSignal,

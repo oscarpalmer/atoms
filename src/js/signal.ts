@@ -1,5 +1,19 @@
 import {queue} from './queue';
 
+declare global {
+	var _atomic_effects: InternalEffect[];
+}
+
+if (globalThis._atomic_effects === undefined) {
+	const effects: InternalEffect[] = [];
+
+	Object.defineProperty(globalThis, '_atomic_effects', {
+		get() {
+			return effects;
+		},
+	});
+}
+
 type InternalEffect = {
 	_active: boolean;
 	_callback: () => void;
@@ -12,10 +26,20 @@ type InternalReactive = {
 	_value: unknown;
 };
 
+abstract class Atomic {
+	declare readonly atomic: boolean;
+
+	constructor() {
+		Object.defineProperty(this, 'atomic', {
+			value: true,
+		});
+	}
+}
+
 /**
  * The base class for reactive values
  */
-abstract class Reactive<T = unknown> {
+abstract class Reactive<T = unknown> extends Atomic {
 	protected _active = true;
 	protected _effects = new Set<InternalEffect>();
 	protected declare _value: T;
@@ -94,11 +118,13 @@ class Computed<T> extends Reactive<T> {
 /**
  * A reactive effect
  */
-class Effect {
+class Effect extends Atomic {
 	private _active = false;
 	private readonly _reactives = new Set<InternalReactive>();
 
 	constructor(private readonly _callback: () => void) {
+		super();
+
 		this.run();
 	}
 
@@ -112,11 +138,11 @@ class Effect {
 
 		this._active = true;
 
-		const index = effects.push(this as never) - 1;
+		const index = _atomic_effects.push(this as never) - 1;
 
 		this._callback();
 
-		effects.splice(index, 1);
+		_atomic_effects.splice(index, 1);
 	}
 
 	/**
@@ -180,8 +206,6 @@ class Signal<T> extends Reactive<T> {
 	}
 }
 
-const effects: InternalEffect[] = [];
-
 /**
  * Creates a computed, reactive value
  */
@@ -197,7 +221,7 @@ export function effect(callback: () => void): Effect {
 }
 
 function getValue(reactive: InternalReactive): unknown {
-	const effect = effects[effects.length - 1];
+	const effect = _atomic_effects[_atomic_effects.length - 1];
 
 	if (effect !== undefined) {
 		reactive._effects.add(effect);
@@ -211,28 +235,35 @@ function getValue(reactive: InternalReactive): unknown {
  * Is the value a computed, reactive value?
  */
 export function isComputed(value: unknown): value is Computed<unknown> {
-	return value instanceof Computed;
+	return isInstance(/^computed$/i, value);
 }
 
 /**
  * Is the value a reactive effect?
  */
 export function isEffect(value: unknown): value is Effect {
-	return value instanceof Effect;
+	return isInstance(/^effect$/i, value);
+}
+
+function isInstance(expression: RegExp, value: unknown): boolean {
+	return (
+		expression.test(value?.constructor?.name ?? '') &&
+		(value as Atomic).atomic === true
+	);
 }
 
 /**
  * Is the value a reactive value?
  */
 export function isReactive(value: unknown): value is Reactive<unknown> {
-	return value instanceof Computed || value instanceof Signal;
+	return isComputed(value) || isSignal(value);
 }
 
 /**
  * Is the value a reactive value?
  */
 export function isSignal(value: unknown): value is Signal<unknown> {
-	return value instanceof Signal;
+	return isInstance(/^signal$/i, value);
 }
 
 function setValue<T>(reactive: InternalReactive, value: T, run: boolean): void {

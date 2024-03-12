@@ -39,6 +39,8 @@ type TimerState = {
 
 type WorkType = 'restart' | 'start' | 'stop';
 
+let milliseconds = 0;
+
 /**
  * A timer that can be started, stopped, and restarted as neeeded
  */
@@ -154,9 +156,13 @@ function work(
 	state.active = true;
 
 	const isRepeated = count > 0;
-	const milliseconds = 1000 / 60;
 
 	let index = 0;
+	let total = count * interval;
+
+	if (total < milliseconds) {
+		total = milliseconds;
+	}
 
 	let start: DOMHighResTimeStamp | undefined;
 
@@ -168,17 +174,16 @@ function work(
 		start ??= timestamp;
 
 		const elapsed = timestamp - start;
-		const maximum = elapsed + milliseconds;
-		const minimum = elapsed - milliseconds;
+		const finished = elapsed >= total;
 
-		if (minimum < interval && interval < maximum) {
+		if (finished || (elapsed - 2 < interval && interval < elapsed + 2)) {
 			if (state.active) {
 				callback((isRepeated ? index : undefined) as never);
 			}
 
 			index += 1;
 
-			if (index < count) {
+			if (!finished && index < count) {
 				start = undefined;
 			} else {
 				state.active = false;
@@ -197,3 +202,22 @@ function work(
 
 	return timer;
 }
+
+/**
+ * Called immediately to calculate an approximate refresh rate in milliseconds
+ */
+(() => {
+	let start: number;
+
+	function fn(time: number) {
+		if (start === undefined) {
+			start = time;
+
+			requestAnimationFrame(fn);
+		} else {
+			milliseconds = time - start;
+		}
+	}
+
+	requestAnimationFrame(fn);
+})();

@@ -286,18 +286,25 @@ function isPlainObject(value) {
 
 // src/js/queue.ts
 function queue(callback) {
-  queued.add(callback);
-  if (queued.size > 0) {
+  _atomic_queued.add(callback);
+  if (_atomic_queued.size > 0) {
     queueMicrotask(() => {
-      const callbacks = Array.from(queued);
-      queued.clear();
+      const callbacks = Array.from(_atomic_queued);
+      _atomic_queued.clear();
       for (const callback2 of callbacks) {
         callback2();
       }
     });
   }
 }
-var queued = new Set;
+if (globalThis._atomic_effects === undefined) {
+  const queued = new Set;
+  Object.defineProperty(globalThis, "_atomic_queued", {
+    get() {
+      return queued;
+    }
+  });
+}
 
 // src/js/value.ts
 var _cloneNested = function(value) {
@@ -618,7 +625,7 @@ function effect(callback) {
   return new Effect(callback);
 }
 var getValue = function(reactive) {
-  const effect2 = effects[effects.length - 1];
+  const effect2 = _atomic_effects[_atomic_effects.length - 1];
   if (effect2 !== undefined) {
     reactive._effects.add(effect2);
     effect2._reactives.add(reactive);
@@ -626,16 +633,19 @@ var getValue = function(reactive) {
   return reactive._value;
 };
 function isComputed(value2) {
-  return value2 instanceof Computed;
+  return isInstance(/^computed$/i, value2);
 }
 function isEffect(value2) {
-  return value2 instanceof Effect;
+  return isInstance(/^effect$/i, value2);
 }
+var isInstance = function(expression, value2) {
+  return expression.test(value2?.constructor?.name ?? "") && value2.atomic === true;
+};
 function isReactive(value2) {
-  return value2 instanceof Computed || value2 instanceof Signal;
+  return isComputed(value2) || isSignal(value2);
 }
 function isSignal(value2) {
-  return value2 instanceof Signal;
+  return isInstance(/^signal$/i, value2);
 }
 var setValue = function(reactive, value2, run) {
   if (!run && Object.is(value2, reactive._value)) {
@@ -651,8 +661,27 @@ var setValue = function(reactive, value2, run) {
 function signal(value2) {
   return new Signal(value2);
 }
+if (globalThis._atomic_effects === undefined) {
+  const effects = [];
+  Object.defineProperty(globalThis, "_atomic_effects", {
+    get() {
+      return effects;
+    }
+  });
+}
 
-class Reactive {
+class Atomic {
+  constructor() {
+    Object.defineProperty(this, "atomic", {
+      value: true
+    });
+  }
+}
+
+class Reactive extends Atomic {
+  constructor() {
+    super(...arguments);
+  }
   _active = true;
   _effects = new Set;
   peek() {
@@ -683,11 +712,12 @@ class Computed extends Reactive {
   }
 }
 
-class Effect {
+class Effect extends Atomic {
   _callback;
   _active = false;
   _reactives = new Set;
   constructor(_callback) {
+    super();
     this._callback = _callback;
     this.run();
   }
@@ -696,9 +726,9 @@ class Effect {
       return;
     }
     this._active = true;
-    const index = effects.push(this) - 1;
+    const index = _atomic_effects.push(this) - 1;
     this._callback();
-    effects.splice(index, 1);
+    _atomic_effects.splice(index, 1);
   }
   stop() {
     if (!this._active) {
@@ -735,7 +765,6 @@ class Signal extends Reactive {
     this._active = false;
   }
 }
-var effects = [];
 // src/js/timer.ts
 function repeat(callback, options) {
   const count = typeof options?.count === "number" ? options.count : Number.POSITIVE_INFINITY;
@@ -763,8 +792,11 @@ var work = function(type, timer, state, options) {
   }
   state.active = true;
   const isRepeated = count > 0;
-  const milliseconds = 16.666666666666668;
   let index = 0;
+  let total = count * interval;
+  if (total < milliseconds) {
+    total = milliseconds;
+  }
   let start;
   function step(timestamp) {
     if (!state.active) {
@@ -772,14 +804,13 @@ var work = function(type, timer, state, options) {
     }
     start ??= timestamp;
     const elapsed = timestamp - start;
-    const maximum = elapsed + milliseconds;
-    const minimum = elapsed - milliseconds;
-    if (minimum < interval && interval < maximum) {
+    const finished = elapsed >= total;
+    if (finished || elapsed - 2 < interval && interval < elapsed + 2) {
       if (state.active) {
         callback(isRepeated ? index : undefined);
       }
       index += 1;
-      if (index < count) {
+      if (!finished && index < count) {
         start = undefined;
       } else {
         state.active = false;
@@ -793,6 +824,7 @@ var work = function(type, timer, state, options) {
   state.frame = requestAnimationFrame(step);
   return timer;
 };
+var milliseconds = 0;
 
 class Timer {
   get active() {
@@ -819,6 +851,18 @@ class Timer {
     return work("stop", this, this.state, this.options);
   }
 }
+(() => {
+  let start;
+  function fn(time) {
+    if (start === undefined) {
+      start = time;
+      requestAnimationFrame(fn);
+    } else {
+      milliseconds = time - start;
+    }
+  }
+  requestAnimationFrame(fn);
+})();
 export {
   wait,
   unsubscribe,
