@@ -4,7 +4,6 @@ export * from './event';
 export * from './number';
 export * from './proxy';
 export * from './queue';
-export * from './signal';
 export * from './string';
 export * from './timer';
 export * from './value';

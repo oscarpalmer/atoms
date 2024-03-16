@@ -297,7 +297,7 @@ function queue(callback) {
     });
   }
 }
-if (globalThis._atomic_effects === undefined) {
+if (globalThis._atomic_queued === undefined) {
   const queued = new Set;
   Object.defineProperty(globalThis, "_atomic_queued", {
     get() {
@@ -617,154 +617,6 @@ class Manager {
   }
 }
 var cloned = new Map;
-// src/js/signal.ts
-function computed(callback) {
-  return new Computed(callback);
-}
-function effect(callback) {
-  return new Effect(callback);
-}
-var getValue = function(reactive) {
-  const effect2 = _atomic_effects[_atomic_effects.length - 1];
-  if (effect2 !== undefined) {
-    reactive._effects.add(effect2);
-    effect2._reactives.add(reactive);
-  }
-  return reactive._value;
-};
-function isComputed(value2) {
-  return isInstance(/^computed$/i, value2);
-}
-function isEffect(value2) {
-  return isInstance(/^effect$/i, value2);
-}
-var isInstance = function(expression, value2) {
-  return expression.test(value2?.constructor?.name ?? "") && value2.atomic === true;
-};
-function isReactive(value2) {
-  return isComputed(value2) || isSignal(value2);
-}
-function isSignal(value2) {
-  return isInstance(/^signal$/i, value2);
-}
-var setValue = function(reactive, value2, run) {
-  if (!run && Object.is(value2, reactive._value)) {
-    return;
-  }
-  reactive._value = value2;
-  if (reactive._active) {
-    for (const effect2 of reactive._effects) {
-      queue(effect2._callback);
-    }
-  }
-};
-function signal(value2) {
-  return new Signal(value2);
-}
-if (globalThis._atomic_effects === undefined) {
-  const effects = [];
-  Object.defineProperty(globalThis, "_atomic_effects", {
-    get() {
-      return effects;
-    }
-  });
-}
-
-class Atomic {
-  constructor() {
-    Object.defineProperty(this, "atomic", {
-      value: true
-    });
-  }
-}
-
-class Reactive extends Atomic {
-  constructor() {
-    super(...arguments);
-  }
-  _active = true;
-  _effects = new Set;
-  peek() {
-    return this._value;
-  }
-  toJSON() {
-    return this.value;
-  }
-  toString() {
-    return String(this.value);
-  }
-}
-
-class Computed extends Reactive {
-  _effect;
-  get value() {
-    return getValue(this);
-  }
-  constructor(callback) {
-    super();
-    this._effect = effect(() => setValue(this, callback(), false));
-  }
-  run() {
-    this._effect.run();
-  }
-  stop() {
-    this._effect.stop();
-  }
-}
-
-class Effect extends Atomic {
-  _callback;
-  _active = false;
-  _reactives = new Set;
-  constructor(_callback) {
-    super();
-    this._callback = _callback;
-    this.run();
-  }
-  run() {
-    if (this._active) {
-      return;
-    }
-    this._active = true;
-    const index = _atomic_effects.push(this) - 1;
-    this._callback();
-    _atomic_effects.splice(index, 1);
-  }
-  stop() {
-    if (!this._active) {
-      return;
-    }
-    this._active = false;
-    for (const value2 of this._reactives) {
-      value2._effects.delete(this);
-    }
-    this._reactives.clear();
-  }
-}
-
-class Signal extends Reactive {
-  _value;
-  get value() {
-    return getValue(this);
-  }
-  set value(value2) {
-    setValue(this, value2, false);
-  }
-  constructor(_value) {
-    super();
-    this._value = _value;
-  }
-  run() {
-    if (this._active) {
-      return;
-    }
-    this._active = true;
-    setValue(this, this._value, true);
-  }
-  stop() {
-    this._active = false;
-  }
-}
 // src/js/timer.ts
 function repeat(callback, options) {
   const count = typeof options?.count === "number" ? options.count : Number.POSITIVE_INFINITY;
@@ -869,17 +721,12 @@ export {
   unique,
   subscribe,
   splice,
-  signal,
   set,
   repeat,
   queue,
   push,
   proxy,
   merge,
-  isSignal,
-  isReactive,
-  isEffect,
-  isComputed,
   insert,
   indexOf,
   groupBy,
@@ -895,10 +742,8 @@ export {
   find,
   filter,
   exists,
-  effect,
   diff,
   createUuid,
-  computed,
   cloneProxy,
   clone,
   clamp,

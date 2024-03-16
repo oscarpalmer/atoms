@@ -12,6 +12,9 @@
 		"typescript": "^5.4"
 	},
 	"exports": {
+		".": {
+			"types": "./types/index.d.ts"
+		},
 		"./array": {
 			"bun": "./src/js/array.ts",
 			"import": "./dist/js/array.mjs",
@@ -59,12 +62,6 @@
 			"import": "./dist/js/queue.mjs",
 			"require": "./dist/js/queue.js",
 			"types": "./types/queue.d.ts"
-		},
-		"./signal": {
-			"bun": "./src/js/signal.ts",
-			"import": "./dist/js/signal.mjs",
-			"require": "./dist/js/signal.js",
-			"types": "./types/signal.d.ts"
 		},
 		"./string": {
 			"bun": "./src/js/string.ts",
@@ -117,5 +114,5 @@
 	},
 	"type": "module",
 	"types": "./types/index.d.ts",
-	"version": "0.30.0"
+	"version": "0.31.0"
 }
