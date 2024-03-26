@@ -6,9 +6,9 @@
 	"description": "Sweet little atomic goodies…",
 	"devDependencies": {
 		"@biomejs/biome": "^1.6",
-		"@happy-dom/global-registrator": "^13.7",
+		"@happy-dom/global-registrator": "^14.3",
 		"bun": "^1.0",
-		"sass": "^1.71",
+		"sass": "^1.72",
 		"typescript": "^5.4"
 	},
 	"exports": {
@@ -45,17 +45,15 @@
 			"require": "./dist/js/is.js",
 			"types": "./types/is.d.ts"
 		},
+		"./models": {
+			"bun": "./src/js/models.ts",
+			"types": "./types/models.d.ts"
+		},
 		"./number": {
 			"bun": "./src/js/number.ts",
 			"import": "./dist/js/number.mjs",
 			"require": "./dist/js/number.js",
 			"types": "./types/number.d.ts"
-		},
-		"./proxy": {
-			"bun": "./src/js/proxy.ts",
-			"import": "./dist/js/proxy.mjs",
-			"require": "./dist/js/proxy.js",
-			"types": "./types/proxy.d.ts"
 		},
 		"./queue": {
 			"bun": "./src/js/queue.ts",
@@ -114,5 +112,5 @@
 	},
 	"type": "module",
 	"types": "./types/index.d.ts",
-	"version": "0.31.0"
+	"version": "0.32.0"
 }

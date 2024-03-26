@@ -8,32 +8,27 @@ var _findElements = function(selector, context, single) {
     let index2 = 0;
     for (;index2 < length2; index2 += 1) {
       const value = callback.call(contexts[index2], selector);
-      if (single && value != null) {
+      if (single) {
+        if (value == null) {
+          continue;
+        }
         return value;
       }
-      if (!single) {
-        result.push(...Array.from(value));
-      }
+      result.push(...Array.from(value));
     }
     return single ? undefined : result.filter((value, index3, array) => array.indexOf(value) === index3);
   }
-  const nodes = Array.isArray(selector) || selector instanceof NodeList ? selector : [selector];
+  const nodes = Array.isArray(selector) ? selector : selector instanceof NodeList ? Array.from(selector) : [selector];
   const { length } = nodes;
   let index = 0;
   for (;index < length; index += 1) {
     const node = nodes[index];
     const element = node instanceof Document ? node.body : node instanceof Element ? node : undefined;
-    if (element == null) {
-      continue;
-    }
-    if (context == null || contexts.some((context2) => context2.contains(node))) {
-      if (single) {
-        return element;
-      }
+    if (element != null && (context == null || contexts.length === 0 || contexts.some((context2) => context2 === element || context2.contains(element))) && !result.includes(element)) {
       result.push(element);
     }
   }
-  return single ? undefined : result.filter((value, index2, array) => array.indexOf(value) === index2);
+  return result;
 };
 function findElement(selector, context) {
   return _findElements(selector, context, true);
@@ -66,7 +61,7 @@ function getElementUnderPointer(skipIgnore) {
       return false;
     }
     const style = getComputedStyle(element);
-    return typeof skipIgnore === "boolean" && skipIgnore || style.pointerEvents !== "none" && style.visibility !== "hidden";
+    return skipIgnore === true || style.pointerEvents !== "none" && style.visibility !== "hidden";
   });
   return elements[elements.length - 1];
 }

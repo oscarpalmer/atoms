@@ -141,32 +141,27 @@ var _findElements = function(selector, context, single) {
     let index2 = 0;
     for (;index2 < length2; index2 += 1) {
       const value = callback.call(contexts[index2], selector);
-      if (single && value != null) {
+      if (single) {
+        if (value == null) {
+          continue;
+        }
         return value;
       }
-      if (!single) {
-        result.push(...Array.from(value));
-      }
+      result.push(...Array.from(value));
     }
     return single ? undefined : result.filter((value, index3, array) => array.indexOf(value) === index3);
   }
-  const nodes = Array.isArray(selector) || selector instanceof NodeList ? selector : [selector];
+  const nodes = Array.isArray(selector) ? selector : selector instanceof NodeList ? Array.from(selector) : [selector];
   const { length } = nodes;
   let index = 0;
   for (;index < length; index += 1) {
     const node = nodes[index];
     const element = node instanceof Document ? node.body : node instanceof Element ? node : undefined;
-    if (element == null) {
-      continue;
-    }
-    if (context == null || contexts.some((context2) => context2.contains(node))) {
-      if (single) {
-        return element;
-      }
+    if (element != null && (context == null || contexts.length === 0 || contexts.some((context2) => context2 === element || context2.contains(element))) && !result.includes(element)) {
       result.push(element);
     }
   }
-  return single ? undefined : result.filter((value, index2, array) => array.indexOf(value) === index2);
+  return result;
 };
 function findElement(selector, context) {
   return _findElements(selector, context, true);
@@ -199,7 +194,7 @@ function getElementUnderPointer(skipIgnore) {
       return false;
     }
     const style = getComputedStyle(element);
-    return typeof skipIgnore === "boolean" && skipIgnore || style.pointerEvents !== "none" && style.visibility !== "hidden";
+    return skipIgnore === true || style.pointerEvents !== "none" && style.visibility !== "hidden";
   });
   return elements[elements.length - 1];
 }
@@ -238,52 +233,28 @@ function getNumber(value) {
     return value;
   }
   if (typeof value === "symbol") {
-    return NaN;
+    return Number.NaN;
   }
   let parsed = value?.valueOf?.() ?? value;
   if (typeof parsed === "object") {
     parsed = parsed?.toString() ?? parsed;
   }
   if (typeof parsed !== "string") {
-    return parsed == null ? NaN : typeof parsed === "number" ? parsed : +parsed;
+    return parsed == null ? Number.NaN : typeof parsed === "number" ? parsed : +parsed;
   }
   if (/^\s*0+\s*$/.test(parsed)) {
     return 0;
   }
   const trimmed = parsed.trim();
   if (trimmed.length === 0) {
-    return NaN;
+    return Number.NaN;
   }
   const isBinary = /^0b[01]+$/i.test(trimmed);
   if (isBinary || /^0o[0-7]+$/i.test(trimmed)) {
-    return parseInt(trimmed.slice(2), isBinary ? 2 : 8);
+    return Number.parseInt(trimmed.slice(2), isBinary ? 2 : 8);
   }
   return +(/^0x[0-9a-f]+$/i.test(trimmed) ? trimmed : trimmed.replace(/_/g, ""));
 }
-// src/js/string.ts
-function createUuid() {
-  return "10000000-1000-4000-8000-100000000000".replace(/[018]/g, (substring) => (substring ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> substring / 4).toString(16));
-}
-function getString(value) {
-  if (typeof value === "string") {
-    return value;
-  }
-  const result = value?.toString?.() ?? value;
-  return result?.toString?.() ?? String(result);
-}
-
-// src/js/is.ts
-function isArrayOrPlainObject(value) {
-  return Array.isArray(value) || isPlainObject(value);
-}
-function isPlainObject(value) {
-  if (typeof value !== "object" || value === null) {
-    return false;
-  }
-  const prototype = Object.getPrototypeOf(value);
-  return (prototype === null || prototype === Object.prototype || Object.getPrototypeOf(prototype) === null) && !(Symbol.toStringTag in value) && !(Symbol.iterator in value);
-}
-
 // src/js/queue.ts
 function queue(callback) {
   _atomic_queued.add(callback);
@@ -304,6 +275,126 @@ if (globalThis._atomic_queued === undefined) {
       return queued;
     }
   });
+}
+// src/js/string.ts
+function createUuid() {
+  return "10000000-1000-4000-8000-100000000000".replace(/[018]/g, (substring) => (substring ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> substring / 4).toString(16));
+}
+function getString(value) {
+  if (typeof value === "string") {
+    return value;
+  }
+  const result = value?.toString?.() ?? value;
+  return result?.toString?.() ?? String(result);
+}
+// src/js/timer.ts
+function repeat(callback, options) {
+  const count = typeof options?.count === "number" ? options.count : Number.POSITIVE_INFINITY;
+  return new Timer(callback, { ...options ?? {}, ...{ count } }).start();
+}
+function wait(callback, time) {
+  return new Timer(callback, {
+    count: 1,
+    interval: time
+  }).start();
+}
+var work = function(type, timer, state, options) {
+  if (type === "start" && timer.active || type === "stop" && !timer.active) {
+    return timer;
+  }
+  const { afterCallback, callback, count, interval } = options;
+  if (typeof state.frame === "number") {
+    cancelAnimationFrame(state.frame);
+    afterCallback?.(false);
+  }
+  if (type === "stop") {
+    state.active = false;
+    state.frame = undefined;
+    return timer;
+  }
+  state.active = true;
+  const isRepeated = count > 0;
+  let index = 0;
+  let total = count * interval;
+  if (total < milliseconds) {
+    total = milliseconds;
+  }
+  let start;
+  function step(timestamp) {
+    if (!state.active) {
+      return;
+    }
+    start ??= timestamp;
+    const elapsed = timestamp - start;
+    const finished = elapsed >= total;
+    if (finished || elapsed - 2 < interval && interval < elapsed + 2) {
+      if (state.active) {
+        callback(isRepeated ? index : undefined);
+      }
+      index += 1;
+      if (!finished && index < count) {
+        start = undefined;
+      } else {
+        state.active = false;
+        state.frame = undefined;
+        afterCallback?.(true);
+        return;
+      }
+    }
+    state.frame = requestAnimationFrame(step);
+  }
+  state.frame = requestAnimationFrame(step);
+  return timer;
+};
+var milliseconds = 0;
+
+class Timer {
+  get active() {
+    return this.state.active;
+  }
+  constructor(callback, options) {
+    this.options = {
+      afterCallback: options.afterCallback,
+      callback,
+      count: typeof options.count === "number" && options.count > 0 ? options.count : 1,
+      interval: typeof options.interval === "number" && options.interval >= 0 ? options.interval : 0
+    };
+    this.state = {
+      active: false
+    };
+  }
+  restart() {
+    return work("restart", this, this.state, this.options);
+  }
+  start() {
+    return work("start", this, this.state, this.options);
+  }
+  stop() {
+    return work("stop", this, this.state, this.options);
+  }
+}
+(() => {
+  let start;
+  function fn(time) {
+    if (start === undefined) {
+      start = time;
+      requestAnimationFrame(fn);
+    } else {
+      milliseconds = time - start;
+    }
+  }
+  requestAnimationFrame(fn);
+})();
+// src/js/is.ts
+function isArrayOrPlainObject(value) {
+  return Array.isArray(value) || isPlainObject(value);
+}
+function isPlainObject(value) {
+  if (typeof value !== "object" || value === null) {
+    return false;
+  }
+  const prototype = Object.getPrototypeOf(value);
+  return (prototype === null || prototype === Object.prototype || Object.getPrototypeOf(prototype) === null) && !(Symbol.toStringTag in value) && !(Symbol.iterator in value);
 }
 
 // src/js/value.ts
@@ -436,16 +527,12 @@ function diff(first, second) {
   }
   return result;
 }
-function get(data, key) {
+function getValue(data, key) {
   const parts = getString(key).split(".");
-  const { length } = parts;
   let index = 0;
   let value = typeof data === "object" ? data ?? {} : {};
-  for (;index < length; index += 1) {
-    value = _getValue(value, parts[index]);
-    if (value == null) {
-      return;
-    }
+  while (value != null) {
+    value = _getValue(value, parts[index++]);
   }
   return value;
 }
@@ -475,7 +562,7 @@ function merge(...values) {
   }
   return result;
 }
-function set(data, key, value) {
+function setValue(data, key, value) {
   const parts = getString(key).split(".");
   const { length } = parts;
   const lastIndex = length - 1;
@@ -496,246 +583,24 @@ function set(data, key, value) {
   }
   return data;
 }
-
-// src/js/proxy.ts
-var _createProxy = function(existing, value2) {
-  if (!isArrayOrPlainObject(value2) || _isProxy(value2) && value2.$ === existing) {
-    return value2;
-  }
-  const isArray = Array.isArray(value2);
-  const proxy = new Proxy(isArray ? [] : {}, {
-    get(target, property) {
-      return property === "$" ? manager : Reflect.get(target, property);
-    },
-    set(target, property, value3) {
-      if (property === "$") {
-        return true;
-      }
-      const isSubscribed = manager.subscribed;
-      const original = isSubscribed && !cloned.has(manager) ? clone(merge(manager.owner)) : undefined;
-      const actual = _createProxy(manager, value3);
-      const result = Reflect.set(target, property, actual);
-      if (result && isSubscribed) {
-        _onChange(manager, original);
-      }
-      return result;
-    }
-  });
-  const manager = existing ?? new Manager(proxy);
-  Object.defineProperty(proxy, "$", {
-    value: manager
-  });
-  const keys = Object.keys(value2);
-  const { length } = keys;
-  let index = 0;
-  for (;index < length; index += 1) {
-    const key = keys[index];
-    proxy[key] = value2[key];
-  }
-  return proxy;
-};
-var _emit = function(manager) {
-  const difference = diff(cloned.get(manager) ?? {}, clone(merge(manager.owner)));
-  const keys = Object.keys(difference.values);
-  const { length } = keys;
-  let index = 0;
-  for (;index < length; index += 1) {
-    const key = keys[index];
-    const subscribers = manager.subscribers.get(key);
-    if (subscribers === undefined || subscribers.size === 0) {
-      continue;
-    }
-    const { from } = difference.values[key];
-    const to = get(manager.owner, key);
-    for (const subscriber of subscribers) {
-      subscriber(to, from);
-    }
-  }
-  cloned.delete(manager);
-};
-var _isProxy = function(value2) {
-  return value2?.$ instanceof Manager;
-};
-var _onChange = function(manager, value2) {
-  if (!cloned.has(manager)) {
-    cloned.set(manager, value2);
-  }
-  queue(manager.emitter);
-};
-function cloneProxy(proxy) {
-  if (!_isProxy(proxy)) {
-    throw new Error("Value must be a proxy");
-  }
-  return proxy.$.clone();
-}
-function proxy(value2) {
-  if (!isArrayOrPlainObject(value2)) {
-    throw new Error("Proxy value must be an array or object");
-  }
-  return _createProxy(undefined, value2);
-}
-function subscribe(proxy2, key, subscriber) {
-  if (_isProxy(proxy2)) {
-    proxy2.$.on(key, subscriber);
-  }
-}
-function unsubscribe(proxy2, key, subscriber) {
-  if (_isProxy(proxy2)) {
-    proxy2.$.off(key, subscriber);
-  }
-}
-
-class Manager {
-  owner;
-  count = 0;
-  subscribers = new Map;
-  get subscribed() {
-    return this.count > 0;
-  }
-  constructor(owner) {
-    this.owner = owner;
-    this.emitter = function() {
-      _emit(this);
-    }.bind(this);
-  }
-  clone() {
-    return _createProxy(undefined, clone(merge(this.owner)));
-  }
-  off(key, subscriber) {
-    if (this.subscribers.get(key)?.delete(subscriber) ?? false) {
-      this.count -= 1;
-    }
-  }
-  on(key, subscriber) {
-    let subscribers = this.subscribers.get(key);
-    if (subscribers === undefined) {
-      subscribers = new Set;
-      this.subscribers.set(key, subscribers);
-    }
-    subscribers.add(subscriber);
-    this.count += 1;
-  }
-}
-var cloned = new Map;
-// src/js/timer.ts
-function repeat(callback, options) {
-  const count = typeof options?.count === "number" ? options.count : Number.POSITIVE_INFINITY;
-  return new Timer(callback, { ...options ?? {}, ...{ count } }).start();
-}
-function wait(callback, time) {
-  return new Timer(callback, {
-    count: 1,
-    interval: time
-  }).start();
-}
-var work = function(type, timer, state, options) {
-  if (type === "start" && timer.active || type === "stop" && !timer.active) {
-    return timer;
-  }
-  const { afterCallback, callback, count, interval } = options;
-  if (typeof state.frame === "number") {
-    cancelAnimationFrame(state.frame);
-    afterCallback?.(false);
-  }
-  if (type === "stop") {
-    state.active = false;
-    state.frame = undefined;
-    return timer;
-  }
-  state.active = true;
-  const isRepeated = count > 0;
-  let index = 0;
-  let total = count * interval;
-  if (total < milliseconds) {
-    total = milliseconds;
-  }
-  let start;
-  function step(timestamp) {
-    if (!state.active) {
-      return;
-    }
-    start ??= timestamp;
-    const elapsed = timestamp - start;
-    const finished = elapsed >= total;
-    if (finished || elapsed - 2 < interval && interval < elapsed + 2) {
-      if (state.active) {
-        callback(isRepeated ? index : undefined);
-      }
-      index += 1;
-      if (!finished && index < count) {
-        start = undefined;
-      } else {
-        state.active = false;
-        state.frame = undefined;
-        afterCallback?.(true);
-        return;
-      }
-    }
-    state.frame = requestAnimationFrame(step);
-  }
-  state.frame = requestAnimationFrame(step);
-  return timer;
-};
-var milliseconds = 0;
-
-class Timer {
-  get active() {
-    return this.state.active;
-  }
-  constructor(callback, options) {
-    this.options = {
-      afterCallback: options.afterCallback,
-      callback,
-      count: typeof options.count === "number" && options.count > 0 ? options.count : 1,
-      interval: typeof options.interval === "number" && options.interval >= 0 ? options.interval : 0
-    };
-    this.state = {
-      active: false
-    };
-  }
-  restart() {
-    return work("restart", this, this.state, this.options);
-  }
-  start() {
-    return work("start", this, this.state, this.options);
-  }
-  stop() {
-    return work("stop", this, this.state, this.options);
-  }
-}
-(() => {
-  let start;
-  function fn(time) {
-    if (start === undefined) {
-      start = time;
-      requestAnimationFrame(fn);
-    } else {
-      milliseconds = time - start;
-    }
-  }
-  requestAnimationFrame(fn);
-})();
 export {
   wait,
-  unsubscribe,
   unique,
-  subscribe,
   splice,
-  set,
+  setValue,
   repeat,
   queue,
   push,
-  proxy,
   merge,
   insert,
   indexOf,
   groupBy,
+  getValue,
   getTextDirection,
   getString,
   getPosition,
   getNumber,
   getElementUnderPointer,
-  get,
   findParentElement,
   findElements,
   findElement,
@@ -744,7 +609,6 @@ export {
   exists,
   diff,
   createUuid,
-  cloneProxy,
   clone,
   clamp,
   chunk,

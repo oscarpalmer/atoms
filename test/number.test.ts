@@ -27,6 +27,7 @@ test('getNumber', () => {
 
 	obj.valueOf = () => 123;
 
+	expect(getNumber(123)).toBe(123);
 	expect(getNumber(undefined)).toBeNaN();
 	expect(getNumber(null)).toBeNaN();
 	expect(getNumber(' ')).toBeNaN();

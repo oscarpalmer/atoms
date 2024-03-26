@@ -1,4 +1,4 @@
-import type {PlainObject} from './is';
+import type {PlainObject} from './models';
 import type {Key} from './value';
 
 type BooleanCallback<T> = (item: T, index: number, array: T[]) => boolean;

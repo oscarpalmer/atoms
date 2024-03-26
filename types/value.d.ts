@@ -1,4 +1,4 @@
-import { type ArrayOrPlainObject } from './is';
+import type { ArrayOrPlainObject } from './models';
 export type DiffType = 'full' | 'none' | 'partial';
 export type DiffResult<T1 = unknown, T2 = T1> = {
     original: DiffValue<T1, T2>;
@@ -31,15 +31,15 @@ export declare function diff<T1 = unknown, T2 = T1>(first: T1, second: T2): Diff
  * - You can retrieve a nested value by using dot notation, e.g., `foo.bar.baz`
  * - Returns `undefined` if the value is not found
  */
-export declare function get(data: ValueObject, key: Key): unknown;
+export declare function getValue(data: ValueObject, key: Key): unknown;
 /**
  * Merges multiple arrays or objects into a single one
  */
-export declare function merge<T = ArrayOrPlainObject>(...values: T[]): T;
+export declare function merge<T extends ArrayOrPlainObject>(...values: T[]): T;
 /**
  * - Set the value in an object using a key path
  * - You can set a nested value by using dot notation, e.g., `foo.bar.baz`
  * - If a part of the path does not exist, it will be created, either as an array or a generic object, depending on the key
  * - Returns the original object
  */
-export declare function set<T extends ValueObject>(data: T, key: Key, value: unknown): T;
+export declare function setValue<T extends ValueObject>(data: T, key: Key, value: unknown): T;

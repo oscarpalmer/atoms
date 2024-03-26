@@ -1,5 +1,5 @@
 import {expect, test} from 'bun:test';
-import {clone, diff, get, merge, set} from '../src/js/value';
+import {clone, diff, getValue, merge, setValue} from '../src/js/value';
 
 type Diffable = {
 	numbers: number[];
@@ -37,14 +37,17 @@ test('clone', () => {
 		boolean: true,
 		date: new Date(),
 		expression: /test/,
+		fn() {},
 		instances: [new Test(1, 'Hello'), new Test(2, 'World')],
 		map: new Map([
 			['a', 1],
 			['b', 2],
 		]),
+		nil: null,
 		node: document.createElement('div'),
 		set: new Set([1, 2, 3]),
 		symbol: Symbol('abc'),
+		undef: undefined,
 	};
 
 	const cloned = clone(data);
@@ -72,6 +75,10 @@ test('clone', () => {
 	expect(data.node.textContent).not.toBe(cloned.node.textContent);
 	expect(data.set.has(4)).not.toBe(cloned.set.has(4));
 	expect(data.symbol).not.toBe(cloned.symbol);
+
+	expect(data.fn).toBe(cloned.fn);
+	expect(data.nil).toBe(cloned.nil);
+	expect(data.undef).toBe(cloned.undef);
 });
 
 test('diff', () => {
@@ -136,7 +143,7 @@ test('diff', () => {
 	expect(diffed.values.additional).toEqual({from: undefined, to: 'xyz'});
 });
 
-test('get', () => {
+test('getValue', () => {
 	const data = {
 		a: {
 			b: [{}, new Map([['c', new Set([null, 123])]]), {}],
@@ -144,24 +151,24 @@ test('get', () => {
 	};
 
 	// @ts-expect-error - Testing invalid input
-	expect(get(undefined)).toBe(undefined);
+	expect(getValue(undefined)).toBe(undefined);
 
 	// @ts-expect-error - Testing invalid input
-	expect(get(null)).toBe(undefined);
+	expect(getValue(null)).toBe(undefined);
 
 	// @ts-expect-error - Testing invalid input
-	expect(get(data, undefined)).toBe(undefined);
+	expect(getValue(data, undefined)).toBe(undefined);
 
 	// @ts-expect-error - Testing invalid input
-	expect(get(data, null)).toBe(undefined);
+	expect(getValue(data, null)).toBe(undefined);
 
-	expect(get(data, '')).toBe(undefined);
-	expect(get(data, 'a.b.1.c.1')).toBe(undefined);
-	expect(get(data, 'a.b.99.c')).toBe(undefined);
+	expect(getValue(data, '')).toBe(undefined);
+	expect(getValue(data, 'a.b.1.c.1')).toBe(undefined);
+	expect(getValue(data, 'a.b.99.c')).toBe(undefined);
 
-	expect(get(data, '__proto__')).toBe(undefined);
-	expect(get(data, 'constructor')).toBe(undefined);
-	expect(get(data, 'prototype')).toBe(undefined);
+	expect(getValue(data, '__proto__')).toBe(undefined);
+	expect(getValue(data, 'constructor')).toBe(undefined);
+	expect(getValue(data, 'prototype')).toBe(undefined);
 });
 
 test('merge', () => {
@@ -197,7 +204,7 @@ test('merge', () => {
 	});
 });
 
-test('set', () => {
+test('setValue', () => {
 	const data = {
 		in: {
 			a: {
@@ -212,24 +219,24 @@ test('set', () => {
 	};
 
 	// @ts-expect-error - Testing invalid input
-	expect(set(undefined)).toBe(undefined);
+	expect(setValue(undefined)).toBe(undefined);
 
 	// @ts-expect-error - Testing invalid input
-	expect(set(null)).toBe(null);
+	expect(setValue(null)).toBe(null);
 
 	// @ts-expect-error - Testing invalid input
-	expect(set(data, undefined)).toBe(data);
+	expect(setValue(data, undefined)).toBe(data);
 
 	// @ts-expect-error - Testing invalid input
-	expect(set(data, null)).toBe(data);
+	expect(setValue(data, null)).toBe(data);
 
-	expect(set(data, '', undefined)).toBe(data);
+	expect(setValue(data, '', undefined)).toBe(data);
 
-	set(data, 'in.a.nested.array.3', 123);
-	set(data, 'in.a.nested.map.3', 123);
-	set(data, 'in.a.nested.object.3', 123);
-	set(data, 'in.a.nested.set.3', 123);
-	set(data, 'in.a.new.array.5', 123);
+	setValue(data, 'in.a.nested.array.3', 123);
+	setValue(data, 'in.a.nested.map.3', 123);
+	setValue(data, 'in.a.nested.object.3', 123);
+	setValue(data, 'in.a.nested.set.3', 123);
+	setValue(data, 'in.a.new.array.5', 123);
 
 	expect(data.in.a.nested.array[3]).toEqual(123);
 	expect(data.in.a.nested.map.get('3')).toEqual(123);
@@ -242,7 +249,7 @@ test('set', () => {
 	expect(setArray.length).toBe(0);
 	expect(setArray[0]).toEqual(undefined);
 
-	set(data, 'in.a.nested.set.0', 456);
+	setValue(data, 'in.a.nested.set.0', 456);
 
 	expect(data.in.a.nested.set.has(123)).toBe(false);
 	expect(data.in.a.nested.set.has(456)).toBe(false);
@@ -255,9 +262,9 @@ test('set', () => {
 	// @ts-expect-error - Testing created objects
 	expect(data.in.a.new.array[5]).toEqual(123);
 
-	set(data, '__proto__', 123);
-	set(data, 'constructor', 123);
-	set(data, 'prototype', 123);
+	setValue(data, '__proto__', 123);
+	setValue(data, 'constructor', 123);
+	setValue(data, 'prototype', 123);
 
 	expect(data.constructor).toBe(data.constructor);
 

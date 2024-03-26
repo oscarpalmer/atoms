@@ -21,6 +21,10 @@ async function getFiles(path: string): Promise<string[]> {
 
 getFiles('./src/js').then(async files => {
 	for (const file of files) {
+		if (file.endsWith('models.ts')) {
+			continue;
+		}
+
 		await Bun.build({
 			entrypoints: [`${directory}/${file}`],
 			external: isMjs ? ['*'] : [],

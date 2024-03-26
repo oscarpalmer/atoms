@@ -1,14 +1,11 @@
-type Position = {
-	x: number;
-	y: number;
-};
+import type {EventPosition} from './models';
 
 /**
  * Get the X- and Y-coordinates from a pointer event
  */
 export function getPosition(
 	event: MouseEvent | TouchEvent,
-): Position | undefined {
+): EventPosition | undefined {
 	let x: number | undefined;
 	let y: number | undefined;
 

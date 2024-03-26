@@ -1,8 +1,5 @@
-import {
-	type ArrayOrPlainObject,
-	type PlainObject,
-	isArrayOrPlainObject,
-} from './is';
+import {isArrayOrPlainObject} from './is';
+import type {ArrayOrPlainObject, PlainObject} from './models';
 import {getString} from './string';
 
 export type DiffType = 'full' | 'none' | 'partial';
@@ -245,19 +242,14 @@ export function diff<T1 = unknown, T2 = T1>(
  * - You can retrieve a nested value by using dot notation, e.g., `foo.bar.baz`
  * - Returns `undefined` if the value is not found
  */
-export function get(data: ValueObject, key: Key): unknown {
+export function getValue(data: ValueObject, key: Key): unknown {
 	const parts = getString(key).split('.');
-	const {length} = parts;
 
 	let index = 0;
 	let value = typeof data === 'object' ? data ?? {} : {};
 
-	for (; index < length; index += 1) {
-		value = _getValue(value, parts[index]) as ValueObject;
-
-		if (value == null) {
-			return;
-		}
+	while (value != null) {
+		value = _getValue(value, parts[index++]) as ValueObject;
 	}
 
 	return value;
@@ -266,7 +258,7 @@ export function get(data: ValueObject, key: Key): unknown {
 /**
  * Merges multiple arrays or objects into a single one
  */
-export function merge<T = ArrayOrPlainObject>(...values: T[]): T {
+export function merge<T extends ArrayOrPlainObject>(...values: T[]): T {
 	if (values.length === 0) {
 		return {} as T;
 	}
@@ -312,7 +304,7 @@ export function merge<T = ArrayOrPlainObject>(...values: T[]): T {
  * - If a part of the path does not exist, it will be created, either as an array or a generic object, depending on the key
  * - Returns the original object
  */
-export function set<T extends ValueObject>(
+export function setValue<T extends ValueObject>(
 	data: T,
 	key: Key,
 	value: unknown,

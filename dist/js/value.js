@@ -149,16 +149,12 @@ function diff(first, second) {
   }
   return result;
 }
-function get(data, key) {
+function getValue(data, key) {
   const parts = getString(key).split(".");
-  const { length } = parts;
   let index = 0;
   let value = typeof data === "object" ? data ?? {} : {};
-  for (;index < length; index += 1) {
-    value = _getValue(value, parts[index]);
-    if (value == null) {
-      return;
-    }
+  while (value != null) {
+    value = _getValue(value, parts[index++]);
   }
   return value;
 }
@@ -188,7 +184,7 @@ function merge(...values) {
   }
   return result;
 }
-function set(data, key, value) {
+function setValue(data, key, value) {
   const parts = getString(key).split(".");
   const { length } = parts;
   const lastIndex = length - 1;
@@ -210,9 +206,9 @@ function set(data, key, value) {
   return data;
 }
 export {
-  set,
+  setValue,
   merge,
-  get,
+  getValue,
   diff,
   clone
 };

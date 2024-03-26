@@ -1,8 +1,5 @@
+import type {ArrayOrPlainObject, PlainObject} from './models';
 import {getString} from './string';
-
-export type ArrayOrPlainObject = unknown[] | PlainObject;
-
-export type PlainObject = Record<string, unknown>;
 
 /**
  * Is the value an array or a plain object?

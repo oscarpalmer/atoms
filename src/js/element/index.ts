@@ -27,13 +27,15 @@ function _findElements(
 				| Element[]
 				| null;
 
-			if (single && value != null) {
+			if (single) {
+				if (value == null) {
+					continue;
+				}
+
 				return value;
 			}
 
-			if (!single) {
-				result.push(...Array.from(value as Element[]));
-			}
+			result.push(...Array.from(value as Element[]));
 		}
 
 		return single
@@ -41,10 +43,11 @@ function _findElements(
 			: result.filter((value, index, array) => array.indexOf(value) === index);
 	}
 
-	const nodes =
-		Array.isArray(selector) || selector instanceof NodeList
-			? selector
-			: [selector];
+	const nodes = Array.isArray(selector)
+		? selector
+		: selector instanceof NodeList
+		  ? Array.from(selector)
+		  : [selector];
 
 	const {length} = nodes;
 
@@ -60,22 +63,20 @@ function _findElements(
 				  ? node
 				  : undefined;
 
-		if (element == null) {
-			continue;
-		}
-
-		if (context == null || contexts.some(context => context.contains(node))) {
-			if (single) {
-				return element;
-			}
-
+		if (
+			element != null &&
+			(context == null ||
+				contexts.length === 0 ||
+				contexts.some(
+					context => context === element || context.contains(element),
+				)) &&
+			!result.includes(element)
+		) {
 			result.push(element);
 		}
 	}
 
-	return single
-		? undefined
-		: result.filter((value, index, array) => array.indexOf(value) === index);
+	return result;
 }
 
 /**
@@ -156,7 +157,7 @@ export function getElementUnderPointer(
 			const style = getComputedStyle(element);
 
 			return (
-				(typeof skipIgnore === 'boolean' && skipIgnore) ||
+				skipIgnore === true ||
 				(style.pointerEvents !== 'none' && style.visibility !== 'hidden')
 			);
 		},
