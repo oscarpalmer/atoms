@@ -15,7 +15,7 @@ function isNullable(value) {
   return value == null;
 }
 function isNullableOrWhitespace(value) {
-  return value == null || getString(value).trim().length === 0;
+  return value == null || /^\s*$/.test(getString(value));
 }
 function isNumber(value) {
   return typeof value === "number" && !Number.isNaN(value);
@@ -33,7 +33,11 @@ function isPlainObject(value) {
   const prototype = Object.getPrototypeOf(value);
   return (prototype === null || prototype === Object.prototype || Object.getPrototypeOf(prototype) === null) && !(Symbol.toStringTag in value) && !(Symbol.iterator in value);
 }
+function isPrimitive(value) {
+  return value == null || /^(bigint|boolean|number|string|symbol)$/.test(typeof value);
+}
 export {
+  isPrimitive,
   isPlainObject,
   isObject,
   isNumerical,

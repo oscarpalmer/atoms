@@ -1,8 +1,8 @@
-import type {ArrayOrPlainObject, PlainObject} from './models';
+import type {ArrayOrPlainObject, PlainObject, Primitive} from './models';
 import {getString} from './string';
 
 /**
- * Is the value an array or a plain object?
+ * Is the value an array or a record?
  */
 export function isArrayOrPlainObject(
 	value: unknown,
@@ -23,7 +23,7 @@ export function isNullable(value: unknown): value is undefined | null {
 export function isNullableOrWhitespace(
 	value: unknown,
 ): value is undefined | null | '' {
-	return value == null || getString(value).trim().length === 0;
+	return value == null || /^\s*$/.test(getString(value));
 }
 
 /**
@@ -55,7 +55,7 @@ export function isObject(value: unknown): value is object {
 }
 
 /**
- * Is the value a generic object?
+ * Is the value a plain object?
  */
 export function isPlainObject(value: unknown): value is PlainObject {
 	if (typeof value !== 'object' || value === null) {
@@ -70,5 +70,15 @@ export function isPlainObject(value: unknown): value is PlainObject {
 			Object.getPrototypeOf(prototype) === null) &&
 		!(Symbol.toStringTag in value) &&
 		!(Symbol.iterator in value)
+	);
+}
+
+/**
+ * Is the value a primitive value?
+ */
+export function isPrimitive(value: unknown): value is Primitive {
+	return (
+		value == null ||
+		/^(bigint|boolean|number|string|symbol)$/.test(typeof value)
 	);
 }

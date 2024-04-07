@@ -1,6 +1,6 @@
-import type { ArrayOrPlainObject, PlainObject } from './models';
+import type { ArrayOrPlainObject, PlainObject, Primitive } from './models';
 /**
- * Is the value an array or a plain object?
+ * Is the value an array or a record?
  */
 export declare function isArrayOrPlainObject(value: unknown): value is ArrayOrPlainObject;
 /**
@@ -24,6 +24,10 @@ export declare function isNumerical(value: unknown): value is number | `${number
  */
 export declare function isObject(value: unknown): value is object;
 /**
- * Is the value a generic object?
+ * Is the value a plain object?
  */
 export declare function isPlainObject(value: unknown): value is PlainObject;
+/**
+ * Is the value a primitive value?
+ */
+export declare function isPrimitive(value: unknown): value is Primitive;

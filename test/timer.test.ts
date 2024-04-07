@@ -1,5 +1,5 @@
 import {expect, test} from 'bun:test';
-import {repeat, wait} from '../src/js/timer';
+import {isRepeated, isTimer, isWaited, repeat, wait} from '../src/js/timer';
 
 test('start', done => {
 	wait(() => {
@@ -86,4 +86,25 @@ test('afterCallback', done => {
 			count: 10,
 		},
 	);
+});
+
+test('is', done => {
+	const repeated = repeat(() => {}, {count: 1});
+	const waited = wait(() => {});
+
+	expect(isTimer(repeated)).toBe(true);
+	expect(isTimer(waited)).toBe(true);
+
+	expect(isRepeated(repeated)).toBe(true);
+	expect(isRepeated(waited)).toBe(false);
+
+	expect(isWaited(repeated)).toBe(false);
+	expect(isWaited(waited)).toBe(true);
+
+	wait(() => {
+		expect(repeated.active).toBe(false);
+		expect(waited.active).toBe(false);
+
+		done();
+	}, 125);
 });

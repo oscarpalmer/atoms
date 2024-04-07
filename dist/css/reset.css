@@ -39,7 +39,6 @@
 
 ::before,
 ::after {
-  box-sizing: inherit;
   text-decoration: inherit;
   vertical-align: inherit;
 }
@@ -83,6 +82,10 @@
   font-weight: bolder;
 }
 
+:where(button, h1, h2, h3, h4, h5, h6, input, label, legend) {
+  line-height: 1.125;
+}
+
 :where(button, [type=button i], [type=reset i], [type=submit i]) {
   -webkit-appearance: button;
   cursor: pointer;
@@ -107,10 +110,6 @@
 
 :where(dl, ol, ul) :where(dl, ol, ul) {
   margin: 0;
-}
-
-:where(h1, h2, h3, h4, h5, h6, label, legend) {
-  line-height: 1.125;
 }
 
 :where(h1, h2, h3, h4, h5, h6) {
@@ -178,10 +177,6 @@
   border: 1px solid WindowFrame;
   color: inherit;
   letter-spacing: inherit;
-}
-
-:where(button, input) {
-  line-height: 1.25;
 }
 
 :where(fieldset) {

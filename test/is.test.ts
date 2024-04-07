@@ -7,6 +7,7 @@ import {
 	isNumerical,
 	isObject,
 	isPlainObject,
+	isPrimitive,
 } from '../src/js/is';
 
 const values = [
@@ -26,6 +27,8 @@ const values = [
 	{},
 	[],
 	() => {},
+	new Map(),
+	new Set(),
 ];
 
 const {length} = values;
@@ -52,7 +55,7 @@ test('isNullable', () => {
 
 test('isNullableOrWhitespace', () => {
 	const expected = Array.from({length}, (_, index) =>
-		[0, 1, 2, 3, length - 2].includes(index),
+		[0, 1, 2, 3, length - 4].includes(index),
 	);
 
 	let index = 0;
@@ -87,9 +90,7 @@ test('isNumerical', () => {
 });
 
 test('isObject', () => {
-	const expected = Array.from({length}, (_, index) =>
-		[13, 14, 15].includes(index),
-	);
+	const expected = Array.from({length}, (_, index) => index > 12);
 
 	let index = 0;
 
@@ -105,5 +106,15 @@ test('isPlainObject', () => {
 
 	for (; index < length; index += 1) {
 		expect(isPlainObject(values[index])).toBe(expected[index]);
+	}
+});
+
+test('isPrimitive', () => {
+	const expected = Array.from({length}, (_, index) => index < 13);
+
+	let index = 0;
+
+	for (; index < length; index += 1) {
+		expect(isPrimitive(values[index])).toBe(expected[index]);
 	}
 });

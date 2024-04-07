@@ -75,22 +75,14 @@ var _getDiffs = function(first, second, prefix) {
   return changes;
 };
 var _getKey = function(...parts) {
-  return parts.filter((part) => part !== undefined).join(".");
+  return parts.filter((part) => part != null).join(".");
 };
-var _getValue = function(data, key) {
-  if (typeof data !== "object" || data === null || /^(__proto__|constructor|prototype)$/i.test(key)) {
-    return;
-  }
-  return data instanceof Map ? data.get(key) : data[key];
-};
-var _setValue = function(data, key, value) {
-  if (typeof data !== "object" || data === null || /^(__proto__|constructor|prototype)$/i.test(key)) {
-    return;
-  }
-  if (data instanceof Map) {
-    data.set(key, value);
-  } else {
-    data[key] = value;
+var _handleValue = function(data, path, value, get) {
+  if (typeof data === "object" && data !== null && !/^(__proto__|constructor|prototype)$/i.test(path)) {
+    if (get) {
+      return data[path];
+    }
+    data[path] = value;
   }
 };
 function clone(value) {
@@ -149,12 +141,13 @@ function diff(first, second) {
   }
   return result;
 }
-function getValue(data, key) {
-  const parts = getString(key).split(".");
+function getValue(data, path) {
+  const parts = getString(path).split(".");
+  const { length } = parts;
   let index = 0;
   let value = typeof data === "object" ? data ?? {} : {};
-  while (value != null) {
-    value = _getValue(value, parts[index++]);
+  while (index < length && value != null) {
+    value = _handleValue(value, parts[index++], null, true);
   }
   return value;
 }
@@ -184,8 +177,8 @@ function merge(...values) {
   }
   return result;
 }
-function setValue(data, key, value) {
-  const parts = getString(key).split(".");
+function setValue(data, path, value) {
+  const parts = getString(path).split(".");
   const { length } = parts;
   const lastIndex = length - 1;
   let index = 0;
@@ -193,10 +186,10 @@ function setValue(data, key, value) {
   for (;index < length; index += 1) {
     const part = parts[index];
     if (parts.indexOf(part) === lastIndex) {
-      _setValue(target, part, value);
+      _handleValue(target, part, value, false);
       break;
     }
-    let next = _getValue(target, part);
+    let next = _handleValue(target, part, null, true);
     if (typeof next !== "object" || next === null) {
       next = /^\d+$/.test(part) ? [] : {};
       target[part] = next;

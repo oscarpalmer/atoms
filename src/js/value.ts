@@ -1,30 +1,27 @@
+import type {ToString} from 'type-fest/source/internal';
 import {isArrayOrPlainObject} from './is';
-import type {ArrayOrPlainObject, PlainObject} from './models';
+import type {ArrayOrPlainObject, Get, Key, Paths, PlainObject} from './models';
 import {getString} from './string';
 
 export type DiffType = 'full' | 'none' | 'partial';
 
-export type DiffResult<T1 = unknown, T2 = T1> = {
-	original: DiffValue<T1, T2>;
+export type DiffResult<First, Second = First> = {
+	original: DiffValue<First, Second>;
 	type: DiffType;
 	values: Record<string, DiffValue>;
 };
 
-export type DiffValue<T1 = unknown, T2 = T1> = {
-	from: T1;
-	to: T2;
+export type DiffValue<First = unknown, Second = First> = {
+	from: First;
+	to: Second;
 };
-
-export type Key = number | string;
 
 type KeyedDiffValue = {
 	key: string;
 } & DiffValue;
 
-export type ValueObject = ArrayOrPlainObject | Map<unknown, unknown>;
-
 function _cloneNested(value: ArrayOrPlainObject): ArrayOrPlainObject {
-	const cloned = Array.isArray(value) ? [] : {};
+	const cloned = (Array.isArray(value) ? [] : {}) as PlainObject;
 	const keys = Object.keys(value);
 	const {length} = keys;
 
@@ -33,7 +30,7 @@ function _cloneNested(value: ArrayOrPlainObject): ArrayOrPlainObject {
 	for (; index < length; index += 1) {
 		const key = keys[index];
 
-		cloned[key as never] = clone(value[key as never]);
+		cloned[key] = clone((value as PlainObject)[key]);
 	}
 
 	return cloned;
@@ -48,8 +45,8 @@ function _cloneRegularExpression(value: RegExp): RegExp {
 }
 
 function _getDiffs(
-	first: unknown,
-	second: unknown,
+	first: ArrayOrPlainObject,
+	second: ArrayOrPlainObject,
 	prefix?: string,
 ): KeyedDiffValue[] {
 	const changes: KeyedDiffValue[] = [];
@@ -89,7 +86,10 @@ function _getDiffs(
 				};
 
 				const nested = isArrayOrPlainObject(from) || isArrayOrPlainObject(to);
-				const diffs = nested ? _getDiffs(from, to, prefixed) : [];
+
+				const diffs = nested
+					? _getDiffs(from as PlainObject, to as PlainObject, prefixed)
+					: [];
 
 				if (!nested || (nested && diffs.length > 0)) {
 					changes.push(change);
@@ -106,75 +106,60 @@ function _getDiffs(
 }
 
 function _getKey(...parts: Array<Key | undefined>): string {
-	return parts.filter(part => part !== undefined).join('.');
+	return parts.filter(part => part != null).join('.');
 }
 
-/**
- * Internal function to get a value from an object
- */
-function _getValue(data: ValueObject, key: string): unknown {
+function _handleValue(
+	data: PlainObject,
+	path: string,
+	value: unknown,
+	get: boolean,
+): unknown {
 	if (
-		typeof data !== 'object' ||
-		data === null ||
-		/^(__proto__|constructor|prototype)$/i.test(key)
+		typeof data === 'object' &&
+		data !== null &&
+		!/^(__proto__|constructor|prototype)$/i.test(path)
 	) {
-		return;
-	}
+		if (get) {
+			return data[path];
+		}
 
-	return data instanceof Map ? data.get(key as never) : data[key as never];
-}
-
-/**
- * Internal function to set a value in an object
- */
-function _setValue(data: ValueObject, key: string, value: unknown): void {
-	if (
-		typeof data !== 'object' ||
-		data === null ||
-		/^(__proto__|constructor|prototype)$/i.test(key)
-	) {
-		return;
-	}
-
-	if (data instanceof Map) {
-		data.set(key as never, value);
-	} else {
-		data[key as never] = value as never;
+		data[path] = value;
 	}
 }
 
 /**
  * Clones any kind of value
  */
-export function clone<T>(value: T): T {
+export function clone<Value>(value: Value): Value {
 	switch (true) {
 		case value == null:
 		case typeof value === 'function':
 			return value;
 
 		case typeof value === 'bigint':
-			return BigInt(value) as T;
+			return BigInt(value) as Value;
 
 		case typeof value === 'boolean':
-			return Boolean(value) as T;
+			return Boolean(value) as Value;
 
 		case typeof value === 'number':
-			return Number(value) as T;
+			return Number(value) as Value;
 
 		case typeof value === 'string':
-			return String(value) as T;
+			return String(value) as Value;
 
 		case typeof value === 'symbol':
-			return Symbol(value.description) as T;
+			return Symbol(value.description) as Value;
 
 		case value instanceof Node:
-			return value.cloneNode(true) as T;
+			return value.cloneNode(true) as Value;
 
 		case value instanceof RegExp:
-			return _cloneRegularExpression(value) as T;
+			return _cloneRegularExpression(value) as Value;
 
 		case isArrayOrPlainObject(value):
-			return _cloneNested(value) as T;
+			return _cloneNested(value) as Value;
 
 		default:
 			return structuredClone(value);
@@ -191,11 +176,11 @@ export function clone<T>(value: T): T {
  * 		- `partial` if the values are partially different
  * 	- `values` holds the differences with dot-notation keys
  */
-export function diff<T1 = unknown, T2 = T1>(
-	first: T1,
-	second: T2,
-): DiffResult<T1, T2> {
-	const result: DiffResult<T1, T2> = {
+export function diff<First, Second = First>(
+	first: First,
+	second: Second,
+): DiffResult<First, Second> {
+	const result: DiffResult<First, Second> = {
 		original: {
 			from: first,
 			to: second,
@@ -219,7 +204,11 @@ export function diff<T1 = unknown, T2 = T1>(
 		result.type = 'full';
 	}
 
-	const diffs = _getDiffs(first, second);
+	const diffs = _getDiffs(
+		first as ArrayOrPlainObject,
+		second as ArrayOrPlainObject,
+	);
+
 	const {length} = diffs;
 
 	if (length === 0) {
@@ -238,29 +227,35 @@ export function diff<T1 = unknown, T2 = T1>(
 }
 
 /**
- * - Get the value from an object using a key path
+ * - Get the value from an object using a path
  * - You can retrieve a nested value by using dot notation, e.g., `foo.bar.baz`
  * - Returns `undefined` if the value is not found
  */
-export function getValue(data: ValueObject, key: Key): unknown {
-	const parts = getString(key).split('.');
+export function getValue<Data extends PlainObject, Path extends Paths<Data>>(
+	data: Data,
+	path: Path,
+): Get<Data, ToString<Path>> {
+	const parts = getString(path).split('.');
+	const {length} = parts;
 
 	let index = 0;
 	let value = typeof data === 'object' ? data ?? {} : {};
 
-	while (value != null) {
-		value = _getValue(value, parts[index++]) as ValueObject;
+	while (index < length && value != null) {
+		value = _handleValue(value, parts[index++], null, true) as PlainObject;
 	}
 
-	return value;
+	return value as never;
 }
 
 /**
  * Merges multiple arrays or objects into a single one
  */
-export function merge<T extends ArrayOrPlainObject>(...values: T[]): T {
+export function merge<Model extends ArrayOrPlainObject>(
+	...values: Model[]
+): Model {
 	if (values.length === 0) {
-		return {} as T;
+		return {} as Model;
 	}
 
 	const actual = values.filter(value =>
@@ -295,45 +290,45 @@ export function merge<T extends ArrayOrPlainObject>(...values: T[]): T {
 		}
 	}
 
-	return result as T;
+	return result as Model;
 }
 
 /**
- * - Set the value in an object using a key path
+ * - Set the value in an object using a path
  * - You can set a nested value by using dot notation, e.g., `foo.bar.baz`
- * - If a part of the path does not exist, it will be created, either as an array or a generic object, depending on the key
+ * - If a part of the path does not exist, it will be created, either as an array or a generic object, depending on the path
  * - Returns the original object
  */
-export function setValue<T extends ValueObject>(
-	data: T,
-	key: Key,
+export function setValue<Data extends PlainObject>(
+	data: Data,
+	path: string,
 	value: unknown,
-): T {
-	const parts = getString(key).split('.');
+): Data {
+	const parts = getString(path).split('.');
 	const {length} = parts;
 	const lastIndex = length - 1;
 
 	let index = 0;
-	let target: ValueObject = typeof data === 'object' ? data ?? {} : {};
+	let target: PlainObject = typeof data === 'object' ? data ?? {} : {};
 
 	for (; index < length; index += 1) {
 		const part = parts[index];
 
 		if (parts.indexOf(part) === lastIndex) {
-			_setValue(target, part, value);
+			_handleValue(target, part, value, false);
 
 			break;
 		}
 
-		let next = _getValue(target, part);
+		let next = _handleValue(target, part, null, true);
 
 		if (typeof next !== 'object' || next === null) {
 			next = /^\d+$/.test(part) ? [] : {};
 
-			target[part as never] = next as never;
+			target[part] = next;
 		}
 
-		target = next as ValueObject;
+		target = next as PlainObject;
 	}
 
 	return data;

@@ -1,19 +1,63 @@
 // src/js/timer.ts
+function isRepeated(value) {
+  return /^repeat$/.test(value?.$timer ?? "");
+}
+function isTimer(value) {
+  return /^repeat|wait$/.test(value?.$timer ?? "");
+}
+function isWaited(value) {
+  return /^wait$/.test(value?.$timer ?? "");
+}
 function repeat(callback, options) {
   const count = typeof options?.count === "number" ? options.count : Number.POSITIVE_INFINITY;
-  return new Timer(callback, { ...options ?? {}, ...{ count } }).start();
+  return timer("repeat", callback, { ...options ?? {}, ...{ count } }).start();
 }
+var timer = function(type, callback, options) {
+  const extended = {
+    afterCallback: options.afterCallback,
+    count: typeof options.count === "number" && options.count > 0 ? options.count : 1,
+    interval: typeof options.interval === "number" && options.interval >= 0 ? options.interval : 0
+  };
+  const state = {
+    callback,
+    active: false
+  };
+  const instance = Object.create({
+    restart() {
+      return work("restart", this, state, extended);
+    },
+    start() {
+      return work("start", this, state, extended);
+    },
+    stop() {
+      return work("stop", this, state, extended);
+    }
+  });
+  Object.defineProperties(instance, {
+    $timer: {
+      get() {
+        return type;
+      }
+    },
+    active: {
+      get() {
+        return state.active;
+      }
+    }
+  });
+  return instance.start();
+};
 function wait(callback, time) {
-  return new Timer(callback, {
+  return timer("wait", callback, {
     count: 1,
-    interval: time
-  }).start();
+    interval: time ?? 0
+  });
 }
-var work = function(type, timer, state, options) {
-  if (type === "start" && timer.active || type === "stop" && !timer.active) {
-    return timer;
+var work = function(type, timer2, state, options) {
+  if (type === "start" && state.active || type === "stop" && !state.active) {
+    return timer2;
   }
-  const { afterCallback, callback, count, interval } = options;
+  const { afterCallback, count, interval } = options;
   if (typeof state.frame === "number") {
     cancelAnimationFrame(state.frame);
     afterCallback?.(false);
@@ -21,10 +65,10 @@ var work = function(type, timer, state, options) {
   if (type === "stop") {
     state.active = false;
     state.frame = undefined;
-    return timer;
+    return timer2;
   }
   state.active = true;
-  const isRepeated = count > 0;
+  const isRepeated2 = count > 0;
   let index = 0;
   let total = count * interval;
   if (total < milliseconds) {
@@ -40,7 +84,7 @@ var work = function(type, timer, state, options) {
     const finished = elapsed >= total;
     if (finished || elapsed - 2 < interval && interval < elapsed + 2) {
       if (state.active) {
-        callback(isRepeated ? index : undefined);
+        state.callback(isRepeated2 ? index : undefined);
       }
       index += 1;
       if (!finished && index < count) {
@@ -55,39 +99,13 @@ var work = function(type, timer, state, options) {
     state.frame = requestAnimationFrame(step);
   }
   state.frame = requestAnimationFrame(step);
-  return timer;
+  return timer2;
 };
 var milliseconds = 0;
-
-class Timer {
-  get active() {
-    return this.state.active;
-  }
-  constructor(callback, options) {
-    this.options = {
-      afterCallback: options.afterCallback,
-      callback,
-      count: typeof options.count === "number" && options.count > 0 ? options.count : 1,
-      interval: typeof options.interval === "number" && options.interval >= 0 ? options.interval : 0
-    };
-    this.state = {
-      active: false
-    };
-  }
-  restart() {
-    return work("restart", this, this.state, this.options);
-  }
-  start() {
-    return work("start", this, this.state, this.options);
-  }
-  stop() {
-    return work("stop", this, this.state, this.options);
-  }
-}
 (() => {
   let start;
   function fn(time) {
-    if (start === undefined) {
+    if (start == null) {
       start = time;
       requestAnimationFrame(fn);
     } else {
@@ -99,5 +117,7 @@ class Timer {
 export {
   wait,
   repeat,
-  Timer
+  isWaited,
+  isTimer,
+  isRepeated
 };

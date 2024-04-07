@@ -40,7 +40,6 @@
 
 ::before,
 ::after {
-	box-sizing: inherit;
 	text-decoration: inherit;
 	vertical-align: inherit;
 }
@@ -86,6 +85,10 @@
 	font-weight: bolder; // Add the correct font weight in Chrome, Edge, and Safari [RS][SE]
 }
 
+:where(button, h1, h2, h3, h4, h5, h6, input, label, legend) {
+	line-height: 1.125; // Set shorter line heights on headings and interactive elements [AB]
+}
+
 :where(button, [type='button' i], [type='reset' i], [type='submit' i]) {
 	-webkit-appearance: button; // Correct the inability to style clickable types in iOS [RS][SE]
 	cursor: pointer;
@@ -110,10 +113,6 @@
 
 :where(dl, ol, ul) :where(dl, ol, ul) {
 	margin: 0; // Remove the margin on nested lists in Chrome, Edge, and Safari [SE]
-}
-
-:where(h1, h2, h3, h4, h5, h6, label, legend) {
-	line-height: 1.125;
 }
 
 :where(h1, h2, h3, h4, h5, h6) {
@@ -182,10 +181,6 @@
 	border: 1px solid WindowFrame; // ditto
 	color: inherit; // ditto
 	letter-spacing: inherit; // ditto
-}
-
-:where(button, input) {
-	line-height: 1.25;
 }
 
 :where(fieldset) {

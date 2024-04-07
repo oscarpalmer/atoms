@@ -11,7 +11,7 @@ function queue(callback) {
     });
   }
 }
-if (globalThis._atomic_queued === undefined) {
+if (globalThis._atomic_queued == null) {
   const queued = new Set;
   Object.defineProperty(globalThis, "_atomic_queued", {
     get() {

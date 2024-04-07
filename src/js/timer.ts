@@ -1,8 +1,12 @@
+import type {PlainObject} from './models';
+
 /**
  * Callback that runs after the timer has finished (or is stopped)
  * - `finished` is `true` if the timer was allowed to finish, and `false` if it was stopped
  */
 type AfterCallback = (finished: boolean) => void;
+
+type AnyCallback = (() => void) | IndexedCallback;
 
 /**
  * Callback that runs for each iteration of the timer
@@ -18,23 +22,39 @@ type Options = {
 	/**
 	 * How many times the timer should repeat
 	 */
-	count?: number;
+	count: number;
 	/**
 	 * Interval between each callback
 	 */
-	interval?: number;
-};
-
-type TimerOptions = {
-	afterCallback?: AfterCallback;
-	callback: IndexedCallback;
-	count: number;
 	interval: number;
 };
 
-type TimerState = {
+type State = {
 	active: boolean;
+	callback: AnyCallback;
 	frame?: number;
+};
+
+/**
+ * A timer that can be started, stopped, and restarted as neeeded
+ */
+type Timer = {
+	/**
+	 * Is the timer running?
+	 */
+	get active(): boolean;
+	/**
+	 * Restarts the timer
+	 */
+	restart(): Timer;
+	/**
+	 * Starts the timer
+	 */
+	start(): Timer;
+	/**
+	 * Stops the timer
+	 */
+	stop(): Timer;
 };
 
 type WorkType = 'restart' | 'start' | 'stop';
@@ -42,58 +62,24 @@ type WorkType = 'restart' | 'start' | 'stop';
 let milliseconds = 0;
 
 /**
- * A timer that can be started, stopped, and restarted as neeeded
+ * Is the value a repeating timer?
  */
-export class Timer {
-	private declare readonly state: TimerState;
-	private declare readonly options: TimerOptions;
+export function isRepeated(value: unknown): value is Timer {
+	return /^repeat$/.test(((value as PlainObject)?.$timer as string) ?? '');
+}
 
-	/**
-	 * Is the timer running?
-	 */
-	get active(): boolean {
-		return this.state.active;
-	}
+/**
+ * Is the value a timer?
+ */
+export function isTimer(value: unknown): value is Timer {
+	return /^repeat|wait$/.test(((value as PlainObject)?.$timer as string) ?? '');
+}
 
-	constructor(callback: IndexedCallback, options: Options) {
-		this.options = {
-			afterCallback: options.afterCallback,
-			callback,
-			count:
-				typeof options.count === 'number' && options.count > 0
-					? options.count
-					: 1,
-			interval:
-				typeof options.interval === 'number' && options.interval >= 0
-					? options.interval
-					: 0,
-		};
-
-		this.state = {
-			active: false,
-		};
-	}
-
-	/**
-	 * Restarts the timer
-	 */
-	restart(): Timer {
-		return work('restart', this, this.state, this.options);
-	}
-
-	/**
-	 * Starts the timer
-	 */
-	start(): Timer {
-		return work('start', this, this.state, this.options);
-	}
-
-	/**
-	 * Stops the timer
-	 */
-	stop(): Timer {
-		return work('stop', this, this.state, this.options);
-	}
+/**
+ * Is the value a waiting timer?
+ */
+export function isWaited(value: unknown): value is Timer {
+	return /^wait$/.test(((value as PlainObject)?.$timer as string) ?? '');
 }
 
 /**
@@ -103,15 +89,65 @@ export class Timer {
  * - `options.afterCallback` defaults to `undefined`
  */
 export function repeat(
-	callback: (index: number) => void,
-	options?: Options,
+	callback: IndexedCallback,
+	options?: Partial<Options>,
 ): Timer {
 	const count =
 		typeof options?.count === 'number'
 			? options.count
 			: Number.POSITIVE_INFINITY;
 
-	return new Timer(callback, {...(options ?? {}), ...{count}}).start();
+	return timer('repeat', callback, {...(options ?? {}), ...{count}}).start();
+}
+
+function timer(
+	type: 'repeat' | 'wait',
+	callback: AnyCallback,
+	options: Partial<Options>,
+): Timer {
+	const extended: Options = {
+		afterCallback: options.afterCallback,
+		count:
+			typeof options.count === 'number' && options.count > 0
+				? options.count
+				: 1,
+		interval:
+			typeof options.interval === 'number' && options.interval >= 0
+				? options.interval
+				: 0,
+	};
+
+	const state: State = {
+		callback,
+		active: false,
+	};
+
+	const instance = Object.create({
+		restart() {
+			return work('restart', this as Timer, state, extended);
+		},
+		start() {
+			return work('start', this as Timer, state, extended);
+		},
+		stop() {
+			return work('stop', this as Timer, state, extended);
+		},
+	});
+
+	Object.defineProperties(instance, {
+		$timer: {
+			get() {
+				return type;
+			},
+		},
+		active: {
+			get() {
+				return state.active;
+			},
+		},
+	});
+
+	return instance.start();
 }
 
 /**
@@ -119,26 +155,26 @@ export function repeat(
  * - `time` defaults to `0`
  */
 export function wait(callback: () => void, time?: number): Timer {
-	return new Timer(callback, {
+	return timer('wait', callback, {
 		count: 1,
-		interval: time,
-	}).start();
+		interval: time ?? 0,
+	});
 }
 
 function work(
 	type: WorkType,
 	timer: Timer,
-	state: TimerState,
-	options: TimerOptions,
+	state: State,
+	options: Options,
 ): Timer {
 	if (
-		(type === 'start' && timer.active) ||
-		(type === 'stop' && !timer.active)
+		(type === 'start' && state.active) ||
+		(type === 'stop' && !state.active)
 	) {
 		return timer;
 	}
 
-	const {afterCallback, callback, count, interval} = options;
+	const {afterCallback, count, interval} = options;
 
 	if (typeof state.frame === 'number') {
 		cancelAnimationFrame(state.frame);
@@ -178,7 +214,7 @@ function work(
 
 		if (finished || (elapsed - 2 < interval && interval < elapsed + 2)) {
 			if (state.active) {
-				callback((isRepeated ? index : undefined) as never);
+				state.callback((isRepeated ? index : undefined) as never);
 			}
 
 			index += 1;
@@ -210,7 +246,7 @@ function work(
 	let start: number;
 
 	function fn(time: number) {
-		if (start === undefined) {
+		if (start == null) {
 			start = time;
 
 			requestAnimationFrame(fn);

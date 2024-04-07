@@ -2,7 +2,7 @@ declare global {
 	var _atomic_queued: Set<() => void>;
 }
 
-if (globalThis._atomic_queued === undefined) {
+if (globalThis._atomic_queued == null) {
 	const queued = new Set<() => void>();
 
 	Object.defineProperty(globalThis, '_atomic_queued', {

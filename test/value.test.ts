@@ -147,8 +147,13 @@ test('getValue', () => {
 	const data = {
 		a: {
 			b: [{}, new Map([['c', new Set([null, 123])]]), {}],
+			c: {
+				d: 123,
+			},
 		},
 	};
+
+	expect(getValue(data, 'a.c.d')).toBe(data.a.c.d);
 
 	// @ts-expect-error - Testing invalid input
 	expect(getValue(undefined)).toBe(undefined);
@@ -239,7 +244,7 @@ test('setValue', () => {
 	setValue(data, 'in.a.new.array.5', 123);
 
 	expect(data.in.a.nested.array[3]).toEqual(123);
-	expect(data.in.a.nested.map.get('3')).toEqual(123);
+	expect(data.in.a.nested.map.get('3')).toEqual(undefined);
 	expect(data.in.a.nested.object['3']).toEqual(123);
 
 	expect(data.in.a.nested.set.has(123)).toBe(false);

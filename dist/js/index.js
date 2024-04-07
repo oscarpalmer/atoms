@@ -11,15 +11,15 @@ var _getCallbacks = function(bool, key) {
     return;
   }
   return {
-    key: (item) => item?.[key]
+    key: (value) => value?.[key]
   };
 };
 var _findValue = function(type, array, value, key) {
   const callbacks = _getCallbacks(value, key);
-  if (callbacks?.bool === undefined && callbacks?.key === undefined) {
+  if (callbacks?.bool == null && callbacks?.key == null) {
     return type === "index" ? array.indexOf(value) : array.find((item) => item === value);
   }
-  if (callbacks.bool !== undefined) {
+  if (callbacks.bool != null) {
     const index2 = array.findIndex(callbacks.bool);
     return type === "index" ? index2 : index2 > -1 ? array[index2] : undefined;
   }
@@ -36,13 +36,13 @@ var _findValue = function(type, array, value, key) {
 var _findValues = function(type, array, value, key) {
   const callbacks = _getCallbacks(value, key);
   const { length } = array;
-  if (type === "unique" && callbacks?.key === undefined && length >= 100) {
+  if (type === "unique" && callbacks?.key == null && length >= 100) {
     return Array.from(new Set(array));
   }
   if (typeof callbacks?.bool === "function") {
     return array.filter(callbacks.bool);
   }
-  if (type === "all" && key === undefined) {
+  if (type === "all" && key == null) {
     return array.filter((item) => item === value);
   }
   const hasCallback = typeof callbacks?.key === "function";
@@ -68,7 +68,7 @@ var _insertValues = function(type, array, values, start, deleteCount) {
   let returned;
   for (;index < length; index += 1) {
     const result = array.splice(start, index === 0 ? deleteCount : 0, ...chunked[index]);
-    if (returned === undefined) {
+    if (returned == null) {
       returned = result;
     }
   }
@@ -99,7 +99,7 @@ function find(array, value, key) {
 }
 function groupBy(array, key) {
   const callbacks = _getCallbacks(undefined, key);
-  if (callbacks?.key === undefined) {
+  if (callbacks?.key == null) {
     return {};
   }
   const grouped = {};
@@ -125,8 +125,9 @@ function insert(array, index, values) {
 function push(array, values) {
   return _insertValues("push", array, values, array.length, 0);
 }
-function splice(array, start, deleteCount, values) {
-  return _insertValues("splice", array, values, start, deleteCount);
+function splice(array, start, amountOrValues, values) {
+  const amoutOrValuesIsArray = Array.isArray(amountOrValues);
+  return _insertValues("splice", array, amoutOrValuesIsArray ? amountOrValues : values ?? [], start, amoutOrValuesIsArray ? array.length : typeof amountOrValues === "number" && amountOrValues > 0 ? amountOrValues : 0);
 }
 function unique(array, key) {
   return _findValues("unique", array, undefined, key);
@@ -268,7 +269,7 @@ function queue(callback) {
     });
   }
 }
-if (globalThis._atomic_queued === undefined) {
+if (globalThis._atomic_queued == null) {
   const queued = new Set;
   Object.defineProperty(globalThis, "_atomic_queued", {
     get() {
@@ -288,21 +289,65 @@ function getString(value) {
   return result?.toString?.() ?? String(result);
 }
 // src/js/timer.ts
+function isRepeated(value) {
+  return /^repeat$/.test(value?.$timer ?? "");
+}
+function isTimer(value) {
+  return /^repeat|wait$/.test(value?.$timer ?? "");
+}
+function isWaited(value) {
+  return /^wait$/.test(value?.$timer ?? "");
+}
 function repeat(callback, options) {
   const count = typeof options?.count === "number" ? options.count : Number.POSITIVE_INFINITY;
-  return new Timer(callback, { ...options ?? {}, ...{ count } }).start();
+  return timer("repeat", callback, { ...options ?? {}, ...{ count } }).start();
 }
+var timer = function(type, callback, options) {
+  const extended = {
+    afterCallback: options.afterCallback,
+    count: typeof options.count === "number" && options.count > 0 ? options.count : 1,
+    interval: typeof options.interval === "number" && options.interval >= 0 ? options.interval : 0
+  };
+  const state = {
+    callback,
+    active: false
+  };
+  const instance = Object.create({
+    restart() {
+      return work("restart", this, state, extended);
+    },
+    start() {
+      return work("start", this, state, extended);
+    },
+    stop() {
+      return work("stop", this, state, extended);
+    }
+  });
+  Object.defineProperties(instance, {
+    $timer: {
+      get() {
+        return type;
+      }
+    },
+    active: {
+      get() {
+        return state.active;
+      }
+    }
+  });
+  return instance.start();
+};
 function wait(callback, time) {
-  return new Timer(callback, {
+  return timer("wait", callback, {
     count: 1,
-    interval: time
-  }).start();
+    interval: time ?? 0
+  });
 }
-var work = function(type, timer, state, options) {
-  if (type === "start" && timer.active || type === "stop" && !timer.active) {
-    return timer;
+var work = function(type, timer2, state, options) {
+  if (type === "start" && state.active || type === "stop" && !state.active) {
+    return timer2;
   }
-  const { afterCallback, callback, count, interval } = options;
+  const { afterCallback, count, interval } = options;
   if (typeof state.frame === "number") {
     cancelAnimationFrame(state.frame);
     afterCallback?.(false);
@@ -310,10 +355,10 @@ var work = function(type, timer, state, options) {
   if (type === "stop") {
     state.active = false;
     state.frame = undefined;
-    return timer;
+    return timer2;
   }
   state.active = true;
-  const isRepeated = count > 0;
+  const isRepeated2 = count > 0;
   let index = 0;
   let total = count * interval;
   if (total < milliseconds) {
@@ -329,7 +374,7 @@ var work = function(type, timer, state, options) {
     const finished = elapsed >= total;
     if (finished || elapsed - 2 < interval && interval < elapsed + 2) {
       if (state.active) {
-        callback(isRepeated ? index : undefined);
+        state.callback(isRepeated2 ? index : undefined);
       }
       index += 1;
       if (!finished && index < count) {
@@ -344,39 +389,13 @@ var work = function(type, timer, state, options) {
     state.frame = requestAnimationFrame(step);
   }
   state.frame = requestAnimationFrame(step);
-  return timer;
+  return timer2;
 };
 var milliseconds = 0;
-
-class Timer {
-  get active() {
-    return this.state.active;
-  }
-  constructor(callback, options) {
-    this.options = {
-      afterCallback: options.afterCallback,
-      callback,
-      count: typeof options.count === "number" && options.count > 0 ? options.count : 1,
-      interval: typeof options.interval === "number" && options.interval >= 0 ? options.interval : 0
-    };
-    this.state = {
-      active: false
-    };
-  }
-  restart() {
-    return work("restart", this, this.state, this.options);
-  }
-  start() {
-    return work("start", this, this.state, this.options);
-  }
-  stop() {
-    return work("stop", this, this.state, this.options);
-  }
-}
 (() => {
   let start;
   function fn(time) {
-    if (start === undefined) {
+    if (start == null) {
       start = time;
       requestAnimationFrame(fn);
     } else {
@@ -453,22 +472,14 @@ var _getDiffs = function(first, second, prefix) {
   return changes;
 };
 var _getKey = function(...parts) {
-  return parts.filter((part) => part !== undefined).join(".");
+  return parts.filter((part) => part != null).join(".");
 };
-var _getValue = function(data, key) {
-  if (typeof data !== "object" || data === null || /^(__proto__|constructor|prototype)$/i.test(key)) {
-    return;
-  }
-  return data instanceof Map ? data.get(key) : data[key];
-};
-var _setValue = function(data, key, value) {
-  if (typeof data !== "object" || data === null || /^(__proto__|constructor|prototype)$/i.test(key)) {
-    return;
-  }
-  if (data instanceof Map) {
-    data.set(key, value);
-  } else {
-    data[key] = value;
+var _handleValue = function(data, path, value, get) {
+  if (typeof data === "object" && data !== null && !/^(__proto__|constructor|prototype)$/i.test(path)) {
+    if (get) {
+      return data[path];
+    }
+    data[path] = value;
   }
 };
 function clone(value) {
@@ -527,12 +538,13 @@ function diff(first, second) {
   }
   return result;
 }
-function getValue(data, key) {
-  const parts = getString(key).split(".");
+function getValue(data, path) {
+  const parts = getString(path).split(".");
+  const { length } = parts;
   let index = 0;
   let value = typeof data === "object" ? data ?? {} : {};
-  while (value != null) {
-    value = _getValue(value, parts[index++]);
+  while (index < length && value != null) {
+    value = _handleValue(value, parts[index++], null, true);
   }
   return value;
 }
@@ -562,8 +574,8 @@ function merge(...values) {
   }
   return result;
 }
-function setValue(data, key, value) {
-  const parts = getString(key).split(".");
+function setValue(data, path, value) {
+  const parts = getString(path).split(".");
   const { length } = parts;
   const lastIndex = length - 1;
   let index = 0;
@@ -571,10 +583,10 @@ function setValue(data, key, value) {
   for (;index < length; index += 1) {
     const part = parts[index];
     if (parts.indexOf(part) === lastIndex) {
-      _setValue(target, part, value);
+      _handleValue(target, part, value, false);
       break;
     }
-    let next = _getValue(target, part);
+    let next = _handleValue(target, part, null, true);
     if (typeof next !== "object" || next === null) {
       next = /^\d+$/.test(part) ? [] : {};
       target[part] = next;
@@ -592,6 +604,9 @@ export {
   queue,
   push,
   merge,
+  isWaited,
+  isTimer,
+  isRepeated,
   insert,
   indexOf,
   groupBy,
@@ -613,7 +628,6 @@ export {
   clamp,
   chunk,
   between,
-  Timer,
   findElements as $$,
   findElement as $
 };

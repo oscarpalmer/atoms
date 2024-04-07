@@ -1,29 +1,32 @@
-import type {PlainObject} from './models';
-import type {Key} from './value';
+import type {Key, PlainObject} from './models';
 
-type BooleanCallback<T> = (item: T, index: number, array: T[]) => boolean;
+type BooleanCallback<Value> = (
+	value: Value,
+	index: number,
+	array: Value[],
+) => boolean;
 
-type Callbacks<T> = {
-	bool?: BooleanCallback<T>;
-	key?: KeyCallback<T>;
+type Callbacks<Value> = {
+	bool?: BooleanCallback<Value>;
+	key?: KeyCallback<Value>;
 };
 
 type FindType = 'index' | 'value';
 
 type InsertType = 'push' | 'splice';
 
-type KeyCallback<T> = (item: T) => Key;
+type KeyCallback<Value> = (value: Value) => Key;
 
-function _getCallbacks<T>(
+function _getCallbacks<Value>(
 	bool: unknown,
 	key: unknown,
-): Callbacks<T> | undefined {
+): Callbacks<Value> | undefined {
 	if (typeof bool === 'function') {
-		return {bool: bool as BooleanCallback<T>};
+		return {bool: bool as BooleanCallback<Value>};
 	}
 
 	if (typeof key === 'function') {
-		return {key: key as KeyCallback<T>};
+		return {key: key as KeyCallback<Value>};
 	}
 
 	const isString = typeof key === 'string';
@@ -36,25 +39,25 @@ function _getCallbacks<T>(
 	}
 
 	return {
-		key: (item: T) => (item as PlainObject)?.[key as string] as Key,
+		key: (value: Value) => (value as PlainObject)?.[key as string] as Key,
 	};
 }
 
-function _findValue<T1, T2 = T1>(
+function _findValue<Model, Value = Model>(
 	type: FindType,
-	array: T1[],
-	value: T2 | BooleanCallback<T1>,
-	key?: Key | KeyCallback<T1>,
+	array: Model[],
+	value: Value | BooleanCallback<Model>,
+	key?: Key | KeyCallback<Model>,
 ): unknown {
 	const callbacks = _getCallbacks(value, key);
 
-	if (callbacks?.bool === undefined && callbacks?.key === undefined) {
+	if (callbacks?.bool == null && callbacks?.key == null) {
 		return type === 'index'
-			? array.indexOf(value as T1)
+			? array.indexOf(value as Model)
 			: array.find(item => item === value);
 	}
 
-	if (callbacks.bool !== undefined) {
+	if (callbacks.bool != null) {
 		const index = array.findIndex(callbacks.bool);
 
 		return type === 'index' ? index : index > -1 ? array[index] : undefined;
@@ -75,17 +78,17 @@ function _findValue<T1, T2 = T1>(
 	return type === 'index' ? -1 : undefined;
 }
 
-function _findValues<T1, T2 = T1>(
+function _findValues<Model, Value = Model>(
 	type: 'all' | 'unique',
-	array: T1[],
-	value: T2 | BooleanCallback<T1>,
-	key?: Key | KeyCallback<T1>,
-): T1[] {
+	array: Model[],
+	value: Value | BooleanCallback<Model>,
+	key?: Key | KeyCallback<Model>,
+): Model[] {
 	const callbacks = _getCallbacks(value, key);
 
 	const {length} = array;
 
-	if (type === 'unique' && callbacks?.key === undefined && length >= 100) {
+	if (type === 'unique' && callbacks?.key == null && length >= 100) {
 		return Array.from(new Set(array));
 	}
 
@@ -93,13 +96,13 @@ function _findValues<T1, T2 = T1>(
 		return array.filter(callbacks.bool);
 	}
 
-	if (type === 'all' && key === undefined) {
+	if (type === 'all' && key == null) {
 		return array.filter(item => item === value);
 	}
 
 	const hasCallback = typeof callbacks?.key === 'function';
 
-	const result: T1[] = [];
+	const result: Model[] = [];
 
 	const values: unknown[] = hasCallback ? [] : result;
 
@@ -124,10 +127,10 @@ function _findValues<T1, T2 = T1>(
 	return result;
 }
 
-function _insertValues<T>(
+function _insertValues<Value>(
 	type: InsertType,
-	array: T[],
-	values: T[],
+	array: Value[],
+	values: Value[],
 	start: number,
 	deleteCount: number,
 ): unknown {
@@ -135,7 +138,7 @@ function _insertValues<T>(
 	const {length} = chunked;
 
 	let index = 0;
-	let returned: T[] | undefined;
+	let returned: Value[] | undefined;
 
 	for (; index < length; index += 1) {
 		const result = array.splice(
@@ -144,7 +147,7 @@ function _insertValues<T>(
 			...chunked[index],
 		);
 
-		if (returned === undefined) {
+		if (returned == null) {
 			returned = result;
 		}
 	}
@@ -155,7 +158,7 @@ function _insertValues<T>(
 /**
  * Chunks an array into smaller arrays of a specified size
  */
-export function chunk<T>(array: T[], size?: number): T[][] {
+export function chunk<Value>(array: Value[], size?: number): Value[][] {
 	const {length} = array;
 
 	const chunkSize = typeof size === 'number' && size > 0 ? size : 32_000;
@@ -164,7 +167,7 @@ export function chunk<T>(array: T[], size?: number): T[][] {
 		return [array];
 	}
 
-	const chunks: T[][] = [];
+	const chunks: Value[][] = [];
 
 	let remaining = Number(length);
 
@@ -180,28 +183,28 @@ export function chunk<T>(array: T[], size?: number): T[][] {
 /**
  * Does the value exist in array?
  */
-export function exists<T1, T2>(
-	array: T1[],
-	value: T2 | BooleanCallback<T1>,
+export function exists<Model, Value>(
+	array: Model[],
+	value: Value | BooleanCallback<Model>,
 ): boolean;
 
 /**
  * - Does the value exist in array?
  * - Use `key` to find a comparison value to match with `value`
  */
-export function exists<T1, T2 = T1>(
-	array: T1[],
-	value: T2,
-	key: Key | KeyCallback<T1>,
+export function exists<Model, Value = Model>(
+	array: Model[],
+	value: Value,
+	key: Key | KeyCallback<Model>,
 ): boolean;
 
 /**
  * Does the value exist in array?
  */
-export function exists<T1, T2 = T1>(
-	array: T1[],
-	value: T2 | BooleanCallback<T1>,
-	key?: Key | KeyCallback<T1>,
+export function exists<Model, Value = Model>(
+	array: Model[],
+	value: Value | BooleanCallback<Model>,
+	key?: Key | KeyCallback<Model>,
 ): boolean {
 	return (_findValue('index', array, value, key) as number) > -1;
 }
@@ -209,75 +212,75 @@ export function exists<T1, T2 = T1>(
 /**
  * Returns a filtered array of items matching `value`
  */
-export function filter<T1, T2>(
-	array: T1[],
-	value: T2 | BooleanCallback<T1>,
-): T1[];
+export function filter<Model, Value>(
+	array: Model[],
+	value: Value | BooleanCallback<Model>,
+): Model[];
 
 /**
  * - Returns a filtered array of items
  * - Use `key` to find a comparison value to match with `value`
  */
-export function filter<T1, T2 = T1>(
-	array: T1[],
-	value: T2,
-	key: Key | KeyCallback<T1>,
-): T1[];
+export function filter<Model, Value = Model>(
+	array: Model[],
+	value: Value,
+	key: Key | KeyCallback<Model>,
+): Model[];
 
 /**
  * Returns a filtered array of items
  */
-export function filter<T1, T2 = T1>(
-	array: T1[],
-	value: T2 | BooleanCallback<T1>,
-	key?: Key | KeyCallback<T1>,
-): T1[] {
+export function filter<Model, Value = Model>(
+	array: Model[],
+	value: Value | BooleanCallback<Model>,
+	key?: Key | KeyCallback<Model>,
+): Model[] {
 	return _findValues('all', array, value, key);
 }
 
 /**
  * Returns the first item matching `value`, or `undefined` if no match is found
  */
-export function find<T1, T2>(
-	array: T1[],
-	value: T2 | BooleanCallback<T1>,
-): T1 | undefined;
+export function find<Model, Value>(
+	array: Model[],
+	value: Value | BooleanCallback<Model>,
+): Model | undefined;
 
 /**
  * - Returns the first matching item, or `undefined` if no match is found
  * - Use `key` to find a comparison value to match with `value`
  */
-export function find<T1, T2 = T1>(
-	array: T1[],
-	value: T2,
-	key: Key | KeyCallback<T1>,
-): T1 | undefined;
+export function find<Model, Value = Model>(
+	array: Model[],
+	value: Value,
+	key: Key | KeyCallback<Model>,
+): Model | undefined;
 
 /**
  * - Returns the first matching item, or `undefined` if no match is found
  */
-export function find<T1, T2 = T1>(
-	array: T1[],
-	value: T2 | BooleanCallback<T1>,
-	key?: Key | KeyCallback<T1>,
-): T1 | undefined {
-	return _findValue('value', array, value, key) as T1 | undefined;
+export function find<Model, Value = Model>(
+	array: Model[],
+	value: Value | BooleanCallback<Model>,
+	key?: Key | KeyCallback<Model>,
+): Model | undefined {
+	return _findValue('value', array, value, key) as Model | undefined;
 }
 
 /**
  * Groups an array of items using a key or callback
  */
-export function groupBy<T>(
-	array: T[],
-	key: Key | KeyCallback<T>,
-): Record<Key, T[]> {
+export function groupBy<Value>(
+	array: Value[],
+	key: Key | KeyCallback<Value>,
+): Record<Key, Value[]> {
 	const callbacks = _getCallbacks(undefined, key);
 
-	if (callbacks?.key === undefined) {
+	if (callbacks?.key == null) {
 		return {};
 	}
 
-	const grouped: Record<Key, T[]> = {};
+	const grouped: Record<Key, Value[]> = {};
 
 	const {length} = array;
 
@@ -300,28 +303,28 @@ export function groupBy<T>(
 /**
  * Returns the index for the first item matching `value`, or `-1` if no match is found
  */
-export function indexOf<T1, T2>(
-	array: T1[],
-	value: T2 | BooleanCallback<T1>,
+export function indexOf<Model, Value>(
+	array: Model[],
+	value: Value | BooleanCallback<Model>,
 ): number;
 
 /**
  * - Returns the index for the first matching item, or `-1` if no match is found
  * - Use `key` to find a comparison value to match with `value`
  */
-export function indexOf<T1, T2 = T1>(
-	array: T1[],
-	value: T2,
-	key: Key | KeyCallback<T1>,
+export function indexOf<Model, Value = Model>(
+	array: Model[],
+	value: Value,
+	key: Key | KeyCallback<Model>,
 ): number;
 
 /**
  * Returns the index of the first matching item, or `-1` if no match is found
  */
-export function indexOf<T1, T2 = T1>(
-	array: T1[],
-	value: T2 | BooleanCallback<T1>,
-	key?: Key | KeyCallback<T1>,
+export function indexOf<Model, Value = Model>(
+	array: Model[],
+	value: Value | BooleanCallback<Model>,
+	key?: Key | KeyCallback<Model>,
 ): number {
 	return _findValue('index', array, value, key) as number;
 }
@@ -330,7 +333,11 @@ export function indexOf<T1, T2 = T1>(
  * - Inserts values into an array at a specified index
  * - Uses chunking to avoid stack overflow
  */
-export function insert<T>(array: T[], index: number, values: T[]): void {
+export function insert<Value>(
+	array: Value[],
+	index: number,
+	values: Value[],
+): void {
 	_insertValues('splice', array, values, index, 0);
 }
 
@@ -338,37 +345,86 @@ export function insert<T>(array: T[], index: number, values: T[]): void {
  * - Pushes values to the end of an array
  * - Uses chunking to avoid stack overflow
  */
-export function push<T>(array: T[], values: T[]): number {
+export function push<Value>(array: Value[], values: Value[]): number {
 	return _insertValues('push', array, values, array.length, 0) as number;
 }
+
+/**
+ * Removes and returns all items from an array starting from a specific index
+ */
+export function splice<Value>(array: Value[], start: number): Value[];
+
+/**
+ * Removes and returns _(up to)_ a specific amount of items from an array, starting from a specific index
+ */
+export function splice<Value>(
+	array: Value[],
+	start: number,
+	amount: number,
+): Value[];
 
 /**
  * - Splices values into an array and returns any removed values
  * - Uses chunking to avoid stack overflow
  */
-export function splice<T>(
-	array: T[],
+export function splice<Value>(
+	array: Value[],
 	start: number,
-	deleteCount: number,
-	values: T[],
-): T[] {
-	return _insertValues('splice', array, values, start, deleteCount) as T[];
+	values: Value[],
+): Value[];
+
+/**
+ * - Splices values into an array and returns any removed values
+ * - Uses chunking to avoid stack overflow
+ */
+export function splice<Value>(
+	array: Value[],
+	start: number,
+	amount: number,
+	values: Value[],
+): Value[];
+
+export function splice<Value>(
+	array: Value[],
+	start: number,
+	amountOrValues?: number | Value[],
+	values?: Value[],
+): Value[] {
+	const amoutOrValuesIsArray = Array.isArray(amountOrValues);
+
+	return _insertValues(
+		'splice',
+		array,
+		amoutOrValuesIsArray ? amountOrValues : values ?? [],
+		start,
+		amoutOrValuesIsArray
+			? array.length
+			: typeof amountOrValues === 'number' && amountOrValues > 0
+			  ? amountOrValues
+			  : 0,
+	) as Value[];
 }
 
 /**
  * Returns an array of unique items
  */
-export function unique<T>(array: T[]): T[];
+export function unique<Value>(array: Value[]): Value[];
 
 /**
  * - Returns an array of unique items
  * - Use `key` to find a comparison value to match with `value`
  */
-export function unique<T>(array: T[], key: Key | KeyCallback<T>): T[];
+export function unique<Value>(
+	array: Value[],
+	key: Key | KeyCallback<Value>,
+): Value[];
 
 /**
  * Returns an array of unique items
  */
-export function unique<T>(array: T[], key?: Key | KeyCallback<T>): T[] {
+export function unique<Value>(
+	array: Value[],
+	key?: Key | KeyCallback<Value>,
+): Value[] {
 	return _findValues('unique', array, undefined, key);
 }

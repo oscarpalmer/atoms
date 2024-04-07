@@ -3,12 +3,15 @@
 		"name": "Oscar Palmér",
 		"url": "https://oscarpalmer.se"
 	},
+	"dependencies": {
+		"type-fest": "^4.15"
+	},
 	"description": "Sweet little atomic goodies…",
 	"devDependencies": {
 		"@biomejs/biome": "^1.6",
-		"@happy-dom/global-registrator": "^14.3",
-		"bun": "^1.0",
-		"sass": "^1.72",
+		"@happy-dom/global-registrator": "^14.6",
+		"bun": "^1.1",
+		"sass": "^1.74",
 		"typescript": "^5.4"
 	},
 	"exports": {
@@ -20,6 +23,15 @@
 			"import": "./dist/js/array.mjs",
 			"require": "./dist/js/array.js",
 			"types": "./types/array.d.ts"
+		},
+		"./css/a11y": {
+			"style": "./dist/css/a11y.css"
+		},
+		"./css/flex": {
+			"style": "./dist/css/flex.css"
+		},
+		"./css/reset": {
+			"style": "./dist/css/reset.css"
 		},
 		"./element": {
 			"bun": "./src/js/element/index.ts",
@@ -112,5 +124,5 @@
 	},
 	"type": "module",
 	"types": "./types/index.d.ts",
-	"version": "0.32.0"
+	"version": "0.33.0"
 }
