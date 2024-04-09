@@ -1,12 +1,3 @@
-// src/js/string.ts
-function getString(value) {
-  if (typeof value === "string") {
-    return value;
-  }
-  const result = value?.toString?.() ?? value;
-  return result?.toString?.() ?? String(result);
-}
-
 // src/js/is.ts
 function isArrayOrPlainObject(value) {
   return Array.isArray(value) || isPlainObject(value);
@@ -35,6 +26,15 @@ var _cloneRegularExpression = function(value) {
   const cloned = new RegExp(value.source, value.flags);
   cloned.lastIndex = value.lastIndex;
   return cloned;
+};
+var _findKey = function(needle, haystack, ignoreCase) {
+  if (!ignoreCase) {
+    return needle;
+  }
+  const keys = Object.keys(haystack);
+  const normalised = keys.map((key) => key.toLowerCase());
+  const index = normalised.indexOf(needle.toLowerCase());
+  return index > -1 ? keys[index] : needle;
 };
 var _getDiffs = function(first, second, prefix) {
   const changes = [];
@@ -77,12 +77,13 @@ var _getDiffs = function(first, second, prefix) {
 var _getKey = function(...parts) {
   return parts.filter((part) => part != null).join(".");
 };
-var _handleValue = function(data, path, value, get) {
+var _handleValue = function(data, path, value, get, ignoreCase) {
   if (typeof data === "object" && data !== null && !/^(__proto__|constructor|prototype)$/i.test(path)) {
+    const key = _findKey(path, data, ignoreCase);
     if (get) {
-      return data[path];
+      return data[key];
     }
-    data[path] = value;
+    data[key] = value;
   }
 };
 function clone(value) {
@@ -141,13 +142,14 @@ function diff(first, second) {
   }
   return result;
 }
-function getValue(data, path) {
-  const parts = getString(path).split(".");
+function getValue(data, path, ignoreCase) {
+  const shouldIgnoreCase = ignoreCase === true;
+  const parts = (shouldIgnoreCase ? path.toLowerCase() : path).split(".");
   const { length } = parts;
   let index = 0;
   let value = typeof data === "object" ? data ?? {} : {};
   while (index < length && value != null) {
-    value = _handleValue(value, parts[index++], null, true);
+    value = _handleValue(value, parts[index++], null, true, shouldIgnoreCase);
   }
   return value;
 }
@@ -177,8 +179,9 @@ function merge(...values) {
   }
   return result;
 }
-function setValue(data, path, value) {
-  const parts = getString(path).split(".");
+function setValue(data, path, value, ignoreCase) {
+  const shouldIgnoreCase = ignoreCase === true;
+  const parts = (shouldIgnoreCase ? path.toLowerCase() : path).split(".");
   const { length } = parts;
   const lastIndex = length - 1;
   let index = 0;
@@ -186,10 +189,10 @@ function setValue(data, path, value) {
   for (;index < length; index += 1) {
     const part = parts[index];
     if (parts.indexOf(part) === lastIndex) {
-      _handleValue(target, part, value, false);
+      _handleValue(target, part, value, false, shouldIgnoreCase);
       break;
     }
-    let next = _handleValue(target, part, null, true);
+    let next = _handleValue(target, part, null, true, shouldIgnoreCase);
     if (typeof next !== "object" || next === null) {
       next = /^\d+$/.test(part) ? [] : {};
       target[part] = next;

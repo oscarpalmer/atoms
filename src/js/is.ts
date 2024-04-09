@@ -20,6 +20,13 @@ export function isNullable(value: unknown): value is undefined | null {
 /**
  * Is the value undefined, null, or an empty string?
  */
+export function isNullableOrEmpty(value: unknown): value is undefined | null | '' {
+	return value == null || getString(value) === '';
+}
+
+/**
+ * Is the value undefined, null, or a whitespace-only string?
+ */
 export function isNullableOrWhitespace(
 	value: unknown,
 ): value is undefined | null | '' {

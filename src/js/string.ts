@@ -20,7 +20,12 @@ export function getString(value: unknown): string {
 		return value;
 	}
 
-	const result = value?.toString?.() ?? value;
+	if (typeof value !== 'object' || value == null) {
+		return String(value);
+	}
 
-	return result?.toString?.() ?? String(result);
+	const valueOff = value.valueOf?.() ?? value;
+	const asString = valueOff?.toString?.() ?? String(valueOff);
+
+	return asString.startsWith('[object ') ? JSON.stringify(value) : asString;
 }

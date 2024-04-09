@@ -3,8 +3,12 @@ function getString(value) {
   if (typeof value === "string") {
     return value;
   }
-  const result = value?.toString?.() ?? value;
-  return result?.toString?.() ?? String(result);
+  if (typeof value !== "object" || value == null) {
+    return String(value);
+  }
+  const valueOff = value.valueOf?.() ?? value;
+  const asString = valueOff?.toString?.() ?? String(valueOff);
+  return asString.startsWith("[object ") ? JSON.stringify(value) : asString;
 }
 
 // src/js/is.ts
@@ -13,6 +17,9 @@ function isArrayOrPlainObject(value) {
 }
 function isNullable(value) {
   return value == null;
+}
+function isNullableOrEmpty(value) {
+  return value == null || getString(value) === "";
 }
 function isNullableOrWhitespace(value) {
   return value == null || /^\s*$/.test(getString(value));
@@ -43,6 +50,7 @@ export {
   isNumerical,
   isNumber,
   isNullableOrWhitespace,
+  isNullableOrEmpty,
   isNullable,
   isArrayOrPlainObject
 };

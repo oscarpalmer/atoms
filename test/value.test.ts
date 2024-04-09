@@ -155,20 +155,8 @@ test('getValue', () => {
 
 	expect(getValue(data, 'a.c.d')).toBe(data.a.c.d);
 
-	// @ts-expect-error - Testing invalid input
-	expect(getValue(undefined)).toBe(undefined);
-
-	// @ts-expect-error - Testing invalid input
-	expect(getValue(null)).toBe(undefined);
-
-	// @ts-expect-error - Testing invalid input
-	expect(getValue(data, undefined)).toBe(undefined);
-
-	// @ts-expect-error - Testing invalid input
-	expect(getValue(data, null)).toBe(undefined);
-
 	expect(getValue(data, '')).toBe(undefined);
-	expect(getValue(data, 'a.b.1.c.1')).toBe(undefined);
+	expect(getValue(data, 'a.B.1.C.1', true)).toBe(undefined);
 	expect(getValue(data, 'a.b.99.c')).toBe(undefined);
 
 	expect(getValue(data, '__proto__')).toBe(undefined);
@@ -223,25 +211,13 @@ test('setValue', () => {
 		},
 	};
 
-	// @ts-expect-error - Testing invalid input
-	expect(setValue(undefined)).toBe(undefined);
-
-	// @ts-expect-error - Testing invalid input
-	expect(setValue(null)).toBe(null);
-
-	// @ts-expect-error - Testing invalid input
-	expect(setValue(data, undefined)).toBe(data);
-
-	// @ts-expect-error - Testing invalid input
-	expect(setValue(data, null)).toBe(data);
-
 	expect(setValue(data, '', undefined)).toBe(data);
 
-	setValue(data, 'in.a.nested.array.3', 123);
+	setValue(data, 'in.a.NeStEd.array.3', 123, true);
 	setValue(data, 'in.a.nested.map.3', 123);
-	setValue(data, 'in.a.nested.object.3', 123);
+	setValue(data, 'in.a.NeStEd.object.3', 123, true);
 	setValue(data, 'in.a.nested.set.3', 123);
-	setValue(data, 'in.a.new.array.5', 123);
+	setValue(data, 'in.a.nEw.array.5', 123);
 
 	expect(data.in.a.nested.array[3]).toEqual(123);
 	expect(data.in.a.nested.map.get('3')).toEqual(undefined);
@@ -265,7 +241,7 @@ test('setValue', () => {
 	expect(setArray[0]).toEqual(undefined);
 
 	// @ts-expect-error - Testing created objects
-	expect(data.in.a.new.array[5]).toEqual(123);
+	expect(data.in.a.nEw.array[5]).toEqual(123);
 
 	setValue(data, '__proto__', 123);
 	setValue(data, 'constructor', 123);

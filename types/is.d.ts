@@ -10,6 +10,10 @@ export declare function isNullable(value: unknown): value is undefined | null;
 /**
  * Is the value undefined, null, or an empty string?
  */
+export declare function isNullableOrEmpty(value: unknown): value is undefined | null | '';
+/**
+ * Is the value undefined, null, or a whitespace-only string?
+ */
 export declare function isNullableOrWhitespace(value: unknown): value is undefined | null | '';
 /**
  * Is the value a number?

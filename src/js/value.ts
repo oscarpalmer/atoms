@@ -1,7 +1,6 @@
 import type {ToString} from 'type-fest/source/internal';
 import {isArrayOrPlainObject} from './is';
 import type {ArrayOrPlainObject, Get, Key, Paths, PlainObject} from './models';
-import {getString} from './string';
 
 export type DiffType = 'full' | 'none' | 'partial';
 
@@ -42,6 +41,22 @@ function _cloneRegularExpression(value: RegExp): RegExp {
 	cloned.lastIndex = value.lastIndex;
 
 	return cloned;
+}
+
+function _findKey(
+	needle: string,
+	haystack: PlainObject,
+	ignoreCase: boolean,
+): string {
+	if (!ignoreCase) {
+		return needle;
+	}
+
+	const keys = Object.keys(haystack);
+	const normalised = keys.map(key => key.toLowerCase());
+	const index = normalised.indexOf(needle.toLowerCase());
+
+	return index > -1 ? keys[index] : needle;
 }
 
 function _getDiffs(
@@ -114,17 +129,20 @@ function _handleValue(
 	path: string,
 	value: unknown,
 	get: boolean,
+	ignoreCase: boolean,
 ): unknown {
 	if (
 		typeof data === 'object' &&
 		data !== null &&
 		!/^(__proto__|constructor|prototype)$/i.test(path)
 	) {
+		const key = _findKey(path, data, ignoreCase);
+
 		if (get) {
-			return data[path];
+			return data[key];
 		}
 
-		data[path] = value;
+		data[key] = value;
 	}
 }
 
@@ -227,22 +245,47 @@ export function diff<First, Second = First>(
 }
 
 /**
- * - Get the value from an object using a path
+ * - Get the value from an object using a known path
  * - You can retrieve a nested value by using dot notation, e.g., `foo.bar.baz`
  * - Returns `undefined` if the value is not found
  */
 export function getValue<Data extends PlainObject, Path extends Paths<Data>>(
 	data: Data,
 	path: Path,
-): Get<Data, ToString<Path>> {
-	const parts = getString(path).split('.');
+): Get<Data, ToString<Path>>;
+
+/**
+ * - Get the value from an object using an unknown path
+ * - You can retrieve a nested value by using dot notation, e.g., `foo.bar.baz`
+ * - If `ignoreCase` is `true`, path matching will be case-insensitive
+ * - Returns `undefined` if the value is not found
+ */
+export function getValue<Data extends PlainObject>(
+	data: Data,
+	path: string,
+	ignoreCase?: boolean,
+): unknown;
+
+export function getValue(
+	data: PlainObject,
+	path: string,
+	ignoreCase?: boolean,
+): unknown {
+	const shouldIgnoreCase = ignoreCase === true;
+	const parts = (shouldIgnoreCase ? path.toLowerCase() : path).split('.');
 	const {length} = parts;
 
 	let index = 0;
 	let value = typeof data === 'object' ? data ?? {} : {};
 
 	while (index < length && value != null) {
-		value = _handleValue(value, parts[index++], null, true) as PlainObject;
+		value = _handleValue(
+			value,
+			parts[index++],
+			null,
+			true,
+			shouldIgnoreCase,
+		) as PlainObject;
 	}
 
 	return value as never;
@@ -294,17 +337,39 @@ export function merge<Model extends ArrayOrPlainObject>(
 }
 
 /**
- * - Set the value in an object using a path
+ * - Set the value in an object using a known path
  * - You can set a nested value by using dot notation, e.g., `foo.bar.baz`
  * - If a part of the path does not exist, it will be created, either as an array or a generic object, depending on the path
+ * - Returns the original object
+ */
+export function setValue<Data extends PlainObject, Path extends Paths<Data>>(
+	data: Data,
+	path: Path,
+	value: unknown,
+): Data;
+
+/**
+ * - Set the value in an object using an unknown path
+ * - You can set a nested value by using dot notation, e.g., `foo.bar.baz`
+ * - If a part of the path does not exist, it will be created, either as an array or a generic object, depending on the path
+ * - If `ignoreCase` is `true`, path matching will be case-insensitive
  * - Returns the original object
  */
 export function setValue<Data extends PlainObject>(
 	data: Data,
 	path: string,
 	value: unknown,
+	ignoreCase?: boolean,
+): Data;
+
+export function setValue<Data extends PlainObject>(
+	data: Data,
+	path: string,
+	value: unknown,
+	ignoreCase?: boolean,
 ): Data {
-	const parts = getString(path).split('.');
+	const shouldIgnoreCase = ignoreCase === true;
+	const parts = (shouldIgnoreCase ? path.toLowerCase() : path).split('.');
 	const {length} = parts;
 	const lastIndex = length - 1;
 
@@ -315,12 +380,12 @@ export function setValue<Data extends PlainObject>(
 		const part = parts[index];
 
 		if (parts.indexOf(part) === lastIndex) {
-			_handleValue(target, part, value, false);
+			_handleValue(target, part, value, false, shouldIgnoreCase);
 
 			break;
 		}
 
-		let next = _handleValue(target, part, null, true);
+		let next = _handleValue(target, part, null, true, shouldIgnoreCase);
 
 		if (typeof next !== 'object' || next === null) {
 			next = /^\d+$/.test(part) ? [] : {};

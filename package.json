@@ -9,7 +9,7 @@
 	"description": "Sweet little atomic goodies…",
 	"devDependencies": {
 		"@biomejs/biome": "^1.6",
-		"@happy-dom/global-registrator": "^14.6",
+		"@happy-dom/global-registrator": "^14.7",
 		"bun": "^1.1",
 		"sass": "^1.74",
 		"typescript": "^5.4"
@@ -25,12 +25,15 @@
 			"types": "./types/array.d.ts"
 		},
 		"./css/a11y": {
+			"sass": "./src/css/a11y.scss",
 			"style": "./dist/css/a11y.css"
 		},
 		"./css/flex": {
+			"sass": "./src/css/flex.scss",
 			"style": "./dist/css/flex.css"
 		},
 		"./css/reset": {
+			"sass": "./src/css/reset.scss",
 			"style": "./dist/css/reset.css"
 		},
 		"./element": {
@@ -106,8 +109,6 @@
 	],
 	"keywords": [],
 	"license": "MIT",
-	"main": "./dist/js/index.js",
-	"module": "./dist/js/index.mjs",
 	"name": "@oscarpalmer/atoms",
 	"repository": {
 		"type": "git",
@@ -124,5 +125,5 @@
 	},
 	"type": "module",
 	"types": "./types/index.d.ts",
-	"version": "0.33.0"
+	"version": "0.34.0"
 }

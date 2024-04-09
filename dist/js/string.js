@@ -6,8 +6,12 @@ function getString(value) {
   if (typeof value === "string") {
     return value;
   }
-  const result = value?.toString?.() ?? value;
-  return result?.toString?.() ?? String(result);
+  if (typeof value !== "object" || value == null) {
+    return String(value);
+  }
+  const valueOff = value.valueOf?.() ?? value;
+  const asString = valueOff?.toString?.() ?? String(valueOff);
+  return asString.startsWith("[object ") ? JSON.stringify(value) : asString;
 }
 export {
   getString,

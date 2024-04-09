@@ -124,7 +124,8 @@
   color: inherit;
 }
 
-:where(nav) :where(ol, ul) {
+:where(nav) :where(ol, ul),
+:where(ul[class]) {
   list-style-type: none;
   padding: 0;
 }

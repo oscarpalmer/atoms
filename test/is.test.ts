@@ -2,6 +2,7 @@ import {expect, test} from 'bun:test';
 import {
 	isArrayOrPlainObject,
 	isNullable,
+	isNullableOrEmpty,
 	isNullableOrWhitespace,
 	isNumber,
 	isNumerical,
@@ -50,6 +51,18 @@ test('isNullable', () => {
 
 	for (; index < length; index += 1) {
 		expect(isNullable(values[index])).toBe(expected[index]);
+	}
+});
+
+test('isNullableOrEmpty', () => {
+	const expected = Array.from({length}, (_, index) =>
+		[0, 1, 2, length - 4].includes(index),
+	);
+
+	let index = 0;
+
+	for (; index < length; index += 1) {
+		expect(isNullableOrEmpty(values[index])).toBe(expected[index]);
 	}
 });
 
