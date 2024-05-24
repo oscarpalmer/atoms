@@ -46,8 +46,8 @@ function _findElements(
 	const nodes = Array.isArray(selector)
 		? selector
 		: selector instanceof NodeList
-		  ? Array.from(selector)
-		  : [selector];
+			? Array.from(selector)
+			: [selector];
 
 	const {length} = nodes;
 
@@ -60,8 +60,8 @@ function _findElements(
 			node instanceof Document
 				? node.body
 				: node instanceof Element
-				  ? node
-				  : undefined;
+					? node
+					: undefined;
 
 		if (
 			element != null &&
@@ -110,34 +110,34 @@ export function findElements(
 export function findParentElement(
 	origin: Element,
 	selector: string | ((element: Element) => boolean),
-): Element | undefined {
+): Element | null {
 	if (origin == null || selector == null) {
-		return;
+		return null;
 	}
 
-	function matches(element: Element): boolean {
-		return typeof selector === 'string'
-			? element.matches?.(selector) ?? false
-			: typeof selector === 'function'
-			  ? selector(element)
-			  : false;
+	if (typeof selector === 'string') {
+		if (origin.matches?.(selector)) {
+			return origin;
+		}
+
+		return origin.closest(selector);
 	}
 
-	if (matches(origin)) {
+	if (selector(origin)) {
 		return origin;
 	}
 
 	let parent: Element | null = origin.parentElement;
 
-	while (parent != null && !matches(parent)) {
+	while (parent != null && !selector(parent)) {
 		if (parent === document.body) {
-			return;
+			return null;
 		}
 
 		parent = parent.parentElement;
 	}
 
-	return parent ?? undefined;
+	return parent;
 }
 
 /**

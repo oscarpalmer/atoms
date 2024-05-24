@@ -13,21 +13,39 @@ type AnyCallback = (() => void) | IndexedCallback;
  */
 type IndexedCallback = (index: number) => void;
 
-type Options = {
+type BaseOptions = {
+	/**
+	 * Interval between each callback
+	 */
+	interval: number;
+	/**
+	 * Maximum amount of time the timer may run for
+	 */
+	timeout: number;
+};
+
+type OptionsWithCount = {
+	/**
+	 * How many times the timer should repeat
+	 */
+	count: number;
+} & BaseOptions;
+
+type OptionsWithError = {
+	/**
+	 * Callback to run when an error occurs _(usually a timeout)_
+	 */
+	errorCallback?: () => void;
+};
+
+type RepeatOptions = {
 	/**
 	 * Callback to run after the timer has finished (or is stopped)
 	 * - `finished` is `true` if the timer was allowed to finish, and `false` if it was stopped
 	 */
 	afterCallback?: AfterCallback;
-	/**
-	 * How many times the timer should repeat
-	 */
-	count: number;
-	/**
-	 * Interval between each callback
-	 */
-	interval: number;
-};
+} & OptionsWithCount &
+	OptionsWithError;
 
 type State = {
 	active: boolean;
@@ -57,6 +75,23 @@ type Timer = {
 	stop(): Timer;
 };
 
+type TimerOptions = {} & RepeatOptions;
+
+type WaitOptions = {} & BaseOptions & OptionsWithError;
+
+type When = {
+	/**
+	 * Stops the timer
+	 */
+	stop(): void;
+	then(
+		resolve?: (() => void) | null,
+		reject?: (() => void) | null,
+	): Promise<void>;
+};
+
+type WhenOptions = {} & OptionsWithCount;
+
 type WorkType = 'restart' | 'start' | 'stop';
 
 let milliseconds = 0;
@@ -83,38 +118,48 @@ export function isWaited(value: unknown): value is Timer {
 }
 
 /**
- * - Creates a timer which calls a callback after a certain amount of time, and repeats it a certain amount of times, with an optional callback after it's finished (or stopped)
+ * Creates a timer which:
+ * - calls a callback after a certain amount of time...
+ * - ... and repeats it a certain amount of times
+ * ---
  * - `options.count` defaults to `Infinity`
  * - `options.time` defaults to `0`
- * - `options.afterCallback` defaults to `undefined`
  */
 export function repeat(
 	callback: IndexedCallback,
-	options?: Partial<Options>,
+	options?: Partial<RepeatOptions>,
 ): Timer {
-	const count =
-		typeof options?.count === 'number'
-			? options.count
-			: Number.POSITIVE_INFINITY;
-
-	return timer('repeat', callback, {...(options ?? {}), ...{count}}).start();
+	return timer('repeat', callback, {
+		...(options ?? {}),
+		...{
+			count:
+				typeof options?.count === 'number'
+					? options.count
+					: Number.POSITIVE_INFINITY,
+		},
+	}).start();
 }
 
 function timer(
 	type: 'repeat' | 'wait',
 	callback: AnyCallback,
-	options: Partial<Options>,
+	options: Partial<TimerOptions>,
 ): Timer {
-	const extended: Options = {
+	const extended: TimerOptions = {
 		afterCallback: options.afterCallback,
 		count:
 			typeof options.count === 'number' && options.count > 0
 				? options.count
 				: 1,
+		errorCallback: options.errorCallback,
 		interval:
 			typeof options.interval === 'number' && options.interval >= 0
 				? options.interval
 				: 0,
+		timeout:
+			typeof options.timeout === 'number' && options.timeout > 0
+				? options.timeout
+				: 30_000,
 	};
 
 	const state: State = {
@@ -147,25 +192,98 @@ function timer(
 		},
 	});
 
-	return instance.start();
+	return instance;
 }
 
 /**
- * - Creates a timer which calls a callback after a certain amount of time
+ * Creates a timer which calls a callback after a certain amount of time
+ */
+export function wait(callback: () => void): Timer;
+
+/**
+ * Creates a timer which calls a callback after a certain amount of time
  * - `time` defaults to `0`
  */
-export function wait(callback: () => void, time?: number): Timer {
+export function wait(callback: () => void, time: number): Timer;
+
+/**
+ * Creates a timer which calls a callback after a certain amount of time
+ * - `options.interval` defaults to `0`
+ */
+export function wait(
+	callback: () => void,
+	options: Partial<WaitOptions>,
+): Timer;
+
+export function wait(
+	callback: () => void,
+	options?: number | Partial<WaitOptions>,
+): Timer {
+	const optionsIsNumber = typeof options === 'number';
+
 	return timer('wait', callback, {
 		count: 1,
-		interval: time ?? 0,
+		errorCallback: optionsIsNumber ? undefined : options?.errorCallback,
+		interval: optionsIsNumber ? options : options?.interval ?? 0,
+	}).start();
+}
+
+/**
+ * - Creates a promise that resolves when a condition is met
+ * - If the condition is never met in a timely manner, the promise will reject
+ */
+export function when(
+	condition: () => boolean,
+	options?: Partial<WhenOptions>,
+): When {
+	let rejecter: () => void;
+	let resolver: () => void;
+
+	const repeated = repeat(
+		() => {
+			if (condition()) {
+				repeated.stop();
+
+				resolver?.();
+			}
+		},
+		{
+			errorCallback() {
+				rejecter?.();
+			},
+			count: options?.count,
+			interval: options?.interval,
+			timeout: options?.timeout,
+		},
+	);
+
+	const promise = new Promise<void>((resolve, reject) => {
+		resolver = resolve;
+		rejecter = reject;
 	});
+
+	const instance = Object.create({
+		stop() {
+			repeated.stop();
+
+			rejecter?.();
+		},
+		// biome-ignore lint/suspicious/noThenProperty: <explanation>
+		then(resolve?: () => void, reject?: () => void) {
+			repeated.start();
+
+			return promise.then(resolve, reject);
+		},
+	});
+
+	return instance;
 }
 
 function work(
 	type: WorkType,
 	timer: Timer,
 	state: State,
-	options: Options,
+	options: RepeatOptions,
 ): Timer {
 	if (
 		(type === 'start' && state.active) ||
@@ -174,7 +292,7 @@ function work(
 		return timer;
 	}
 
-	const {afterCallback, count, interval} = options;
+	const {afterCallback, count, errorCallback, interval, timeout} = options;
 
 	if (typeof state.frame === 'number') {
 		cancelAnimationFrame(state.frame);
@@ -194,22 +312,35 @@ function work(
 	const isRepeated = count > 0;
 
 	let index = 0;
-	let total = count * interval;
+	let total = count * (interval > 0 ? interval : 1);
 
 	if (total < milliseconds) {
 		total = milliseconds;
 	}
 
-	let start: DOMHighResTimeStamp | undefined;
+	let current: DOMHighResTimeStamp | null;
+	let start: DOMHighResTimeStamp | null;
+
+	function finish(finished: boolean, error: boolean) {
+		state.active = false;
+		state.frame = undefined;
+
+		if (error) {
+			errorCallback?.();
+		}
+
+		afterCallback?.(finished);
+	}
 
 	function step(timestamp: DOMHighResTimeStamp): void {
 		if (!state.active) {
 			return;
 		}
 
+		current ??= timestamp;
 		start ??= timestamp;
 
-		const elapsed = timestamp - start;
+		const elapsed = timestamp - current;
 		const finished = elapsed >= total;
 
 		if (finished || (elapsed - 2 < interval && interval < elapsed + 2)) {
@@ -219,15 +350,18 @@ function work(
 
 			index += 1;
 
-			if (!finished && index < count) {
-				start = undefined;
-			} else {
-				state.active = false;
-				state.frame = undefined;
+			switch (true) {
+				case !finished && timestamp - start >= timeout:
+					finish(false, true);
+					return;
 
-				afterCallback?.(true);
+				case !finished && index < count:
+					current = null;
+					break;
 
-				return;
+				default:
+					finish(true, false);
+					return;
 			}
 		}
 

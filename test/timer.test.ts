@@ -1,5 +1,5 @@
 import {expect, test} from 'bun:test';
-import {isRepeated, isTimer, isWaited, repeat, wait} from '../src/js/timer';
+import {isRepeated, isTimer, isWaited, repeat, wait, when} from '../src/js/timer';
 
 test('start', done => {
 	wait(() => {
@@ -86,6 +86,60 @@ test('afterCallback', done => {
 			count: 10,
 		},
 	);
+});
+
+test('errorCallback', done => {
+	let error = false;
+	let finished: boolean | undefined;
+
+	repeat(() => {}, {
+		afterCallback(f) {
+			finished = f;
+		},
+		errorCallback() {
+			error = true;
+		},
+		timeout: 125,
+	});
+
+	wait(() => {
+		expect(error).toBe(true);
+		expect(finished).toBe(false);
+		done();
+	}, 250);
+});
+
+test('when', done => {
+	let stopped = false;
+	let value = 0;
+
+	wait(() => {
+		value += 1;
+	}, 125);
+
+	when(() => value > 0).then(() => {
+		expect(value).toEqual(1);
+	});
+
+	const what = when(() => value > 1, {
+		interval: 125,
+	});
+
+	wait(() => {
+		what.stop();
+	}, 175);
+
+	what.then(null, () => {
+		stopped = true;
+	});
+
+	when(() => value > 1, {
+		timeout: 250,
+	}).then(null, () => {
+		expect(stopped).toBe(true);
+		expect(value).toEqual(1);
+		done();
+	});
 });
 
 test('is', done => {

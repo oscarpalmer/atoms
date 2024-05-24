@@ -172,22 +172,25 @@ function findElements(selector, context) {
 }
 function findParentElement(origin, selector) {
   if (origin == null || selector == null) {
-    return;
+    return null;
   }
-  function matches(element) {
-    return typeof selector === "string" ? element.matches?.(selector) ?? false : typeof selector === "function" ? selector(element) : false;
+  if (typeof selector === "string") {
+    if (origin.matches?.(selector)) {
+      return origin;
+    }
+    return origin.closest(selector);
   }
-  if (matches(origin)) {
+  if (selector(origin)) {
     return origin;
   }
   let parent = origin.parentElement;
-  while (parent != null && !matches(parent)) {
+  while (parent != null && !selector(parent)) {
     if (parent === document.body) {
-      return;
+      return null;
     }
     parent = parent.parentElement;
   }
-  return parent ?? undefined;
+  return parent;
 }
 function getElementUnderPointer(skipIgnore) {
   const elements = Array.from(document.querySelectorAll(":hover")).filter((element) => {
@@ -476,14 +479,20 @@ function isWaited(value) {
   return /^wait$/.test(value?.$timer ?? "");
 }
 function repeat(callback, options) {
-  const count = typeof options?.count === "number" ? options.count : Number.POSITIVE_INFINITY;
-  return timer("repeat", callback, { ...options ?? {}, ...{ count } }).start();
+  return timer("repeat", callback, {
+    ...options ?? {},
+    ...{
+      count: typeof options?.count === "number" ? options.count : Number.POSITIVE_INFINITY
+    }
+  }).start();
 }
 var timer = function(type, callback, options) {
   const extended = {
     afterCallback: options.afterCallback,
     count: typeof options.count === "number" && options.count > 0 ? options.count : 1,
-    interval: typeof options.interval === "number" && options.interval >= 0 ? options.interval : 0
+    errorCallback: options.errorCallback,
+    interval: typeof options.interval === "number" && options.interval >= 0 ? options.interval : 0,
+    timeout: typeof options.timeout === "number" && options.timeout > 0 ? options.timeout : 30000
   };
   const state = {
     callback,
@@ -512,19 +521,53 @@ var timer = function(type, callback, options) {
       }
     }
   });
-  return instance.start();
+  return instance;
 };
-function wait(callback, time) {
+function wait(callback, options) {
+  const optionsIsNumber = typeof options === "number";
   return timer("wait", callback, {
     count: 1,
-    interval: time ?? 0
+    errorCallback: optionsIsNumber ? undefined : options?.errorCallback,
+    interval: optionsIsNumber ? options : options?.interval ?? 0
+  }).start();
+}
+function when(condition, options) {
+  let rejecter;
+  let resolver;
+  const repeated = repeat(() => {
+    if (condition()) {
+      repeated.stop();
+      resolver?.();
+    }
+  }, {
+    errorCallback() {
+      rejecter?.();
+    },
+    count: options?.count,
+    interval: options?.interval,
+    timeout: options?.timeout
   });
+  const promise = new Promise((resolve, reject) => {
+    resolver = resolve;
+    rejecter = reject;
+  });
+  const instance = Object.create({
+    stop() {
+      repeated.stop();
+      rejecter?.();
+    },
+    then(resolve, reject) {
+      repeated.start();
+      return promise.then(resolve, reject);
+    }
+  });
+  return instance;
 }
 var work = function(type, timer2, state, options) {
   if (type === "start" && state.active || type === "stop" && !state.active) {
     return timer2;
   }
-  const { afterCallback, count, interval } = options;
+  const { afterCallback, count, errorCallback, interval, timeout } = options;
   if (typeof state.frame === "number") {
     cancelAnimationFrame(state.frame);
     afterCallback?.(false);
@@ -537,30 +580,43 @@ var work = function(type, timer2, state, options) {
   state.active = true;
   const isRepeated2 = count > 0;
   let index = 0;
-  let total = count * interval;
+  let total = count * (interval > 0 ? interval : 1);
   if (total < milliseconds) {
     total = milliseconds;
   }
+  let current;
   let start;
+  function finish(finished, error) {
+    state.active = false;
+    state.frame = undefined;
+    if (error) {
+      errorCallback?.();
+    }
+    afterCallback?.(finished);
+  }
   function step(timestamp) {
     if (!state.active) {
       return;
     }
+    current ??= timestamp;
     start ??= timestamp;
-    const elapsed = timestamp - start;
+    const elapsed = timestamp - current;
     const finished = elapsed >= total;
     if (finished || elapsed - 2 < interval && interval < elapsed + 2) {
       if (state.active) {
         state.callback(isRepeated2 ? index : undefined);
       }
       index += 1;
-      if (!finished && index < count) {
-        start = undefined;
-      } else {
-        state.active = false;
-        state.frame = undefined;
-        afterCallback?.(true);
-        return;
+      switch (true) {
+        case (!finished && timestamp - start >= timeout):
+          finish(false, true);
+          return;
+        case (!finished && index < count):
+          current = null;
+          break;
+        default:
+          finish(true, false);
+          return;
       }
     }
     state.frame = requestAnimationFrame(step);
@@ -791,6 +847,7 @@ function setValue(data, path, value, ignoreCase) {
   return data;
 }
 export {
+  when,
   wait,
   unique,
   splice,

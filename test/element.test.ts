@@ -65,6 +65,7 @@ test('findParentElement', () => {
 		return;
 	}
 
+	expect(findParentElement(origin, '#origin')).toBe(origin);
 	expect(findParentElement(origin, '.target')).toBe(target);
 
 	expect(findParentElement(origin, element => element.id === 'origin')).toBe(
@@ -75,10 +76,14 @@ test('findParentElement', () => {
 		findParentElement(origin, element => (element as HTMLElement).hidden),
 	).toBe(hidden);
 
-	// @ts-expect-error Testing invalid input
-	expect(findParentElement(null, 'span')).toBe(undefined);
+	expect(findParentElement(origin, 'noop')).toBe(null);
 
-	expect(findParentElement(origin, 'noop')).toBe(undefined);
+	expect(findParentElement(origin, element => element.tagName === 'noop')).toBe(
+		null,
+	);
+
+	// @ts-expect-error Testing invalid input
+	expect(findParentElement(null, 'span')).toBe(null);
 });
 
 test('getElementUnderPointer', () => {

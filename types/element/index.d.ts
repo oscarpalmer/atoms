@@ -16,7 +16,7 @@ export declare function findElements(selector: Selector, context?: Selector): El
  * - Matches may be found by a query string or a callback
  * - If no match is found, `undefined` is returned
  */
-export declare function findParentElement(origin: Element, selector: string | ((element: Element) => boolean)): Element | undefined;
+export declare function findParentElement(origin: Element, selector: string | ((element: Element) => boolean)): Element | null;
 /**
  * - Get the most specific element under the pointer
  * - Ignores elements with `pointer-events: none` and `visibility: hidden`

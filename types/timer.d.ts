@@ -7,21 +7,35 @@ type AfterCallback = (finished: boolean) => void;
  * Callback that runs for each iteration of the timer
  */
 type IndexedCallback = (index: number) => void;
-type Options = {
+type BaseOptions = {
+    /**
+     * Interval between each callback
+     */
+    interval: number;
+    /**
+     * Maximum amount of time the timer may run for
+     */
+    timeout: number;
+};
+type OptionsWithCount = {
+    /**
+     * How many times the timer should repeat
+     */
+    count: number;
+} & BaseOptions;
+type OptionsWithError = {
+    /**
+     * Callback to run when an error occurs _(usually a timeout)_
+     */
+    errorCallback?: () => void;
+};
+type RepeatOptions = {
     /**
      * Callback to run after the timer has finished (or is stopped)
      * - `finished` is `true` if the timer was allowed to finish, and `false` if it was stopped
      */
     afterCallback?: AfterCallback;
-    /**
-     * How many times the timer should repeat
-     */
-    count: number;
-    /**
-     * Interval between each callback
-     */
-    interval: number;
-};
+} & OptionsWithCount & OptionsWithError;
 /**
  * A timer that can be started, stopped, and restarted as neeeded
  */
@@ -43,6 +57,15 @@ type Timer = {
      */
     stop(): Timer;
 };
+type WaitOptions = {} & BaseOptions & OptionsWithError;
+type When = {
+    /**
+     * Stops the timer
+     */
+    stop(): void;
+    then(resolve?: (() => void) | null, reject?: (() => void) | null): Promise<void>;
+};
+type WhenOptions = {} & OptionsWithCount;
 /**
  * Is the value a repeating timer?
  */
@@ -56,15 +79,31 @@ export declare function isTimer(value: unknown): value is Timer;
  */
 export declare function isWaited(value: unknown): value is Timer;
 /**
- * - Creates a timer which calls a callback after a certain amount of time, and repeats it a certain amount of times, with an optional callback after it's finished (or stopped)
+ * Creates a timer which:
+ * - calls a callback after a certain amount of time...
+ * - ... and repeats it a certain amount of times
+ * ---
  * - `options.count` defaults to `Infinity`
  * - `options.time` defaults to `0`
- * - `options.afterCallback` defaults to `undefined`
  */
-export declare function repeat(callback: IndexedCallback, options?: Partial<Options>): Timer;
+export declare function repeat(callback: IndexedCallback, options?: Partial<RepeatOptions>): Timer;
 /**
- * - Creates a timer which calls a callback after a certain amount of time
+ * Creates a timer which calls a callback after a certain amount of time
+ */
+export declare function wait(callback: () => void): Timer;
+/**
+ * Creates a timer which calls a callback after a certain amount of time
  * - `time` defaults to `0`
  */
-export declare function wait(callback: () => void, time?: number): Timer;
+export declare function wait(callback: () => void, time: number): Timer;
+/**
+ * Creates a timer which calls a callback after a certain amount of time
+ * - `options.interval` defaults to `0`
+ */
+export declare function wait(callback: () => void, options: Partial<WaitOptions>): Timer;
+/**
+ * - Creates a promise that resolves when a condition is met
+ * - If the condition is never met in a timely manner, the promise will reject
+ */
+export declare function when(condition: () => boolean, options?: Partial<WhenOptions>): When;
 export {};

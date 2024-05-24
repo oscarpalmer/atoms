@@ -38,22 +38,25 @@ function findElements(selector, context) {
 }
 function findParentElement(origin, selector) {
   if (origin == null || selector == null) {
-    return;
+    return null;
   }
-  function matches(element) {
-    return typeof selector === "string" ? element.matches?.(selector) ?? false : typeof selector === "function" ? selector(element) : false;
+  if (typeof selector === "string") {
+    if (origin.matches?.(selector)) {
+      return origin;
+    }
+    return origin.closest(selector);
   }
-  if (matches(origin)) {
+  if (selector(origin)) {
     return origin;
   }
   let parent = origin.parentElement;
-  while (parent != null && !matches(parent)) {
+  while (parent != null && !selector(parent)) {
     if (parent === document.body) {
-      return;
+      return null;
     }
     parent = parent.parentElement;
   }
-  return parent ?? undefined;
+  return parent;
 }
 function getElementUnderPointer(skipIgnore) {
   const elements = Array.from(document.querySelectorAll(":hover")).filter((element) => {
