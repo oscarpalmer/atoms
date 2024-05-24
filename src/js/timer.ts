@@ -264,9 +264,11 @@ export function when(
 
 	const instance = Object.create({
 		stop() {
-			repeated.stop();
+			if (repeated.active) {
+				repeated.stop();
 
-			rejecter?.();
+				rejecter?.();
+			}
 		},
 		// biome-ignore lint/suspicious/noThenProperty: <explanation>
 		then(resolve?: () => void, reject?: () => void) {

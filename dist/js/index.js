@@ -553,8 +553,10 @@ function when(condition, options) {
   });
   const instance = Object.create({
     stop() {
-      repeated.stop();
-      rejecter?.();
+      if (repeated.active) {
+        repeated.stop();
+        rejecter?.();
+      }
     },
     then(resolve, reject) {
       repeated.start();
