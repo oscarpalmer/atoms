@@ -363,6 +363,12 @@ function getPosition(event) {
   return typeof x === "number" && typeof y === "number" ? { x, y } : undefined;
 }
 // src/js/string.ts
+function capitalise(value) {
+  if (value.length === 0) {
+    return value;
+  }
+  return value.length === 1 ? value.toLocaleUpperCase() : value.charAt(0).toLocaleUpperCase() + value.slice(1).toLocaleLowerCase();
+}
 function createUuid() {
   return "10000000-1000-4000-8000-100000000000".replace(/[018]/g, (substring) => (substring ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> substring / 4).toString(16));
 }
@@ -377,10 +383,20 @@ function getString(value) {
   const asString = valueOff?.toString?.() ?? String(valueOff);
   return asString.startsWith("[object ") ? JSON.stringify(value) : asString;
 }
+function titleCase(value) {
+  return value.split(/\s+/).map((word) => capitalise(word)).join(" ");
+}
 
 // src/js/is.ts
 function isArrayOrPlainObject(value) {
   return Array.isArray(value) || isPlainObject(value);
+}
+function isEmpty(value) {
+  if (Array.isArray(value)) {
+    return value.length === 0 || value.filter((item) => item != null).length === 0;
+  }
+  const values = Object.values(value);
+  return values.length === 0 || values.filter((item) => item != null).length === 0;
 }
 function isNullable(value) {
   return value == null;
@@ -467,6 +483,28 @@ if (globalThis._atomic_queued == null) {
       return queued;
     }
   });
+}
+// src/js/random.ts
+function getRandomBoolean() {
+  return Math.random() > 0.5;
+}
+function getRandomColour() {
+  return `#${Array.from({ length: 6 }, getRandomHex).join("")}`;
+}
+function getRandomDate(earliest, latest) {
+  const earliestTime = earliest?.getTime() ?? -8640000000000000;
+  const latestTime = latest?.getTime() ?? 8640000000000000;
+  return new Date(getRandomInteger(earliestTime, latestTime));
+}
+function getRandomFloat(min, max) {
+  const minimum = min ?? Number.MIN_SAFE_INTEGER;
+  return Math.random() * ((max ?? Number.MAX_SAFE_INTEGER) - minimum) + minimum;
+}
+function getRandomInteger(min, max) {
+  return Math.floor(getRandomFloat(min, max));
+}
+function getRandomHex() {
+  return "0123456789ABCDEF"[getRandomInteger(0, 16)];
 }
 // src/js/timer.ts
 function isRepeated(value) {
@@ -583,8 +621,8 @@ var work = function(type, timer2, state, options) {
   const isRepeated2 = count > 0;
   let index = 0;
   let total = count * (interval > 0 ? interval : 1);
-  if (total < milliseconds) {
-    total = milliseconds;
+  if (total < 16.66667) {
+    total = 16.66667;
   }
   let current;
   let start;
@@ -626,19 +664,6 @@ var work = function(type, timer2, state, options) {
   state.frame = requestAnimationFrame(step);
   return timer2;
 };
-var milliseconds = 0;
-(() => {
-  let start;
-  function fn(time) {
-    if (start == null) {
-      start = time;
-      requestAnimationFrame(fn);
-    } else {
-      milliseconds = time - start;
-    }
-  }
-  requestAnimationFrame(fn);
-})();
 // src/js/touch.ts
 var supportsTouch = (() => {
   let value = false;
@@ -852,6 +877,7 @@ export {
   when,
   wait,
   unique,
+  titleCase,
   splice,
   setValue,
   repeat,
@@ -871,6 +897,7 @@ export {
   isNullableOrEmpty,
   isNullable,
   isFocusableElement,
+  isEmpty,
   isArrayOrPlainObject,
   insert,
   indexOf,
@@ -879,6 +906,13 @@ export {
   getTextDirection,
   getTabbableElements,
   getString,
+  getRandomInteger,
+  getRandomHex,
+  getRandomFloat,
+  getRandomDate,
+  getRandomColour,
+  getRandomColour as getRandomColor,
+  getRandomBoolean,
   getPosition,
   getNumber,
   getFocusableElements,
@@ -894,6 +928,8 @@ export {
   clone,
   clamp,
   chunk,
+  capitalise as capitalize,
+  capitalise,
   between,
   findElements as $$,
   findElement as $

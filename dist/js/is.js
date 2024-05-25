@@ -15,6 +15,13 @@ function getString(value) {
 function isArrayOrPlainObject(value) {
   return Array.isArray(value) || isPlainObject(value);
 }
+function isEmpty(value) {
+  if (Array.isArray(value)) {
+    return value.length === 0 || value.filter((item) => item != null).length === 0;
+  }
+  const values = Object.values(value);
+  return values.length === 0 || values.filter((item) => item != null).length === 0;
+}
 function isNullable(value) {
   return value == null;
 }
@@ -52,5 +59,6 @@ export {
   isNullableOrWhitespace,
   isNullableOrEmpty,
   isNullable,
+  isEmpty,
   isArrayOrPlainObject
 };

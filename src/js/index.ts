@@ -6,6 +6,7 @@ export * from './is';
 export * from './models';
 export * from './number';
 export * from './queue';
+export * from './random';
 export * from './string';
 export * from './timer';
 export * from './touch';

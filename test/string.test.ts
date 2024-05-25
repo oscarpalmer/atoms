@@ -1,5 +1,5 @@
 import {expect, test} from 'bun:test';
-import {createUuid, getString} from '../src/js/string';
+import {capitalise, createUuid, getString, titleCase} from '../src/js/string';
 
 class ItemWithoutToString {
 	constructor(public value: string) {}
@@ -12,6 +12,19 @@ class ItemWithToString {
 		return this.value;
 	}
 }
+
+test('capitalise', () => {
+	const original = ['', 'a', 'A', 'aPpLe', 'ö', 'Ç', 'η', 'ф'];
+	const expected = ['', 'A', 'A', 'Apple', 'Ö', 'Ç', 'Η', 'Ф'];
+
+	const {length} = original;
+
+	let index = 0;
+
+	for (; index < length; index += 1) {
+		expect(capitalise(original[index])).toBe(expected[index]);
+	}
+});
 
 test('createUuid', () => {
 	const ids = new Set<string>();
@@ -41,4 +54,26 @@ test('getString', () => {
 	expect(getString([1, 2, 3])).toBe('1,2,3');
 	expect(getString(new ItemWithoutToString('test'))).toBe('{"value":"test"}');
 	expect(getString(new ItemWithToString('test'))).toBe('test');
+});
+
+test('titleCase', () => {
+	const original = [
+		'the quick brown fox jumps over the lazy dog',
+		'η γρήγορη καφέ αλεπού πηδάει πάνω από το τεμπέλικο σκυλί',
+		'быстрая коричневая лиса прыгает через ленивую собаку',
+	];
+
+	const expected = [
+		'The Quick Brown Fox Jumps Over The Lazy Dog',
+		'Η Γρήγορη Καφέ Αλεπού Πηδάει Πάνω Από Το Τεμπέλικο Σκυλί',
+		'Быстрая Коричневая Лиса Прыгает Через Ленивую Собаку',
+	];
+
+	const {length} = original;
+
+	let index = 0;
+
+	for (; index < length; index += 1) {
+		expect(titleCase(original[index])).toBe(expected[index]);
+	}
 });

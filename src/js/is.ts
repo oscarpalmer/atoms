@@ -10,6 +10,20 @@ export function isArrayOrPlainObject(
 	return Array.isArray(value) || isPlainObject(value);
 }
 
+export function isEmpty(value: ArrayOrPlainObject): boolean {
+	if (Array.isArray(value)) {
+		return (
+			value.length === 0 || value.filter(item => item != null).length === 0
+		);
+	}
+
+	const values = Object.values(value);
+
+	return (
+		values.length === 0 || values.filter(item => item != null).length === 0
+	);
+}
+
 /**
  * Is the value undefined or null?
  */

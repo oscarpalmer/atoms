@@ -94,8 +94,6 @@ type WhenOptions = {} & OptionsWithCount;
 
 type WorkType = 'restart' | 'start' | 'stop';
 
-let milliseconds = 0;
-
 /**
  * Is the value a repeating timer?
  */
@@ -202,13 +200,13 @@ export function wait(callback: () => void): Timer;
 
 /**
  * Creates a timer which calls a callback after a certain amount of time
- * - `time` defaults to `0`
  */
 export function wait(callback: () => void, time: number): Timer;
 
 /**
  * Creates a timer which calls a callback after a certain amount of time
  * - `options.interval` defaults to `0`
+ * - `options.timeout` defaults to `30_000` _(30 seconds)_
  */
 export function wait(
 	callback: () => void,
@@ -316,8 +314,8 @@ function work(
 	let index = 0;
 	let total = count * (interval > 0 ? interval : 1);
 
-	if (total < milliseconds) {
-		total = milliseconds;
+	if (total < 16.66667) {
+		total = 16.66667;
 	}
 
 	let current: DOMHighResTimeStamp | null;
@@ -374,22 +372,3 @@ function work(
 
 	return timer;
 }
-
-/**
- * Called immediately to calculate an approximate refresh rate in milliseconds
- */
-(() => {
-	let start: number;
-
-	function fn(time: number) {
-		if (start == null) {
-			start = time;
-
-			requestAnimationFrame(fn);
-		} else {
-			milliseconds = time - start;
-		}
-	}
-
-	requestAnimationFrame(fn);
-})();

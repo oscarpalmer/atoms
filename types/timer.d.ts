@@ -93,12 +93,12 @@ export declare function repeat(callback: IndexedCallback, options?: Partial<Repe
 export declare function wait(callback: () => void): Timer;
 /**
  * Creates a timer which calls a callback after a certain amount of time
- * - `time` defaults to `0`
  */
 export declare function wait(callback: () => void, time: number): Timer;
 /**
  * Creates a timer which calls a callback after a certain amount of time
  * - `options.interval` defaults to `0`
+ * - `options.timeout` defaults to `30_000` _(30 seconds)_
  */
 export declare function wait(callback: () => void, options: Partial<WaitOptions>): Timer;
 /**

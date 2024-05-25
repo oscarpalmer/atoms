@@ -113,8 +113,8 @@ var work = function(type, timer2, state, options) {
   const isRepeated2 = count > 0;
   let index = 0;
   let total = count * (interval > 0 ? interval : 1);
-  if (total < milliseconds) {
-    total = milliseconds;
+  if (total < 16.66667) {
+    total = 16.66667;
   }
   let current;
   let start;
@@ -156,19 +156,6 @@ var work = function(type, timer2, state, options) {
   state.frame = requestAnimationFrame(step);
   return timer2;
 };
-var milliseconds = 0;
-(() => {
-  let start;
-  function fn(time) {
-    if (start == null) {
-      start = time;
-      requestAnimationFrame(fn);
-    } else {
-      milliseconds = time - start;
-    }
-  }
-  requestAnimationFrame(fn);
-})();
 export {
   when,
   wait,

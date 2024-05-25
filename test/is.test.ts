@@ -1,6 +1,7 @@
 import {expect, test} from 'bun:test';
 import {
 	isArrayOrPlainObject,
+	isEmpty,
 	isNullable,
 	isNullableOrEmpty,
 	isNullableOrWhitespace,
@@ -42,6 +43,18 @@ test('isArrayOrPlainObject', () => {
 	for (; index < length; index += 1) {
 		expect(isArrayOrPlainObject(values[index])).toBe(expected[index]);
 	}
+});
+
+test('isEmpty', () => {
+	expect(isEmpty([])).toBe(true);
+	expect(isEmpty([null])).toBe(true);
+	expect(isEmpty([undefined])).toBe(true);
+	expect(isEmpty([123])).toBe(false);
+
+	expect(isEmpty({})).toBe(true);
+	expect(isEmpty({key: null})).toBe(true);
+	expect(isEmpty({key: undefined})).toBe(true);
+	expect(isEmpty({key: 123})).toBe(false);
 });
 
 test('isNullable', () => {
