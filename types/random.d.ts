@@ -22,4 +22,3 @@ export declare function getRandomInteger(min?: number, max?: number): number;
  * Returns a random hexadecimal character
  */
 export declare function getRandomHex(): string;
-export { getRandomColour as getRandomColor };

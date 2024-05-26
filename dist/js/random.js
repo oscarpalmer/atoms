@@ -26,6 +26,5 @@ export {
   getRandomFloat,
   getRandomDate,
   getRandomColour,
-  getRandomColour as getRandomColor,
   getRandomBoolean
 };

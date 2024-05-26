@@ -1,7 +1,7 @@
 import {expect, test} from 'bun:test';
 import {
 	getRandomBoolean,
-	getRandomColor,
+	getRandomColour,
 	getRandomDate,
 	getRandomFloat,
 	getRandomHex,
@@ -47,14 +47,14 @@ test('getRandomBoolean', () => {
 	expect(invalid).toBe(0);
 });
 
-test('getRandomColor', () => {
+test('getRandomColour', () => {
 	const pattern = /^#[0-9A-F]{6}$/;
 
 	let index = 0;
 	let invalid = 0;
 
 	for (; index < size; index += 1) {
-		if (!pattern.test(getRandomColor())) {
+		if (!pattern.test(getRandomColour())) {
 			invalid += 1;
 		}
 	}

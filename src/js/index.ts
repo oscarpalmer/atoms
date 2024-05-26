@@ -1,4 +1,5 @@
 export * from './array';
+export * from './colour';
 export * from './element/index';
 export * from './element/focusable';
 export * from './event';

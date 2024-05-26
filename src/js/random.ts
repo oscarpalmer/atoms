@@ -44,5 +44,3 @@ export function getRandomInteger(min?: number, max?: number): number {
 export function getRandomHex(): string {
 	return '0123456789ABCDEF'[getRandomInteger(0, 16)];
 }
-
-export {getRandomColour as getRandomColor};
