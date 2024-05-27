@@ -94,25 +94,36 @@ type WhenOptions = {} & OptionsWithCount;
 
 type WorkType = 'restart' | 'start' | 'stop';
 
+function is(value: unknown, pattern: RegExp) {
+	return pattern.test((value as PlainObject)?.$timer as string);
+}
+
 /**
  * Is the value a repeating timer?
  */
 export function isRepeated(value: unknown): value is Timer {
-	return /^repeat$/.test(((value as PlainObject)?.$timer as string) ?? '');
+	return is(value, /^repeat$/);
 }
 
 /**
  * Is the value a timer?
  */
 export function isTimer(value: unknown): value is Timer {
-	return /^repeat|wait$/.test(((value as PlainObject)?.$timer as string) ?? '');
+	return is(value, /^repeat|wait$/);
 }
 
 /**
  * Is the value a waiting timer?
  */
 export function isWaited(value: unknown): value is Timer {
-	return /^wait$/.test(((value as PlainObject)?.$timer as string) ?? '');
+	return is(value, /^wait$/);
+}
+
+/**
+ * Is the value a conditional timer?
+ */
+export function isWhen(value: unknown): value is When {
+	return is(value, /^when$/) && typeof (value as When).then === 'function';
 }
 
 /**
@@ -120,8 +131,9 @@ export function isWaited(value: unknown): value is Timer {
  * - calls a callback after a certain amount of time...
  * - ... and repeats it a certain amount of times
  * ---
- * - `options.count` defaults to `Infinity`
- * - `options.time` defaults to `0`
+ * - `options.count` defaults to `Infinity` _(minimum `1`)_
+ * - `options.interval` defaults to `0`
+ * - `options.timeout` defaults to `30_000` _(30 seconds)_
  */
 export function repeat(
 	callback: IndexedCallback,
@@ -132,7 +144,9 @@ export function repeat(
 		...{
 			count:
 				typeof options?.count === 'number'
-					? options.count
+					? options.count > 0
+						? options.count
+						: 1
 					: Number.POSITIVE_INFINITY,
 		},
 	}).start();
@@ -268,11 +282,24 @@ export function when(
 				rejecter?.();
 			}
 		},
-		// biome-ignore lint/suspicious/noThenProperty: <explanation>
+		// biome-ignore lint/suspicious/noThenProperty: returning a promise-like object, so it's ok ;)
 		then(resolve?: () => void, reject?: () => void) {
 			repeated.start();
 
 			return promise.then(resolve, reject);
+		},
+	});
+
+	Object.defineProperties(instance, {
+		$timer: {
+			get() {
+				return 'when';
+			},
+		},
+		active: {
+			get() {
+				return repeated.active;
+			},
 		},
 	});
 
@@ -292,12 +319,12 @@ function work(
 		return timer;
 	}
 
-	const {afterCallback, count, errorCallback, interval, timeout} = options;
+	const {count, interval, timeout} = options;
 
 	if (typeof state.frame === 'number') {
 		cancelAnimationFrame(state.frame);
 
-		afterCallback?.(false);
+		options.afterCallback?.(false);
 	}
 
 	if (type === 'stop') {
@@ -326,10 +353,10 @@ function work(
 		state.frame = undefined;
 
 		if (error) {
-			errorCallback?.();
+			options.errorCallback?.();
 		}
 
-		afterCallback?.(finished);
+		options.afterCallback?.(finished);
 	}
 
 	function step(timestamp: DOMHighResTimeStamp): void {

@@ -79,12 +79,17 @@ export declare function isTimer(value: unknown): value is Timer;
  */
 export declare function isWaited(value: unknown): value is Timer;
 /**
+ * Is the value a conditional timer?
+ */
+export declare function isWhen(value: unknown): value is When;
+/**
  * Creates a timer which:
  * - calls a callback after a certain amount of time...
  * - ... and repeats it a certain amount of times
  * ---
- * - `options.count` defaults to `Infinity`
- * - `options.time` defaults to `0`
+ * - `options.count` defaults to `Infinity` _(minimum `1`)_
+ * - `options.interval` defaults to `0`
+ * - `options.timeout` defaults to `30_000` _(30 seconds)_
  */
 export declare function repeat(callback: IndexedCallback, options?: Partial<RepeatOptions>): Timer;
 /**

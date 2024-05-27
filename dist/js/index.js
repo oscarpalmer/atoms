@@ -681,20 +681,26 @@ function getRandomHex() {
   return "0123456789ABCDEF"[getRandomInteger(0, 16)];
 }
 // src/js/timer.ts
+var is = function(value, pattern) {
+  return pattern.test(value?.$timer);
+};
 function isRepeated(value) {
-  return /^repeat$/.test(value?.$timer ?? "");
+  return is(value, /^repeat$/);
 }
 function isTimer(value) {
-  return /^repeat|wait$/.test(value?.$timer ?? "");
+  return is(value, /^repeat|wait$/);
 }
 function isWaited(value) {
-  return /^wait$/.test(value?.$timer ?? "");
+  return is(value, /^wait$/);
+}
+function isWhen(value) {
+  return is(value, /^when$/) && typeof value.then === "function";
 }
 function repeat(callback, options) {
   return timer("repeat", callback, {
     ...options ?? {},
     ...{
-      count: typeof options?.count === "number" ? options.count : Number.POSITIVE_INFINITY
+      count: typeof options?.count === "number" ? options.count > 0 ? options.count : 1 : Number.POSITIVE_INFINITY
     }
   }).start();
 }
@@ -775,16 +781,28 @@ function when(condition, options) {
       return promise.then(resolve, reject);
     }
   });
+  Object.defineProperties(instance, {
+    $timer: {
+      get() {
+        return "when";
+      }
+    },
+    active: {
+      get() {
+        return repeated.active;
+      }
+    }
+  });
   return instance;
 }
 var work = function(type, timer2, state, options) {
   if (type === "start" && state.active || type === "stop" && !state.active) {
     return timer2;
   }
-  const { afterCallback, count, errorCallback, interval, timeout } = options;
+  const { count, interval, timeout } = options;
   if (typeof state.frame === "number") {
     cancelAnimationFrame(state.frame);
-    afterCallback?.(false);
+    options.afterCallback?.(false);
   }
   if (type === "stop") {
     state.active = false;
@@ -801,9 +819,9 @@ var work = function(type, timer2, state, options) {
     state.active = false;
     state.frame = undefined;
     if (error) {
-      errorCallback?.();
+      options.errorCallback?.();
     }
-    afterCallback?.(finished);
+    options.afterCallback?.(finished);
   }
   function step(timestamp) {
     if (!state.active) {
@@ -1057,6 +1075,7 @@ export {
   queue,
   push,
   merge,
+  isWhen,
   isWaited,
   isTimer,
   isTabbableElement,
