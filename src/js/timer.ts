@@ -311,15 +311,15 @@ function work(
 
 	const isRepeated = count > 0;
 
-	let index = 0;
-	let total = count * (interval > 0 ? interval : 1);
-
-	if (total < 16.66667) {
-		total = 16.66667;
-	}
+	const total =
+		count === Number.POSITIVE_INFINITY
+			? timeout
+			: count * (interval > 0 ? interval : 17);
 
 	let current: DOMHighResTimeStamp | null;
 	let start: DOMHighResTimeStamp | null;
+
+	let index = 0;
 
 	function finish(finished: boolean, error: boolean) {
 		state.active = false;

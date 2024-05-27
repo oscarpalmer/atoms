@@ -793,13 +793,10 @@ var work = function(type, timer2, state, options) {
   }
   state.active = true;
   const isRepeated2 = count > 0;
-  let index = 0;
-  let total = count * (interval > 0 ? interval : 1);
-  if (total < 16.66667) {
-    total = 16.66667;
-  }
+  const total = count === Number.POSITIVE_INFINITY ? timeout : count * (interval > 0 ? interval : 17);
   let current;
   let start;
+  let index = 0;
   function finish(finished, error) {
     state.active = false;
     state.frame = undefined;

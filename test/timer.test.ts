@@ -99,6 +99,8 @@ test('errorCallback', done => {
 		errorCallback() {
 			error = true;
 		},
+		count: 100,
+		interval: 50,
 		timeout: 125,
 	});
 
