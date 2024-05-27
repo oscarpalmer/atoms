@@ -39,7 +39,7 @@ type RepeatOptions = {
 /**
  * A timer that can be started, stopped, and restarted as neeeded
  */
-type Timer = {
+export type Timer = {
     /**
      * Is the timer running?
      */
@@ -58,7 +58,7 @@ type Timer = {
     stop(): Timer;
 };
 type WaitOptions = {} & BaseOptions & OptionsWithError;
-type When = {
+export type When = {
     /**
      * Stops the timer
      */

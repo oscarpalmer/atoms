@@ -56,7 +56,7 @@ type State = {
 /**
  * A timer that can be started, stopped, and restarted as neeeded
  */
-type Timer = {
+export type Timer = {
 	/**
 	 * Is the timer running?
 	 */
@@ -79,7 +79,7 @@ type TimerOptions = {} & RepeatOptions;
 
 type WaitOptions = {} & BaseOptions & OptionsWithError;
 
-type When = {
+export type When = {
 	/**
 	 * Stops the timer
 	 */
