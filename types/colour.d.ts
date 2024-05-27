@@ -81,6 +81,10 @@ export type RGBColourValue = {
  */
 export declare function getForegroundColour(value: RGBColourValue): string;
 /**
+ * Get a hex-colour from a string
+ */
+export declare function getHexColour(value: string): HexColour;
+/**
  * Convert a hex-colour to an RGB-colour
  */
 export declare function hexToRgb(value: string): RGBColour;

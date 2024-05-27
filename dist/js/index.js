@@ -181,16 +181,16 @@ var createHex = function(original) {
       return hexToRgb(value);
     },
     toString() {
-      return value;
+      return `#${value}`;
     }
   });
   Object.defineProperty(instance, "value", {
     get() {
-      return value.slice();
+      return `#${value}`;
     },
     set(hex) {
       if (anyPattern.test(hex)) {
-        value = `#${getHex(hex)}`;
+        value = getNormalisedHex(hex);
       }
     }
   });
@@ -260,12 +260,15 @@ function getForegroundColour(value) {
   const luminance = 0.2126 * values[2] + 0.7152 * values[1] + 0.0722 * values[0];
   return luminance > 0.625 ? "black" : "white";
 }
-var getHex = function(value) {
+function getHexColour(value) {
+  return createHex(anyPattern.test(value) ? getNormalisedHex(value) : "000000");
+}
+var getNormalisedHex = function(value) {
   const normalised = value.replace(/^#/, "");
   return normalised.length === 3 ? normalised.split("").map((character) => character.repeat(2)).join("") : normalised;
 };
 function hexToRgb(value) {
-  const hex = anyPattern.test(value) ? getHex(value) : "";
+  const hex = anyPattern.test(value) ? getNormalisedHex(value) : "";
   const pairs = groupedPattern.exec(hex) ?? [];
   const rgb = [];
   const { length } = pairs;
@@ -293,7 +296,7 @@ function hslToRgb(value) {
   });
 }
 function rgbToHex(value) {
-  return createHex(`#${[value.red, value.green, value.blue].map((colour) => {
+  return createHex(`${[value.red, value.green, value.blue].map((colour) => {
     const hex = colour.toString(16);
     return hex.length === 1 ? `0${hex}` : hex;
   }).join("")}`);
@@ -1089,6 +1092,7 @@ export {
   getRandomBoolean,
   getPosition,
   getNumber,
+  getHexColour,
   getForegroundColour,
   getFocusableElements,
   getElementUnderPointer,

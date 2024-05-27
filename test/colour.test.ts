@@ -1,6 +1,7 @@
 import {expect, test} from 'bun:test';
 import {
 	getForegroundColour,
+	getHexColour,
 	hexToRgb,
 	hslToRgb,
 	rgbToHex,
@@ -67,6 +68,14 @@ test('getForegroundColour', () => {
 	}
 });
 
+test('getHexColour', () => {
+	for (let index = 0; index < length; index += 1) {
+		expect(getHexColour(hexes[index]).value).toEqual(hexes[index]);
+	}
+
+	expect(getHexColour('invalid').value).toBe('#000000');
+});
+
 test('hexToRgb', () => {
 	for (let index = 0; index < length; index += 1) {
 		const {blue, green, red} = hexToRgb(hexes[index]);
@@ -110,7 +119,7 @@ test('HexColour', () => {
 
 		expect(hex.value).toBe(value);
 
-		hex.value = '#fab';
+		hex.value = 'fab';
 
 		expect(hex.value).toBe('#ffaabb');
 	}

@@ -103,17 +103,17 @@ function createHex(original: string): HexColour {
 			return hexToRgb(value);
 		},
 		toString() {
-			return value;
+			return `#${value}`;
 		},
 	});
 
 	Object.defineProperty(instance, 'value', {
 		get() {
-			return value.slice();
+			return `#${value}`;
 		},
 		set(hex: string) {
 			if (anyPattern.test(hex)) {
-				value = `#${getHex(hex)}`;
+				value = getNormalisedHex(hex);
 			}
 		},
 	});
@@ -208,7 +208,14 @@ export function getForegroundColour(value: RGBColourValue): string {
 	return luminance > 0.625 ? 'black' : 'white';
 }
 
-function getHex(value: string): string {
+/**
+ * Get a hex-colour from a string
+ */
+export function getHexColour(value: string): HexColour {
+	return createHex(anyPattern.test(value) ? getNormalisedHex(value) : '000000');
+}
+
+function getNormalisedHex(value: string): string {
 	const normalised = value.replace(/^#/, '');
 
 	return normalised.length === 3
@@ -223,7 +230,7 @@ function getHex(value: string): string {
  * Convert a hex-colour to an RGB-colour
  */
 export function hexToRgb(value: string): RGBColour {
-	const hex = anyPattern.test(value) ? getHex(value) : '';
+	const hex = anyPattern.test(value) ? getNormalisedHex(value) : '';
 	const pairs = groupedPattern.exec(hex) ?? [];
 	const rgb = [];
 
@@ -269,7 +276,7 @@ export function hslToRgb(value: HSLColourValue): RGBColour {
  */
 export function rgbToHex(value: RGBColourValue): HexColour {
 	return createHex(
-		`#${[value.red, value.green, value.blue]
+		`${[value.red, value.green, value.blue]
 			.map(colour => {
 				const hex = colour.toString(16);
 
