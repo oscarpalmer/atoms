@@ -12,7 +12,7 @@ type Colour<Model> = {
      */
     toString(): string;
 };
-type HexColour = {
+export type HexColour = {
     /**
      * The current value of the colour
      */
