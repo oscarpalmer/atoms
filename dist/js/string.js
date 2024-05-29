@@ -22,7 +22,17 @@ function getString(value) {
 function titleCase(value) {
   return value.split(/\s+/).map((word) => capitalise(word)).join(" ");
 }
+function truncate(value, length, suffix) {
+  const suffixLength = suffix?.length ?? 0;
+  const truncatedLength = length - suffixLength;
+  return value.length <= length ? value : `${value.slice(0, truncatedLength)}${suffix ?? ""}`;
+}
+function words(value) {
+  return [];
+}
 export {
+  words,
+  truncate,
   titleCase,
   getString,
   createUuid,

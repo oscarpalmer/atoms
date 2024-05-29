@@ -53,4 +53,26 @@ export function titleCase(value: string): string {
 		.join(' ');
 }
 
+/**
+ * Truncates a string to a specified length, when possible
+ * - Returned as-is if the string is already short enough
+ * - A suffix may be appended to the truncated string, e.g., an ellipsis
+ */
+export function truncate(
+	value: string,
+	length: number,
+	suffix?: string,
+): string {
+	const suffixLength = suffix?.length ?? 0;
+	const truncatedLength = length - suffixLength;
+
+	return value.length <= length
+		? value
+		: `${value.slice(0, truncatedLength)}${suffix ?? ''}`;
+}
+
+export function words(value: string): string[] {
+	return [];
+}
+
 export {capitalise as capitalize};

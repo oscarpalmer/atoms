@@ -597,6 +597,14 @@ function getString(value) {
 function titleCase(value) {
   return value.split(/\s+/).map((word) => capitalise(word)).join(" ");
 }
+function truncate(value, length, suffix) {
+  const suffixLength = suffix?.length ?? 0;
+  const truncatedLength = length - suffixLength;
+  return value.length <= length ? value : `${value.slice(0, truncatedLength)}${suffix ?? ""}`;
+}
+function words(value) {
+  return [];
+}
 
 // src/js/is.ts
 function isArrayOrPlainObject(value) {
@@ -637,6 +645,79 @@ function isPlainObject(value) {
 function isPrimitive(value) {
   return value == null || /^(bigint|boolean|number|string|symbol)$/.test(typeof value);
 }
+// src/js/log.ts
+var time = function(label) {
+  const started = log.enabled;
+  let stopped = false;
+  if (started) {
+    console.time(label);
+  }
+  return Object.create({
+    log() {
+      if (started && log.enabled) {
+        console.timeLog(label);
+      }
+    },
+    stop() {
+      if (started && !stopped) {
+        stopped = true;
+        console.timeEnd(label);
+      }
+    }
+  });
+};
+var work = function(type, data) {
+  if (log.enabled) {
+    console[type](...data);
+  }
+};
+var types = new Set([
+  "dir",
+  "debug",
+  "error",
+  "info",
+  "table",
+  "trace",
+  "warn"
+]);
+var log = (() => {
+  let enabled = true;
+  function instance(...data) {
+    work("log", data);
+  }
+  Object.defineProperties(instance, {
+    enabled: {
+      get() {
+        return enabled;
+      },
+      set(value) {
+        enabled = value;
+      }
+    },
+    time: {
+      value: time
+    }
+  });
+  for (const type of types) {
+    Object.defineProperty(instance, type, {
+      value: (...data) => work(type, data)
+    });
+  }
+  return instance;
+})();
+// src/js/math.ts
+function average(values) {
+  return values.length > 0 ? sum(values) / values.length : Number.NaN;
+}
+function max(values) {
+  return values.length > 0 ? Math.max(...values) : Number.NaN;
+}
+function min(values) {
+  return values.length > 0 ? Math.min(...values) : Number.NaN;
+}
+function sum(values) {
+  return values.reduce((a, b) => a + b, 0);
+}
 // src/js/queue.ts
 function queue(callback) {
   _atomic_queued.add(callback);
@@ -670,12 +751,12 @@ function getRandomDate(earliest, latest) {
   const latestTime = latest?.getTime() ?? 8640000000000000;
   return new Date(getRandomInteger(earliestTime, latestTime));
 }
-function getRandomFloat(min, max) {
-  const minimum = min ?? Number.MIN_SAFE_INTEGER;
-  return Math.random() * ((max ?? Number.MAX_SAFE_INTEGER) - minimum) + minimum;
+function getRandomFloat(min2, max2) {
+  const minimum = min2 ?? Number.MIN_SAFE_INTEGER;
+  return Math.random() * ((max2 ?? Number.MAX_SAFE_INTEGER) - minimum) + minimum;
 }
-function getRandomInteger(min, max) {
-  return Math.floor(getRandomFloat(min, max));
+function getRandomInteger(min2, max2) {
+  return Math.floor(getRandomFloat(min2, max2));
 }
 function getRandomHex() {
   return "0123456789ABCDEF"[getRandomInteger(0, 16)];
@@ -718,13 +799,13 @@ var timer = function(type, callback, options) {
   };
   const instance = Object.create({
     restart() {
-      return work("restart", this, state, extended);
+      return work2("restart", this, state, extended);
     },
     start() {
-      return work("start", this, state, extended);
+      return work2("start", this, state, extended);
     },
     stop() {
-      return work("stop", this, state, extended);
+      return work2("stop", this, state, extended);
     }
   });
   Object.defineProperties(instance, {
@@ -795,7 +876,7 @@ function when(condition, options) {
   });
   return instance;
 }
-var work = function(type, timer2, state, options) {
+var work2 = function(type, timer2, state, options) {
   if (type === "start" && state.active || type === "stop" && !state.active) {
     return timer2;
   }
@@ -1063,10 +1144,13 @@ function setValue(data, path, value, ignoreCase) {
   return data;
 }
 export {
+  words,
   when,
   wait,
   unique,
+  truncate,
   titleCase,
+  sum,
   splice,
   setValue,
   rgbToHsl,
@@ -1074,7 +1158,10 @@ export {
   repeat,
   queue,
   push,
+  min,
   merge,
+  max,
+  log,
   isWhen,
   isWaited,
   isTimer,
@@ -1126,6 +1213,7 @@ export {
   capitalise as capitalize,
   capitalise,
   between,
+  average,
   findElements as $$,
   findElement as $
 };

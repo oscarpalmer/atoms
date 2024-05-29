@@ -80,15 +80,22 @@ type TimerOptions = {} & RepeatOptions;
 type WaitOptions = {} & BaseOptions & OptionsWithError;
 
 export type When = {
-	/**
-	 * Stops the timer
-	 */
-	stop(): void;
-	then(
-		resolve?: (() => void) | null,
-		reject?: (() => void) | null,
-	): Promise<void>;
-};
+		/**
+		 * Is the timer running?
+		 */
+		get active(): boolean;
+		/**
+		 * Stops the timer
+		 */
+		stop(): void;
+		/**
+		 * Starts the timer and returns a promise that resolves when the condition is met
+		 */
+		then(
+			resolve?: (() => void) | null,
+			reject?: (() => void) | null,
+		): Promise<void>;
+	};
 
 type WhenOptions = {} & OptionsWithCount;
 

@@ -131,9 +131,16 @@ test('when', done => {
 		expect(value).toEqual(1);
 	});
 
-	const what = when(() => value > 1, {
-		interval: 125,
-	});
+	const what = when(
+		() => {
+			expect(what.active).toBe(true);
+
+			return value > 1;
+		},
+		{
+			interval: 125,
+		},
+	);
 
 	wait(() => {
 		what.stop();

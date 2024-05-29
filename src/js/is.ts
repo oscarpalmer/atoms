@@ -10,6 +10,9 @@ export function isArrayOrPlainObject(
 	return Array.isArray(value) || isPlainObject(value);
 }
 
+/**
+ * Is the array or object completely empty or only containing `null` or `undefined` values?
+ */
 export function isEmpty(value: ArrayOrPlainObject): boolean {
 	if (Array.isArray(value)) {
 		return (

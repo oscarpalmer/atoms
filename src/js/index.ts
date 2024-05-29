@@ -4,6 +4,8 @@ export * from './element/index';
 export * from './element/focusable';
 export * from './event';
 export * from './is';
+export * from './log';
+export * from './math';
 export * from './models';
 export * from './number';
 export * from './queue';

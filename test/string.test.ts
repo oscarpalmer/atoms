@@ -1,5 +1,11 @@
 import {expect, test} from 'bun:test';
-import {capitalise, createUuid, getString, titleCase} from '../src/js/string';
+import {
+	capitalise,
+	createUuid,
+	getString,
+	titleCase,
+	truncate,
+} from '../src/js/string';
 
 class ItemWithoutToString {
 	constructor(public value: string) {}
@@ -54,6 +60,30 @@ test('getString', () => {
 	expect(getString([1, 2, 3])).toBe('1,2,3');
 	expect(getString(new ItemWithoutToString('test'))).toBe('{"value":"test"}');
 	expect(getString(new ItemWithToString('test'))).toBe('test');
+});
+
+test('truncate', () => {
+	const original = [
+		'Hello, world!',
+		'The quick brown fox jumps over the lazy dog',
+		'One morning, when Gregor Samsa woke from troubled dreams, he found himself transformed in his bed into a horrible vermin.',
+	];
+
+	const expected = [
+		'Hello, world!',
+		'The quick brown fox jum…',
+		'One morning, when Gre!!!',
+	];
+
+	const suffixes = [undefined, '…', '!!!'];
+
+	const {length} = original;
+
+	for (let index = 0; index < length; index += 1) {
+		expect(truncate(original[index], 24, suffixes[index])).toBe(
+			expected[index],
+		);
+	}
 });
 
 test('titleCase', () => {
