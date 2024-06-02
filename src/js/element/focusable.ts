@@ -24,29 +24,42 @@ const selector = [
 	.map(selector => `${selector}:not([inert])`)
 	.join(',');
 
-function _getItem(element: Element, tabbable: boolean): ElementWithTabIndex {
+/**
+ * Get a list of focusable elements within a parent element
+ */
+export function getFocusableElements(parent: Element): Element[] {
+	return getValidElements(parent, getFocusableFilters(), false);
+}
+
+function getFocusableFilters(): Filter[] {
+	return [isDisabled, isInert, isHidden, isSummarised];
+}
+
+function getItem(element: Element, tabbable: boolean): ElementWithTabIndex {
 	return {
 		element,
-		tabIndex: tabbable ? _getTabIndex(element) : -1,
+		tabIndex: tabbable ? getTabIndex(element) : -1,
 	};
 }
 
-function _getFocusableFilters(): Filter[] {
-	return [_isDisabled, _isInert, _isHidden, _isSummarised];
+function getTabbableFilters(): Filter[] {
+	return [isNotTabbable, isNotTabbableRadio, ...getFocusableFilters()];
 }
 
-function _getTabbableFilters(): Filter[] {
-	return [_isNotTabbable, _isNotTabbableRadio, ..._getFocusableFilters()];
+/**
+ * Get a list of tabbable elements within a parent element
+ */
+export function getTabbableElements(parent: Element): Element[] {
+	return getValidElements(parent, getTabbableFilters(), true);
 }
 
-function _getTabIndex(element: Element): number {
+function getTabIndex(element: Element): number {
 	const tabIndex = (element as HTMLElement)?.tabIndex ?? -1;
 
 	if (
 		tabIndex < 0 &&
-		(/^(audio|details|video)$/i.test(element.tagName) ||
-			_isEditable(element)) &&
-		!_hasTabIndex(element)
+		(/^(audio|details|video)$/i.test(element.tagName) || isEditable(element)) &&
+		!hasTabIndex(element)
 	) {
 		return 0;
 	}
@@ -54,7 +67,7 @@ function _getTabIndex(element: Element): number {
 	return tabIndex;
 }
 
-function _getValidElements(
+function getValidElements(
 	parent: Element,
 	filters: Filter[],
 	tabbable: boolean,
@@ -62,7 +75,7 @@ function _getValidElements(
 	const items: ElementWithTabIndex[] = Array.from(
 		parent.querySelectorAll(selector),
 	)
-		.map(element => _getItem(element, tabbable))
+		.map(element => getItem(element, tabbable))
 		.filter(item => !filters.some(filter => filter(item)));
 
 	if (!tabbable) {
@@ -92,16 +105,16 @@ function _getValidElements(
 	return [...indiced.flat(), ...zeroed];
 }
 
-function _hasTabIndex(element: Element): boolean {
+function hasTabIndex(element: Element): boolean {
 	return !Number.isNaN(
 		Number.parseInt(element.getAttribute('tabindex') as string, 10),
 	);
 }
 
-function _isDisabled(item: ElementWithTabIndex): boolean {
+function isDisabled(item: ElementWithTabIndex): boolean {
 	if (
 		/^(button|input|select|textarea)$/i.test(item.element.tagName) &&
-		_isDisabledFromFieldset(item.element)
+		isDisabledFromFieldset(item.element)
 	) {
 		return true;
 	}
@@ -112,7 +125,7 @@ function _isDisabled(item: ElementWithTabIndex): boolean {
 	);
 }
 
-function _isDisabledFromFieldset(element: Element): boolean {
+function isDisabledFromFieldset(element: Element): boolean {
 	let parent = element.parentElement;
 
 	while (parent !== null) {
@@ -142,11 +155,18 @@ function _isDisabledFromFieldset(element: Element): boolean {
 	return false;
 }
 
-function _isEditable(element: Element): boolean {
+function isEditable(element: Element): boolean {
 	return /^(|true)$/i.test(element.getAttribute('contenteditable') as string);
 }
 
-function _isHidden(item: ElementWithTabIndex) {
+/**
+ * Is the element focusable?
+ */
+export function isFocusableElement(element: Element): boolean {
+	return isValidElement(element, getFocusableFilters(), false);
+}
+
+function isHidden(item: ElementWithTabIndex) {
 	if (
 		((item.element as HTMLElement).hidden ?? false) ||
 		(item.element instanceof HTMLInputElement && item.element.type === 'hidden')
@@ -177,23 +197,23 @@ function _isHidden(item: ElementWithTabIndex) {
 	return height === 0 && width === 0;
 }
 
-function _isInert(item: ElementWithTabIndex): boolean {
+function isInert(item: ElementWithTabIndex): boolean {
 	return (
 		((item.element as InertElement).inert ?? false) ||
 		/^(|true)$/i.test(item.element.getAttribute('inert') as string) ||
 		(item.element.parentElement !== null &&
-			_isInert({
+			isInert({
 				element: item.element.parentElement,
 				tabIndex: -1,
 			}))
 	);
 }
 
-function _isNotTabbable(item: ElementWithTabIndex) {
+function isNotTabbable(item: ElementWithTabIndex) {
 	return (item.tabIndex ?? -1) < 0;
 }
 
-function _isNotTabbableRadio(item: ElementWithTabIndex): boolean {
+function isNotTabbableRadio(item: ElementWithTabIndex): boolean {
 	if (
 		!(item.element instanceof HTMLInputElement) ||
 		item.element.type !== 'radio' ||
@@ -221,7 +241,7 @@ function _isNotTabbableRadio(item: ElementWithTabIndex): boolean {
 	return checked !== undefined && checked !== item.element;
 }
 
-function _isSummarised(item: ElementWithTabIndex) {
+function isSummarised(item: ElementWithTabIndex) {
 	return (
 		item.element instanceof HTMLDetailsElement &&
 		Array.from(item.element.children).some(child =>
@@ -230,40 +250,19 @@ function _isSummarised(item: ElementWithTabIndex) {
 	);
 }
 
-function _isValidElement(
-	element: Element,
-	filters: Filter[],
-	tabbable: boolean,
-): boolean {
-	const item = _getItem(element, tabbable);
-
-	return !filters.some(filter => filter(item));
-}
-
-/**
- * Get a list of focusable elements within a parent element
- */
-export function getFocusableElements(parent: Element): Element[] {
-	return _getValidElements(parent, _getFocusableFilters(), false);
-}
-
-/**
- * Get a list of tabbable elements within a parent element
- */
-export function getTabbableElements(parent: Element): Element[] {
-	return _getValidElements(parent, _getTabbableFilters(), true);
-}
-
-/**
- * Is the element focusable?
- */
-export function isFocusableElement(element: Element): boolean {
-	return _isValidElement(element, _getFocusableFilters(), false);
-}
-
 /**
  * Is the element tabbable?
  */
 export function isTabbableElement(element: Element): boolean {
-	return _isValidElement(element, _getTabbableFilters(), true);
+	return isValidElement(element, getTabbableFilters(), true);
+}
+
+function isValidElement(
+	element: Element,
+	filters: Filter[],
+	tabbable: boolean,
+): boolean {
+	const item = getItem(element, tabbable);
+
+	return !filters.some(filter => filter(item));
 }

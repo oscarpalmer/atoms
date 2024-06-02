@@ -1,3 +1,11 @@
+declare global {
+	var _atomic_logging: boolean;
+}
+
+if (globalThis._atomic_logging == null) {
+	globalThis._atomic_logging = true;
+}
+
 /**
  * Logs any number of values at the "log" log level
  */
@@ -77,8 +85,6 @@ const types = new Set<Type>([
 ]);
 
 const log = (() => {
-	let enabled = true;
-
 	function instance(...data: unknown[]): void {
 		work('log', data);
 	}
@@ -86,10 +92,10 @@ const log = (() => {
 	Object.defineProperties(instance, {
 		enabled: {
 			get() {
-				return enabled;
+				return _atomic_logging ?? true;
 			},
 			set(value: boolean) {
-				enabled = value;
+				_atomic_logging = value;
 			},
 		},
 		time: {
@@ -117,7 +123,7 @@ function time(label: string): Time {
 
 	return Object.create({
 		log() {
-			if (started && log.enabled) {
+			if (started && !stopped && log.enabled) {
 				console.timeLog(label);
 			}
 		},

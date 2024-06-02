@@ -17,144 +17,6 @@ type InsertType = 'push' | 'splice';
 
 type KeyCallback<Value> = (value: Value) => Key;
 
-function _getCallbacks<Value>(
-	bool: unknown,
-	key: unknown,
-): Callbacks<Value> | undefined {
-	if (typeof bool === 'function') {
-		return {bool: bool as BooleanCallback<Value>};
-	}
-
-	if (typeof key === 'function') {
-		return {key: key as KeyCallback<Value>};
-	}
-
-	const isString = typeof key === 'string';
-
-	if (
-		(!isString && typeof key !== 'number') ||
-		(isString && key.includes('.'))
-	) {
-		return;
-	}
-
-	return {
-		key: (value: Value) => (value as PlainObject)?.[key as string] as Key,
-	};
-}
-
-function _findValue<Model, Value = Model>(
-	type: FindType,
-	array: Model[],
-	value: Value | BooleanCallback<Model>,
-	key?: Key | KeyCallback<Model>,
-): unknown {
-	const callbacks = _getCallbacks(value, key);
-
-	if (callbacks?.bool == null && callbacks?.key == null) {
-		return type === 'index'
-			? array.indexOf(value as Model)
-			: array.find(item => item === value);
-	}
-
-	if (callbacks.bool != null) {
-		const index = array.findIndex(callbacks.bool);
-
-		return type === 'index' ? index : index > -1 ? array[index] : undefined;
-	}
-
-	const {length} = array;
-
-	let index = 0;
-
-	for (; index < length; index += 1) {
-		const item = array[index];
-
-		if (callbacks.key?.(item) === value) {
-			return type === 'index' ? index : item;
-		}
-	}
-
-	return type === 'index' ? -1 : undefined;
-}
-
-function _findValues<Model, Value = Model>(
-	type: 'all' | 'unique',
-	array: Model[],
-	value: Value | BooleanCallback<Model>,
-	key?: Key | KeyCallback<Model>,
-): Model[] {
-	const callbacks = _getCallbacks(value, key);
-
-	const {length} = array;
-
-	if (type === 'unique' && callbacks?.key == null && length >= 100) {
-		return Array.from(new Set(array));
-	}
-
-	if (typeof callbacks?.bool === 'function') {
-		return array.filter(callbacks.bool);
-	}
-
-	if (type === 'all' && key == null) {
-		return array.filter(item => item === value);
-	}
-
-	const hasCallback = typeof callbacks?.key === 'function';
-
-	const result: Model[] = [];
-
-	const values: unknown[] = hasCallback ? [] : result;
-
-	let index = 0;
-
-	for (; index < length; index += 1) {
-		const item = array[index];
-		const itemValue = hasCallback ? callbacks.key?.(item) : item;
-
-		if (
-			(type === 'all' && itemValue === value) ||
-			(type === 'unique' && values.indexOf(itemValue) === -1)
-		) {
-			if (values !== result) {
-				values.push(itemValue);
-			}
-
-			result.push(item);
-		}
-	}
-
-	return result;
-}
-
-function _insertValues<Value>(
-	type: InsertType,
-	array: Value[],
-	values: Value[],
-	start: number,
-	deleteCount: number,
-): unknown {
-	const chunked = chunk(values).reverse();
-	const {length} = chunked;
-
-	let index = 0;
-	let returned: Value[] | undefined;
-
-	for (; index < length; index += 1) {
-		const result = array.splice(
-			start,
-			index === 0 ? deleteCount : 0,
-			...chunked[index],
-		);
-
-		if (returned == null) {
-			returned = result;
-		}
-	}
-
-	return type === 'splice' ? returned : array.length;
-}
-
 /**
  * Chunks an array into smaller arrays of a specified size
  */
@@ -206,7 +68,7 @@ export function exists<Model, Value = Model>(
 	value: Value | BooleanCallback<Model>,
 	key?: Key | KeyCallback<Model>,
 ): boolean {
-	return (_findValue('index', array, value, key) as number) > -1;
+	return (findValue('index', array, value, key) as number) > -1;
 }
 
 /**
@@ -235,7 +97,7 @@ export function filter<Model, Value = Model>(
 	value: Value | BooleanCallback<Model>,
 	key?: Key | KeyCallback<Model>,
 ): Model[] {
-	return _findValues('all', array, value, key);
+	return findValues('all', array, value, key);
 }
 
 /**
@@ -264,7 +126,117 @@ export function find<Model, Value = Model>(
 	value: Value | BooleanCallback<Model>,
 	key?: Key | KeyCallback<Model>,
 ): Model | undefined {
-	return _findValue('value', array, value, key) as Model | undefined;
+	return findValue('value', array, value, key) as Model | undefined;
+}
+
+function findValue<Model, Value = Model>(
+	type: FindType,
+	array: Model[],
+	value: Value | BooleanCallback<Model>,
+	key?: Key | KeyCallback<Model>,
+): unknown {
+	const callbacks = getCallbacks(value, key);
+
+	if (callbacks?.bool == null && callbacks?.key == null) {
+		return type === 'index'
+			? array.indexOf(value as Model)
+			: array.find(item => item === value);
+	}
+
+	if (callbacks.bool != null) {
+		const index = array.findIndex(callbacks.bool);
+
+		return type === 'index' ? index : index > -1 ? array[index] : undefined;
+	}
+
+	const {length} = array;
+
+	let index = 0;
+
+	for (; index < length; index += 1) {
+		const item = array[index];
+
+		if (callbacks.key?.(item) === value) {
+			return type === 'index' ? index : item;
+		}
+	}
+
+	return type === 'index' ? -1 : undefined;
+}
+
+function findValues<Model, Value = Model>(
+	type: 'all' | 'unique',
+	array: Model[],
+	value: Value | BooleanCallback<Model>,
+	key?: Key | KeyCallback<Model>,
+): Model[] {
+	const callbacks = getCallbacks(value, key);
+
+	const {length} = array;
+
+	if (type === 'unique' && callbacks?.key == null && length >= 100) {
+		return Array.from(new Set(array));
+	}
+
+	if (typeof callbacks?.bool === 'function') {
+		return array.filter(callbacks.bool);
+	}
+
+	if (type === 'all' && key == null) {
+		return array.filter(item => item === value);
+	}
+
+	const hasCallback = typeof callbacks?.key === 'function';
+
+	const result: Model[] = [];
+
+	const values: unknown[] = hasCallback ? [] : result;
+
+	let index = 0;
+
+	for (; index < length; index += 1) {
+		const item = array[index];
+		const itemValue = hasCallback ? callbacks.key?.(item) : item;
+
+		if (
+			(type === 'all' && itemValue === value) ||
+			(type === 'unique' && values.indexOf(itemValue) === -1)
+		) {
+			if (values !== result) {
+				values.push(itemValue);
+			}
+
+			result.push(item);
+		}
+	}
+
+	return result;
+}
+
+function getCallbacks<Value>(
+	bool: unknown,
+	key: unknown,
+): Callbacks<Value> | undefined {
+	if (typeof bool === 'function') {
+		return {bool: bool as BooleanCallback<Value>};
+	}
+
+	if (typeof key === 'function') {
+		return {key: key as KeyCallback<Value>};
+	}
+
+	const isString = typeof key === 'string';
+
+	if (
+		(!isString && typeof key !== 'number') ||
+		(isString && key.includes('.'))
+	) {
+		return;
+	}
+
+	return {
+		key: (value: Value) => (value as PlainObject)?.[key as string] as Key,
+	};
 }
 
 /**
@@ -274,7 +246,7 @@ export function groupBy<Value>(
 	array: Value[],
 	key: Key | KeyCallback<Value>,
 ): Record<Key, Value[]> {
-	const callbacks = _getCallbacks(undefined, key);
+	const callbacks = getCallbacks(undefined, key);
 
 	if (callbacks?.key == null) {
 		return {};
@@ -326,7 +298,7 @@ export function indexOf<Model, Value = Model>(
 	value: Value | BooleanCallback<Model>,
 	key?: Key | KeyCallback<Model>,
 ): number {
-	return _findValue('index', array, value, key) as number;
+	return findValue('index', array, value, key) as number;
 }
 
 /**
@@ -338,7 +310,35 @@ export function insert<Value>(
 	index: number,
 	values: Value[],
 ): void {
-	_insertValues('splice', array, values, index, 0);
+	insertValues('splice', array, values, index, 0);
+}
+
+function insertValues<Value>(
+	type: InsertType,
+	array: Value[],
+	values: Value[],
+	start: number,
+	deleteCount: number,
+): unknown {
+	const chunked = chunk(values).reverse();
+	const {length} = chunked;
+
+	let index = 0;
+	let returned: Value[] | undefined;
+
+	for (; index < length; index += 1) {
+		const result = array.splice(
+			start,
+			index === 0 ? deleteCount : 0,
+			...chunked[index],
+		);
+
+		if (returned == null) {
+			returned = result;
+		}
+	}
+
+	return type === 'splice' ? returned : array.length;
 }
 
 /**
@@ -346,7 +346,7 @@ export function insert<Value>(
  * - Uses chunking to avoid stack overflow
  */
 export function push<Value>(array: Value[], values: Value[]): number {
-	return _insertValues('push', array, values, array.length, 0) as number;
+	return insertValues('push', array, values, array.length, 0) as number;
 }
 
 /**
@@ -392,7 +392,7 @@ export function splice<Value>(
 ): Value[] {
 	const amoutOrValuesIsArray = Array.isArray(amountOrValues);
 
-	return _insertValues(
+	return insertValues(
 		'splice',
 		array,
 		amoutOrValuesIsArray ? amountOrValues : values ?? [],
@@ -400,8 +400,8 @@ export function splice<Value>(
 		amoutOrValuesIsArray
 			? array.length
 			: typeof amountOrValues === 'number' && amountOrValues > 0
-			  ? amountOrValues
-			  : 0,
+				? amountOrValues
+				: 0,
 	) as Value[];
 }
 
@@ -426,5 +426,5 @@ export function unique<Value>(
 	array: Value[],
 	key?: Key | KeyCallback<Value>,
 ): Value[] {
-	return _findValues('unique', array, undefined, key);
+	return findValues('unique', array, undefined, key);
 }

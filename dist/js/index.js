@@ -1,21 +1,29 @@
 // src/js/array.ts
-var _getCallbacks = function(bool, key) {
-  if (typeof bool === "function") {
-    return { bool };
+function chunk(array, size) {
+  const { length } = array;
+  const chunkSize = typeof size === "number" && size > 0 ? size : 32000;
+  if (length <= chunkSize) {
+    return [array];
   }
-  if (typeof key === "function") {
-    return { key };
+  const chunks = [];
+  let remaining = Number(length);
+  while (remaining > 0) {
+    chunks.push(array.splice(0, chunkSize));
+    remaining -= chunkSize;
   }
-  const isString = typeof key === "string";
-  if (!isString && typeof key !== "number" || isString && key.includes(".")) {
-    return;
-  }
-  return {
-    key: (value) => value?.[key]
-  };
-};
-var _findValue = function(type, array, value, key) {
-  const callbacks = _getCallbacks(value, key);
+  return chunks;
+}
+function exists(array, value, key) {
+  return findValue("index", array, value, key) > -1;
+}
+function filter(array, value, key) {
+  return findValues("all", array, value, key);
+}
+function find(array, value, key) {
+  return findValue("value", array, value, key);
+}
+var findValue = function(type, array, value, key) {
+  const callbacks = getCallbacks(value, key);
   if (callbacks?.bool == null && callbacks?.key == null) {
     return type === "index" ? array.indexOf(value) : array.find((item) => item === value);
   }
@@ -33,8 +41,8 @@ var _findValue = function(type, array, value, key) {
   }
   return type === "index" ? -1 : undefined;
 };
-var _findValues = function(type, array, value, key) {
-  const callbacks = _getCallbacks(value, key);
+var findValues = function(type, array, value, key) {
+  const callbacks = getCallbacks(value, key);
   const { length } = array;
   if (type === "unique" && callbacks?.key == null && length >= 100) {
     return Array.from(new Set(array));
@@ -61,44 +69,23 @@ var _findValues = function(type, array, value, key) {
   }
   return result;
 };
-var _insertValues = function(type, array, values, start, deleteCount) {
-  const chunked = chunk(values).reverse();
-  const { length } = chunked;
-  let index = 0;
-  let returned;
-  for (;index < length; index += 1) {
-    const result = array.splice(start, index === 0 ? deleteCount : 0, ...chunked[index]);
-    if (returned == null) {
-      returned = result;
-    }
+var getCallbacks = function(bool, key) {
+  if (typeof bool === "function") {
+    return { bool };
   }
-  return type === "splice" ? returned : array.length;
+  if (typeof key === "function") {
+    return { key };
+  }
+  const isString = typeof key === "string";
+  if (!isString && typeof key !== "number" || isString && key.includes(".")) {
+    return;
+  }
+  return {
+    key: (value) => value?.[key]
+  };
 };
-function chunk(array, size) {
-  const { length } = array;
-  const chunkSize = typeof size === "number" && size > 0 ? size : 32000;
-  if (length <= chunkSize) {
-    return [array];
-  }
-  const chunks = [];
-  let remaining = Number(length);
-  while (remaining > 0) {
-    chunks.push(array.splice(0, chunkSize));
-    remaining -= chunkSize;
-  }
-  return chunks;
-}
-function exists(array, value, key) {
-  return _findValue("index", array, value, key) > -1;
-}
-function filter(array, value, key) {
-  return _findValues("all", array, value, key);
-}
-function find(array, value, key) {
-  return _findValue("value", array, value, key);
-}
 function groupBy(array, key) {
-  const callbacks = _getCallbacks(undefined, key);
+  const callbacks = getCallbacks(undefined, key);
   if (callbacks?.key == null) {
     return {};
   }
@@ -117,20 +104,33 @@ function groupBy(array, key) {
   return grouped;
 }
 function indexOf(array, value, key) {
-  return _findValue("index", array, value, key);
+  return findValue("index", array, value, key);
 }
 function insert(array, index, values) {
-  _insertValues("splice", array, values, index, 0);
+  insertValues("splice", array, values, index, 0);
 }
+var insertValues = function(type, array, values, start, deleteCount) {
+  const chunked = chunk(values).reverse();
+  const { length } = chunked;
+  let index = 0;
+  let returned;
+  for (;index < length; index += 1) {
+    const result = array.splice(start, index === 0 ? deleteCount : 0, ...chunked[index]);
+    if (returned == null) {
+      returned = result;
+    }
+  }
+  return type === "splice" ? returned : array.length;
+};
 function push(array, values) {
-  return _insertValues("push", array, values, array.length, 0);
+  return insertValues("push", array, values, array.length, 0);
 }
 function splice(array, start, amountOrValues, values) {
   const amoutOrValuesIsArray = Array.isArray(amountOrValues);
-  return _insertValues("splice", array, amoutOrValuesIsArray ? amountOrValues : values ?? [], start, amoutOrValuesIsArray ? array.length : typeof amountOrValues === "number" && amountOrValues > 0 ? amountOrValues : 0);
+  return insertValues("splice", array, amoutOrValuesIsArray ? amountOrValues : values ?? [], start, amoutOrValuesIsArray ? array.length : typeof amountOrValues === "number" && amountOrValues > 0 ? amountOrValues : 0);
 }
 function unique(array, key) {
-  return _findValues("unique", array, undefined, key);
+  return findValues("unique", array, undefined, key);
 }
 // src/js/number.ts
 function between(value, min, max) {
@@ -343,237 +343,10 @@ function rgbToHsl(rgb) {
 }
 var anyPattern = /^#*([a-f0-9]{3}){1,2}$/i;
 var groupedPattern = /^#*([a-f0-9]{2})([a-f0-9]{2})([a-f0-9]{2})$/i;
-// src/js/element/index.ts
-var _findElements = function(selector, context, single) {
-  const callback = single ? document.querySelector : document.querySelectorAll;
-  const contexts = context == null ? [document] : _findElements(context, undefined, false);
-  const result = [];
-  if (typeof selector === "string") {
-    const { length: length2 } = contexts;
-    let index2 = 0;
-    for (;index2 < length2; index2 += 1) {
-      const value = callback.call(contexts[index2], selector);
-      if (single) {
-        if (value == null) {
-          continue;
-        }
-        return value;
-      }
-      result.push(...Array.from(value));
-    }
-    return single ? undefined : result.filter((value, index3, array) => array.indexOf(value) === index3);
-  }
-  const nodes = Array.isArray(selector) ? selector : selector instanceof NodeList ? Array.from(selector) : [selector];
-  const { length } = nodes;
-  let index = 0;
-  for (;index < length; index += 1) {
-    const node = nodes[index];
-    const element = node instanceof Document ? node.body : node instanceof Element ? node : undefined;
-    if (element != null && (context == null || contexts.length === 0 || contexts.some((context2) => context2 === element || context2.contains(element))) && !result.includes(element)) {
-      result.push(element);
-    }
-  }
-  return result;
-};
-function findElement(selector, context) {
-  return _findElements(selector, context, true);
-}
-function findElements(selector, context) {
-  return _findElements(selector, context, false);
-}
-function findParentElement(origin, selector) {
-  if (origin == null || selector == null) {
-    return null;
-  }
-  if (typeof selector === "string") {
-    if (origin.matches?.(selector)) {
-      return origin;
-    }
-    return origin.closest(selector);
-  }
-  if (selector(origin)) {
-    return origin;
-  }
-  let parent = origin.parentElement;
-  while (parent != null && !selector(parent)) {
-    if (parent === document.body) {
-      return null;
-    }
-    parent = parent.parentElement;
-  }
-  return parent;
-}
-function getElementUnderPointer(skipIgnore) {
-  const elements = Array.from(document.querySelectorAll(":hover")).filter((element) => {
-    if (/^head$/i.test(element.tagName)) {
-      return false;
-    }
-    const style = getComputedStyle(element);
-    return skipIgnore === true || style.pointerEvents !== "none" && style.visibility !== "hidden";
-  });
-  return elements[elements.length - 1];
-}
-function getTextDirection(element) {
-  const direction = element.getAttribute("dir");
-  if (direction !== null && /^(ltr|rtl)$/i.test(direction)) {
-    return direction.toLowerCase();
-  }
-  return getComputedStyle?.(element)?.direction === "rtl" ? "rtl" : "ltr";
-}
-// src/js/element/focusable.ts
-var _getItem = function(element, tabbable) {
-  return {
-    element,
-    tabIndex: tabbable ? _getTabIndex(element) : -1
-  };
-};
-var _getFocusableFilters = function() {
-  return [_isDisabled, _isInert, _isHidden, _isSummarised];
-};
-var _getTabbableFilters = function() {
-  return [_isNotTabbable, _isNotTabbableRadio, ..._getFocusableFilters()];
-};
-var _getTabIndex = function(element) {
-  const tabIndex = element?.tabIndex ?? -1;
-  if (tabIndex < 0 && (/^(audio|details|video)$/i.test(element.tagName) || _isEditable(element)) && !_hasTabIndex(element)) {
-    return 0;
-  }
-  return tabIndex;
-};
-var _getValidElements = function(parent, filters, tabbable) {
-  const items = Array.from(parent.querySelectorAll(selector)).map((element) => _getItem(element, tabbable)).filter((item) => !filters.some((filter2) => filter2(item)));
-  if (!tabbable) {
-    return items.map((item) => item.element);
-  }
-  const indiced = [];
-  const zeroed = [];
-  const { length } = items;
-  let index = 0;
-  for (;index < length; index += 1) {
-    const item = items[index];
-    if (item.tabIndex === 0) {
-      zeroed.push(item.element);
-    } else {
-      indiced[item.tabIndex] = [
-        ...indiced[item.tabIndex] ?? [],
-        item.element
-      ];
-    }
-  }
-  return [...indiced.flat(), ...zeroed];
-};
-var _hasTabIndex = function(element) {
-  return !Number.isNaN(Number.parseInt(element.getAttribute("tabindex"), 10));
-};
-var _isDisabled = function(item) {
-  if (/^(button|input|select|textarea)$/i.test(item.element.tagName) && _isDisabledFromFieldset(item.element)) {
-    return true;
-  }
-  return (item.element.disabled ?? false) || item.element.getAttribute("aria-disabled") === "true";
-};
-var _isDisabledFromFieldset = function(element) {
-  let parent = element.parentElement;
-  while (parent !== null) {
-    if (parent instanceof HTMLFieldSetElement && parent.disabled) {
-      const children = Array.from(parent.children);
-      const { length } = children;
-      let index = 0;
-      for (;index < length; index += 1) {
-        const child = children[index];
-        if (child instanceof HTMLLegendElement) {
-          return parent.matches("fieldset[disabled] *") ? true : !child.contains(element);
-        }
-      }
-      return true;
-    }
-    parent = parent.parentElement;
-  }
-  return false;
-};
-var _isEditable = function(element) {
-  return /^(|true)$/i.test(element.getAttribute("contenteditable"));
-};
-var _isHidden = function(item) {
-  if ((item.element.hidden ?? false) || item.element instanceof HTMLInputElement && item.element.type === "hidden") {
-    return true;
-  }
-  const isDirectSummary = item.element.matches("details > summary:first-of-type");
-  const nodeUnderDetails = isDirectSummary ? item.element.parentElement : item.element;
-  if (nodeUnderDetails?.matches("details:not([open]) *") ?? false) {
-    return true;
-  }
-  const style = getComputedStyle(item.element);
-  if (style.display === "none" || style.visibility === "hidden") {
-    return true;
-  }
-  const { height, width } = item.element.getBoundingClientRect();
-  return height === 0 && width === 0;
-};
-var _isInert = function(item) {
-  return (item.element.inert ?? false) || /^(|true)$/i.test(item.element.getAttribute("inert")) || item.element.parentElement !== null && _isInert({
-    element: item.element.parentElement,
-    tabIndex: -1
-  });
-};
-var _isNotTabbable = function(item) {
-  return (item.tabIndex ?? -1) < 0;
-};
-var _isNotTabbableRadio = function(item) {
-  if (!(item.element instanceof HTMLInputElement) || item.element.type !== "radio" || !item.element.name || item.element.checked) {
-    return false;
-  }
-  const parent = item.element.form ?? item.element.getRootNode?.() ?? item.element.ownerDocument;
-  const realName = CSS?.escape?.(item.element.name) ?? item.element.name;
-  const radios = Array.from(parent.querySelectorAll(`input[type="radio"][name="${realName}"]`));
-  const checked = radios.find((radio) => radio.checked);
-  return checked !== undefined && checked !== item.element;
-};
-var _isSummarised = function(item) {
-  return item.element instanceof HTMLDetailsElement && Array.from(item.element.children).some((child) => /^summary$/i.test(child.tagName));
-};
-var _isValidElement = function(element, filters, tabbable) {
-  const item = _getItem(element, tabbable);
-  return !filters.some((filter2) => filter2(item));
-};
-function getFocusableElements(parent) {
-  return _getValidElements(parent, _getFocusableFilters(), false);
-}
-function getTabbableElements(parent) {
-  return _getValidElements(parent, _getTabbableFilters(), true);
-}
-function isFocusableElement(element) {
-  return _isValidElement(element, _getFocusableFilters(), false);
-}
-function isTabbableElement(element) {
-  return _isValidElement(element, _getTabbableFilters(), true);
-}
-var selector = [
-  '[contenteditable]:not([contenteditable="false"])',
-  "[tabindex]:not(slot)",
-  "a[href]",
-  "audio[controls]",
-  "button",
-  "details",
-  "details > summary:first-of-type",
-  "input",
-  "select",
-  "textarea",
-  "video[controls]"
-].map((selector2) => `${selector2}:not([inert])`).join(",");
-// src/js/event.ts
-function getPosition(event) {
-  let x;
-  let y;
-  if (event instanceof MouseEvent) {
-    x = event.clientX;
-    y = event.clientY;
-  } else if (event instanceof TouchEvent) {
-    x = event.touches[0]?.clientX;
-    y = event.touches[0]?.clientY;
-  }
-  return typeof x === "number" && typeof y === "number" ? { x, y } : undefined;
-}
 // src/js/string.ts
+function camelCase(value) {
+  return toCase(value, "", true, false);
+}
 function capitalise(value) {
   if (value.length === 0) {
     return value;
@@ -594,16 +367,34 @@ function getString(value) {
   const asString = valueOff?.toString?.() ?? String(valueOff);
   return asString.startsWith("[object ") ? JSON.stringify(value) : asString;
 }
-function titleCase(value) {
-  return value.split(/\s+/).map((word) => capitalise(word)).join(" ");
+function join(value, delimiter) {
+  return value.filter((item) => !isNullableOrWhitespace(item)).map(getString).join(typeof delimiter === "string" ? delimiter : "");
 }
+function kebabCase(value) {
+  return toCase(value, "-", false, false);
+}
+function pascalCase(value) {
+  return toCase(value, "", true, true);
+}
+function snakeCase(value) {
+  return toCase(value, "_", false, false);
+}
+function titleCase(value) {
+  return words(value).map(capitalise).join(" ");
+}
+var toCase = function(value, delimiter, capitaliseAny, capitaliseFirst) {
+  return words(value).map((word, index) => {
+    const parts = word.replace(/(\p{Lu}*)(\p{Lu})(\p{Ll}+)/gu, (full, one, two, three) => three === "s" ? full : `${one}-${two}${three}`).replace(/(\p{Ll})(\p{Lu})/gu, "$1-$2").split("-");
+    return parts.filter((part) => part.length > 0).map((part, partIndex) => !capitaliseAny || partIndex === 0 && index === 0 && !capitaliseFirst ? part.toLocaleLowerCase() : capitalise(part)).join(delimiter);
+  }).join(delimiter);
+};
 function truncate(value, length, suffix) {
   const suffixLength = suffix?.length ?? 0;
   const truncatedLength = length - suffixLength;
   return value.length <= length ? value : `${value.slice(0, truncatedLength)}${suffix ?? ""}`;
 }
 function words(value) {
-  return [];
+  return value.match(/[^\x00-\x2f\x3a-\x40\x5b-\x60\x7b-\x7f]+/g) ?? [];
 }
 
 // src/js/is.ts
@@ -645,6 +436,291 @@ function isPlainObject(value) {
 function isPrimitive(value) {
   return value == null || /^(bigint|boolean|number|string|symbol)$/.test(typeof value);
 }
+
+// src/js/element/index.ts
+function findElement(selector, context) {
+  return findElementOrElements(selector, context, true);
+}
+var findElementOrElements = function(selector, context, single) {
+  const callback = single ? document.querySelector : document.querySelectorAll;
+  const contexts = context == null ? [document] : findElementOrElements(context, undefined, false);
+  const result = [];
+  if (typeof selector === "string") {
+    const { length: length2 } = contexts;
+    let index2 = 0;
+    for (;index2 < length2; index2 += 1) {
+      const value = callback.call(contexts[index2], selector);
+      if (single) {
+        if (value == null) {
+          continue;
+        }
+        return value;
+      }
+      result.push(...Array.from(value));
+    }
+    return single ? undefined : result.filter((value, index3, array) => array.indexOf(value) === index3);
+  }
+  const nodes = Array.isArray(selector) ? selector : selector instanceof NodeList ? Array.from(selector) : [selector];
+  const { length } = nodes;
+  let index = 0;
+  for (;index < length; index += 1) {
+    const node = nodes[index];
+    const element = node instanceof Document ? node.body : node instanceof Element ? node : undefined;
+    if (element != null && (context == null || contexts.length === 0 || contexts.some((context2) => context2 === element || context2.contains(element))) && !result.includes(element)) {
+      result.push(element);
+    }
+  }
+  return result;
+};
+function findElements(selector, context) {
+  return findElementOrElements(selector, context, false);
+}
+function findParentElement(origin, selector) {
+  if (origin == null || selector == null) {
+    return null;
+  }
+  if (typeof selector === "string") {
+    if (origin.matches?.(selector)) {
+      return origin;
+    }
+    return origin.closest(selector);
+  }
+  if (selector(origin)) {
+    return origin;
+  }
+  let parent = origin.parentElement;
+  while (parent != null && !selector(parent)) {
+    if (parent === document.body) {
+      return null;
+    }
+    parent = parent.parentElement;
+  }
+  return parent;
+}
+function getData(element, keys) {
+  if (typeof keys === "string") {
+    return getDataValue(element, keys);
+  }
+  const data = {};
+  for (const key of keys) {
+    data[key] = getDataValue(element, key);
+  }
+  return data;
+}
+var getDataValue = function(element, key) {
+  const value = element.dataset[key];
+  if (value == null) {
+    return;
+  }
+  try {
+    return JSON.parse(value);
+  } catch {
+    return;
+  }
+};
+function getElementUnderPointer(skipIgnore) {
+  const elements = Array.from(document.querySelectorAll(":hover")).filter((element) => {
+    if (/^head$/i.test(element.tagName)) {
+      return false;
+    }
+    const style = getComputedStyle(element);
+    return skipIgnore === true || style.pointerEvents !== "none" && style.visibility !== "hidden";
+  });
+  return elements[elements.length - 1];
+}
+function getTextDirection(element) {
+  const direction = element.getAttribute("dir");
+  if (direction !== null && /^(ltr|rtl)$/i.test(direction)) {
+    return direction.toLowerCase();
+  }
+  return getComputedStyle?.(element)?.direction === "rtl" ? "rtl" : "ltr";
+}
+function setData(element, first, second) {
+  setValues(element, first, second, updateDataAttribute);
+}
+function setStyles(element, first, second) {
+  setValues(element, first, second, updateStyleProperty);
+}
+var setValues = function(element, first, second, callback) {
+  if (isPlainObject(first)) {
+    const entries = Object.entries(first);
+    for (const [key, value] of entries) {
+      callback(element, key, value);
+    }
+  } else if (first != null) {
+    callback(element, first, second);
+  }
+};
+var updateDataAttribute = function(element, key, value) {
+  updateValue(element, `data-${key}`, value, element.setAttribute, element.removeAttribute, true);
+};
+var updateStyleProperty = function(element, key, value) {
+  updateValue(element, key, value, function(key2, value2) {
+    this.style[key2] = value2;
+  }, function(key2) {
+    this.style[key2] = "";
+  }, false);
+};
+var updateValue = function(element, key, value, set, remove, json) {
+  if (isNullableOrWhitespace(value)) {
+    remove.call(element, key);
+  } else {
+    set.call(element, key, json ? JSON.stringify(value) : String(value));
+  }
+};
+// src/js/element/focusable.ts
+function getFocusableElements(parent) {
+  return getValidElements(parent, getFocusableFilters(), false);
+}
+var getFocusableFilters = function() {
+  return [isDisabled, isInert, isHidden, isSummarised];
+};
+var getItem = function(element, tabbable) {
+  return {
+    element,
+    tabIndex: tabbable ? getTabIndex(element) : -1
+  };
+};
+var getTabbableFilters = function() {
+  return [isNotTabbable, isNotTabbableRadio, ...getFocusableFilters()];
+};
+function getTabbableElements(parent) {
+  return getValidElements(parent, getTabbableFilters(), true);
+}
+var getTabIndex = function(element) {
+  const tabIndex = element?.tabIndex ?? -1;
+  if (tabIndex < 0 && (/^(audio|details|video)$/i.test(element.tagName) || isEditable(element)) && !hasTabIndex(element)) {
+    return 0;
+  }
+  return tabIndex;
+};
+var getValidElements = function(parent, filters, tabbable) {
+  const items = Array.from(parent.querySelectorAll(selector)).map((element) => getItem(element, tabbable)).filter((item) => !filters.some((filter2) => filter2(item)));
+  if (!tabbable) {
+    return items.map((item) => item.element);
+  }
+  const indiced = [];
+  const zeroed = [];
+  const { length } = items;
+  let index = 0;
+  for (;index < length; index += 1) {
+    const item = items[index];
+    if (item.tabIndex === 0) {
+      zeroed.push(item.element);
+    } else {
+      indiced[item.tabIndex] = [
+        ...indiced[item.tabIndex] ?? [],
+        item.element
+      ];
+    }
+  }
+  return [...indiced.flat(), ...zeroed];
+};
+var hasTabIndex = function(element) {
+  return !Number.isNaN(Number.parseInt(element.getAttribute("tabindex"), 10));
+};
+var isDisabled = function(item) {
+  if (/^(button|input|select|textarea)$/i.test(item.element.tagName) && isDisabledFromFieldset(item.element)) {
+    return true;
+  }
+  return (item.element.disabled ?? false) || item.element.getAttribute("aria-disabled") === "true";
+};
+var isDisabledFromFieldset = function(element) {
+  let parent = element.parentElement;
+  while (parent !== null) {
+    if (parent instanceof HTMLFieldSetElement && parent.disabled) {
+      const children = Array.from(parent.children);
+      const { length } = children;
+      let index = 0;
+      for (;index < length; index += 1) {
+        const child = children[index];
+        if (child instanceof HTMLLegendElement) {
+          return parent.matches("fieldset[disabled] *") ? true : !child.contains(element);
+        }
+      }
+      return true;
+    }
+    parent = parent.parentElement;
+  }
+  return false;
+};
+var isEditable = function(element) {
+  return /^(|true)$/i.test(element.getAttribute("contenteditable"));
+};
+function isFocusableElement(element) {
+  return isValidElement(element, getFocusableFilters(), false);
+}
+var isHidden = function(item) {
+  if ((item.element.hidden ?? false) || item.element instanceof HTMLInputElement && item.element.type === "hidden") {
+    return true;
+  }
+  const isDirectSummary = item.element.matches("details > summary:first-of-type");
+  const nodeUnderDetails = isDirectSummary ? item.element.parentElement : item.element;
+  if (nodeUnderDetails?.matches("details:not([open]) *") ?? false) {
+    return true;
+  }
+  const style = getComputedStyle(item.element);
+  if (style.display === "none" || style.visibility === "hidden") {
+    return true;
+  }
+  const { height, width } = item.element.getBoundingClientRect();
+  return height === 0 && width === 0;
+};
+var isInert = function(item) {
+  return (item.element.inert ?? false) || /^(|true)$/i.test(item.element.getAttribute("inert")) || item.element.parentElement !== null && isInert({
+    element: item.element.parentElement,
+    tabIndex: -1
+  });
+};
+var isNotTabbable = function(item) {
+  return (item.tabIndex ?? -1) < 0;
+};
+var isNotTabbableRadio = function(item) {
+  if (!(item.element instanceof HTMLInputElement) || item.element.type !== "radio" || !item.element.name || item.element.checked) {
+    return false;
+  }
+  const parent = item.element.form ?? item.element.getRootNode?.() ?? item.element.ownerDocument;
+  const realName = CSS?.escape?.(item.element.name) ?? item.element.name;
+  const radios = Array.from(parent.querySelectorAll(`input[type="radio"][name="${realName}"]`));
+  const checked = radios.find((radio) => radio.checked);
+  return checked !== undefined && checked !== item.element;
+};
+var isSummarised = function(item) {
+  return item.element instanceof HTMLDetailsElement && Array.from(item.element.children).some((child) => /^summary$/i.test(child.tagName));
+};
+function isTabbableElement(element) {
+  return isValidElement(element, getTabbableFilters(), true);
+}
+var isValidElement = function(element, filters, tabbable) {
+  const item = getItem(element, tabbable);
+  return !filters.some((filter2) => filter2(item));
+};
+var selector = [
+  '[contenteditable]:not([contenteditable="false"])',
+  "[tabindex]:not(slot)",
+  "a[href]",
+  "audio[controls]",
+  "button",
+  "details",
+  "details > summary:first-of-type",
+  "input",
+  "select",
+  "textarea",
+  "video[controls]"
+].map((selector2) => `${selector2}:not([inert])`).join(",");
+// src/js/event.ts
+function getPosition(event) {
+  let x;
+  let y;
+  if (event instanceof MouseEvent) {
+    x = event.clientX;
+    y = event.clientY;
+  } else if (event instanceof TouchEvent) {
+    x = event.touches[0]?.clientX;
+    y = event.touches[0]?.clientY;
+  }
+  return typeof x === "number" && typeof y === "number" ? { x, y } : undefined;
+}
 // src/js/log.ts
 var time = function(label) {
   const started = log.enabled;
@@ -654,7 +730,7 @@ var time = function(label) {
   }
   return Object.create({
     log() {
-      if (started && log.enabled) {
+      if (started && !stopped && log.enabled) {
         console.timeLog(label);
       }
     },
@@ -671,6 +747,9 @@ var work = function(type, data) {
     console[type](...data);
   }
 };
+if (globalThis._atomic_logging == null) {
+  globalThis._atomic_logging = true;
+}
 var types = new Set([
   "dir",
   "debug",
@@ -681,17 +760,16 @@ var types = new Set([
   "warn"
 ]);
 var log = (() => {
-  let enabled = true;
   function instance(...data) {
     work("log", data);
   }
   Object.defineProperties(instance, {
     enabled: {
       get() {
-        return enabled;
+        return _atomic_logging ?? true;
       },
       set(value) {
-        enabled = value;
+        _atomic_logging = value;
       }
     },
     time: {
@@ -762,20 +840,20 @@ function getRandomHex() {
   return "0123456789ABCDEF"[getRandomInteger(0, 16)];
 }
 // src/js/timer.ts
-var is = function(value, pattern) {
+var is3 = function(value, pattern) {
   return pattern.test(value?.$timer);
 };
 function isRepeated(value) {
-  return is(value, /^repeat$/);
+  return is3(value, /^repeat$/);
 }
 function isTimer(value) {
-  return is(value, /^repeat|wait$/);
+  return is3(value, /^repeat|wait$/);
 }
 function isWaited(value) {
-  return is(value, /^wait$/);
+  return is3(value, /^wait$/);
 }
 function isWhen(value) {
-  return is(value, /^when$/) && typeof value.then === "function";
+  return is3(value, /^when$/) && typeof value.then === "function";
 }
 function repeat(callback, options) {
   return timer("repeat", callback, {
@@ -953,81 +1031,6 @@ var supportsTouch = (() => {
   return value;
 })();
 // src/js/value.ts
-var _cloneNested = function(value) {
-  const cloned = Array.isArray(value) ? [] : {};
-  const keys = Object.keys(value);
-  const { length } = keys;
-  let index = 0;
-  for (;index < length; index += 1) {
-    const key = keys[index];
-    cloned[key] = clone(value[key]);
-  }
-  return cloned;
-};
-var _cloneRegularExpression = function(value) {
-  const cloned = new RegExp(value.source, value.flags);
-  cloned.lastIndex = value.lastIndex;
-  return cloned;
-};
-var _findKey = function(needle, haystack, ignoreCase) {
-  if (!ignoreCase) {
-    return needle;
-  }
-  const keys = Object.keys(haystack);
-  const normalised = keys.map((key) => key.toLowerCase());
-  const index = normalised.indexOf(needle.toLowerCase());
-  return index > -1 ? keys[index] : needle;
-};
-var _getDiffs = function(first, second, prefix) {
-  const changes = [];
-  const checked = new Set;
-  let outer = 0;
-  for (;outer < 2; outer += 1) {
-    const value = outer === 0 ? first : second;
-    if (!value) {
-      continue;
-    }
-    const keys = Object.keys(value);
-    const { length } = keys;
-    let inner = 0;
-    for (;inner < length; inner += 1) {
-      const key = keys[inner];
-      if (checked.has(key)) {
-        continue;
-      }
-      const from = first?.[key];
-      const to = second?.[key];
-      if (!Object.is(from, to)) {
-        const prefixed = _getKey(prefix, key);
-        const change = {
-          from,
-          to,
-          key: prefixed
-        };
-        const nested = isArrayOrPlainObject(from) || isArrayOrPlainObject(to);
-        const diffs = nested ? _getDiffs(from, to, prefixed) : [];
-        if (!nested || nested && diffs.length > 0) {
-          changes.push(change);
-        }
-        changes.push(...diffs);
-      }
-      checked.add(key);
-    }
-  }
-  return changes;
-};
-var _getKey = function(...parts) {
-  return parts.filter((part) => part != null).join(".");
-};
-var _handleValue = function(data, path, value, get, ignoreCase) {
-  if (typeof data === "object" && data !== null && !/^(__proto__|constructor|prototype)$/i.test(path)) {
-    const key = _findKey(path, data, ignoreCase);
-    if (get) {
-      return data[key];
-    }
-    data[key] = value;
-  }
-};
 function clone(value) {
   switch (true) {
     case value == null:
@@ -1046,13 +1049,29 @@ function clone(value) {
     case value instanceof Node:
       return value.cloneNode(true);
     case value instanceof RegExp:
-      return _cloneRegularExpression(value);
+      return cloneRegularExpression(value);
     case isArrayOrPlainObject(value):
-      return _cloneNested(value);
+      return cloneNested(value);
     default:
       return structuredClone(value);
   }
 }
+var cloneNested = function(value) {
+  const cloned = Array.isArray(value) ? [] : {};
+  const keys = Object.keys(value);
+  const { length } = keys;
+  let index = 0;
+  for (;index < length; index += 1) {
+    const key = keys[index];
+    cloned[key] = clone(value[key]);
+  }
+  return cloned;
+};
+var cloneRegularExpression = function(value) {
+  const cloned = new RegExp(value.source, value.flags);
+  cloned.lastIndex = value.lastIndex;
+  return cloned;
+};
 function diff(first, second) {
   const result = {
     original: {
@@ -1072,7 +1091,7 @@ function diff(first, second) {
   if (firstIsArrayOrObject !== secondIsArrayOrObject) {
     result.type = "full";
   }
-  const diffs = _getDiffs(first, second);
+  const diffs = getDiffs(first, second);
   const { length } = diffs;
   if (length === 0) {
     result.type = "none";
@@ -1084,6 +1103,53 @@ function diff(first, second) {
   }
   return result;
 }
+var findKey = function(needle, haystack, ignoreCase) {
+  if (!ignoreCase) {
+    return needle;
+  }
+  const keys = Object.keys(haystack);
+  const normalised = keys.map((key) => key.toLowerCase());
+  const index = normalised.indexOf(needle.toLowerCase());
+  return index > -1 ? keys[index] : needle;
+};
+var getDiffs = function(first, second, prefix) {
+  const changes = [];
+  const checked = new Set;
+  let outer = 0;
+  for (;outer < 2; outer += 1) {
+    const value = outer === 0 ? first : second;
+    if (!value) {
+      continue;
+    }
+    const keys = Object.keys(value);
+    const { length } = keys;
+    let inner = 0;
+    for (;inner < length; inner += 1) {
+      const key = keys[inner];
+      if (checked.has(key)) {
+        continue;
+      }
+      const from = first?.[key];
+      const to = second?.[key];
+      if (!Object.is(from, to)) {
+        const prefixed = join([prefix, key], ".");
+        const change = {
+          from,
+          to,
+          key: prefixed
+        };
+        const nested = isArrayOrPlainObject(from) || isArrayOrPlainObject(to);
+        const diffs = nested ? getDiffs(from, to, prefixed) : [];
+        if (!nested || nested && diffs.length > 0) {
+          changes.push(change);
+        }
+        changes.push(...diffs);
+      }
+      checked.add(key);
+    }
+  }
+  return changes;
+};
 function getValue(data, path, ignoreCase) {
   const shouldIgnoreCase = ignoreCase === true;
   const parts = (shouldIgnoreCase ? path.toLowerCase() : path).split(".");
@@ -1091,10 +1157,19 @@ function getValue(data, path, ignoreCase) {
   let index = 0;
   let value = typeof data === "object" ? data ?? {} : {};
   while (index < length && value != null) {
-    value = _handleValue(value, parts[index++], null, true, shouldIgnoreCase);
+    value = handleValue(value, parts[index++], null, true, shouldIgnoreCase);
   }
   return value;
 }
+var handleValue = function(data, path, value, get, ignoreCase) {
+  if (typeof data === "object" && data !== null && !/^(__proto__|constructor|prototype)$/i.test(path)) {
+    const key = findKey(path, data, ignoreCase);
+    if (get) {
+      return data[key];
+    }
+    data[key] = value;
+  }
+};
 function merge(...values) {
   if (values.length === 0) {
     return {};
@@ -1131,10 +1206,10 @@ function setValue(data, path, value, ignoreCase) {
   for (;index < length; index += 1) {
     const part = parts[index];
     if (parts.indexOf(part) === lastIndex) {
-      _handleValue(target, part, value, false, shouldIgnoreCase);
+      handleValue(target, part, value, false, shouldIgnoreCase);
       break;
     }
-    let next = _handleValue(target, part, null, true, shouldIgnoreCase);
+    let next = handleValue(target, part, null, true, shouldIgnoreCase);
     if (typeof next !== "object" || next === null) {
       next = /^\d+$/.test(part) ? [] : {};
       target[part] = next;
@@ -1152,16 +1227,22 @@ export {
   titleCase,
   sum,
   splice,
+  snakeCase,
   setValue,
+  setStyles,
+  setData,
   rgbToHsl,
   rgbToHex,
   repeat,
   queue,
   push,
+  pascalCase,
   min,
   merge,
   max,
   log,
+  kebabCase,
+  join,
   isWhen,
   isWaited,
   isTimer,
@@ -1199,6 +1280,7 @@ export {
   getForegroundColour,
   getFocusableElements,
   getElementUnderPointer,
+  getData,
   findParentElement,
   findElements,
   findElement,
@@ -1212,6 +1294,7 @@ export {
   chunk,
   capitalise as capitalize,
   capitalise,
+  camelCase,
   between,
   average,
   findElements as $$,

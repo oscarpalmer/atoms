@@ -1,6 +1,25 @@
+// src/js/string.ts
+function getString(value) {
+  if (typeof value === "string") {
+    return value;
+  }
+  if (typeof value !== "object" || value == null) {
+    return String(value);
+  }
+  const valueOff = value.valueOf?.() ?? value;
+  const asString = valueOff?.toString?.() ?? String(valueOff);
+  return asString.startsWith("[object ") ? JSON.stringify(value) : asString;
+}
+function join(value, delimiter) {
+  return value.filter((item) => !isNullableOrWhitespace(item)).map(getString).join(typeof delimiter === "string" ? delimiter : "");
+}
+
 // src/js/is.ts
 function isArrayOrPlainObject(value) {
   return Array.isArray(value) || isPlainObject(value);
+}
+function isNullableOrWhitespace(value) {
+  return value == null || /^\s*$/.test(getString(value));
 }
 function isPlainObject(value) {
   if (typeof value !== "object" || value === null) {
@@ -11,81 +30,6 @@ function isPlainObject(value) {
 }
 
 // src/js/value.ts
-var _cloneNested = function(value) {
-  const cloned = Array.isArray(value) ? [] : {};
-  const keys = Object.keys(value);
-  const { length } = keys;
-  let index = 0;
-  for (;index < length; index += 1) {
-    const key = keys[index];
-    cloned[key] = clone(value[key]);
-  }
-  return cloned;
-};
-var _cloneRegularExpression = function(value) {
-  const cloned = new RegExp(value.source, value.flags);
-  cloned.lastIndex = value.lastIndex;
-  return cloned;
-};
-var _findKey = function(needle, haystack, ignoreCase) {
-  if (!ignoreCase) {
-    return needle;
-  }
-  const keys = Object.keys(haystack);
-  const normalised = keys.map((key) => key.toLowerCase());
-  const index = normalised.indexOf(needle.toLowerCase());
-  return index > -1 ? keys[index] : needle;
-};
-var _getDiffs = function(first, second, prefix) {
-  const changes = [];
-  const checked = new Set;
-  let outer = 0;
-  for (;outer < 2; outer += 1) {
-    const value = outer === 0 ? first : second;
-    if (!value) {
-      continue;
-    }
-    const keys = Object.keys(value);
-    const { length } = keys;
-    let inner = 0;
-    for (;inner < length; inner += 1) {
-      const key = keys[inner];
-      if (checked.has(key)) {
-        continue;
-      }
-      const from = first?.[key];
-      const to = second?.[key];
-      if (!Object.is(from, to)) {
-        const prefixed = _getKey(prefix, key);
-        const change = {
-          from,
-          to,
-          key: prefixed
-        };
-        const nested = isArrayOrPlainObject(from) || isArrayOrPlainObject(to);
-        const diffs = nested ? _getDiffs(from, to, prefixed) : [];
-        if (!nested || nested && diffs.length > 0) {
-          changes.push(change);
-        }
-        changes.push(...diffs);
-      }
-      checked.add(key);
-    }
-  }
-  return changes;
-};
-var _getKey = function(...parts) {
-  return parts.filter((part) => part != null).join(".");
-};
-var _handleValue = function(data, path, value, get, ignoreCase) {
-  if (typeof data === "object" && data !== null && !/^(__proto__|constructor|prototype)$/i.test(path)) {
-    const key = _findKey(path, data, ignoreCase);
-    if (get) {
-      return data[key];
-    }
-    data[key] = value;
-  }
-};
 function clone(value) {
   switch (true) {
     case value == null:
@@ -104,13 +48,29 @@ function clone(value) {
     case value instanceof Node:
       return value.cloneNode(true);
     case value instanceof RegExp:
-      return _cloneRegularExpression(value);
+      return cloneRegularExpression(value);
     case isArrayOrPlainObject(value):
-      return _cloneNested(value);
+      return cloneNested(value);
     default:
       return structuredClone(value);
   }
 }
+var cloneNested = function(value) {
+  const cloned = Array.isArray(value) ? [] : {};
+  const keys = Object.keys(value);
+  const { length } = keys;
+  let index = 0;
+  for (;index < length; index += 1) {
+    const key = keys[index];
+    cloned[key] = clone(value[key]);
+  }
+  return cloned;
+};
+var cloneRegularExpression = function(value) {
+  const cloned = new RegExp(value.source, value.flags);
+  cloned.lastIndex = value.lastIndex;
+  return cloned;
+};
 function diff(first, second) {
   const result = {
     original: {
@@ -130,7 +90,7 @@ function diff(first, second) {
   if (firstIsArrayOrObject !== secondIsArrayOrObject) {
     result.type = "full";
   }
-  const diffs = _getDiffs(first, second);
+  const diffs = getDiffs(first, second);
   const { length } = diffs;
   if (length === 0) {
     result.type = "none";
@@ -142,6 +102,53 @@ function diff(first, second) {
   }
   return result;
 }
+var findKey = function(needle, haystack, ignoreCase) {
+  if (!ignoreCase) {
+    return needle;
+  }
+  const keys = Object.keys(haystack);
+  const normalised = keys.map((key) => key.toLowerCase());
+  const index = normalised.indexOf(needle.toLowerCase());
+  return index > -1 ? keys[index] : needle;
+};
+var getDiffs = function(first, second, prefix) {
+  const changes = [];
+  const checked = new Set;
+  let outer = 0;
+  for (;outer < 2; outer += 1) {
+    const value = outer === 0 ? first : second;
+    if (!value) {
+      continue;
+    }
+    const keys = Object.keys(value);
+    const { length } = keys;
+    let inner = 0;
+    for (;inner < length; inner += 1) {
+      const key = keys[inner];
+      if (checked.has(key)) {
+        continue;
+      }
+      const from = first?.[key];
+      const to = second?.[key];
+      if (!Object.is(from, to)) {
+        const prefixed = join([prefix, key], ".");
+        const change = {
+          from,
+          to,
+          key: prefixed
+        };
+        const nested = isArrayOrPlainObject(from) || isArrayOrPlainObject(to);
+        const diffs = nested ? getDiffs(from, to, prefixed) : [];
+        if (!nested || nested && diffs.length > 0) {
+          changes.push(change);
+        }
+        changes.push(...diffs);
+      }
+      checked.add(key);
+    }
+  }
+  return changes;
+};
 function getValue(data, path, ignoreCase) {
   const shouldIgnoreCase = ignoreCase === true;
   const parts = (shouldIgnoreCase ? path.toLowerCase() : path).split(".");
@@ -149,10 +156,19 @@ function getValue(data, path, ignoreCase) {
   let index = 0;
   let value = typeof data === "object" ? data ?? {} : {};
   while (index < length && value != null) {
-    value = _handleValue(value, parts[index++], null, true, shouldIgnoreCase);
+    value = handleValue(value, parts[index++], null, true, shouldIgnoreCase);
   }
   return value;
 }
+var handleValue = function(data, path, value, get, ignoreCase) {
+  if (typeof data === "object" && data !== null && !/^(__proto__|constructor|prototype)$/i.test(path)) {
+    const key = findKey(path, data, ignoreCase);
+    if (get) {
+      return data[key];
+    }
+    data[key] = value;
+  }
+};
 function merge(...values) {
   if (values.length === 0) {
     return {};
@@ -189,10 +205,10 @@ function setValue(data, path, value, ignoreCase) {
   for (;index < length; index += 1) {
     const part = parts[index];
     if (parts.indexOf(part) === lastIndex) {
-      _handleValue(target, part, value, false, shouldIgnoreCase);
+      handleValue(target, part, value, false, shouldIgnoreCase);
       break;
     }
-    let next = _handleValue(target, part, null, true, shouldIgnoreCase);
+    let next = handleValue(target, part, null, true, shouldIgnoreCase);
     if (typeof next !== "object" || next === null) {
       next = /^\d+$/.test(part) ? [] : {};
       target[part] = next;

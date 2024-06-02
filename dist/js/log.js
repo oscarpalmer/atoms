@@ -7,7 +7,7 @@ var time = function(label) {
   }
   return Object.create({
     log() {
-      if (started && log.enabled) {
+      if (started && !stopped && log.enabled) {
         console.timeLog(label);
       }
     },
@@ -24,6 +24,9 @@ var work = function(type, data) {
     console[type](...data);
   }
 };
+if (globalThis._atomic_logging == null) {
+  globalThis._atomic_logging = true;
+}
 var types = new Set([
   "dir",
   "debug",
@@ -34,17 +37,16 @@ var types = new Set([
   "warn"
 ]);
 var log = (() => {
-  let enabled = true;
   function instance(...data) {
     work("log", data);
   }
   Object.defineProperties(instance, {
     enabled: {
       get() {
-        return enabled;
+        return _atomic_logging ?? true;
       },
       set(value) {
-        enabled = value;
+        _atomic_logging = value;
       }
     },
     time: {

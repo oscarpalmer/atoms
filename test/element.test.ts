@@ -5,9 +5,12 @@ import {
 	findElement,
 	findElements,
 	findParentElement,
-	getElementUnderPointer,
+	getData,
 	getTextDirection,
-} from '../src/js/element';
+	setData,
+	setStyles,
+	wait,
+} from '../src/js';
 
 document.body.innerHTML = `<div>
 	<div class="target">
@@ -86,6 +89,32 @@ test('findParentElement', () => {
 	expect(findParentElement(null, 'span')).toBe(null);
 });
 
+test('getData & setData', done => {
+	const div = document.createElement('div');
+
+	setData(div, 'test', 'value');
+
+	setData(div, {
+		foo: ['bar', 1, true],
+		bar: {baz: true},
+	});
+
+	div.dataset.badJson = '""?""';
+
+	wait(() => {
+		expect(getData(div, 'test')).toBe('value');
+		expect(getData(div, 'noop')).toBe(undefined);
+		expect(getData(div, 'badJson')).toBe(undefined);
+
+		const data = getData(div, ['foo', 'bar']);
+
+		expect(data.foo).toEqual(['bar', 1, true]);
+		expect(data.bar).toEqual({baz: true});
+
+		done();
+	}, 125);
+});
+
 test('getElementUnderPointer', () => {
 	const origin = document.getElementById('origin');
 	const hover = document.getElementById('hover');
@@ -133,4 +162,32 @@ test('getTextDirection', () => {
 
 	// Should be inherited from parent and be 'rtl', but does not seem to be; Happy DOM?
 	expect(getTextDirection(innerElement)).toBe('ltr');
+});
+
+test('setStyles', done => {
+	const div = document.createElement('div');
+
+	div.style.display = 'none';
+
+	setStyles(div, 'color', 'red');
+
+	setStyles(div, {
+		backgroundColor: 'green',
+		position: 'absolute',
+	});
+
+	wait(() => {
+		expect(div.style.color).toBe('red');
+		expect(div.style.display).toBe('none');
+		expect(div.style.backgroundColor).toBe('green');
+		expect(div.style.position).toBe('absolute');
+
+		setStyles(div, 'display');
+
+		wait(() => {
+			expect(div.style.display).toBe('');
+
+			done();
+		}, 125);
+	}, 125);
 });

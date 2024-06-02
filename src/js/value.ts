@@ -1,6 +1,7 @@
 import type {ToString} from 'type-fest/source/internal';
 import {isArrayOrPlainObject} from './is';
 import type {ArrayOrPlainObject, Get, Key, Paths, PlainObject} from './models';
+import {join} from './string';
 
 export type DiffType = 'full' | 'none' | 'partial';
 
@@ -18,133 +19,6 @@ export type DiffValue<First = unknown, Second = First> = {
 type KeyedDiffValue = {
 	key: string;
 } & DiffValue;
-
-function _cloneNested(value: ArrayOrPlainObject): ArrayOrPlainObject {
-	const cloned = (Array.isArray(value) ? [] : {}) as PlainObject;
-	const keys = Object.keys(value);
-	const {length} = keys;
-
-	let index = 0;
-
-	for (; index < length; index += 1) {
-		const key = keys[index];
-
-		cloned[key] = clone((value as PlainObject)[key]);
-	}
-
-	return cloned;
-}
-
-function _cloneRegularExpression(value: RegExp): RegExp {
-	const cloned = new RegExp(value.source, value.flags);
-
-	cloned.lastIndex = value.lastIndex;
-
-	return cloned;
-}
-
-function _findKey(
-	needle: string,
-	haystack: PlainObject,
-	ignoreCase: boolean,
-): string {
-	if (!ignoreCase) {
-		return needle;
-	}
-
-	const keys = Object.keys(haystack);
-	const normalised = keys.map(key => key.toLowerCase());
-	const index = normalised.indexOf(needle.toLowerCase());
-
-	return index > -1 ? keys[index] : needle;
-}
-
-function _getDiffs(
-	first: ArrayOrPlainObject,
-	second: ArrayOrPlainObject,
-	prefix?: string,
-): KeyedDiffValue[] {
-	const changes: KeyedDiffValue[] = [];
-	const checked = new Set<Key>();
-
-	let outer = 0;
-
-	for (; outer < 2; outer += 1) {
-		const value = outer === 0 ? first : second;
-
-		if (!value) {
-			continue;
-		}
-
-		const keys = Object.keys(value);
-		const {length} = keys;
-
-		let inner = 0;
-
-		for (; inner < length; inner += 1) {
-			const key = keys[inner];
-
-			if (checked.has(key)) {
-				continue;
-			}
-
-			const from = first?.[key as never];
-			const to = second?.[key as never];
-
-			if (!Object.is(from, to)) {
-				const prefixed = _getKey(prefix, key);
-
-				const change = {
-					from,
-					to,
-					key: prefixed,
-				};
-
-				const nested = isArrayOrPlainObject(from) || isArrayOrPlainObject(to);
-
-				const diffs = nested
-					? _getDiffs(from as PlainObject, to as PlainObject, prefixed)
-					: [];
-
-				if (!nested || (nested && diffs.length > 0)) {
-					changes.push(change);
-				}
-
-				changes.push(...diffs);
-			}
-
-			checked.add(key);
-		}
-	}
-
-	return changes;
-}
-
-function _getKey(...parts: Array<Key | undefined>): string {
-	return parts.filter(part => part != null).join('.');
-}
-
-function _handleValue(
-	data: PlainObject,
-	path: string,
-	value: unknown,
-	get: boolean,
-	ignoreCase: boolean,
-): unknown {
-	if (
-		typeof data === 'object' &&
-		data !== null &&
-		!/^(__proto__|constructor|prototype)$/i.test(path)
-	) {
-		const key = _findKey(path, data, ignoreCase);
-
-		if (get) {
-			return data[key];
-		}
-
-		data[key] = value;
-	}
-}
 
 /**
  * Clones any kind of value
@@ -174,14 +48,38 @@ export function clone<Value>(value: Value): Value {
 			return value.cloneNode(true) as Value;
 
 		case value instanceof RegExp:
-			return _cloneRegularExpression(value) as Value;
+			return cloneRegularExpression(value) as Value;
 
 		case isArrayOrPlainObject(value):
-			return _cloneNested(value) as Value;
+			return cloneNested(value) as Value;
 
 		default:
 			return structuredClone(value);
 	}
+}
+
+function cloneNested(value: ArrayOrPlainObject): ArrayOrPlainObject {
+	const cloned = (Array.isArray(value) ? [] : {}) as PlainObject;
+	const keys = Object.keys(value);
+	const {length} = keys;
+
+	let index = 0;
+
+	for (; index < length; index += 1) {
+		const key = keys[index];
+
+		cloned[key] = clone((value as PlainObject)[key]);
+	}
+
+	return cloned;
+}
+
+function cloneRegularExpression(value: RegExp): RegExp {
+	const cloned = new RegExp(value.source, value.flags);
+
+	cloned.lastIndex = value.lastIndex;
+
+	return cloned;
 }
 
 /**
@@ -222,7 +120,7 @@ export function diff<First, Second = First>(
 		result.type = 'full';
 	}
 
-	const diffs = _getDiffs(
+	const diffs = getDiffs(
 		first as ArrayOrPlainObject,
 		second as ArrayOrPlainObject,
 	);
@@ -242,6 +140,83 @@ export function diff<First, Second = First>(
 	}
 
 	return result;
+}
+
+function findKey(
+	needle: string,
+	haystack: PlainObject,
+	ignoreCase: boolean,
+): string {
+	if (!ignoreCase) {
+		return needle;
+	}
+
+	const keys = Object.keys(haystack);
+	const normalised = keys.map(key => key.toLowerCase());
+	const index = normalised.indexOf(needle.toLowerCase());
+
+	return index > -1 ? keys[index] : needle;
+}
+
+function getDiffs(
+	first: ArrayOrPlainObject,
+	second: ArrayOrPlainObject,
+	prefix?: string,
+): KeyedDiffValue[] {
+	const changes: KeyedDiffValue[] = [];
+	const checked = new Set<Key>();
+
+	let outer = 0;
+
+	for (; outer < 2; outer += 1) {
+		const value = outer === 0 ? first : second;
+
+		if (!value) {
+			continue;
+		}
+
+		const keys = Object.keys(value);
+		const {length} = keys;
+
+		let inner = 0;
+
+		for (; inner < length; inner += 1) {
+			const key = keys[inner];
+
+			if (checked.has(key)) {
+				continue;
+			}
+
+			const from = first?.[key as never];
+			const to = second?.[key as never];
+
+			if (!Object.is(from, to)) {
+				const prefixed = join([prefix, key], '.');
+
+				const change = {
+					from,
+					to,
+					key: prefixed,
+				};
+
+				const nested = isArrayOrPlainObject(from) || isArrayOrPlainObject(to);
+
+				const diffs = nested
+					? getDiffs(from as PlainObject, to as PlainObject, prefixed)
+					: [];
+
+				if (!nested || (nested && diffs.length > 0)) {
+					changes.push(change);
+				}
+
+				changes.push(...diffs);
+			}
+
+			checked.add(key);
+		}
+	}
+
+	return changes;
 }
 
 /**
@@ -279,7 +254,7 @@ export function getValue(
 	let value = typeof data === 'object' ? data ?? {} : {};
 
 	while (index < length && value != null) {
-		value = _handleValue(
+		value = handleValue(
 			value,
 			parts[index++],
 			null,
@@ -289,6 +264,28 @@ export function getValue(
 	}
 
 	return value as never;
+}
+
+function handleValue(
+	data: PlainObject,
+	path: string,
+	value: unknown,
+	get: boolean,
+	ignoreCase: boolean,
+): unknown {
+	if (
+		typeof data === 'object' &&
+		data !== null &&
+		!/^(__proto__|constructor|prototype)$/i.test(path)
+	) {
+		const key = findKey(path, data, ignoreCase);
+
+		if (get) {
+			return data[key];
+		}
+
+		data[key] = value;
+	}
 }
 
 /**
@@ -380,12 +377,12 @@ export function setValue<Data extends PlainObject>(
 		const part = parts[index];
 
 		if (parts.indexOf(part) === lastIndex) {
-			_handleValue(target, part, value, false, shouldIgnoreCase);
+			handleValue(target, part, value, false, shouldIgnoreCase);
 
 			break;
 		}
 
-		let next = _handleValue(target, part, null, true, shouldIgnoreCase);
+		let next = handleValue(target, part, null, true, shouldIgnoreCase);
 
 		if (typeof next !== 'object' || next === null) {
 			next = /^\d+$/.test(part) ? [] : {};

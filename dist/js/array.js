@@ -1,21 +1,29 @@
 // src/js/array.ts
-var _getCallbacks = function(bool, key) {
-  if (typeof bool === "function") {
-    return { bool };
+function chunk(array, size) {
+  const { length } = array;
+  const chunkSize = typeof size === "number" && size > 0 ? size : 32000;
+  if (length <= chunkSize) {
+    return [array];
   }
-  if (typeof key === "function") {
-    return { key };
+  const chunks = [];
+  let remaining = Number(length);
+  while (remaining > 0) {
+    chunks.push(array.splice(0, chunkSize));
+    remaining -= chunkSize;
   }
-  const isString = typeof key === "string";
-  if (!isString && typeof key !== "number" || isString && key.includes(".")) {
-    return;
-  }
-  return {
-    key: (value) => value?.[key]
-  };
-};
-var _findValue = function(type, array, value, key) {
-  const callbacks = _getCallbacks(value, key);
+  return chunks;
+}
+function exists(array, value, key) {
+  return findValue("index", array, value, key) > -1;
+}
+function filter(array, value, key) {
+  return findValues("all", array, value, key);
+}
+function find(array, value, key) {
+  return findValue("value", array, value, key);
+}
+var findValue = function(type, array, value, key) {
+  const callbacks = getCallbacks(value, key);
   if (callbacks?.bool == null && callbacks?.key == null) {
     return type === "index" ? array.indexOf(value) : array.find((item) => item === value);
   }
@@ -33,8 +41,8 @@ var _findValue = function(type, array, value, key) {
   }
   return type === "index" ? -1 : undefined;
 };
-var _findValues = function(type, array, value, key) {
-  const callbacks = _getCallbacks(value, key);
+var findValues = function(type, array, value, key) {
+  const callbacks = getCallbacks(value, key);
   const { length } = array;
   if (type === "unique" && callbacks?.key == null && length >= 100) {
     return Array.from(new Set(array));
@@ -61,44 +69,23 @@ var _findValues = function(type, array, value, key) {
   }
   return result;
 };
-var _insertValues = function(type, array, values, start, deleteCount) {
-  const chunked = chunk(values).reverse();
-  const { length } = chunked;
-  let index = 0;
-  let returned;
-  for (;index < length; index += 1) {
-    const result = array.splice(start, index === 0 ? deleteCount : 0, ...chunked[index]);
-    if (returned == null) {
-      returned = result;
-    }
+var getCallbacks = function(bool, key) {
+  if (typeof bool === "function") {
+    return { bool };
   }
-  return type === "splice" ? returned : array.length;
+  if (typeof key === "function") {
+    return { key };
+  }
+  const isString = typeof key === "string";
+  if (!isString && typeof key !== "number" || isString && key.includes(".")) {
+    return;
+  }
+  return {
+    key: (value) => value?.[key]
+  };
 };
-function chunk(array, size) {
-  const { length } = array;
-  const chunkSize = typeof size === "number" && size > 0 ? size : 32000;
-  if (length <= chunkSize) {
-    return [array];
-  }
-  const chunks = [];
-  let remaining = Number(length);
-  while (remaining > 0) {
-    chunks.push(array.splice(0, chunkSize));
-    remaining -= chunkSize;
-  }
-  return chunks;
-}
-function exists(array, value, key) {
-  return _findValue("index", array, value, key) > -1;
-}
-function filter(array, value, key) {
-  return _findValues("all", array, value, key);
-}
-function find(array, value, key) {
-  return _findValue("value", array, value, key);
-}
 function groupBy(array, key) {
-  const callbacks = _getCallbacks(undefined, key);
+  const callbacks = getCallbacks(undefined, key);
   if (callbacks?.key == null) {
     return {};
   }
@@ -117,20 +104,33 @@ function groupBy(array, key) {
   return grouped;
 }
 function indexOf(array, value, key) {
-  return _findValue("index", array, value, key);
+  return findValue("index", array, value, key);
 }
 function insert(array, index, values) {
-  _insertValues("splice", array, values, index, 0);
+  insertValues("splice", array, values, index, 0);
 }
+var insertValues = function(type, array, values, start, deleteCount) {
+  const chunked = chunk(values).reverse();
+  const { length } = chunked;
+  let index = 0;
+  let returned;
+  for (;index < length; index += 1) {
+    const result = array.splice(start, index === 0 ? deleteCount : 0, ...chunked[index]);
+    if (returned == null) {
+      returned = result;
+    }
+  }
+  return type === "splice" ? returned : array.length;
+};
 function push(array, values) {
-  return _insertValues("push", array, values, array.length, 0);
+  return insertValues("push", array, values, array.length, 0);
 }
 function splice(array, start, amountOrValues, values) {
   const amoutOrValuesIsArray = Array.isArray(amountOrValues);
-  return _insertValues("splice", array, amoutOrValuesIsArray ? amountOrValues : values ?? [], start, amoutOrValuesIsArray ? array.length : typeof amountOrValues === "number" && amountOrValues > 0 ? amountOrValues : 0);
+  return insertValues("splice", array, amoutOrValuesIsArray ? amountOrValues : values ?? [], start, amoutOrValuesIsArray ? array.length : typeof amountOrValues === "number" && amountOrValues > 0 ? amountOrValues : 0);
 }
 function unique(array, key) {
-  return _findValues("unique", array, undefined, key);
+  return findValues("unique", array, undefined, key);
 }
 export {
   unique,

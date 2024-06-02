@@ -1,4 +1,12 @@
+// src/js/is.ts
+function isNullableOrWhitespace(value) {
+  return value == null || /^\s*$/.test(getString(value));
+}
+
 // src/js/string.ts
+function camelCase(value) {
+  return toCase(value, "", true, false);
+}
 function capitalise(value) {
   if (value.length === 0) {
     return value;
@@ -19,23 +27,46 @@ function getString(value) {
   const asString = valueOff?.toString?.() ?? String(valueOff);
   return asString.startsWith("[object ") ? JSON.stringify(value) : asString;
 }
-function titleCase(value) {
-  return value.split(/\s+/).map((word) => capitalise(word)).join(" ");
+function join(value, delimiter) {
+  return value.filter((item) => !isNullableOrWhitespace(item)).map(getString).join(typeof delimiter === "string" ? delimiter : "");
 }
+function kebabCase(value) {
+  return toCase(value, "-", false, false);
+}
+function pascalCase(value) {
+  return toCase(value, "", true, true);
+}
+function snakeCase(value) {
+  return toCase(value, "_", false, false);
+}
+function titleCase(value) {
+  return words(value).map(capitalise).join(" ");
+}
+var toCase = function(value, delimiter, capitaliseAny, capitaliseFirst) {
+  return words(value).map((word, index) => {
+    const parts = word.replace(/(\p{Lu}*)(\p{Lu})(\p{Ll}+)/gu, (full, one, two, three) => three === "s" ? full : `${one}-${two}${three}`).replace(/(\p{Ll})(\p{Lu})/gu, "$1-$2").split("-");
+    return parts.filter((part) => part.length > 0).map((part, partIndex) => !capitaliseAny || partIndex === 0 && index === 0 && !capitaliseFirst ? part.toLocaleLowerCase() : capitalise(part)).join(delimiter);
+  }).join(delimiter);
+};
 function truncate(value, length, suffix) {
   const suffixLength = suffix?.length ?? 0;
   const truncatedLength = length - suffixLength;
   return value.length <= length ? value : `${value.slice(0, truncatedLength)}${suffix ?? ""}`;
 }
 function words(value) {
-  return [];
+  return value.match(/[^\x00-\x2f\x3a-\x40\x5b-\x60\x7b-\x7f]+/g) ?? [];
 }
 export {
   words,
   truncate,
   titleCase,
+  snakeCase,
+  pascalCase,
+  kebabCase,
+  join,
   getString,
   createUuid,
   capitalise as capitalize,
-  capitalise
+  capitalise,
+  camelCase
 };

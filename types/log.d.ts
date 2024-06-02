@@ -1,3 +1,6 @@
+declare global {
+    var _atomic_logging: boolean;
+}
 /**
  * Logs any number of values at the "log" log level
  */
