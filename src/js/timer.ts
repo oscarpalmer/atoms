@@ -61,6 +61,7 @@ type State = {
 	elapsed?: number;
 	frame?: number;
 	index?: number;
+	minimum: number;
 };
 
 /**
@@ -119,8 +120,20 @@ type WhenOptions = {} & OptionsWithCount;
 
 type WorkType = 'continue' | 'pause' | 'restart' | 'start' | 'stop';
 
+/**
+ * A set of all active timers
+ */
 const activeTimers = new Set<Timer>();
+
+/**
+ * A set of timers that were paused due to the document being hidden
+ */
 const hiddenTimers = new Set<Timer>();
+
+/**
+ * Milliseconds in a frame, probably ;-)
+ */
+const milliseconds = 1_000 / 60;
 
 function getValueOrDefault(value: unknown, defaultValue: number): number {
 	return typeof value === 'number' && value > 0 ? value : defaultValue;
@@ -171,13 +184,14 @@ export function repeat(
 	callback: IndexedCallback,
 	options?: Partial<RepeatOptions>,
 ): Timer {
-	return timer('repeat', callback, options ?? {}).start();
+	return timer('repeat', callback, options ?? {}, true);
 }
 
 function timer(
 	type: 'repeat' | 'wait',
 	callback: AnyCallback,
 	partial: Partial<TimerOptions>,
+	start: boolean,
 ): Timer {
 	const isRepeated = type === 'repeat';
 
@@ -198,6 +212,7 @@ function timer(
 	const state: State = {
 		callback,
 		active: false,
+		minimum: options.interval - (options.interval % milliseconds) / 2,
 	};
 
 	const instance = Object.create({
@@ -230,6 +245,10 @@ function timer(
 			},
 		},
 	});
+
+	if (start) {
+		instance.start();
+	}
 
 	return instance;
 }
@@ -266,7 +285,8 @@ export function wait(
 					interval: options,
 				}
 			: options,
-	).start();
+		true,
+	);
 }
 
 /**
@@ -280,7 +300,8 @@ export function when(
 	let rejecter: () => void;
 	let resolver: () => void;
 
-	const repeated = repeat(
+	const repeated = timer(
+		'repeat',
 		() => {
 			if (condition()) {
 				repeated.stop();
@@ -296,6 +317,7 @@ export function when(
 			interval: options?.interval,
 			timeout: options?.timeout,
 		},
+		false,
 	);
 
 	const promise = new Promise<void>((resolve, reject) => {
@@ -356,6 +378,7 @@ function work(
 	}
 
 	const {count, interval, timeout} = options;
+	const {minimum} = state;
 
 	if (['pause', 'stop'].includes(type)) {
 		activeTimers.delete(timer);
@@ -388,7 +411,7 @@ function work(
 	const total =
 		(count === Number.POSITIVE_INFINITY
 			? Number.POSITIVE_INFINITY
-			: (count - index) * (interval > 0 ? interval : 1000 / 16)) - elapsed;
+			: (count - index) * (interval > 0 ? interval : milliseconds)) - elapsed;
 
 	let current: DOMHighResTimeStamp | null;
 	let start: DOMHighResTimeStamp | null;
@@ -422,7 +445,7 @@ function work(
 
 		const finished = time - elapsed >= total;
 
-		if (finished || (time - 2 < interval && interval < time + 2)) {
+		if (finished || time >= minimum) {
 			if (state.active) {
 				state.callback((isRepeated ? index : undefined) as never);
 			}
