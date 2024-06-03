@@ -101,6 +101,9 @@ type WhenOptions = {} & OptionsWithCount;
 
 type WorkType = 'restart' | 'start' | 'stop';
 
+const activeTimers = new Set<Timer>();
+const hiddenTimers = new Set<Timer>();
+
 function getValueOrDefault(value: unknown, defaultValue: number): number {
 	return typeof value === 'number' && value > 0 ? value : defaultValue;
 }
@@ -331,6 +334,8 @@ function work(
 	}
 
 	if (type === 'stop') {
+		activeTimers.delete(timer);
+
 		state.active = false;
 		state.frame = undefined;
 
@@ -398,7 +403,24 @@ function work(
 		state.frame = requestAnimationFrame(step);
 	}
 
+	activeTimers.add(timer);
+
 	state.frame = requestAnimationFrame(step);
 
 	return timer;
 }
+
+document.addEventListener('visibilitychange', () => {
+	if (document.hidden) {
+		for (const timer of activeTimers) {
+			hiddenTimers.add(timer);
+			timer.stop();
+		}
+	} else {
+		for (const timer of hiddenTimers) {
+			timer.start();
+		}
+
+		hiddenTimers.clear();
+	}
+});

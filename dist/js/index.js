@@ -960,6 +960,7 @@ var work2 = function(type, timer2, state, options, isRepeated2) {
     options.afterCallback?.(false);
   }
   if (type === "stop") {
+    activeTimers.delete(timer2);
     state.active = false;
     state.frame = undefined;
     return timer2;
@@ -1005,9 +1006,25 @@ var work2 = function(type, timer2, state, options, isRepeated2) {
     }
     state.frame = requestAnimationFrame(step);
   }
+  activeTimers.add(timer2);
   state.frame = requestAnimationFrame(step);
   return timer2;
 };
+var activeTimers = new Set;
+var hiddenTimers = new Set;
+document.addEventListener("visibilitychange", () => {
+  if (document.hidden) {
+    for (const timer2 of activeTimers) {
+      hiddenTimers.add(timer2);
+      timer2.stop();
+    }
+  } else {
+    for (const timer2 of hiddenTimers) {
+      timer2.start();
+    }
+    hiddenTimers.clear();
+  }
+});
 // src/js/touch.ts
 var supportsTouch = (() => {
   let value = false;
