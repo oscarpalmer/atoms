@@ -985,7 +985,7 @@ var work2 = function(type, timer2, state, options, isRepeated2) {
   let index = type === "continue" ? +(state.index ?? 0) : 0;
   state.elapsed = elapsed;
   state.index = index;
-  const total = (count === Number.POSITIVE_INFINITY ? timeout : (count - index) * (interval > 0 ? interval : 62.5)) - elapsed;
+  const total = (count === Number.POSITIVE_INFINITY ? Number.POSITIVE_INFINITY : (count - index) * (interval > 0 ? interval : 62.5)) - elapsed;
   let current;
   let start;
   function finish(finished, error) {

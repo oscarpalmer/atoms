@@ -387,7 +387,7 @@ function work(
 
 	const total =
 		(count === Number.POSITIVE_INFINITY
-			? timeout
+			? Number.POSITIVE_INFINITY
 			: (count - index) * (interval > 0 ? interval : 1000 / 16)) - elapsed;
 
 	let current: DOMHighResTimeStamp | null;
