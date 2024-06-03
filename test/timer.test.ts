@@ -1,4 +1,4 @@
-import {expect, test} from 'bun:test';
+import {afterAll, expect, test} from 'bun:test';
 import {
 	isRepeated,
 	isTimer,
@@ -55,6 +55,118 @@ test('restart', done => {
 		expect(value).toEqual(1);
 		done();
 	}, 375);
+});
+
+test('timer: pause & continue', done => {
+	const now = Date.now();
+
+	let count = 0;
+
+	const timer = repeat(
+		index => {
+			if (index < 5) {
+				expect(Date.now() - now).toBeLessThan(125);
+			} else {
+				expect(Date.now() - now).toBeGreaterThan(375);
+			}
+
+			count += 1;
+		},
+		{
+			count: 10,
+			interval: 25,
+		},
+	);
+
+	wait(
+		() => {
+			timer.pause();
+
+			wait(() => {
+				timer.continue();
+
+				wait(() => {
+					expect(count).toEqual(10);
+					done();
+				}, 250);
+			}, 250);
+		},
+		{
+			interval: 125,
+		},
+	);
+});
+
+test('when', done => {
+	let stopped = false;
+	let value = 0;
+
+	wait(() => {
+		value += 1;
+	}, 125);
+
+	when(() => value > 0).then(() => {
+		expect(value).toEqual(1);
+	});
+
+	const what = when(
+		() => {
+			expect(what.active).toBe(true);
+
+			return value > 1;
+		},
+		{
+			interval: 125,
+		},
+	);
+
+	wait(() => {
+		what.stop();
+	}, 175);
+
+	what.then(null, () => {
+		stopped = true;
+	});
+
+	when(() => value > 1, {
+		timeout: 250,
+	}).then(null, () => {
+		expect(stopped).toBe(true);
+		expect(value).toEqual(1);
+		done();
+	});
+});
+
+test('when: pause & continue', done => {
+	let finished = false;
+
+	const what = when(() => finished,
+		{
+			count: 25,
+			interval: 25,
+		},
+	);
+
+	what.then(() => {
+		done();
+	});
+
+	wait(
+		() => {
+			what.pause();
+
+			wait(() => {
+				what.continue();
+
+				wait(() => {
+					finished = true;
+				}, 125);
+			}, 250);
+		},
+		{
+			interval: 125,
+		},
+	);
 });
 
 test('afterCallback', done => {
@@ -121,46 +233,6 @@ test('errorCallback', done => {
 		expect(finished).toBe(false);
 		done();
 	}, 250);
-});
-
-test('when', done => {
-	let stopped = false;
-	let value = 0;
-
-	wait(() => {
-		value += 1;
-	}, 125);
-
-	when(() => value > 0).then(() => {
-		expect(value).toEqual(1);
-	});
-
-	const what = when(
-		() => {
-			expect(what.active).toBe(true);
-
-			return value > 1;
-		},
-		{
-			interval: 125,
-		},
-	);
-
-	wait(() => {
-		what.stop();
-	}, 175);
-
-	what.then(null, () => {
-		stopped = true;
-	});
-
-	when(() => value > 1, {
-		timeout: 250,
-	}).then(null, () => {
-		expect(stopped).toBe(true);
-		expect(value).toEqual(1);
-		done();
-	});
 });
 
 test('is', done => {

@@ -17,6 +17,12 @@ type BaseOptions = {
      */
     timeout: number;
 };
+type BaseTimer = {
+    /**
+     * Is the timer running?
+     */
+    get active(): boolean;
+};
 type OptionsWithCount = {
     /**
      * How many times the timer should repeat
@@ -41,37 +47,45 @@ type RepeatOptions = {
  */
 export type Timer = {
     /**
-     * Is the timer running?
+     * Continues the timer _(if it was paused)_
      */
-    get active(): boolean;
+    continue(): Timer;
     /**
-     * Restarts the timer
+     * Pauses the timer _(if it was running)_
+     */
+    pause(): Timer;
+    /**
+     * Restarts the timer _(if it was running)_
      */
     restart(): Timer;
     /**
-     * Starts the timer
+     * Starts the timer _(if it was stopped)_
      */
     start(): Timer;
     /**
-     * Stops the timer
+     * Stops the timer _(if it was running)_
      */
     stop(): Timer;
-};
+} & BaseTimer;
 type WaitOptions = {} & BaseOptions & OptionsWithError;
 export type When = {
     /**
-     * Is the timer running?
+     * Continues the timer _(if it was paused)_
      */
-    get active(): boolean;
+    continue(): Timer;
     /**
-     * Stops the timer
+     * Pauses the timer _(if it was running)_
      */
-    stop(): void;
+    pause(): Timer;
+    /**
+     * Stops the timer _(if it was running)_
+     */
+    stop(): Timer;
     /**
      * Starts the timer and returns a promise that resolves when the condition is met
      */
     then(resolve?: (() => void) | null, reject?: (() => void) | null): Promise<void>;
-};
+} & BaseTimer;
 type WhenOptions = {} & OptionsWithCount;
 /**
  * Is the value a repeating timer?

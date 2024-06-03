@@ -34,6 +34,12 @@ var timer = function(type, callback, partial) {
     active: false
   };
   const instance = Object.create({
+    continue() {
+      return work("continue", this, state, options, isRepeated2);
+    },
+    pause() {
+      return work("pause", this, state, options, isRepeated2);
+    },
     restart() {
       return work("restart", this, state, options, isRepeated2);
     },
@@ -84,6 +90,12 @@ function when(condition, options) {
     rejecter = reject;
   });
   const instance = Object.create({
+    continue() {
+      repeated.continue();
+    },
+    pause() {
+      repeated.pause();
+    },
     stop() {
       if (repeated.active) {
         repeated.stop();
@@ -110,29 +122,37 @@ function when(condition, options) {
   return instance;
 }
 var work = function(type, timer2, state, options, isRepeated2) {
-  if (type === "start" && state.active || type === "stop" && !state.active) {
+  if (["continue", "start"].includes(type) && state.active || ["pause", "stop"].includes(type) && !state.active) {
     return timer2;
   }
   const { count, interval, timeout } = options;
-  if (typeof state.frame === "number") {
+  if (["pause", "stop"].includes(type)) {
+    activeTimers.delete(timer2);
     cancelAnimationFrame(state.frame);
     options.afterCallback?.(false);
-  }
-  if (type === "stop") {
-    activeTimers.delete(timer2);
     state.active = false;
     state.frame = undefined;
+    if (type === "stop") {
+      state.elapsed = undefined;
+      state.index = undefined;
+    }
     return timer2;
   }
   state.active = true;
   const canTimeout = timeout > 0 && timeout < Number.POSITIVE_INFINITY;
-  const total = count === Number.POSITIVE_INFINITY ? timeout : count * (interval > 0 ? interval : 17);
+  const elapsed = type === "continue" ? +(state.elapsed ?? 0) : 0;
+  let index = type === "continue" ? +(state.index ?? 0) : 0;
+  state.elapsed = elapsed;
+  state.index = index;
+  const total = (count === Number.POSITIVE_INFINITY ? timeout : (count - index) * (interval > 0 ? interval : 62.5)) - elapsed;
   let current;
   let start;
-  let index = 0;
   function finish(finished, error) {
+    activeTimers.delete(timer2);
     state.active = false;
+    state.elapsed = undefined;
     state.frame = undefined;
+    state.index = undefined;
     if (error) {
       options.errorCallback?.();
     }
@@ -144,15 +164,17 @@ var work = function(type, timer2, state, options, isRepeated2) {
     }
     current ??= timestamp;
     start ??= timestamp;
-    const elapsed = timestamp - current;
-    const finished = elapsed >= total;
-    if (finished || elapsed - 2 < interval && interval < elapsed + 2) {
+    const time = timestamp - current;
+    state.elapsed = elapsed + (current - start);
+    const finished = time - elapsed >= total;
+    if (finished || time - 2 < interval && interval < time + 2) {
       if (state.active) {
         state.callback(isRepeated2 ? index : undefined);
       }
       index += 1;
+      state.index = index;
       switch (true) {
-        case (canTimeout && !finished && timestamp - start >= timeout):
+        case (canTimeout && !finished && timestamp - start >= timeout - elapsed):
           finish(false, true);
           return;
         case (!finished && index < count):
@@ -175,11 +197,11 @@ document.addEventListener("visibilitychange", () => {
   if (document.hidden) {
     for (const timer2 of activeTimers) {
       hiddenTimers.add(timer2);
-      timer2.stop();
+      timer2.pause();
     }
   } else {
     for (const timer2 of hiddenTimers) {
-      timer2.start();
+      timer2.continue();
     }
     hiddenTimers.clear();
   }

@@ -9,7 +9,7 @@
 	"description": "Sweet little atomic goodies…",
 	"devDependencies": {
 		"@biomejs/biome": "^1.7",
-		"@happy-dom/global-registrator": "^14.11",
+		"@happy-dom/global-registrator": "^14.12",
 		"bun": "^1.1",
 		"sass": "^1.77",
 		"typescript": "^5.4"
@@ -105,11 +105,7 @@
 		},
 		"./package.json": "./package.json"
 	},
-	"files": [
-		"dist",
-		"src",
-		"types"
-	],
+	"files": ["dist", "src", "types"],
 	"keywords": [],
 	"license": "MIT",
 	"main": "./dist/js/index.js",
@@ -131,5 +127,5 @@
 	},
 	"type": "module",
 	"types": "./types/index.d.ts",
-	"version": "0.46.0"
+	"version": "0.47.0"
 }
