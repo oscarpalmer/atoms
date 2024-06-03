@@ -80,26 +80,30 @@ type TimerOptions = {} & RepeatOptions;
 type WaitOptions = {} & BaseOptions & OptionsWithError;
 
 export type When = {
-		/**
-		 * Is the timer running?
-		 */
-		get active(): boolean;
-		/**
-		 * Stops the timer
-		 */
-		stop(): void;
-		/**
-		 * Starts the timer and returns a promise that resolves when the condition is met
-		 */
-		then(
-			resolve?: (() => void) | null,
-			reject?: (() => void) | null,
-		): Promise<void>;
-	};
+	/**
+	 * Is the timer running?
+	 */
+	get active(): boolean;
+	/**
+	 * Stops the timer
+	 */
+	stop(): void;
+	/**
+	 * Starts the timer and returns a promise that resolves when the condition is met
+	 */
+	then(
+		resolve?: (() => void) | null,
+		reject?: (() => void) | null,
+	): Promise<void>;
+};
 
 type WhenOptions = {} & OptionsWithCount;
 
 type WorkType = 'restart' | 'start' | 'stop';
+
+function getValueOrDefault(value: unknown, defaultValue: number): number {
+	return typeof value === 'number' && value > 0 ? value : defaultValue;
+}
 
 function is(value: unknown, pattern: RegExp) {
 	return pattern.test((value as PlainObject)?.$timer as string);
@@ -138,47 +142,36 @@ export function isWhen(value: unknown): value is When {
  * - calls a callback after a certain amount of time...
  * - ... and repeats it a certain amount of times
  * ---
- * - `options.count` defaults to `Infinity` _(minimum `1`)_
+ * - `options.count` defaults to `Infinity`
  * - `options.interval` defaults to `0`
- * - `options.timeout` defaults to `30_000` _(30 seconds)_
+ * - `options.timeout` defaults to `Infinity`
  */
 export function repeat(
 	callback: IndexedCallback,
 	options?: Partial<RepeatOptions>,
 ): Timer {
-	return timer('repeat', callback, {
-		...(options ?? {}),
-		...{
-			count:
-				typeof options?.count === 'number'
-					? options.count > 0
-						? options.count
-						: 1
-					: Number.POSITIVE_INFINITY,
-		},
-	}).start();
+	return timer('repeat', callback, options ?? {}).start();
 }
 
 function timer(
 	type: 'repeat' | 'wait',
 	callback: AnyCallback,
-	options: Partial<TimerOptions>,
+	partial: Partial<TimerOptions>,
 ): Timer {
-	const extended: TimerOptions = {
-		afterCallback: options.afterCallback,
-		count:
-			typeof options.count === 'number' && options.count > 0
-				? options.count
-				: 1,
-		errorCallback: options.errorCallback,
-		interval:
-			typeof options.interval === 'number' && options.interval >= 0
-				? options.interval
-				: 0,
-		timeout:
-			typeof options.timeout === 'number' && options.timeout > 0
-				? options.timeout
-				: 30_000,
+	const isRepeated = type === 'repeat';
+
+	const options: TimerOptions = {
+		afterCallback: partial.afterCallback,
+		count: getValueOrDefault(
+			partial.count,
+			isRepeated ? Number.POSITIVE_INFINITY : 1,
+		),
+		errorCallback: partial.errorCallback,
+		interval: getValueOrDefault(partial.interval, 0),
+		timeout: getValueOrDefault(
+			partial.timeout,
+			isRepeated ? Number.POSITIVE_INFINITY : 30_000,
+		),
 	};
 
 	const state: State = {
@@ -188,13 +181,13 @@ function timer(
 
 	const instance = Object.create({
 		restart() {
-			return work('restart', this as Timer, state, extended);
+			return work('restart', this as Timer, state, options, isRepeated);
 		},
 		start() {
-			return work('start', this as Timer, state, extended);
+			return work('start', this as Timer, state, options, isRepeated);
 		},
 		stop() {
-			return work('stop', this as Timer, state, extended);
+			return work('stop', this as Timer, state, options, isRepeated);
 		},
 	});
 
@@ -238,13 +231,15 @@ export function wait(
 	callback: () => void,
 	options?: number | Partial<WaitOptions>,
 ): Timer {
-	const optionsIsNumber = typeof options === 'number';
-
-	return timer('wait', callback, {
-		count: 1,
-		errorCallback: optionsIsNumber ? undefined : options?.errorCallback,
-		interval: optionsIsNumber ? options : options?.interval ?? 0,
-	}).start();
+	return timer(
+		'wait',
+		callback,
+		options == null || typeof options === 'number'
+			? {
+					interval: options,
+				}
+			: options,
+	).start();
 }
 
 /**
@@ -318,6 +313,7 @@ function work(
 	timer: Timer,
 	state: State,
 	options: RepeatOptions,
+	isRepeated: boolean,
 ): Timer {
 	if (
 		(type === 'start' && state.active) ||
@@ -343,7 +339,7 @@ function work(
 
 	state.active = true;
 
-	const isRepeated = count > 0;
+	const canTimeout = timeout > 0 && timeout < Number.POSITIVE_INFINITY;
 
 	const total =
 		count === Number.POSITIVE_INFINITY
@@ -385,7 +381,7 @@ function work(
 			index += 1;
 
 			switch (true) {
-				case !finished && timestamp - start >= timeout:
+				case canTimeout && !finished && timestamp - start >= timeout:
 					finish(false, true);
 					return;
 

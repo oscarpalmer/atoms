@@ -94,9 +94,9 @@ export declare function isWhen(value: unknown): value is When;
  * - calls a callback after a certain amount of time...
  * - ... and repeats it a certain amount of times
  * ---
- * - `options.count` defaults to `Infinity` _(minimum `1`)_
+ * - `options.count` defaults to `Infinity`
  * - `options.interval` defaults to `0`
- * - `options.timeout` defaults to `30_000` _(30 seconds)_
+ * - `options.timeout` defaults to `Infinity`
  */
 export declare function repeat(callback: IndexedCallback, options?: Partial<RepeatOptions>): Timer;
 /**

@@ -1,4 +1,7 @@
 // src/js/timer.ts
+var getValueOrDefault = function(value, defaultValue) {
+  return typeof value === "number" && value > 0 ? value : defaultValue;
+};
 var is = function(value, pattern) {
   return pattern.test(value?.$timer);
 };
@@ -15,20 +18,16 @@ function isWhen(value) {
   return is(value, /^when$/) && typeof value.then === "function";
 }
 function repeat(callback, options) {
-  return timer("repeat", callback, {
-    ...options ?? {},
-    ...{
-      count: typeof options?.count === "number" ? options.count > 0 ? options.count : 1 : Number.POSITIVE_INFINITY
-    }
-  }).start();
+  return timer("repeat", callback, options ?? {}).start();
 }
-var timer = function(type, callback, options) {
-  const extended = {
-    afterCallback: options.afterCallback,
-    count: typeof options.count === "number" && options.count > 0 ? options.count : 1,
-    errorCallback: options.errorCallback,
-    interval: typeof options.interval === "number" && options.interval >= 0 ? options.interval : 0,
-    timeout: typeof options.timeout === "number" && options.timeout > 0 ? options.timeout : 30000
+var timer = function(type, callback, partial) {
+  const isRepeated2 = type === "repeat";
+  const options = {
+    afterCallback: partial.afterCallback,
+    count: getValueOrDefault(partial.count, isRepeated2 ? Number.POSITIVE_INFINITY : 1),
+    errorCallback: partial.errorCallback,
+    interval: getValueOrDefault(partial.interval, 0),
+    timeout: getValueOrDefault(partial.timeout, isRepeated2 ? Number.POSITIVE_INFINITY : 30000)
   };
   const state = {
     callback,
@@ -36,13 +35,13 @@ var timer = function(type, callback, options) {
   };
   const instance = Object.create({
     restart() {
-      return work("restart", this, state, extended);
+      return work("restart", this, state, options, isRepeated2);
     },
     start() {
-      return work("start", this, state, extended);
+      return work("start", this, state, options, isRepeated2);
     },
     stop() {
-      return work("stop", this, state, extended);
+      return work("stop", this, state, options, isRepeated2);
     }
   });
   Object.defineProperties(instance, {
@@ -60,12 +59,9 @@ var timer = function(type, callback, options) {
   return instance;
 };
 function wait(callback, options) {
-  const optionsIsNumber = typeof options === "number";
-  return timer("wait", callback, {
-    count: 1,
-    errorCallback: optionsIsNumber ? undefined : options?.errorCallback,
-    interval: optionsIsNumber ? options : options?.interval ?? 0
-  }).start();
+  return timer("wait", callback, options == null || typeof options === "number" ? {
+    interval: options
+  } : options).start();
 }
 function when(condition, options) {
   let rejecter;
@@ -113,7 +109,7 @@ function when(condition, options) {
   });
   return instance;
 }
-var work = function(type, timer2, state, options) {
+var work = function(type, timer2, state, options, isRepeated2) {
   if (type === "start" && state.active || type === "stop" && !state.active) {
     return timer2;
   }
@@ -128,7 +124,7 @@ var work = function(type, timer2, state, options) {
     return timer2;
   }
   state.active = true;
-  const isRepeated2 = count > 0;
+  const canTimeout = timeout > 0 && timeout < Number.POSITIVE_INFINITY;
   const total = count === Number.POSITIVE_INFINITY ? timeout : count * (interval > 0 ? interval : 17);
   let current;
   let start;
@@ -155,7 +151,7 @@ var work = function(type, timer2, state, options) {
       }
       index += 1;
       switch (true) {
-        case (!finished && timestamp - start >= timeout):
+        case (canTimeout && !finished && timestamp - start >= timeout):
           finish(false, true);
           return;
         case (!finished && index < count):

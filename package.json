@@ -120,9 +120,10 @@
 		"url": "git+https://github.com/oscarpalmer/atoms.git"
 	},
 	"scripts": {
-		"build": "bun run build:css && bun run build:js && bun run types",
+		"build": "bun run clean && bun run build:css && bun run build:js && bun run types",
 		"build:css": "bunx sass ./src/css:./dist/css --no-source-map",
 		"build:js": "bunx bun ./.bun.ts && bunx bun ./.bun.ts --mjs",
+		"clean": "rm -rf ./dist && rm -rf ./types && rm ./tsconfig.tsbuildinfo",
 		"test": "bun test",
 		"types": "bunx tsc -p ./tsconfig.json",
 		"watch:css": "bunx sass ./src/css:./dist/css --no-source-map --watch",
@@ -130,5 +131,5 @@
 	},
 	"type": "module",
 	"types": "./types/index.d.ts",
-	"version": "0.44.0"
+	"version": "0.45.0"
 }

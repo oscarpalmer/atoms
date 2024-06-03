@@ -14,6 +14,10 @@ test('start', done => {
 		expect(true).toEqual(true);
 		done();
 	}, 125);
+
+	const x = repeat(() => {}, {timeout: 0});
+
+	x.stop();
 });
 
 test('stop', done => {
