@@ -29,6 +29,10 @@ type BaseTimer = {
 	 * Is the timer running?
 	 */
 	get active(): boolean;
+	/**
+	 * Is the timer paused?
+	 */
+	get paused(): boolean;
 };
 
 type OptionsWithCount = {
@@ -62,6 +66,7 @@ type State = {
 	frame?: number;
 	index?: number;
 	minimum: number;
+	paused: boolean;
 };
 
 /**
@@ -213,6 +218,7 @@ function timer(
 		callback,
 		active: false,
 		minimum: options.interval - (options.interval % milliseconds) / 2,
+		paused: false,
 	};
 
 	const instance = Object.create({
@@ -242,6 +248,11 @@ function timer(
 		active: {
 			get() {
 				return state.active;
+			},
+		},
+		paused: {
+			get() {
+				return state.paused;
 			},
 		},
 	});
@@ -310,6 +321,15 @@ export function when(
 			}
 		},
 		{
+			afterCallback() {
+				if (!repeated.paused) {
+					if (condition()) {
+						resolver?.();
+					} else {
+						rejecter?.();
+					}
+				}
+			},
 			errorCallback() {
 				rejecter?.();
 			},
@@ -381,16 +401,21 @@ function work(
 	const {minimum} = state;
 
 	if (['pause', 'stop'].includes(type)) {
+		const isStop = type === 'stop';
+
 		activeTimers.delete(timer);
 
 		cancelAnimationFrame(state.frame as never);
 
-		options.afterCallback?.(false);
+		if (isStop) {
+			options.afterCallback?.(false);
+		}
 
 		state.active = false;
 		state.frame = undefined;
+		state.paused = !isStop;
 
-		if (type === 'stop') {
+		if (isStop) {
 			state.elapsed = undefined;
 			state.index = undefined;
 		}
@@ -399,6 +424,7 @@ function work(
 	}
 
 	state.active = true;
+	state.paused = false;
 
 	const canTimeout = timeout > 0 && timeout < Number.POSITIVE_INFINITY;
 	const elapsed = type === 'continue' ? +(state.elapsed ?? 0) : 0;

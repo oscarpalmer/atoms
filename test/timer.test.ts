@@ -140,14 +140,13 @@ test('when', done => {
 test('when: pause & continue', done => {
 	let finished = false;
 
-	const what = when(() => finished,
-		{
-			count: 25,
-			interval: 25,
-		},
-	);
+	const what = when(() => finished, {
+		count: 100,
+		interval: 25,
+	});
 
 	what.then(() => {
+		expect(finished).toBe(true);
 		done();
 	});
 

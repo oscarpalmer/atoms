@@ -32,7 +32,8 @@ var timer = function(type, callback, partial, start) {
   const state = {
     callback,
     active: false,
-    minimum: options.interval - options.interval % milliseconds / 2
+    minimum: options.interval - options.interval % milliseconds / 2,
+    paused: false
   };
   const instance = Object.create({
     continue() {
@@ -61,6 +62,11 @@ var timer = function(type, callback, partial, start) {
       get() {
         return state.active;
       }
+    },
+    paused: {
+      get() {
+        return state.paused;
+      }
     }
   });
   if (start) {
@@ -82,6 +88,15 @@ function when(condition, options) {
       resolver?.();
     }
   }, {
+    afterCallback() {
+      if (!repeated.paused) {
+        if (condition()) {
+          resolver?.();
+        } else {
+          rejecter?.();
+        }
+      }
+    },
     errorCallback() {
       rejecter?.();
     },
@@ -132,18 +147,23 @@ var work = function(type, timer2, state, options, isRepeated2) {
   const { count, interval, timeout } = options;
   const { minimum } = state;
   if (["pause", "stop"].includes(type)) {
+    const isStop = type === "stop";
     activeTimers.delete(timer2);
     cancelAnimationFrame(state.frame);
-    options.afterCallback?.(false);
+    if (isStop) {
+      options.afterCallback?.(false);
+    }
     state.active = false;
     state.frame = undefined;
-    if (type === "stop") {
+    state.paused = !isStop;
+    if (isStop) {
       state.elapsed = undefined;
       state.index = undefined;
     }
     return timer2;
   }
   state.active = true;
+  state.paused = false;
   const canTimeout = timeout > 0 && timeout < Number.POSITIVE_INFINITY;
   const elapsed = type === "continue" ? +(state.elapsed ?? 0) : 0;
   let index = type === "continue" ? +(state.index ?? 0) : 0;

@@ -22,6 +22,10 @@ type BaseTimer = {
      * Is the timer running?
      */
     get active(): boolean;
+    /**
+     * Is the timer paused?
+     */
+    get paused(): boolean;
 };
 type OptionsWithCount = {
     /**
