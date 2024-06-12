@@ -17,6 +17,16 @@ type InsertType = 'push' | 'splice';
 
 type KeyCallback<Value> = (value: Value) => Key;
 
+type SortKey = {
+	direction: 'asc' | 'desc';
+	value: Key;
+};
+
+type SortKeyWithCallback<Value> = {
+	callback?: KeyCallback<Value>;
+	direction: 'asc' | 'desc';
+};
+
 /**
  * Chunks an array into smaller arrays of a specified size
  */
@@ -40,6 +50,14 @@ export function chunk<Value>(array: Value[], size?: number): Value[][] {
 	}
 
 	return chunks;
+}
+
+function comparison(first: unknown, second: unknown): number {
+	return [first, second].every(value =>
+		['bigint', 'boolean', 'date', 'number'].includes(typeof value),
+	)
+		? Number(first) - Number(second)
+		: String(first).localeCompare(String(second));
 }
 
 /**
@@ -239,6 +257,28 @@ function getCallbacks<Value>(
 	};
 }
 
+function getSortedValue<Value>(
+	map: Map<Value, Map<KeyCallback<Value>, unknown>>,
+	value: Value,
+	callback: KeyCallback<Value>,
+): unknown {
+	if (!map.has(value)) {
+		map.set(value, new Map());
+	}
+
+	const stored = map.get(value);
+
+	if (stored?.has(callback)) {
+		return stored.get(callback);
+	}
+
+	const result = callback?.(value) ?? value;
+
+	stored?.set(callback, result);
+
+	return result;
+}
+
 /**
  * Groups an array of items using a key or callback
  */
@@ -347,6 +387,106 @@ function insertValues<Value>(
  */
 export function push<Value>(array: Value[], values: Value[]): number {
 	return insertValues('push', array, values, array.length, 0) as number;
+}
+
+/**
+ * Sorts an array of items _(ascending by default)_
+ */
+export function sort<Value>(array: Value[], descending?: boolean): Value[];
+
+/**
+ * - Sorts an array of items, using a `key` to sort by a specific value
+ * - Ascending by default, but can be changed by setting `descending` to `true`, or using a `SortKey`
+ */
+export function sort<Value>(
+	array: Value[],
+	key: Key | SortKey | KeyCallback<Value>,
+	descending?: boolean,
+): Value[];
+
+/**
+ * - Sorts an array of items, using multiple `keys` to sort by specific values
+ * - Ascending by default, but can be changed by setting `descending` to `true`, or using `SortKey`
+ */
+export function sort<Value>(
+	array: Value[],
+	keys: Array<Key | SortKey | KeyCallback<Value>>,
+	descending?: boolean,
+): Value[];
+
+export function sort<Value>(
+	array: Value[],
+	first?:
+		| boolean
+		| Key
+		| SortKey
+		| KeyCallback<Value>
+		| Array<Key | SortKey | KeyCallback<Value>>,
+	second?: boolean,
+): Value[] {
+	if (first == null || typeof first === 'boolean') {
+		return first === true
+			? (array as never[]).sort((first, second) => second - first)
+			: array.sort();
+	}
+
+	const direction = second === true ? 'desc' : 'asc';
+
+	const keys = (Array.isArray(first) ? first : [first])
+		.map(key => {
+			if (typeof key === 'object') {
+				return 'value' in key
+					? {
+							direction: key.direction,
+							callback: getCallbacks(null, key.value)?.key,
+						}
+					: null;
+			}
+
+			return {
+				direction,
+				callback: getCallbacks(null, key)?.key,
+			} as SortKeyWithCallback<Value>;
+		})
+		.filter(
+			key => typeof key?.callback === 'function',
+		) as SortKeyWithCallback<Value>[];
+
+	const {length} = keys;
+
+	if (length === 0) {
+		return second === true
+			? (array as never[]).sort((first, second) => second - first)
+			: array.sort();
+	}
+
+	const store = new Map<Value, Map<KeyCallback<Value>, unknown>>();
+
+	const sorted = array.sort((first, second) => {
+		for (let index = 0; index < length; index += 1) {
+			const {callback, direction} = keys[index] as SortKeyWithCallback<Value>;
+
+			if (callback == null) {
+				continue;
+			}
+
+			const compared =
+				comparison(
+					getSortedValue(store, first, callback),
+					getSortedValue(store, second, callback),
+				) * (direction === 'asc' ? 1 : -1);
+
+			if (compared !== 0) {
+				return compared;
+			}
+		}
+
+		return 0;
+	});
+
+	store.clear();
+
+	return sorted;
 }
 
 /**

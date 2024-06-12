@@ -40,5 +40,8 @@ export declare function titleCase(value: string): string;
  * - A suffix may be appended to the truncated string, e.g., an ellipsis
  */
 export declare function truncate(value: string, length: number, suffix?: string): string;
+/**
+ * Split a string into words _(and other readable parts)_
+ */
 export declare function words(value: string): string[];
 export { capitalise as capitalize };

@@ -8,11 +8,19 @@ function max(values) {
 function min(values) {
   return values.length > 0 ? Math.min(...values) : Number.NaN;
 }
+function round(value, decimals) {
+  if (typeof decimals !== "number" || decimals < 1) {
+    return Math.round(value);
+  }
+  const mod = 10 ** decimals;
+  return Math.round((value + Number.EPSILON) * mod) / mod;
+}
 function sum(values) {
-  return values.reduce((a, b) => a + b, 0);
+  return values.reduce((previous, current) => previous + current, 0);
 }
 export {
   sum,
+  round,
   min,
   max,
   average

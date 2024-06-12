@@ -17,7 +17,7 @@ export function capitalise(value: string): string {
 
 	return value.length === 1
 		? value.toLocaleUpperCase()
-		: value.charAt(0).toLocaleUpperCase() + value.slice(1).toLocaleLowerCase();
+		: `${value.charAt(0).toLocaleUpperCase()}${value.slice(1).toLocaleLowerCase()}`;
 }
 
 /**
@@ -142,6 +142,9 @@ export function truncate(
 		: `${value.slice(0, truncatedLength)}${suffix ?? ''}`;
 }
 
+/**
+ * Split a string into words _(and other readable parts)_
+ */
 export function words(value: string): string[] {
 	// biome-ignore lint/suspicious/noControlCharactersInRegex: Lodash uses it, so it's fine ;-)
 	return value.match(/[^\x00-\x2f\x3a-\x40\x5b-\x60\x7b-\x7f]+/g) ?? [];

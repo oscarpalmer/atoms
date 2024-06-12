@@ -123,7 +123,7 @@ function when(condition, options) {
     },
     then(resolve, reject) {
       repeated.start();
-      return promise.then(resolve, reject);
+      return promise.then(resolve ?? noop, reject ?? noop);
     }
   });
   Object.defineProperties(instance, {
@@ -219,6 +219,8 @@ var work = function(type, timer2, state, options, isRepeated2) {
 var activeTimers = new Set;
 var hiddenTimers = new Set;
 var milliseconds = 16.666666666666668;
+var noop = () => {
+};
 document.addEventListener("visibilitychange", () => {
   if (document.hidden) {
     for (const timer2 of activeTimers) {

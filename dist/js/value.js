@@ -30,47 +30,6 @@ function isPlainObject(value) {
 }
 
 // src/js/value.ts
-function clone(value) {
-  switch (true) {
-    case value == null:
-    case typeof value === "function":
-      return value;
-    case typeof value === "bigint":
-      return BigInt(value);
-    case typeof value === "boolean":
-      return Boolean(value);
-    case typeof value === "number":
-      return Number(value);
-    case typeof value === "string":
-      return String(value);
-    case typeof value === "symbol":
-      return Symbol(value.description);
-    case value instanceof Node:
-      return value.cloneNode(true);
-    case value instanceof RegExp:
-      return cloneRegularExpression(value);
-    case isArrayOrPlainObject(value):
-      return cloneNested(value);
-    default:
-      return structuredClone(value);
-  }
-}
-var cloneNested = function(value) {
-  const cloned = Array.isArray(value) ? [] : {};
-  const keys = Object.keys(value);
-  const { length } = keys;
-  let index = 0;
-  for (;index < length; index += 1) {
-    const key = keys[index];
-    cloned[key] = clone(value[key]);
-  }
-  return cloned;
-};
-var cloneRegularExpression = function(value) {
-  const cloned = new RegExp(value.source, value.flags);
-  cloned.lastIndex = value.lastIndex;
-  return cloned;
-};
 function diff(first, second) {
   const result = {
     original: {
@@ -221,6 +180,5 @@ export {
   setValue,
   merge,
   getValue,
-  diff,
-  clone
+  diff
 };

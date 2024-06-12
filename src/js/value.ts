@@ -21,68 +21,6 @@ type KeyedDiffValue = {
 } & DiffValue;
 
 /**
- * Clones any kind of value
- */
-export function clone<Value>(value: Value): Value {
-	switch (true) {
-		case value == null:
-		case typeof value === 'function':
-			return value;
-
-		case typeof value === 'bigint':
-			return BigInt(value) as Value;
-
-		case typeof value === 'boolean':
-			return Boolean(value) as Value;
-
-		case typeof value === 'number':
-			return Number(value) as Value;
-
-		case typeof value === 'string':
-			return String(value) as Value;
-
-		case typeof value === 'symbol':
-			return Symbol(value.description) as Value;
-
-		case value instanceof Node:
-			return value.cloneNode(true) as Value;
-
-		case value instanceof RegExp:
-			return cloneRegularExpression(value) as Value;
-
-		case isArrayOrPlainObject(value):
-			return cloneNested(value) as Value;
-
-		default:
-			return structuredClone(value);
-	}
-}
-
-function cloneNested(value: ArrayOrPlainObject): ArrayOrPlainObject {
-	const cloned = (Array.isArray(value) ? [] : {}) as PlainObject;
-	const keys = Object.keys(value);
-	const {length} = keys;
-
-	let index = 0;
-
-	for (; index < length; index += 1) {
-		const key = keys[index];
-
-		cloned[key] = clone((value as PlainObject)[key]);
-	}
-
-	return cloned;
-}
-
-function cloneRegularExpression(value: RegExp): RegExp {
-	const cloned = new RegExp(value.source, value.flags);
-
-	cloned.lastIndex = value.lastIndex;
-
-	return cloned;
-}
-
-/**
  * - Find the differences between two values
  * - Returns an object holding the result:
  * 	- `original` holds the original values

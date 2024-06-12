@@ -11,7 +11,7 @@ function capitalise(value) {
   if (value.length === 0) {
     return value;
   }
-  return value.length === 1 ? value.toLocaleUpperCase() : value.charAt(0).toLocaleUpperCase() + value.slice(1).toLocaleLowerCase();
+  return value.length === 1 ? value.toLocaleUpperCase() : `${value.charAt(0).toLocaleUpperCase()}${value.slice(1).toLocaleLowerCase()}`;
 }
 function createUuid() {
   return "10000000-1000-4000-8000-100000000000".replace(/[018]/g, (substring) => (substring ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> substring / 4).toString(16));

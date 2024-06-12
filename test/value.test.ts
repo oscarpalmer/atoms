@@ -1,5 +1,5 @@
 import {expect, test} from 'bun:test';
-import {clone, diff, getValue, merge, setValue} from '../src/js/value';
+import {diff, getValue, merge, setValue} from '../src/js';
 
 type Diffable = {
 	numbers: number[];
@@ -22,64 +22,6 @@ type Mergeable = {
 	name?: {first?: string; last?: string};
 	profession?: string;
 };
-
-class Test {
-	constructor(
-		readonly id: number,
-		public name: string,
-	) {}
-}
-
-test('clone', () => {
-	const data = {
-		array: ['a', 1, true],
-		bigint: BigInt(123),
-		boolean: true,
-		date: new Date(),
-		expression: /test/,
-		fn() {},
-		instances: [new Test(1, 'Hello'), new Test(2, 'World')],
-		map: new Map([
-			['a', 1],
-			['b', 2],
-		]),
-		nil: null,
-		node: document.createElement('div'),
-		set: new Set([1, 2, 3]),
-		symbol: Symbol('abc'),
-		undef: undefined,
-	};
-
-	const cloned = clone(data);
-
-	expect(cloned).not.toBe(data);
-
-	cloned.array.push('b');
-	cloned.bigint = BigInt(456);
-	cloned.boolean = false;
-	cloned.date.setFullYear(2000);
-	cloned.instances[0].name = 'Hi';
-	cloned.instances[1].name = 'Earth';
-	cloned.map.set('c', 3);
-	cloned.node.textContent = 'A node';
-	cloned.set.add(4);
-
-	expect(data.array[3]).not.toBe(cloned.array[3]);
-	expect(data.bigint).not.toBe(cloned.bigint);
-	expect(data.boolean).not.toBe(cloned.boolean);
-	expect(data.date.getFullYear()).not.toBe(cloned.date.getFullYear());
-	expect(data.expression).not.toBe(cloned.expression);
-	expect(data.instances[0].name).not.toBe(cloned.instances[0].name);
-	expect(data.instances[1].name).not.toBe(cloned.instances[1].name);
-	expect(data.map.get('c')).not.toBe(cloned.map.get('c'));
-	expect(data.node.textContent).not.toBe(cloned.node.textContent);
-	expect(data.set.has(4)).not.toBe(cloned.set.has(4));
-	expect(data.symbol).not.toBe(cloned.symbol);
-
-	expect(data.fn).toBe(cloned.fn);
-	expect(data.nil).toBe(cloned.nil);
-	expect(data.undef).toBe(cloned.undef);
-});
 
 test('diff', () => {
 	expect(diff(1, 1).type).toBe('none');

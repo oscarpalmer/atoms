@@ -11,10 +11,6 @@ export type DiffValue<First = unknown, Second = First> = {
     to: Second;
 };
 /**
- * Clones any kind of value
- */
-export declare function clone<Value>(value: Value): Value;
-/**
  * - Find the differences between two values
  * - Returns an object holding the result:
  * 	- `original` holds the original values

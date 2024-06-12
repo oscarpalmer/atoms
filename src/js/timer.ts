@@ -140,6 +140,8 @@ const hiddenTimers = new Set<Timer>();
  */
 const milliseconds = 1_000 / 60;
 
+const noop = () => {};
+
 function getValueOrDefault(value: unknown, defaultValue: number): number {
 	return typeof value === 'number' && value > 0 ? value : defaultValue;
 }
@@ -363,7 +365,7 @@ export function when(
 		then(resolve?: () => void, reject?: () => void) {
 			repeated.start();
 
-			return promise.then(resolve, reject);
+			return promise.then(resolve ?? noop, reject ?? noop);
 		},
 	});
 

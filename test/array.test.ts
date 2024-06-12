@@ -8,6 +8,7 @@ import {
 	indexOf,
 	insert,
 	push,
+	sort,
 	splice,
 	unique,
 } from '../src/js/array';
@@ -181,6 +182,46 @@ test('push', () => {
 	const array: number[] = [];
 
 	expect(push(array, values)).toBe(length);
+});
+
+test('sort', () => {
+	expect(sort([2, 1, 3])).toEqual([1, 2, 3]);
+	expect(sort([2, 1, 3], true)).toEqual([3, 2, 1]);
+
+	expect(sort([2, 1, 3], [])).toEqual([1, 2, 3]);
+	expect(sort([2, 1, 3], [], true)).toEqual([3, 2, 1]);
+
+	expect(sort([2, 1, 3], [{} as never])).toEqual([1, 2, 3]);
+
+	expect(sort([{id: 2}, {id: 1}, {id: 3}], 'id')).toEqual([
+		{id: 1},
+		{id: 2},
+		{id: 3},
+	]);
+
+	expect(sort([{id: 2}, {id: 1}, {id: 3}], 'id', true)).toEqual([
+		{id: 3},
+		{id: 2},
+		{id: 1},
+	]);
+
+	expect(
+		sort(
+			[
+				{age: 24, firstName: 'B', lastName: 'B'},
+				{age: 24, firstName: 'A', lastName: 'B'},
+				{age: 24, firstName: 'A', lastName: 'A'},
+				{age: 48, firstName: 'C', lastName: 'C'},
+			],
+			['age', 'firstName', {direction: 'asc', value: 'lastName'}, {} as never],
+			true,
+		),
+	).toEqual([
+		{age: 48, firstName: 'C', lastName: 'C'},
+		{age: 24, firstName: 'B', lastName: 'B'},
+		{age: 24, firstName: 'A', lastName: 'A'},
+		{age: 24, firstName: 'A', lastName: 'B'},
+	]);
 });
 
 test('splice', () => {

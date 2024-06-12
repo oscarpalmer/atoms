@@ -1,6 +1,10 @@
 import type { Key } from './models';
 type BooleanCallback<Value> = (value: Value, index: number, array: Value[]) => boolean;
 type KeyCallback<Value> = (value: Value) => Key;
+type SortKey = {
+    direction: 'asc' | 'desc';
+    value: Key;
+};
 /**
  * Chunks an array into smaller arrays of a specified size
  */
@@ -55,6 +59,20 @@ export declare function insert<Value>(array: Value[], index: number, values: Val
  * - Uses chunking to avoid stack overflow
  */
 export declare function push<Value>(array: Value[], values: Value[]): number;
+/**
+ * Sorts an array of items _(ascending by default)_
+ */
+export declare function sort<Value>(array: Value[], descending?: boolean): Value[];
+/**
+ * - Sorts an array of items, using a `key` to sort by a specific value
+ * - Ascending by default, but can be changed by setting `descending` to `true`, or using a `SortKey`
+ */
+export declare function sort<Value>(array: Value[], key: Key | SortKey | KeyCallback<Value>, descending?: boolean): Value[];
+/**
+ * - Sorts an array of items, using multiple `keys` to sort by specific values
+ * - Ascending by default, but can be changed by setting `descending` to `true`, or using `SortKey`
+ */
+export declare function sort<Value>(array: Value[], keys: Array<Key | SortKey | KeyCallback<Value>>, descending?: boolean): Value[];
 /**
  * Removes and returns all items from an array starting from a specific index
  */

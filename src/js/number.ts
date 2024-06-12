@@ -46,8 +46,8 @@ export function getNumber(value: unknown): number {
 		return parsed == null
 			? Number.NaN
 			: typeof parsed === 'number'
-			  ? parsed
-			  : +parsed;
+				? parsed
+				: +parsed;
 	}
 
 	if (/^\s*0+\s*$/.test(parsed)) {

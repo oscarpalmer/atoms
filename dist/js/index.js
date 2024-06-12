@@ -13,6 +13,9 @@ function chunk(array, size) {
   }
   return chunks;
 }
+var comparison = function(first, second) {
+  return [first, second].every((value) => ["bigint", "boolean", "date", "number"].includes(typeof value)) ? Number(first) - Number(second) : String(first).localeCompare(String(second));
+};
 function exists(array, value, key) {
   return findValue("index", array, value, key) > -1;
 }
@@ -84,6 +87,18 @@ var getCallbacks = function(bool, key) {
     key: (value) => value?.[key]
   };
 };
+var getSortedValue = function(map, value, callback) {
+  if (!map.has(value)) {
+    map.set(value, new Map);
+  }
+  const stored = map.get(value);
+  if (stored?.has(callback)) {
+    return stored.get(callback);
+  }
+  const result = callback?.(value) ?? value;
+  stored?.set(callback, result);
+  return result;
+};
 function groupBy(array, key) {
   const callbacks = getCallbacks(undefined, key);
   if (callbacks?.key == null) {
@@ -125,6 +140,44 @@ var insertValues = function(type, array, values, start, deleteCount) {
 function push(array, values) {
   return insertValues("push", array, values, array.length, 0);
 }
+function sort(array, first, second) {
+  if (first == null || typeof first === "boolean") {
+    return first === true ? array.sort((first2, second2) => second2 - first2) : array.sort();
+  }
+  const direction = second === true ? "desc" : "asc";
+  const keys = (Array.isArray(first) ? first : [first]).map((key) => {
+    if (typeof key === "object") {
+      return "value" in key ? {
+        direction: key.direction,
+        callback: getCallbacks(null, key.value)?.key
+      } : null;
+    }
+    return {
+      direction,
+      callback: getCallbacks(null, key)?.key
+    };
+  }).filter((key) => typeof key?.callback === "function");
+  const { length } = keys;
+  if (length === 0) {
+    return second === true ? array.sort((first2, second2) => second2 - first2) : array.sort();
+  }
+  const store = new Map;
+  const sorted = array.sort((first2, second2) => {
+    for (let index = 0;index < length; index += 1) {
+      const { callback, direction: direction2 } = keys[index];
+      if (callback == null) {
+        continue;
+      }
+      const compared = comparison(getSortedValue(store, first2, callback), getSortedValue(store, second2, callback)) * (direction2 === "asc" ? 1 : -1);
+      if (compared !== 0) {
+        return compared;
+      }
+    }
+    return 0;
+  });
+  store.clear();
+  return sorted;
+}
 function splice(array, start, amountOrValues, values) {
   const amoutOrValuesIsArray = Array.isArray(amountOrValues);
   return insertValues("splice", array, amoutOrValuesIsArray ? amountOrValues : values ?? [], start, amoutOrValuesIsArray ? array.length : typeof amountOrValues === "number" && amountOrValues > 0 ? amountOrValues : 0);
@@ -132,6 +185,156 @@ function splice(array, start, amountOrValues, values) {
 function unique(array, key) {
   return findValues("unique", array, undefined, key);
 }
+// src/js/string.ts
+function camelCase(value) {
+  return toCase(value, "", true, false);
+}
+function capitalise(value) {
+  if (value.length === 0) {
+    return value;
+  }
+  return value.length === 1 ? value.toLocaleUpperCase() : `${value.charAt(0).toLocaleUpperCase()}${value.slice(1).toLocaleLowerCase()}`;
+}
+function createUuid() {
+  return "10000000-1000-4000-8000-100000000000".replace(/[018]/g, (substring) => (substring ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> substring / 4).toString(16));
+}
+function getString(value) {
+  if (typeof value === "string") {
+    return value;
+  }
+  if (typeof value !== "object" || value == null) {
+    return String(value);
+  }
+  const valueOff = value.valueOf?.() ?? value;
+  const asString = valueOff?.toString?.() ?? String(valueOff);
+  return asString.startsWith("[object ") ? JSON.stringify(value) : asString;
+}
+function join(value, delimiter) {
+  return value.filter((item) => !isNullableOrWhitespace(item)).map(getString).join(typeof delimiter === "string" ? delimiter : "");
+}
+function kebabCase(value) {
+  return toCase(value, "-", false, false);
+}
+function pascalCase(value) {
+  return toCase(value, "", true, true);
+}
+function snakeCase(value) {
+  return toCase(value, "_", false, false);
+}
+function titleCase(value) {
+  return words(value).map(capitalise).join(" ");
+}
+var toCase = function(value, delimiter, capitaliseAny, capitaliseFirst) {
+  return words(value).map((word, index) => {
+    const parts = word.replace(/(\p{Lu}*)(\p{Lu})(\p{Ll}+)/gu, (full, one, two, three) => three === "s" ? full : `${one}-${two}${three}`).replace(/(\p{Ll})(\p{Lu})/gu, "$1-$2").split("-");
+    return parts.filter((part) => part.length > 0).map((part, partIndex) => !capitaliseAny || partIndex === 0 && index === 0 && !capitaliseFirst ? part.toLocaleLowerCase() : capitalise(part)).join(delimiter);
+  }).join(delimiter);
+};
+function truncate(value, length, suffix) {
+  const suffixLength = suffix?.length ?? 0;
+  const truncatedLength = length - suffixLength;
+  return value.length <= length ? value : `${value.slice(0, truncatedLength)}${suffix ?? ""}`;
+}
+function words(value) {
+  return value.match(/[^\x00-\x2f\x3a-\x40\x5b-\x60\x7b-\x7f]+/g) ?? [];
+}
+
+// src/js/is.ts
+function isArrayOrPlainObject(value) {
+  return Array.isArray(value) || isPlainObject(value);
+}
+function isEmpty(value) {
+  if (Array.isArray(value)) {
+    return value.length === 0 || value.filter((item) => item != null).length === 0;
+  }
+  const values = Object.values(value);
+  return values.length === 0 || values.filter((item) => item != null).length === 0;
+}
+function isNullable(value) {
+  return value == null;
+}
+function isNullableOrEmpty(value) {
+  return value == null || getString(value) === "";
+}
+function isNullableOrWhitespace(value) {
+  return value == null || /^\s*$/.test(getString(value));
+}
+function isNumber(value) {
+  return typeof value === "number" && !Number.isNaN(value);
+}
+function isNumerical(value) {
+  return isNumber(value) || typeof value === "string" && value.trim().length > 0 && !Number.isNaN(+value);
+}
+function isObject(value) {
+  return typeof value === "object" && value !== null || typeof value === "function";
+}
+function isPlainObject(value) {
+  if (typeof value !== "object" || value === null) {
+    return false;
+  }
+  const prototype = Object.getPrototypeOf(value);
+  return (prototype === null || prototype === Object.prototype || Object.getPrototypeOf(prototype) === null) && !(Symbol.toStringTag in value) && !(Symbol.iterator in value);
+}
+function isPrimitive(value) {
+  return value == null || /^(bigint|boolean|number|string|symbol)$/.test(typeof value);
+}
+
+// src/js/clone.ts
+function clone(value) {
+  switch (true) {
+    case value == null:
+      return value;
+    case typeof value === "bigint":
+      return BigInt(value);
+    case typeof value === "boolean":
+      return Boolean(value);
+    case typeof value === "function":
+      return;
+    case typeof value === "number":
+      return Number(value);
+    case typeof value === "string":
+      return String(value);
+    case typeof value === "symbol":
+      return Symbol(value.description);
+    case value instanceof ArrayBuffer:
+      return cloneArrayBuffer(value);
+    case value instanceof DataView:
+      return cloneDataView(value);
+    case value instanceof Node:
+      return value.cloneNode(true);
+    case value instanceof RegExp:
+      return cloneRegularExpression(value);
+    case isArrayOrPlainObject(value):
+      return cloneNested(value);
+    default:
+      return structuredClone(value);
+  }
+}
+var cloneArrayBuffer = function(value) {
+  const cloned = new ArrayBuffer(value.byteLength);
+  new Uint8Array(cloned).set(new Uint8Array(value));
+  return cloned;
+};
+var cloneDataView = function(value) {
+  const buffer = cloneArrayBuffer(value.buffer);
+  return new DataView(buffer, value.byteOffset, value.byteLength);
+};
+var cloneNested = function(value) {
+  const cloned = Array.isArray(value) ? [] : {};
+  const keys = Object.keys(value);
+  const { length } = keys;
+  let index = 0;
+  for (;index < length; index += 1) {
+    const key = keys[index];
+    cloned[key] = clone(value[key]);
+  }
+  return cloned;
+};
+var cloneRegularExpression = function(value) {
+  const cloned = new RegExp(value.source, value.flags);
+  cloned.lastIndex = value.lastIndex;
+  return cloned;
+};
 // src/js/number.ts
 function between(value, min, max) {
   return value >= min && value <= max;
@@ -343,100 +546,6 @@ function rgbToHsl(rgb) {
 }
 var anyPattern = /^#*([a-f0-9]{3}){1,2}$/i;
 var groupedPattern = /^#*([a-f0-9]{2})([a-f0-9]{2})([a-f0-9]{2})$/i;
-// src/js/string.ts
-function camelCase(value) {
-  return toCase(value, "", true, false);
-}
-function capitalise(value) {
-  if (value.length === 0) {
-    return value;
-  }
-  return value.length === 1 ? value.toLocaleUpperCase() : value.charAt(0).toLocaleUpperCase() + value.slice(1).toLocaleLowerCase();
-}
-function createUuid() {
-  return "10000000-1000-4000-8000-100000000000".replace(/[018]/g, (substring) => (substring ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> substring / 4).toString(16));
-}
-function getString(value) {
-  if (typeof value === "string") {
-    return value;
-  }
-  if (typeof value !== "object" || value == null) {
-    return String(value);
-  }
-  const valueOff = value.valueOf?.() ?? value;
-  const asString = valueOff?.toString?.() ?? String(valueOff);
-  return asString.startsWith("[object ") ? JSON.stringify(value) : asString;
-}
-function join(value, delimiter) {
-  return value.filter((item) => !isNullableOrWhitespace(item)).map(getString).join(typeof delimiter === "string" ? delimiter : "");
-}
-function kebabCase(value) {
-  return toCase(value, "-", false, false);
-}
-function pascalCase(value) {
-  return toCase(value, "", true, true);
-}
-function snakeCase(value) {
-  return toCase(value, "_", false, false);
-}
-function titleCase(value) {
-  return words(value).map(capitalise).join(" ");
-}
-var toCase = function(value, delimiter, capitaliseAny, capitaliseFirst) {
-  return words(value).map((word, index) => {
-    const parts = word.replace(/(\p{Lu}*)(\p{Lu})(\p{Ll}+)/gu, (full, one, two, three) => three === "s" ? full : `${one}-${two}${three}`).replace(/(\p{Ll})(\p{Lu})/gu, "$1-$2").split("-");
-    return parts.filter((part) => part.length > 0).map((part, partIndex) => !capitaliseAny || partIndex === 0 && index === 0 && !capitaliseFirst ? part.toLocaleLowerCase() : capitalise(part)).join(delimiter);
-  }).join(delimiter);
-};
-function truncate(value, length, suffix) {
-  const suffixLength = suffix?.length ?? 0;
-  const truncatedLength = length - suffixLength;
-  return value.length <= length ? value : `${value.slice(0, truncatedLength)}${suffix ?? ""}`;
-}
-function words(value) {
-  return value.match(/[^\x00-\x2f\x3a-\x40\x5b-\x60\x7b-\x7f]+/g) ?? [];
-}
-
-// src/js/is.ts
-function isArrayOrPlainObject(value) {
-  return Array.isArray(value) || isPlainObject(value);
-}
-function isEmpty(value) {
-  if (Array.isArray(value)) {
-    return value.length === 0 || value.filter((item) => item != null).length === 0;
-  }
-  const values = Object.values(value);
-  return values.length === 0 || values.filter((item) => item != null).length === 0;
-}
-function isNullable(value) {
-  return value == null;
-}
-function isNullableOrEmpty(value) {
-  return value == null || getString(value) === "";
-}
-function isNullableOrWhitespace(value) {
-  return value == null || /^\s*$/.test(getString(value));
-}
-function isNumber(value) {
-  return typeof value === "number" && !Number.isNaN(value);
-}
-function isNumerical(value) {
-  return isNumber(value) || typeof value === "string" && value.trim().length > 0 && !Number.isNaN(+value);
-}
-function isObject(value) {
-  return typeof value === "object" && value !== null || typeof value === "function";
-}
-function isPlainObject(value) {
-  if (typeof value !== "object" || value === null) {
-    return false;
-  }
-  const prototype = Object.getPrototypeOf(value);
-  return (prototype === null || prototype === Object.prototype || Object.getPrototypeOf(prototype) === null) && !(Symbol.toStringTag in value) && !(Symbol.iterator in value);
-}
-function isPrimitive(value) {
-  return value == null || /^(bigint|boolean|number|string|symbol)$/.test(typeof value);
-}
-
 // src/js/element/index.ts
 function findElement(selector, context) {
   return findElementOrElements(selector, context, true);
@@ -708,6 +817,93 @@ var selector = [
   "textarea",
   "video[controls]"
 ].map((selector2) => `${selector2}:not([inert])`).join(",");
+// src/js/equal.ts
+function equal(first, second) {
+  switch (true) {
+    case first === second:
+      return true;
+    case (first == null || second == null):
+      return first === second;
+    case typeof first !== typeof second:
+      return false;
+    case (first instanceof ArrayBuffer && second instanceof ArrayBuffer):
+      return equalArrayBuffer(first, second);
+    case typeof first === "boolean":
+    case first instanceof Date:
+      return Object.is(Number(first), Number(second));
+    case (first instanceof DataView && second instanceof DataView):
+      return equalDataView(first, second);
+    case (first instanceof Error && second instanceof Error):
+      return equalProperties(first, second, ["name", "message"]);
+    case (first instanceof Map && second instanceof Map):
+      return equalMap(first, second);
+    case (first instanceof RegExp && second instanceof RegExp):
+      return equalProperties(first, second, ["source", "flags"]);
+    case (first instanceof Set && second instanceof Set):
+      return equalSet(first, second);
+    case (Array.isArray(first) && Array.isArray(second)):
+    case (isPlainObject(first) && isPlainObject(second)):
+      return equalNested(first, second);
+    default:
+      return Object.is(first, second);
+  }
+}
+var equalArrayBuffer = function(first, second) {
+  return first.byteLength === second.byteLength ? equalNested(new Uint8Array(first), new Uint8Array(second)) : false;
+};
+var equalDataView = function(first, second) {
+  return first.byteOffset === second.byteOffset ? equalArrayBuffer(first.buffer, second.buffer) : false;
+};
+var equalMap = function(first, second) {
+  if (first.size !== second.size) {
+    return false;
+  }
+  const firstKeys = [...first.keys()];
+  const secondKeys = [...second.keys()];
+  if (firstKeys.some((key) => !secondKeys.includes(key))) {
+    return false;
+  }
+  for (const [key, value] of first) {
+    if (!equal(value, second.get(key))) {
+      return false;
+    }
+  }
+  return true;
+};
+var equalNested = function(first, second) {
+  const firstKeys = Object.keys(first);
+  const secondKeys = Object.keys(second);
+  const { length } = firstKeys;
+  if (length !== secondKeys.length || firstKeys.some((key) => !secondKeys.includes(key))) {
+    return false;
+  }
+  for (let index = 0;index < length; index += 1) {
+    const key = firstKeys[index];
+    if (!equal(first[key], second[key])) {
+      return false;
+    }
+  }
+  return true;
+};
+var equalProperties = function(first, second, properties) {
+  for (const key of properties) {
+    if (!Object.is(first[key], second[key])) {
+      return false;
+    }
+  }
+  return true;
+};
+var equalSet = function(first, second) {
+  if (first.size !== second.size) {
+    return false;
+  }
+  for (const value of first) {
+    if (!second.has(value)) {
+      return false;
+    }
+  }
+  return true;
+};
 // src/js/event.ts
 function getPosition(event) {
   let x;
@@ -793,8 +989,15 @@ function max(values) {
 function min(values) {
   return values.length > 0 ? Math.min(...values) : Number.NaN;
 }
+function round(value, decimals) {
+  if (typeof decimals !== "number" || decimals < 1) {
+    return Math.round(value);
+  }
+  const mod = 10 ** decimals;
+  return Math.round((value + Number.EPSILON) * mod) / mod;
+}
 function sum(values) {
-  return values.reduce((a, b) => a + b, 0);
+  return values.reduce((previous, current) => previous + current, 0);
 }
 // src/js/queue.ts
 function queue(callback) {
@@ -843,20 +1046,20 @@ function getRandomHex() {
 var getValueOrDefault = function(value, defaultValue) {
   return typeof value === "number" && value > 0 ? value : defaultValue;
 };
-var is3 = function(value, pattern) {
+var is5 = function(value, pattern) {
   return pattern.test(value?.$timer);
 };
 function isRepeated(value) {
-  return is3(value, /^repeat$/);
+  return is5(value, /^repeat$/);
 }
 function isTimer(value) {
-  return is3(value, /^repeat|wait$/);
+  return is5(value, /^repeat|wait$/);
 }
 function isWaited(value) {
-  return is3(value, /^wait$/);
+  return is5(value, /^wait$/);
 }
 function isWhen(value) {
-  return is3(value, /^when$/) && typeof value.then === "function";
+  return is5(value, /^when$/) && typeof value.then === "function";
 }
 function repeat(callback, options) {
   return timer("repeat", callback, options ?? {}, true);
@@ -964,7 +1167,7 @@ function when(condition, options) {
     },
     then(resolve, reject) {
       repeated.start();
-      return promise.then(resolve, reject);
+      return promise.then(resolve ?? noop, reject ?? noop);
     }
   });
   Object.defineProperties(instance, {
@@ -1060,6 +1263,8 @@ var work2 = function(type, timer2, state, options, isRepeated2) {
 var activeTimers = new Set;
 var hiddenTimers = new Set;
 var milliseconds = 16.666666666666668;
+var noop = () => {
+};
 document.addEventListener("visibilitychange", () => {
   if (document.hidden) {
     for (const timer2 of activeTimers) {
@@ -1092,47 +1297,6 @@ var supportsTouch = (() => {
   return value;
 })();
 // src/js/value.ts
-function clone(value) {
-  switch (true) {
-    case value == null:
-    case typeof value === "function":
-      return value;
-    case typeof value === "bigint":
-      return BigInt(value);
-    case typeof value === "boolean":
-      return Boolean(value);
-    case typeof value === "number":
-      return Number(value);
-    case typeof value === "string":
-      return String(value);
-    case typeof value === "symbol":
-      return Symbol(value.description);
-    case value instanceof Node:
-      return value.cloneNode(true);
-    case value instanceof RegExp:
-      return cloneRegularExpression(value);
-    case isArrayOrPlainObject(value):
-      return cloneNested(value);
-    default:
-      return structuredClone(value);
-  }
-}
-var cloneNested = function(value) {
-  const cloned = Array.isArray(value) ? [] : {};
-  const keys = Object.keys(value);
-  const { length } = keys;
-  let index = 0;
-  for (;index < length; index += 1) {
-    const key = keys[index];
-    cloned[key] = clone(value[key]);
-  }
-  return cloned;
-};
-var cloneRegularExpression = function(value) {
-  const cloned = new RegExp(value.source, value.flags);
-  cloned.lastIndex = value.lastIndex;
-  return cloned;
-};
 function diff(first, second) {
   const result = {
     original: {
@@ -1288,10 +1452,12 @@ export {
   titleCase,
   sum,
   splice,
+  sort,
   snakeCase,
   setValue,
   setStyles,
   setData,
+  round,
   rgbToHsl,
   rgbToHex,
   repeat,
@@ -1348,6 +1514,7 @@ export {
   find,
   filter,
   exists,
+  equal,
   diff,
   createUuid,
   clone,
