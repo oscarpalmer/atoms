@@ -2,9 +2,9 @@ import {expect, test} from 'bun:test';
 import {log} from '../src/js/log';
 
 test('log', () => {
-	expect(log).toBeFunction();
+	expect(log.it).toBeFunction();
 
-	log('test');
+	log.it('test');
 
 	expect(log.enabled).toBeTrue();
 

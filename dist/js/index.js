@@ -31,12 +31,11 @@ var findValue = function(type, array, value, key) {
     return type === "index" ? array.indexOf(value) : array.find((item) => item === value);
   }
   if (callbacks.bool != null) {
-    const index2 = array.findIndex(callbacks.bool);
-    return type === "index" ? index2 : index2 > -1 ? array[index2] : undefined;
+    const index = array.findIndex(callbacks.bool);
+    return type === "index" ? index : index > -1 ? array[index] : undefined;
   }
   const { length } = array;
-  let index = 0;
-  for (;index < length; index += 1) {
+  for (let index = 0;index < length; index += 1) {
     const item = array[index];
     if (callbacks.key?.(item) === value) {
       return type === "index" ? index : item;
@@ -59,8 +58,7 @@ var findValues = function(type, array, value, key) {
   const hasCallback = typeof callbacks?.key === "function";
   const result = [];
   const values = hasCallback ? [] : result;
-  let index = 0;
-  for (;index < length; index += 1) {
+  for (let index = 0;index < length; index += 1) {
     const item = array[index];
     const itemValue = hasCallback ? callbacks.key?.(item) : item;
     if (type === "all" && itemValue === value || type === "unique" && values.indexOf(itemValue) === -1) {
@@ -106,8 +104,7 @@ function groupBy(array, key) {
   }
   const grouped = {};
   const { length } = array;
-  let index = 0;
-  for (;index < length; index += 1) {
+  for (let index = 0;index < length; index += 1) {
     const item = array[index];
     const value = callbacks.key(item);
     if (value in grouped) {
@@ -127,9 +124,8 @@ function insert(array, index, values) {
 var insertValues = function(type, array, values, start, deleteCount) {
   const chunked = chunk(values).reverse();
   const { length } = chunked;
-  let index = 0;
   let returned;
-  for (;index < length; index += 1) {
+  for (let index = 0;index < length; index += 1) {
     const result = array.splice(start, index === 0 ? deleteCount : 0, ...chunked[index]);
     if (returned == null) {
       returned = result;
@@ -323,8 +319,7 @@ var cloneNested = function(value) {
   const cloned = Array.isArray(value) ? [] : {};
   const keys = Object.keys(value);
   const { length } = keys;
-  let index = 0;
-  for (;index < length; index += 1) {
+  for (let index = 0;index < length; index += 1) {
     const key = keys[index];
     cloned[key] = clone(value[key]);
   }
@@ -556,9 +551,8 @@ var findElementOrElements = function(selector, context, single) {
   const result = [];
   if (typeof selector === "string") {
     const { length: length2 } = contexts;
-    let index2 = 0;
-    for (;index2 < length2; index2 += 1) {
-      const value = callback.call(contexts[index2], selector);
+    for (let index = 0;index < length2; index += 1) {
+      const value = callback.call(contexts[index], selector);
       if (single) {
         if (value == null) {
           continue;
@@ -567,12 +561,11 @@ var findElementOrElements = function(selector, context, single) {
       }
       result.push(...Array.from(value));
     }
-    return single ? undefined : result.filter((value, index3, array) => array.indexOf(value) === index3);
+    return single ? undefined : result.filter((value, index, array) => array.indexOf(value) === index);
   }
   const nodes = Array.isArray(selector) ? selector : selector instanceof NodeList ? Array.from(selector) : [selector];
   const { length } = nodes;
-  let index = 0;
-  for (;index < length; index += 1) {
+  for (let index = 0;index < length; index += 1) {
     const node = nodes[index];
     const element = node instanceof Document ? node.body : node instanceof Element ? node : undefined;
     if (element != null && (context == null || contexts.length === 0 || contexts.some((context2) => context2 === element || context2.contains(element))) && !result.includes(element)) {
@@ -711,8 +704,7 @@ var getValidElements = function(parent, filters, tabbable) {
   const indiced = [];
   const zeroed = [];
   const { length } = items;
-  let index = 0;
-  for (;index < length; index += 1) {
+  for (let index = 0;index < length; index += 1) {
     const item = items[index];
     if (item.tabIndex === 0) {
       zeroed.push(item.element);
@@ -740,8 +732,7 @@ var isDisabledFromFieldset = function(element) {
     if (parent instanceof HTMLFieldSetElement && parent.disabled) {
       const children = Array.from(parent.children);
       const { length } = children;
-      let index = 0;
-      for (;index < length; index += 1) {
+      for (let index = 0;index < length; index += 1) {
         const child = children[index];
         if (child instanceof HTMLLegendElement) {
           return parent.matches("fieldset[disabled] *") ? true : !child.contains(element);
@@ -829,7 +820,7 @@ function equal(first, second) {
     case (first instanceof ArrayBuffer && second instanceof ArrayBuffer):
       return equalArrayBuffer(first, second);
     case typeof first === "boolean":
-    case first instanceof Date:
+    case (first instanceof Date && second instanceof Date):
       return Object.is(Number(first), Number(second));
     case (first instanceof DataView && second instanceof DataView):
       return equalDataView(first, second);
@@ -904,6 +895,105 @@ var equalSet = function(first, second) {
   }
   return true;
 };
+// src/js/emitter.ts
+var createObserable = function(emitter, observers) {
+  const instance = Object.create({
+    subscribe(first, second, third) {
+      return createSubscription(emitter, observers, getObserver(first, second, third));
+    }
+  });
+  return instance;
+};
+var createSubscription = function(emitter, observers, observer) {
+  let closed = false;
+  const instance = Object.create({
+    unsubscribe() {
+      if (!closed) {
+        closed = true;
+        observers.delete(instance);
+      }
+    }
+  });
+  Object.defineProperty(instance, "closed", {
+    get() {
+      return closed || !emitter.active;
+    }
+  });
+  observers.set(instance, observer);
+  observer.next?.(emitter.value);
+  return instance;
+};
+var getObserver = function(first, second, third) {
+  let observer;
+  if (typeof first === "object") {
+    observer = first;
+  } else {
+    observer = {
+      error: second,
+      next: first,
+      complete: third
+    };
+  }
+  return observer;
+};
+function emitter(value) {
+  let active = true;
+  let stored = value;
+  function finish(emit) {
+    if (active) {
+      active = false;
+      for (const [subscription, observer] of observers) {
+        if (emit) {
+          observer.complete?.();
+        }
+        subscription.unsubscribe();
+      }
+    }
+  }
+  const observers = new Map;
+  const instance = Object.create({
+    destroy() {
+      finish(false);
+    },
+    error(error) {
+      if (active) {
+        for (const [, observer] of observers) {
+          observer.error?.(error);
+        }
+      }
+    },
+    finish() {
+      finish(true);
+    },
+    next(value2) {
+      if (active) {
+        stored = value2;
+        for (const [, observer] of observers) {
+          observer.next?.(value2);
+        }
+      }
+    }
+  });
+  const observable = createObserable(instance, observers);
+  Object.defineProperties(instance, {
+    active: {
+      get() {
+        return active;
+      }
+    },
+    observable: {
+      get() {
+        return observable;
+      }
+    },
+    value: {
+      get() {
+        return stored;
+      }
+    }
+  });
+  return instance;
+}
 // src/js/event.ts
 function getPosition(event) {
   let x;
@@ -956,9 +1046,7 @@ var types = new Set([
   "warn"
 ]);
 var log = (() => {
-  function instance(...data) {
-    work("log", data);
-  }
+  const instance = Object.create(null);
   Object.defineProperties(instance, {
     enabled: {
       get() {
@@ -967,6 +1055,9 @@ var log = (() => {
       set(value) {
         _atomic_logging = value;
       }
+    },
+    it: {
+      value: (...data) => work("log", data)
     },
     time: {
       value: time
@@ -1043,6 +1134,14 @@ function getRandomHex() {
   return "0123456789ABCDEF"[getRandomInteger(0, 16)];
 }
 // src/js/timer.ts
+async function delay(time2) {
+  return new Promise((resolve) => {
+    wait(resolve, {
+      errorCallback: resolve,
+      interval: time2
+    });
+  });
+}
 var getValueOrDefault = function(value, defaultValue) {
   return typeof value === "number" && value > 0 ? value : defaultValue;
 };
@@ -1236,22 +1335,21 @@ var work2 = function(type, timer2, state, options, isRepeated2) {
     const time2 = timestamp - current;
     state.elapsed = elapsed + (current - start);
     const finished = time2 - elapsed >= total;
+    if (timestamp - start >= timeout - elapsed) {
+      finish(finished, !finished);
+      return;
+    }
     if (finished || time2 >= minimum) {
       if (state.active) {
         state.callback(isRepeated2 ? index : undefined);
       }
       index += 1;
       state.index = index;
-      switch (true) {
-        case (canTimeout && !finished && timestamp - start >= timeout - elapsed):
-          finish(false, true);
-          return;
-        case (!finished && index < count):
-          current = null;
-          break;
-        default:
-          finish(true, false);
-          return;
+      if (!finished && index < count) {
+        current = null;
+      } else {
+        finish(true, false);
+        return;
       }
     }
     state.frame = requestAnimationFrame(step);
@@ -1321,8 +1419,7 @@ function diff(first, second) {
   if (length === 0) {
     result.type = "none";
   }
-  let index = 0;
-  for (;index < length; index += 1) {
+  for (let index = 0;index < length; index += 1) {
     const diff2 = diffs[index];
     result.values[diff2.key] = { from: diff2.from, to: diff2.to };
   }
@@ -1340,17 +1437,15 @@ var findKey = function(needle, haystack, ignoreCase) {
 var getDiffs = function(first, second, prefix) {
   const changes = [];
   const checked = new Set;
-  let outer = 0;
-  for (;outer < 2; outer += 1) {
-    const value = outer === 0 ? first : second;
+  for (let outerIndex = 0;outerIndex < 2; outerIndex += 1) {
+    const value = outerIndex === 0 ? first : second;
     if (!value) {
       continue;
     }
     const keys = Object.keys(value);
     const { length } = keys;
-    let inner = 0;
-    for (;inner < length; inner += 1) {
-      const key = keys[inner];
+    for (let innerIndex = 0;innerIndex < length; innerIndex += 1) {
+      const key = keys[innerIndex];
       if (checked.has(key)) {
         continue;
       }
@@ -1402,14 +1497,12 @@ function merge(...values) {
   const actual = values.filter((value) => isArrayOrPlainObject(value));
   const result = actual.every(Array.isArray) ? [] : {};
   const { length } = actual;
-  let itemIndex = 0;
-  for (;itemIndex < length; itemIndex += 1) {
-    const item = actual[itemIndex];
+  for (let outerIndex = 0;outerIndex < length; outerIndex += 1) {
+    const item = actual[outerIndex];
     const keys = Object.keys(item);
     const size = keys.length;
-    let keyIndex = 0;
-    for (;keyIndex < size; keyIndex += 1) {
-      const key = keys[keyIndex];
+    for (let innerIndex = 0;innerIndex < size; innerIndex += 1) {
+      const key = keys[innerIndex];
       const next = item[key];
       const previous = result[key];
       if (isArrayOrPlainObject(next)) {
@@ -1426,9 +1519,8 @@ function setValue(data, path, value, ignoreCase) {
   const parts = (shouldIgnoreCase ? path.toLowerCase() : path).split(".");
   const { length } = parts;
   const lastIndex = length - 1;
-  let index = 0;
   let target = typeof data === "object" ? data ?? {} : {};
-  for (;index < length; index += 1) {
+  for (let index = 0;index < length; index += 1) {
     const part = parts[index];
     if (parts.indexOf(part) === lastIndex) {
       handleValue(target, part, value, false, shouldIgnoreCase);
@@ -1515,7 +1607,9 @@ export {
   filter,
   exists,
   equal,
+  emitter,
   diff,
+  delay,
   createUuid,
   clone,
   clamp,

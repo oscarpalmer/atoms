@@ -33,9 +33,8 @@ var findElementOrElements = function(selector, context, single) {
   const result = [];
   if (typeof selector === "string") {
     const { length: length2 } = contexts;
-    let index2 = 0;
-    for (;index2 < length2; index2 += 1) {
-      const value = callback.call(contexts[index2], selector);
+    for (let index = 0;index < length2; index += 1) {
+      const value = callback.call(contexts[index], selector);
       if (single) {
         if (value == null) {
           continue;
@@ -44,12 +43,11 @@ var findElementOrElements = function(selector, context, single) {
       }
       result.push(...Array.from(value));
     }
-    return single ? undefined : result.filter((value, index3, array) => array.indexOf(value) === index3);
+    return single ? undefined : result.filter((value, index, array) => array.indexOf(value) === index);
   }
   const nodes = Array.isArray(selector) ? selector : selector instanceof NodeList ? Array.from(selector) : [selector];
   const { length } = nodes;
-  let index = 0;
-  for (;index < length; index += 1) {
+  for (let index = 0;index < length; index += 1) {
     const node = nodes[index];
     const element = node instanceof Document ? node.body : node instanceof Element ? node : undefined;
     if (element != null && (context == null || contexts.length === 0 || contexts.some((context2) => context2 === element || context2.contains(element))) && !result.includes(element)) {

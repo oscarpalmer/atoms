@@ -4,6 +4,7 @@ export * from './colour';
 export * from './element/index';
 export * from './element/focusable';
 export * from './equal';
+export * from './emitter';
 export * from './event';
 export * from './is';
 export * from './log';

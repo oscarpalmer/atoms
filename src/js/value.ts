@@ -69,9 +69,7 @@ export function diff<First, Second = First>(
 		result.type = 'none';
 	}
 
-	let index = 0;
-
-	for (; index < length; index += 1) {
+	for (let index = 0; index < length; index += 1) {
 		const diff = diffs[index];
 
 		result.values[diff.key] = {from: diff.from, to: diff.to};
@@ -104,10 +102,8 @@ function getDiffs(
 	const changes: KeyedDiffValue[] = [];
 	const checked = new Set<Key>();
 
-	let outer = 0;
-
-	for (; outer < 2; outer += 1) {
-		const value = outer === 0 ? first : second;
+	for (let outerIndex = 0; outerIndex < 2; outerIndex += 1) {
+		const value = outerIndex === 0 ? first : second;
 
 		if (!value) {
 			continue;
@@ -116,10 +112,8 @@ function getDiffs(
 		const keys = Object.keys(value);
 		const {length} = keys;
 
-		let inner = 0;
-
-		for (; inner < length; inner += 1) {
-			const key = keys[inner];
+		for (let innerIndex = 0; innerIndex < length; innerIndex += 1) {
+			const key = keys[innerIndex];
 
 			if (checked.has(key)) {
 				continue;
@@ -241,20 +235,15 @@ export function merge<Model extends ArrayOrPlainObject>(
 	) as PlainObject[];
 
 	const result = (actual.every(Array.isArray) ? [] : {}) as PlainObject;
-
 	const {length} = actual;
 
-	let itemIndex = 0;
-
-	for (; itemIndex < length; itemIndex += 1) {
-		const item = actual[itemIndex];
+	for (let outerIndex = 0; outerIndex < length; outerIndex += 1) {
+		const item = actual[outerIndex];
 		const keys = Object.keys(item);
 		const size = keys.length;
 
-		let keyIndex = 0;
-
-		for (; keyIndex < size; keyIndex += 1) {
-			const key = keys[keyIndex];
+		for (let innerIndex = 0; innerIndex < size; innerIndex += 1) {
+			const key = keys[innerIndex];
 			const next = item[key];
 			const previous = result[key];
 
@@ -308,10 +297,9 @@ export function setValue<Data extends PlainObject>(
 	const {length} = parts;
 	const lastIndex = length - 1;
 
-	let index = 0;
 	let target: PlainObject = typeof data === 'object' ? data ?? {} : {};
 
-	for (; index < length; index += 1) {
+	for (let index = 0; index < length; index += 1) {
 		const part = parts[index];
 
 		if (parts.indexOf(part) === lastIndex) {

@@ -6,12 +6,7 @@ if (globalThis._atomic_logging == null) {
 	globalThis._atomic_logging = true;
 }
 
-/**
- * Logs any number of values at the "log" log level
- */
-type LogCallback = (...data: unknown[]) => void;
-
-type LogPrototype = {
+type Log = {
 	/**
 	 * Is logging to the console enabled? _(defaults to `true`)_
 	 */
@@ -32,6 +27,10 @@ type LogPrototype = {
 	 * Logs any number of values at the "info" log level
 	 */
 	info(...data: unknown[]): void;
+	/**
+	 * Logs any number of values at the "log" log level
+	 */
+	it(data: unknown): void;
 	/**
 	 * Logs data as a table, with optional properties to use as columns
 	 */
@@ -85,9 +84,7 @@ const types = new Set<Type>([
 ]);
 
 const log = (() => {
-	function instance(...data: unknown[]): void {
-		work('log', data);
-	}
+	const instance = Object.create(null);
 
 	Object.defineProperties(instance, {
 		enabled: {
@@ -97,6 +94,9 @@ const log = (() => {
 			set(value: boolean) {
 				_atomic_logging = value;
 			},
+		},
+		it: {
+			value: (...data: unknown[]) => work('log', data),
 		},
 		time: {
 			value: time,
@@ -110,7 +110,7 @@ const log = (() => {
 	}
 
 	return instance;
-})() as LogCallback & LogPrototype;
+})() as Log;
 
 function time(label: string): Time {
 	const started = log.enabled;

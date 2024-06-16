@@ -10,7 +10,7 @@
 	"devDependencies": {
 		"@biomejs/biome": "^1.8.1",
 		"@happy-dom/global-registrator": "^14.12.0",
-		"@types/bun": "^1.1.3",
+		"@types/bun": "^1.1.4",
 		"bun": "^1.1.13",
 		"sass": "^1.77.5",
 		"typescript": "^5.4.5"
@@ -106,7 +106,11 @@
 		},
 		"./package.json": "./package.json"
 	},
-	"files": ["dist", "src", "types"],
+	"files": [
+		"dist",
+		"src",
+		"types"
+	],
 	"keywords": [],
 	"license": "MIT",
 	"main": "./dist/js/index.js",
@@ -128,5 +132,5 @@
 	},
 	"type": "module",
 	"types": "./types/index.d.ts",
-	"version": "0.50.0"
+	"version": "0.51.0"
 }

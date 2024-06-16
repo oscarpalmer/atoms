@@ -54,8 +54,7 @@ function diff(first, second) {
   if (length === 0) {
     result.type = "none";
   }
-  let index = 0;
-  for (;index < length; index += 1) {
+  for (let index = 0;index < length; index += 1) {
     const diff2 = diffs[index];
     result.values[diff2.key] = { from: diff2.from, to: diff2.to };
   }
@@ -73,17 +72,15 @@ var findKey = function(needle, haystack, ignoreCase) {
 var getDiffs = function(first, second, prefix) {
   const changes = [];
   const checked = new Set;
-  let outer = 0;
-  for (;outer < 2; outer += 1) {
-    const value = outer === 0 ? first : second;
+  for (let outerIndex = 0;outerIndex < 2; outerIndex += 1) {
+    const value = outerIndex === 0 ? first : second;
     if (!value) {
       continue;
     }
     const keys = Object.keys(value);
     const { length } = keys;
-    let inner = 0;
-    for (;inner < length; inner += 1) {
-      const key = keys[inner];
+    for (let innerIndex = 0;innerIndex < length; innerIndex += 1) {
+      const key = keys[innerIndex];
       if (checked.has(key)) {
         continue;
       }
@@ -135,14 +132,12 @@ function merge(...values) {
   const actual = values.filter((value) => isArrayOrPlainObject(value));
   const result = actual.every(Array.isArray) ? [] : {};
   const { length } = actual;
-  let itemIndex = 0;
-  for (;itemIndex < length; itemIndex += 1) {
-    const item = actual[itemIndex];
+  for (let outerIndex = 0;outerIndex < length; outerIndex += 1) {
+    const item = actual[outerIndex];
     const keys = Object.keys(item);
     const size = keys.length;
-    let keyIndex = 0;
-    for (;keyIndex < size; keyIndex += 1) {
-      const key = keys[keyIndex];
+    for (let innerIndex = 0;innerIndex < size; innerIndex += 1) {
+      const key = keys[innerIndex];
       const next = item[key];
       const previous = result[key];
       if (isArrayOrPlainObject(next)) {
@@ -159,9 +154,8 @@ function setValue(data, path, value, ignoreCase) {
   const parts = (shouldIgnoreCase ? path.toLowerCase() : path).split(".");
   const { length } = parts;
   const lastIndex = length - 1;
-  let index = 0;
   let target = typeof data === "object" ? data ?? {} : {};
-  for (;index < length; index += 1) {
+  for (let index = 0;index < length; index += 1) {
     const part = parts[index];
     if (parts.indexOf(part) === lastIndex) {
       handleValue(target, part, value, false, shouldIgnoreCase);

@@ -19,7 +19,7 @@ export function equal(first: unknown, second: unknown): boolean {
 			return equalArrayBuffer(first, second);
 
 		case typeof first === 'boolean':
-		case first instanceof Date:
+		case first instanceof Date && second instanceof Date:
 			return Object.is(Number(first), Number(second));
 
 		case first instanceof DataView && second instanceof DataView:

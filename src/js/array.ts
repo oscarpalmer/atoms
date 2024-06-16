@@ -169,9 +169,7 @@ function findValue<Model, Value = Model>(
 
 	const {length} = array;
 
-	let index = 0;
-
-	for (; index < length; index += 1) {
+	for (let index = 0; index < length; index += 1) {
 		const item = array[index];
 
 		if (callbacks.key?.(item) === value) {
@@ -205,14 +203,10 @@ function findValues<Model, Value = Model>(
 	}
 
 	const hasCallback = typeof callbacks?.key === 'function';
-
 	const result: Model[] = [];
-
 	const values: unknown[] = hasCallback ? [] : result;
 
-	let index = 0;
-
-	for (; index < length; index += 1) {
+	for (let index = 0; index < length; index += 1) {
 		const item = array[index];
 		const itemValue = hasCallback ? callbacks.key?.(item) : item;
 
@@ -293,12 +287,9 @@ export function groupBy<Value>(
 	}
 
 	const grouped: Record<Key, Value[]> = {};
-
 	const {length} = array;
 
-	let index = 0;
-
-	for (; index < length; index += 1) {
+	for (let index = 0; index < length; index += 1) {
 		const item = array[index];
 		const value = callbacks.key(item);
 
@@ -363,10 +354,9 @@ function insertValues<Value>(
 	const chunked = chunk(values).reverse();
 	const {length} = chunked;
 
-	let index = 0;
 	let returned: Value[] | undefined;
 
-	for (; index < length; index += 1) {
+	for (let index = 0; index < length; index += 1) {
 		const result = array.splice(
 			start,
 			index === 0 ? deleteCount : 0,

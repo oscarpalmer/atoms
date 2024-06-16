@@ -19,7 +19,7 @@ function equal(first, second) {
     case (first instanceof ArrayBuffer && second instanceof ArrayBuffer):
       return equalArrayBuffer(first, second);
     case typeof first === "boolean":
-    case first instanceof Date:
+    case (first instanceof Date && second instanceof Date):
       return Object.is(Number(first), Number(second));
     case (first instanceof DataView && second instanceof DataView):
       return equalDataView(first, second);

@@ -10,6 +10,7 @@ import {
 	snakeCase,
 	titleCase,
 	truncate,
+	words,
 } from '../src/js/string';
 
 class ItemWithoutToString {
@@ -187,6 +188,39 @@ test('titleCase', () => {
 	let index = 0;
 
 	for (; index < length; index += 1) {
-		titleCase(original[index]);
+		expect(titleCase(original[index])).toBe(expected[index]);
+	}
+});
+
+test('words', () => {
+	const original = [
+		'Hello, world!',
+		'The quick brown fox jumps over the lazy dog',
+		'Η γρήγορη καφέ αλεπού πηδάει πάνω από το τεμπέλικο σκυλί',
+		'Быстрая коричневая лиса прыгает через ленивую собаку',
+	];
+
+	const expected = [
+		['Hello', 'world'],
+		['The', 'quick', 'brown', 'fox', 'jumps', 'over', 'the', 'lazy', 'dog'],
+		[
+			'Η',
+			'γρήγορη',
+			'καφέ',
+			'αλεπού',
+			'πηδάει',
+			'πάνω',
+			'από',
+			'το',
+			'τεμπέλικο',
+			'σκυλί',
+		],
+		['Быстрая', 'коричневая', 'лиса', 'прыгает', 'через', 'ленивую', 'собаку'],
+	];
+
+	const {length} = original;
+
+	for (let index = 0; index < length; index += 1) {
+		expect(words(original[index])).toEqual(expected[index]);
 	}
 });

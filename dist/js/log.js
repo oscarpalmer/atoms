@@ -37,9 +37,7 @@ var types = new Set([
   "warn"
 ]);
 var log = (() => {
-  function instance(...data) {
-    work("log", data);
-  }
+  const instance = Object.create(null);
   Object.defineProperties(instance, {
     enabled: {
       get() {
@@ -48,6 +46,9 @@ var log = (() => {
       set(value) {
         _atomic_logging = value;
       }
+    },
+    it: {
+      value: (...data) => work("log", data)
     },
     time: {
       value: time

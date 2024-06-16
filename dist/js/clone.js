@@ -54,8 +54,7 @@ var cloneNested = function(value) {
   const cloned = Array.isArray(value) ? [] : {};
   const keys = Object.keys(value);
   const { length } = keys;
-  let index = 0;
-  for (;index < length; index += 1) {
+  for (let index = 0;index < length; index += 1) {
     const key = keys[index];
     cloned[key] = clone(value[key]);
   }

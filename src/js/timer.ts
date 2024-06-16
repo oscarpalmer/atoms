@@ -473,6 +473,12 @@ function work(
 
 		const finished = time - elapsed >= total;
 
+		if (timestamp - start >= timeout - elapsed) {
+			finish(finished, !finished);
+
+			return;
+		}
+
 		if (finished || time >= minimum) {
 			if (state.active) {
 				state.callback((isRepeated ? index : undefined) as never);
@@ -482,18 +488,11 @@ function work(
 
 			state.index = index;
 
-			switch (true) {
-				case canTimeout && !finished && timestamp - start >= timeout - elapsed:
-					finish(false, true);
-					return;
-
-				case !finished && index < count:
-					current = null;
-					break;
-
-				default:
-					finish(true, false);
-					return;
+			if (!finished && index < count) {
+				current = null;
+			} else {
+				finish(true, false);
+				return;
 			}
 		}
 

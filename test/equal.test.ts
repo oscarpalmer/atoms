@@ -1,6 +1,41 @@
 import {expect, test} from 'bun:test';
 import {equal} from '../src/js';
 
+test('any', () => {
+	const values = [
+		null,
+		undefined,
+		false,
+		true,
+		0,
+		1,
+		'',
+		'a',
+		/./,
+		[],
+		{},
+		new ArrayBuffer(8),
+		new DataView(new ArrayBuffer(8)),
+		new Date(),
+		new Error('foo'),
+		new Map(),
+		new Set(),
+		Symbol('abc'),
+	];
+
+	const {length} = values;
+
+	for (let outerIndex = 0; outerIndex < length; outerIndex += 1) {
+		const outer = values[outerIndex];
+
+		for (let innerIndex = 0; innerIndex < length; innerIndex += 1) {
+			const inner = values[innerIndex];
+
+			expect(equal(outer, inner)).toBe(outerIndex === innerIndex);
+		}
+	}
+});
+
 test('array', () => {
 	expect(equal([1, 2, 3], [1, 2, 3])).toBe(true);
 	expect(equal([1, 2, 3], [3, 2, 1])).toBe(false);
@@ -103,7 +138,7 @@ test('primitive', () => {
 	];
 
 	for (const [first, second, result] of primitives) {
-		expect(equal(first, second)).toBe(result);
+		expect(equal(first, second)).toBe(result as never);
 	}
 });
 

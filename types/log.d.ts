@@ -1,11 +1,7 @@
 declare global {
     var _atomic_logging: boolean;
 }
-/**
- * Logs any number of values at the "log" log level
- */
-type LogCallback = (...data: unknown[]) => void;
-type LogPrototype = {
+type Log = {
     /**
      * Is logging to the console enabled? _(defaults to `true`)_
      */
@@ -26,6 +22,10 @@ type LogPrototype = {
      * Logs any number of values at the "info" log level
      */
     info(...data: unknown[]): void;
+    /**
+     * Logs any number of values at the "log" log level
+     */
+    it(data: unknown): void;
     /**
      * Logs data as a table, with optional properties to use as columns
      */
@@ -56,5 +56,5 @@ type Time = {
      */
     stop(): void;
 };
-declare const log: LogCallback & LogPrototype;
+declare const log: Log;
 export { log };

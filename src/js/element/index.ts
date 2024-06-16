@@ -33,9 +33,7 @@ function findElementOrElements(
 	if (typeof selector === 'string') {
 		const {length} = contexts;
 
-		let index = 0;
-
-		for (; index < length; index += 1) {
+		for (let index = 0; index < length; index += 1) {
 			const value = callback.call(contexts[index], selector) as
 				| Element
 				| Element[]
@@ -65,9 +63,7 @@ function findElementOrElements(
 
 	const {length} = nodes;
 
-	let index = 0;
-
-	for (; index < length; index += 1) {
+	for (let index = 0; index < length; index += 1) {
 		const node = nodes[index];
 
 		const element =

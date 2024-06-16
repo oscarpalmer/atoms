@@ -31,12 +31,11 @@ var findValue = function(type, array, value, key) {
     return type === "index" ? array.indexOf(value) : array.find((item) => item === value);
   }
   if (callbacks.bool != null) {
-    const index2 = array.findIndex(callbacks.bool);
-    return type === "index" ? index2 : index2 > -1 ? array[index2] : undefined;
+    const index = array.findIndex(callbacks.bool);
+    return type === "index" ? index : index > -1 ? array[index] : undefined;
   }
   const { length } = array;
-  let index = 0;
-  for (;index < length; index += 1) {
+  for (let index = 0;index < length; index += 1) {
     const item = array[index];
     if (callbacks.key?.(item) === value) {
       return type === "index" ? index : item;
@@ -59,8 +58,7 @@ var findValues = function(type, array, value, key) {
   const hasCallback = typeof callbacks?.key === "function";
   const result = [];
   const values = hasCallback ? [] : result;
-  let index = 0;
-  for (;index < length; index += 1) {
+  for (let index = 0;index < length; index += 1) {
     const item = array[index];
     const itemValue = hasCallback ? callbacks.key?.(item) : item;
     if (type === "all" && itemValue === value || type === "unique" && values.indexOf(itemValue) === -1) {
@@ -106,8 +104,7 @@ function groupBy(array, key) {
   }
   const grouped = {};
   const { length } = array;
-  let index = 0;
-  for (;index < length; index += 1) {
+  for (let index = 0;index < length; index += 1) {
     const item = array[index];
     const value = callbacks.key(item);
     if (value in grouped) {
@@ -127,9 +124,8 @@ function insert(array, index, values) {
 var insertValues = function(type, array, values, start, deleteCount) {
   const chunked = chunk(values).reverse();
   const { length } = chunked;
-  let index = 0;
   let returned;
-  for (;index < length; index += 1) {
+  for (let index = 0;index < length; index += 1) {
     const result = array.splice(start, index === 0 ? deleteCount : 0, ...chunked[index]);
     if (returned == null) {
       returned = result;

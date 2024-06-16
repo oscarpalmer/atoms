@@ -32,8 +32,7 @@ var getValidElements = function(parent, filters, tabbable) {
   const indiced = [];
   const zeroed = [];
   const { length } = items;
-  let index = 0;
-  for (;index < length; index += 1) {
+  for (let index = 0;index < length; index += 1) {
     const item = items[index];
     if (item.tabIndex === 0) {
       zeroed.push(item.element);
@@ -61,8 +60,7 @@ var isDisabledFromFieldset = function(element) {
     if (parent instanceof HTMLFieldSetElement && parent.disabled) {
       const children = Array.from(parent.children);
       const { length } = children;
-      let index = 0;
-      for (;index < length; index += 1) {
+      for (let index = 0;index < length; index += 1) {
         const child = children[index];
         if (child instanceof HTMLLegendElement) {
           return parent.matches("fieldset[disabled] *") ? true : !child.contains(element);
