@@ -1,13 +1,13 @@
-// src/js/log.ts
+// src/js/logger.ts
 var time = function(label) {
-  const started = log.enabled;
+  const started = logger.enabled;
   let stopped = false;
   if (started) {
     console.time(label);
   }
   return Object.create({
     log() {
-      if (started && !stopped && log.enabled) {
+      if (started && !stopped && logger.enabled) {
         console.timeLog(label);
       }
     },
@@ -20,7 +20,7 @@ var time = function(label) {
   });
 };
 var work = function(type, data) {
-  if (log.enabled) {
+  if (logger.enabled) {
     console[type](...data);
   }
 };
@@ -32,11 +32,12 @@ var types = new Set([
   "debug",
   "error",
   "info",
+  "log",
   "table",
   "trace",
   "warn"
 ]);
-var log = (() => {
+var logger = (() => {
   const instance = Object.create(null);
   Object.defineProperties(instance, {
     enabled: {
@@ -46,9 +47,6 @@ var log = (() => {
       set(value) {
         _atomic_logging = value;
       }
-    },
-    it: {
-      value: (...data) => work("log", data)
     },
     time: {
       value: time
@@ -62,5 +60,5 @@ var log = (() => {
   return instance;
 })();
 export {
-  log
+  logger
 };

@@ -18,36 +18,36 @@ test('emitter', done => {
 });
 
 test('emitter: observable + subscription', done => {
-	const value = emitter(0);
+	const first = emitter(0);
+	const second = emitter(0);
+	const third = emitter(0);
 
 	const results = {
 		first: {
-			completed: false,
+			complete: false,
 			count: 0,
-			error: undefined,
-			subscription: undefined,
+			error: null,
 		},
 		second: {
-			completed: false,
+			complete: false,
 			count: 0,
-			error: undefined,
-			subscription: undefined,
+			error: null,
 		},
 	};
 
-	const first = value.observable.subscribe({
+	const one = first.observable.subscribe({
 		complete() {
-			results.first.completed = true;
-		},
-		error(value) {
-			results.first.error = value as never;
+			results.first.complete = true;
 		},
 		next() {
 			results.first.count += 1;
 		},
+		error(error) {
+			results.first.error = error as never;
+		},
 	});
 
-	const second = value.observable.subscribe(
+	const two = second.observable.subscribe(
 		() => {
 			results.second.count += 1;
 		},
@@ -55,63 +55,65 @@ test('emitter: observable + subscription', done => {
 			results.second.error = error as never;
 		},
 		() => {
-			results.second.completed = true;
+			results.second.complete = true;
 		},
 	);
 
+	const three = first.observable.subscribe({});
+
+	expect(first.active).toBe(true);
+	expect(second.active).toBe(true);
+	expect(third.active).toBe(true);
+
+	expect(one.closed).toBe(false);
+	expect(two.closed).toBe(false);
+	expect(three.closed).toBe(false);
+
+	expect(results.first.complete).toBe(false);
+	expect(results.first.count).toBe(1);
+	expect(results.first.error).toBe(null);
+
+	expect(results.second.complete).toBe(false);
+	expect(results.second.count).toBe(1);
+	expect(results.second.error).toBe(null);
+
+	first.emit(1);
+	second.error(new Error('test'));
+	third.finish();
+
 	wait(() => {
-		expect(results.first.completed).toBe(false);
-		expect(results.first.count).toBe(1);
-		expect(results.first.error).toBeUndefined();
-		expect(first.closed).toBe(false);
+		expect(third.active).toBe(false);
 
-		expect(results.second.completed).toBe(false);
+		expect(results.first.complete).toBe(false);
+		expect(results.first.count).toBe(2);
+		expect(results.first.error).toBe(null);
+
+		expect(results.second.complete).toBe(false);
 		expect(results.second.count).toBe(1);
-		expect(results.second.error).toBeUndefined();
-		expect(second.closed).toBe(false);
+		expect(results.second.error).toBeInstanceOf(Error);
 
-		value.next(1);
+		first.emit(2, true);
+		second.error(new Error('test'), true);
+
+		three.unsubscribe();
 
 		wait(() => {
-			expect(results.first.completed).toBe(false);
-			expect(results.first.count).toBe(2);
-			expect(results.first.error).toBeUndefined();
-			expect(first.closed).toBe(false);
+			expect(first.active).toBe(false);
+			expect(second.active).toBe(false);
 
-			expect(results.second.completed).toBe(false);
-			expect(results.second.count).toBe(2);
-			expect(results.second.error).toBeUndefined();
-			expect(second.closed).toBe(false);
+			expect(one.closed).toBe(true);
+			expect(two.closed).toBe(true);
+			expect(three.closed).toBe(true);
 
-			value.error(new Error('test'));
+			expect(results.first.complete).toBe(true);
+			expect(results.first.count).toBe(3);
+			expect(results.first.error).toBe(null);
 
-			wait(() => {
-				expect(results.first.completed).toBe(false);
-				expect(results.first.count).toBe(2);
-				expect(results.first.error).toBeInstanceOf(Error);
-				expect(first.closed).toBe(false);
+			expect(results.second.complete).toBe(true);
+			expect(results.second.count).toBe(1);
+			expect(results.second.error).toBeInstanceOf(Error);
 
-				expect(results.second.completed).toBe(false);
-				expect(results.second.count).toBe(2);
-				expect(results.second.error).toBeInstanceOf(Error);
-				expect(second.closed).toBe(false);
-
-				value.finish();
-
-				wait(() => {
-					expect(results.first.completed).toBe(true);
-					expect(results.first.count).toBe(2);
-					expect(results.first.error).toBeInstanceOf(Error);
-					expect(first.closed).toBe(true);
-
-					expect(results.second.completed).toBe(true);
-					expect(results.second.count).toBe(2);
-					expect(results.second.error).toBeInstanceOf(Error);
-					expect(second.closed).toBe(true);
-
-					done();
-				});
-			});
+			done();
 		});
 	});
 });

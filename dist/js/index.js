@@ -955,23 +955,29 @@ function emitter(value) {
     destroy() {
       finish(false);
     },
-    error(error) {
-      if (active) {
-        for (const [, observer] of observers) {
-          observer.error?.(error);
-        }
-      }
-    },
-    finish() {
-      finish(true);
-    },
-    next(value2) {
+    emit(value2, complete) {
       if (active) {
         stored = value2;
         for (const [, observer] of observers) {
           observer.next?.(value2);
         }
+        if (complete === true) {
+          finish(true);
+        }
       }
+    },
+    error(error, complete) {
+      if (active) {
+        for (const [, observer] of observers) {
+          observer.error?.(error);
+        }
+        if (complete === true) {
+          finish(true);
+        }
+      }
+    },
+    finish() {
+      finish(true);
     }
   });
   const observable = createObserable(instance, observers);
@@ -1007,16 +1013,16 @@ function getPosition(event) {
   }
   return typeof x === "number" && typeof y === "number" ? { x, y } : undefined;
 }
-// src/js/log.ts
+// src/js/logger.ts
 var time = function(label) {
-  const started = log.enabled;
+  const started = logger.enabled;
   let stopped = false;
   if (started) {
     console.time(label);
   }
   return Object.create({
     log() {
-      if (started && !stopped && log.enabled) {
+      if (started && !stopped && logger.enabled) {
         console.timeLog(label);
       }
     },
@@ -1029,7 +1035,7 @@ var time = function(label) {
   });
 };
 var work = function(type, data) {
-  if (log.enabled) {
+  if (logger.enabled) {
     console[type](...data);
   }
 };
@@ -1041,11 +1047,12 @@ var types = new Set([
   "debug",
   "error",
   "info",
+  "log",
   "table",
   "trace",
   "warn"
 ]);
-var log = (() => {
+var logger = (() => {
   const instance = Object.create(null);
   Object.defineProperties(instance, {
     enabled: {
@@ -1055,9 +1062,6 @@ var log = (() => {
       set(value) {
         _atomic_logging = value;
       }
-    },
-    it: {
-      value: (...data) => work("log", data)
     },
     time: {
       value: time
@@ -1133,15 +1137,11 @@ function getRandomInteger(min2, max2) {
 function getRandomHex() {
   return "0123456789ABCDEF"[getRandomInteger(0, 16)];
 }
-// src/js/timer.ts
-async function delay(time2) {
-  return new Promise((resolve) => {
-    wait(resolve, {
-      errorCallback: resolve,
-      interval: time2
-    });
-  });
+// src/js/function.ts
+function noop() {
 }
+
+// src/js/timer.ts
 var getValueOrDefault = function(value, defaultValue) {
   return typeof value === "number" && value > 0 ? value : defaultValue;
 };
@@ -1361,8 +1361,6 @@ var work2 = function(type, timer2, state, options, isRepeated2) {
 var activeTimers = new Set;
 var hiddenTimers = new Set;
 var milliseconds = 16.666666666666668;
-var noop = () => {
-};
 document.addEventListener("visibilitychange", () => {
   if (document.hidden) {
     for (const timer2 of activeTimers) {
@@ -1559,7 +1557,7 @@ export {
   min,
   merge,
   max,
-  log,
+  logger,
   kebabCase,
   join,
   isWhen,
@@ -1609,7 +1607,6 @@ export {
   equal,
   emitter,
   diff,
-  delay,
   createUuid,
   clone,
   clamp,

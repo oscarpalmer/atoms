@@ -1,3 +1,7 @@
+// src/js/function.ts
+function noop() {
+}
+
 // src/js/timer.ts
 var getValueOrDefault = function(value, defaultValue) {
   return typeof value === "number" && value > 0 ? value : defaultValue;
@@ -192,22 +196,21 @@ var work = function(type, timer2, state, options, isRepeated2) {
     const time = timestamp - current;
     state.elapsed = elapsed + (current - start);
     const finished = time - elapsed >= total;
+    if (timestamp - start >= timeout - elapsed) {
+      finish(finished, !finished);
+      return;
+    }
     if (finished || time >= minimum) {
       if (state.active) {
         state.callback(isRepeated2 ? index : undefined);
       }
       index += 1;
       state.index = index;
-      switch (true) {
-        case (canTimeout && !finished && timestamp - start >= timeout - elapsed):
-          finish(false, true);
-          return;
-        case (!finished && index < count):
-          current = null;
-          break;
-        default:
-          finish(true, false);
-          return;
+      if (!finished && index < count) {
+        current = null;
+      } else {
+        finish(true, false);
+        return;
       }
     }
     state.frame = requestAnimationFrame(step);
@@ -219,8 +222,6 @@ var work = function(type, timer2, state, options, isRepeated2) {
 var activeTimers = new Set;
 var hiddenTimers = new Set;
 var milliseconds = 16.666666666666668;
-var noop = () => {
-};
 document.addEventListener("visibilitychange", () => {
   if (document.hidden) {
     for (const timer2 of activeTimers) {

@@ -7,7 +7,7 @@ export * from './equal';
 export * from './emitter';
 export * from './event';
 export * from './is';
-export * from './log';
+export * from './logger';
 export * from './math';
 export * from './models';
 export * from './number';

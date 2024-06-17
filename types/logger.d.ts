@@ -1,7 +1,7 @@
 declare global {
     var _atomic_logging: boolean;
 }
-type Log = {
+type Logger = {
     /**
      * Is logging to the console enabled? _(defaults to `true`)_
      */
@@ -25,7 +25,7 @@ type Log = {
     /**
      * Logs any number of values at the "log" log level
      */
-    it(data: unknown): void;
+    log(data: unknown): void;
     /**
      * Logs data as a table, with optional properties to use as columns
      */
@@ -56,5 +56,5 @@ type Time = {
      */
     stop(): void;
 };
-declare const log: Log;
-export { log };
+declare const logger: Logger;
+export { logger };

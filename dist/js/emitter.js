@@ -58,18 +58,24 @@ function emitter(value) {
     destroy() {
       finish(false);
     },
-    emit(value2) {
+    emit(value2, complete) {
       if (active) {
         stored = value2;
         for (const [, observer] of observers) {
           observer.next?.(value2);
         }
+        if (complete === true) {
+          finish(true);
+        }
       }
     },
-    error(error) {
+    error(error, complete) {
       if (active) {
         for (const [, observer] of observers) {
           observer.error?.(error);
+        }
+        if (complete === true) {
+          finish(true);
         }
       }
     },

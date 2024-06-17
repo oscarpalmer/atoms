@@ -1,3 +1,4 @@
+import {noop} from './function';
 import type {PlainObject} from './models';
 
 /**
@@ -139,8 +140,6 @@ const hiddenTimers = new Set<Timer>();
  * Milliseconds in a frame, probably ;-)
  */
 const milliseconds = 1_000 / 60;
-
-const noop = () => {};
 
 function getValueOrDefault(value: unknown, defaultValue: number): number {
 	return typeof value === 'number' && value > 0 ? value : defaultValue;

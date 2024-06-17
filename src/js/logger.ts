@@ -6,7 +6,7 @@ if (globalThis._atomic_logging == null) {
 	globalThis._atomic_logging = true;
 }
 
-type Log = {
+type Logger = {
 	/**
 	 * Is logging to the console enabled? _(defaults to `true`)_
 	 */
@@ -30,7 +30,7 @@ type Log = {
 	/**
 	 * Logs any number of values at the "log" log level
 	 */
-	it(data: unknown): void;
+	log(data: unknown): void;
 	/**
 	 * Logs data as a table, with optional properties to use as columns
 	 */
@@ -78,12 +78,13 @@ const types = new Set<Type>([
 	'debug',
 	'error',
 	'info',
+	'log',
 	'table',
 	'trace',
 	'warn',
 ]);
 
-const log = (() => {
+const logger = (() => {
 	const instance = Object.create(null);
 
 	Object.defineProperties(instance, {
@@ -94,9 +95,6 @@ const log = (() => {
 			set(value: boolean) {
 				_atomic_logging = value;
 			},
-		},
-		it: {
-			value: (...data: unknown[]) => work('log', data),
 		},
 		time: {
 			value: time,
@@ -110,10 +108,10 @@ const log = (() => {
 	}
 
 	return instance;
-})() as Log;
+})() as Logger;
 
 function time(label: string): Time {
-	const started = log.enabled;
+	const started = logger.enabled;
 
 	let stopped = false;
 
@@ -123,7 +121,7 @@ function time(label: string): Time {
 
 	return Object.create({
 		log() {
-			if (started && !stopped && log.enabled) {
+			if (started && !stopped && logger.enabled) {
 				console.timeLog(label);
 			}
 		},
@@ -138,9 +136,9 @@ function time(label: string): Time {
 }
 
 function work(type: Type, data: unknown[]): void {
-	if (log.enabled) {
+	if (logger.enabled) {
 		console[type](...data);
 	}
 }
 
-export {log};
+export {logger};
