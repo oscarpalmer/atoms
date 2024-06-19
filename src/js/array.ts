@@ -1,10 +1,7 @@
+import {isKey} from './is';
 import type {Key, PlainObject} from './models';
 
-type BooleanCallback<Value> = (
-	value: Value,
-	index: number,
-	array: Value[],
-) => boolean;
+type BooleanCallback<Value> = GenericCallback<Value, boolean>;
 
 type Callbacks<Value> = {
 	bool?: BooleanCallback<Value>;
@@ -13,17 +10,25 @@ type Callbacks<Value> = {
 
 type FindType = 'index' | 'value';
 
+type GenericCallback<Value, Returned> = (
+	value: Value,
+	index: number,
+	array: Value[],
+) => Returned;
+
 type InsertType = 'push' | 'splice';
 
-type KeyCallback<Value> = (value: Value) => Key;
+type KeyCallback<Value> = GenericCallback<Value, Key>;
 
-type SortKey = {
+type SortKey<Value> = {
 	direction: 'asc' | 'desc';
-	value: Key;
+	value: Key | SortKeyCallback<Value>;
 };
 
+type SortKeyCallback<Value> = (value: Value) => Key;
+
 type SortKeyWithCallback<Value> = {
-	callback?: KeyCallback<Value>;
+	callback: SortKeyCallback<Value>;
 	direction: 'asc' | 'desc';
 };
 
@@ -53,11 +58,16 @@ export function chunk<Value>(array: Value[], size?: number): Value[][] {
 }
 
 function comparison(first: unknown, second: unknown): number {
-	return [first, second].every(value =>
-		['bigint', 'boolean', 'date', 'number'].includes(typeof value),
-	)
-		? Number(first) - Number(second)
-		: String(first).localeCompare(String(second));
+	if (typeof first === 'number' && typeof second === 'number') {
+		return first - second;
+	}
+
+	const firstAsNumber = Number(first);
+	const secondAsNumber = Number(second);
+
+	return Number.isNaN(firstAsNumber) || Number.isNaN(secondAsNumber)
+		? String(first).localeCompare(String(second))
+		: firstAsNumber - secondAsNumber;
 }
 
 /**
@@ -172,7 +182,7 @@ function findValue<Model, Value = Model>(
 	for (let index = 0; index < length; index += 1) {
 		const item = array[index];
 
-		if (callbacks.key?.(item) === value) {
+		if (callbacks.key?.(item, index, array) === value) {
 			return type === 'index' ? index : item;
 		}
 	}
@@ -208,14 +218,14 @@ function findValues<Model, Value = Model>(
 
 	for (let index = 0; index < length; index += 1) {
 		const item = array[index];
-		const itemValue = hasCallback ? callbacks.key?.(item) : item;
+		const itemKey = hasCallback ? callbacks.key?.(item, index, array) : item;
 
 		if (
-			(type === 'all' && itemValue === value) ||
-			(type === 'unique' && values.indexOf(itemValue) === -1)
+			(type === 'all' && itemKey === value) ||
+			(type === 'unique' && values.indexOf(itemKey) === -1)
 		) {
 			if (values !== result) {
-				values.push(itemValue);
+				values.push(itemKey);
 			}
 
 			result.push(item);
@@ -251,28 +261,6 @@ function getCallbacks<Value>(
 	};
 }
 
-function getSortedValue<Value>(
-	map: Map<Value, Map<KeyCallback<Value>, unknown>>,
-	value: Value,
-	callback: KeyCallback<Value>,
-): unknown {
-	if (!map.has(value)) {
-		map.set(value, new Map());
-	}
-
-	const stored = map.get(value);
-
-	if (stored?.has(callback)) {
-		return stored.get(callback);
-	}
-
-	const result = callback?.(value) ?? value;
-
-	stored?.set(callback, result);
-
-	return result;
-}
-
 /**
  * Groups an array of items using a key or callback
  */
@@ -280,27 +268,46 @@ export function groupBy<Value>(
 	array: Value[],
 	key: Key | KeyCallback<Value>,
 ): Record<Key, Value[]> {
-	const callbacks = getCallbacks(undefined, key);
+	return groupValues(array, key, true, false) as never;
+}
 
-	if (callbacks?.key == null) {
+function groupValues<Value>(
+	array: Value[],
+	key: Key | KeyCallback<Value>,
+	arrays: boolean,
+	indicable: boolean,
+): Record<Key, unknown> {
+	const callbacks = getCallbacks(undefined, key);
+	const hasCallback = typeof callbacks?.key === 'function';
+
+	if (!hasCallback && !indicable) {
 		return {};
 	}
 
-	const grouped: Record<Key, Value[]> = {};
+	const record: Record<Key, unknown> = {};
 	const {length} = array;
 
 	for (let index = 0; index < length; index += 1) {
-		const item = array[index];
-		const value = callbacks.key(item);
+		const value = array[index];
 
-		if (value in grouped) {
-			grouped[value].push(item);
+		const key = hasCallback
+			? callbacks?.key?.(value, index, array) ?? index
+			: index;
+
+		if (arrays) {
+			const existing = record[key];
+
+			if (Array.isArray(existing)) {
+				existing.push(value);
+			} else {
+				record[key] = [value];
+			}
 		} else {
-			grouped[value] = [item];
+			record[key] = value;
 		}
 	}
 
-	return grouped;
+	return record;
 }
 
 /**
@@ -390,7 +397,7 @@ export function sort<Value>(array: Value[], descending?: boolean): Value[];
  */
 export function sort<Value>(
 	array: Value[],
-	key: Key | SortKey | KeyCallback<Value>,
+	key: Key | SortKey<Value> | SortKeyCallback<Value>,
 	descending?: boolean,
 ): Value[];
 
@@ -400,7 +407,7 @@ export function sort<Value>(
  */
 export function sort<Value>(
 	array: Value[],
-	keys: Array<Key | SortKey | KeyCallback<Value>>,
+	keys: Array<Key | SortKey<Value> | SortKeyCallback<Value>>,
 	descending?: boolean,
 ): Value[];
 
@@ -409,11 +416,15 @@ export function sort<Value>(
 	first?:
 		| boolean
 		| Key
-		| SortKey
-		| KeyCallback<Value>
-		| Array<Key | SortKey | KeyCallback<Value>>,
+		| SortKey<Value>
+		| SortKeyCallback<Value>
+		| Array<Key | SortKey<Value> | SortKeyCallback<Value>>,
 	second?: boolean,
 ): Value[] {
+	if (array.length < 2) {
+		return array;
+	}
+
 	if (first == null || typeof first === 'boolean') {
 		return first === true
 			? (array as never[]).sort((first, second) => second - first)
@@ -424,47 +435,55 @@ export function sort<Value>(
 
 	const keys = (Array.isArray(first) ? first : [first])
 		.map(key => {
-			if (typeof key === 'object') {
-				return 'value' in key
-					? {
-							direction: key.direction,
-							callback: getCallbacks(null, key.value)?.key,
-						}
-					: null;
+			const returned: SortKeyWithCallback<Value> = {
+				direction,
+				callback: undefined as never,
+			};
+
+			if (isKey(key)) {
+				returned.callback = (value: Value) =>
+					(value as PlainObject)[key] as never;
+			} else if (typeof key === 'function') {
+				returned.callback = key;
+			} else if (typeof key?.value === 'function' || isKey(key?.value)) {
+				returned.direction = key?.direction ?? direction;
+				returned.callback =
+					typeof key.value === 'function'
+						? key.value
+						: (value: Value) =>
+								(value as PlainObject)[key.value as Key] as never;
 			}
 
-			return {
-				direction,
-				callback: getCallbacks(null, key)?.key,
-			} as SortKeyWithCallback<Value>;
+			return returned;
 		})
-		.filter(
-			key => typeof key?.callback === 'function',
-		) as SortKeyWithCallback<Value>[];
+		.filter(key => typeof key.callback === 'function');
 
 	const {length} = keys;
 
 	if (length === 0) {
-		return second === true
-			? (array as never[]).sort((first, second) => second - first)
-			: array.sort();
+		return direction === 'asc'
+			? array.sort()
+			: (array as never[]).sort((first, second) => second - first);
 	}
 
-	const store = new Map<Value, Map<KeyCallback<Value>, unknown>>();
+	if (length === 1) {
+		return array.sort(
+			(first, second) =>
+				comparison(keys[0].callback(first), keys[0].callback(second)) *
+				(keys[0].direction === 'asc' ? 1 : -1),
+		);
+	}
 
 	const sorted = array.sort((first, second) => {
 		for (let index = 0; index < length; index += 1) {
-			const {callback, direction} = keys[index] as SortKeyWithCallback<Value>;
+			const {callback, direction} = keys[index];
 
-			if (callback == null) {
-				continue;
-			}
+			const descending = direction === 'desc';
 
-			const compared =
-				comparison(
-					getSortedValue(store, first, callback),
-					getSortedValue(store, second, callback),
-				) * (direction === 'asc' ? 1 : -1);
+			const compared = comparison(
+				callback(descending ? second : first),
+				callback(descending ? first : second),
+			);
 
 			if (compared !== 0) {
 				return compared;
@@ -473,8 +492,6 @@ export function sort<Value>(
 
 		return 0;
 	});
-
-	store.clear();
 
 	return sorted;
 }
@@ -533,6 +550,153 @@ export function splice<Value>(
 				? amountOrValues
 				: 0,
 	) as Value[];
+}
+
+/**
+ * Converts an array into a map, using indices as keys
+ */
+export function toMap<Value>(array: Value[]): Map<number, Value>;
+
+/**
+ * Converts an array into a map, using indices as keys and grouping values into arrays
+ */
+export function toMap<Value>(
+	array: Value[],
+	arrays: true,
+): Map<number, Value[]>;
+
+/**
+ * - Converts an array into a map
+ * - Uses `key` to find an identifcation value to use as keys
+ */
+export function toMap<Value>(array: Value[], key: Key): Map<Key, Value>;
+
+/**
+ * - Converts an array into a map
+ * - Uses `key` to find an identifcation value to use as keys
+ * - Groups values into arrays
+ */
+export function toMap<Value>(
+	array: Value[],
+	key: Key,
+	arrays: true,
+): Map<Key, Value[]>;
+
+/**
+ * - Converts an array into a map
+ * - Uses `key` to find an identifcation value to use as keys
+ */
+export function toMap<Value>(
+	array: Value[],
+	key: KeyCallback<Value>,
+): Map<Key, Value>;
+
+/**
+ * - Converts an array into a map
+ * - Uses `key` to find an identifcation value to use as keys
+ * - Groups values into arrays
+ */
+export function toMap<Value>(
+	array: Value[],
+	key: KeyCallback<Value>,
+	arrays: true,
+): Map<Key, Value[]>;
+
+export function toMap<Value>(
+	array: Value[],
+	first?: boolean | Key | KeyCallback<Value>,
+	second?: boolean,
+): Map<Key, unknown> {
+	const asArrays = first === true || second === true;
+	const callbacks = getCallbacks(undefined, first);
+	const hasCallback = typeof callbacks?.key === 'function';
+	const map = new Map<Key, unknown>();
+	const {length} = array;
+
+	for (let index = 0; index < length; index += 1) {
+		const value = array[index];
+
+		const key = hasCallback
+			? callbacks?.key?.(value, index, array) ?? index
+			: index;
+
+		if (asArrays) {
+			const existing = map.get(key);
+
+			if (Array.isArray(existing)) {
+				existing.push(value);
+			} else {
+				map.set(key, [value]);
+			}
+		} else {
+			map.set(key, value);
+		}
+	}
+
+	return map;
+}
+
+/**
+ * Converts an array into a record, using indices as keys
+ */
+export function toRecord<Value>(array: Value[]): Record<number, Value>;
+
+/**
+ * Converts an array into a record, using indices as keys and grouping values into arrays
+ */
+export function toRecord<Value>(
+	array: Value[],
+	arrays: true,
+): Record<number, Value[]>;
+
+/**
+ * - Converts an array into a record
+ * - Uses `key` to find an identifcation value to use as keys
+ */
+export function toRecord<Value>(array: Value[], key: Key): Record<Key, Value>;
+
+/**
+ * - Converts an array into a record
+ * - Uses `key` to find an identifcation value to use as keys
+ * - Groups values into arrays
+ */
+export function toRecord<Value>(
+	array: Value[],
+	key: Key,
+	arrays: true,
+): Record<Key, Value[]>;
+
+/**
+ * - Converts an array into a record
+ * - Uses `key` to find an identifcation value to use as keys
+ */
+export function toRecord<Value>(
+	array: Value[],
+	key: KeyCallback<Value>,
+): Record<Key, Value>;
+
+/**
+ * - Converts an array into a record
+ * - Uses `key` to find an identifcation value to use as keys
+ * - Groups values into arrays
+ */
+export function toRecord<Value>(
+	array: Value[],
+	key: KeyCallback<Value>,
+	arrays: true,
+): Record<Key, Value[]>;
+
+export function toRecord<Value>(
+	array: Value[],
+	first?: boolean | Key | KeyCallback<Value>,
+	second?: boolean,
+): Record<Key, unknown> {
+	return groupValues(
+		array,
+		first as Key | KeyCallback<Value>,
+		first === true || second === true,
+		true,
+	);
 }
 
 /**

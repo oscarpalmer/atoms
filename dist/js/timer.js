@@ -67,6 +67,11 @@ var timer = function(type, callback, partial, start) {
         return state.active;
       }
     },
+    callback: {
+      get() {
+        return globalThis._atomic_timer_debug ? state.callback : undefined;
+      }
+    },
     paused: {
       get() {
         return state.paused;
@@ -219,6 +224,13 @@ var work = function(type, timer2, state, options, isRepeated2) {
   state.frame = requestAnimationFrame(step);
   return timer2;
 };
+if (globalThis._atomic_timers == null) {
+  Object.defineProperty(globalThis, "_atomic_timers", {
+    get() {
+      return globalThis._atomic_timer_debug ? [...activeTimers] : [];
+    }
+  });
+}
 var activeTimers = new Set;
 var hiddenTimers = new Set;
 var milliseconds = 16.666666666666668;

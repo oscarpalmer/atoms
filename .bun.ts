@@ -1,4 +1,4 @@
-import * as fs from 'fs/promises';
+import * as fs from 'node:fs/promises';
 
 const directory = String(__dirname).replace(/\\/g, '/');
 const isMjs = process.argv.includes('--mjs');

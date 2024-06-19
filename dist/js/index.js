@@ -1,186 +1,3 @@
-// src/js/array.ts
-function chunk(array, size) {
-  const { length } = array;
-  const chunkSize = typeof size === "number" && size > 0 ? size : 32000;
-  if (length <= chunkSize) {
-    return [array];
-  }
-  const chunks = [];
-  let remaining = Number(length);
-  while (remaining > 0) {
-    chunks.push(array.splice(0, chunkSize));
-    remaining -= chunkSize;
-  }
-  return chunks;
-}
-var comparison = function(first, second) {
-  return [first, second].every((value) => ["bigint", "boolean", "date", "number"].includes(typeof value)) ? Number(first) - Number(second) : String(first).localeCompare(String(second));
-};
-function exists(array, value, key) {
-  return findValue("index", array, value, key) > -1;
-}
-function filter(array, value, key) {
-  return findValues("all", array, value, key);
-}
-function find(array, value, key) {
-  return findValue("value", array, value, key);
-}
-var findValue = function(type, array, value, key) {
-  const callbacks = getCallbacks(value, key);
-  if (callbacks?.bool == null && callbacks?.key == null) {
-    return type === "index" ? array.indexOf(value) : array.find((item) => item === value);
-  }
-  if (callbacks.bool != null) {
-    const index = array.findIndex(callbacks.bool);
-    return type === "index" ? index : index > -1 ? array[index] : undefined;
-  }
-  const { length } = array;
-  for (let index = 0;index < length; index += 1) {
-    const item = array[index];
-    if (callbacks.key?.(item) === value) {
-      return type === "index" ? index : item;
-    }
-  }
-  return type === "index" ? -1 : undefined;
-};
-var findValues = function(type, array, value, key) {
-  const callbacks = getCallbacks(value, key);
-  const { length } = array;
-  if (type === "unique" && callbacks?.key == null && length >= 100) {
-    return Array.from(new Set(array));
-  }
-  if (typeof callbacks?.bool === "function") {
-    return array.filter(callbacks.bool);
-  }
-  if (type === "all" && key == null) {
-    return array.filter((item) => item === value);
-  }
-  const hasCallback = typeof callbacks?.key === "function";
-  const result = [];
-  const values = hasCallback ? [] : result;
-  for (let index = 0;index < length; index += 1) {
-    const item = array[index];
-    const itemValue = hasCallback ? callbacks.key?.(item) : item;
-    if (type === "all" && itemValue === value || type === "unique" && values.indexOf(itemValue) === -1) {
-      if (values !== result) {
-        values.push(itemValue);
-      }
-      result.push(item);
-    }
-  }
-  return result;
-};
-var getCallbacks = function(bool, key) {
-  if (typeof bool === "function") {
-    return { bool };
-  }
-  if (typeof key === "function") {
-    return { key };
-  }
-  const isString = typeof key === "string";
-  if (!isString && typeof key !== "number" || isString && key.includes(".")) {
-    return;
-  }
-  return {
-    key: (value) => value?.[key]
-  };
-};
-var getSortedValue = function(map, value, callback) {
-  if (!map.has(value)) {
-    map.set(value, new Map);
-  }
-  const stored = map.get(value);
-  if (stored?.has(callback)) {
-    return stored.get(callback);
-  }
-  const result = callback?.(value) ?? value;
-  stored?.set(callback, result);
-  return result;
-};
-function groupBy(array, key) {
-  const callbacks = getCallbacks(undefined, key);
-  if (callbacks?.key == null) {
-    return {};
-  }
-  const grouped = {};
-  const { length } = array;
-  for (let index = 0;index < length; index += 1) {
-    const item = array[index];
-    const value = callbacks.key(item);
-    if (value in grouped) {
-      grouped[value].push(item);
-    } else {
-      grouped[value] = [item];
-    }
-  }
-  return grouped;
-}
-function indexOf(array, value, key) {
-  return findValue("index", array, value, key);
-}
-function insert(array, index, values) {
-  insertValues("splice", array, values, index, 0);
-}
-var insertValues = function(type, array, values, start, deleteCount) {
-  const chunked = chunk(values).reverse();
-  const { length } = chunked;
-  let returned;
-  for (let index = 0;index < length; index += 1) {
-    const result = array.splice(start, index === 0 ? deleteCount : 0, ...chunked[index]);
-    if (returned == null) {
-      returned = result;
-    }
-  }
-  return type === "splice" ? returned : array.length;
-};
-function push(array, values) {
-  return insertValues("push", array, values, array.length, 0);
-}
-function sort(array, first, second) {
-  if (first == null || typeof first === "boolean") {
-    return first === true ? array.sort((first2, second2) => second2 - first2) : array.sort();
-  }
-  const direction = second === true ? "desc" : "asc";
-  const keys = (Array.isArray(first) ? first : [first]).map((key) => {
-    if (typeof key === "object") {
-      return "value" in key ? {
-        direction: key.direction,
-        callback: getCallbacks(null, key.value)?.key
-      } : null;
-    }
-    return {
-      direction,
-      callback: getCallbacks(null, key)?.key
-    };
-  }).filter((key) => typeof key?.callback === "function");
-  const { length } = keys;
-  if (length === 0) {
-    return second === true ? array.sort((first2, second2) => second2 - first2) : array.sort();
-  }
-  const store = new Map;
-  const sorted = array.sort((first2, second2) => {
-    for (let index = 0;index < length; index += 1) {
-      const { callback, direction: direction2 } = keys[index];
-      if (callback == null) {
-        continue;
-      }
-      const compared = comparison(getSortedValue(store, first2, callback), getSortedValue(store, second2, callback)) * (direction2 === "asc" ? 1 : -1);
-      if (compared !== 0) {
-        return compared;
-      }
-    }
-    return 0;
-  });
-  store.clear();
-  return sorted;
-}
-function splice(array, start, amountOrValues, values) {
-  const amoutOrValuesIsArray = Array.isArray(amountOrValues);
-  return insertValues("splice", array, amoutOrValuesIsArray ? amountOrValues : values ?? [], start, amoutOrValuesIsArray ? array.length : typeof amountOrValues === "number" && amountOrValues > 0 ? amountOrValues : 0);
-}
-function unique(array, key) {
-  return findValues("unique", array, undefined, key);
-}
 // src/js/string.ts
 function camelCase(value) {
   return toCase(value, "", true, false);
@@ -246,6 +63,9 @@ function isEmpty(value) {
   const values = Object.values(value);
   return values.length === 0 || values.filter((item) => item != null).length === 0;
 }
+function isKey(value) {
+  return typeof value === "number" || typeof value === "string";
+}
 function isNullable(value) {
   return value == null;
 }
@@ -275,6 +95,221 @@ function isPrimitive(value) {
   return value == null || /^(bigint|boolean|number|string|symbol)$/.test(typeof value);
 }
 
+// src/js/array.ts
+function chunk(array, size) {
+  const { length } = array;
+  const chunkSize = typeof size === "number" && size > 0 ? size : 32000;
+  if (length <= chunkSize) {
+    return [array];
+  }
+  const chunks = [];
+  let remaining = Number(length);
+  while (remaining > 0) {
+    chunks.push(array.splice(0, chunkSize));
+    remaining -= chunkSize;
+  }
+  return chunks;
+}
+var comparison = function(first, second) {
+  if (typeof first === "number" && typeof second === "number") {
+    return first - second;
+  }
+  const firstAsNumber = Number(first);
+  const secondAsNumber = Number(second);
+  return Number.isNaN(firstAsNumber) || Number.isNaN(secondAsNumber) ? String(first).localeCompare(String(second)) : firstAsNumber - secondAsNumber;
+};
+function exists(array, value, key) {
+  return findValue("index", array, value, key) > -1;
+}
+function filter(array, value, key) {
+  return findValues("all", array, value, key);
+}
+function find(array, value, key) {
+  return findValue("value", array, value, key);
+}
+var findValue = function(type, array, value, key) {
+  const callbacks = getCallbacks(value, key);
+  if (callbacks?.bool == null && callbacks?.key == null) {
+    return type === "index" ? array.indexOf(value) : array.find((item) => item === value);
+  }
+  if (callbacks.bool != null) {
+    const index = array.findIndex(callbacks.bool);
+    return type === "index" ? index : index > -1 ? array[index] : undefined;
+  }
+  const { length } = array;
+  for (let index = 0;index < length; index += 1) {
+    const item = array[index];
+    if (callbacks.key?.(item, index, array) === value) {
+      return type === "index" ? index : item;
+    }
+  }
+  return type === "index" ? -1 : undefined;
+};
+var findValues = function(type, array, value, key) {
+  const callbacks = getCallbacks(value, key);
+  const { length } = array;
+  if (type === "unique" && callbacks?.key == null && length >= 100) {
+    return Array.from(new Set(array));
+  }
+  if (typeof callbacks?.bool === "function") {
+    return array.filter(callbacks.bool);
+  }
+  if (type === "all" && key == null) {
+    return array.filter((item) => item === value);
+  }
+  const hasCallback = typeof callbacks?.key === "function";
+  const result = [];
+  const values = hasCallback ? [] : result;
+  for (let index = 0;index < length; index += 1) {
+    const item = array[index];
+    const itemKey = hasCallback ? callbacks.key?.(item, index, array) : item;
+    if (type === "all" && itemKey === value || type === "unique" && values.indexOf(itemKey) === -1) {
+      if (values !== result) {
+        values.push(itemKey);
+      }
+      result.push(item);
+    }
+  }
+  return result;
+};
+var getCallbacks = function(bool, key) {
+  if (typeof bool === "function") {
+    return { bool };
+  }
+  if (typeof key === "function") {
+    return { key };
+  }
+  const isString = typeof key === "string";
+  if (!isString && typeof key !== "number" || isString && key.includes(".")) {
+    return;
+  }
+  return {
+    key: (value) => value?.[key]
+  };
+};
+function groupBy(array, key) {
+  return groupValues(array, key, true, false);
+}
+var groupValues = function(array, key, arrays, indicable) {
+  const callbacks = getCallbacks(undefined, key);
+  const hasCallback = typeof callbacks?.key === "function";
+  if (!hasCallback && !indicable) {
+    return {};
+  }
+  const record = {};
+  const { length } = array;
+  for (let index = 0;index < length; index += 1) {
+    const value = array[index];
+    const key2 = hasCallback ? callbacks?.key?.(value, index, array) ?? index : index;
+    if (arrays) {
+      const existing = record[key2];
+      if (Array.isArray(existing)) {
+        existing.push(value);
+      } else {
+        record[key2] = [value];
+      }
+    } else {
+      record[key2] = value;
+    }
+  }
+  return record;
+};
+function indexOf(array, value, key) {
+  return findValue("index", array, value, key);
+}
+function insert(array, index, values) {
+  insertValues("splice", array, values, index, 0);
+}
+var insertValues = function(type, array, values, start, deleteCount) {
+  const chunked = chunk(values).reverse();
+  const { length } = chunked;
+  let returned;
+  for (let index = 0;index < length; index += 1) {
+    const result = array.splice(start, index === 0 ? deleteCount : 0, ...chunked[index]);
+    if (returned == null) {
+      returned = result;
+    }
+  }
+  return type === "splice" ? returned : array.length;
+};
+function push(array, values) {
+  return insertValues("push", array, values, array.length, 0);
+}
+function sort(array, first, second) {
+  if (array.length < 2) {
+    return array;
+  }
+  if (first == null || typeof first === "boolean") {
+    return first === true ? array.sort((first2, second2) => second2 - first2) : array.sort();
+  }
+  const direction = second === true ? "desc" : "asc";
+  const keys = (Array.isArray(first) ? first : [first]).map((key) => {
+    const returned = {
+      direction,
+      callback: undefined
+    };
+    if (isKey(key)) {
+      returned.callback = (value) => value[key];
+    } else if (typeof key === "function") {
+      returned.callback = key;
+    } else if (typeof key?.value === "function" || isKey(key?.value)) {
+      returned.direction = key?.direction ?? direction;
+      returned.callback = typeof key.value === "function" ? key.value : (value) => value[key.value];
+    }
+    return returned;
+  }).filter((key) => typeof key.callback === "function");
+  const { length } = keys;
+  if (length === 0) {
+    return direction === "asc" ? array.sort() : array.sort((first2, second2) => second2 - first2);
+  }
+  if (length === 1) {
+    return array.sort((first2, second2) => comparison(keys[0].callback(first2), keys[0].callback(second2)) * (keys[0].direction === "asc" ? 1 : -1));
+  }
+  const sorted = array.sort((first2, second2) => {
+    for (let index = 0;index < length; index += 1) {
+      const { callback, direction: direction2 } = keys[index];
+      const descending = direction2 === "desc";
+      const compared = comparison(callback(descending ? second2 : first2), callback(descending ? first2 : second2));
+      if (compared !== 0) {
+        return compared;
+      }
+    }
+    return 0;
+  });
+  return sorted;
+}
+function splice(array, start, amountOrValues, values) {
+  const amoutOrValuesIsArray = Array.isArray(amountOrValues);
+  return insertValues("splice", array, amoutOrValuesIsArray ? amountOrValues : values ?? [], start, amoutOrValuesIsArray ? array.length : typeof amountOrValues === "number" && amountOrValues > 0 ? amountOrValues : 0);
+}
+function toMap(array, first, second) {
+  const asArrays = first === true || second === true;
+  const callbacks = getCallbacks(undefined, first);
+  const hasCallback = typeof callbacks?.key === "function";
+  const map = new Map;
+  const { length } = array;
+  for (let index = 0;index < length; index += 1) {
+    const value = array[index];
+    const key = hasCallback ? callbacks?.key?.(value, index, array) ?? index : index;
+    if (asArrays) {
+      const existing = map.get(key);
+      if (Array.isArray(existing)) {
+        existing.push(value);
+      } else {
+        map.set(key, [value]);
+      }
+    } else {
+      map.set(key, value);
+    }
+  }
+  return map;
+}
+function toRecord(array, first, second) {
+  return groupValues(array, first, first === true || second === true, true);
+}
+function unique(array, key) {
+  return findValues("unique", array, undefined, key);
+}
 // src/js/clone.ts
 function clone(value) {
   switch (true) {
@@ -541,135 +576,6 @@ function rgbToHsl(rgb) {
 }
 var anyPattern = /^#*([a-f0-9]{3}){1,2}$/i;
 var groupedPattern = /^#*([a-f0-9]{2})([a-f0-9]{2})([a-f0-9]{2})$/i;
-// src/js/element/index.ts
-function findElement(selector, context) {
-  return findElementOrElements(selector, context, true);
-}
-var findElementOrElements = function(selector, context, single) {
-  const callback = single ? document.querySelector : document.querySelectorAll;
-  const contexts = context == null ? [document] : findElementOrElements(context, undefined, false);
-  const result = [];
-  if (typeof selector === "string") {
-    const { length: length2 } = contexts;
-    for (let index = 0;index < length2; index += 1) {
-      const value = callback.call(contexts[index], selector);
-      if (single) {
-        if (value == null) {
-          continue;
-        }
-        return value;
-      }
-      result.push(...Array.from(value));
-    }
-    return single ? undefined : result.filter((value, index, array) => array.indexOf(value) === index);
-  }
-  const nodes = Array.isArray(selector) ? selector : selector instanceof NodeList ? Array.from(selector) : [selector];
-  const { length } = nodes;
-  for (let index = 0;index < length; index += 1) {
-    const node = nodes[index];
-    const element = node instanceof Document ? node.body : node instanceof Element ? node : undefined;
-    if (element != null && (context == null || contexts.length === 0 || contexts.some((context2) => context2 === element || context2.contains(element))) && !result.includes(element)) {
-      result.push(element);
-    }
-  }
-  return result;
-};
-function findElements(selector, context) {
-  return findElementOrElements(selector, context, false);
-}
-function findParentElement(origin, selector) {
-  if (origin == null || selector == null) {
-    return null;
-  }
-  if (typeof selector === "string") {
-    if (origin.matches?.(selector)) {
-      return origin;
-    }
-    return origin.closest(selector);
-  }
-  if (selector(origin)) {
-    return origin;
-  }
-  let parent = origin.parentElement;
-  while (parent != null && !selector(parent)) {
-    if (parent === document.body) {
-      return null;
-    }
-    parent = parent.parentElement;
-  }
-  return parent;
-}
-function getData(element, keys) {
-  if (typeof keys === "string") {
-    return getDataValue(element, keys);
-  }
-  const data = {};
-  for (const key of keys) {
-    data[key] = getDataValue(element, key);
-  }
-  return data;
-}
-var getDataValue = function(element, key) {
-  const value = element.dataset[key];
-  if (value == null) {
-    return;
-  }
-  try {
-    return JSON.parse(value);
-  } catch {
-    return;
-  }
-};
-function getElementUnderPointer(skipIgnore) {
-  const elements = Array.from(document.querySelectorAll(":hover")).filter((element) => {
-    if (/^head$/i.test(element.tagName)) {
-      return false;
-    }
-    const style = getComputedStyle(element);
-    return skipIgnore === true || style.pointerEvents !== "none" && style.visibility !== "hidden";
-  });
-  return elements[elements.length - 1];
-}
-function getTextDirection(element) {
-  const direction = element.getAttribute("dir");
-  if (direction !== null && /^(ltr|rtl)$/i.test(direction)) {
-    return direction.toLowerCase();
-  }
-  return getComputedStyle?.(element)?.direction === "rtl" ? "rtl" : "ltr";
-}
-function setData(element, first, second) {
-  setValues(element, first, second, updateDataAttribute);
-}
-function setStyles(element, first, second) {
-  setValues(element, first, second, updateStyleProperty);
-}
-var setValues = function(element, first, second, callback) {
-  if (isPlainObject(first)) {
-    const entries = Object.entries(first);
-    for (const [key, value] of entries) {
-      callback(element, key, value);
-    }
-  } else if (first != null) {
-    callback(element, first, second);
-  }
-};
-var updateDataAttribute = function(element, key, value) {
-  updateValue(element, `data-${key}`, value, element.setAttribute, element.removeAttribute, true);
-};
-var updateStyleProperty = function(element, key, value) {
-  updateValue(element, key, value, function(key2, value2) {
-    this.style[key2] = value2;
-  }, function(key2) {
-    this.style[key2] = "";
-  }, false);
-};
-var updateValue = function(element, key, value, set, remove, json) {
-  if (isNullableOrWhitespace(value)) {
-    remove.call(element, key);
-  } else {
-    set.call(element, key, json ? JSON.stringify(value) : String(value));
-  }
-};
 // src/js/element/focusable.ts
 function getFocusableElements(parent) {
   return getValidElements(parent, getFocusableFilters(), false);
@@ -808,92 +714,134 @@ var selector = [
   "textarea",
   "video[controls]"
 ].map((selector2) => `${selector2}:not([inert])`).join(",");
-// src/js/equal.ts
-function equal(first, second) {
-  switch (true) {
-    case first === second:
-      return true;
-    case (first == null || second == null):
-      return first === second;
-    case typeof first !== typeof second:
-      return false;
-    case (first instanceof ArrayBuffer && second instanceof ArrayBuffer):
-      return equalArrayBuffer(first, second);
-    case typeof first === "boolean":
-    case (first instanceof Date && second instanceof Date):
-      return Object.is(Number(first), Number(second));
-    case (first instanceof DataView && second instanceof DataView):
-      return equalDataView(first, second);
-    case (first instanceof Error && second instanceof Error):
-      return equalProperties(first, second, ["name", "message"]);
-    case (first instanceof Map && second instanceof Map):
-      return equalMap(first, second);
-    case (first instanceof RegExp && second instanceof RegExp):
-      return equalProperties(first, second, ["source", "flags"]);
-    case (first instanceof Set && second instanceof Set):
-      return equalSet(first, second);
-    case (Array.isArray(first) && Array.isArray(second)):
-    case (isPlainObject(first) && isPlainObject(second)):
-      return equalNested(first, second);
-    default:
-      return Object.is(first, second);
-  }
+// src/js/element/index.ts
+function findElement(selector2, context) {
+  return findElementOrElements(selector2, context, true);
 }
-var equalArrayBuffer = function(first, second) {
-  return first.byteLength === second.byteLength ? equalNested(new Uint8Array(first), new Uint8Array(second)) : false;
-};
-var equalDataView = function(first, second) {
-  return first.byteOffset === second.byteOffset ? equalArrayBuffer(first.buffer, second.buffer) : false;
-};
-var equalMap = function(first, second) {
-  if (first.size !== second.size) {
-    return false;
-  }
-  const firstKeys = [...first.keys()];
-  const secondKeys = [...second.keys()];
-  if (firstKeys.some((key) => !secondKeys.includes(key))) {
-    return false;
-  }
-  for (const [key, value] of first) {
-    if (!equal(value, second.get(key))) {
-      return false;
+var findElementOrElements = function(selector2, context, single) {
+  const callback = single ? document.querySelector : document.querySelectorAll;
+  const contexts = context == null ? [document] : findElementOrElements(context, undefined, false);
+  const result = [];
+  if (typeof selector2 === "string") {
+    const { length: length2 } = contexts;
+    for (let index = 0;index < length2; index += 1) {
+      const value = callback.call(contexts[index], selector2);
+      if (single) {
+        if (value == null) {
+          continue;
+        }
+        return value;
+      }
+      result.push(...Array.from(value));
     }
+    return single ? undefined : result.filter((value, index, array) => array.indexOf(value) === index);
   }
-  return true;
-};
-var equalNested = function(first, second) {
-  const firstKeys = Object.keys(first);
-  const secondKeys = Object.keys(second);
-  const { length } = firstKeys;
-  if (length !== secondKeys.length || firstKeys.some((key) => !secondKeys.includes(key))) {
-    return false;
-  }
+  const nodes = Array.isArray(selector2) ? selector2 : selector2 instanceof NodeList ? Array.from(selector2) : [selector2];
+  const { length } = nodes;
   for (let index = 0;index < length; index += 1) {
-    const key = firstKeys[index];
-    if (!equal(first[key], second[key])) {
-      return false;
+    const node = nodes[index];
+    const element = node instanceof Document ? node.body : node instanceof Element ? node : undefined;
+    if (element != null && (context == null || contexts.length === 0 || contexts.some((context2) => context2 === element || context2.contains(element))) && !result.includes(element)) {
+      result.push(element);
     }
   }
-  return true;
+  return result;
 };
-var equalProperties = function(first, second, properties) {
-  for (const key of properties) {
-    if (!Object.is(first[key], second[key])) {
-      return false;
-    }
+function findElements(selector2, context) {
+  return findElementOrElements(selector2, context, false);
+}
+function findParentElement(origin, selector2) {
+  if (origin == null || selector2 == null) {
+    return null;
   }
-  return true;
+  if (typeof selector2 === "string") {
+    if (origin.matches?.(selector2)) {
+      return origin;
+    }
+    return origin.closest(selector2);
+  }
+  if (selector2(origin)) {
+    return origin;
+  }
+  let parent = origin.parentElement;
+  while (parent != null && !selector2(parent)) {
+    if (parent === document.body) {
+      return null;
+    }
+    parent = parent.parentElement;
+  }
+  return parent;
+}
+function getData(element, keys) {
+  if (typeof keys === "string") {
+    return getDataValue(element, keys);
+  }
+  const data = {};
+  for (const key of keys) {
+    data[key] = getDataValue(element, key);
+  }
+  return data;
+}
+var getDataValue = function(element, key) {
+  const value = element.dataset[key];
+  if (value == null) {
+    return;
+  }
+  try {
+    return JSON.parse(value);
+  } catch {
+    return;
+  }
 };
-var equalSet = function(first, second) {
-  if (first.size !== second.size) {
-    return false;
-  }
-  for (const value of first) {
-    if (!second.has(value)) {
+function getElementUnderPointer(skipIgnore) {
+  const elements = Array.from(document.querySelectorAll(":hover")).filter((element) => {
+    if (/^head$/i.test(element.tagName)) {
       return false;
     }
+    const style = getComputedStyle(element);
+    return skipIgnore === true || style.pointerEvents !== "none" && style.visibility !== "hidden";
+  });
+  return elements[elements.length - 1];
+}
+function getTextDirection(element) {
+  const direction = element.getAttribute("dir");
+  if (direction !== null && /^(ltr|rtl)$/i.test(direction)) {
+    return direction.toLowerCase();
   }
-  return true;
+  return getComputedStyle?.(element)?.direction === "rtl" ? "rtl" : "ltr";
+}
+function setData(element, first, second) {
+  setValues(element, first, second, updateDataAttribute);
+}
+function setStyles(element, first, second) {
+  setValues(element, first, second, updateStyleProperty);
+}
+var setValues = function(element, first, second, callback) {
+  if (isPlainObject(first)) {
+    const entries = Object.entries(first);
+    for (const [key, value] of entries) {
+      callback(element, key, value);
+    }
+  } else if (first != null) {
+    callback(element, first, second);
+  }
+};
+var updateDataAttribute = function(element, key, value) {
+  updateValue(element, `data-${key}`, value, element.setAttribute, element.removeAttribute, true);
+};
+var updateStyleProperty = function(element, key, value) {
+  updateValue(element, key, value, function(key2, value2) {
+    this.style[key2] = value2;
+  }, function(key2) {
+    this.style[key2] = "";
+  }, false);
+};
+var updateValue = function(element, key, value, set, remove, json) {
+  if (isNullableOrWhitespace(value)) {
+    remove.call(element, key);
+  } else {
+    set.call(element, key, json ? JSON.stringify(value) : String(value));
+  }
 };
 // src/js/emitter.ts
 var createObserable = function(emitter, observers) {
@@ -1000,6 +948,93 @@ function emitter(value) {
   });
   return instance;
 }
+// src/js/equal.ts
+function equal(first, second) {
+  switch (true) {
+    case first === second:
+      return true;
+    case (first == null || second == null):
+      return first === second;
+    case typeof first !== typeof second:
+      return false;
+    case (first instanceof ArrayBuffer && second instanceof ArrayBuffer):
+      return equalArrayBuffer(first, second);
+    case typeof first === "boolean":
+    case (first instanceof Date && second instanceof Date):
+      return Object.is(Number(first), Number(second));
+    case (first instanceof DataView && second instanceof DataView):
+      return equalDataView(first, second);
+    case (first instanceof Error && second instanceof Error):
+      return equalProperties(first, second, ["name", "message"]);
+    case (first instanceof Map && second instanceof Map):
+      return equalMap(first, second);
+    case (first instanceof RegExp && second instanceof RegExp):
+      return equalProperties(first, second, ["source", "flags"]);
+    case (first instanceof Set && second instanceof Set):
+      return equalSet(first, second);
+    case (Array.isArray(first) && Array.isArray(second)):
+    case (isPlainObject(first) && isPlainObject(second)):
+      return equalNested(first, second);
+    default:
+      return Object.is(first, second);
+  }
+}
+var equalArrayBuffer = function(first, second) {
+  return first.byteLength === second.byteLength ? equalNested(new Uint8Array(first), new Uint8Array(second)) : false;
+};
+var equalDataView = function(first, second) {
+  return first.byteOffset === second.byteOffset ? equalArrayBuffer(first.buffer, second.buffer) : false;
+};
+var equalMap = function(first, second) {
+  if (first.size !== second.size) {
+    return false;
+  }
+  const firstKeys = [...first.keys()];
+  const secondKeys = [...second.keys()];
+  if (firstKeys.some((key) => !secondKeys.includes(key))) {
+    return false;
+  }
+  for (const [key, value] of first) {
+    if (!equal(value, second.get(key))) {
+      return false;
+    }
+  }
+  return true;
+};
+var equalNested = function(first, second) {
+  const firstKeys = Object.keys(first);
+  const secondKeys = Object.keys(second);
+  const { length } = firstKeys;
+  if (length !== secondKeys.length || firstKeys.some((key) => !secondKeys.includes(key))) {
+    return false;
+  }
+  for (let index = 0;index < length; index += 1) {
+    const key = firstKeys[index];
+    if (!equal(first[key], second[key])) {
+      return false;
+    }
+  }
+  return true;
+};
+var equalProperties = function(first, second, properties) {
+  for (const key of properties) {
+    if (!Object.is(first[key], second[key])) {
+      return false;
+    }
+  }
+  return true;
+};
+var equalSet = function(first, second) {
+  if (first.size !== second.size) {
+    return false;
+  }
+  for (const value of first) {
+    if (!second.has(value)) {
+      return false;
+    }
+  }
+  return true;
+};
 // src/js/event.ts
 function getPosition(event) {
   let x;
@@ -1012,6 +1047,39 @@ function getPosition(event) {
     y = event.touches[0]?.clientY;
   }
   return typeof x === "number" && typeof y === "number" ? { x, y } : undefined;
+}
+// src/js/function.ts
+function memoise(callback) {
+  function get(...parameters) {
+    const key = parameters[0];
+    if (cache.has(key)) {
+      return cache.get(key);
+    }
+    const value = callback(...parameters);
+    cache.set(key, value);
+    return value;
+  }
+  const cache = new Map;
+  return Object.create({
+    cache,
+    clear() {
+      cache.clear();
+    },
+    delete(key) {
+      return cache.delete(key);
+    },
+    get(key) {
+      return cache.get(key);
+    },
+    has(key) {
+      return cache.has(key);
+    },
+    run(...parameters) {
+      return get(...parameters);
+    }
+  });
+}
+function noop() {
 }
 // src/js/logger.ts
 var time = function(label) {
@@ -1119,6 +1187,17 @@ if (globalThis._atomic_queued == null) {
 function getRandomBoolean() {
   return Math.random() > 0.5;
 }
+function getRandomCharacters(length, selection) {
+  if (length < 1) {
+    return "";
+  }
+  const actualSelection = typeof selection === "string" && selection.length > 0 ? selection : "abcdefghijklmnopqrstuvwxyz";
+  let characters = "";
+  for (let index = 0;index < length; index += 1) {
+    characters += actualSelection.charAt(getRandomInteger(0, actualSelection.length));
+  }
+  return characters;
+}
 function getRandomColour() {
   return `#${Array.from({ length: 6 }, getRandomHex).join("")}`;
 }
@@ -1137,28 +1216,24 @@ function getRandomInteger(min2, max2) {
 function getRandomHex() {
   return "0123456789ABCDEF"[getRandomInteger(0, 16)];
 }
-// src/js/function.ts
-function noop() {
-}
-
 // src/js/timer.ts
 var getValueOrDefault = function(value, defaultValue) {
   return typeof value === "number" && value > 0 ? value : defaultValue;
 };
-var is5 = function(value, pattern) {
+var is6 = function(value, pattern) {
   return pattern.test(value?.$timer);
 };
 function isRepeated(value) {
-  return is5(value, /^repeat$/);
+  return is6(value, /^repeat$/);
 }
 function isTimer(value) {
-  return is5(value, /^repeat|wait$/);
+  return is6(value, /^repeat|wait$/);
 }
 function isWaited(value) {
-  return is5(value, /^wait$/);
+  return is6(value, /^wait$/);
 }
 function isWhen(value) {
-  return is5(value, /^when$/) && typeof value.then === "function";
+  return is6(value, /^when$/) && typeof value.then === "function";
 }
 function repeat(callback, options) {
   return timer("repeat", callback, options ?? {}, true);
@@ -1204,6 +1279,11 @@ var timer = function(type, callback, partial, start) {
     active: {
       get() {
         return state.active;
+      }
+    },
+    callback: {
+      get() {
+        return globalThis._atomic_timer_debug ? state.callback : undefined;
       }
     },
     paused: {
@@ -1358,6 +1438,13 @@ var work2 = function(type, timer2, state, options, isRepeated2) {
   state.frame = requestAnimationFrame(step);
   return timer2;
 };
+if (globalThis._atomic_timers == null) {
+  Object.defineProperty(globalThis, "_atomic_timers", {
+    get() {
+      return globalThis._atomic_timer_debug ? [...activeTimers] : [];
+    }
+  });
+}
 var activeTimers = new Set;
 var hiddenTimers = new Set;
 var milliseconds = 16.666666666666668;
@@ -1539,6 +1626,8 @@ export {
   wait,
   unique,
   truncate,
+  toRecord,
+  toMap,
   titleCase,
   sum,
   splice,
@@ -1554,8 +1643,10 @@ export {
   queue,
   push,
   pascalCase,
+  noop,
   min,
   merge,
+  memoise,
   max,
   logger,
   kebabCase,
@@ -1573,6 +1664,7 @@ export {
   isNullableOrWhitespace,
   isNullableOrEmpty,
   isNullable,
+  isKey,
   isFocusableElement,
   isEmpty,
   isArrayOrPlainObject,
@@ -1590,6 +1682,7 @@ export {
   getRandomFloat,
   getRandomDate,
   getRandomColour,
+  getRandomCharacters,
   getRandomBoolean,
   getPosition,
   getNumber,

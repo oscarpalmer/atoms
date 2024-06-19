@@ -1,4 +1,4 @@
-import type { ArrayOrPlainObject, PlainObject, Primitive } from './models';
+import type { ArrayOrPlainObject, Key, PlainObject, Primitive } from './models';
 /**
  * Is the value an array or a record?
  */
@@ -7,6 +7,10 @@ export declare function isArrayOrPlainObject(value: unknown): value is ArrayOrPl
  * Is the array or object completely empty or only containing `null` or `undefined` values?
  */
 export declare function isEmpty(value: ArrayOrPlainObject): boolean;
+/**
+ * Is the value a key?
+ */
+export declare function isKey(value: unknown): value is Key;
 /**
  * Is the value undefined or null?
  */

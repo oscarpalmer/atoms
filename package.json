@@ -4,7 +4,7 @@
 		"url": "https://oscarpalmer.se"
 	},
 	"dependencies": {
-		"type-fest": "^4.20.0"
+		"type-fest": "^4.20.1"
 	},
 	"description": "Sweet little atomic goodies…",
 	"devDependencies": {
@@ -12,7 +12,7 @@
 		"@happy-dom/global-registrator": "^14.12.0",
 		"@types/bun": "^1.1.4",
 		"bun": "^1.1.13",
-		"sass": "^1.77.5",
+		"sass": "^1.77.6",
 		"typescript": "^5.4.5"
 	},
 	"exports": {
@@ -132,5 +132,5 @@
 	},
 	"type": "module",
 	"types": "./types/index.d.ts",
-	"version": "0.52.0"
+	"version": "0.53.0"
 }

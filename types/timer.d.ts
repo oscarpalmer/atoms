@@ -1,3 +1,7 @@
+declare global {
+    var _atomic_timer_debug: boolean | undefined;
+    var _atomic_timers: Timer[] | undefined;
+}
 /**
  * Callback that runs after the timer has finished (or is stopped)
  * - `finished` is `true` if the timer was allowed to finish, and `false` if it was stopped

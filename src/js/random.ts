@@ -6,6 +6,34 @@ export function getRandomBoolean(): boolean {
 }
 
 /**
+ * Returns a random string of characters with a specified length
+ * - `selection` defaults to all lowercase letters in the English alphabet
+ */
+export function getRandomCharacters(
+	length: number,
+	selection?: string,
+): string {
+	if (length < 1) {
+		return '';
+	}
+
+	const actualSelection =
+		typeof selection === 'string' && selection.length > 0
+			? selection
+			: 'abcdefghijklmnopqrstuvwxyz';
+
+	let characters = '';
+
+	for (let index = 0; index < length; index += 1) {
+		characters += actualSelection.charAt(
+			getRandomInteger(0, actualSelection.length),
+		);
+	}
+
+	return characters;
+}
+
+/**
  * Returns a random hexadecimal colour
  */
 export function getRandomColour(): string {

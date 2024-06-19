@@ -1,11 +1,12 @@
 export * from './array';
 export * from './clone';
 export * from './colour';
-export * from './element/index';
 export * from './element/focusable';
-export * from './equal';
+export * from './element/index';
 export * from './emitter';
+export * from './equal';
 export * from './event';
+export * from './function';
 export * from './is';
 export * from './logger';
 export * from './math';
@@ -17,3 +18,4 @@ export * from './string';
 export * from './timer';
 export * from './touch';
 export * from './value';
+

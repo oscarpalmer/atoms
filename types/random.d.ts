@@ -3,6 +3,11 @@
  */
 export declare function getRandomBoolean(): boolean;
 /**
+ * Returns a random string of characters with a specified length
+ * - `selection` defaults to all lowercase letters in the English alphabet
+ */
+export declare function getRandomCharacters(length: number, selection?: string): string;
+/**
  * Returns a random hexadecimal colour
  */
 export declare function getRandomColour(): string;

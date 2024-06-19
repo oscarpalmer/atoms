@@ -1,6 +1,8 @@
 import {expect, test} from 'bun:test';
+import {wait} from '../dist/js/timer';
 import {
 	getRandomBoolean,
+	getRandomCharacters,
 	getRandomColour,
 	getRandomDate,
 	getRandomFloat,
@@ -45,6 +47,45 @@ test('getRandomBoolean', () => {
 	}
 
 	expect(invalid).toBe(0);
+});
+
+test('getRandomCharacters', done => {
+	const alphabet = new Set('abcdefghijklmnopqrstuvwxyz');
+	const size = 100_000;
+
+	let defaultFailed = false;
+
+	for (let index = 0; index < size; index += 1) {
+		const random = getRandomCharacters(5);
+
+		if (
+			random.length !== 5 ||
+			!random.split('').every(character => alphabet.has(character))
+		) {
+			defaultFailed = true;
+		}
+	}
+
+	const selection = 'aeiouåäö';
+
+	let selectionFailed = false;
+
+	for (let index = 0; index < size; index += 1) {
+		const random = getRandomCharacters(5, selection);
+
+		if (
+			random.length !== 5 ||
+			!random.split('').every(character => selection.includes(character))
+		) {
+			selectionFailed = true;
+		}
+	}
+
+	wait(() => {
+		expect(defaultFailed).toBe(false);
+
+		done();
+	}, 250);
 });
 
 test('getRandomColour', () => {

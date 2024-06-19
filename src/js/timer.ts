@@ -1,6 +1,19 @@
 import {noop} from './function';
 import type {PlainObject} from './models';
 
+declare global {
+	var _atomic_timer_debug: boolean | undefined;
+	var _atomic_timers: Timer[] | undefined;
+}
+
+if (globalThis._atomic_timers == null) {
+	Object.defineProperty(globalThis, '_atomic_timers', {
+		get() {
+			return globalThis._atomic_timer_debug ? [...activeTimers] : [];
+		},
+	});
+}
+
 /**
  * Callback that runs after the timer has finished (or is stopped)
  * - `finished` is `true` if the timer was allowed to finish, and `false` if it was stopped
@@ -249,6 +262,11 @@ function timer(
 		active: {
 			get() {
 				return state.active;
+			},
+		},
+		callback: {
+			get() {
+				return globalThis._atomic_timer_debug ? state.callback : undefined;
 			},
 		},
 		paused: {

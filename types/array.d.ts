@@ -1,10 +1,12 @@
 import type { Key } from './models';
-type BooleanCallback<Value> = (value: Value, index: number, array: Value[]) => boolean;
-type KeyCallback<Value> = (value: Value) => Key;
-type SortKey = {
+type BooleanCallback<Value> = GenericCallback<Value, boolean>;
+type GenericCallback<Value, Returned> = (value: Value, index: number, array: Value[]) => Returned;
+type KeyCallback<Value> = GenericCallback<Value, Key>;
+type SortKey<Value> = {
     direction: 'asc' | 'desc';
-    value: Key;
+    value: Key | SortKeyCallback<Value>;
 };
+type SortKeyCallback<Value> = (value: Value) => Key;
 /**
  * Chunks an array into smaller arrays of a specified size
  */
@@ -67,12 +69,12 @@ export declare function sort<Value>(array: Value[], descending?: boolean): Value
  * - Sorts an array of items, using a `key` to sort by a specific value
  * - Ascending by default, but can be changed by setting `descending` to `true`, or using a `SortKey`
  */
-export declare function sort<Value>(array: Value[], key: Key | SortKey | KeyCallback<Value>, descending?: boolean): Value[];
+export declare function sort<Value>(array: Value[], key: Key | SortKey<Value> | SortKeyCallback<Value>, descending?: boolean): Value[];
 /**
  * - Sorts an array of items, using multiple `keys` to sort by specific values
  * - Ascending by default, but can be changed by setting `descending` to `true`, or using `SortKey`
  */
-export declare function sort<Value>(array: Value[], keys: Array<Key | SortKey | KeyCallback<Value>>, descending?: boolean): Value[];
+export declare function sort<Value>(array: Value[], keys: Array<Key | SortKey<Value> | SortKeyCallback<Value>>, descending?: boolean): Value[];
 /**
  * Removes and returns all items from an array starting from a specific index
  */
@@ -91,6 +93,66 @@ export declare function splice<Value>(array: Value[], start: number, values: Val
  * - Uses chunking to avoid stack overflow
  */
 export declare function splice<Value>(array: Value[], start: number, amount: number, values: Value[]): Value[];
+/**
+ * Converts an array into a map, using indices as keys
+ */
+export declare function toMap<Value>(array: Value[]): Map<number, Value>;
+/**
+ * Converts an array into a map, using indices as keys and grouping values into arrays
+ */
+export declare function toMap<Value>(array: Value[], arrays: true): Map<number, Value[]>;
+/**
+ * - Converts an array into a map
+ * - Uses `key` to find an identifcation value to use as keys
+ */
+export declare function toMap<Value>(array: Value[], key: Key): Map<Key, Value>;
+/**
+ * - Converts an array into a map
+ * - Uses `key` to find an identifcation value to use as keys
+ * - Groups values into arrays
+ */
+export declare function toMap<Value>(array: Value[], key: Key, arrays: true): Map<Key, Value[]>;
+/**
+ * - Converts an array into a map
+ * - Uses `key` to find an identifcation value to use as keys
+ */
+export declare function toMap<Value>(array: Value[], key: KeyCallback<Value>): Map<Key, Value>;
+/**
+ * - Converts an array into a map
+ * - Uses `key` to find an identifcation value to use as keys
+ * - Groups values into arrays
+ */
+export declare function toMap<Value>(array: Value[], key: KeyCallback<Value>, arrays: true): Map<Key, Value[]>;
+/**
+ * Converts an array into a record, using indices as keys
+ */
+export declare function toRecord<Value>(array: Value[]): Record<number, Value>;
+/**
+ * Converts an array into a record, using indices as keys and grouping values into arrays
+ */
+export declare function toRecord<Value>(array: Value[], arrays: true): Record<number, Value[]>;
+/**
+ * - Converts an array into a record
+ * - Uses `key` to find an identifcation value to use as keys
+ */
+export declare function toRecord<Value>(array: Value[], key: Key): Record<Key, Value>;
+/**
+ * - Converts an array into a record
+ * - Uses `key` to find an identifcation value to use as keys
+ * - Groups values into arrays
+ */
+export declare function toRecord<Value>(array: Value[], key: Key, arrays: true): Record<Key, Value[]>;
+/**
+ * - Converts an array into a record
+ * - Uses `key` to find an identifcation value to use as keys
+ */
+export declare function toRecord<Value>(array: Value[], key: KeyCallback<Value>): Record<Key, Value>;
+/**
+ * - Converts an array into a record
+ * - Uses `key` to find an identifcation value to use as keys
+ * - Groups values into arrays
+ */
+export declare function toRecord<Value>(array: Value[], key: KeyCallback<Value>, arrays: true): Record<Key, Value[]>;
 /**
  * Returns an array of unique items
  */

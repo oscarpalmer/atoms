@@ -1,4 +1,4 @@
-import type {ArrayOrPlainObject, PlainObject, Primitive} from './models';
+import type {ArrayOrPlainObject, Key, PlainObject, Primitive} from './models';
 import {getString} from './string';
 
 /**
@@ -28,6 +28,13 @@ export function isEmpty(value: ArrayOrPlainObject): boolean {
 }
 
 /**
+ * Is the value a key?
+ */
+export function isKey(value: unknown): value is Key {
+	return typeof value === 'number' || typeof value === 'string';
+}
+
+/**
  * Is the value undefined or null?
  */
 export function isNullable(value: unknown): value is undefined | null {
@@ -37,7 +44,9 @@ export function isNullable(value: unknown): value is undefined | null {
 /**
  * Is the value undefined, null, or an empty string?
  */
-export function isNullableOrEmpty(value: unknown): value is undefined | null | '' {
+export function isNullableOrEmpty(
+	value: unknown,
+): value is undefined | null | '' {
 	return value == null || getString(value) === '';
 }
 

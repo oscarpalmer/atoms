@@ -1,4 +1,5 @@
 import {expect, test} from 'bun:test';
+import {diff, equal, getRandomInteger, wait} from '../dist/js';
 import {
 	chunk,
 	exists,
@@ -10,8 +11,20 @@ import {
 	push,
 	sort,
 	splice,
+	toMap,
+	toRecord,
 	unique,
 } from '../src/js/array';
+
+const complex = [
+	{id: 1, name: 'Alice'},
+	{id: 2, name: 'Bob'},
+	{id: 3, name: 'Charlie'},
+	{id: 4, name: 'Alice'},
+	{id: 5, name: 'David'},
+];
+
+const simple = [1, 2, 3, 4];
 
 test('chunk', () => {
 	const array = Array.from({length: 10}, (_, i) => i + 1);
@@ -22,17 +35,8 @@ test('chunk', () => {
 });
 
 test('exists', () => {
-	const simple = [1, 2, 3, 4];
-
 	expect(exists(simple, 2)).toBe(true);
 	expect(exists(simple, 5)).toBe(false);
-
-	const complex = [
-		{id: 1, name: 'Alice'},
-		{id: 2, name: 'Bob'},
-		{id: 3, name: 'Charlie'},
-		{id: 4, name: 'David'},
-	];
 
 	const existsByKeyCallback = exists(complex, 3, item => item.id);
 	const existsByKeyValue = exists(complex, 3, 'id');
@@ -46,17 +50,8 @@ test('exists', () => {
 });
 
 test('filter', () => {
-	const simple = [1, 2, 3, 4];
-
 	expect(filter(simple, 2)).toEqual([2]);
 	expect(filter(simple, 5)).toEqual([]);
-
-	const complex = [
-		{id: 1, name: 'Alice'},
-		{id: 2, name: 'Bob'},
-		{id: 3, name: 'Charlie'},
-		{id: 4, name: 'David'},
-	];
 
 	const filterByKeyValue = filter(complex, 3, 'id');
 	const filterByKeyCallback = filter(complex, 3, item => item.id);
@@ -70,17 +65,8 @@ test('filter', () => {
 });
 
 test('find', () => {
-	const simple = [1, 2, 3, 4];
-
 	expect(find(simple, 2)).toBe(2);
 	expect(find(simple, 5)).toBeUndefined();
-
-	const complex = [
-		{id: 1, name: 'Alice'},
-		{id: 2, name: 'Bob'},
-		{id: 3, name: 'Charlie'},
-		{id: 4, name: 'David'},
-	];
 
 	const findByKeyCallback = find(complex, item => item.id === 3);
 	const findByKeyValue = find(complex, 3, 'id');
@@ -94,17 +80,8 @@ test('find', () => {
 });
 
 test('indexOf', () => {
-	const simple = [1, 2, 3, 4];
-
 	expect(indexOf(simple, 2)).toBe(1);
 	expect(indexOf(simple, 5)).toBe(-1);
-
-	const complex = [
-		{id: 1, name: 'Alice'},
-		{id: 2, name: 'Bob'},
-		{id: 3, name: 'Charlie'},
-		{id: 4, name: 'David'},
-	];
 
 	const indexOfByKeyCallback = indexOf(complex, 3, item => item.id);
 	const indexOfByKeyValue = indexOf(complex, 3, 'id');
@@ -184,7 +161,9 @@ test('push', () => {
 	expect(push(array, values)).toBe(length);
 });
 
-test('sort', () => {
+test('sort: basic', () => {
+	expect(sort([1])).toEqual([1]);
+
 	expect(sort([2, 1, 3])).toEqual([1, 2, 3]);
 	expect(sort([2, 1, 3], true)).toEqual([3, 2, 1]);
 
@@ -209,19 +188,72 @@ test('sort', () => {
 		sort(
 			[
 				{age: 24, firstName: 'B', lastName: 'B'},
+				{age: 48, firstName: 'C', lastName: 'C'},
 				{age: 24, firstName: 'A', lastName: 'B'},
 				{age: 24, firstName: 'A', lastName: 'A'},
 				{age: 48, firstName: 'C', lastName: 'C'},
 			],
-			['age', 'firstName', {direction: 'asc', value: 'lastName'}, {} as never],
+			[
+				item => item.age,
+				'firstName',
+				{direction: 'asc', value: 'lastName'},
+				{} as never,
+			],
 			true,
 		),
 	).toEqual([
+		{age: 48, firstName: 'C', lastName: 'C'},
 		{age: 48, firstName: 'C', lastName: 'C'},
 		{age: 24, firstName: 'B', lastName: 'B'},
 		{age: 24, firstName: 'A', lastName: 'A'},
 		{age: 24, firstName: 'A', lastName: 'B'},
 	]);
+});
+
+test('sort: large', done => {
+	const firstNames = ['Alice', 'Bob', 'Charlie', 'David'];
+	const lastNames = ['Avery', 'Baker', 'Charlie', 'Davidson'];
+
+	const large = Array.from({length: 100_000}, (_, index) => ({
+		id: index + 1,
+		age: getRandomInteger(24, 48),
+		name: {
+			first: firstNames[index % 4],
+			last: lastNames[index % 4],
+		},
+	}));
+
+	const native = large.slice().sort((first, second) => {
+		const age = first.age - second.age;
+
+		if (age !== 0) {
+			return age;
+		}
+
+		const lastName = second.name.last.localeCompare(first.name.last);
+
+		if (lastName !== 0) {
+			return lastName;
+		}
+
+		return first.name.first.localeCompare(second.name.first);
+	});
+
+	const atomic = sort(large, [
+		'age',
+		{direction: 'desc', value: item => item.name.last},
+		item => item.name.first,
+	]);
+
+	wait(() => {
+		const diffed = diff(native, atomic);
+
+		wait(() => {
+			expect(diffed.type).toBe('none');
+
+			done();
+		}, 250);
+	}, 250);
 });
 
 test('splice', () => {
@@ -244,6 +276,139 @@ test('splice', () => {
 	expect(array[0]).toBe(1);
 	expect(array[1]).toBe('#1');
 	expect(array[length + 1]).toBe(3);
+});
+
+test('toMap', () => {
+	const indicedObjects = toMap(complex);
+	const keyedObjects = toMap(complex, 'id');
+	const callbackedObjects = toMap(complex, item => item.name);
+
+	expect(indicedObjects).toEqual(
+		new Map([
+			[0, {id: 1, name: 'Alice'}],
+			[1, {id: 2, name: 'Bob'}],
+			[2, {id: 3, name: 'Charlie'}],
+			[3, {id: 4, name: 'Alice'}],
+			[4, {id: 5, name: 'David'}],
+		]),
+	);
+
+	expect(keyedObjects).toEqual(
+		new Map([
+			[1, {id: 1, name: 'Alice'}],
+			[2, {id: 2, name: 'Bob'}],
+			[3, {id: 3, name: 'Charlie'}],
+			[4, {id: 4, name: 'Alice'}],
+			[5, {id: 5, name: 'David'}],
+		]),
+	);
+
+	expect(callbackedObjects).toEqual(
+		new Map([
+			['Alice', {id: 4, name: 'Alice'}],
+			['Bob', {id: 2, name: 'Bob'}],
+			['Charlie', {id: 3, name: 'Charlie'}],
+			['David', {id: 5, name: 'David'}],
+		]),
+	);
+
+	const indicedArrays = toMap(complex, true);
+	const keyedArrays = toMap(complex, 'id', true);
+	const callbackedArrays = toMap(complex, item => item.name, true);
+
+	expect(indicedArrays).toEqual(
+		new Map([
+			[0, [{id: 1, name: 'Alice'}]],
+			[1, [{id: 2, name: 'Bob'}]],
+			[2, [{id: 3, name: 'Charlie'}]],
+			[3, [{id: 4, name: 'Alice'}]],
+			[4, [{id: 5, name: 'David'}]],
+		]),
+	);
+
+	expect(keyedArrays).toEqual(
+		new Map([
+			[1, [{id: 1, name: 'Alice'}]],
+			[2, [{id: 2, name: 'Bob'}]],
+			[3, [{id: 3, name: 'Charlie'}]],
+			[4, [{id: 4, name: 'Alice'}]],
+			[5, [{id: 5, name: 'David'}]],
+		]),
+	);
+
+	expect(callbackedArrays).toEqual(
+		new Map([
+			[
+				'Alice',
+				[
+					{id: 1, name: 'Alice'},
+					{id: 4, name: 'Alice'},
+				],
+			],
+			['Bob', [{id: 2, name: 'Bob'}]],
+			['Charlie', [{id: 3, name: 'Charlie'}]],
+			['David', [{id: 5, name: 'David'}]],
+		]),
+	);
+});
+
+test('toRecord', () => {
+	const indicedObjects = toRecord(complex);
+	const keyedObjects = toRecord(complex, 'id');
+	const callbackedObjects = toRecord(complex, item => item.name);
+
+	expect(indicedObjects).toEqual({
+		0: {id: 1, name: 'Alice'},
+		1: {id: 2, name: 'Bob'},
+		2: {id: 3, name: 'Charlie'},
+		3: {id: 4, name: 'Alice'},
+		4: {id: 5, name: 'David'},
+	});
+
+	expect(keyedObjects).toEqual({
+		1: {id: 1, name: 'Alice'},
+		2: {id: 2, name: 'Bob'},
+		3: {id: 3, name: 'Charlie'},
+		4: {id: 4, name: 'Alice'},
+		5: {id: 5, name: 'David'},
+	});
+
+	expect(callbackedObjects).toEqual({
+		Alice: {id: 4, name: 'Alice'},
+		Bob: {id: 2, name: 'Bob'},
+		Charlie: {id: 3, name: 'Charlie'},
+		David: {id: 5, name: 'David'},
+	});
+
+	const indicedArrays = toRecord(complex, true);
+	const keyedArrays = toRecord(complex, 'id', true);
+	const callbackedArrays = toRecord(complex, item => item.name, true);
+
+	expect(indicedArrays).toEqual({
+		0: [{id: 1, name: 'Alice'}],
+		1: [{id: 2, name: 'Bob'}],
+		2: [{id: 3, name: 'Charlie'}],
+		3: [{id: 4, name: 'Alice'}],
+		4: [{id: 5, name: 'David'}],
+	});
+
+	expect(keyedArrays).toEqual({
+		1: [{id: 1, name: 'Alice'}],
+		2: [{id: 2, name: 'Bob'}],
+		3: [{id: 3, name: 'Charlie'}],
+		4: [{id: 4, name: 'Alice'}],
+		5: [{id: 5, name: 'David'}],
+	});
+
+	expect(callbackedArrays).toEqual({
+		Alice: [
+			{id: 1, name: 'Alice'},
+			{id: 4, name: 'Alice'},
+		],
+		Bob: [{id: 2, name: 'Bob'}],
+		Charlie: [{id: 3, name: 'Charlie'}],
+		David: [{id: 5, name: 'David'}],
+	});
 });
 
 test('unique', () => {

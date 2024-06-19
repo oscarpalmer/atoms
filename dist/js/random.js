@@ -2,6 +2,17 @@
 function getRandomBoolean() {
   return Math.random() > 0.5;
 }
+function getRandomCharacters(length, selection) {
+  if (length < 1) {
+    return "";
+  }
+  const actualSelection = typeof selection === "string" && selection.length > 0 ? selection : "abcdefghijklmnopqrstuvwxyz";
+  let characters = "";
+  for (let index = 0;index < length; index += 1) {
+    characters += actualSelection.charAt(getRandomInteger(0, actualSelection.length));
+  }
+  return characters;
+}
 function getRandomColour() {
   return `#${Array.from({ length: 6 }, getRandomHex).join("")}`;
 }
@@ -26,5 +37,6 @@ export {
   getRandomFloat,
   getRandomDate,
   getRandomColour,
+  getRandomCharacters,
   getRandomBoolean
 };

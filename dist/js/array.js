@@ -1,3 +1,8 @@
+// src/js/is.ts
+function isKey(value) {
+  return typeof value === "number" || typeof value === "string";
+}
+
 // src/js/array.ts
 function chunk(array, size) {
   const { length } = array;
@@ -14,7 +19,12 @@ function chunk(array, size) {
   return chunks;
 }
 var comparison = function(first, second) {
-  return [first, second].every((value) => ["bigint", "boolean", "date", "number"].includes(typeof value)) ? Number(first) - Number(second) : String(first).localeCompare(String(second));
+  if (typeof first === "number" && typeof second === "number") {
+    return first - second;
+  }
+  const firstAsNumber = Number(first);
+  const secondAsNumber = Number(second);
+  return Number.isNaN(firstAsNumber) || Number.isNaN(secondAsNumber) ? String(first).localeCompare(String(second)) : firstAsNumber - secondAsNumber;
 };
 function exists(array, value, key) {
   return findValue("index", array, value, key) > -1;
@@ -37,7 +47,7 @@ var findValue = function(type, array, value, key) {
   const { length } = array;
   for (let index = 0;index < length; index += 1) {
     const item = array[index];
-    if (callbacks.key?.(item) === value) {
+    if (callbacks.key?.(item, index, array) === value) {
       return type === "index" ? index : item;
     }
   }
@@ -60,10 +70,10 @@ var findValues = function(type, array, value, key) {
   const values = hasCallback ? [] : result;
   for (let index = 0;index < length; index += 1) {
     const item = array[index];
-    const itemValue = hasCallback ? callbacks.key?.(item) : item;
-    if (type === "all" && itemValue === value || type === "unique" && values.indexOf(itemValue) === -1) {
+    const itemKey = hasCallback ? callbacks.key?.(item, index, array) : item;
+    if (type === "all" && itemKey === value || type === "unique" && values.indexOf(itemKey) === -1) {
       if (values !== result) {
-        values.push(itemValue);
+        values.push(itemKey);
       }
       result.push(item);
     }
@@ -85,36 +95,33 @@ var getCallbacks = function(bool, key) {
     key: (value) => value?.[key]
   };
 };
-var getSortedValue = function(map, value, callback) {
-  if (!map.has(value)) {
-    map.set(value, new Map);
-  }
-  const stored = map.get(value);
-  if (stored?.has(callback)) {
-    return stored.get(callback);
-  }
-  const result = callback?.(value) ?? value;
-  stored?.set(callback, result);
-  return result;
-};
 function groupBy(array, key) {
+  return groupValues(array, key, true, false);
+}
+var groupValues = function(array, key, arrays, indicable) {
   const callbacks = getCallbacks(undefined, key);
-  if (callbacks?.key == null) {
+  const hasCallback = typeof callbacks?.key === "function";
+  if (!hasCallback && !indicable) {
     return {};
   }
-  const grouped = {};
+  const record = {};
   const { length } = array;
   for (let index = 0;index < length; index += 1) {
-    const item = array[index];
-    const value = callbacks.key(item);
-    if (value in grouped) {
-      grouped[value].push(item);
+    const value = array[index];
+    const key2 = hasCallback ? callbacks?.key?.(value, index, array) ?? index : index;
+    if (arrays) {
+      const existing = record[key2];
+      if (Array.isArray(existing)) {
+        existing.push(value);
+      } else {
+        record[key2] = [value];
+      }
     } else {
-      grouped[value] = [item];
+      record[key2] = value;
     }
   }
-  return grouped;
-}
+  return record;
+};
 function indexOf(array, value, key) {
   return findValue("index", array, value, key);
 }
@@ -137,52 +144,84 @@ function push(array, values) {
   return insertValues("push", array, values, array.length, 0);
 }
 function sort(array, first, second) {
+  if (array.length < 2) {
+    return array;
+  }
   if (first == null || typeof first === "boolean") {
     return first === true ? array.sort((first2, second2) => second2 - first2) : array.sort();
   }
   const direction = second === true ? "desc" : "asc";
   const keys = (Array.isArray(first) ? first : [first]).map((key) => {
-    if (typeof key === "object") {
-      return "value" in key ? {
-        direction: key.direction,
-        callback: getCallbacks(null, key.value)?.key
-      } : null;
-    }
-    return {
+    const returned = {
       direction,
-      callback: getCallbacks(null, key)?.key
+      callback: undefined
     };
-  }).filter((key) => typeof key?.callback === "function");
+    if (isKey(key)) {
+      returned.callback = (value) => value[key];
+    } else if (typeof key === "function") {
+      returned.callback = key;
+    } else if (typeof key?.value === "function" || isKey(key?.value)) {
+      returned.direction = key?.direction ?? direction;
+      returned.callback = typeof key.value === "function" ? key.value : (value) => value[key.value];
+    }
+    return returned;
+  }).filter((key) => typeof key.callback === "function");
   const { length } = keys;
   if (length === 0) {
-    return second === true ? array.sort((first2, second2) => second2 - first2) : array.sort();
+    return direction === "asc" ? array.sort() : array.sort((first2, second2) => second2 - first2);
   }
-  const store = new Map;
+  if (length === 1) {
+    return array.sort((first2, second2) => comparison(keys[0].callback(first2), keys[0].callback(second2)) * (keys[0].direction === "asc" ? 1 : -1));
+  }
   const sorted = array.sort((first2, second2) => {
     for (let index = 0;index < length; index += 1) {
       const { callback, direction: direction2 } = keys[index];
-      if (callback == null) {
-        continue;
-      }
-      const compared = comparison(getSortedValue(store, first2, callback), getSortedValue(store, second2, callback)) * (direction2 === "asc" ? 1 : -1);
+      const descending = direction2 === "desc";
+      const compared = comparison(callback(descending ? second2 : first2), callback(descending ? first2 : second2));
       if (compared !== 0) {
         return compared;
       }
     }
     return 0;
   });
-  store.clear();
   return sorted;
 }
 function splice(array, start, amountOrValues, values) {
   const amoutOrValuesIsArray = Array.isArray(amountOrValues);
   return insertValues("splice", array, amoutOrValuesIsArray ? amountOrValues : values ?? [], start, amoutOrValuesIsArray ? array.length : typeof amountOrValues === "number" && amountOrValues > 0 ? amountOrValues : 0);
 }
+function toMap(array, first, second) {
+  const asArrays = first === true || second === true;
+  const callbacks = getCallbacks(undefined, first);
+  const hasCallback = typeof callbacks?.key === "function";
+  const map = new Map;
+  const { length } = array;
+  for (let index = 0;index < length; index += 1) {
+    const value = array[index];
+    const key = hasCallback ? callbacks?.key?.(value, index, array) ?? index : index;
+    if (asArrays) {
+      const existing = map.get(key);
+      if (Array.isArray(existing)) {
+        existing.push(value);
+      } else {
+        map.set(key, [value]);
+      }
+    } else {
+      map.set(key, value);
+    }
+  }
+  return map;
+}
+function toRecord(array, first, second) {
+  return groupValues(array, first, first === true || second === true, true);
+}
 function unique(array, key) {
   return findValues("unique", array, undefined, key);
 }
 export {
   unique,
+  toRecord,
+  toMap,
   splice,
   sort,
   push,

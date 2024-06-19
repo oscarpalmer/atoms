@@ -22,6 +22,9 @@ function isEmpty(value) {
   const values = Object.values(value);
   return values.length === 0 || values.filter((item) => item != null).length === 0;
 }
+function isKey(value) {
+  return typeof value === "number" || typeof value === "string";
+}
 function isNullable(value) {
   return value == null;
 }
@@ -59,6 +62,7 @@ export {
   isNullableOrWhitespace,
   isNullableOrEmpty,
   isNullable,
+  isKey,
   isEmpty,
   isArrayOrPlainObject
 };
