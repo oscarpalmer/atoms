@@ -1,4 +1,4 @@
-import {afterAll, expect, test} from 'bun:test';
+import {expect, test} from 'bun:test';
 import {
 	isRepeated,
 	isTimer,
@@ -261,4 +261,28 @@ test('is', done => {
 
 		done();
 	}, 25);
+});
+
+test('debugging', done => {
+	wait(() => {
+		// ?
+	}, 1000);
+
+	wait(() => {
+		expect(globalThis._atomic_timers).toBeArrayOfSize(0);
+
+		globalThis._atomic_timer_debug = true;
+
+		wait(() => {
+			expect(globalThis._atomic_timers).toBeArrayOfSize(2);
+
+			globalThis._atomic_timer_debug = false;
+
+			wait(() => {
+				expect(globalThis._atomic_timers).toBeArrayOfSize(0);
+
+				done();
+			});
+		});
+	});
 });

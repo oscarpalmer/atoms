@@ -37,7 +37,8 @@ var timer = function(type, callback, partial, start) {
     callback,
     active: false,
     minimum: options.interval - options.interval % milliseconds / 2,
-    paused: false
+    paused: false,
+    trace: new TimerTrace
   };
   const instance = Object.create({
     continue() {
@@ -67,14 +68,14 @@ var timer = function(type, callback, partial, start) {
         return state.active;
       }
     },
-    callback: {
-      get() {
-        return globalThis._atomic_timer_debug ? state.callback : undefined;
-      }
-    },
     paused: {
       get() {
         return state.paused;
+      }
+    },
+    trace: {
+      get() {
+        return globalThis._atomic_timer_debug ? state.trace : undefined;
       }
     }
   });
@@ -230,6 +231,13 @@ if (globalThis._atomic_timers == null) {
       return globalThis._atomic_timer_debug ? [...activeTimers] : [];
     }
   });
+}
+
+class TimerTrace extends Error {
+  constructor() {
+    super();
+    this.name = "TimerTrace";
+  }
 }
 var activeTimers = new Set;
 var hiddenTimers = new Set;

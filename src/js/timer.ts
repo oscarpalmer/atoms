@@ -81,6 +81,7 @@ type State = {
 	index?: number;
 	minimum: number;
 	paused: boolean;
+	trace: unknown;
 };
 
 /**
@@ -138,6 +139,14 @@ export type When = {
 type WhenOptions = {} & OptionsWithCount;
 
 type WorkType = 'continue' | 'pause' | 'restart' | 'start' | 'stop';
+
+class TimerTrace extends Error {
+	constructor() {
+		super();
+
+		this.name = 'TimerTrace';
+	}
+}
 
 /**
  * A set of all active timers
@@ -233,6 +242,7 @@ function timer(
 		active: false,
 		minimum: options.interval - (options.interval % milliseconds) / 2,
 		paused: false,
+		trace: new TimerTrace(),
 	};
 
 	const instance = Object.create({
@@ -264,14 +274,14 @@ function timer(
 				return state.active;
 			},
 		},
-		callback: {
-			get() {
-				return globalThis._atomic_timer_debug ? state.callback : undefined;
-			},
-		},
 		paused: {
 			get() {
 				return state.paused;
+			},
+		},
+		trace: {
+			get() {
+				return globalThis._atomic_timer_debug ? state.trace : undefined;
 			},
 		},
 	});
