@@ -23,6 +23,10 @@ export declare function join(value: unknown[], delimiter?: string): string;
  */
 export declare function kebabCase(value: string): string;
 /**
+ * Parses a JSON string into its proper value _(or `undefined` if it fails)_
+ */
+export declare function parse(value: string, reviver?: (this: unknown, key: string, value: unknown) => unknown): unknown;
+/**
  * Convert a string to pascal case _(ThisIsPascalCase)_
  */
 export declare function pascalCase(value: string): string;

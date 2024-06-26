@@ -1,5 +1,5 @@
 import type {ToString} from 'type-fest/source/internal';
-import {isArrayOrPlainObject} from './is';
+import {isArrayOrPlainObject, isNumerical} from './is';
 import type {ArrayOrPlainObject, Get, Key, Paths, PlainObject} from './models';
 import {join} from './string';
 
@@ -297,7 +297,9 @@ export function setValue<Data extends PlainObject>(
 	const {length} = parts;
 	const lastIndex = length - 1;
 
-	let target: PlainObject = typeof data === 'object' ? data ?? {} : {};
+	let previous: PlainObject | undefined;
+	let target: PlainObject =
+		typeof data === 'object' && data !== null ? data : {};
 
 	for (let index = 0; index < length; index += 1) {
 		const part = parts[index];
@@ -311,11 +313,27 @@ export function setValue<Data extends PlainObject>(
 		let next = handleValue(target, part, null, true, shouldIgnoreCase);
 
 		if (typeof next !== 'object' || next === null) {
-			next = /^\d+$/.test(part) ? [] : {};
+			if (isNumerical(part) && previous != null) {
+				const temporary = previous[parts[index - 1]];
+
+				if (!Array.isArray(temporary)) {
+					previous[parts[index - 1]] =
+						typeof temporary === 'object' &&
+						temporary !== null &&
+						Object.keys(temporary).every(isNumerical)
+							? Object.values(temporary)
+							: [];
+
+					target = previous[parts[index - 1]] as PlainObject;
+				}
+			}
+
+			next = {};
 
 			target[part] = next;
 		}
 
+		previous = target;
 		target = next as PlainObject;
 	}
 

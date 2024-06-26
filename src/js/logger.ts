@@ -1,3 +1,5 @@
+import {noop} from './function';
+
 declare global {
 	var _atomic_logging: boolean;
 }
@@ -12,13 +14,13 @@ type Logger = {
 	 */
 	enabled: boolean;
 	/**
-	 * Logs the value and shows all its properties
-	 */
-	dir(value: unknown): void;
-	/**
 	 * Logs any number of values at the "debug" log level
 	 */
 	debug(...data: unknown[]): void;
+	/**
+	 * Logs the value and shows all its properties
+	 */
+	dir(value: unknown): void;
 	/**
 	 * Logs any number of values at the "error" log level
 	 */
@@ -103,7 +105,9 @@ const logger = (() => {
 
 	for (const type of types) {
 		Object.defineProperty(instance, type, {
-			value: (...data: unknown[]) => work(type, data),
+			get() {
+				return instance.enabled ? console[type] : noop;
+			},
 		});
 	}
 
@@ -133,12 +137,6 @@ function time(label: string): Time {
 			}
 		},
 	});
-}
-
-function work(type: Type, data: unknown[]): void {
-	if (logger.enabled) {
-		console[type](...data);
-	}
 }
 
 export {logger};

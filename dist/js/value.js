@@ -21,6 +21,12 @@ function isArrayOrPlainObject(value) {
 function isNullableOrWhitespace(value) {
   return value == null || /^\s*$/.test(getString(value));
 }
+function isNumber(value) {
+  return typeof value === "number" && !Number.isNaN(value);
+}
+function isNumerical(value) {
+  return isNumber(value) || typeof value === "string" && value.trim().length > 0 && !Number.isNaN(+value);
+}
 function isPlainObject(value) {
   if (typeof value !== "object" || value === null) {
     return false;
@@ -154,7 +160,8 @@ function setValue(data, path, value, ignoreCase) {
   const parts = (shouldIgnoreCase ? path.toLowerCase() : path).split(".");
   const { length } = parts;
   const lastIndex = length - 1;
-  let target = typeof data === "object" ? data ?? {} : {};
+  let previous;
+  let target = typeof data === "object" && data !== null ? data : {};
   for (let index = 0;index < length; index += 1) {
     const part = parts[index];
     if (parts.indexOf(part) === lastIndex) {
@@ -163,9 +170,17 @@ function setValue(data, path, value, ignoreCase) {
     }
     let next = handleValue(target, part, null, true, shouldIgnoreCase);
     if (typeof next !== "object" || next === null) {
-      next = /^\d+$/.test(part) ? [] : {};
+      if (isNumerical(part) && previous != null) {
+        const temporary = previous[parts[index - 1]];
+        if (!Array.isArray(temporary)) {
+          previous[parts[index - 1]] = typeof temporary === "object" && temporary !== null && Object.keys(temporary).every(isNumerical) ? Object.values(temporary) : [];
+          target = previous[parts[index - 1]];
+        }
+      }
+      next = {};
       target[part] = next;
     }
+    previous = target;
     target = next;
   }
   return data;

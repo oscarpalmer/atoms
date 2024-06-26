@@ -10,6 +10,12 @@ function getString(value) {
   const asString = valueOff?.toString?.() ?? String(valueOff);
   return asString.startsWith("[object ") ? JSON.stringify(value) : asString;
 }
+function parse(value, reviver) {
+  try {
+    return JSON.parse(value, reviver);
+  } catch {
+  }
+}
 
 // src/js/is.ts
 function isNullableOrWhitespace(value) {
@@ -93,13 +99,8 @@ function getData(element, keys) {
 }
 var getDataValue = function(element, key) {
   const value = element.dataset[key];
-  if (value == null) {
-    return;
-  }
-  try {
-    return JSON.parse(value);
-  } catch {
-    return;
+  if (value != null) {
+    return parse(value);
   }
 };
 function getElementUnderPointer(skipIgnore) {

@@ -1,3 +1,7 @@
+// src/js/function.ts
+function noop() {
+}
+
 // src/js/logger.ts
 var time = function(label) {
   const started = logger.enabled;
@@ -18,11 +22,6 @@ var time = function(label) {
       }
     }
   });
-};
-var work = function(type, data) {
-  if (logger.enabled) {
-    console[type](...data);
-  }
 };
 if (globalThis._atomic_logging == null) {
   globalThis._atomic_logging = true;
@@ -54,7 +53,9 @@ var logger = (() => {
   });
   for (const type of types) {
     Object.defineProperty(instance, type, {
-      value: (...data) => work(type, data)
+      get() {
+        return instance.enabled ? console[type] : noop;
+      }
     });
   }
   return instance;

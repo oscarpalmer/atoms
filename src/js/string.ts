@@ -71,6 +71,20 @@ export function kebabCase(value: string): string {
 }
 
 /**
+ * Parses a JSON string into its proper value _(or `undefined` if it fails)_
+ */
+export function parse(
+	value: string,
+	reviver?: (this: unknown, key: string, value: unknown) => unknown,
+): unknown {
+	try {
+		return JSON.parse(value, reviver);
+	} catch {
+		// ?
+	}
+}
+
+/**
  * Convert a string to pascal case _(ThisIsPascalCase)_
  */
 export function pascalCase(value: string): string {

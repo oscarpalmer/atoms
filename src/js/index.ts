@@ -12,10 +12,10 @@ export * from './logger';
 export * from './math';
 export * from './models';
 export * from './number';
+export * from './query';
 export * from './queue';
 export * from './random';
 export * from './string';
 export * from './timer';
 export * from './touch';
 export * from './value';
-

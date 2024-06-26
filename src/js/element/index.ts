@@ -1,5 +1,6 @@
 import {isNullableOrWhitespace, isPlainObject} from '../is';
 import type {PlainObject} from '../models';
+import {parse} from '../string';
 
 type Selector = string | Document | Element | Element[] | NodeList;
 
@@ -172,14 +173,8 @@ export function getData(
 function getDataValue(element: HTMLElement, key: string): unknown {
 	const value = element.dataset[key];
 
-	if (value == null) {
-		return;
-	}
-
-	try {
-		return JSON.parse(value);
-	} catch {
-		return;
+	if (value != null) {
+		return parse(value);
 	}
 }
 
@@ -338,3 +333,4 @@ function updateValue(
 }
 
 export {findElement as $, findElements as $$};
+

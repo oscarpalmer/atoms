@@ -140,6 +140,12 @@ test('primitive', () => {
 	for (const [first, second, result] of primitives) {
 		expect(equal(first, second)).toBe(result as never);
 	}
+
+	const firstLaxString = 'hElLo WoRlD';
+	const secondLaxString = 'hello world';
+
+	expect(equal(firstLaxString, secondLaxString)).toBe(false);
+	expect(equal(firstLaxString, secondLaxString, true)).toBe(true);
 });
 
 test('regular expression', () => {
@@ -150,13 +156,18 @@ test('regular expression', () => {
 
 test('set', () => {
 	const first = new Set([1, 2, 3]);
-	const second = new Set([1, 2, 3]);
+	const second = new Set([3, 2, 1]);
 
 	expect(equal(first, second)).toBe(true);
 
 	second.add(4);
 
 	expect(equal(first, second)).toBe(false);
+
+	const firstNested = new Set([{id: 1}, {id: 2}]);
+	const secondNested = new Set([{id: 2}, {id: 1}]);
+
+	expect(equal(firstNested, secondNested)).toBe(true);
 });
 
 test('symbol', () => {

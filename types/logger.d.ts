@@ -7,13 +7,13 @@ type Logger = {
      */
     enabled: boolean;
     /**
-     * Logs the value and shows all its properties
-     */
-    dir(value: unknown): void;
-    /**
      * Logs any number of values at the "debug" log level
      */
     debug(...data: unknown[]): void;
+    /**
+     * Logs the value and shows all its properties
+     */
+    dir(value: unknown): void;
     /**
      * Logs any number of values at the "error" log level
      */

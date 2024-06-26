@@ -1,5 +1,5 @@
 import {expect, test} from 'bun:test';
-import {diff, equal, getRandomInteger, wait} from '../dist/js';
+import {diff, getRandomInteger, wait} from '../src/js';
 import {
 	chunk,
 	exists,

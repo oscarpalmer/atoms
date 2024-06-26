@@ -2,9 +2,24 @@ import {isPlainObject} from './is';
 import type {ArrayOrPlainObject, PlainObject} from './models';
 
 /**
+ * Are two strings equal? _(Case-sensitive by default)_
+ */
+export function equal(
+	first: string,
+	second: string,
+	ignoreCase?: boolean,
+): boolean;
+
+/**
  * Are two values equal? _(Does a deep comparison, if needed)_
  */
-export function equal(first: unknown, second: unknown): boolean {
+export function equal(first: unknown, second: unknown): boolean;
+
+export function equal(
+	first: unknown,
+	second: unknown,
+	ignoreCase?: boolean,
+): boolean {
 	switch (true) {
 		case first === second:
 			return true;
@@ -40,6 +55,9 @@ export function equal(first: unknown, second: unknown): boolean {
 		case Array.isArray(first) && Array.isArray(second):
 		case isPlainObject(first) && isPlainObject(second):
 			return equalNested(first, second);
+
+		case typeof first === 'string' && ignoreCase === true:
+			return Object.is(first.toLowerCase(), (second as string).toLowerCase());
 
 		default:
 			return Object.is(first, second);
@@ -126,12 +144,16 @@ function equalProperties(
 }
 
 function equalSet(first: Set<unknown>, second: Set<unknown>): boolean {
-	if (first.size !== second.size) {
+	const {size} = first;
+
+	if (size !== second.size) {
 		return false;
 	}
 
-	for (const value of first) {
-		if (!second.has(value)) {
+	const values = [...second];
+
+	for (const item of first) {
+		if (!values.some(value => equal(item, value))) {
 			return false;
 		}
 	}

@@ -33,6 +33,12 @@ function join(value, delimiter) {
 function kebabCase(value) {
   return toCase(value, "-", false, false);
 }
+function parse(value, reviver) {
+  try {
+    return JSON.parse(value, reviver);
+  } catch {
+  }
+}
 function pascalCase(value) {
   return toCase(value, "", true, true);
 }
@@ -62,6 +68,7 @@ export {
   titleCase,
   snakeCase,
   pascalCase,
+  parse,
   kebabCase,
   join,
   getString,

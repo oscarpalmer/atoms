@@ -137,10 +137,13 @@ test('merge', () => {
 		},
 		profession: 'Developer?',
 	});
+
+	expect(merge()).toEqual({});
 });
 
 test('setValue', () => {
 	const data = {
+		change: {},
 		in: {
 			a: {
 				nested: {
@@ -164,6 +167,16 @@ test('setValue', () => {
 	expect(data.in.a.nested.array[3]).toEqual(123);
 	expect(data.in.a.nested.map.get('3')).toEqual(undefined);
 	expect(data.in.a.nested.object['3']).toEqual(123);
+
+	setValue(data, 'change.hmm.huh', 123);
+
+	// @ts-expect-error - Testing created objects
+	expect(data.change.hmm.huh).toEqual(123);
+
+	setValue(data, 'change.hmm.0.id', 123);
+
+	// @ts-expect-error - Testing created arrays
+	expect(data.change.hmm[0].id).toEqual(123);
 
 	expect(data.in.a.nested.set.has(123)).toBe(false);
 

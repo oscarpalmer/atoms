@@ -8,7 +8,7 @@ function isPlainObject(value) {
 }
 
 // src/js/equal.ts
-function equal(first, second) {
+function equal(first, second, ignoreCase) {
   switch (true) {
     case first === second:
       return true;
@@ -34,6 +34,8 @@ function equal(first, second) {
     case (Array.isArray(first) && Array.isArray(second)):
     case (isPlainObject(first) && isPlainObject(second)):
       return equalNested(first, second);
+    case (typeof first === "string" && ignoreCase === true):
+      return Object.is(first.toLowerCase(), second.toLowerCase());
     default:
       return Object.is(first, second);
   }
@@ -84,11 +86,13 @@ var equalProperties = function(first, second, properties) {
   return true;
 };
 var equalSet = function(first, second) {
-  if (first.size !== second.size) {
+  const { size } = first;
+  if (size !== second.size) {
     return false;
   }
-  for (const value of first) {
-    if (!second.has(value)) {
+  const values = [...second];
+  for (const item of first) {
+    if (!values.some((value) => equal(item, value))) {
       return false;
     }
   }
