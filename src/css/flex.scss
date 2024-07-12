@@ -4,7 +4,7 @@
 
 .flow,
 .stack {
-	:where(&, &-large, &-small) {
+	:where(&, &-large, &-small, &-text) {
 		display: flex;
 	}
 }

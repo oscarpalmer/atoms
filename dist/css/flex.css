@@ -2,10 +2,11 @@
   flex: 1;
 }
 
-:where(.flow, .flow-large, .flow-small,
+:where(.flow, .flow-large, .flow-small, .flow-text,
 .stack,
 .stack-large,
-.stack-small) {
+.stack-small,
+.stack-text) {
   display: flex;
 }
 
