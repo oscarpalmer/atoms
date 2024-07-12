@@ -241,7 +241,7 @@ class TimerTrace extends Error {
 }
 var activeTimers = new Set;
 var hiddenTimers = new Set;
-var milliseconds = 16.666666666666668;
+var milliseconds = 1000 / 60;
 document.addEventListener("visibilitychange", () => {
   if (document.hidden) {
     for (const timer2 of activeTimers) {

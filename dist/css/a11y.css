@@ -1,7 +1,7 @@
-.visually-hidden {
+:where(.visually-hidden) {
   position: absolute !important;
 }
-.visually-hidden:not(:active):not(:focus):not(:focus-within) {
+:where(.visually-hidden:not(:active):not(:focus):not(:focus-within)) {
   width: 1px !important;
   height: 1px !important;
   padding: 0 !important;

@@ -4,16 +4,16 @@
 		"url": "https://oscarpalmer.se"
 	},
 	"dependencies": {
-		"type-fest": "^4.20.1"
+		"type-fest": "^4.21.0"
 	},
 	"description": "Sweet little atomic goodies…",
 	"devDependencies": {
-		"@biomejs/biome": "^1.8.2",
+		"@biomejs/biome": "^1.8.3",
 		"@happy-dom/global-registrator": "^14.12.3",
-		"@types/bun": "^1.1.5",
-		"bun": "^1.1.16",
-		"sass": "^1.77.6",
-		"typescript": "^5.5.2"
+		"@types/bun": "^1.1.6",
+		"bun": "^1.1.18",
+		"sass": "^1.77.8",
+		"typescript": "^5.5.3"
 	},
 	"exports": {
 		".": {
@@ -106,11 +106,7 @@
 		},
 		"./package.json": "./package.json"
 	},
-	"files": [
-		"dist",
-		"src",
-		"types"
-	],
+	"files": ["dist", "src", "types"],
 	"keywords": [],
 	"license": "MIT",
 	"main": "./dist/js/index.js",
@@ -132,5 +128,5 @@
 	},
 	"type": "module",
 	"types": "./types/index.d.ts",
-	"version": "0.55.0"
+	"version": "0.56.0"
 }
