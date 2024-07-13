@@ -5,6 +5,10 @@ export type EventPosition = {
     y: number;
 };
 export type GenericCallback = (...args: any[]) => any;
+export type GetterSetter<Value> = {
+    get(): Value;
+    set(value: Value): void;
+};
 export type Key = number | string;
 export type PlainObject = UnknownRecord;
 export type UnknownArrayOrRecord = UnknownArray | UnknownRecord;

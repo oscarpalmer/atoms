@@ -2,6 +2,7 @@ import {expect, test} from 'bun:test';
 import {diff, getRandomInteger, wait} from '../src/js';
 import {
 	chunk,
+	compact,
 	exists,
 	filter,
 	find,
@@ -32,6 +33,14 @@ test('chunk', () => {
 	expect(chunk(array, 3)).toEqual([[1, 2, 3], [4, 5, 6], [7, 8, 9], [10]]);
 
 	expect(chunk(array, 100)).toEqual([array]);
+});
+
+test('compact', () => {
+	expect(compact([1, 2, 3, 4])).toEqual([1, 2, 3, 4]);
+
+	expect(compact([1, null, 2, undefined, 3, null, 4, undefined])).toEqual([
+		1, 2, 3, 4,
+	]);
 });
 
 test('exists', () => {

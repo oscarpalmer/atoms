@@ -1,4 +1,4 @@
-// src/js/string.ts
+// src/js/string/index.ts
 function getString(value) {
   if (typeof value === "string") {
     return value;
@@ -10,7 +10,6 @@ function getString(value) {
   const asString = valueOff?.toString?.() ?? String(valueOff);
   return asString.startsWith("[object ") ? JSON.stringify(value) : asString;
 }
-
 // src/js/is.ts
 function isArrayOrPlainObject(value) {
   return Array.isArray(value) || isPlainObject(value);

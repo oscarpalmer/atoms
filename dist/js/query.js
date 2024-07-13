@@ -1,4 +1,8 @@
-// src/js/string.ts
+// src/js/array/index.ts
+function compact(array) {
+  return array.filter((value) => value != null);
+}
+// src/js/string/index.ts
 function getString(value) {
   if (typeof value === "string") {
     return value;
@@ -11,9 +15,8 @@ function getString(value) {
   return asString.startsWith("[object ") ? JSON.stringify(value) : asString;
 }
 function join(value, delimiter) {
-  return value.filter((item) => !isNullableOrWhitespace(item)).map(getString).join(typeof delimiter === "string" ? delimiter : "");
+  return compact(value).map(getString).filter((value2) => value2.trim().length > 0).join(typeof delimiter === "string" ? delimiter : "");
 }
-
 // src/js/is.ts
 function isNullableOrWhitespace(value) {
   return value == null || /^\s*$/.test(getString(value));
@@ -31,8 +34,7 @@ function isPlainObject(value) {
   const prototype = Object.getPrototypeOf(value);
   return (prototype === null || prototype === Object.prototype || Object.getPrototypeOf(prototype) === null) && !(Symbol.toStringTag in value) && !(Symbol.iterator in value);
 }
-
-// src/js/value.ts
+// src/js/internal/value-handle.ts
 var findKey = function(needle, haystack, ignoreCase) {
   if (!ignoreCase) {
     return needle;
@@ -42,7 +44,7 @@ var findKey = function(needle, haystack, ignoreCase) {
   const index = normalised.indexOf(needle.toLowerCase());
   return index > -1 ? keys[index] : needle;
 };
-var handleValue = function(data, path, value, get, ignoreCase) {
+function handleValue(data, path, value, get, ignoreCase) {
   if (typeof data === "object" && data !== null && !/^(__proto__|constructor|prototype)$/i.test(path)) {
     const key = findKey(path, data, ignoreCase);
     if (get) {
@@ -50,7 +52,8 @@ var handleValue = function(data, path, value, get, ignoreCase) {
     }
     data[key] = value;
   }
-};
+}
+// src/js/value/set.ts
 function setValue(data, path, value, ignoreCase) {
   const shouldIgnoreCase = ignoreCase === true;
   const parts = (shouldIgnoreCase ? path.toLowerCase() : path).split(".");
@@ -81,7 +84,6 @@ function setValue(data, path, value, ignoreCase) {
   }
   return data;
 }
-
 // src/js/query.ts
 function fromQuery(query) {
   const parts = query.split("&");

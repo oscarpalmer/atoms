@@ -11,7 +11,7 @@
 		"@biomejs/biome": "^1.8.3",
 		"@happy-dom/global-registrator": "^14.12.3",
 		"@types/bun": "^1.1.6",
-		"bun": "^1.1.18",
+		"bun": "^1.1.20",
 		"sass": "^1.77.8",
 		"typescript": "^5.5.3"
 	},
@@ -23,10 +23,16 @@
 			"types": "./types/index.d.ts"
 		},
 		"./array": {
-			"bun": "./src/js/array.ts",
-			"import": "./dist/js/array.mjs",
-			"require": "./dist/js/array.js",
-			"types": "./types/array.d.ts"
+			"bun": "./src/js/array/index.ts",
+			"import": "./dist/js/array/index.mjs",
+			"require": "./dist/js/array/index.js",
+			"types": "./types/array/index.d.ts"
+		},
+		"./colour": {
+			"bun": "./src/js/colour/index.ts",
+			"import": "./dist/js/colour/index.mjs",
+			"require": "./dist/js/colour/index.js",
+			"types": "./types/colour/index.d.ts"
 		},
 		"./css/a11y": {
 			"sass": "./src/css/a11y.scss",
@@ -46,6 +52,12 @@
 			"require": "./dist/js/element/index.js",
 			"types": "./types/element/index.d.ts"
 		},
+		"./emitter": {
+			"bun": "./src/js/emitter.ts",
+			"import": "./dist/js/emitter.mjs",
+			"require": "./dist/js/emitter.js",
+			"types": "./types/emitter.d.ts"
+		},
 		"./event": {
 			"bun": "./src/js/event.ts",
 			"import": "./dist/js/event.mjs",
@@ -58,11 +70,29 @@
 			"require": "./dist/js/element/focusable.js",
 			"types": "./types/element/focusable.d.ts"
 		},
+		"./function": {
+			"bun": "./src/js/function/index.ts",
+			"import": "./dist/js/function/index.mjs",
+			"require": "./dist/js/function/index.js",
+			"types": "./types/function/index.d.ts"
+		},
 		"./is": {
 			"bun": "./src/js/is.ts",
 			"import": "./dist/js/is.mjs",
 			"require": "./dist/js/is.js",
 			"types": "./types/is.d.ts"
+		},
+		"./logger": {
+			"bun": "./src/js/logger.ts",
+			"import": "./dist/js/logger.mjs",
+			"require": "./dist/js/logger.js",
+			"types": "./types/logger.d.ts"
+		},
+		"./math": {
+			"bun": "./src/js/math.ts",
+			"import": "./dist/js/math.mjs",
+			"require": "./dist/js/math.js",
+			"types": "./types/math.d.ts"
 		},
 		"./models": {
 			"bun": "./src/js/models.ts",
@@ -74,17 +104,29 @@
 			"require": "./dist/js/number.js",
 			"types": "./types/number.d.ts"
 		},
+		"./query": {
+			"bun": "./src/js/query.ts",
+			"import": "./dist/js/query.mjs",
+			"require": "./dist/js/query.js",
+			"types": "./types/query.d.ts"
+		},
 		"./queue": {
 			"bun": "./src/js/queue.ts",
 			"import": "./dist/js/queue.mjs",
 			"require": "./dist/js/queue.js",
 			"types": "./types/queue.d.ts"
 		},
+		"./random": {
+			"bun": "./src/js/random.ts",
+			"import": "./dist/js/random.mjs",
+			"require": "./dist/js/random.js",
+			"types": "./types/random.d.ts"
+		},
 		"./string": {
-			"bun": "./src/js/string.ts",
-			"import": "./dist/js/string.mjs",
-			"require": "./dist/js/string.js",
-			"types": "./types/string.d.ts"
+			"bun": "./src/js/string/index.ts",
+			"import": "./dist/js/string/index.mjs",
+			"require": "./dist/js/string/index.js",
+			"types": "./types/string/index.d.ts"
 		},
 		"./supports-touch": {
 			"bun": "./src/js/touch.ts",
@@ -99,10 +141,10 @@
 			"types": "./types/timer.d.ts"
 		},
 		"./value": {
-			"bun": "./src/js/value.ts",
-			"import": "./dist/js/value.mjs",
-			"require": "./dist/js/value.js",
-			"types": "./types/value.d.ts"
+			"bun": "./src/js/value/index.ts",
+			"import": "./dist/js/value/index.mjs",
+			"require": "./dist/js/value/index.js",
+			"types": "./types/value/index.d.ts"
 		},
 		"./package.json": "./package.json"
 	},
@@ -128,5 +170,5 @@
 	},
 	"type": "module",
 	"types": "./types/index.d.ts",
-	"version": "0.56.1"
+	"version": "0.57.0"
 }

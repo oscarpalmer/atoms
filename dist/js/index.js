@@ -1,13 +1,153 @@
-// src/js/string.ts
-function camelCase(value) {
-  return toCase(value, "", true, false);
-}
-function capitalise(value) {
-  if (value.length === 0) {
-    return value;
+// src/js/array/chunk.ts
+function chunk(array, size) {
+  const { length } = array;
+  const chunkSize = typeof size === "number" && size > 0 ? size : 32000;
+  if (length <= chunkSize) {
+    return [array];
   }
-  return value.length === 1 ? value.toLocaleUpperCase() : `${value.charAt(0).toLocaleUpperCase()}${value.slice(1).toLocaleLowerCase()}`;
+  const chunks = [];
+  let remaining = Number(length);
+  while (remaining > 0) {
+    chunks.push(array.splice(0, chunkSize));
+    remaining -= chunkSize;
+  }
+  return chunks;
 }
+
+// src/js/array/insert.ts
+function insert(array, index, values) {
+  insertValues("splice", array, values, index, 0);
+}
+function insertValues(type, array, values, start, deleteCount) {
+  const chunked = chunk(values).reverse();
+  const { length } = chunked;
+  let returned;
+  for (let index = 0;index < length; index += 1) {
+    const result = array.splice(start, index === 0 ? deleteCount : 0, ...chunked[index]);
+    if (returned == null) {
+      returned = result;
+    }
+  }
+  return type === "splice" ? returned : array.length;
+}
+
+// src/js/array/index.ts
+function compact(array2) {
+  return array2.filter((value) => value != null);
+}
+function push(array2, values) {
+  return insertValues("push", array2, values, array2.length, 0);
+}
+
+// src/js/internal/array-callbacks.ts
+function getCallbacks(bool, key) {
+  if (typeof bool === "function") {
+    return { bool };
+  }
+  if (typeof key === "function") {
+    return { key };
+  }
+  const isString = typeof key === "string";
+  if (!isString && typeof key !== "number" || isString && key.includes(".")) {
+    return;
+  }
+  return {
+    key: (value) => value?.[key]
+  };
+}
+
+// src/js/internal/array-find.ts
+function findValue(type, array, value, key) {
+  const callbacks = getCallbacks(value, key);
+  if (callbacks?.bool == null && callbacks?.key == null) {
+    return type === "index" ? array.indexOf(value) : array.find((item) => item === value);
+  }
+  if (callbacks.bool != null) {
+    const index = array.findIndex(callbacks.bool);
+    return type === "index" ? index : index > -1 ? array[index] : undefined;
+  }
+  const { length } = array;
+  for (let index = 0;index < length; index += 1) {
+    const item = array[index];
+    if (callbacks.key?.(item, index, array) === value) {
+      return type === "index" ? index : item;
+    }
+  }
+  return type === "index" ? -1 : undefined;
+}
+function findValues(type, array, value, key) {
+  const callbacks = getCallbacks(value, key);
+  const { length } = array;
+  if (type === "unique" && callbacks?.key == null && length >= 100) {
+    return Array.from(new Set(array));
+  }
+  if (typeof callbacks?.bool === "function") {
+    return array.filter(callbacks.bool);
+  }
+  if (type === "all" && key == null) {
+    return array.filter((item) => item === value);
+  }
+  const hasCallback = typeof callbacks?.key === "function";
+  const result = [];
+  const values = hasCallback ? [] : result;
+  for (let index = 0;index < length; index += 1) {
+    const item = array[index];
+    const itemKey = hasCallback ? callbacks.key?.(item, index, array) : item;
+    if (type === "all" && itemKey === value || type === "unique" && values.indexOf(itemKey) === -1) {
+      if (values !== result) {
+        values.push(itemKey);
+      }
+      result.push(item);
+    }
+  }
+  return result;
+}
+
+// src/js/array/exists.ts
+function exists(array, value, key) {
+  return findValue("index", array, value, key) > -1;
+}
+// src/js/array/filter.ts
+function filter(array, value, key) {
+  return findValues("all", array, value, key);
+}
+// src/js/array/find.ts
+function find(array, value, key) {
+  return findValue("value", array, value, key);
+}
+// src/js/array/group-by.ts
+function groupBy(array, key) {
+  return groupValues(array, key, true, false);
+}
+function groupValues(array, key, arrays, indicable) {
+  const callbacks = getCallbacks(undefined, key);
+  const hasCallback = typeof callbacks?.key === "function";
+  if (!hasCallback && !indicable) {
+    return {};
+  }
+  const record = {};
+  const { length } = array;
+  for (let index = 0;index < length; index += 1) {
+    const value = array[index];
+    const key2 = hasCallback ? callbacks?.key?.(value, index, array) ?? index : index;
+    if (arrays) {
+      const existing = record[key2];
+      if (Array.isArray(existing)) {
+        existing.push(value);
+      } else {
+        record[key2] = [value];
+      }
+    } else {
+      record[key2] = value;
+    }
+  }
+  return record;
+}
+// src/js/array/index-of.ts
+function indexOf(array, value, key) {
+  return findValue("index", array, value, key);
+}
+// src/js/string/index.ts
 function createUuid() {
   return "10000000-1000-4000-8000-100000000000".replace(/[018]/g, (substring) => (substring ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> substring / 4).toString(16));
 }
@@ -23,16 +163,35 @@ function getString(value) {
   return asString.startsWith("[object ") ? JSON.stringify(value) : asString;
 }
 function join(value, delimiter) {
-  return value.filter((item) => !isNullableOrWhitespace(item)).map(getString).join(typeof delimiter === "string" ? delimiter : "");
-}
-function kebabCase(value) {
-  return toCase(value, "-", false, false);
+  return compact(value).map(getString).filter((value2) => value2.trim().length > 0).join(typeof delimiter === "string" ? delimiter : "");
 }
 function parse(value, reviver) {
   try {
     return JSON.parse(value, reviver);
   } catch {
   }
+}
+function truncate(value, length, suffix) {
+  const suffixLength = suffix?.length ?? 0;
+  const truncatedLength = length - suffixLength;
+  return value.length <= length ? value : `${value.slice(0, truncatedLength)}${suffix ?? ""}`;
+}
+function words(value) {
+  return value.match(/[^\x00-\x2f\x3a-\x40\x5b-\x60\x7b-\x7f]+/g) ?? [];
+}
+
+// src/js/string/case.ts
+function camelCase(value) {
+  return toCase(value, "", true, false);
+}
+function capitalise(value) {
+  if (value.length === 0) {
+    return value;
+  }
+  return value.length === 1 ? value.toLocaleUpperCase() : `${value.charAt(0).toLocaleUpperCase()}${value.slice(1).toLocaleLowerCase()}`;
+}
+function kebabCase(value) {
+  return toCase(value, "-", false, false);
 }
 function pascalCase(value) {
   return toCase(value, "", true, true);
@@ -49,15 +208,6 @@ var toCase = function(value, delimiter, capitaliseAny, capitaliseFirst) {
     return parts.filter((part) => part.length > 0).map((part, partIndex) => !capitaliseAny || partIndex === 0 && index === 0 && !capitaliseFirst ? part.toLocaleLowerCase() : capitalise(part)).join(delimiter);
   }).join(delimiter);
 };
-function truncate(value, length, suffix) {
-  const suffixLength = suffix?.length ?? 0;
-  const truncatedLength = length - suffixLength;
-  return value.length <= length ? value : `${value.slice(0, truncatedLength)}${suffix ?? ""}`;
-}
-function words(value) {
-  return value.match(/[^\x00-\x2f\x3a-\x40\x5b-\x60\x7b-\x7f]+/g) ?? [];
-}
-
 // src/js/is.ts
 function isArrayOrPlainObject(value) {
   return Array.isArray(value) || isPlainObject(value);
@@ -101,21 +251,7 @@ function isPrimitive(value) {
   return value == null || /^(bigint|boolean|number|string|symbol)$/.test(typeof value);
 }
 
-// src/js/array.ts
-function chunk(array, size) {
-  const { length } = array;
-  const chunkSize = typeof size === "number" && size > 0 ? size : 32000;
-  if (length <= chunkSize) {
-    return [array];
-  }
-  const chunks = [];
-  let remaining = Number(length);
-  while (remaining > 0) {
-    chunks.push(array.splice(0, chunkSize));
-    remaining -= chunkSize;
-  }
-  return chunks;
-}
+// src/js/array/sort.ts
 var comparison = function(first, second) {
   if (typeof first === "number" && typeof second === "number") {
     return first - second;
@@ -124,129 +260,12 @@ var comparison = function(first, second) {
   const secondAsNumber = Number(second);
   return Number.isNaN(firstAsNumber) || Number.isNaN(secondAsNumber) ? String(first).localeCompare(String(second)) : firstAsNumber - secondAsNumber;
 };
-function exists(array, value, key) {
-  return findValue("index", array, value, key) > -1;
-}
-function filter(array, value, key) {
-  return findValues("all", array, value, key);
-}
-function find(array, value, key) {
-  return findValue("value", array, value, key);
-}
-var findValue = function(type, array, value, key) {
-  const callbacks = getCallbacks(value, key);
-  if (callbacks?.bool == null && callbacks?.key == null) {
-    return type === "index" ? array.indexOf(value) : array.find((item) => item === value);
-  }
-  if (callbacks.bool != null) {
-    const index = array.findIndex(callbacks.bool);
-    return type === "index" ? index : index > -1 ? array[index] : undefined;
-  }
-  const { length } = array;
-  for (let index = 0;index < length; index += 1) {
-    const item = array[index];
-    if (callbacks.key?.(item, index, array) === value) {
-      return type === "index" ? index : item;
-    }
-  }
-  return type === "index" ? -1 : undefined;
-};
-var findValues = function(type, array, value, key) {
-  const callbacks = getCallbacks(value, key);
-  const { length } = array;
-  if (type === "unique" && callbacks?.key == null && length >= 100) {
-    return Array.from(new Set(array));
-  }
-  if (typeof callbacks?.bool === "function") {
-    return array.filter(callbacks.bool);
-  }
-  if (type === "all" && key == null) {
-    return array.filter((item) => item === value);
-  }
-  const hasCallback = typeof callbacks?.key === "function";
-  const result = [];
-  const values = hasCallback ? [] : result;
-  for (let index = 0;index < length; index += 1) {
-    const item = array[index];
-    const itemKey = hasCallback ? callbacks.key?.(item, index, array) : item;
-    if (type === "all" && itemKey === value || type === "unique" && values.indexOf(itemKey) === -1) {
-      if (values !== result) {
-        values.push(itemKey);
-      }
-      result.push(item);
-    }
-  }
-  return result;
-};
-var getCallbacks = function(bool, key) {
-  if (typeof bool === "function") {
-    return { bool };
-  }
-  if (typeof key === "function") {
-    return { key };
-  }
-  const isString = typeof key === "string";
-  if (!isString && typeof key !== "number" || isString && key.includes(".")) {
-    return;
-  }
-  return {
-    key: (value) => value?.[key]
-  };
-};
-function groupBy(array, key) {
-  return groupValues(array, key, true, false);
-}
-var groupValues = function(array, key, arrays, indicable) {
-  const callbacks = getCallbacks(undefined, key);
-  const hasCallback = typeof callbacks?.key === "function";
-  if (!hasCallback && !indicable) {
-    return {};
-  }
-  const record = {};
-  const { length } = array;
-  for (let index = 0;index < length; index += 1) {
-    const value = array[index];
-    const key2 = hasCallback ? callbacks?.key?.(value, index, array) ?? index : index;
-    if (arrays) {
-      const existing = record[key2];
-      if (Array.isArray(existing)) {
-        existing.push(value);
-      } else {
-        record[key2] = [value];
-      }
-    } else {
-      record[key2] = value;
-    }
-  }
-  return record;
-};
-function indexOf(array, value, key) {
-  return findValue("index", array, value, key);
-}
-function insert(array, index, values) {
-  insertValues("splice", array, values, index, 0);
-}
-var insertValues = function(type, array, values, start, deleteCount) {
-  const chunked = chunk(values).reverse();
-  const { length } = chunked;
-  let returned;
-  for (let index = 0;index < length; index += 1) {
-    const result = array.splice(start, index === 0 ? deleteCount : 0, ...chunked[index]);
-    if (returned == null) {
-      returned = result;
-    }
-  }
-  return type === "splice" ? returned : array.length;
-};
-function push(array, values) {
-  return insertValues("push", array, values, array.length, 0);
-}
-function sort(array, first, second) {
-  if (array.length < 2) {
-    return array;
+function sort(array2, first, second) {
+  if (array2.length < 2) {
+    return array2;
   }
   if (first == null || typeof first === "boolean") {
-    return first === true ? array.sort((first2, second2) => second2 - first2) : array.sort();
+    return first === true ? array2.sort((first2, second2) => second2 - first2) : array2.sort();
   }
   const direction = second === true ? "desc" : "asc";
   const keys = (Array.isArray(first) ? first : [first]).map((key) => {
@@ -266,12 +285,12 @@ function sort(array, first, second) {
   }).filter((key) => typeof key.callback === "function");
   const { length } = keys;
   if (length === 0) {
-    return direction === "asc" ? array.sort() : array.sort((first2, second2) => second2 - first2);
+    return direction === "asc" ? array2.sort() : array2.sort((first2, second2) => second2 - first2);
   }
   if (length === 1) {
-    return array.sort((first2, second2) => comparison(keys[0].callback(first2), keys[0].callback(second2)) * (keys[0].direction === "asc" ? 1 : -1));
+    return array2.sort((first2, second2) => comparison(keys[0].callback(first2), keys[0].callback(second2)) * (keys[0].direction === "asc" ? 1 : -1));
   }
-  const sorted = array.sort((first2, second2) => {
+  const sorted = array2.sort((first2, second2) => {
     for (let index = 0;index < length; index += 1) {
       const { callback, direction: direction2 } = keys[index];
       const descending = direction2 === "desc";
@@ -284,19 +303,21 @@ function sort(array, first, second) {
   });
   return sorted;
 }
-function splice(array, start, amountOrValues, values) {
+// src/js/array/splice.ts
+function splice(array2, start, amountOrValues, values) {
   const amoutOrValuesIsArray = Array.isArray(amountOrValues);
-  return insertValues("splice", array, amoutOrValuesIsArray ? amountOrValues : values ?? [], start, amoutOrValuesIsArray ? array.length : typeof amountOrValues === "number" && amountOrValues > 0 ? amountOrValues : 0);
+  return insertValues("splice", array2, amoutOrValuesIsArray ? amountOrValues : values ?? [], start, amoutOrValuesIsArray ? array2.length : typeof amountOrValues === "number" && amountOrValues > 0 ? amountOrValues : 0);
 }
-function toMap(array, first, second) {
+// src/js/array/to-map.ts
+function toMap(array2, first, second) {
   const asArrays = first === true || second === true;
   const callbacks = getCallbacks(undefined, first);
   const hasCallback = typeof callbacks?.key === "function";
   const map = new Map;
-  const { length } = array;
+  const { length } = array2;
   for (let index = 0;index < length; index += 1) {
-    const value = array[index];
-    const key = hasCallback ? callbacks?.key?.(value, index, array) ?? index : index;
+    const value = array2[index];
+    const key = hasCallback ? callbacks?.key?.(value, index, array2) ?? index : index;
     if (asArrays) {
       const existing = map.get(key);
       if (Array.isArray(existing)) {
@@ -310,67 +331,28 @@ function toMap(array, first, second) {
   }
   return map;
 }
-function toRecord(array, first, second) {
-  return groupValues(array, first, first === true || second === true, true);
+// src/js/array/to-record.ts
+function toRecord(array2, first, second) {
+  return groupValues(array2, first, first === true || second === true, true);
 }
-function unique(array, key) {
-  return findValues("unique", array, undefined, key);
+// src/js/array/unique.ts
+function unique(array2, key) {
+  return findValues("unique", array2, undefined, key);
 }
-// src/js/clone.ts
-function clone(value) {
-  switch (true) {
-    case value == null:
-      return value;
-    case typeof value === "bigint":
-      return BigInt(value);
-    case typeof value === "boolean":
-      return Boolean(value);
-    case typeof value === "function":
-      return;
-    case typeof value === "number":
-      return Number(value);
-    case typeof value === "string":
-      return String(value);
-    case typeof value === "symbol":
-      return Symbol(value.description);
-    case value instanceof ArrayBuffer:
-      return cloneArrayBuffer(value);
-    case value instanceof DataView:
-      return cloneDataView(value);
-    case value instanceof Node:
-      return value.cloneNode(true);
-    case value instanceof RegExp:
-      return cloneRegularExpression(value);
-    case isArrayOrPlainObject(value):
-      return cloneNested(value);
-    default:
-      return structuredClone(value);
+// src/js/colour/index.ts
+function getForegroundColour(value) {
+  const values = [value.blue / 255, value.green / 255, value.red / 255];
+  for (let colour of values) {
+    if (colour <= 0.03928) {
+      colour /= 12.92;
+    } else {
+      colour = ((colour + 0.055) / 1.055) ** 2.4;
+    }
   }
+  const luminance = 0.2126 * values[2] + 0.7152 * values[1] + 0.0722 * values[0];
+  return luminance > 0.625 ? "black" : "white";
 }
-var cloneArrayBuffer = function(value) {
-  const cloned = new ArrayBuffer(value.byteLength);
-  new Uint8Array(cloned).set(new Uint8Array(value));
-  return cloned;
-};
-var cloneDataView = function(value) {
-  const buffer = cloneArrayBuffer(value.buffer);
-  return new DataView(buffer, value.byteOffset, value.byteLength);
-};
-var cloneNested = function(value) {
-  const cloned = Array.isArray(value) ? [] : {};
-  const keys = Object.keys(value);
-  const { length } = keys;
-  for (let index = 0;index < length; index += 1) {
-    const key = keys[index];
-    cloned[key] = clone(value[key]);
-  }
-  return cloned;
-};
-var cloneRegularExpression = function(value) {
-  const cloned = new RegExp(value.source, value.flags);
-  cloned.lastIndex = value.lastIndex;
-  return cloned;
-};
+
 // src/js/number.ts
 function between(value, min, max) {
   return value >= min && value <= max;
@@ -409,33 +391,20 @@ function getNumber(value) {
   return +(/^0x[0-9a-f]+$/i.test(trimmed) ? trimmed : trimmed.replace(/_/g, ""));
 }
 
-// src/js/colour.ts
-var createHex = function(original) {
-  let value = original.slice();
-  const instance = Object.create({
-    toHsl() {
-      return hexToRgb(value).toHsl();
-    },
-    toRgb() {
-      return hexToRgb(value);
-    },
-    toString() {
-      return `#${value}`;
-    }
-  });
-  Object.defineProperty(instance, "value", {
+// src/js/internal/colour-property.ts
+function createProperty(store, key, min, max) {
+  return {
     get() {
-      return `#${value}`;
+      return store[key];
     },
-    set(hex) {
-      if (anyPattern.test(hex)) {
-        value = getNormalisedHex(hex);
-      }
+    set(value) {
+      store[key] = clamp(value, min, max);
     }
-  });
-  return instance;
-};
-var createHsl = function(original) {
+  };
+}
+
+// src/js/colour/hsl.ts
+function createHsl(original) {
   const value = { ...original };
   const instance = Object.create({
     toHex() {
@@ -455,66 +424,6 @@ var createHsl = function(original) {
     value: { value }
   });
   return instance;
-};
-var createProperty = function(store, key, min, max) {
-  return {
-    get() {
-      return store[key];
-    },
-    set(value) {
-      store[key] = clamp(value, min, max);
-    }
-  };
-};
-var createRgb = function(original) {
-  const value = { ...original };
-  const instance = Object.create({
-    toHex() {
-      return rgbToHex(value);
-    },
-    toHsl() {
-      return rgbToHsl(value);
-    },
-    toString() {
-      return `rgb(${value.red}, ${value.green}, ${value.blue})`;
-    }
-  });
-  Object.defineProperties(instance, {
-    blue: createProperty(value, "blue", 0, 255),
-    green: createProperty(value, "green", 0, 255),
-    red: createProperty(value, "red", 0, 255),
-    value: { value }
-  });
-  return instance;
-};
-function getForegroundColour(value) {
-  const values = [value.blue / 255, value.green / 255, value.red / 255];
-  for (let colour of values) {
-    if (colour <= 0.03928) {
-      colour /= 12.92;
-    } else {
-      colour = ((colour + 0.055) / 1.055) ** 2.4;
-    }
-  }
-  const luminance = 0.2126 * values[2] + 0.7152 * values[1] + 0.0722 * values[0];
-  return luminance > 0.625 ? "black" : "white";
-}
-function getHexColour(value) {
-  return createHex(anyPattern.test(value) ? getNormalisedHex(value) : "000000");
-}
-var getNormalisedHex = function(value) {
-  const normalised = value.replace(/^#/, "");
-  return normalised.length === 3 ? normalised.split("").map((character) => character.repeat(2)).join("") : normalised;
-};
-function hexToRgb(value) {
-  const hex = anyPattern.test(value) ? getNormalisedHex(value) : "";
-  const pairs = groupedPattern.exec(hex) ?? [];
-  const rgb = [];
-  const { length } = pairs;
-  for (let index = 1;index < length; index += 1) {
-    rgb.push(Number.parseInt(pairs[index], 16));
-  }
-  return createRgb({ blue: rgb[2] ?? 0, green: rgb[1] ?? 0, red: rgb[0] ?? 0 });
 }
 function hslToRgb(value) {
   let hue = value.hue % 360;
@@ -534,16 +443,39 @@ function hslToRgb(value) {
     red: clamp(Math.round(get(0) * 255), 0, 255)
   });
 }
+
+// src/js/colour/rgb.ts
+function createRgb(original) {
+  const value = { ...original };
+  const instance = Object.create({
+    toHex() {
+      return rgbToHex(value);
+    },
+    toHsl() {
+      return rgbToHsl(value);
+    },
+    toString() {
+      return `rgb(${value.red}, ${value.green}, ${value.blue})`;
+    }
+  });
+  Object.defineProperties(instance, {
+    blue: createProperty(value, "blue", 0, 255),
+    green: createProperty(value, "green", 0, 255),
+    red: createProperty(value, "red", 0, 255),
+    value: { value }
+  });
+  return instance;
+}
 function rgbToHex(value) {
   return createHex(`${[value.red, value.green, value.blue].map((colour) => {
-    const hex = colour.toString(16);
-    return hex.length === 1 ? `0${hex}` : hex;
+    const hex2 = colour.toString(16);
+    return hex2.length === 1 ? `0${hex2}` : hex2;
   }).join("")}`);
 }
-function rgbToHsl(rgb) {
-  const blue = rgb.blue / 255;
-  const green = rgb.green / 255;
-  const red = rgb.red / 255;
+function rgbToHsl(rgb2) {
+  const blue = rgb2.blue / 255;
+  const green = rgb2.green / 255;
+  const red = rgb2.red / 255;
   const max = Math.max(blue, green, red);
   const min = Math.min(blue, green, red);
   const delta = max - min;
@@ -580,6 +512,50 @@ function rgbToHsl(rgb) {
     saturation: +(saturation * 100).toFixed(2)
   });
 }
+
+// src/js/colour/hex.ts
+function createHex(original) {
+  let value = original.slice();
+  const instance = Object.create({
+    toHsl() {
+      return hexToRgb(value).toHsl();
+    },
+    toRgb() {
+      return hexToRgb(value);
+    },
+    toString() {
+      return `#${value}`;
+    }
+  });
+  Object.defineProperty(instance, "value", {
+    get() {
+      return `#${value}`;
+    },
+    set(hex2) {
+      if (anyPattern.test(hex2)) {
+        value = getNormalisedHex(hex2);
+      }
+    }
+  });
+  return instance;
+}
+function getHexColour(value) {
+  return createHex(anyPattern.test(value) ? getNormalisedHex(value) : "000000");
+}
+var getNormalisedHex = function(value) {
+  const normalised = value.replace(/^#/, "");
+  return normalised.length === 3 ? normalised.split("").map((character) => character.repeat(2)).join("") : normalised;
+};
+function hexToRgb(value) {
+  const hex2 = anyPattern.test(value) ? getNormalisedHex(value) : "";
+  const pairs = groupedPattern.exec(hex2) ?? [];
+  const rgb3 = [];
+  const { length } = pairs;
+  for (let index = 1;index < length; index += 1) {
+    rgb3.push(Number.parseInt(pairs[index], 16));
+  }
+  return createRgb({ blue: rgb3[2] ?? 0, green: rgb3[1] ?? 0, red: rgb3[0] ?? 0 });
+}
 var anyPattern = /^#*([a-f0-9]{3}){1,2}$/i;
 var groupedPattern = /^#*([a-f0-9]{2})([a-f0-9]{2})([a-f0-9]{2})$/i;
 // src/js/element/focusable.ts
@@ -609,7 +585,7 @@ var getTabIndex = function(element) {
   return tabIndex;
 };
 var getValidElements = function(parent, filters, tabbable) {
-  const items = Array.from(parent.querySelectorAll(selector)).map((element) => getItem(element, tabbable)).filter((item) => !filters.some((filter2) => filter2(item)));
+  const items = Array.from(parent.querySelectorAll(selector)).map((element) => getItem(element, tabbable)).filter((item) => !filters.some((filter3) => filter3(item)));
   if (!tabbable) {
     return items.map((item) => item.element);
   }
@@ -705,7 +681,7 @@ function isTabbableElement(element) {
 }
 var isValidElement = function(element, filters, tabbable) {
   const item = getItem(element, tabbable);
-  return !filters.some((filter2) => filter2(item));
+  return !filters.some((filter3) => filter3(item));
 };
 var selector = [
   '[contenteditable]:not([contenteditable="false"])',
@@ -721,6 +697,67 @@ var selector = [
   "video[controls]"
 ].map((selector2) => `${selector2}:not([inert])`).join(",");
 // src/js/element/index.ts
+function getElementUnderPointer(skipIgnore) {
+  const elements = Array.from(document.querySelectorAll(":hover")).filter((element) => {
+    if (/^head$/i.test(element.tagName)) {
+      return false;
+    }
+    const style = getComputedStyle(element);
+    return skipIgnore === true || style.pointerEvents !== "none" && style.visibility !== "hidden";
+  });
+  return elements[elements.length - 1];
+}
+function getTextDirection(element) {
+  const direction = element.getAttribute("dir");
+  if (direction !== null && /^(ltr|rtl)$/i.test(direction)) {
+    return direction.toLowerCase();
+  }
+  return getComputedStyle?.(element)?.direction === "rtl" ? "rtl" : "ltr";
+}
+
+// src/js/internal/element-value.ts
+function setElementValues(element, first, second, callback) {
+  if (isPlainObject(first)) {
+    const entries = Object.entries(first);
+    for (const [key, value] of entries) {
+      callback(element, key, value);
+    }
+  } else if (first != null) {
+    callback(element, first, second);
+  }
+}
+function updateElementValue(element, key, value, set, remove, json) {
+  if (isNullableOrWhitespace(value)) {
+    remove.call(element, key);
+  } else {
+    set.call(element, key, json ? JSON.stringify(value) : String(value));
+  }
+}
+
+// src/js/element/data.ts
+function getData(element, keys) {
+  if (typeof keys === "string") {
+    return getDataValue(element, keys);
+  }
+  const data = {};
+  for (const key of keys) {
+    data[key] = getDataValue(element, key);
+  }
+  return data;
+}
+var getDataValue = function(element, key) {
+  const value = element.dataset[key];
+  if (value != null) {
+    return parse(value);
+  }
+};
+function setData(element, first, second) {
+  setElementValues(element, first, second, updateDataAttribute);
+}
+var updateDataAttribute = function(element, key, value) {
+  updateElementValue(element, `data-${key}`, value, element.setAttribute, element.removeAttribute, true);
+};
+// src/js/element/find.ts
 function findElement(selector2, context) {
   return findElementOrElements(selector2, context, true);
 }
@@ -740,7 +777,7 @@ var findElementOrElements = function(selector2, context, single) {
       }
       result.push(...Array.from(value));
     }
-    return single ? undefined : result.filter((value, index, array) => array.indexOf(value) === index);
+    return single ? undefined : result.filter((value, index, array2) => array2.indexOf(value) === index);
   }
   const nodes = Array.isArray(selector2) ? selector2 : selector2 instanceof NodeList ? Array.from(selector2) : [selector2];
   const { length } = nodes;
@@ -778,71 +815,16 @@ function findParentElement(origin, selector2) {
   }
   return parent;
 }
-function getData(element, keys) {
-  if (typeof keys === "string") {
-    return getDataValue(element, keys);
-  }
-  const data = {};
-  for (const key of keys) {
-    data[key] = getDataValue(element, key);
-  }
-  return data;
-}
-var getDataValue = function(element, key) {
-  const value = element.dataset[key];
-  if (value != null) {
-    return parse(value);
-  }
-};
-function getElementUnderPointer(skipIgnore) {
-  const elements = Array.from(document.querySelectorAll(":hover")).filter((element) => {
-    if (/^head$/i.test(element.tagName)) {
-      return false;
-    }
-    const style = getComputedStyle(element);
-    return skipIgnore === true || style.pointerEvents !== "none" && style.visibility !== "hidden";
-  });
-  return elements[elements.length - 1];
-}
-function getTextDirection(element) {
-  const direction = element.getAttribute("dir");
-  if (direction !== null && /^(ltr|rtl)$/i.test(direction)) {
-    return direction.toLowerCase();
-  }
-  return getComputedStyle?.(element)?.direction === "rtl" ? "rtl" : "ltr";
-}
-function setData(element, first, second) {
-  setValues(element, first, second, updateDataAttribute);
-}
+// src/js/element/style.ts
 function setStyles(element, first, second) {
-  setValues(element, first, second, updateStyleProperty);
+  setElementValues(element, first, second, updateStyleProperty);
 }
-var setValues = function(element, first, second, callback) {
-  if (isPlainObject(first)) {
-    const entries = Object.entries(first);
-    for (const [key, value] of entries) {
-      callback(element, key, value);
-    }
-  } else if (first != null) {
-    callback(element, first, second);
-  }
-};
-var updateDataAttribute = function(element, key, value) {
-  updateValue(element, `data-${key}`, value, element.setAttribute, element.removeAttribute, true);
-};
 var updateStyleProperty = function(element, key, value) {
-  updateValue(element, key, value, function(key2, value2) {
+  updateElementValue(element, key, value, function(key2, value2) {
     this.style[key2] = value2;
   }, function(key2) {
     this.style[key2] = "";
   }, false);
-};
-var updateValue = function(element, key, value, set, remove, json) {
-  if (isNullableOrWhitespace(value)) {
-    remove.call(element, key);
-  } else {
-    set.call(element, key, json ? JSON.stringify(value) : String(value));
-  }
 };
 // src/js/emitter.ts
 var createObserable = function(emitter, observers) {
@@ -949,97 +931,6 @@ function emitter(value) {
   });
   return instance;
 }
-// src/js/equal.ts
-function equal(first, second, ignoreCase) {
-  switch (true) {
-    case first === second:
-      return true;
-    case (first == null || second == null):
-      return first === second;
-    case typeof first !== typeof second:
-      return false;
-    case (first instanceof ArrayBuffer && second instanceof ArrayBuffer):
-      return equalArrayBuffer(first, second);
-    case typeof first === "boolean":
-    case (first instanceof Date && second instanceof Date):
-      return Object.is(Number(first), Number(second));
-    case (first instanceof DataView && second instanceof DataView):
-      return equalDataView(first, second);
-    case (first instanceof Error && second instanceof Error):
-      return equalProperties(first, second, ["name", "message"]);
-    case (first instanceof Map && second instanceof Map):
-      return equalMap(first, second);
-    case (first instanceof RegExp && second instanceof RegExp):
-      return equalProperties(first, second, ["source", "flags"]);
-    case (first instanceof Set && second instanceof Set):
-      return equalSet(first, second);
-    case (Array.isArray(first) && Array.isArray(second)):
-    case (isPlainObject(first) && isPlainObject(second)):
-      return equalNested(first, second);
-    case (typeof first === "string" && ignoreCase === true):
-      return Object.is(first.toLowerCase(), second.toLowerCase());
-    default:
-      return Object.is(first, second);
-  }
-}
-var equalArrayBuffer = function(first, second) {
-  return first.byteLength === second.byteLength ? equalNested(new Uint8Array(first), new Uint8Array(second)) : false;
-};
-var equalDataView = function(first, second) {
-  return first.byteOffset === second.byteOffset ? equalArrayBuffer(first.buffer, second.buffer) : false;
-};
-var equalMap = function(first, second) {
-  if (first.size !== second.size) {
-    return false;
-  }
-  const firstKeys = [...first.keys()];
-  const secondKeys = [...second.keys()];
-  if (firstKeys.some((key) => !secondKeys.includes(key))) {
-    return false;
-  }
-  for (const [key, value] of first) {
-    if (!equal(value, second.get(key))) {
-      return false;
-    }
-  }
-  return true;
-};
-var equalNested = function(first, second) {
-  const firstKeys = Object.keys(first);
-  const secondKeys = Object.keys(second);
-  const { length } = firstKeys;
-  if (length !== secondKeys.length || firstKeys.some((key) => !secondKeys.includes(key))) {
-    return false;
-  }
-  for (let index = 0;index < length; index += 1) {
-    const key = firstKeys[index];
-    if (!equal(first[key], second[key])) {
-      return false;
-    }
-  }
-  return true;
-};
-var equalProperties = function(first, second, properties) {
-  for (const key of properties) {
-    if (!Object.is(first[key], second[key])) {
-      return false;
-    }
-  }
-  return true;
-};
-var equalSet = function(first, second) {
-  const { size } = first;
-  if (size !== second.size) {
-    return false;
-  }
-  const values = [...second];
-  for (const item of first) {
-    if (!values.some((value) => equal(item, value))) {
-      return false;
-    }
-  }
-  return true;
-};
 // src/js/event.ts
 function getPosition(event) {
   let x;
@@ -1164,7 +1055,154 @@ function round(value, decimals) {
 function sum(values) {
   return values.reduce((previous, current) => previous + current, 0);
 }
-// src/js/value.ts
+// src/js/value/clone.ts
+function clone(value) {
+  switch (true) {
+    case value == null:
+      return value;
+    case typeof value === "bigint":
+      return BigInt(value);
+    case typeof value === "boolean":
+      return Boolean(value);
+    case typeof value === "function":
+      return;
+    case typeof value === "number":
+      return Number(value);
+    case typeof value === "string":
+      return String(value);
+    case typeof value === "symbol":
+      return Symbol(value.description);
+    case value instanceof ArrayBuffer:
+      return cloneArrayBuffer(value);
+    case value instanceof DataView:
+      return cloneDataView(value);
+    case value instanceof Node:
+      return value.cloneNode(true);
+    case value instanceof RegExp:
+      return cloneRegularExpression(value);
+    case isArrayOrPlainObject(value):
+      return cloneNested(value);
+    default:
+      return structuredClone(value);
+  }
+}
+var cloneArrayBuffer = function(value) {
+  const cloned = new ArrayBuffer(value.byteLength);
+  new Uint8Array(cloned).set(new Uint8Array(value));
+  return cloned;
+};
+var cloneDataView = function(value) {
+  const buffer = cloneArrayBuffer(value.buffer);
+  return new DataView(buffer, value.byteOffset, value.byteLength);
+};
+var cloneNested = function(value) {
+  const cloned = Array.isArray(value) ? [] : {};
+  const keys = Object.keys(value);
+  const { length } = keys;
+  for (let index = 0;index < length; index += 1) {
+    const key = keys[index];
+    cloned[key] = clone(value[key]);
+  }
+  return cloned;
+};
+var cloneRegularExpression = function(value) {
+  const cloned = new RegExp(value.source, value.flags);
+  cloned.lastIndex = value.lastIndex;
+  return cloned;
+};
+// src/js/value/equal.ts
+function equal(first, second, ignoreCase) {
+  switch (true) {
+    case first === second:
+      return true;
+    case (first == null || second == null):
+      return first === second;
+    case typeof first !== typeof second:
+      return false;
+    case (first instanceof ArrayBuffer && second instanceof ArrayBuffer):
+      return equalArrayBuffer(first, second);
+    case typeof first === "boolean":
+    case (first instanceof Date && second instanceof Date):
+      return Object.is(Number(first), Number(second));
+    case (first instanceof DataView && second instanceof DataView):
+      return equalDataView(first, second);
+    case (first instanceof Error && second instanceof Error):
+      return equalProperties(first, second, ["name", "message"]);
+    case (first instanceof Map && second instanceof Map):
+      return equalMap(first, second);
+    case (first instanceof RegExp && second instanceof RegExp):
+      return equalProperties(first, second, ["source", "flags"]);
+    case (first instanceof Set && second instanceof Set):
+      return equalSet(first, second);
+    case (Array.isArray(first) && Array.isArray(second)):
+    case (isPlainObject(first) && isPlainObject(second)):
+      return equalNested(first, second);
+    case (typeof first === "string" && ignoreCase === true):
+      return Object.is(first.toLowerCase(), second.toLowerCase());
+    default:
+      return Object.is(first, second);
+  }
+}
+var equalArrayBuffer = function(first, second) {
+  return first.byteLength === second.byteLength ? equalNested(new Uint8Array(first), new Uint8Array(second)) : false;
+};
+var equalDataView = function(first, second) {
+  return first.byteOffset === second.byteOffset ? equalArrayBuffer(first.buffer, second.buffer) : false;
+};
+var equalMap = function(first, second) {
+  if (first.size !== second.size) {
+    return false;
+  }
+  const firstKeys = [...first.keys()];
+  const secondKeys = [...second.keys()];
+  if (firstKeys.some((key) => !secondKeys.includes(key))) {
+    return false;
+  }
+  for (const [key, value] of first) {
+    if (!equal(value, second.get(key))) {
+      return false;
+    }
+  }
+  return true;
+};
+var equalNested = function(first, second) {
+  const firstKeys = Object.keys(first);
+  const secondKeys = Object.keys(second);
+  const { length } = firstKeys;
+  if (length !== secondKeys.length || firstKeys.some((key) => !secondKeys.includes(key))) {
+    return false;
+  }
+  for (let index = 0;index < length; index += 1) {
+    const key = firstKeys[index];
+    if (!equal(first[key], second[key])) {
+      return false;
+    }
+  }
+  return true;
+};
+var equalProperties = function(first, second, properties) {
+  for (const key of properties) {
+    if (!Object.is(first[key], second[key])) {
+      return false;
+    }
+  }
+  return true;
+};
+var equalSet = function(first, second) {
+  const { size } = first;
+  if (size !== second.size) {
+    return false;
+  }
+  const values = [...second];
+  for (const item of first) {
+    if (!values.some((value) => equal(item, value))) {
+      return false;
+    }
+  }
+  return true;
+};
+
+// src/js/value/diff.ts
 function diff(first, second) {
   const result = {
     original: {
@@ -1195,15 +1233,6 @@ function diff(first, second) {
   }
   return result;
 }
-var findKey = function(needle, haystack, ignoreCase) {
-  if (!ignoreCase) {
-    return needle;
-  }
-  const keys = Object.keys(haystack);
-  const normalised = keys.map((key) => key.toLowerCase());
-  const index = normalised.indexOf(needle.toLowerCase());
-  return index > -1 ? keys[index] : needle;
-};
 var getDiffs = function(first, second, prefix) {
   const changes = [];
   const checked = new Set;
@@ -1221,7 +1250,7 @@ var getDiffs = function(first, second, prefix) {
       }
       const from = first?.[key];
       const to = second?.[key];
-      if (!Object.is(from, to)) {
+      if (!equal(from, to)) {
         const prefixed = join([prefix, key], ".");
         const change = {
           from,
@@ -1240,26 +1269,39 @@ var getDiffs = function(first, second, prefix) {
   }
   return changes;
 };
-function getValue(data, path, ignoreCase) {
+// src/js/internal/value-handle.ts
+var findKey = function(needle, haystack, ignoreCase) {
+  if (!ignoreCase) {
+    return needle;
+  }
+  const keys = Object.keys(haystack);
+  const normalised = keys.map((key) => key.toLowerCase());
+  const index = normalised.indexOf(needle.toLowerCase());
+  return index > -1 ? keys[index] : needle;
+};
+function handleValue(data2, path, value, get, ignoreCase) {
+  if (typeof data2 === "object" && data2 !== null && !/^(__proto__|constructor|prototype)$/i.test(path)) {
+    const key = findKey(path, data2, ignoreCase);
+    if (get) {
+      return data2[key];
+    }
+    data2[key] = value;
+  }
+}
+
+// src/js/value/get.ts
+function getValue(data2, path, ignoreCase) {
   const shouldIgnoreCase = ignoreCase === true;
   const parts = (shouldIgnoreCase ? path.toLowerCase() : path).split(".");
   const { length } = parts;
   let index = 0;
-  let value = typeof data === "object" ? data ?? {} : {};
+  let value = typeof data2 === "object" ? data2 ?? {} : {};
   while (index < length && value != null) {
     value = handleValue(value, parts[index++], null, true, shouldIgnoreCase);
   }
   return value;
 }
-var handleValue = function(data, path, value, get, ignoreCase) {
-  if (typeof data === "object" && data !== null && !/^(__proto__|constructor|prototype)$/i.test(path)) {
-    const key = findKey(path, data, ignoreCase);
-    if (get) {
-      return data[key];
-    }
-    data[key] = value;
-  }
-};
+// src/js/value/merge.ts
 function merge(...values) {
   if (values.length === 0) {
     return {};
@@ -1284,13 +1326,14 @@ function merge(...values) {
   }
   return result;
 }
-function setValue(data, path, value, ignoreCase) {
+// src/js/value/set.ts
+function setValue(data2, path, value, ignoreCase) {
   const shouldIgnoreCase = ignoreCase === true;
   const parts = (shouldIgnoreCase ? path.toLowerCase() : path).split(".");
   const { length } = parts;
   const lastIndex = length - 1;
   let previous;
-  let target = typeof data === "object" && data !== null ? data : {};
+  let target = typeof data2 === "object" && data2 !== null ? data2 : {};
   for (let index = 0;index < length; index += 1) {
     const part = parts[index];
     if (parts.indexOf(part) === lastIndex) {
@@ -1312,9 +1355,8 @@ function setValue(data, path, value, ignoreCase) {
     previous = target;
     target = next;
   }
-  return data;
+  return data2;
 }
-
 // src/js/query.ts
 function fromQuery(query) {
   const parts = query.split("&");
@@ -1431,20 +1473,20 @@ function getRandomHex() {
 var getValueOrDefault = function(value2, defaultValue) {
   return typeof value2 === "number" && value2 > 0 ? value2 : defaultValue;
 };
-var is8 = function(value2, pattern) {
+var is9 = function(value2, pattern) {
   return pattern.test(value2?.$timer);
 };
 function isRepeated(value2) {
-  return is8(value2, /^repeat$/);
+  return is9(value2, /^repeat$/);
 }
 function isTimer(value2) {
-  return is8(value2, /^repeat|wait$/);
+  return is9(value2, /^repeat|wait$/);
 }
 function isWaited(value2) {
-  return is8(value2, /^wait$/);
+  return is9(value2, /^wait$/);
 }
 function isWhen(value2) {
-  return is8(value2, /^when$/) && typeof value2.then === "function";
+  return is9(value2, /^when$/) && typeof value2.then === "function";
 }
 function repeat(callback, options) {
   return timer("repeat", callback, options ?? {}, true);
@@ -1782,10 +1824,10 @@ export {
   emitter,
   diff,
   createUuid,
+  compact,
   clone,
   clamp,
   chunk,
-  capitalise as capitalize,
   capitalise,
   camelCase,
   between,

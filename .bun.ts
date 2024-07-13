@@ -1,5 +1,6 @@
 import * as fs from 'node:fs/promises';
 
+const allowed = ['focusable.ts', 'index.ts', 'models.ts'];
 const directory = String(__dirname).replace(/\\/g, '/');
 const isMjs = process.argv.includes('--mjs');
 
@@ -21,7 +22,14 @@ async function getFiles(path: string): Promise<string[]> {
 
 getFiles('./src/js').then(async files => {
 	for (const file of files) {
-		if (!isMjs && file.endsWith('models.ts')) {
+		const parts = file.split('/');
+
+		if (
+			(!isMjs &&
+				parts.length > 4 &&
+				!allowed.includes(parts.at(-1) as string)) ||
+			(!isMjs && file.endsWith('models.ts'))
+		) {
 			continue;
 		}
 

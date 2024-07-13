@@ -16,6 +16,11 @@ export type EventPosition = {
 // biome-ignore lint/suspicious/noExplicitAny: <explanation>
 export type GenericCallback = (...args: any[]) => any;
 
+export type GetterSetter<Value> = {
+	get(): Value;
+	set(value: Value): void;
+};
+
 export type Key = number | string;
 
 export type PlainObject = UnknownRecord;
