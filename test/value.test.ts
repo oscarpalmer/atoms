@@ -1,5 +1,5 @@
 import {expect, test} from 'bun:test';
-import {diff, getValue, merge, setValue} from '../src/js';
+import {diff, getValue, merge, partial, setValue} from '../src/js';
 
 type Diffable = {
 	numbers: number[];
@@ -141,6 +141,21 @@ test('merge', () => {
 	expect(merge()).toEqual({});
 });
 
+test('partial', () => {
+	expect(
+		partial(
+			{
+				a: 1,
+				b: true,
+				c: 'abc',
+			},
+			['b'],
+		),
+	).toEqual({
+		b: true,
+	});
+});
+
 test('setValue', () => {
 	const data = {
 		change: {},
@@ -164,6 +179,7 @@ test('setValue', () => {
 	setValue(data, 'in.a.nested.set.3', 123);
 	setValue(data, 'in.a.nEw.array.5', 123);
 
+	// @ts-expect-error - Testing created arrays
 	expect(data.in.a.nested.array[3]).toEqual(123);
 	expect(data.in.a.nested.map.get('3')).toEqual(undefined);
 	expect(data.in.a.nested.object['3']).toEqual(123);

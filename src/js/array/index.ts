@@ -1,16 +1,15 @@
+import type {NestedArrayType} from '../models';
 import {insertValues} from './insert';
 
 /**
- * Returns a new compacted array with all `null` and `undefined` values removed
+ * Flattens an array _(using native `flat` and maximum depth)_
  */
-export function compact<Value>(
-	array: Array<Value | null | undefined>,
-): Value[] {
-	return array.filter(value => value != null);
+export function flatten<Value>(array: Value[]): NestedArrayType<Value>[] {
+	return array.flat(Number.POSITIVE_INFINITY) as NestedArrayType<Value>[];
 }
 
 /**
- * - Pushes values to the end of an array
+ * - Pushes values to the end of an array, returning the new length
  * - Uses chunking to avoid stack overflow
  */
 export function push<Value>(array: Value[], values: Value[]): number {
@@ -18,6 +17,8 @@ export function push<Value>(array: Value[], values: Value[]): number {
 }
 
 export * from './chunk';
+export * from './compact';
+export * from './count';
 export * from './exists';
 export * from './filter';
 export * from './find';

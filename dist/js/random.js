@@ -25,13 +25,17 @@ function getRandomFloat(min, max) {
   const minimum = min ?? Number.MIN_SAFE_INTEGER;
   return Math.random() * ((max ?? Number.MAX_SAFE_INTEGER) - minimum) + minimum;
 }
-function getRandomInteger(min, max) {
-  return Math.floor(getRandomFloat(min, max));
-}
 function getRandomHex() {
   return "0123456789ABCDEF"[getRandomInteger(0, 16)];
 }
+function getRandomInteger(min, max) {
+  return Math.floor(getRandomFloat(min, max));
+}
+function getRandomItem(array) {
+  return array[getRandomInteger(0, array.length)];
+}
 export {
+  getRandomItem,
   getRandomInteger,
   getRandomHex,
   getRandomFloat,

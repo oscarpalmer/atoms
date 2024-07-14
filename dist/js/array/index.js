@@ -32,13 +32,17 @@ function insertValues(type, array, values, start, deleteCount) {
 }
 
 // src/js/array/index.ts
-function compact(array2) {
-  return array2.filter((value) => value != null);
+function flatten(array2) {
+  return array2.flat(Number.POSITIVE_INFINITY);
 }
 function push(array2, values) {
   return insertValues("push", array2, values, array2.length, 0);
 }
 
+// src/js/array/compact.ts
+function compact(array, strict) {
+  return strict === true ? array.filter((item) => !!item) : array.filter((item) => item != null);
+}
 // src/js/internal/array-callbacks.ts
 function getCallbacks(bool, key) {
   if (typeof bool === "function") {
@@ -103,6 +107,10 @@ function findValues(type, array, value, key) {
   return result;
 }
 
+// src/js/array/count.ts
+function count(array, value, key) {
+  return findValues("all", array, value, key).length;
+}
 // src/js/array/exists.ts
 function exists(array, value, key) {
   return findValue("index", array, value, key) > -1;
@@ -250,9 +258,11 @@ export {
   insert,
   indexOf,
   groupBy,
+  flatten,
   find,
   filter,
   exists,
+  count,
   compact,
   chunk
 };

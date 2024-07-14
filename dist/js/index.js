@@ -32,13 +32,17 @@ function insertValues(type, array, values, start, deleteCount) {
 }
 
 // src/js/array/index.ts
-function compact(array2) {
-  return array2.filter((value) => value != null);
+function flatten(array2) {
+  return array2.flat(Number.POSITIVE_INFINITY);
 }
 function push(array2, values) {
   return insertValues("push", array2, values, array2.length, 0);
 }
 
+// src/js/array/compact.ts
+function compact(array, strict) {
+  return strict === true ? array.filter((item) => !!item) : array.filter((item) => item != null);
+}
 // src/js/internal/array-callbacks.ts
 function getCallbacks(bool, key) {
   if (typeof bool === "function") {
@@ -103,6 +107,10 @@ function findValues(type, array, value, key) {
   return result;
 }
 
+// src/js/array/count.ts
+function count(array, value, key) {
+  return findValues("all", array, value, key).length;
+}
 // src/js/array/exists.ts
 function exists(array, value, key) {
   return findValue("index", array, value, key) > -1;
@@ -1055,6 +1063,15 @@ function round(value, decimals) {
 function sum(values) {
   return values.reduce((previous, current) => previous + current, 0);
 }
+// src/js/value/index.ts
+function partial(value, keys) {
+  const result = {};
+  for (const key of keys) {
+    result[key] = value[key];
+  }
+  return result;
+}
+
 // src/js/value/clone.ts
 function clone(value) {
   switch (true) {
@@ -1463,13 +1480,25 @@ function getRandomFloat(min2, max2) {
   const minimum = min2 ?? Number.MIN_SAFE_INTEGER;
   return Math.random() * ((max2 ?? Number.MAX_SAFE_INTEGER) - minimum) + minimum;
 }
-function getRandomInteger(min2, max2) {
-  return Math.floor(getRandomFloat(min2, max2));
-}
 function getRandomHex() {
   return "0123456789ABCDEF"[getRandomInteger(0, 16)];
 }
+function getRandomInteger(min2, max2) {
+  return Math.floor(getRandomFloat(min2, max2));
+}
+function getRandomItem(array2) {
+  return array2[getRandomInteger(0, array2.length)];
+}
 // src/js/timer.ts
+function delay(time2, timeout) {
+  return new Promise((resolve, reject) => {
+    wait(resolve, {
+      timeout,
+      errorCallback: reject,
+      interval: time2
+    });
+  });
+}
 var getValueOrDefault = function(value2, defaultValue) {
   return typeof value2 === "number" && value2 > 0 ? value2 : defaultValue;
 };
@@ -1491,14 +1520,14 @@ function isWhen(value2) {
 function repeat(callback, options) {
   return timer("repeat", callback, options ?? {}, true);
 }
-var timer = function(type, callback, partial, start) {
+var timer = function(type, callback, partial2, start) {
   const isRepeated2 = type === "repeat";
   const options = {
-    afterCallback: partial.afterCallback,
-    count: getValueOrDefault(partial.count, isRepeated2 ? Number.POSITIVE_INFINITY : 1),
-    errorCallback: partial.errorCallback,
-    interval: getValueOrDefault(partial.interval, 0),
-    timeout: getValueOrDefault(partial.timeout, isRepeated2 ? Number.POSITIVE_INFINITY : 30000)
+    afterCallback: partial2.afterCallback,
+    count: getValueOrDefault(partial2.count, isRepeated2 ? Number.POSITIVE_INFINITY : 1),
+    errorCallback: partial2.errorCallback,
+    interval: getValueOrDefault(partial2.interval, 0),
+    timeout: getValueOrDefault(partial2.timeout, isRepeated2 ? Number.POSITIVE_INFINITY : 30000)
   };
   const state = {
     callback,
@@ -1621,7 +1650,7 @@ var work = function(type, timer2, state, options, isRepeated2) {
   if (["continue", "start"].includes(type) && state.active || ["pause", "stop"].includes(type) && !state.active) {
     return timer2;
   }
-  const { count, interval, timeout } = options;
+  const { count: count3, interval, timeout } = options;
   const { minimum } = state;
   if (["pause", "stop"].includes(type)) {
     const isStop = type === "stop";
@@ -1646,7 +1675,7 @@ var work = function(type, timer2, state, options, isRepeated2) {
   let index = type === "continue" ? +(state.index ?? 0) : 0;
   state.elapsed = elapsed;
   state.index = index;
-  const total = (count === Number.POSITIVE_INFINITY ? Number.POSITIVE_INFINITY : (count - index) * (interval > 0 ? interval : milliseconds)) - elapsed;
+  const total = (count3 === Number.POSITIVE_INFINITY ? Number.POSITIVE_INFINITY : (count3 - index) * (interval > 0 ? interval : milliseconds)) - elapsed;
   let current;
   let start;
   function finish(finished, error) {
@@ -1679,7 +1708,7 @@ var work = function(type, timer2, state, options, isRepeated2) {
       }
       index += 1;
       state.index = index;
-      if (!finished && index < count) {
+      if (!finished && index < count3) {
         current = null;
       } else {
         finish(true, false);
@@ -1764,6 +1793,7 @@ export {
   queue,
   push,
   pascalCase,
+  partial,
   parse,
   noop,
   min,
@@ -1799,6 +1829,7 @@ export {
   getTextDirection,
   getTabbableElements,
   getString,
+  getRandomItem,
   getRandomInteger,
   getRandomHex,
   getRandomFloat,
@@ -1814,6 +1845,7 @@ export {
   getElementUnderPointer,
   getData,
   fromQuery,
+  flatten,
   findParentElement,
   findElements,
   findElement,
@@ -1823,7 +1855,9 @@ export {
   equal,
   emitter,
   diff,
+  delay,
   createUuid,
+  count,
   compact,
   clone,
   clamp,

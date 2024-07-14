@@ -3,6 +3,15 @@ function noop() {
 }
 
 // src/js/timer.ts
+function delay(time, timeout) {
+  return new Promise((resolve, reject) => {
+    wait(resolve, {
+      timeout,
+      errorCallback: reject,
+      interval: time
+    });
+  });
+}
 var getValueOrDefault = function(value, defaultValue) {
   return typeof value === "number" && value > 0 ? value : defaultValue;
 };
@@ -262,5 +271,6 @@ export {
   isWhen,
   isWaited,
   isTimer,
-  isRepeated
+  isRepeated,
+  delay
 };

@@ -20,10 +20,14 @@ export declare function getRandomDate(earliest?: Date, latest?: Date): Date;
  */
 export declare function getRandomFloat(min?: number, max?: number): number;
 /**
+ * Returns a random hexadecimal character
+ */
+export declare function getRandomHex(): string;
+/**
  * Returns a random integer
  */
 export declare function getRandomInteger(min?: number, max?: number): number;
 /**
- * Returns a random hexadecimal character
+ * Returns a random item from an array
  */
-export declare function getRandomHex(): string;
+export declare function getRandomItem<Value>(array: Value[]): Value;

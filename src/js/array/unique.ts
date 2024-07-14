@@ -16,9 +16,6 @@ export function unique<Value>(
 	key: Key | KeyCallback<Value>,
 ): Value[];
 
-/**
- * Returns an array of unique items
- */
 export function unique<Value>(
 	array: Value[],
 	key?: Key | KeyCallback<Value>,

@@ -96,6 +96,10 @@ export type When = {
 } & BaseTimer;
 type WhenOptions = {} & OptionsWithCount;
 /**
+ * Creates a delayed promise that resolves after a certain amount of time _(or rejects when timed out)_
+ */
+export declare function delay(time: number, timeout?: number): Promise<void>;
+/**
  * Is the value a repeating timer?
  */
 export declare function isRepeated(value: unknown): value is Timer;

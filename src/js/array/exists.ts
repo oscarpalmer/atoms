@@ -20,9 +20,6 @@ export function exists<Model, Value = Model>(
 	key: Key | KeyCallback<Model>,
 ): boolean;
 
-/**
- * Does the value exist in array?
- */
 export function exists<Model, Value = Model>(
 	array: Model[],
 	value: Value | BooleanCallback<Model>,

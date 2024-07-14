@@ -3,27 +3,27 @@ import type {Key} from '../models';
 import type {BooleanCallback, KeyCallback} from './models';
 
 /**
- * Returns a filtered array of items matching `value`
+ * Returns the number of items _(count)_ that match the given value
  */
-export function filter<Model, Value>(
+export function count<Model, Value>(
 	array: Model[],
 	value: Value | BooleanCallback<Model>,
-): Model[];
+): number;
 
 /**
- * - Returns a filtered array of items
+ * - Returns the number of items _(count)_ that match the given value
  * - Use `key` to find a comparison value to match with `value`
  */
-export function filter<Model, Value = Model>(
+export function count<Model, Value = Model>(
 	array: Model[],
 	value: Value,
 	key: Key | KeyCallback<Model>,
-): Model[];
+): number;
 
-export function filter<Model, Value = Model>(
+export function count<Model, Value = Model>(
 	array: Model[],
 	value: Value | BooleanCallback<Model>,
 	key?: Key | KeyCallback<Model>,
-): Model[] {
-	return findValues('all', array, value, key);
+): number {
+	return findValues('all', array, value, key).length;
 }

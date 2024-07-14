@@ -1,6 +1,14 @@
-// src/js/array/index.ts
-function compact(array) {
-  return array.filter((value) => value != null);
+// src/js/value/index.ts
+function partial(value, keys) {
+  const result = {};
+  for (const key of keys) {
+    result[key] = value[key];
+  }
+  return result;
+}
+// src/js/array/compact.ts
+function compact(array, strict) {
+  return strict === true ? array.filter((item) => !!item) : array.filter((item) => item != null);
 }
 // src/js/string/index.ts
 function getString(value) {
@@ -339,6 +347,7 @@ function setValue(data, path, value, ignoreCase) {
 }
 export {
   setValue,
+  partial,
   merge,
   getValue,
   equal,

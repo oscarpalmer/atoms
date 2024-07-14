@@ -13,6 +13,10 @@ export type EventPosition = {
 	y: number;
 };
 
+export type NestedArrayType<Value> = Value extends Array<infer NestedValue>
+	? NestedArrayType<NestedValue>
+	: Value;
+
 // biome-ignore lint/suspicious/noExplicitAny: <explanation>
 export type GenericCallback = (...args: any[]) => any;
 

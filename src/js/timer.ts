@@ -163,6 +163,19 @@ const hiddenTimers = new Set<Timer>();
  */
 const milliseconds = 1_000 / 60;
 
+/**
+ * Creates a delayed promise that resolves after a certain amount of time _(or rejects when timed out)_
+ */
+export function delay(time: number, timeout?: number): Promise<void> {
+	return new Promise((resolve, reject) => {
+		wait(resolve, {
+			timeout,
+			errorCallback: reject,
+			interval: time,
+		});
+	});
+}
+
 function getValueOrDefault(value: unknown, defaultValue: number): number {
 	return typeof value === 'number' && value > 0 ? value : defaultValue;
 }

@@ -1,5 +1,6 @@
 import {expect, test} from 'bun:test';
 import {
+	delay,
 	isRepeated,
 	isTimer,
 	isWaited,
@@ -285,4 +286,12 @@ test('debugging', done => {
 			});
 		});
 	});
+});
+
+test('delay', async () => {
+	const then = Date.now();
+
+	await delay(1000);
+
+	expect(Math.abs(Date.now() - then - 1000)).toBeLessThan(17);
 });

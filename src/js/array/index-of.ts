@@ -20,9 +20,6 @@ export function indexOf<Model, Value = Model>(
 	key: Key | KeyCallback<Model>,
 ): number;
 
-/**
- * Returns the index of the first matching item, or `-1` if no match is found
- */
 export function indexOf<Model, Value = Model>(
 	array: Model[],
 	value: Value | BooleanCallback<Model>,

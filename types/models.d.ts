@@ -4,6 +4,7 @@ export type EventPosition = {
     x: number;
     y: number;
 };
+export type NestedArrayType<Value> = Value extends Array<infer NestedValue> ? NestedArrayType<NestedValue> : Value;
 export type GenericCallback = (...args: any[]) => any;
 export type GetterSetter<Value> = {
     get(): Value;

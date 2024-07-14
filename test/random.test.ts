@@ -8,6 +8,7 @@ import {
 	getRandomFloat,
 	getRandomHex,
 	getRandomInteger,
+	getRandomItem,
 } from '../src/js/random';
 
 const size = 100_000;
@@ -145,6 +146,22 @@ test('getRandomHex', () => {
 		const hex = getRandomHex();
 
 		if (!possible.has(hex)) {
+			invalid += 1;
+		}
+	}
+
+	expect(invalid).toBe(0);
+});
+
+test('getRandomItem', () => {
+	const items = Array.from({length: 10}, (_, index) => index);
+
+	let invalid = 0;
+
+	for (let index = 0; index < size; index += 1) {
+		const item = getRandomItem(items);
+
+		if (!items.includes(item)) {
 			invalid += 1;
 		}
 	}

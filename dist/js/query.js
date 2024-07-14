@@ -1,6 +1,6 @@
-// src/js/array/index.ts
-function compact(array) {
-  return array.filter((value) => value != null);
+// src/js/array/compact.ts
+function compact(array, strict) {
+  return strict === true ? array.filter((item) => !!item) : array.filter((item) => item != null);
 }
 // src/js/string/index.ts
 function getString(value) {

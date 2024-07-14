@@ -20,9 +20,6 @@ export function find<Model, Value = Model>(
 	key: Key | KeyCallback<Model>,
 ): Model | undefined;
 
-/**
- * - Returns the first matching item, or `undefined` if no match is found
- */
 export function find<Model, Value = Model>(
 	array: Model[],
 	value: Value | BooleanCallback<Model>,

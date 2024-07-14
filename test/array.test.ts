@@ -3,9 +3,11 @@ import {diff, getRandomInteger, wait} from '../src/js';
 import {
 	chunk,
 	compact,
+	count,
 	exists,
 	filter,
 	find,
+	flatten,
 	groupBy,
 	indexOf,
 	insert,
@@ -38,9 +40,32 @@ test('chunk', () => {
 test('compact', () => {
 	expect(compact([1, 2, 3, 4])).toEqual([1, 2, 3, 4]);
 
-	expect(compact([1, null, 2, undefined, 3, null, 4, undefined])).toEqual([
+	expect(compact([0, 1, null, 2, undefined, 3, false, 4, ''])).toEqual([
+		0,
+		1,
+		2,
+		3,
+		false,
+		4,
+		'',
+	]);
+
+	expect(compact([0, 1, null, 2, undefined, 3, false, 4, ''], true)).toEqual([
 		1, 2, 3, 4,
 	]);
+});
+
+test('count', () => {
+	expect(count(simple, 2)).toBe(1);
+	expect(count(simple, 5)).toBe(0);
+
+	const countByKeyValue = count(complex, 3, 'id');
+	const countByKeyCallback = count(complex, 3, item => item.id);
+	const countByValueCallback = count(complex, item => item.id === 3);
+
+	expect(countByKeyValue).toBe(1);
+	expect(countByKeyCallback).toBe(1);
+	expect(countByValueCallback).toBe(1);
 });
 
 test('exists', () => {
@@ -86,6 +111,12 @@ test('find', () => {
 	const findByValueCallback = find(complex, item => item.id === 3);
 
 	expect(findByValueCallback).toEqual({id: 3, name: 'Charlie'});
+});
+
+test('flatten', () => {
+	expect(flatten([1, [2, [3, [4, [5, [6, [7, [8, [9, [10]]]]]]]]]])).toEqual([
+		1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
+	]);
 });
 
 test('indexOf', () => {

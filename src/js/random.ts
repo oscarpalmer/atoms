@@ -60,6 +60,13 @@ export function getRandomFloat(min?: number, max?: number): number {
 }
 
 /**
+ * Returns a random hexadecimal character
+ */
+export function getRandomHex(): string {
+	return '0123456789ABCDEF'[getRandomInteger(0, 16)];
+}
+
+/**
  * Returns a random integer
  */
 export function getRandomInteger(min?: number, max?: number): number {
@@ -67,8 +74,8 @@ export function getRandomInteger(min?: number, max?: number): number {
 }
 
 /**
- * Returns a random hexadecimal character
+ * Returns a random item from an array
  */
-export function getRandomHex(): string {
-	return '0123456789ABCDEF'[getRandomInteger(0, 16)];
+export function getRandomItem<Value>(array: Value[]): Value {
+	return array[getRandomInteger(0, array.length)];
 }
