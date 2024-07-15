@@ -6,6 +6,7 @@ dist/**/*.mjs
 dist/**/internal
 dist/js/**/*.js
 
+*.cts
 *.tsbuildinfo
 
 !dist/js/**/index.js

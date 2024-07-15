@@ -12,27 +12,33 @@
 		"@happy-dom/global-registrator": "^14.12.3",
 		"@types/bun": "^1.1.6",
 		"bun": "^1.1.20",
+		"dts-bundle-generator": "^9.5.1",
 		"sass": "^1.77.8",
 		"typescript": "^5.5.3"
 	},
 	"exports": {
 		".": {
 			"bun": "./src/js/index.ts",
-			"import": "./dist/js/index.mjs",
-			"require": "./dist/js/index.js",
-			"types": "./types/index.d.ts"
+			"import": {
+				"types": "./types/index.d.ts",
+				"default": "./dist/js/index.mjs"
+			},
+			"require": {
+				"types": "./types/index.d.cts",
+				"default": "./dist/js/index.js"
+			}
 		},
 		"./array": {
+			"types": "./types/array/index.d.ts",
 			"bun": "./src/js/array/index.ts",
 			"import": "./dist/js/array/index.mjs",
-			"require": "./dist/js/array/index.js",
-			"types": "./types/array/index.d.ts"
+			"require": "./dist/js/array/index.js"
 		},
 		"./colour": {
+			"types": "./types/colour/index.d.ts",
 			"bun": "./src/js/colour/index.ts",
 			"import": "./dist/js/colour/index.mjs",
-			"require": "./dist/js/colour/index.js",
-			"types": "./types/colour/index.d.ts"
+			"require": "./dist/js/colour/index.js"
 		},
 		"./css/a11y": {
 			"sass": "./src/css/a11y.scss",
@@ -47,104 +53,104 @@
 			"style": "./dist/css/reset.css"
 		},
 		"./element": {
+			"types": "./types/element/index.d.ts",
 			"bun": "./src/js/element/index.ts",
 			"import": "./dist/js/element/index.mjs",
-			"require": "./dist/js/element/index.js",
-			"types": "./types/element/index.d.ts"
+			"require": "./dist/js/element/index.js"
 		},
 		"./emitter": {
+			"types": "./types/emitter.d.ts",
 			"bun": "./src/js/emitter.ts",
 			"import": "./dist/js/emitter.mjs",
-			"require": "./dist/js/emitter.js",
-			"types": "./types/emitter.d.ts"
+			"require": "./dist/js/emitter.js"
 		},
 		"./event": {
+			"types": "./types/event.d.ts",
 			"bun": "./src/js/event.ts",
 			"import": "./dist/js/event.mjs",
-			"require": "./dist/js/event.js",
-			"types": "./types/event.d.ts"
+			"require": "./dist/js/event.js"
 		},
 		"./focusable": {
+			"types": "./types/element/focusable.d.ts",
 			"bun": "./src/js/element/focusable.ts",
 			"import": "./dist/js/element/focusable.mjs",
-			"require": "./dist/js/element/focusable.js",
-			"types": "./types/element/focusable.d.ts"
+			"require": "./dist/js/element/focusable.js"
 		},
 		"./function": {
-			"bun": "./src/js/function/index.ts",
-			"import": "./dist/js/function/index.mjs",
-			"require": "./dist/js/function/index.js",
-			"types": "./types/function/index.d.ts"
+			"types": "./types/function.d.ts",
+			"bun": "./src/js/function.ts",
+			"import": "./dist/js/function.mjs",
+			"require": "./dist/js/function.js"
 		},
 		"./is": {
+			"types": "./types/is.d.ts",
 			"bun": "./src/js/is.ts",
 			"import": "./dist/js/is.mjs",
-			"require": "./dist/js/is.js",
-			"types": "./types/is.d.ts"
+			"require": "./dist/js/is.js"
 		},
 		"./logger": {
+			"types": "./types/logger.d.ts",
 			"bun": "./src/js/logger.ts",
 			"import": "./dist/js/logger.mjs",
-			"require": "./dist/js/logger.js",
-			"types": "./types/logger.d.ts"
+			"require": "./dist/js/logger.js"
 		},
 		"./math": {
+			"types": "./types/math.d.ts",
 			"bun": "./src/js/math.ts",
 			"import": "./dist/js/math.mjs",
-			"require": "./dist/js/math.js",
-			"types": "./types/math.d.ts"
+			"require": "./dist/js/math.js"
 		},
 		"./models": {
-			"bun": "./src/js/models.ts",
-			"types": "./types/models.d.ts"
+			"types": "./types/models.d.ts",
+			"bun": "./src/js/models.ts"
 		},
 		"./number": {
+			"types": "./types/number.d.ts",
 			"bun": "./src/js/number.ts",
 			"import": "./dist/js/number.mjs",
-			"require": "./dist/js/number.js",
-			"types": "./types/number.d.ts"
+			"require": "./dist/js/number.js"
 		},
 		"./query": {
+			"types": "./types/query.d.ts",
 			"bun": "./src/js/query.ts",
 			"import": "./dist/js/query.mjs",
-			"require": "./dist/js/query.js",
-			"types": "./types/query.d.ts"
+			"require": "./dist/js/query.js"
 		},
 		"./queue": {
+			"types": "./types/queue.d.ts",
 			"bun": "./src/js/queue.ts",
 			"import": "./dist/js/queue.mjs",
-			"require": "./dist/js/queue.js",
-			"types": "./types/queue.d.ts"
+			"require": "./dist/js/queue.js"
 		},
 		"./random": {
+			"types": "./types/random.d.ts",
 			"bun": "./src/js/random.ts",
 			"import": "./dist/js/random.mjs",
-			"require": "./dist/js/random.js",
-			"types": "./types/random.d.ts"
+			"require": "./dist/js/random.js"
 		},
 		"./string": {
+			"types": "./types/string/index.d.ts",
 			"bun": "./src/js/string/index.ts",
 			"import": "./dist/js/string/index.mjs",
-			"require": "./dist/js/string/index.js",
-			"types": "./types/string/index.d.ts"
+			"require": "./dist/js/string/index.js"
 		},
 		"./supports-touch": {
+			"types": "./types/touch.d.ts",
 			"bun": "./src/js/touch.ts",
 			"import": "./dist/js/touch.mjs",
-			"require": "./dist/js/touch.js",
-			"types": "./types/touch.d.ts"
+			"require": "./dist/js/touch.js"
 		},
 		"./timer": {
+			"types": "./types/timer.d.ts",
 			"bun": "./src/js/timer.ts",
 			"import": "./dist/js/timer.mjs",
-			"require": "./dist/js/timer.js",
-			"types": "./types/timer.d.ts"
+			"require": "./dist/js/timer.js"
 		},
 		"./value": {
+			"types": "./types/value/index.d.ts",
 			"bun": "./src/js/value/index.ts",
 			"import": "./dist/js/value/index.mjs",
-			"require": "./dist/js/value/index.js",
-			"types": "./types/value/index.d.ts"
+			"require": "./dist/js/value/index.js"
 		},
 		"./package.json": "./package.json"
 	},
@@ -162,13 +168,15 @@
 		"build": "bun run clean && bun run build:css && bun run build:js && bun run types",
 		"build:css": "bunx sass ./src/css:./dist/css --no-source-map",
 		"build:js": "bunx bun ./.bun.ts && bunx bun ./.bun.ts --mjs",
-		"clean": "rm -rf ./dist && rm -rf ./types && rm ./tsconfig.tsbuildinfo",
+		"clean": "rm -rf ./dist && rm -rf ./types && rm -f ./tsconfig.tsbuildinfo",
 		"test": "bun test",
-		"types": "bunx tsc -p ./tsconfig.json",
+		"types": "bun run types:cjs && bun run types:esm",
+		"types:cjs": "bunx dts-bundle-generator --out-file ./types/index.d.cts --no-check --silent ./src/js/index.ts",
+		"types:esm": "bunx tsc -p ./tsconfig.json",
 		"watch:css": "bunx sass ./src/css:./dist/css --no-source-map --watch",
 		"watch:js": "bun build ./src/js/index.ts --outfile ./dist/js/index.js --watch"
 	},
 	"type": "module",
 	"types": "./types/index.d.ts",
-	"version": "0.58.0"
+	"version": "0.59.0"
 }
