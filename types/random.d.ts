@@ -31,3 +31,8 @@ export declare function getRandomInteger(min?: number, max?: number): number;
  * Returns a random item from an array
  */
 export declare function getRandomItem<Value>(array: Value[]): Value;
+/**
+ * - Returns an amount of random items from an array
+ * - If `amount` is not specified, a shuffled array will be returned instead
+ */
+export declare function getRandomItems<Value>(array: Value[], amount?: number): Value[];

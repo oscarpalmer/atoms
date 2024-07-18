@@ -1,5 +1,4 @@
 import {handleValue} from '../internal/value-handle';
-import {isNumerical} from '../is';
 import type {Paths, PlainObject} from '../models';
 
 /**
@@ -46,7 +45,7 @@ export function setValue<Data extends PlainObject>(
 	for (let index = 0; index < length; index += 1) {
 		const part = parts[index];
 
-		if (parts.indexOf(part) === lastIndex) {
+		if (index === lastIndex) {
 			handleValue(target, part, value, false, shouldIgnoreCase);
 
 			break;
@@ -55,21 +54,6 @@ export function setValue<Data extends PlainObject>(
 		let next = handleValue(target, part, null, true, shouldIgnoreCase);
 
 		if (typeof next !== 'object' || next === null) {
-			if (isNumerical(part) && previous != null) {
-				const temporary = previous[parts[index - 1]];
-
-				if (!Array.isArray(temporary)) {
-					previous[parts[index - 1]] =
-						typeof temporary === 'object' &&
-						temporary !== null &&
-						Object.keys(temporary).every(isNumerical)
-							? Object.values(temporary)
-							: [];
-
-					target = previous[parts[index - 1]] as PlainObject;
-				}
-			}
-
 			next = {};
 
 			target[part] = next;

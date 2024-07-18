@@ -19,11 +19,12 @@ function insert(array, index, values) {
   insertValues("splice", array, values, index, 0);
 }
 function insertValues(type, array, values, start, deleteCount) {
-  const chunked = chunk(values).reverse();
-  const { length } = chunked;
+  const chunked = chunk(values);
+  const lastIndex = chunked.length - 1;
+  let index = Number(chunked.length);
   let returned;
-  for (let index = 0;index < length; index += 1) {
-    const result = array.splice(start, index === 0 ? deleteCount : 0, ...chunked[index]);
+  while (--index >= 0) {
+    const result = array.splice(start, index === lastIndex ? deleteCount : 0, ...chunked[index]);
     if (returned == null) {
       returned = result;
     }
@@ -154,6 +155,59 @@ function groupValues(array, key, arrays, indicable) {
 // src/js/array/index-of.ts
 function indexOf(array, value, key) {
   return findValue("index", array, value, key);
+}
+// src/js/random.ts
+function getRandomBoolean() {
+  return Math.random() > 0.5;
+}
+function getRandomCharacters(length, selection) {
+  if (length < 1) {
+    return "";
+  }
+  const actualSelection = typeof selection === "string" && selection.length > 0 ? selection : "abcdefghijklmnopqrstuvwxyz";
+  let characters = "";
+  for (let index = 0;index < length; index += 1) {
+    characters += actualSelection.charAt(getRandomInteger(0, actualSelection.length));
+  }
+  return characters;
+}
+function getRandomColour() {
+  return `#${Array.from({ length: 6 }, getRandomHex).join("")}`;
+}
+function getRandomDate(earliest, latest) {
+  const earliestTime = earliest?.getTime() ?? -8640000000000000;
+  const latestTime = latest?.getTime() ?? 8640000000000000;
+  return new Date(getRandomInteger(earliestTime, latestTime));
+}
+function getRandomFloat(min, max) {
+  const minimum = min ?? Number.MIN_SAFE_INTEGER;
+  return Math.random() * ((max ?? Number.MAX_SAFE_INTEGER) - minimum) + minimum;
+}
+function getRandomHex() {
+  return "0123456789ABCDEF"[getRandomInteger(0, 16)];
+}
+function getRandomInteger(min, max) {
+  return Math.floor(getRandomFloat(min, max));
+}
+function getRandomItem(array) {
+  return array[getRandomInteger(0, array.length)];
+}
+function getRandomItems(array, amount) {
+  if (amount === 1) {
+    return array.length === 0 ? [] : [array[getRandomInteger(0, array.length)]];
+  }
+  return amount == null || amount >= array.length ? shuffle2(array) : shuffle2(array).slice(0, amount);
+}
+
+// src/js/array/shuffle.ts
+function shuffle2(array) {
+  const shuffled = array.slice();
+  const { length } = shuffled;
+  for (let index = 0;index < length; index += 1) {
+    const random2 = getRandomInteger(0, length);
+    [shuffled[index], shuffled[random2]] = [shuffled[random2], shuffled[index]];
+  }
+  return shuffled;
 }
 // src/js/string/index.ts
 function createUuid() {
@@ -1065,8 +1119,10 @@ function sum(values) {
 }
 // src/js/value/index.ts
 function partial(value, keys) {
+  const { length } = keys;
   const result = {};
-  for (const key of keys) {
+  for (let index = 0;index < length; index += 1) {
+    const key = keys[index];
     result[key] = value[key];
   }
   return result;
@@ -1353,19 +1409,12 @@ function setValue(data2, path, value, ignoreCase) {
   let target = typeof data2 === "object" && data2 !== null ? data2 : {};
   for (let index = 0;index < length; index += 1) {
     const part = parts[index];
-    if (parts.indexOf(part) === lastIndex) {
+    if (index === lastIndex) {
       handleValue(target, part, value, false, shouldIgnoreCase);
       break;
     }
     let next = handleValue(target, part, null, true, shouldIgnoreCase);
     if (typeof next !== "object" || next === null) {
-      if (isNumerical(part) && previous != null) {
-        const temporary = previous[parts[index - 1]];
-        if (!Array.isArray(temporary)) {
-          previous[parts[index - 1]] = typeof temporary === "object" && temporary !== null && Object.keys(temporary).every(isNumerical) ? Object.values(temporary) : [];
-          target = previous[parts[index - 1]];
-        }
-      }
       next = {};
       target[part] = next;
     }
@@ -1373,6 +1422,59 @@ function setValue(data2, path, value, ignoreCase) {
     target = next;
   }
   return data2;
+}
+// src/js/value/smush.ts
+var flatten2 = function(value, prefix) {
+  const keys = Object.keys(value);
+  const { length } = keys;
+  const smushed = {};
+  for (let index = 0;index < length; index += 1) {
+    const key = keys[index];
+    const val = value[key];
+    if (isArrayOrPlainObject(val)) {
+      Object.assign(smushed, {
+        [join([prefix, key], ".")]: Array.isArray(val) ? [...val] : { ...val },
+        ...flatten2(val, join([prefix, key], "."))
+      });
+    } else {
+      smushed[join([prefix, key], ".")] = val;
+    }
+  }
+  return smushed;
+};
+function smush(value) {
+  return flatten2(value);
+}
+// src/js/value/unsmush.ts
+var getKeyGroups = function(value) {
+  const keys = Object.keys(value);
+  const { length } = keys;
+  const grouped = [];
+  for (let index = 0;index < length; index += 1) {
+    const key = keys[index];
+    const dots = key.split(".");
+    if (grouped[dots.length] == null) {
+      grouped[dots.length] = [key];
+    } else {
+      grouped[dots.length].push(key);
+    }
+  }
+  return grouped;
+};
+function unsmush(value) {
+  const groups = getKeyGroups(value);
+  const { length } = groups;
+  const unsmushed = {};
+  for (let groupIndex = 1;groupIndex < length; groupIndex += 1) {
+    const group = groups[groupIndex];
+    const groupLength = group.length;
+    for (let keyIndex = 0;keyIndex < groupLength; keyIndex += 1) {
+      const key = group[keyIndex];
+      const val = value[key];
+      setValue(unsmushed, key, isArrayOrPlainObject(val) ? Array.isArray(val) ? [...val] : { ...val } : val);
+    }
+  }
+  return unsmushed;
 }
 // src/js/query.ts
 function fromQuery(query) {
@@ -1453,42 +1555,6 @@ if (globalThis._atomic_queued == null) {
     }
   });
 }
-// src/js/random.ts
-function getRandomBoolean() {
-  return Math.random() > 0.5;
-}
-function getRandomCharacters(length, selection) {
-  if (length < 1) {
-    return "";
-  }
-  const actualSelection = typeof selection === "string" && selection.length > 0 ? selection : "abcdefghijklmnopqrstuvwxyz";
-  let characters = "";
-  for (let index = 0;index < length; index += 1) {
-    characters += actualSelection.charAt(getRandomInteger(0, actualSelection.length));
-  }
-  return characters;
-}
-function getRandomColour() {
-  return `#${Array.from({ length: 6 }, getRandomHex).join("")}`;
-}
-function getRandomDate(earliest, latest) {
-  const earliestTime = earliest?.getTime() ?? -8640000000000000;
-  const latestTime = latest?.getTime() ?? 8640000000000000;
-  return new Date(getRandomInteger(earliestTime, latestTime));
-}
-function getRandomFloat(min2, max2) {
-  const minimum = min2 ?? Number.MIN_SAFE_INTEGER;
-  return Math.random() * ((max2 ?? Number.MAX_SAFE_INTEGER) - minimum) + minimum;
-}
-function getRandomHex() {
-  return "0123456789ABCDEF"[getRandomInteger(0, 16)];
-}
-function getRandomInteger(min2, max2) {
-  return Math.floor(getRandomFloat(min2, max2));
-}
-function getRandomItem(array2) {
-  return array2[getRandomInteger(0, array2.length)];
-}
 // src/js/timer.ts
 function delay(time2, timeout) {
   return new Promise((resolve, reject) => {
@@ -1502,20 +1568,20 @@ function delay(time2, timeout) {
 var getValueOrDefault = function(value2, defaultValue) {
   return typeof value2 === "number" && value2 > 0 ? value2 : defaultValue;
 };
-var is9 = function(value2, pattern) {
+var is10 = function(value2, pattern) {
   return pattern.test(value2?.$timer);
 };
 function isRepeated(value2) {
-  return is9(value2, /^repeat$/);
+  return is10(value2, /^repeat$/);
 }
 function isTimer(value2) {
-  return is9(value2, /^repeat|wait$/);
+  return is10(value2, /^repeat|wait$/);
 }
 function isWaited(value2) {
-  return is9(value2, /^wait$/);
+  return is10(value2, /^wait$/);
 }
 function isWhen(value2) {
-  return is9(value2, /^when$/) && typeof value2.then === "function";
+  return is10(value2, /^when$/) && typeof value2.then === "function";
 }
 function repeat(callback, options) {
   return timer("repeat", callback, options ?? {}, true);
@@ -1773,6 +1839,7 @@ export {
   words,
   when,
   wait,
+  unsmush,
   unique,
   truncate,
   toRecord,
@@ -1783,6 +1850,8 @@ export {
   splice,
   sort,
   snakeCase,
+  smush,
+  shuffle2 as shuffle,
   setValue,
   setStyles,
   setData,
@@ -1829,6 +1898,7 @@ export {
   getTextDirection,
   getTabbableElements,
   getString,
+  getRandomItems,
   getRandomItem,
   getRandomInteger,
   getRandomHex,

@@ -21,12 +21,6 @@ function join(value, delimiter) {
 function isNullableOrWhitespace(value) {
   return value == null || /^\s*$/.test(getString(value));
 }
-function isNumber(value) {
-  return typeof value === "number" && !Number.isNaN(value);
-}
-function isNumerical(value) {
-  return isNumber(value) || typeof value === "string" && value.trim().length > 0 && !Number.isNaN(+value);
-}
 function isPlainObject(value) {
   if (typeof value !== "object" || value === null) {
     return false;
@@ -63,19 +57,12 @@ function setValue(data, path, value, ignoreCase) {
   let target = typeof data === "object" && data !== null ? data : {};
   for (let index = 0;index < length; index += 1) {
     const part = parts[index];
-    if (parts.indexOf(part) === lastIndex) {
+    if (index === lastIndex) {
       handleValue(target, part, value, false, shouldIgnoreCase);
       break;
     }
     let next = handleValue(target, part, null, true, shouldIgnoreCase);
     if (typeof next !== "object" || next === null) {
-      if (isNumerical(part) && previous != null) {
-        const temporary = previous[parts[index - 1]];
-        if (!Array.isArray(temporary)) {
-          previous[parts[index - 1]] = typeof temporary === "object" && temporary !== null && Object.keys(temporary).every(isNumerical) ? Object.values(temporary) : [];
-          target = previous[parts[index - 1]];
-        }
-      }
       next = {};
       target[part] = next;
     }

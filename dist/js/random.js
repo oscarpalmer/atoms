@@ -1,3 +1,14 @@
+// src/js/array/shuffle.ts
+function shuffle(array) {
+  const shuffled = array.slice();
+  const { length } = shuffled;
+  for (let index = 0;index < length; index += 1) {
+    const random2 = getRandomInteger(0, length);
+    [shuffled[index], shuffled[random2]] = [shuffled[random2], shuffled[index]];
+  }
+  return shuffled;
+}
+
 // src/js/random.ts
 function getRandomBoolean() {
   return Math.random() > 0.5;
@@ -34,7 +45,14 @@ function getRandomInteger(min, max) {
 function getRandomItem(array) {
   return array[getRandomInteger(0, array.length)];
 }
+function getRandomItems(array, amount) {
+  if (amount === 1) {
+    return array.length === 0 ? [] : [array[getRandomInteger(0, array.length)]];
+  }
+  return amount == null || amount >= array.length ? shuffle(array) : shuffle(array).slice(0, amount);
+}
 export {
+  getRandomItems,
   getRandomItem,
   getRandomInteger,
   getRandomHex,

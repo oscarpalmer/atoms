@@ -1,3 +1,5 @@
+import {shuffle} from './array/shuffle';
+
 /**
  * Returns a random boolean
  */
@@ -78,4 +80,21 @@ export function getRandomInteger(min?: number, max?: number): number {
  */
 export function getRandomItem<Value>(array: Value[]): Value {
 	return array[getRandomInteger(0, array.length)];
+}
+
+/**
+ * - Returns an amount of random items from an array
+ * - If `amount` is not specified, a shuffled array will be returned instead
+ */
+export function getRandomItems<Value>(
+	array: Value[],
+	amount?: number,
+): Value[] {
+	if (amount === 1) {
+		return array.length === 0 ? [] : [array[getRandomInteger(0, array.length)]];
+	}
+
+	return amount == null || amount >= array.length
+		? shuffle(array)
+		: shuffle(array).slice(0, amount);
 }

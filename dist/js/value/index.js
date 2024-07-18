@@ -1,7 +1,9 @@
 // src/js/value/index.ts
 function partial(value, keys) {
+  const { length } = keys;
   const result = {};
-  for (const key of keys) {
+  for (let index = 0;index < length; index += 1) {
+    const key = keys[index];
     result[key] = value[key];
   }
   return result;
@@ -28,12 +30,6 @@ function join(value, delimiter) {
 // src/js/is.ts
 function isArrayOrPlainObject(value) {
   return Array.isArray(value) || isPlainObject(value);
-}
-function isNumber(value) {
-  return typeof value === "number" && !Number.isNaN(value);
-}
-function isNumerical(value) {
-  return isNumber(value) || typeof value === "string" && value.trim().length > 0 && !Number.isNaN(+value);
 }
 function isPlainObject(value) {
   if (typeof value !== "object" || value === null) {
@@ -324,19 +320,12 @@ function setValue(data, path, value, ignoreCase) {
   let target = typeof data === "object" && data !== null ? data : {};
   for (let index = 0;index < length; index += 1) {
     const part = parts[index];
-    if (parts.indexOf(part) === lastIndex) {
+    if (index === lastIndex) {
       handleValue(target, part, value, false, shouldIgnoreCase);
       break;
     }
     let next = handleValue(target, part, null, true, shouldIgnoreCase);
     if (typeof next !== "object" || next === null) {
-      if (isNumerical(part) && previous != null) {
-        const temporary = previous[parts[index - 1]];
-        if (!Array.isArray(temporary)) {
-          previous[parts[index - 1]] = typeof temporary === "object" && temporary !== null && Object.keys(temporary).every(isNumerical) ? Object.values(temporary) : [];
-          target = previous[parts[index - 1]];
-        }
-      }
       next = {};
       target[part] = next;
     }
@@ -345,7 +334,62 @@ function setValue(data, path, value, ignoreCase) {
   }
   return data;
 }
+// src/js/value/smush.ts
+var flatten = function(value, prefix) {
+  const keys = Object.keys(value);
+  const { length } = keys;
+  const smushed = {};
+  for (let index = 0;index < length; index += 1) {
+    const key = keys[index];
+    const val = value[key];
+    if (isArrayOrPlainObject(val)) {
+      Object.assign(smushed, {
+        [join([prefix, key], ".")]: Array.isArray(val) ? [...val] : { ...val },
+        ...flatten(val, join([prefix, key], "."))
+      });
+    } else {
+      smushed[join([prefix, key], ".")] = val;
+    }
+  }
+  return smushed;
+};
+function smush(value) {
+  return flatten(value);
+}
+// src/js/value/unsmush.ts
+var getKeyGroups = function(value) {
+  const keys = Object.keys(value);
+  const { length } = keys;
+  const grouped = [];
+  for (let index = 0;index < length; index += 1) {
+    const key = keys[index];
+    const dots = key.split(".");
+    if (grouped[dots.length] == null) {
+      grouped[dots.length] = [key];
+    } else {
+      grouped[dots.length].push(key);
+    }
+  }
+  return grouped;
+};
+function unsmush(value) {
+  const groups = getKeyGroups(value);
+  const { length } = groups;
+  const unsmushed = {};
+  for (let groupIndex = 1;groupIndex < length; groupIndex += 1) {
+    const group = groups[groupIndex];
+    const groupLength = group.length;
+    for (let keyIndex = 0;keyIndex < groupLength; keyIndex += 1) {
+      const key = group[keyIndex];
+      const val = value[key];
+      setValue(unsmushed, key, isArrayOrPlainObject(val) ? Array.isArray(val) ? [...val] : { ...val } : val);
+    }
+  }
+  return unsmushed;
+}
 export {
+  unsmush,
+  smush,
   setValue,
   partial,
   merge,

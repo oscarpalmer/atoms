@@ -9,3 +9,5 @@ export * from './equal';
 export * from './get';
 export * from './merge';
 export * from './set';
+export * from './smush';
+export * from './unsmush';

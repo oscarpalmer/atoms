@@ -17,6 +17,7 @@ export * from './find';
 export { groupBy } from './group-by';
 export * from './index-of';
 export { insert } from './insert';
+export * from './shuffle';
 export { sort } from './sort';
 export * from './splice';
 export * from './to-map';

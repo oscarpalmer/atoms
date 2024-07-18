@@ -20,15 +20,16 @@ export function insertValues<Value>(
 	start: number,
 	deleteCount: number,
 ): unknown {
-	const chunked = chunk(values).reverse();
-	const {length} = chunked;
+	const chunked = chunk(values);
+	const lastIndex = chunked.length - 1;
 
+	let index = Number(chunked.length);
 	let returned: Value[] | undefined;
 
-	for (let index = 0; index < length; index += 1) {
+	while (--index >= 0) {
 		const result = array.splice(
 			start,
-			index === 0 ? deleteCount : 0,
+			index === lastIndex ? deleteCount : 0,
 			...chunked[index],
 		);
 

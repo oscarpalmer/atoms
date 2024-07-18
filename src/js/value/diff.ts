@@ -28,7 +28,7 @@ type KeyedDiffValue = {
  * 		- `full` if the values are completely different
  * 		- `none` if the values are the same
  * 		- `partial` if the values are partially different
- * 	- `values` holds the differences with dot-notation keys
+ * 	- `values` holds the differences with dot notation keys
  */
 export function diff<First, Second = First>(
 	first: First,

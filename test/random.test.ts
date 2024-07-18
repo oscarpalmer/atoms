@@ -9,6 +9,7 @@ import {
 	getRandomHex,
 	getRandomInteger,
 	getRandomItem,
+	getRandomItems,
 } from '../src/js/random';
 
 const size = 100_000;
@@ -167,4 +168,12 @@ test('getRandomItem', () => {
 	}
 
 	expect(invalid).toBe(0);
+});
+
+test('getRandomItems', () => {
+	const original = [1, 2, 3, 4, 5];
+
+	expect(getRandomItems(original, 0)).toEqual([]);
+	expect(getRandomItems(original, 1)).toHaveLength(1);
+	expect(getRandomItems(original, 2)).toHaveLength(2);
 });

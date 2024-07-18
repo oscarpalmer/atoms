@@ -1,5 +1,13 @@
 import {expect, test} from 'bun:test';
-import {diff, getValue, merge, partial, setValue} from '../src/js';
+import {
+	diff,
+	getValue,
+	merge,
+	partial,
+	setValue,
+	smush,
+	unsmush,
+} from '../src/js';
 
 type Diffable = {
 	numbers: number[];
@@ -224,4 +232,27 @@ test('setValue', () => {
 	expect(data.__proto__).toBe(data.__proto__);
 	// @ts-expect-error - Testing JS internals
 	expect(data.prototype).toBe(data.prototype);
+});
+
+test('smush & unsmush', () => {
+	const data = {
+		a: 1,
+		b: [2, 3],
+		c: [
+			[4, 5],
+			[6, 7],
+		],
+		d: {
+			e: 'f',
+			g: {
+				h: 'i',
+			},
+		},
+	};
+
+	const smushed = smush(data);
+	const unsmushed = unsmush(smushed);
+
+	expect(smushed['d.g.h']).toBe(data.d.g.h);
+	expect(data).toEqual(unsmushed);
 });

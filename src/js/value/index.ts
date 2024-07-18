@@ -7,9 +7,12 @@ export function partial<Value extends PlainObject, Key extends keyof Value>(
 	value: Value,
 	keys: Key[],
 ): Pick<Value, Key> {
+	const {length} = keys;
 	const result = {} as Pick<Value, Key>;
 
-	for (const key of keys) {
+	for (let index = 0; index < length; index += 1) {
+		const key = keys[index];
+
 		result[key] = value[key];
 	}
 
@@ -22,3 +25,5 @@ export * from './equal';
 export * from './get';
 export * from './merge';
 export * from './set';
+export * from './smush';
+export * from './unsmush';

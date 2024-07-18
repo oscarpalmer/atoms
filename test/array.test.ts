@@ -12,6 +12,7 @@ import {
 	indexOf,
 	insert,
 	push,
+	shuffle,
 	sort,
 	splice,
 	toMap,
@@ -19,7 +20,12 @@ import {
 	unique,
 } from '../src/js/array';
 
-const complex = [
+type Item = {
+	id: number;
+	name: string;
+};
+
+const complex: Item[] = [
 	{id: 1, name: 'Alice'},
 	{id: 2, name: 'Bob'},
 	{id: 3, name: 'Charlie'},
@@ -199,6 +205,23 @@ test('push', () => {
 	const array: number[] = [];
 
 	expect(push(array, values)).toBe(length);
+});
+
+test('shuffle', () => {
+	let first: Item[] | null = null;
+	let second: Item[] | null = null;
+
+	while (first == null || first[0].id === complex[0].id) {
+		first = shuffle(complex);
+	}
+
+	while (second == null || second[0].id === first[0].id) {
+		second = shuffle(complex);
+	}
+
+	expect(first).not.toEqual(complex);
+	expect(second).not.toEqual(complex);
+	expect(first).not.toEqual(second);
 });
 
 test('sort: basic', () => {

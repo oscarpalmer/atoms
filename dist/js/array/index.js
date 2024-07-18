@@ -19,11 +19,12 @@ function insert(array, index, values) {
   insertValues("splice", array, values, index, 0);
 }
 function insertValues(type, array, values, start, deleteCount) {
-  const chunked = chunk(values).reverse();
-  const { length } = chunked;
+  const chunked = chunk(values);
+  const lastIndex = chunked.length - 1;
+  let index = Number(chunked.length);
   let returned;
-  for (let index = 0;index < length; index += 1) {
-    const result = array.splice(start, index === 0 ? deleteCount : 0, ...chunked[index]);
+  while (--index >= 0) {
+    const result = array.splice(start, index === lastIndex ? deleteCount : 0, ...chunked[index]);
     if (returned == null) {
       returned = result;
     }
@@ -155,6 +156,25 @@ function groupValues(array, key, arrays, indicable) {
 function indexOf(array, value, key) {
   return findValue("index", array, value, key);
 }
+// src/js/random.ts
+function getRandomFloat(min, max) {
+  const minimum = min ?? Number.MIN_SAFE_INTEGER;
+  return Math.random() * ((max ?? Number.MAX_SAFE_INTEGER) - minimum) + minimum;
+}
+function getRandomInteger(min, max) {
+  return Math.floor(getRandomFloat(min, max));
+}
+
+// src/js/array/shuffle.ts
+function shuffle2(array) {
+  const shuffled = array.slice();
+  const { length } = shuffled;
+  for (let index = 0;index < length; index += 1) {
+    const random2 = getRandomInteger(0, length);
+    [shuffled[index], shuffled[random2]] = [shuffled[random2], shuffled[index]];
+  }
+  return shuffled;
+}
 // src/js/is.ts
 function isKey(value) {
   return typeof value === "number" || typeof value === "string";
@@ -254,6 +274,7 @@ export {
   toMap,
   splice,
   sort,
+  shuffle2 as shuffle,
   push,
   insert,
   indexOf,
