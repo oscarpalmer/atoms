@@ -12,8 +12,8 @@ function delay(time, timeout) {
     });
   });
 }
-var getValueOrDefault = function(value, defaultValue) {
-  return typeof value === "number" && value > 0 ? value : defaultValue;
+var getValueOrDefault = function(value, defaultValue, minimum) {
+  return typeof value === "number" && value > (minimum ?? 0) ? value : defaultValue;
 };
 var is = function(value, pattern) {
   return pattern.test(value?.$timer);
@@ -39,7 +39,7 @@ var timer = function(type, callback, partial, start) {
     afterCallback: partial.afterCallback,
     count: getValueOrDefault(partial.count, isRepeated2 ? Number.POSITIVE_INFINITY : 1),
     errorCallback: partial.errorCallback,
-    interval: getValueOrDefault(partial.interval, 0),
+    interval: getValueOrDefault(partial.interval, milliseconds, milliseconds),
     timeout: getValueOrDefault(partial.timeout, isRepeated2 ? Number.POSITIVE_INFINITY : 30000)
   };
   const state = {
@@ -165,7 +165,7 @@ var work = function(type, timer2, state, options, isRepeated2) {
   }
   const { count, interval, timeout } = options;
   const { minimum } = state;
-  if (["pause", "stop"].includes(type)) {
+  if (["pause", "restart", "stop"].includes(type)) {
     const isStop = type === "stop";
     activeTimers.delete(timer2);
     cancelAnimationFrame(state.frame);
@@ -179,11 +179,10 @@ var work = function(type, timer2, state, options, isRepeated2) {
       state.elapsed = undefined;
       state.index = undefined;
     }
-    return timer2;
+    return type === "restart" ? work("start", timer2, state, options, isRepeated2) : timer2;
   }
   state.active = true;
   state.paused = false;
-  const canTimeout = timeout > 0 && timeout < Number.POSITIVE_INFINITY;
   const elapsed = type === "continue" ? +(state.elapsed ?? 0) : 0;
   let index = type === "continue" ? +(state.index ?? 0) : 0;
   state.elapsed = elapsed;

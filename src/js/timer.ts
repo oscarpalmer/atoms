@@ -176,8 +176,14 @@ export function delay(time: number, timeout?: number): Promise<void> {
 	});
 }
 
-function getValueOrDefault(value: unknown, defaultValue: number): number {
-	return typeof value === 'number' && value > 0 ? value : defaultValue;
+function getValueOrDefault(
+	value: unknown,
+	defaultValue: number,
+	minimum?: number,
+): number {
+	return typeof value === 'number' && value > (minimum ?? 0)
+		? value
+		: defaultValue;
 }
 
 function is(value: unknown, pattern: RegExp) {
@@ -218,7 +224,7 @@ export function isWhen(value: unknown): value is When {
  * - ... and repeats it a certain amount of times
  * ---
  * - `options.count` defaults to `Infinity`
- * - `options.interval` defaults to `0`
+ * - `options.interval` defaults to `1000/60` _(1 frame)_
  * - `options.timeout` defaults to `Infinity`
  */
 export function repeat(
@@ -243,7 +249,7 @@ function timer(
 			isRepeated ? Number.POSITIVE_INFINITY : 1,
 		),
 		errorCallback: partial.errorCallback,
-		interval: getValueOrDefault(partial.interval, 0),
+		interval: getValueOrDefault(partial.interval, milliseconds, milliseconds),
 		timeout: getValueOrDefault(
 			partial.timeout,
 			isRepeated ? Number.POSITIVE_INFINITY : 30_000,
@@ -318,7 +324,7 @@ export function wait(callback: () => void, time: number): Timer;
 
 /**
  * Creates a timer which calls a callback after a certain amount of time
- * - `options.interval` defaults to `0`
+ * - `options.interval` defaults to `1000/60` _(1 frame)_
  * - `options.timeout` defaults to `30_000` _(30 seconds)_
  */
 export function wait(
@@ -442,7 +448,7 @@ function work(
 	const {count, interval, timeout} = options;
 	const {minimum} = state;
 
-	if (['pause', 'stop'].includes(type)) {
+	if (['pause', 'restart', 'stop'].includes(type)) {
 		const isStop = type === 'stop';
 
 		activeTimers.delete(timer);
@@ -462,13 +468,14 @@ function work(
 			state.index = undefined;
 		}
 
-		return timer;
+		return type === 'restart'
+			? work('start', timer, state, options, isRepeated)
+			: timer;
 	}
 
 	state.active = true;
 	state.paused = false;
 
-	const canTimeout = timeout > 0 && timeout < Number.POSITIVE_INFINITY;
 	const elapsed = type === 'continue' ? +(state.elapsed ?? 0) : 0;
 
 	let index = type === 'continue' ? +(state.index ?? 0) : 0;

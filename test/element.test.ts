@@ -2,6 +2,7 @@ import {expect, test} from 'bun:test';
 import {
 	$,
 	$$,
+	closest,
 	findElement,
 	findElements,
 	findParentElement,
@@ -22,6 +23,71 @@ document.body.innerHTML = `<div>
 		</div>
 	</div>
 </div>`;
+
+test('closest', () => {
+	const template = `
+<div>
+	<div>
+		<div>
+			<div class="target">bad</div>
+		</div>
+	</div>
+	<div>
+		<div class="target">good</div>
+	</div>
+	<div>
+		<div class="origin">
+			<p>origin</p>
+			<div>
+				<div>
+					<div class="target">
+						<p>good</p>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<ul>
+	<li class="target">1</li>
+	<li class="target">2</li>
+	<li class="target">3</li>
+	<li class="origin">4</li>
+	<li class="target">5</li>
+	<li class="target">6</li>
+	<li class="target">7</li>
+</ul>
+`;
+
+	const element = document.createElement('div');
+
+	element.innerHTML = template;
+
+	const divOrigin = $('div.origin', element);
+	const liOrigin = $('li.origin', element);
+
+	if (divOrigin == null || liOrigin == null) {
+		return;
+	}
+
+	const divTargets = closest(divOrigin, 'div.target', element);
+	const liTargets = closest(liOrigin, 'li.target', element);
+
+	expect(divTargets.length).toBe(2);
+	expect(divTargets.map(target => target.textContent?.trim())).toEqual([
+		'good',
+		'good',
+	]);
+
+	expect(liTargets.length).toBe(2);
+	expect(liTargets.map(target => target.textContent?.trim())).toEqual([
+		'3',
+		'5',
+	]);
+
+	expect(closest(liOrigin, '.not-found').length).toBe(0);
+});
 
 test('findElement', () => {
 	const target = findElement('.target');

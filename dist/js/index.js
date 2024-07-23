@@ -777,6 +777,71 @@ function getTextDirection(element) {
   return getComputedStyle?.(element)?.direction === "rtl" ? "rtl" : "ltr";
 }
 
+// src/js/element/closest.ts
+var calculateDistance = function(origin, target) {
+  const comparison2 = origin.compareDocumentPosition(target);
+  const children = [...origin.parentElement?.children ?? []];
+  switch (true) {
+    case children.includes(target):
+      return Math.abs(children.indexOf(origin) - children.indexOf(target));
+    case !!(comparison2 & 2 || comparison2 & 8):
+      return traverse(origin, target);
+    case !!(comparison2 & 4 || comparison2 & 16):
+      return traverse(target, origin);
+    default:
+      return -1;
+  }
+};
+function closest(origin, selector2, context) {
+  const elements = [...(context ?? document).querySelectorAll(selector2)];
+  const { length } = elements;
+  if (length === 0) {
+    return [];
+  }
+  const distances = [];
+  let minimum = null;
+  for (let index = 0;index < length; index += 1) {
+    const element = elements[index];
+    const distance = calculateDistance(origin, element);
+    if (distance < 0) {
+      continue;
+    }
+    if (minimum == null || distance < minimum) {
+      minimum = distance;
+    }
+    distances.push({
+      distance,
+      element
+    });
+  }
+  return minimum == null ? [] : distances.filter((found) => found.distance === minimum).map((found) => found.element);
+}
+var traverse = function(from, to) {
+  const children = [...to.children];
+  if (children.includes(from)) {
+    return children.indexOf(from) + 1;
+  }
+  let current = from;
+  let distance = 0;
+  let parent = from.parentElement;
+  while (parent != null) {
+    if (parent === to) {
+      return distance + 1;
+    }
+    const children2 = [...parent.children ?? []];
+    if (children2.includes(to)) {
+      return distance + Math.abs(children2.indexOf(current) - children2.indexOf(to));
+    }
+    const index = children2.findIndex((child) => child.contains(to));
+    if (index > -1) {
+      return distance + Math.abs(index - children2.indexOf(current)) + traverse(to, children2[index]);
+    }
+    current = parent;
+    distance += 1;
+    parent = parent.parentElement;
+  }
+  return -1e6;
+};
 // src/js/internal/element-value.ts
 function setElementValues(element, first, second, callback) {
   if (isPlainObject(first)) {
@@ -1007,6 +1072,20 @@ function getPosition(event) {
   return typeof x === "number" && typeof y === "number" ? { x, y } : undefined;
 }
 // src/js/function.ts
+function debounce(callback, time) {
+  const interval = clamp(time ?? 0, 0, 1000);
+  let timer;
+  const debounced = (...parameters) => {
+    clearTimeout(timer);
+    timer = setTimeout(() => {
+      callback(...parameters);
+    }, interval);
+  };
+  debounced.cancel = () => {
+    clearTimeout(timer);
+  };
+  return debounced;
+}
 function memoise(callback) {
   function get(...parameters) {
     const key = parameters[0];
@@ -1038,6 +1117,25 @@ function memoise(callback) {
   });
 }
 function noop() {
+}
+function throttle(callback, time) {
+  const interval = clamp(time ?? 0, 0, 1000);
+  let timestamp = performance.now();
+  let timer;
+  return (...parameters) => {
+    clearTimeout(timer);
+    const now = performance.now();
+    const difference = now - timestamp;
+    if (difference >= interval) {
+      timestamp = now;
+      callback(...parameters);
+    } else {
+      timer = setTimeout(() => {
+        timestamp = performance.now();
+        callback(...parameters);
+      }, difference + interval);
+    }
+  };
 }
 // src/js/logger.ts
 var time = function(label) {
@@ -1565,8 +1663,8 @@ function delay(time2, timeout) {
     });
   });
 }
-var getValueOrDefault = function(value2, defaultValue) {
-  return typeof value2 === "number" && value2 > 0 ? value2 : defaultValue;
+var getValueOrDefault = function(value2, defaultValue, minimum) {
+  return typeof value2 === "number" && value2 > (minimum ?? 0) ? value2 : defaultValue;
 };
 var is10 = function(value2, pattern) {
   return pattern.test(value2?.$timer);
@@ -1592,7 +1690,7 @@ var timer = function(type, callback, partial2, start) {
     afterCallback: partial2.afterCallback,
     count: getValueOrDefault(partial2.count, isRepeated2 ? Number.POSITIVE_INFINITY : 1),
     errorCallback: partial2.errorCallback,
-    interval: getValueOrDefault(partial2.interval, 0),
+    interval: getValueOrDefault(partial2.interval, milliseconds, milliseconds),
     timeout: getValueOrDefault(partial2.timeout, isRepeated2 ? Number.POSITIVE_INFINITY : 30000)
   };
   const state = {
@@ -1718,7 +1816,7 @@ var work = function(type, timer2, state, options, isRepeated2) {
   }
   const { count: count3, interval, timeout } = options;
   const { minimum } = state;
-  if (["pause", "stop"].includes(type)) {
+  if (["pause", "restart", "stop"].includes(type)) {
     const isStop = type === "stop";
     activeTimers.delete(timer2);
     cancelAnimationFrame(state.frame);
@@ -1732,11 +1830,10 @@ var work = function(type, timer2, state, options, isRepeated2) {
       state.elapsed = undefined;
       state.index = undefined;
     }
-    return timer2;
+    return type === "restart" ? work("start", timer2, state, options, isRepeated2) : timer2;
   }
   state.active = true;
   state.paused = false;
-  const canTimeout = timeout > 0 && timeout < Number.POSITIVE_INFINITY;
   const elapsed = type === "continue" ? +(state.elapsed ?? 0) : 0;
   let index = type === "continue" ? +(state.index ?? 0) : 0;
   state.elapsed = elapsed;
@@ -1846,6 +1943,7 @@ export {
   toQuery,
   toMap,
   titleCase,
+  throttle,
   sum,
   splice,
   sort,
@@ -1926,9 +2024,11 @@ export {
   emitter,
   diff,
   delay,
+  debounce,
   createUuid,
   count,
   compact,
+  closest,
   clone,
   clamp,
   chunk,

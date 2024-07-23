@@ -121,7 +121,7 @@ export declare function isWhen(value: unknown): value is When;
  * - ... and repeats it a certain amount of times
  * ---
  * - `options.count` defaults to `Infinity`
- * - `options.interval` defaults to `0`
+ * - `options.interval` defaults to `1000/60` _(1 frame)_
  * - `options.timeout` defaults to `Infinity`
  */
 export declare function repeat(callback: IndexedCallback, options?: Partial<RepeatOptions>): Timer;
@@ -135,7 +135,7 @@ export declare function wait(callback: () => void): Timer;
 export declare function wait(callback: () => void, time: number): Timer;
 /**
  * Creates a timer which calls a callback after a certain amount of time
- * - `options.interval` defaults to `0`
+ * - `options.interval` defaults to `1000/60` _(1 frame)_
  * - `options.timeout` defaults to `30_000` _(30 seconds)_
  */
 export declare function wait(callback: () => void, options: Partial<WaitOptions>): Timer;

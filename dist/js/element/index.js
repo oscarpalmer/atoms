@@ -16,6 +16,72 @@ function getTextDirection(element) {
   }
   return getComputedStyle?.(element)?.direction === "rtl" ? "rtl" : "ltr";
 }
+
+// src/js/element/closest.ts
+var calculateDistance = function(origin, target) {
+  const comparison = origin.compareDocumentPosition(target);
+  const children = [...origin.parentElement?.children ?? []];
+  switch (true) {
+    case children.includes(target):
+      return Math.abs(children.indexOf(origin) - children.indexOf(target));
+    case !!(comparison & 2 || comparison & 8):
+      return traverse(origin, target);
+    case !!(comparison & 4 || comparison & 16):
+      return traverse(target, origin);
+    default:
+      return -1;
+  }
+};
+function closest(origin, selector, context) {
+  const elements = [...(context ?? document).querySelectorAll(selector)];
+  const { length } = elements;
+  if (length === 0) {
+    return [];
+  }
+  const distances = [];
+  let minimum = null;
+  for (let index = 0;index < length; index += 1) {
+    const element = elements[index];
+    const distance = calculateDistance(origin, element);
+    if (distance < 0) {
+      continue;
+    }
+    if (minimum == null || distance < minimum) {
+      minimum = distance;
+    }
+    distances.push({
+      distance,
+      element
+    });
+  }
+  return minimum == null ? [] : distances.filter((found) => found.distance === minimum).map((found) => found.element);
+}
+var traverse = function(from, to) {
+  const children = [...to.children];
+  if (children.includes(from)) {
+    return children.indexOf(from) + 1;
+  }
+  let current = from;
+  let distance = 0;
+  let parent = from.parentElement;
+  while (parent != null) {
+    if (parent === to) {
+      return distance + 1;
+    }
+    const children2 = [...parent.children ?? []];
+    if (children2.includes(to)) {
+      return distance + Math.abs(children2.indexOf(current) - children2.indexOf(to));
+    }
+    const index = children2.findIndex((child) => child.contains(to));
+    if (index > -1) {
+      return distance + Math.abs(index - children2.indexOf(current)) + traverse(to, children2[index]);
+    }
+    current = parent;
+    distance += 1;
+    parent = parent.parentElement;
+  }
+  return -1e6;
+};
 // src/js/string/index.ts
 function getString(value) {
   if (typeof value === "string") {
@@ -166,6 +232,7 @@ export {
   findParentElement,
   findElements,
   findElement,
+  closest,
   findElements as $$,
   findElement as $
 };

@@ -1,4 +1,10 @@
 import type { GenericCallback } from './models';
+type Debounced<Callback extends GenericCallback> = Callback & {
+    /**
+     * Cancels the debounce
+     */
+    cancel: () => void;
+};
 type Memoised<Callback extends GenericCallback> = {
     readonly cache: Map<Parameters<Callback>[0], ReturnType<Callback>>;
     /**
@@ -23,6 +29,13 @@ type Memoised<Callback extends GenericCallback> = {
     run(...parameters: Parameters<Callback>): ReturnType<Callback>;
 };
 /**
+ * - Debounces a function, ensuring it is only called after `time` milliseconds have passed
+ * - On subsequent calls, the timer is reset and will wait another `time` milliseconds _(and so on...)_
+ * - Time is clamped between _0_ and _1000_ milliseconds
+ * - Returns the callback with an added `cancel`-method for manually cancelling the debounce
+ */
+export declare function debounce<Callback extends GenericCallback>(callback: Callback, time?: number): Debounced<Callback>;
+/**
  * Memoises a function, caching and retrieving results based on the first parameter
  */
 export declare function memoise<Callback extends GenericCallback>(callback: Callback): Memoised<Callback>;
@@ -30,4 +43,9 @@ export declare function memoise<Callback extends GenericCallback>(callback: Call
  * A function that does nothing, which can be useful, I guess…
  */
 export declare function noop(): void;
+/**
+ * - Throttles a function, ensuring it is only called once every `time` milliseconds
+ * - Time is clamped between _0_ and _1000_ milliseconds
+ */
+export declare function throttle<Callback extends GenericCallback>(callback: Callback, time?: number): Callback;
 export {};
