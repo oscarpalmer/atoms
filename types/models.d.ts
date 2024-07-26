@@ -12,6 +12,5 @@ export type GetterSetter<Value> = {
 };
 export type Key = number | string;
 export type PlainObject = UnknownRecord;
-export type ToString<T> = T extends string | number ? `${T}` : never;
 export type UnknownArrayOrRecord = UnknownArray | UnknownRecord;
 export type { Get, Paths, Primitive, UnknownArray, UnknownRecord };
