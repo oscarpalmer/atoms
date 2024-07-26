@@ -1,5 +1,4 @@
-import type { ToString } from 'type-fest/source/internal';
-import type { Get, Paths, PlainObject } from '../models';
+import type { Get, Paths, PlainObject, ToString } from '../models';
 /**
  * - Get the value from an object using a known path
  * - You can retrieve a nested value by using dot notation, e.g., `foo.bar.baz`

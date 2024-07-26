@@ -1,6 +1,5 @@
-import type {ToString} from 'type-fest/source/internal';
 import {handleValue} from '../internal/value-handle';
-import type {Get, Paths, PlainObject} from '../models';
+import type {Get, Paths, PlainObject, ToString} from '../models';
 
 /**
  * - Get the value from an object using a known path
