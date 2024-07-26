@@ -175,12 +175,12 @@
 		"clean": "rm -rf ./dist && rm -rf ./types && rm -f ./tsconfig.tsbuildinfo",
 		"test": "bun test",
 		"types": "bun run types:cjs && bun run types:esm",
-		"types:cjs": "bunx dts-bundle-generator --out-file ./types/index.d.cts --no-check --silent ./src/js/index.ts",
+		"types:cjs": "bunx dts-bundle-generator --out-file ./types/index.d.cts --external-inlines 'type-fest' --no-check --silent ./src/js/index.ts",
 		"types:esm": "bunx tsc -p ./tsconfig.json",
 		"watch:css": "bunx sass ./src/css:./dist/css --no-source-map --watch",
 		"watch:js": "bun build ./src/js/index.ts --outfile ./dist/js/index.js --watch"
 	},
 	"type": "module",
-	"types": "./types/index.d.ts",
-	"version": "0.63.0"
+	"types": "./types/index.d.cts",
+	"version": "0.64.0"
 }
