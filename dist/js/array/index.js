@@ -176,19 +176,19 @@ function shuffle2(array) {
   return shuffled;
 }
 // src/js/is.ts
-function isKey(value) {
-  return typeof value === "number" || typeof value === "string";
+function isKey(value2) {
+  return typeof value2 === "number" || typeof value2 === "string";
 }
 
 // src/js/array/sort.ts
-var comparison = function(first, second) {
+function comparison(first, second) {
   if (typeof first === "number" && typeof second === "number") {
     return first - second;
   }
   const firstAsNumber = Number(first);
   const secondAsNumber = Number(second);
   return Number.isNaN(firstAsNumber) || Number.isNaN(secondAsNumber) ? String(first).localeCompare(String(second)) : firstAsNumber - secondAsNumber;
-};
+}
 function sort(array2, first, second) {
   if (array2.length < 2) {
     return array2;
@@ -203,12 +203,12 @@ function sort(array2, first, second) {
       callback: undefined
     };
     if (isKey(key)) {
-      returned.callback = (value) => value[key];
+      returned.callback = (value2) => value2[key];
     } else if (typeof key === "function") {
       returned.callback = key;
     } else if (typeof key?.value === "function" || isKey(key?.value)) {
       returned.direction = key?.direction ?? direction;
-      returned.callback = typeof key.value === "function" ? key.value : (value) => value[key.value];
+      returned.callback = typeof key.value === "function" ? key.value : (value2) => value2[key.value];
     }
     return returned;
   }).filter((key) => typeof key.callback === "function");
@@ -245,17 +245,17 @@ function toMap(array2, first, second) {
   const map = new Map;
   const { length } = array2;
   for (let index = 0;index < length; index += 1) {
-    const value = array2[index];
-    const key = hasCallback ? callbacks?.key?.(value, index, array2) ?? index : index;
+    const value2 = array2[index];
+    const key = hasCallback ? callbacks?.key?.(value2, index, array2) ?? index : index;
     if (asArrays) {
       const existing = map.get(key);
       if (Array.isArray(existing)) {
-        existing.push(value);
+        existing.push(value2);
       } else {
-        map.set(key, [value]);
+        map.set(key, [value2]);
       }
     } else {
-      map.set(key, value);
+      map.set(key, value2);
     }
   }
   return map;

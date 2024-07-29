@@ -14,17 +14,18 @@ export function isArrayOrPlainObject(
  * Is the array or object completely empty or only containing `null` or `undefined` values?
  */
 export function isEmpty(value: ArrayOrPlainObject): boolean {
-	if (Array.isArray(value)) {
-		return (
-			value.length === 0 || value.filter(item => item != null).length === 0
-		);
+	const values = Object.values(value);
+	const {length} = values;
+
+	let count = 0;
+
+	for (let index = 0; index < length; index += 1) {
+		if (values[index] != null) {
+			count += 1;
+		}
 	}
 
-	const values = Object.values(value);
-
-	return (
-		values.length === 0 || values.filter(item => item != null).length === 0
-	);
+	return count === 0;
 }
 
 /**

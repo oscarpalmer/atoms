@@ -54,7 +54,7 @@ export function equal(
 
 		case Array.isArray(first) && Array.isArray(second):
 		case isPlainObject(first) && isPlainObject(second):
-			return equalNested(first, second);
+			return equalObject(first, second);
 
 		case typeof first === 'string' && ignoreCase === true:
 			return Object.is(first.toLowerCase(), (second as string).toLowerCase());
@@ -66,7 +66,7 @@ export function equal(
 
 function equalArrayBuffer(first: ArrayBuffer, second: ArrayBuffer): boolean {
 	return first.byteLength === second.byteLength
-		? equalNested(
+		? equalObject(
 				new Uint8Array(first) as never,
 				new Uint8Array(second) as never,
 			)
@@ -83,7 +83,9 @@ function equalMap(
 	first: Map<unknown, unknown>,
 	second: Map<unknown, unknown>,
 ): boolean {
-	if (first.size !== second.size) {
+	const {size} = first;
+
+	if (size !== second.size) {
 		return false;
 	}
 
@@ -94,8 +96,10 @@ function equalMap(
 		return false;
 	}
 
-	for (const [key, value] of first) {
-		if (!equal(value, second.get(key))) {
+	for (let index = 0; index < size; index += 1) {
+		const key = firstKeys[index];
+
+		if (!equal(first.get(key), second.get(key))) {
 			return false;
 		}
 	}
@@ -103,7 +107,7 @@ function equalMap(
 	return true;
 }
 
-function equalNested(
+function equalObject(
 	first: ArrayOrPlainObject,
 	second: ArrayOrPlainObject,
 ): boolean {
@@ -134,8 +138,17 @@ function equalProperties(
 	second: object,
 	properties: string[],
 ): boolean {
-	for (const key of properties) {
-		if (!Object.is((first as PlainObject)[key], (second as PlainObject)[key])) {
+	const {length} = properties;
+
+	for (let index = 0; index < length; index += 1) {
+		const property = properties[index];
+
+		if (
+			!equal(
+				(first as PlainObject)[property],
+				(second as PlainObject)[property],
+			)
+		) {
 			return false;
 		}
 	}
@@ -150,10 +163,13 @@ function equalSet(first: Set<unknown>, second: Set<unknown>): boolean {
 		return false;
 	}
 
-	const values = [...second];
+	const firstValues = [...first];
+	const secondValues = [...second];
 
-	for (const item of first) {
-		if (!values.some(value => equal(item, value))) {
+	for (let index = 0; index < size; index += 1) {
+		const firstValue = firstValues[index];
+
+		if (!secondValues.some(secondValue => equal(firstValue, secondValue))) {
 			return false;
 		}
 	}

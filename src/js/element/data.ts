@@ -24,8 +24,11 @@ export function getData(
 	}
 
 	const data: PlainObject = {};
+	const {length} = keys;
 
-	for (const key of keys) {
+	for (let index = 0; index < length; index += 1) {
+		const key = keys[index];
+
 		data[key] = getDataValue(element, key);
 	}
 

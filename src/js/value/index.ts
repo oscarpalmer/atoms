@@ -4,20 +4,20 @@ import type {PlainObject} from '../models';
  * Creates a new object with only the specified keys
  */
 export function partial<Value extends PlainObject, Key extends keyof Value>(
-	value: Value,
-	keys: Key[],
-): Pick<Value, Key> {
-	const {length} = keys;
-	const result = {} as Pick<Value, Key>;
+		value: Value,
+		keys: Key[],
+	): Pick<Value, Key> {
+		const result = {} as Pick<Value, Key>;
+		const {length} = keys;
 
-	for (let index = 0; index < length; index += 1) {
-		const key = keys[index];
+		for (let index = 0; index < length; index += 1) {
+			const key = keys[index];
 
-		result[key] = value[key];
+			result[key] = value[key];
+		}
+
+		return result;
 	}
-
-	return result;
-}
 
 export * from './clone';
 export * from './diff';
@@ -27,3 +27,4 @@ export * from './merge';
 export * from './set';
 export * from './smush';
 export * from './unsmush';
+

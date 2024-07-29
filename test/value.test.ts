@@ -134,7 +134,7 @@ test('merge', () => {
 		hobbies: ['Wrestling'],
 	};
 
-	const merged = merge(first, second, third);
+	const merged = merge([first, second, third]);
 
 	expect(merged).toEqual({
 		age: 99,
@@ -146,7 +146,8 @@ test('merge', () => {
 		profession: 'Developer?',
 	});
 
-	expect(merge()).toEqual({});
+	// @ts-expect-error
+	expect(merge([])).toEqual({});
 });
 
 test('partial', () => {

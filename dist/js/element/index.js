@@ -18,7 +18,7 @@ function getTextDirection(element) {
 }
 
 // src/js/element/closest.ts
-var calculateDistance = function(origin, target) {
+function calculateDistance(origin, target) {
   const comparison = origin.compareDocumentPosition(target);
   const children = [...origin.parentElement?.children ?? []];
   switch (true) {
@@ -31,7 +31,7 @@ var calculateDistance = function(origin, target) {
     default:
       return -1;
   }
-};
+}
 function closest(origin, selector, context) {
   const elements = [...(context ?? document).querySelectorAll(selector)];
   const { length } = elements;
@@ -56,7 +56,7 @@ function closest(origin, selector, context) {
   }
   return minimum == null ? [] : distances.filter((found) => found.distance === minimum).map((found) => found.element);
 }
-var traverse = function(from, to) {
+function traverse(from, to) {
   const children = [...to.children];
   if (children.includes(from)) {
     return children.indexOf(from) + 1;
@@ -81,53 +81,55 @@ var traverse = function(from, to) {
     parent = parent.parentElement;
   }
   return -1e6;
-};
-// src/js/string/index.ts
-function getString(value) {
-  if (typeof value === "string") {
-    return value;
-  }
-  if (typeof value !== "object" || value == null) {
-    return String(value);
-  }
-  const valueOff = value.valueOf?.() ?? value;
-  const asString = valueOff?.toString?.() ?? String(valueOff);
-  return asString.startsWith("[object ") ? JSON.stringify(value) : asString;
 }
-function parse(value, reviver) {
+// src/js/string/index.ts
+function getString(value2) {
+  if (typeof value2 === "string") {
+    return value2;
+  }
+  if (typeof value2 !== "object" || value2 == null) {
+    return String(value2);
+  }
+  const valueOff = value2.valueOf?.() ?? value2;
+  const asString = valueOff?.toString?.() ?? String(valueOff);
+  return asString.startsWith("[object ") ? JSON.stringify(value2) : asString;
+}
+function parse(value2, reviver) {
   try {
-    return JSON.parse(value, reviver);
+    return JSON.parse(value2, reviver);
   } catch {
   }
 }
 // src/js/is.ts
-function isNullableOrWhitespace(value) {
-  return value == null || /^\s*$/.test(getString(value));
+function isNullableOrWhitespace(value2) {
+  return value2 == null || /^\s*$/.test(getString(value2));
 }
-function isPlainObject(value) {
-  if (typeof value !== "object" || value === null) {
+function isPlainObject(value2) {
+  if (typeof value2 !== "object" || value2 === null) {
     return false;
   }
-  const prototype = Object.getPrototypeOf(value);
-  return (prototype === null || prototype === Object.prototype || Object.getPrototypeOf(prototype) === null) && !(Symbol.toStringTag in value) && !(Symbol.iterator in value);
+  const prototype = Object.getPrototypeOf(value2);
+  return (prototype === null || prototype === Object.prototype || Object.getPrototypeOf(prototype) === null) && !(Symbol.toStringTag in value2) && !(Symbol.iterator in value2);
 }
 
 // src/js/internal/element-value.ts
 function setElementValues(element, first, second, callback) {
   if (isPlainObject(first)) {
     const entries = Object.entries(first);
-    for (const [key, value] of entries) {
-      callback(element, key, value);
+    const { length } = entries;
+    for (let index = 0;index < length; index += 1) {
+      const [key, value2] = entries[index];
+      callback(element, key, value2);
     }
   } else if (first != null) {
     callback(element, first, second);
   }
 }
-function updateElementValue(element, key, value, set, remove, json) {
-  if (isNullableOrWhitespace(value)) {
+function updateElementValue(element, key, value2, set3, remove, json) {
+  if (isNullableOrWhitespace(value2)) {
     remove.call(element, key);
   } else {
-    set.call(element, key, json ? JSON.stringify(value) : String(value));
+    set3.call(element, key, json ? JSON.stringify(value2) : String(value2));
   }
 }
 
@@ -137,44 +139,46 @@ function getData(element, keys) {
     return getDataValue(element, keys);
   }
   const data = {};
-  for (const key of keys) {
+  const { length } = keys;
+  for (let index = 0;index < length; index += 1) {
+    const key = keys[index];
     data[key] = getDataValue(element, key);
   }
   return data;
 }
-var getDataValue = function(element, key) {
-  const value = element.dataset[key];
-  if (value != null) {
-    return parse(value);
+function getDataValue(element, key) {
+  const value2 = element.dataset[key];
+  if (value2 != null) {
+    return parse(value2);
   }
-};
+}
 function setData(element, first, second) {
   setElementValues(element, first, second, updateDataAttribute);
 }
-var updateDataAttribute = function(element, key, value) {
-  updateElementValue(element, `data-${key}`, value, element.setAttribute, element.removeAttribute, true);
-};
+function updateDataAttribute(element, key, value2) {
+  updateElementValue(element, `data-${key}`, value2, element.setAttribute, element.removeAttribute, true);
+}
 // src/js/element/find.ts
 function findElement(selector, context) {
   return findElementOrElements(selector, context, true);
 }
-var findElementOrElements = function(selector, context, single) {
+function findElementOrElements(selector, context, single) {
   const callback = single ? document.querySelector : document.querySelectorAll;
   const contexts = context == null ? [document] : findElementOrElements(context, undefined, false);
   const result = [];
   if (typeof selector === "string") {
     const { length: length2 } = contexts;
     for (let index = 0;index < length2; index += 1) {
-      const value = callback.call(contexts[index], selector);
+      const value2 = callback.call(contexts[index], selector);
       if (single) {
-        if (value == null) {
+        if (value2 == null) {
           continue;
         }
-        return value;
+        return value2;
       }
-      result.push(...Array.from(value));
+      result.push(...Array.from(value2));
     }
-    return single ? undefined : result.filter((value, index, array2) => array2.indexOf(value) === index);
+    return single ? undefined : result.filter((value2, index, array2) => array2.indexOf(value2) === index);
   }
   const nodes = Array.isArray(selector) ? selector : selector instanceof NodeList ? Array.from(selector) : [selector];
   const { length } = nodes;
@@ -186,7 +190,7 @@ var findElementOrElements = function(selector, context, single) {
     }
   }
   return result;
-};
+}
 function findElements(selector, context) {
   return findElementOrElements(selector, context, false);
 }
@@ -216,13 +220,13 @@ function findParentElement(origin, selector) {
 function setStyles(element, first, second) {
   setElementValues(element, first, second, updateStyleProperty);
 }
-var updateStyleProperty = function(element, key, value) {
-  updateElementValue(element, key, value, function(key2, value2) {
-    this.style[key2] = value2;
+function updateStyleProperty(element, key, value2) {
+  updateElementValue(element, key, value2, function(key2, value3) {
+    this.style[key2] = value3;
   }, function(key2) {
     this.style[key2] = "";
   }, false);
-};
+}
 export {
   setStyles,
   setData,

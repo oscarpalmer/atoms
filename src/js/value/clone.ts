@@ -37,6 +37,10 @@ export function clone(value: unknown) {
 		case value instanceof DataView:
 			return cloneDataView(value);
 
+		case value instanceof Map:
+		case value instanceof Set:
+			return cloneMapOrSet(value);
+
 		case value instanceof Node:
 			return value.cloneNode(true);
 
@@ -44,7 +48,7 @@ export function clone(value: unknown) {
 			return cloneRegularExpression(value);
 
 		case isArrayOrPlainObject(value):
-			return cloneNested(value);
+			return cloneObject(value);
 
 		default:
 			return structuredClone(value);
@@ -65,7 +69,28 @@ function cloneDataView(value: DataView): DataView {
 	return new DataView(buffer, value.byteOffset, value.byteLength);
 }
 
-function cloneNested(value: ArrayOrPlainObject): ArrayOrPlainObject {
+function cloneMapOrSet<Value extends Map<unknown, unknown> | Set<unknown>>(
+	value: Value,
+): Value {
+	const isMap = value instanceof Map;
+	const cloned = isMap ? new Map<unknown, unknown>() : new Set<unknown>();
+	const entries = [...value.entries()];
+	const {length} = entries;
+
+	for (let index = 0; index < length; index += 1) {
+		const entry = entries[index];
+
+		if (isMap) {
+			(cloned as Map<unknown, unknown>).set(clone(entry[0]), clone(entry[1]));
+		} else {
+			(cloned as Set<unknown>).add(clone(entry[0]));
+		}
+	}
+
+	return cloned as Value;
+}
+
+function cloneObject(value: ArrayOrPlainObject): ArrayOrPlainObject {
 	const cloned = (Array.isArray(value) ? [] : {}) as PlainObject;
 	const keys = Object.keys(value);
 	const {length} = keys;

@@ -23,5 +23,5 @@ export function getForegroundColour(value: RGBColourValue): string {
 
 export {getHexColour, hexToRgb} from './hex';
 export {hslToRgb} from './hsl';
-export {rgbToHex, rgbToHsl} from './rgb';
 export * from './models';
+export {rgbToHex, rgbToHsl} from './rgb';

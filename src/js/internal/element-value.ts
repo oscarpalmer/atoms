@@ -9,8 +9,11 @@ export function setElementValues(
 ): void {
 	if (isPlainObject(first)) {
 		const entries = Object.entries(first);
+		const {length} = entries;
 
-		for (const [key, value] of entries) {
+		for (let index = 0; index < length; index += 1) {
+			const [key, value] = entries[index];
+
 			callback(element, key, value);
 		}
 	} else if (first != null) {

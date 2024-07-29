@@ -1,7 +1,7 @@
-import {equal} from './equal';
 import {isArrayOrPlainObject} from '../is';
 import type {ArrayOrPlainObject, Key, PlainObject} from '../models';
 import {join} from '../string';
+import {equal} from './equal';
 
 export type DiffType = 'full' | 'none' | 'partial';
 

@@ -3,7 +3,7 @@ function noop() {
 }
 
 // src/js/logger.ts
-var time = function(label) {
+function time(label) {
   const started = logger.enabled;
   let stopped = false;
   if (started) {
@@ -22,7 +22,7 @@ var time = function(label) {
       }
     }
   });
-};
+}
 if (globalThis._atomic_logging == null) {
   globalThis._atomic_logging = true;
 }

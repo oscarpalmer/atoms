@@ -3,10 +3,11 @@ function queue(callback) {
   _atomic_queued.add(callback);
   if (_atomic_queued.size > 0) {
     queueMicrotask(() => {
-      const callbacks = Array.from(_atomic_queued);
+      const callbacks = [..._atomic_queued];
+      const { length } = callbacks;
       _atomic_queued.clear();
-      for (const callback2 of callbacks) {
-        callback2();
+      for (let index = 0;index < length; index += 1) {
+        callbacks[index]();
       }
     });
   }

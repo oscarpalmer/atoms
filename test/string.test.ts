@@ -8,6 +8,7 @@ import {
 	kebabCase,
 	pascalCase,
 	snakeCase,
+	template,
 	titleCase,
 	truncate,
 	words,
@@ -144,6 +145,40 @@ test('snakeCase', () => {
 	expect(snakeCase('XmlHTTPRequest')).toBe('xml_http_request');
 	expect(snakeCase('IDs')).toBe('ids');
 	expect(snakeCase('Product XMLs')).toBe('product_xmls');
+});
+
+test('template', () => {
+	const basic = '{{a.0.b.1.c}}';
+	const custom = '<a.0.b.1.c>';
+
+	const variables = {
+		a: [
+			{
+				B: [
+					null,
+					{
+						c: 'Hello!',
+					},
+				],
+			},
+		],
+	};
+
+	expect(template(basic, variables)).toBe('');
+	expect(template(custom, variables)).toBe('<a.0.b.1.c>');
+
+	expect(
+		template(basic, variables, {
+			ignoreCase: true,
+		}),
+	).toBe('Hello!');
+
+	expect(
+		template(custom, variables, {
+			ignoreCase: true,
+			pattern: /<([^>]+)>/g,
+		}),
+	).toBe('Hello!');
 });
 
 test('truncate', () => {

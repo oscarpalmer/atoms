@@ -25,3 +25,4 @@ export declare function truncate(value: string, length: number, suffix?: string)
  */
 export declare function words(value: string): string[];
 export * from './case';
+export * from './template';

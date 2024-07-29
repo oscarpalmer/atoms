@@ -171,10 +171,10 @@ function createHex(original) {
 function getHexColour(value) {
   return createHex(anyPattern.test(value) ? getNormalisedHex(value) : "000000");
 }
-var getNormalisedHex = function(value) {
+function getNormalisedHex(value) {
   const normalised = value.replace(/^#/, "");
   return normalised.length === 3 ? normalised.split("").map((character) => character.repeat(2)).join("") : normalised;
-};
+}
 function hexToRgb(value) {
   const hex2 = anyPattern.test(value) ? getNormalisedHex(value) : "";
   const pairs = groupedPattern.exec(hex2) ?? [];

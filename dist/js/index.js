@@ -33,7 +33,7 @@ function insertValues(type, array, values, start, deleteCount) {
 }
 
 // src/js/array/index.ts
-function flatten(array2) {
+function flatten2(array2) {
   return array2.flat(Number.POSITIVE_INFINITY);
 }
 function push(array2, values) {
@@ -213,33 +213,33 @@ function shuffle2(array) {
 function createUuid() {
   return "10000000-1000-4000-8000-100000000000".replace(/[018]/g, (substring) => (substring ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> substring / 4).toString(16));
 }
-function getString(value) {
-  if (typeof value === "string") {
-    return value;
+function getString(value2) {
+  if (typeof value2 === "string") {
+    return value2;
   }
-  if (typeof value !== "object" || value == null) {
-    return String(value);
+  if (typeof value2 !== "object" || value2 == null) {
+    return String(value2);
   }
-  const valueOff = value.valueOf?.() ?? value;
+  const valueOff = value2.valueOf?.() ?? value2;
   const asString = valueOff?.toString?.() ?? String(valueOff);
-  return asString.startsWith("[object ") ? JSON.stringify(value) : asString;
+  return asString.startsWith("[object ") ? JSON.stringify(value2) : asString;
 }
-function join(value, delimiter) {
-  return compact(value).map(getString).filter((value2) => value2.trim().length > 0).join(typeof delimiter === "string" ? delimiter : "");
+function join(value2, delimiter) {
+  return compact(value2).map(getString).filter((value3) => value3.trim().length > 0).join(typeof delimiter === "string" ? delimiter : "");
 }
-function parse(value, reviver) {
+function parse(value2, reviver) {
   try {
-    return JSON.parse(value, reviver);
+    return JSON.parse(value2, reviver);
   } catch {
   }
 }
-function truncate(value, length, suffix) {
+function truncate(value2, length, suffix) {
   const suffixLength = suffix?.length ?? 0;
   const truncatedLength = length - suffixLength;
-  return value.length <= length ? value : `${value.slice(0, truncatedLength)}${suffix ?? ""}`;
+  return value2.length <= length ? value2 : `${value2.slice(0, truncatedLength)}${suffix ?? ""}`;
 }
-function words(value) {
-  return value.match(/[^\x00-\x2f\x3a-\x40\x5b-\x60\x7b-\x7f]+/g) ?? [];
+function words(value2) {
+  return value2.match(/[^\x00-\x2f\x3a-\x40\x5b-\x60\x7b-\x7f]+/g) ?? [];
 }
 
 // src/js/string/case.ts
@@ -264,64 +264,473 @@ function snakeCase(value) {
 function titleCase(value) {
   return words(value).map(capitalise).join(" ");
 }
-var toCase = function(value, delimiter, capitaliseAny, capitaliseFirst) {
+function toCase(value, delimiter, capitaliseAny, capitaliseFirst) {
   return words(value).map((word, index) => {
     const parts = word.replace(/(\p{Lu}*)(\p{Lu})(\p{Ll}+)/gu, (full, one, two, three) => three === "s" ? full : `${one}-${two}${three}`).replace(/(\p{Ll})(\p{Lu})/gu, "$1-$2").split("-");
     return parts.filter((part) => part.length > 0).map((part, partIndex) => !capitaliseAny || partIndex === 0 && index === 0 && !capitaliseFirst ? part.toLocaleLowerCase() : capitalise(part)).join(delimiter);
   }).join(delimiter);
-};
-// src/js/is.ts
-function isArrayOrPlainObject(value) {
-  return Array.isArray(value) || isPlainObject(value);
 }
-function isEmpty(value) {
-  if (Array.isArray(value)) {
-    return value.length === 0 || value.filter((item) => item != null).length === 0;
+// src/js/value/index.ts
+function partial(value, keys) {
+  const result = {};
+  const { length } = keys;
+  for (let index = 0;index < length; index += 1) {
+    const key = keys[index];
+    result[key] = value[key];
   }
-  const values = Object.values(value);
-  return values.length === 0 || values.filter((item) => item != null).length === 0;
+  return result;
 }
-function isKey(value) {
-  return typeof value === "number" || typeof value === "string";
+
+// src/js/value/clone.ts
+function clone(value) {
+  switch (true) {
+    case value == null:
+      return value;
+    case typeof value === "bigint":
+      return BigInt(value);
+    case typeof value === "boolean":
+      return Boolean(value);
+    case typeof value === "function":
+      return;
+    case typeof value === "number":
+      return Number(value);
+    case typeof value === "string":
+      return String(value);
+    case typeof value === "symbol":
+      return Symbol(value.description);
+    case value instanceof ArrayBuffer:
+      return cloneArrayBuffer(value);
+    case value instanceof DataView:
+      return cloneDataView(value);
+    case value instanceof Map:
+    case value instanceof Set:
+      return cloneMapOrSet(value);
+    case value instanceof Node:
+      return value.cloneNode(true);
+    case value instanceof RegExp:
+      return cloneRegularExpression(value);
+    case isArrayOrPlainObject(value):
+      return cloneObject(value);
+    default:
+      return structuredClone(value);
+  }
 }
-function isNullable(value) {
-  return value == null;
+function cloneArrayBuffer(value) {
+  const cloned = new ArrayBuffer(value.byteLength);
+  new Uint8Array(cloned).set(new Uint8Array(value));
+  return cloned;
 }
-function isNullableOrEmpty(value) {
-  return value == null || getString(value) === "";
+function cloneDataView(value) {
+  const buffer = cloneArrayBuffer(value.buffer);
+  return new DataView(buffer, value.byteOffset, value.byteLength);
 }
-function isNullableOrWhitespace(value) {
-  return value == null || /^\s*$/.test(getString(value));
+function cloneMapOrSet(value) {
+  const isMap = value instanceof Map;
+  const cloned = isMap ? new Map : new Set;
+  const entries = [...value.entries()];
+  const { length } = entries;
+  for (let index = 0;index < length; index += 1) {
+    const entry = entries[index];
+    if (isMap) {
+      cloned.set(clone(entry[0]), clone(entry[1]));
+    } else {
+      cloned.add(clone(entry[0]));
+    }
+  }
+  return cloned;
 }
-function isNumber(value) {
-  return typeof value === "number" && !Number.isNaN(value);
+function cloneObject(value) {
+  const cloned = Array.isArray(value) ? [] : {};
+  const keys = Object.keys(value);
+  const { length } = keys;
+  for (let index = 0;index < length; index += 1) {
+    const key = keys[index];
+    cloned[key] = clone(value[key]);
+  }
+  return cloned;
 }
-function isNumerical(value) {
-  return isNumber(value) || typeof value === "string" && value.trim().length > 0 && !Number.isNaN(+value);
+function cloneRegularExpression(value) {
+  const cloned = new RegExp(value.source, value.flags);
+  cloned.lastIndex = value.lastIndex;
+  return cloned;
 }
-function isObject(value) {
-  return typeof value === "object" && value !== null || typeof value === "function";
+// src/js/value/equal.ts
+function equal(first, second, ignoreCase) {
+  switch (true) {
+    case first === second:
+      return true;
+    case (first == null || second == null):
+      return first === second;
+    case typeof first !== typeof second:
+      return false;
+    case (first instanceof ArrayBuffer && second instanceof ArrayBuffer):
+      return equalArrayBuffer(first, second);
+    case typeof first === "boolean":
+    case (first instanceof Date && second instanceof Date):
+      return Object.is(Number(first), Number(second));
+    case (first instanceof DataView && second instanceof DataView):
+      return equalDataView(first, second);
+    case (first instanceof Error && second instanceof Error):
+      return equalProperties(first, second, ["name", "message"]);
+    case (first instanceof Map && second instanceof Map):
+      return equalMap(first, second);
+    case (first instanceof RegExp && second instanceof RegExp):
+      return equalProperties(first, second, ["source", "flags"]);
+    case (first instanceof Set && second instanceof Set):
+      return equalSet(first, second);
+    case (Array.isArray(first) && Array.isArray(second)):
+    case (isPlainObject(first) && isPlainObject(second)):
+      return equalObject(first, second);
+    case (typeof first === "string" && ignoreCase === true):
+      return Object.is(first.toLowerCase(), second.toLowerCase());
+    default:
+      return Object.is(first, second);
+  }
 }
-function isPlainObject(value) {
-  if (typeof value !== "object" || value === null) {
+function equalArrayBuffer(first, second) {
+  return first.byteLength === second.byteLength ? equalObject(new Uint8Array(first), new Uint8Array(second)) : false;
+}
+function equalDataView(first, second) {
+  return first.byteOffset === second.byteOffset ? equalArrayBuffer(first.buffer, second.buffer) : false;
+}
+function equalMap(first, second) {
+  const { size } = first;
+  if (size !== second.size) {
     return false;
   }
-  const prototype = Object.getPrototypeOf(value);
-  return (prototype === null || prototype === Object.prototype || Object.getPrototypeOf(prototype) === null) && !(Symbol.toStringTag in value) && !(Symbol.iterator in value);
+  const firstKeys = [...first.keys()];
+  const secondKeys = [...second.keys()];
+  if (firstKeys.some((key) => !secondKeys.includes(key))) {
+    return false;
+  }
+  for (let index = 0;index < size; index += 1) {
+    const key = firstKeys[index];
+    if (!equal(first.get(key), second.get(key))) {
+      return false;
+    }
+  }
+  return true;
 }
-function isPrimitive(value) {
-  return value == null || /^(bigint|boolean|number|string|symbol)$/.test(typeof value);
+function equalObject(first, second) {
+  const firstKeys = Object.keys(first);
+  const secondKeys = Object.keys(second);
+  const { length } = firstKeys;
+  if (length !== secondKeys.length || firstKeys.some((key) => !secondKeys.includes(key))) {
+    return false;
+  }
+  for (let index = 0;index < length; index += 1) {
+    const key = firstKeys[index];
+    if (!equal(first[key], second[key])) {
+      return false;
+    }
+  }
+  return true;
+}
+function equalProperties(first, second, properties) {
+  const { length } = properties;
+  for (let index = 0;index < length; index += 1) {
+    const property = properties[index];
+    if (!equal(first[property], second[property])) {
+      return false;
+    }
+  }
+  return true;
+}
+function equalSet(first, second) {
+  const { size } = first;
+  if (size !== second.size) {
+    return false;
+  }
+  const firstValues = [...first];
+  const secondValues = [...second];
+  for (let index = 0;index < size; index += 1) {
+    const firstValue = firstValues[index];
+    if (!secondValues.some((secondValue) => equal(firstValue, secondValue))) {
+      return false;
+    }
+  }
+  return true;
+}
+
+// src/js/value/diff.ts
+function diff(first, second) {
+  const result = {
+    original: {
+      from: first,
+      to: second
+    },
+    type: "partial",
+    values: {}
+  };
+  const same = Object.is(first, second);
+  const firstIsArrayOrObject = isArrayOrPlainObject(first);
+  const secondIsArrayOrObject = isArrayOrPlainObject(second);
+  if (same || !firstIsArrayOrObject && !secondIsArrayOrObject) {
+    result.type = same ? "none" : "full";
+    return result;
+  }
+  if (firstIsArrayOrObject !== secondIsArrayOrObject) {
+    result.type = "full";
+  }
+  const diffs = getDiffs(first, second);
+  const { length } = diffs;
+  if (length === 0) {
+    result.type = "none";
+  }
+  for (let index = 0;index < length; index += 1) {
+    const diff2 = diffs[index];
+    result.values[diff2.key] = { from: diff2.from, to: diff2.to };
+  }
+  return result;
+}
+function getDiffs(first, second, prefix) {
+  const changes = [];
+  const checked = new Set;
+  for (let outerIndex = 0;outerIndex < 2; outerIndex += 1) {
+    const value = outerIndex === 0 ? first : second;
+    if (!value) {
+      continue;
+    }
+    const keys = Object.keys(value);
+    const { length } = keys;
+    for (let innerIndex = 0;innerIndex < length; innerIndex += 1) {
+      const key = keys[innerIndex];
+      if (checked.has(key)) {
+        continue;
+      }
+      const from = first?.[key];
+      const to = second?.[key];
+      if (!equal(from, to)) {
+        const prefixed = join([prefix, key], ".");
+        const change = {
+          from,
+          to,
+          key: prefixed
+        };
+        const nested = isArrayOrPlainObject(from) || isArrayOrPlainObject(to);
+        const diffs = nested ? getDiffs(from, to, prefixed) : [];
+        if (!nested || nested && diffs.length > 0) {
+          changes.push(change);
+        }
+        changes.push(...diffs);
+      }
+      checked.add(key);
+    }
+  }
+  return changes;
+}
+// src/js/internal/value-handle.ts
+function findKey(needle, haystack, ignoreCase) {
+  if (!ignoreCase) {
+    return needle;
+  }
+  const keys = Object.keys(haystack);
+  const normalised = keys.map((key) => key.toLowerCase());
+  const index = normalised.indexOf(needle.toLowerCase());
+  return index > -1 ? keys[index] : needle;
+}
+function handleValue(data, path, value, get, ignoreCase) {
+  if (typeof data === "object" && data !== null && !/^(__proto__|constructor|prototype)$/i.test(path)) {
+    const key = findKey(path, data, ignoreCase);
+    if (get) {
+      return data[key];
+    }
+    data[key] = value;
+  }
+}
+
+// src/js/value/get.ts
+function getValue(data, path, ignoreCase) {
+  const shouldIgnoreCase = ignoreCase === true;
+  const parts = (shouldIgnoreCase ? path.toLowerCase() : path).split(".");
+  const { length } = parts;
+  let index = 0;
+  let value = typeof data === "object" ? data ?? {} : {};
+  while (index < length && value != null) {
+    value = handleValue(value, parts[index++], null, true, shouldIgnoreCase);
+  }
+  return value;
+}
+// src/js/value/merge.ts
+function merge(values, options) {
+  if (values.length === 0) {
+    return {};
+  }
+  const skipNullable = options?.skipNullable ?? false;
+  const actual = values.filter((value) => isArrayOrPlainObject(value));
+  const result = actual.every(Array.isArray) ? [] : {};
+  const isArray = Array.isArray(result);
+  const { length } = actual;
+  for (let outerIndex = 0;outerIndex < length; outerIndex += 1) {
+    const item = actual[outerIndex];
+    const keys = Object.keys(item);
+    const size = keys.length;
+    for (let innerIndex = 0;innerIndex < size; innerIndex += 1) {
+      const key = keys[innerIndex];
+      const next = item[key];
+      const previous = result[key];
+      if (isArray && skipNullable && next == null) {
+        continue;
+      }
+      if (isArrayOrPlainObject(next)) {
+        result[key] = isArrayOrPlainObject(previous) ? merge([previous, next]) : merge([next]);
+      } else {
+        result[key] = next;
+      }
+    }
+  }
+  return result;
+}
+// src/js/value/set.ts
+function setValue(data, path, value, ignoreCase) {
+  const shouldIgnoreCase = ignoreCase === true;
+  const parts = (shouldIgnoreCase ? path.toLowerCase() : path).split(".");
+  const { length } = parts;
+  const lastIndex = length - 1;
+  let previous;
+  let target = typeof data === "object" && data !== null ? data : {};
+  for (let index = 0;index < length; index += 1) {
+    const part = parts[index];
+    if (index === lastIndex) {
+      handleValue(target, part, value, false, shouldIgnoreCase);
+      break;
+    }
+    let next = handleValue(target, part, null, true, shouldIgnoreCase);
+    if (typeof next !== "object" || next === null) {
+      next = {};
+      target[part] = next;
+    }
+    previous = target;
+    target = next;
+  }
+  return data;
+}
+// src/js/value/smush.ts
+function flatten(value, prefix) {
+  const keys = Object.keys(value);
+  const { length } = keys;
+  const smushed = {};
+  for (let index = 0;index < length; index += 1) {
+    const key = keys[index];
+    const val = value[key];
+    if (isArrayOrPlainObject(val)) {
+      Object.assign(smushed, {
+        [join([prefix, key], ".")]: Array.isArray(val) ? [...val] : { ...val },
+        ...flatten(val, join([prefix, key], "."))
+      });
+    } else {
+      smushed[join([prefix, key], ".")] = val;
+    }
+  }
+  return smushed;
+}
+function smush(value) {
+  return flatten(value);
+}
+// src/js/value/unsmush.ts
+function getKeyGroups(value) {
+  const keys = Object.keys(value);
+  const { length } = keys;
+  const grouped = [];
+  for (let index = 0;index < length; index += 1) {
+    const key = keys[index];
+    const dots = key.split(".");
+    if (grouped[dots.length] == null) {
+      grouped[dots.length] = [key];
+    } else {
+      grouped[dots.length].push(key);
+    }
+  }
+  return grouped;
+}
+function unsmush(value) {
+  const groups = getKeyGroups(value);
+  const { length } = groups;
+  const unsmushed = {};
+  for (let groupIndex = 1;groupIndex < length; groupIndex += 1) {
+    const group = groups[groupIndex];
+    const groupLength = group.length;
+    for (let keyIndex = 0;keyIndex < groupLength; keyIndex += 1) {
+      const key = group[keyIndex];
+      const val = value[key];
+      setValue(unsmushed, key, isArrayOrPlainObject(val) ? Array.isArray(val) ? [...val] : { ...val } : val);
+    }
+  }
+  return unsmushed;
+}
+// src/js/string/template.ts
+function template(value2, variables, options) {
+  const ignoreCase = options?.ignoreCase === true;
+  const pattern = options?.pattern instanceof RegExp ? options.pattern : /{{([\s\S]+?)}}/g;
+  const values = {};
+  return value2.replace(pattern, (_, key) => {
+    if (values[key] != null) {
+      return values[key];
+    }
+    const value3 = getValue(variables, key, ignoreCase);
+    if (value3 == null) {
+      return "";
+    }
+    values[key] = String(value3);
+    return values[key];
+  });
+}
+// src/js/is.ts
+function isArrayOrPlainObject(value2) {
+  return Array.isArray(value2) || isPlainObject(value2);
+}
+function isEmpty(value2) {
+  const values = Object.values(value2);
+  const { length } = values;
+  let count2 = 0;
+  for (let index = 0;index < length; index += 1) {
+    if (values[index] != null) {
+      count2 += 1;
+    }
+  }
+  return count2 === 0;
+}
+function isKey(value2) {
+  return typeof value2 === "number" || typeof value2 === "string";
+}
+function isNullable(value2) {
+  return value2 == null;
+}
+function isNullableOrEmpty(value2) {
+  return value2 == null || getString(value2) === "";
+}
+function isNullableOrWhitespace(value2) {
+  return value2 == null || /^\s*$/.test(getString(value2));
+}
+function isNumber(value2) {
+  return typeof value2 === "number" && !Number.isNaN(value2);
+}
+function isNumerical(value2) {
+  return isNumber(value2) || typeof value2 === "string" && value2.trim().length > 0 && !Number.isNaN(+value2);
+}
+function isObject(value2) {
+  return typeof value2 === "object" && value2 !== null || typeof value2 === "function";
+}
+function isPlainObject(value2) {
+  if (typeof value2 !== "object" || value2 === null) {
+    return false;
+  }
+  const prototype = Object.getPrototypeOf(value2);
+  return (prototype === null || prototype === Object.prototype || Object.getPrototypeOf(prototype) === null) && !(Symbol.toStringTag in value2) && !(Symbol.iterator in value2);
+}
+function isPrimitive(value2) {
+  return value2 == null || /^(bigint|boolean|number|string|symbol)$/.test(typeof value2);
 }
 
 // src/js/array/sort.ts
-var comparison = function(first, second) {
+function comparison(first, second) {
   if (typeof first === "number" && typeof second === "number") {
     return first - second;
   }
   const firstAsNumber = Number(first);
   const secondAsNumber = Number(second);
   return Number.isNaN(firstAsNumber) || Number.isNaN(secondAsNumber) ? String(first).localeCompare(String(second)) : firstAsNumber - secondAsNumber;
-};
+}
 function sort(array2, first, second) {
   if (array2.length < 2) {
     return array2;
@@ -336,12 +745,12 @@ function sort(array2, first, second) {
       callback: undefined
     };
     if (isKey(key)) {
-      returned.callback = (value) => value[key];
+      returned.callback = (value2) => value2[key];
     } else if (typeof key === "function") {
       returned.callback = key;
     } else if (typeof key?.value === "function" || isKey(key?.value)) {
       returned.direction = key?.direction ?? direction;
-      returned.callback = typeof key.value === "function" ? key.value : (value) => value[key.value];
+      returned.callback = typeof key.value === "function" ? key.value : (value2) => value2[key.value];
     }
     return returned;
   }).filter((key) => typeof key.callback === "function");
@@ -378,17 +787,17 @@ function toMap(array2, first, second) {
   const map = new Map;
   const { length } = array2;
   for (let index = 0;index < length; index += 1) {
-    const value = array2[index];
-    const key = hasCallback ? callbacks?.key?.(value, index, array2) ?? index : index;
+    const value2 = array2[index];
+    const key = hasCallback ? callbacks?.key?.(value2, index, array2) ?? index : index;
     if (asArrays) {
       const existing = map.get(key);
       if (Array.isArray(existing)) {
-        existing.push(value);
+        existing.push(value2);
       } else {
-        map.set(key, [value]);
+        map.set(key, [value2]);
       }
     } else {
-      map.set(key, value);
+      map.set(key, value2);
     }
   }
   return map;
@@ -402,8 +811,8 @@ function unique(array2, key) {
   return findValues("unique", array2, undefined, key);
 }
 // src/js/colour/index.ts
-function getForegroundColour(value) {
-  const values = [value.blue / 255, value.green / 255, value.red / 255];
+function getForegroundColour(value2) {
+  const values = [value2.blue / 255, value2.green / 255, value2.red / 255];
   for (let colour of values) {
     if (colour <= 0.03928) {
       colour /= 12.92;
@@ -416,23 +825,23 @@ function getForegroundColour(value) {
 }
 
 // src/js/number.ts
-function between(value, min, max) {
-  return value >= min && value <= max;
+function between(value2, min, max) {
+  return value2 >= min && value2 <= max;
 }
-function clamp(value, min, max, loop) {
-  if (value < min) {
+function clamp(value2, min, max, loop) {
+  if (value2 < min) {
     return loop === true ? max : min;
   }
-  return value > max ? loop === true ? min : max : value;
+  return value2 > max ? loop === true ? min : max : value2;
 }
-function getNumber(value) {
-  if (typeof value === "number") {
-    return value;
+function getNumber(value2) {
+  if (typeof value2 === "number") {
+    return value2;
   }
-  if (typeof value === "symbol") {
+  if (typeof value2 === "symbol") {
     return Number.NaN;
   }
-  let parsed = value?.valueOf?.() ?? value;
+  let parsed = value2?.valueOf?.() ?? value2;
   if (typeof parsed === "object") {
     parsed = parsed?.toString() ?? parsed;
   }
@@ -459,77 +868,77 @@ function createProperty(store, key, min, max) {
     get() {
       return store[key];
     },
-    set(value) {
-      store[key] = clamp(value, min, max);
+    set(value2) {
+      store[key] = clamp(value2, min, max);
     }
   };
 }
 
 // src/js/colour/hsl.ts
 function createHsl(original) {
-  const value = { ...original };
+  const value2 = { ...original };
   const instance = Object.create({
     toHex() {
-      return hslToRgb(value).toHex();
+      return hslToRgb(value2).toHex();
     },
     toRgb() {
-      return hslToRgb(value);
+      return hslToRgb(value2);
     },
     toString() {
-      return `hsl(${value.hue}, ${value.saturation}%, ${value.lightness}%)`;
+      return `hsl(${value2.hue}, ${value2.saturation}%, ${value2.lightness}%)`;
     }
   });
   Object.defineProperties(instance, {
-    hue: createProperty(value, "hue", 0, 360),
-    lightness: createProperty(value, "lightness", 0, 100),
-    saturation: createProperty(value, "saturation", 0, 100),
-    value: { value }
+    hue: createProperty(value2, "hue", 0, 360),
+    lightness: createProperty(value2, "lightness", 0, 100),
+    saturation: createProperty(value2, "saturation", 0, 100),
+    value: { value: value2 }
   });
   return instance;
 }
-function hslToRgb(value) {
-  let hue = value.hue % 360;
+function hslToRgb(value2) {
+  let hue = value2.hue % 360;
   if (hue < 0) {
     hue += 360;
   }
-  const saturation = value.saturation / 100;
-  const lightness = value.lightness / 100;
-  function get(value2) {
-    const part = (value2 + hue / 30) % 12;
+  const saturation = value2.saturation / 100;
+  const lightness = value2.lightness / 100;
+  function get2(value3) {
+    const part = (value3 + hue / 30) % 12;
     const mod = saturation * Math.min(lightness, 1 - lightness);
     return lightness - mod * Math.max(-1, Math.min(part - 3, 9 - part, 1));
   }
   return createRgb({
-    blue: clamp(Math.round(get(4) * 255), 0, 255),
-    green: clamp(Math.round(get(8) * 255), 0, 255),
-    red: clamp(Math.round(get(0) * 255), 0, 255)
+    blue: clamp(Math.round(get2(4) * 255), 0, 255),
+    green: clamp(Math.round(get2(8) * 255), 0, 255),
+    red: clamp(Math.round(get2(0) * 255), 0, 255)
   });
 }
 
 // src/js/colour/rgb.ts
 function createRgb(original) {
-  const value = { ...original };
+  const value2 = { ...original };
   const instance = Object.create({
     toHex() {
-      return rgbToHex(value);
+      return rgbToHex(value2);
     },
     toHsl() {
-      return rgbToHsl(value);
+      return rgbToHsl(value2);
     },
     toString() {
-      return `rgb(${value.red}, ${value.green}, ${value.blue})`;
+      return `rgb(${value2.red}, ${value2.green}, ${value2.blue})`;
     }
   });
   Object.defineProperties(instance, {
-    blue: createProperty(value, "blue", 0, 255),
-    green: createProperty(value, "green", 0, 255),
-    red: createProperty(value, "red", 0, 255),
-    value: { value }
+    blue: createProperty(value2, "blue", 0, 255),
+    green: createProperty(value2, "green", 0, 255),
+    red: createProperty(value2, "red", 0, 255),
+    value: { value: value2 }
   });
   return instance;
 }
-function rgbToHex(value) {
-  return createHex(`${[value.red, value.green, value.blue].map((colour) => {
+function rgbToHex(value2) {
+  return createHex(`${[value2.red, value2.green, value2.blue].map((colour) => {
     const hex2 = colour.toString(16);
     return hex2.length === 1 ? `0${hex2}` : hex2;
   }).join("")}`);
@@ -577,39 +986,39 @@ function rgbToHsl(rgb2) {
 
 // src/js/colour/hex.ts
 function createHex(original) {
-  let value = original.slice();
+  let value2 = original.slice();
   const instance = Object.create({
     toHsl() {
-      return hexToRgb(value).toHsl();
+      return hexToRgb(value2).toHsl();
     },
     toRgb() {
-      return hexToRgb(value);
+      return hexToRgb(value2);
     },
     toString() {
-      return `#${value}`;
+      return `#${value2}`;
     }
   });
   Object.defineProperty(instance, "value", {
     get() {
-      return `#${value}`;
+      return `#${value2}`;
     },
     set(hex2) {
       if (anyPattern.test(hex2)) {
-        value = getNormalisedHex(hex2);
+        value2 = getNormalisedHex(hex2);
       }
     }
   });
   return instance;
 }
-function getHexColour(value) {
-  return createHex(anyPattern.test(value) ? getNormalisedHex(value) : "000000");
+function getHexColour(value2) {
+  return createHex(anyPattern.test(value2) ? getNormalisedHex(value2) : "000000");
 }
-var getNormalisedHex = function(value) {
-  const normalised = value.replace(/^#/, "");
+function getNormalisedHex(value2) {
+  const normalised = value2.replace(/^#/, "");
   return normalised.length === 3 ? normalised.split("").map((character) => character.repeat(2)).join("") : normalised;
-};
-function hexToRgb(value) {
-  const hex2 = anyPattern.test(value) ? getNormalisedHex(value) : "";
+}
+function hexToRgb(value2) {
+  const hex2 = anyPattern.test(value2) ? getNormalisedHex(value2) : "";
   const pairs = groupedPattern.exec(hex2) ?? [];
   const rgb3 = [];
   const { length } = pairs;
@@ -624,29 +1033,29 @@ var groupedPattern = /^#*([a-f0-9]{2})([a-f0-9]{2})([a-f0-9]{2})$/i;
 function getFocusableElements(parent) {
   return getValidElements(parent, getFocusableFilters(), false);
 }
-var getFocusableFilters = function() {
+function getFocusableFilters() {
   return [isDisabled, isInert, isHidden, isSummarised];
-};
-var getItem = function(element, tabbable) {
+}
+function getItem(element, tabbable) {
   return {
     element,
     tabIndex: tabbable ? getTabIndex(element) : -1
   };
-};
-var getTabbableFilters = function() {
+}
+function getTabbableFilters() {
   return [isNotTabbable, isNotTabbableRadio, ...getFocusableFilters()];
-};
+}
 function getTabbableElements(parent) {
   return getValidElements(parent, getTabbableFilters(), true);
 }
-var getTabIndex = function(element) {
+function getTabIndex(element) {
   const tabIndex = element?.tabIndex ?? -1;
   if (tabIndex < 0 && (/^(audio|details|video)$/i.test(element.tagName) || isEditable(element)) && !hasTabIndex(element)) {
     return 0;
   }
   return tabIndex;
-};
-var getValidElements = function(parent, filters, tabbable) {
+}
+function getValidElements(parent, filters, tabbable) {
   const items = Array.from(parent.querySelectorAll(selector)).map((element) => getItem(element, tabbable)).filter((item) => !filters.some((filter3) => filter3(item)));
   if (!tabbable) {
     return items.map((item) => item.element);
@@ -666,17 +1075,17 @@ var getValidElements = function(parent, filters, tabbable) {
     }
   }
   return [...indiced.flat(), ...zeroed];
-};
-var hasTabIndex = function(element) {
+}
+function hasTabIndex(element) {
   return !Number.isNaN(Number.parseInt(element.getAttribute("tabindex"), 10));
-};
-var isDisabled = function(item) {
+}
+function isDisabled(item) {
   if (/^(button|input|select|textarea)$/i.test(item.element.tagName) && isDisabledFromFieldset(item.element)) {
     return true;
   }
   return (item.element.disabled ?? false) || item.element.getAttribute("aria-disabled") === "true";
-};
-var isDisabledFromFieldset = function(element) {
+}
+function isDisabledFromFieldset(element) {
   let parent = element.parentElement;
   while (parent !== null) {
     if (parent instanceof HTMLFieldSetElement && parent.disabled) {
@@ -693,14 +1102,14 @@ var isDisabledFromFieldset = function(element) {
     parent = parent.parentElement;
   }
   return false;
-};
-var isEditable = function(element) {
+}
+function isEditable(element) {
   return /^(|true)$/i.test(element.getAttribute("contenteditable"));
-};
+}
 function isFocusableElement(element) {
   return isValidElement(element, getFocusableFilters(), false);
 }
-var isHidden = function(item) {
+function isHidden(item) {
   if ((item.element.hidden ?? false) || item.element instanceof HTMLInputElement && item.element.type === "hidden") {
     return true;
   }
@@ -715,17 +1124,17 @@ var isHidden = function(item) {
   }
   const { height, width } = item.element.getBoundingClientRect();
   return height === 0 && width === 0;
-};
-var isInert = function(item) {
+}
+function isInert(item) {
   return (item.element.inert ?? false) || /^(|true)$/i.test(item.element.getAttribute("inert")) || item.element.parentElement !== null && isInert({
     element: item.element.parentElement,
     tabIndex: -1
   });
-};
-var isNotTabbable = function(item) {
+}
+function isNotTabbable(item) {
   return (item.tabIndex ?? -1) < 0;
-};
-var isNotTabbableRadio = function(item) {
+}
+function isNotTabbableRadio(item) {
   if (!(item.element instanceof HTMLInputElement) || item.element.type !== "radio" || !item.element.name || item.element.checked) {
     return false;
   }
@@ -734,17 +1143,17 @@ var isNotTabbableRadio = function(item) {
   const radios = Array.from(parent.querySelectorAll(`input[type="radio"][name="${realName}"]`));
   const checked = radios.find((radio) => radio.checked);
   return checked !== undefined && checked !== item.element;
-};
-var isSummarised = function(item) {
+}
+function isSummarised(item) {
   return item.element instanceof HTMLDetailsElement && Array.from(item.element.children).some((child) => /^summary$/i.test(child.tagName));
-};
+}
 function isTabbableElement(element) {
   return isValidElement(element, getTabbableFilters(), true);
 }
-var isValidElement = function(element, filters, tabbable) {
+function isValidElement(element, filters, tabbable) {
   const item = getItem(element, tabbable);
   return !filters.some((filter3) => filter3(item));
-};
+}
 var selector = [
   '[contenteditable]:not([contenteditable="false"])',
   "[tabindex]:not(slot)",
@@ -778,7 +1187,7 @@ function getTextDirection(element) {
 }
 
 // src/js/element/closest.ts
-var calculateDistance = function(origin, target) {
+function calculateDistance(origin, target) {
   const comparison2 = origin.compareDocumentPosition(target);
   const children = [...origin.parentElement?.children ?? []];
   switch (true) {
@@ -791,7 +1200,7 @@ var calculateDistance = function(origin, target) {
     default:
       return -1;
   }
-};
+}
 function closest(origin, selector2, context) {
   const elements = [...(context ?? document).querySelectorAll(selector2)];
   const { length } = elements;
@@ -816,7 +1225,7 @@ function closest(origin, selector2, context) {
   }
   return minimum == null ? [] : distances.filter((found) => found.distance === minimum).map((found) => found.element);
 }
-var traverse = function(from, to) {
+function traverse(from, to) {
   const children = [...to.children];
   if (children.includes(from)) {
     return children.indexOf(from) + 1;
@@ -841,23 +1250,25 @@ var traverse = function(from, to) {
     parent = parent.parentElement;
   }
   return -1e6;
-};
+}
 // src/js/internal/element-value.ts
 function setElementValues(element, first, second, callback) {
   if (isPlainObject(first)) {
     const entries = Object.entries(first);
-    for (const [key, value] of entries) {
-      callback(element, key, value);
+    const { length } = entries;
+    for (let index = 0;index < length; index += 1) {
+      const [key, value2] = entries[index];
+      callback(element, key, value2);
     }
   } else if (first != null) {
     callback(element, first, second);
   }
 }
-function updateElementValue(element, key, value, set, remove, json) {
-  if (isNullableOrWhitespace(value)) {
+function updateElementValue(element, key, value2, set3, remove, json) {
+  if (isNullableOrWhitespace(value2)) {
     remove.call(element, key);
   } else {
-    set.call(element, key, json ? JSON.stringify(value) : String(value));
+    set3.call(element, key, json ? JSON.stringify(value2) : String(value2));
   }
 }
 
@@ -867,44 +1278,46 @@ function getData(element, keys) {
     return getDataValue(element, keys);
   }
   const data = {};
-  for (const key of keys) {
+  const { length } = keys;
+  for (let index = 0;index < length; index += 1) {
+    const key = keys[index];
     data[key] = getDataValue(element, key);
   }
   return data;
 }
-var getDataValue = function(element, key) {
-  const value = element.dataset[key];
-  if (value != null) {
-    return parse(value);
+function getDataValue(element, key) {
+  const value2 = element.dataset[key];
+  if (value2 != null) {
+    return parse(value2);
   }
-};
+}
 function setData(element, first, second) {
   setElementValues(element, first, second, updateDataAttribute);
 }
-var updateDataAttribute = function(element, key, value) {
-  updateElementValue(element, `data-${key}`, value, element.setAttribute, element.removeAttribute, true);
-};
+function updateDataAttribute(element, key, value2) {
+  updateElementValue(element, `data-${key}`, value2, element.setAttribute, element.removeAttribute, true);
+}
 // src/js/element/find.ts
 function findElement(selector2, context) {
   return findElementOrElements(selector2, context, true);
 }
-var findElementOrElements = function(selector2, context, single) {
+function findElementOrElements(selector2, context, single) {
   const callback = single ? document.querySelector : document.querySelectorAll;
   const contexts = context == null ? [document] : findElementOrElements(context, undefined, false);
   const result = [];
   if (typeof selector2 === "string") {
     const { length: length2 } = contexts;
     for (let index = 0;index < length2; index += 1) {
-      const value = callback.call(contexts[index], selector2);
+      const value2 = callback.call(contexts[index], selector2);
       if (single) {
-        if (value == null) {
+        if (value2 == null) {
           continue;
         }
-        return value;
+        return value2;
       }
-      result.push(...Array.from(value));
+      result.push(...Array.from(value2));
     }
-    return single ? undefined : result.filter((value, index, array2) => array2.indexOf(value) === index);
+    return single ? undefined : result.filter((value2, index, array2) => array2.indexOf(value2) === index);
   }
   const nodes = Array.isArray(selector2) ? selector2 : selector2 instanceof NodeList ? Array.from(selector2) : [selector2];
   const { length } = nodes;
@@ -916,7 +1329,7 @@ var findElementOrElements = function(selector2, context, single) {
     }
   }
   return result;
-};
+}
 function findElements(selector2, context) {
   return findElementOrElements(selector2, context, false);
 }
@@ -946,23 +1359,23 @@ function findParentElement(origin, selector2) {
 function setStyles(element, first, second) {
   setElementValues(element, first, second, updateStyleProperty);
 }
-var updateStyleProperty = function(element, key, value) {
-  updateElementValue(element, key, value, function(key2, value2) {
-    this.style[key2] = value2;
+function updateStyleProperty(element, key, value2) {
+  updateElementValue(element, key, value2, function(key2, value3) {
+    this.style[key2] = value3;
   }, function(key2) {
     this.style[key2] = "";
   }, false);
-};
+}
 // src/js/emitter.ts
-var createObserable = function(emitter, observers) {
+function createObserable(emitter, observers) {
   const instance = Object.create({
     subscribe(first, second, third) {
       return createSubscription(emitter, observers, getObserver(first, second, third));
     }
   });
   return instance;
-};
-var createSubscription = function(emitter, observers, observer) {
+}
+function createSubscription(emitter, observers, observer) {
   let closed = false;
   const instance = Object.create({
     unsubscribe() {
@@ -980,8 +1393,8 @@ var createSubscription = function(emitter, observers, observer) {
   observers.set(instance, observer);
   observer.next?.(emitter.value);
   return instance;
-};
-var getObserver = function(first, second, third) {
+}
+function getObserver(first, second, third) {
   let observer;
   if (typeof first === "object") {
     observer = first;
@@ -993,10 +1406,10 @@ var getObserver = function(first, second, third) {
     };
   }
   return observer;
-};
-function emitter(value) {
+}
+function emitter(value2) {
   let active = true;
-  let stored = value;
+  let stored = value2;
   function finish(emit) {
     if (active) {
       active = false;
@@ -1013,11 +1426,11 @@ function emitter(value) {
     destroy() {
       finish(false);
     },
-    emit(value2, complete) {
+    emit(value3, complete) {
       if (active) {
-        stored = value2;
+        stored = value3;
         for (const [, observer] of observers) {
-          observer.next?.(value2);
+          observer.next?.(value3);
         }
         if (complete === true) {
           finish(true);
@@ -1087,14 +1500,14 @@ function debounce(callback, time) {
   return debounced;
 }
 function memoise(callback) {
-  function get(...parameters) {
+  function get2(...parameters) {
     const key = parameters[0];
     if (cache.has(key)) {
       return cache.get(key);
     }
-    const value = callback(...parameters);
-    cache.set(key, value);
-    return value;
+    const value2 = callback(...parameters);
+    cache.set(key, value2);
+    return value2;
   }
   const cache = new Map;
   return Object.create({
@@ -1112,7 +1525,7 @@ function memoise(callback) {
       return cache.has(key);
     },
     run(...parameters) {
-      return get(...parameters);
+      return get2(...parameters);
     }
   });
 }
@@ -1138,7 +1551,7 @@ function throttle(callback, time) {
   };
 }
 // src/js/logger.ts
-var time = function(label) {
+function time(label) {
   const started = logger.enabled;
   let stopped = false;
   if (started) {
@@ -1157,7 +1570,7 @@ var time = function(label) {
       }
     }
   });
-};
+}
 if (globalThis._atomic_logging == null) {
   globalThis._atomic_logging = true;
 }
@@ -1178,8 +1591,8 @@ var logger = (() => {
       get() {
         return _atomic_logging ?? true;
       },
-      set(value) {
-        _atomic_logging = value;
+      set(value2) {
+        _atomic_logging = value2;
       }
     },
     time: {
@@ -1205,374 +1618,15 @@ function max(values) {
 function min(values) {
   return values.length > 0 ? Math.min(...values) : Number.NaN;
 }
-function round(value, decimals) {
+function round(value2, decimals) {
   if (typeof decimals !== "number" || decimals < 1) {
-    return Math.round(value);
+    return Math.round(value2);
   }
   const mod = 10 ** decimals;
-  return Math.round((value + Number.EPSILON) * mod) / mod;
+  return Math.round((value2 + Number.EPSILON) * mod) / mod;
 }
 function sum(values) {
   return values.reduce((previous, current) => previous + current, 0);
-}
-// src/js/value/index.ts
-function partial(value, keys) {
-  const { length } = keys;
-  const result = {};
-  for (let index = 0;index < length; index += 1) {
-    const key = keys[index];
-    result[key] = value[key];
-  }
-  return result;
-}
-
-// src/js/value/clone.ts
-function clone(value) {
-  switch (true) {
-    case value == null:
-      return value;
-    case typeof value === "bigint":
-      return BigInt(value);
-    case typeof value === "boolean":
-      return Boolean(value);
-    case typeof value === "function":
-      return;
-    case typeof value === "number":
-      return Number(value);
-    case typeof value === "string":
-      return String(value);
-    case typeof value === "symbol":
-      return Symbol(value.description);
-    case value instanceof ArrayBuffer:
-      return cloneArrayBuffer(value);
-    case value instanceof DataView:
-      return cloneDataView(value);
-    case value instanceof Node:
-      return value.cloneNode(true);
-    case value instanceof RegExp:
-      return cloneRegularExpression(value);
-    case isArrayOrPlainObject(value):
-      return cloneNested(value);
-    default:
-      return structuredClone(value);
-  }
-}
-var cloneArrayBuffer = function(value) {
-  const cloned = new ArrayBuffer(value.byteLength);
-  new Uint8Array(cloned).set(new Uint8Array(value));
-  return cloned;
-};
-var cloneDataView = function(value) {
-  const buffer = cloneArrayBuffer(value.buffer);
-  return new DataView(buffer, value.byteOffset, value.byteLength);
-};
-var cloneNested = function(value) {
-  const cloned = Array.isArray(value) ? [] : {};
-  const keys = Object.keys(value);
-  const { length } = keys;
-  for (let index = 0;index < length; index += 1) {
-    const key = keys[index];
-    cloned[key] = clone(value[key]);
-  }
-  return cloned;
-};
-var cloneRegularExpression = function(value) {
-  const cloned = new RegExp(value.source, value.flags);
-  cloned.lastIndex = value.lastIndex;
-  return cloned;
-};
-// src/js/value/equal.ts
-function equal(first, second, ignoreCase) {
-  switch (true) {
-    case first === second:
-      return true;
-    case (first == null || second == null):
-      return first === second;
-    case typeof first !== typeof second:
-      return false;
-    case (first instanceof ArrayBuffer && second instanceof ArrayBuffer):
-      return equalArrayBuffer(first, second);
-    case typeof first === "boolean":
-    case (first instanceof Date && second instanceof Date):
-      return Object.is(Number(first), Number(second));
-    case (first instanceof DataView && second instanceof DataView):
-      return equalDataView(first, second);
-    case (first instanceof Error && second instanceof Error):
-      return equalProperties(first, second, ["name", "message"]);
-    case (first instanceof Map && second instanceof Map):
-      return equalMap(first, second);
-    case (first instanceof RegExp && second instanceof RegExp):
-      return equalProperties(first, second, ["source", "flags"]);
-    case (first instanceof Set && second instanceof Set):
-      return equalSet(first, second);
-    case (Array.isArray(first) && Array.isArray(second)):
-    case (isPlainObject(first) && isPlainObject(second)):
-      return equalNested(first, second);
-    case (typeof first === "string" && ignoreCase === true):
-      return Object.is(first.toLowerCase(), second.toLowerCase());
-    default:
-      return Object.is(first, second);
-  }
-}
-var equalArrayBuffer = function(first, second) {
-  return first.byteLength === second.byteLength ? equalNested(new Uint8Array(first), new Uint8Array(second)) : false;
-};
-var equalDataView = function(first, second) {
-  return first.byteOffset === second.byteOffset ? equalArrayBuffer(first.buffer, second.buffer) : false;
-};
-var equalMap = function(first, second) {
-  if (first.size !== second.size) {
-    return false;
-  }
-  const firstKeys = [...first.keys()];
-  const secondKeys = [...second.keys()];
-  if (firstKeys.some((key) => !secondKeys.includes(key))) {
-    return false;
-  }
-  for (const [key, value] of first) {
-    if (!equal(value, second.get(key))) {
-      return false;
-    }
-  }
-  return true;
-};
-var equalNested = function(first, second) {
-  const firstKeys = Object.keys(first);
-  const secondKeys = Object.keys(second);
-  const { length } = firstKeys;
-  if (length !== secondKeys.length || firstKeys.some((key) => !secondKeys.includes(key))) {
-    return false;
-  }
-  for (let index = 0;index < length; index += 1) {
-    const key = firstKeys[index];
-    if (!equal(first[key], second[key])) {
-      return false;
-    }
-  }
-  return true;
-};
-var equalProperties = function(first, second, properties) {
-  for (const key of properties) {
-    if (!Object.is(first[key], second[key])) {
-      return false;
-    }
-  }
-  return true;
-};
-var equalSet = function(first, second) {
-  const { size } = first;
-  if (size !== second.size) {
-    return false;
-  }
-  const values = [...second];
-  for (const item of first) {
-    if (!values.some((value) => equal(item, value))) {
-      return false;
-    }
-  }
-  return true;
-};
-
-// src/js/value/diff.ts
-function diff(first, second) {
-  const result = {
-    original: {
-      from: first,
-      to: second
-    },
-    type: "partial",
-    values: {}
-  };
-  const same = Object.is(first, second);
-  const firstIsArrayOrObject = isArrayOrPlainObject(first);
-  const secondIsArrayOrObject = isArrayOrPlainObject(second);
-  if (same || !firstIsArrayOrObject && !secondIsArrayOrObject) {
-    result.type = same ? "none" : "full";
-    return result;
-  }
-  if (firstIsArrayOrObject !== secondIsArrayOrObject) {
-    result.type = "full";
-  }
-  const diffs = getDiffs(first, second);
-  const { length } = diffs;
-  if (length === 0) {
-    result.type = "none";
-  }
-  for (let index = 0;index < length; index += 1) {
-    const diff2 = diffs[index];
-    result.values[diff2.key] = { from: diff2.from, to: diff2.to };
-  }
-  return result;
-}
-var getDiffs = function(first, second, prefix) {
-  const changes = [];
-  const checked = new Set;
-  for (let outerIndex = 0;outerIndex < 2; outerIndex += 1) {
-    const value = outerIndex === 0 ? first : second;
-    if (!value) {
-      continue;
-    }
-    const keys = Object.keys(value);
-    const { length } = keys;
-    for (let innerIndex = 0;innerIndex < length; innerIndex += 1) {
-      const key = keys[innerIndex];
-      if (checked.has(key)) {
-        continue;
-      }
-      const from = first?.[key];
-      const to = second?.[key];
-      if (!equal(from, to)) {
-        const prefixed = join([prefix, key], ".");
-        const change = {
-          from,
-          to,
-          key: prefixed
-        };
-        const nested = isArrayOrPlainObject(from) || isArrayOrPlainObject(to);
-        const diffs = nested ? getDiffs(from, to, prefixed) : [];
-        if (!nested || nested && diffs.length > 0) {
-          changes.push(change);
-        }
-        changes.push(...diffs);
-      }
-      checked.add(key);
-    }
-  }
-  return changes;
-};
-// src/js/internal/value-handle.ts
-var findKey = function(needle, haystack, ignoreCase) {
-  if (!ignoreCase) {
-    return needle;
-  }
-  const keys = Object.keys(haystack);
-  const normalised = keys.map((key) => key.toLowerCase());
-  const index = normalised.indexOf(needle.toLowerCase());
-  return index > -1 ? keys[index] : needle;
-};
-function handleValue(data2, path, value, get, ignoreCase) {
-  if (typeof data2 === "object" && data2 !== null && !/^(__proto__|constructor|prototype)$/i.test(path)) {
-    const key = findKey(path, data2, ignoreCase);
-    if (get) {
-      return data2[key];
-    }
-    data2[key] = value;
-  }
-}
-
-// src/js/value/get.ts
-function getValue(data2, path, ignoreCase) {
-  const shouldIgnoreCase = ignoreCase === true;
-  const parts = (shouldIgnoreCase ? path.toLowerCase() : path).split(".");
-  const { length } = parts;
-  let index = 0;
-  let value = typeof data2 === "object" ? data2 ?? {} : {};
-  while (index < length && value != null) {
-    value = handleValue(value, parts[index++], null, true, shouldIgnoreCase);
-  }
-  return value;
-}
-// src/js/value/merge.ts
-function merge(...values) {
-  if (values.length === 0) {
-    return {};
-  }
-  const actual = values.filter((value) => isArrayOrPlainObject(value));
-  const result = actual.every(Array.isArray) ? [] : {};
-  const { length } = actual;
-  for (let outerIndex = 0;outerIndex < length; outerIndex += 1) {
-    const item = actual[outerIndex];
-    const keys = Object.keys(item);
-    const size = keys.length;
-    for (let innerIndex = 0;innerIndex < size; innerIndex += 1) {
-      const key = keys[innerIndex];
-      const next = item[key];
-      const previous = result[key];
-      if (isArrayOrPlainObject(next)) {
-        result[key] = isArrayOrPlainObject(previous) ? merge(previous, next) : merge(next);
-      } else {
-        result[key] = next;
-      }
-    }
-  }
-  return result;
-}
-// src/js/value/set.ts
-function setValue(data2, path, value, ignoreCase) {
-  const shouldIgnoreCase = ignoreCase === true;
-  const parts = (shouldIgnoreCase ? path.toLowerCase() : path).split(".");
-  const { length } = parts;
-  const lastIndex = length - 1;
-  let previous;
-  let target = typeof data2 === "object" && data2 !== null ? data2 : {};
-  for (let index = 0;index < length; index += 1) {
-    const part = parts[index];
-    if (index === lastIndex) {
-      handleValue(target, part, value, false, shouldIgnoreCase);
-      break;
-    }
-    let next = handleValue(target, part, null, true, shouldIgnoreCase);
-    if (typeof next !== "object" || next === null) {
-      next = {};
-      target[part] = next;
-    }
-    previous = target;
-    target = next;
-  }
-  return data2;
-}
-// src/js/value/smush.ts
-var flatten2 = function(value, prefix) {
-  const keys = Object.keys(value);
-  const { length } = keys;
-  const smushed = {};
-  for (let index = 0;index < length; index += 1) {
-    const key = keys[index];
-    const val = value[key];
-    if (isArrayOrPlainObject(val)) {
-      Object.assign(smushed, {
-        [join([prefix, key], ".")]: Array.isArray(val) ? [...val] : { ...val },
-        ...flatten2(val, join([prefix, key], "."))
-      });
-    } else {
-      smushed[join([prefix, key], ".")] = val;
-    }
-  }
-  return smushed;
-};
-function smush(value) {
-  return flatten2(value);
-}
-// src/js/value/unsmush.ts
-var getKeyGroups = function(value) {
-  const keys = Object.keys(value);
-  const { length } = keys;
-  const grouped = [];
-  for (let index = 0;index < length; index += 1) {
-    const key = keys[index];
-    const dots = key.split(".");
-    if (grouped[dots.length] == null) {
-      grouped[dots.length] = [key];
-    } else {
-      grouped[dots.length].push(key);
-    }
-  }
-  return grouped;
-};
-function unsmush(value) {
-  const groups = getKeyGroups(value);
-  const { length } = groups;
-  const unsmushed = {};
-  for (let groupIndex = 1;groupIndex < length; groupIndex += 1) {
-    const group = groups[groupIndex];
-    const groupLength = group.length;
-    for (let keyIndex = 0;keyIndex < groupLength; keyIndex += 1) {
-      const key = group[keyIndex];
-      const val = value[key];
-      setValue(unsmushed, key, isArrayOrPlainObject(val) ? Array.isArray(val) ? [...val] : { ...val } : val);
-    }
-  }
-  return unsmushed;
 }
 // src/js/query.ts
 function fromQuery(query) {
@@ -1580,32 +1634,32 @@ function fromQuery(query) {
   const { length } = parts;
   const parameters = {};
   for (let outer = 0;outer < length; outer += 1) {
-    const [key, value2] = parts[outer].split("=").map(decodeURIComponent);
+    const [key, value3] = parts[outer].split("=").map(decodeURIComponent);
     if (isNullableOrWhitespace(key)) {
       continue;
     }
     if (key.includes(".")) {
-      setValue(parameters, key, getValue2(value2));
+      setValue(parameters, key, getValue2(value3));
     } else {
       if (key in parameters) {
         if (!Array.isArray(parameters[key])) {
           parameters[key] = [parameters[key]];
         }
-        parameters[key].push(getValue2(value2));
+        parameters[key].push(getValue2(value3));
       } else {
-        parameters[key] = getValue2(value2);
+        parameters[key] = getValue2(value3);
       }
     }
   }
   return parameters;
 }
-var getParts = function(value2, fromArray, prefix) {
-  const keys = Object.keys(value2);
+function getParts(value3, fromArray, prefix) {
+  const keys = Object.keys(value3);
   const { length } = keys;
   const parts = [];
   for (let index = 0;index < length; index += 1) {
     const key = keys[index];
-    const val = value2[key];
+    const val = value3[key];
     if (Array.isArray(val)) {
       parts.push(...getParts(val, true, join([prefix, fromArray ? null : key], ".")));
     } else if (isPlainObject(val)) {
@@ -1615,20 +1669,20 @@ var getParts = function(value2, fromArray, prefix) {
     }
   }
   return parts;
-};
-var getValue2 = function(value2) {
-  if (/^(false|true)$/.test(value2)) {
-    return value2 === "true";
+}
+function getValue2(value3) {
+  if (/^(false|true)$/.test(value3)) {
+    return value3 === "true";
   }
-  const asNumber = Number(value2);
+  const asNumber = Number(value3);
   if (!Number.isNaN(asNumber)) {
     return asNumber;
   }
-  return value2;
-};
-var isDecodable = function(value2) {
-  return ["boolean", "number", "string"].includes(typeof value2);
-};
+  return value3;
+}
+function isDecodable(value3) {
+  return ["boolean", "number", "string"].includes(typeof value3);
+}
 function toQuery(parameters) {
   return getParts(parameters, false).filter((part) => part.length > 0).join("&");
 }
@@ -1637,10 +1691,11 @@ function queue(callback) {
   _atomic_queued.add(callback);
   if (_atomic_queued.size > 0) {
     queueMicrotask(() => {
-      const callbacks = Array.from(_atomic_queued);
+      const callbacks = [..._atomic_queued];
+      const { length } = callbacks;
       _atomic_queued.clear();
-      for (const callback2 of callbacks) {
-        callback2();
+      for (let index = 0;index < length; index += 1) {
+        callbacks[index]();
       }
     });
   }
@@ -1663,28 +1718,28 @@ function delay(time2, timeout) {
     });
   });
 }
-var getValueOrDefault = function(value2, defaultValue, minimum) {
-  return typeof value2 === "number" && value2 > (minimum ?? 0) ? value2 : defaultValue;
-};
-var is10 = function(value2, pattern) {
-  return pattern.test(value2?.$timer);
-};
-function isRepeated(value2) {
-  return is10(value2, /^repeat$/);
+function getValueOrDefault(value3, defaultValue, minimum) {
+  return typeof value3 === "number" && value3 > (minimum ?? 0) ? value3 : defaultValue;
 }
-function isTimer(value2) {
-  return is10(value2, /^repeat|wait$/);
+function is10(value3, pattern) {
+  return pattern.test(value3?.$timer);
 }
-function isWaited(value2) {
-  return is10(value2, /^wait$/);
+function isRepeated(value3) {
+  return is10(value3, /^repeat$/);
 }
-function isWhen(value2) {
-  return is10(value2, /^when$/) && typeof value2.then === "function";
+function isTimer(value3) {
+  return is10(value3, /^repeat|wait$/);
+}
+function isWaited(value3) {
+  return is10(value3, /^wait$/);
+}
+function isWhen(value3) {
+  return is10(value3, /^when$/) && typeof value3.then === "function";
 }
 function repeat(callback, options) {
   return timer("repeat", callback, options ?? {}, true);
 }
-var timer = function(type, callback, partial2, start) {
+function timer(type, callback, partial2, start) {
   const isRepeated2 = type === "repeat";
   const options = {
     afterCallback: partial2.afterCallback,
@@ -1743,7 +1798,7 @@ var timer = function(type, callback, partial2, start) {
     instance.start();
   }
   return instance;
-};
+}
 function wait(callback, options) {
   return timer("wait", callback, options == null || typeof options === "number" ? {
     interval: options
@@ -1810,7 +1865,7 @@ function when(condition, options) {
   });
   return instance;
 }
-var work = function(type, timer2, state, options, isRepeated2) {
+function work(type, timer2, state, options, isRepeated2) {
   if (["continue", "start"].includes(type) && state.active || ["pause", "stop"].includes(type) && !state.active) {
     return timer2;
   }
@@ -1883,7 +1938,7 @@ var work = function(type, timer2, state, options, isRepeated2) {
   activeTimers.add(timer2);
   state.frame = requestAnimationFrame(step);
   return timer2;
-};
+}
 if (globalThis._atomic_timers == null) {
   Object.defineProperty(globalThis, "_atomic_timers", {
     get() {
@@ -1916,21 +1971,21 @@ document.addEventListener("visibilitychange", () => {
 });
 // src/js/touch.ts
 var supportsTouch = (() => {
-  let value2 = false;
+  let value3 = false;
   try {
     if ("matchMedia" in window) {
       const media = matchMedia("(pointer: coarse)");
       if (typeof media?.matches === "boolean") {
-        value2 = media.matches;
+        value3 = media.matches;
       }
     }
-    if (!value2) {
-      value2 = "ontouchstart" in window || navigator.maxTouchPoints > 0 || (navigator.msMaxTouchPoints ?? 0) > 0;
+    if (!value3) {
+      value3 = "ontouchstart" in window || navigator.maxTouchPoints > 0 || (navigator.msMaxTouchPoints ?? 0) > 0;
     }
   } catch {
-    value2 = false;
+    value3 = false;
   }
-  return value2;
+  return value3;
 })();
 export {
   words,
@@ -1944,6 +1999,7 @@ export {
   toMap,
   titleCase,
   throttle,
+  template,
   sum,
   splice,
   sort,
@@ -2013,7 +2069,7 @@ export {
   getElementUnderPointer,
   getData,
   fromQuery,
-  flatten,
+  flatten2 as flatten,
   findParentElement,
   findElements,
   findElement,
