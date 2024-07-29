@@ -1,6 +1,9 @@
 function calculateDistance(origin: Element, target: Element): number {
-	const comparison = origin.compareDocumentPosition(target);
+	if (origin === target || origin.parentElement === target) {
+		return 0;
+	}
 
+	const comparison = origin.compareDocumentPosition(target);
 	const children = [...(origin.parentElement?.children ?? [])];
 
 	switch (true) {
@@ -29,6 +32,10 @@ export function closest(
 	selector: string,
 	context?: Document | Element,
 ): Element[] {
+	if (origin.matches(selector)) {
+		return [origin];
+	}
+
 	const elements = [...(context ?? document).querySelectorAll(selector)];
 	const {length} = elements;
 

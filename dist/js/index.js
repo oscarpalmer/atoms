@@ -1188,6 +1188,9 @@ function getTextDirection(element) {
 
 // src/js/element/closest.ts
 function calculateDistance(origin, target) {
+  if (origin === target || origin.parentElement === target) {
+    return 0;
+  }
   const comparison2 = origin.compareDocumentPosition(target);
   const children = [...origin.parentElement?.children ?? []];
   switch (true) {
@@ -1202,6 +1205,9 @@ function calculateDistance(origin, target) {
   }
 }
 function closest(origin, selector2, context) {
+  if (origin.matches(selector2)) {
+    return [origin];
+  }
   const elements = [...(context ?? document).querySelectorAll(selector2)];
   const { length } = elements;
   if (length === 0) {

@@ -58,6 +58,14 @@ test('closest', () => {
 	<li class="target">6</li>
 	<li class="target">7</li>
 </ul>
+
+<ul>
+<li class="target"><button></button></li>
+<li class="target"><button></button></li>
+<li class="target"><button class="origin">good</button></li>
+<li class="target"><button></button></li>
+<li class="target"><button></button></li>
+</ul>
 `;
 
 	const element = document.createElement('div');
@@ -66,13 +74,15 @@ test('closest', () => {
 
 	const divOrigin = $('div.origin', element);
 	const liOrigin = $('li.origin', element);
+	const buttonOrigin = $('button.origin', element);
 
-	if (divOrigin == null || liOrigin == null) {
+	if (divOrigin == null || liOrigin == null || buttonOrigin == null) {
 		return;
 	}
 
 	const divTargets = closest(divOrigin, 'div.target', element);
 	const liTargets = closest(liOrigin, 'li.target', element);
+	const buttonTargets = closest(buttonOrigin, 'li.target', element);
 
 	expect(divTargets.length).toBe(2);
 	expect(divTargets.map(target => target.textContent?.trim())).toEqual([
@@ -85,6 +95,11 @@ test('closest', () => {
 		'3',
 		'5',
 	]);
+
+	expect(buttonTargets.length).toBe(1);
+	expect(buttonTargets[0].textContent?.trim()).toBe('good');
+
+	expect(closest(buttonOrigin, 'button.origin', element)[0]).toBe(buttonOrigin);
 
 	expect(closest(liOrigin, '.not-found').length).toBe(0);
 });
