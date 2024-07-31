@@ -18,7 +18,7 @@ function join(value2, delimiter) {
   return compact(value2).map(getString).filter((value3) => value3.trim().length > 0).join(typeof delimiter === "string" ? delimiter : "");
 }
 // src/js/internal/value-handle.ts
-var findKey = function(needle, haystack, ignoreCase) {
+function findKey(needle, haystack, ignoreCase) {
   if (!ignoreCase) {
     return needle;
   }
@@ -26,7 +26,7 @@ var findKey = function(needle, haystack, ignoreCase) {
   const normalised = keys.map((key) => key.toLowerCase());
   const index = normalised.indexOf(needle.toLowerCase());
   return index > -1 ? keys[index] : needle;
-};
+}
 function handleValue(data, path, value, get, ignoreCase) {
   if (typeof data === "object" && data !== null && !/^(__proto__|constructor|prototype)$/i.test(path)) {
     const key = findKey(path, data, ignoreCase);
@@ -97,7 +97,7 @@ function fromQuery(query) {
   }
   return parameters;
 }
-var getParts = function(value3, fromArray, prefix) {
+function getParts(value3, fromArray, prefix) {
   const keys = Object.keys(value3);
   const { length } = keys;
   const parts = [];
@@ -113,8 +113,8 @@ var getParts = function(value3, fromArray, prefix) {
     }
   }
   return parts;
-};
-var getValue2 = function(value3) {
+}
+function getValue2(value3) {
   if (/^(false|true)$/.test(value3)) {
     return value3 === "true";
   }
@@ -123,10 +123,10 @@ var getValue2 = function(value3) {
     return asNumber;
   }
   return value3;
-};
-var isDecodable = function(value3) {
+}
+function isDecodable(value3) {
   return ["boolean", "number", "string"].includes(typeof value3);
-};
+}
 function toQuery(parameters) {
   return getParts(parameters, false).filter((part) => part.length > 0).join("&");
 }

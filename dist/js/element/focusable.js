@@ -2,29 +2,29 @@
 function getFocusableElements(parent) {
   return getValidElements(parent, getFocusableFilters(), false);
 }
-var getFocusableFilters = function() {
+function getFocusableFilters() {
   return [isDisabled, isInert, isHidden, isSummarised];
-};
-var getItem = function(element, tabbable) {
+}
+function getItem(element, tabbable) {
   return {
     element,
     tabIndex: tabbable ? getTabIndex(element) : -1
   };
-};
-var getTabbableFilters = function() {
+}
+function getTabbableFilters() {
   return [isNotTabbable, isNotTabbableRadio, ...getFocusableFilters()];
-};
+}
 function getTabbableElements(parent) {
   return getValidElements(parent, getTabbableFilters(), true);
 }
-var getTabIndex = function(element) {
+function getTabIndex(element) {
   const tabIndex = element?.tabIndex ?? -1;
   if (tabIndex < 0 && (/^(audio|details|video)$/i.test(element.tagName) || isEditable(element)) && !hasTabIndex(element)) {
     return 0;
   }
   return tabIndex;
-};
-var getValidElements = function(parent, filters, tabbable) {
+}
+function getValidElements(parent, filters, tabbable) {
   const items = Array.from(parent.querySelectorAll(selector)).map((element) => getItem(element, tabbable)).filter((item) => !filters.some((filter) => filter(item)));
   if (!tabbable) {
     return items.map((item) => item.element);
@@ -44,17 +44,17 @@ var getValidElements = function(parent, filters, tabbable) {
     }
   }
   return [...indiced.flat(), ...zeroed];
-};
-var hasTabIndex = function(element) {
+}
+function hasTabIndex(element) {
   return !Number.isNaN(Number.parseInt(element.getAttribute("tabindex"), 10));
-};
-var isDisabled = function(item) {
+}
+function isDisabled(item) {
   if (/^(button|input|select|textarea)$/i.test(item.element.tagName) && isDisabledFromFieldset(item.element)) {
     return true;
   }
   return (item.element.disabled ?? false) || item.element.getAttribute("aria-disabled") === "true";
-};
-var isDisabledFromFieldset = function(element) {
+}
+function isDisabledFromFieldset(element) {
   let parent = element.parentElement;
   while (parent !== null) {
     if (parent instanceof HTMLFieldSetElement && parent.disabled) {
@@ -71,14 +71,14 @@ var isDisabledFromFieldset = function(element) {
     parent = parent.parentElement;
   }
   return false;
-};
-var isEditable = function(element) {
+}
+function isEditable(element) {
   return /^(|true)$/i.test(element.getAttribute("contenteditable"));
-};
+}
 function isFocusableElement(element) {
   return isValidElement(element, getFocusableFilters(), false);
 }
-var isHidden = function(item) {
+function isHidden(item) {
   if ((item.element.hidden ?? false) || item.element instanceof HTMLInputElement && item.element.type === "hidden") {
     return true;
   }
@@ -93,17 +93,17 @@ var isHidden = function(item) {
   }
   const { height, width } = item.element.getBoundingClientRect();
   return height === 0 && width === 0;
-};
-var isInert = function(item) {
+}
+function isInert(item) {
   return (item.element.inert ?? false) || /^(|true)$/i.test(item.element.getAttribute("inert")) || item.element.parentElement !== null && isInert({
     element: item.element.parentElement,
     tabIndex: -1
   });
-};
-var isNotTabbable = function(item) {
+}
+function isNotTabbable(item) {
   return (item.tabIndex ?? -1) < 0;
-};
-var isNotTabbableRadio = function(item) {
+}
+function isNotTabbableRadio(item) {
   if (!(item.element instanceof HTMLInputElement) || item.element.type !== "radio" || !item.element.name || item.element.checked) {
     return false;
   }
@@ -112,17 +112,17 @@ var isNotTabbableRadio = function(item) {
   const radios = Array.from(parent.querySelectorAll(`input[type="radio"][name="${realName}"]`));
   const checked = radios.find((radio) => radio.checked);
   return checked !== undefined && checked !== item.element;
-};
-var isSummarised = function(item) {
+}
+function isSummarised(item) {
   return item.element instanceof HTMLDetailsElement && Array.from(item.element.children).some((child) => /^summary$/i.test(child.tagName));
-};
+}
 function isTabbableElement(element) {
   return isValidElement(element, getTabbableFilters(), true);
 }
-var isValidElement = function(element, filters, tabbable) {
+function isValidElement(element, filters, tabbable) {
   const item = getItem(element, tabbable);
   return !filters.some((filter) => filter(item));
-};
+}
 var selector = [
   '[contenteditable]:not([contenteditable="false"])',
   "[tabindex]:not(slot)",

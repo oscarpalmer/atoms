@@ -57,14 +57,14 @@ function snakeCase(value) {
 function titleCase(value) {
   return words(value).map(capitalise).join(" ");
 }
-var toCase = function(value, delimiter, capitaliseAny, capitaliseFirst) {
+function toCase(value, delimiter, capitaliseAny, capitaliseFirst) {
   return words(value).map((word, index) => {
     const parts = word.replace(/(\p{Lu}*)(\p{Lu})(\p{Ll}+)/gu, (full, one, two, three) => three === "s" ? full : `${one}-${two}${three}`).replace(/(\p{Ll})(\p{Lu})/gu, "$1-$2").split("-");
     return parts.filter((part) => part.length > 0).map((part, partIndex) => !capitaliseAny || partIndex === 0 && index === 0 && !capitaliseFirst ? part.toLocaleLowerCase() : capitalise(part)).join(delimiter);
   }).join(delimiter);
-};
+}
 // src/js/internal/value-handle.ts
-var findKey = function(needle, haystack, ignoreCase) {
+function findKey(needle, haystack, ignoreCase) {
   if (!ignoreCase) {
     return needle;
   }
@@ -72,7 +72,7 @@ var findKey = function(needle, haystack, ignoreCase) {
   const normalised = keys.map((key) => key.toLowerCase());
   const index = normalised.indexOf(needle.toLowerCase());
   return index > -1 ? keys[index] : needle;
-};
+}
 function handleValue(data, path, value, get, ignoreCase) {
   if (typeof data === "object" && data !== null && !/^(__proto__|constructor|prototype)$/i.test(path)) {
     const key = findKey(path, data, ignoreCase);

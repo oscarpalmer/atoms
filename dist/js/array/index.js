@@ -181,14 +181,14 @@ function isKey(value2) {
 }
 
 // src/js/array/sort.ts
-var comparison = function(first, second) {
+function comparison(first, second) {
   if (typeof first === "number" && typeof second === "number") {
     return first - second;
   }
   const firstAsNumber = Number(first);
   const secondAsNumber = Number(second);
   return Number.isNaN(firstAsNumber) || Number.isNaN(secondAsNumber) ? String(first).localeCompare(String(second)) : firstAsNumber - secondAsNumber;
-};
+}
 function sort(array2, first, second) {
   if (array2.length < 2) {
     return array2;

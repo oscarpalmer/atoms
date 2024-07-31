@@ -73,16 +73,16 @@ function clone(value2) {
       return structuredClone(value2);
   }
 }
-var cloneArrayBuffer = function(value2) {
+function cloneArrayBuffer(value2) {
   const cloned = new ArrayBuffer(value2.byteLength);
   new Uint8Array(cloned).set(new Uint8Array(value2));
   return cloned;
-};
-var cloneDataView = function(value2) {
+}
+function cloneDataView(value2) {
   const buffer = cloneArrayBuffer(value2.buffer);
   return new DataView(buffer, value2.byteOffset, value2.byteLength);
-};
-var cloneMapOrSet = function(value2) {
+}
+function cloneMapOrSet(value2) {
   const isMap = value2 instanceof Map;
   const cloned = isMap ? new Map : new Set;
   const entries = [...value2.entries()];
@@ -96,8 +96,8 @@ var cloneMapOrSet = function(value2) {
     }
   }
   return cloned;
-};
-var cloneObject = function(value2) {
+}
+function cloneObject(value2) {
   const cloned = Array.isArray(value2) ? [] : {};
   const keys = Object.keys(value2);
   const { length } = keys;
@@ -106,12 +106,12 @@ var cloneObject = function(value2) {
     cloned[key] = clone(value2[key]);
   }
   return cloned;
-};
-var cloneRegularExpression = function(value2) {
+}
+function cloneRegularExpression(value2) {
   const cloned = new RegExp(value2.source, value2.flags);
   cloned.lastIndex = value2.lastIndex;
   return cloned;
-};
+}
 // src/js/value/equal.ts
 function equal(first, second, ignoreCase) {
   switch (true) {
@@ -145,13 +145,13 @@ function equal(first, second, ignoreCase) {
       return Object.is(first, second);
   }
 }
-var equalArrayBuffer = function(first, second) {
+function equalArrayBuffer(first, second) {
   return first.byteLength === second.byteLength ? equalObject(new Uint8Array(first), new Uint8Array(second)) : false;
-};
-var equalDataView = function(first, second) {
+}
+function equalDataView(first, second) {
   return first.byteOffset === second.byteOffset ? equalArrayBuffer(first.buffer, second.buffer) : false;
-};
-var equalMap = function(first, second) {
+}
+function equalMap(first, second) {
   const { size } = first;
   if (size !== second.size) {
     return false;
@@ -168,8 +168,8 @@ var equalMap = function(first, second) {
     }
   }
   return true;
-};
-var equalObject = function(first, second) {
+}
+function equalObject(first, second) {
   const firstKeys = Object.keys(first);
   const secondKeys = Object.keys(second);
   const { length } = firstKeys;
@@ -183,8 +183,8 @@ var equalObject = function(first, second) {
     }
   }
   return true;
-};
-var equalProperties = function(first, second, properties) {
+}
+function equalProperties(first, second, properties) {
   const { length } = properties;
   for (let index = 0;index < length; index += 1) {
     const property = properties[index];
@@ -193,8 +193,8 @@ var equalProperties = function(first, second, properties) {
     }
   }
   return true;
-};
-var equalSet = function(first, second) {
+}
+function equalSet(first, second) {
   const { size } = first;
   if (size !== second.size) {
     return false;
@@ -208,7 +208,7 @@ var equalSet = function(first, second) {
     }
   }
   return true;
-};
+}
 
 // src/js/value/diff.ts
 function diff(first, second) {
@@ -241,7 +241,7 @@ function diff(first, second) {
   }
   return result;
 }
-var getDiffs = function(first, second, prefix) {
+function getDiffs(first, second, prefix) {
   const changes = [];
   const checked = new Set;
   for (let outerIndex = 0;outerIndex < 2; outerIndex += 1) {
@@ -276,9 +276,9 @@ var getDiffs = function(first, second, prefix) {
     }
   }
   return changes;
-};
+}
 // src/js/internal/value-handle.ts
-var findKey = function(needle, haystack, ignoreCase) {
+function findKey(needle, haystack, ignoreCase) {
   if (!ignoreCase) {
     return needle;
   }
@@ -286,7 +286,7 @@ var findKey = function(needle, haystack, ignoreCase) {
   const normalised = keys.map((key) => key.toLowerCase());
   const index = normalised.indexOf(needle.toLowerCase());
   return index > -1 ? keys[index] : needle;
-};
+}
 function handleValue(data, path, value2, get, ignoreCase) {
   if (typeof data === "object" && data !== null && !/^(__proto__|constructor|prototype)$/i.test(path)) {
     const key = findKey(path, data, ignoreCase);
@@ -364,7 +364,7 @@ function setValue(data, path, value2, ignoreCase) {
   return data;
 }
 // src/js/value/smush.ts
-var flatten = function(value2, prefix) {
+function flatten(value2, prefix) {
   const keys = Object.keys(value2);
   const { length } = keys;
   const smushed = {};
@@ -381,12 +381,12 @@ var flatten = function(value2, prefix) {
     }
   }
   return smushed;
-};
+}
 function smush(value2) {
   return flatten(value2);
 }
 // src/js/value/unsmush.ts
-var getKeyGroups = function(value2) {
+function getKeyGroups(value2) {
   const keys = Object.keys(value2);
   const { length } = keys;
   const grouped = [];
@@ -400,7 +400,7 @@ var getKeyGroups = function(value2) {
     }
   }
   return grouped;
-};
+}
 function unsmush(value2) {
   const groups = getKeyGroups(value2);
   const { length } = groups;

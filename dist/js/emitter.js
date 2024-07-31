@@ -3,7 +3,7 @@ function noop() {
 }
 
 // src/js/emitter.ts
-var getObserver = function(first, second, third) {
+function getObserver(first, second, third) {
   let observer = {
     next: noop
   };
@@ -20,11 +20,11 @@ var getObserver = function(first, second, third) {
     };
   }
   return observer;
-};
+}
 function emitter(value) {
   return new Emitter(value);
 }
-var finishEmitter = function(state, emit) {
+function finishEmitter(state, emit) {
   if (state.active) {
     state.active = false;
     for (const [subscription, observer] of state.observers) {
@@ -34,7 +34,7 @@ var finishEmitter = function(state, emit) {
       subscription.unsubscribe();
     }
   }
-};
+}
 
 class Emitter {
   get active() {

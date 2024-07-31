@@ -264,12 +264,12 @@ function snakeCase(value) {
 function titleCase(value) {
   return words(value).map(capitalise).join(" ");
 }
-var toCase = function(value, delimiter, capitaliseAny, capitaliseFirst) {
+function toCase(value, delimiter, capitaliseAny, capitaliseFirst) {
   return words(value).map((word, index) => {
     const parts = word.replace(/(\p{Lu}*)(\p{Lu})(\p{Ll}+)/gu, (full, one, two, three) => three === "s" ? full : `${one}-${two}${three}`).replace(/(\p{Ll})(\p{Lu})/gu, "$1-$2").split("-");
     return parts.filter((part) => part.length > 0).map((part, partIndex) => !capitaliseAny || partIndex === 0 && index === 0 && !capitaliseFirst ? part.toLocaleLowerCase() : capitalise(part)).join(delimiter);
   }).join(delimiter);
-};
+}
 // src/js/value/index.ts
 function partial(value, keys) {
   const result = {};
@@ -315,16 +315,16 @@ function clone(value) {
       return structuredClone(value);
   }
 }
-var cloneArrayBuffer = function(value) {
+function cloneArrayBuffer(value) {
   const cloned = new ArrayBuffer(value.byteLength);
   new Uint8Array(cloned).set(new Uint8Array(value));
   return cloned;
-};
-var cloneDataView = function(value) {
+}
+function cloneDataView(value) {
   const buffer = cloneArrayBuffer(value.buffer);
   return new DataView(buffer, value.byteOffset, value.byteLength);
-};
-var cloneMapOrSet = function(value) {
+}
+function cloneMapOrSet(value) {
   const isMap = value instanceof Map;
   const cloned = isMap ? new Map : new Set;
   const entries = [...value.entries()];
@@ -338,8 +338,8 @@ var cloneMapOrSet = function(value) {
     }
   }
   return cloned;
-};
-var cloneObject = function(value) {
+}
+function cloneObject(value) {
   const cloned = Array.isArray(value) ? [] : {};
   const keys = Object.keys(value);
   const { length } = keys;
@@ -348,12 +348,12 @@ var cloneObject = function(value) {
     cloned[key] = clone(value[key]);
   }
   return cloned;
-};
-var cloneRegularExpression = function(value) {
+}
+function cloneRegularExpression(value) {
   const cloned = new RegExp(value.source, value.flags);
   cloned.lastIndex = value.lastIndex;
   return cloned;
-};
+}
 // src/js/value/equal.ts
 function equal(first, second, ignoreCase) {
   switch (true) {
@@ -387,13 +387,13 @@ function equal(first, second, ignoreCase) {
       return Object.is(first, second);
   }
 }
-var equalArrayBuffer = function(first, second) {
+function equalArrayBuffer(first, second) {
   return first.byteLength === second.byteLength ? equalObject(new Uint8Array(first), new Uint8Array(second)) : false;
-};
-var equalDataView = function(first, second) {
+}
+function equalDataView(first, second) {
   return first.byteOffset === second.byteOffset ? equalArrayBuffer(first.buffer, second.buffer) : false;
-};
-var equalMap = function(first, second) {
+}
+function equalMap(first, second) {
   const { size } = first;
   if (size !== second.size) {
     return false;
@@ -410,8 +410,8 @@ var equalMap = function(first, second) {
     }
   }
   return true;
-};
-var equalObject = function(first, second) {
+}
+function equalObject(first, second) {
   const firstKeys = Object.keys(first);
   const secondKeys = Object.keys(second);
   const { length } = firstKeys;
@@ -425,8 +425,8 @@ var equalObject = function(first, second) {
     }
   }
   return true;
-};
-var equalProperties = function(first, second, properties) {
+}
+function equalProperties(first, second, properties) {
   const { length } = properties;
   for (let index = 0;index < length; index += 1) {
     const property = properties[index];
@@ -435,8 +435,8 @@ var equalProperties = function(first, second, properties) {
     }
   }
   return true;
-};
-var equalSet = function(first, second) {
+}
+function equalSet(first, second) {
   const { size } = first;
   if (size !== second.size) {
     return false;
@@ -450,7 +450,7 @@ var equalSet = function(first, second) {
     }
   }
   return true;
-};
+}
 
 // src/js/value/diff.ts
 function diff(first, second) {
@@ -483,7 +483,7 @@ function diff(first, second) {
   }
   return result;
 }
-var getDiffs = function(first, second, prefix) {
+function getDiffs(first, second, prefix) {
   const changes = [];
   const checked = new Set;
   for (let outerIndex = 0;outerIndex < 2; outerIndex += 1) {
@@ -518,9 +518,9 @@ var getDiffs = function(first, second, prefix) {
     }
   }
   return changes;
-};
+}
 // src/js/internal/value-handle.ts
-var findKey = function(needle, haystack, ignoreCase) {
+function findKey(needle, haystack, ignoreCase) {
   if (!ignoreCase) {
     return needle;
   }
@@ -528,7 +528,7 @@ var findKey = function(needle, haystack, ignoreCase) {
   const normalised = keys.map((key) => key.toLowerCase());
   const index = normalised.indexOf(needle.toLowerCase());
   return index > -1 ? keys[index] : needle;
-};
+}
 function handleValue(data, path, value, get, ignoreCase) {
   if (typeof data === "object" && data !== null && !/^(__proto__|constructor|prototype)$/i.test(path)) {
     const key = findKey(path, data, ignoreCase);
@@ -606,7 +606,7 @@ function setValue(data, path, value, ignoreCase) {
   return data;
 }
 // src/js/value/smush.ts
-var flatten = function(value, prefix) {
+function flatten(value, prefix) {
   const keys = Object.keys(value);
   const { length } = keys;
   const smushed = {};
@@ -623,12 +623,12 @@ var flatten = function(value, prefix) {
     }
   }
   return smushed;
-};
+}
 function smush(value) {
   return flatten(value);
 }
 // src/js/value/unsmush.ts
-var getKeyGroups = function(value) {
+function getKeyGroups(value) {
   const keys = Object.keys(value);
   const { length } = keys;
   const grouped = [];
@@ -642,7 +642,7 @@ var getKeyGroups = function(value) {
     }
   }
   return grouped;
-};
+}
 function unsmush(value) {
   const groups = getKeyGroups(value);
   const { length } = groups;
@@ -723,14 +723,14 @@ function isPrimitive(value2) {
 }
 
 // src/js/array/sort.ts
-var comparison = function(first, second) {
+function comparison(first, second) {
   if (typeof first === "number" && typeof second === "number") {
     return first - second;
   }
   const firstAsNumber = Number(first);
   const secondAsNumber = Number(second);
   return Number.isNaN(firstAsNumber) || Number.isNaN(secondAsNumber) ? String(first).localeCompare(String(second)) : firstAsNumber - secondAsNumber;
-};
+}
 function sort(array2, first, second) {
   if (array2.length < 2) {
     return array2;
@@ -875,9 +875,9 @@ function isHexColour(value2) {
 function isHSLColour(value2) {
   return isInstance(/^hsl$/, value2);
 }
-var isInstance = function(pattern, value2) {
+function isInstance(pattern, value2) {
   return typeof value2 === "object" && value2 !== null && "$colour" in value2 && typeof value2.$colour === "string" && pattern.test(value2.$colour);
-};
+}
 function isRGBColour(value2) {
   return isInstance(/^rgb$/, value2);
 }
@@ -1118,29 +1118,29 @@ class HexColour {
 function getFocusableElements(parent) {
   return getValidElements(parent, getFocusableFilters(), false);
 }
-var getFocusableFilters = function() {
+function getFocusableFilters() {
   return [isDisabled, isInert, isHidden, isSummarised];
-};
-var getItem = function(element, tabbable) {
+}
+function getItem(element, tabbable) {
   return {
     element,
     tabIndex: tabbable ? getTabIndex(element) : -1
   };
-};
-var getTabbableFilters = function() {
+}
+function getTabbableFilters() {
   return [isNotTabbable, isNotTabbableRadio, ...getFocusableFilters()];
-};
+}
 function getTabbableElements(parent) {
   return getValidElements(parent, getTabbableFilters(), true);
 }
-var getTabIndex = function(element) {
+function getTabIndex(element) {
   const tabIndex = element?.tabIndex ?? -1;
   if (tabIndex < 0 && (/^(audio|details|video)$/i.test(element.tagName) || isEditable(element)) && !hasTabIndex(element)) {
     return 0;
   }
   return tabIndex;
-};
-var getValidElements = function(parent, filters, tabbable) {
+}
+function getValidElements(parent, filters, tabbable) {
   const items = Array.from(parent.querySelectorAll(selector)).map((element) => getItem(element, tabbable)).filter((item) => !filters.some((filter3) => filter3(item)));
   if (!tabbable) {
     return items.map((item) => item.element);
@@ -1160,17 +1160,17 @@ var getValidElements = function(parent, filters, tabbable) {
     }
   }
   return [...indiced.flat(), ...zeroed];
-};
-var hasTabIndex = function(element) {
+}
+function hasTabIndex(element) {
   return !Number.isNaN(Number.parseInt(element.getAttribute("tabindex"), 10));
-};
-var isDisabled = function(item) {
+}
+function isDisabled(item) {
   if (/^(button|input|select|textarea)$/i.test(item.element.tagName) && isDisabledFromFieldset(item.element)) {
     return true;
   }
   return (item.element.disabled ?? false) || item.element.getAttribute("aria-disabled") === "true";
-};
-var isDisabledFromFieldset = function(element) {
+}
+function isDisabledFromFieldset(element) {
   let parent = element.parentElement;
   while (parent !== null) {
     if (parent instanceof HTMLFieldSetElement && parent.disabled) {
@@ -1187,14 +1187,14 @@ var isDisabledFromFieldset = function(element) {
     parent = parent.parentElement;
   }
   return false;
-};
-var isEditable = function(element) {
+}
+function isEditable(element) {
   return /^(|true)$/i.test(element.getAttribute("contenteditable"));
-};
+}
 function isFocusableElement(element) {
   return isValidElement(element, getFocusableFilters(), false);
 }
-var isHidden = function(item) {
+function isHidden(item) {
   if ((item.element.hidden ?? false) || item.element instanceof HTMLInputElement && item.element.type === "hidden") {
     return true;
   }
@@ -1209,17 +1209,17 @@ var isHidden = function(item) {
   }
   const { height, width } = item.element.getBoundingClientRect();
   return height === 0 && width === 0;
-};
-var isInert = function(item) {
+}
+function isInert(item) {
   return (item.element.inert ?? false) || /^(|true)$/i.test(item.element.getAttribute("inert")) || item.element.parentElement !== null && isInert({
     element: item.element.parentElement,
     tabIndex: -1
   });
-};
-var isNotTabbable = function(item) {
+}
+function isNotTabbable(item) {
   return (item.tabIndex ?? -1) < 0;
-};
-var isNotTabbableRadio = function(item) {
+}
+function isNotTabbableRadio(item) {
   if (!(item.element instanceof HTMLInputElement) || item.element.type !== "radio" || !item.element.name || item.element.checked) {
     return false;
   }
@@ -1228,17 +1228,17 @@ var isNotTabbableRadio = function(item) {
   const radios = Array.from(parent.querySelectorAll(`input[type="radio"][name="${realName}"]`));
   const checked = radios.find((radio) => radio.checked);
   return checked !== undefined && checked !== item.element;
-};
-var isSummarised = function(item) {
+}
+function isSummarised(item) {
   return item.element instanceof HTMLDetailsElement && Array.from(item.element.children).some((child) => /^summary$/i.test(child.tagName));
-};
+}
 function isTabbableElement(element) {
   return isValidElement(element, getTabbableFilters(), true);
 }
-var isValidElement = function(element, filters, tabbable) {
+function isValidElement(element, filters, tabbable) {
   const item = getItem(element, tabbable);
   return !filters.some((filter3) => filter3(item));
-};
+}
 var selector = [
   '[contenteditable]:not([contenteditable="false"])',
   "[tabindex]:not(slot)",
@@ -1272,7 +1272,7 @@ function getTextDirection(element) {
 }
 
 // src/js/element/closest.ts
-var calculateDistance = function(origin, target) {
+function calculateDistance(origin, target) {
   if (origin === target || origin.parentElement === target) {
     return 0;
   }
@@ -1288,7 +1288,7 @@ var calculateDistance = function(origin, target) {
     default:
       return -1;
   }
-};
+}
 function closest(origin, selector2, context) {
   if (origin.matches(selector2)) {
     return [origin];
@@ -1316,7 +1316,7 @@ function closest(origin, selector2, context) {
   }
   return minimum == null ? [] : distances.filter((found) => found.distance === minimum).map((found) => found.element);
 }
-var traverse = function(from, to) {
+function traverse(from, to) {
   const children = [...to.children];
   if (children.includes(from)) {
     return children.indexOf(from) + 1;
@@ -1341,7 +1341,7 @@ var traverse = function(from, to) {
     parent = parent.parentElement;
   }
   return -1e6;
-};
+}
 // src/js/internal/element-value.ts
 function setElementValues(element, first, second, callback) {
   if (isPlainObject(first)) {
@@ -1376,23 +1376,23 @@ function getData(element, keys) {
   }
   return data;
 }
-var getDataValue = function(element, key) {
+function getDataValue(element, key) {
   const value2 = element.dataset[key];
   if (value2 != null) {
     return parse(value2);
   }
-};
+}
 function setData(element, first, second) {
   setElementValues(element, first, second, updateDataAttribute);
 }
-var updateDataAttribute = function(element, key, value2) {
+function updateDataAttribute(element, key, value2) {
   updateElementValue(element, `data-${key}`, value2, element.setAttribute, element.removeAttribute, true);
-};
+}
 // src/js/element/find.ts
 function findElement(selector2, context) {
   return findElementOrElements(selector2, context, true);
 }
-var findElementOrElements = function(selector2, context, single) {
+function findElementOrElements(selector2, context, single) {
   const callback = single ? document.querySelector : document.querySelectorAll;
   const contexts = context == null ? [document] : findElementOrElements(context, undefined, false);
   const result = [];
@@ -1420,7 +1420,7 @@ var findElementOrElements = function(selector2, context, single) {
     }
   }
   return result;
-};
+}
 function findElements(selector2, context) {
   return findElementOrElements(selector2, context, false);
 }
@@ -1450,13 +1450,13 @@ function findParentElement(origin, selector2) {
 function setStyles(element, first, second) {
   setElementValues(element, first, second, updateStyleProperty);
 }
-var updateStyleProperty = function(element, key, value2) {
+function updateStyleProperty(element, key, value2) {
   updateElementValue(element, key, value2, function(key2, value3) {
     this.style[key2] = value3;
   }, function(key2) {
     this.style[key2] = "";
   }, false);
-};
+}
 // src/js/function.ts
 function debounce(callback, time) {
   const interval = clamp(time ?? 0, 0, 1000);
@@ -1529,7 +1529,7 @@ class Memoised {
 }
 
 // src/js/emitter.ts
-var getObserver = function(first, second, third) {
+function getObserver(first, second, third) {
   let observer = {
     next: noop
   };
@@ -1546,11 +1546,11 @@ var getObserver = function(first, second, third) {
     };
   }
   return observer;
-};
+}
 function emitter(value2) {
   return new Emitter(value2);
 }
-var finishEmitter = function(state, emit) {
+function finishEmitter(state, emit) {
   if (state.active) {
     state.active = false;
     for (const [subscription, observer] of state.observers) {
@@ -1560,7 +1560,7 @@ var finishEmitter = function(state, emit) {
       subscription.unsubscribe();
     }
   }
-};
+}
 
 class Emitter {
   get active() {
@@ -1767,7 +1767,7 @@ function fromQuery(query) {
   }
   return parameters;
 }
-var getParts = function(value3, fromArray, prefix) {
+function getParts(value3, fromArray, prefix) {
   const keys = Object.keys(value3);
   const { length } = keys;
   const parts = [];
@@ -1783,8 +1783,8 @@ var getParts = function(value3, fromArray, prefix) {
     }
   }
   return parts;
-};
-var getValue2 = function(value3) {
+}
+function getValue2(value3) {
   if (/^(false|true)$/.test(value3)) {
     return value3 === "true";
   }
@@ -1793,10 +1793,10 @@ var getValue2 = function(value3) {
     return asNumber;
   }
   return value3;
-};
-var isDecodable = function(value3) {
+}
+function isDecodable(value3) {
   return ["boolean", "number", "string"].includes(typeof value3);
-};
+}
 function toQuery(parameters) {
   return getParts(parameters, false).filter((part) => part.length > 0).join("&");
 }
@@ -1998,9 +1998,9 @@ function delay(time, timeout) {
 }
 
 // src/js/timer/is.ts
-var is11 = function(pattern, value3) {
+function is11(pattern, value3) {
   return pattern.test(value3?.$timer);
-};
+}
 function isRepeated(value3) {
   return is11(/^repeat$/, value3);
 }

@@ -33,9 +33,9 @@ function isHexColour(value) {
 function isHSLColour(value) {
   return isInstance(/^hsl$/, value);
 }
-var isInstance = function(pattern, value) {
+function isInstance(pattern, value) {
   return typeof value === "object" && value !== null && "$colour" in value && typeof value.$colour === "string" && pattern.test(value.$colour);
-};
+}
 function isRGBColour(value) {
   return isInstance(/^rgb$/, value);
 }

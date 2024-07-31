@@ -178,9 +178,9 @@ function delay(time, timeout) {
 }
 
 // src/js/timer/is.ts
-var is = function(pattern, value) {
+function is(pattern, value) {
   return pattern.test(value?.$timer);
-};
+}
 function isRepeated(value) {
   return is(/^repeat$/, value);
 }
