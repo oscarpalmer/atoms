@@ -1658,63 +1658,70 @@ function getPosition(event) {
   return typeof x === "number" && typeof y === "number" ? { x, y } : undefined;
 }
 // src/js/logger.ts
-var time = function(label) {
-  const started = logger.enabled;
-  let stopped = false;
-  if (started) {
-    console.time(label);
-  }
-  return Object.create({
-    log() {
-      if (started && !stopped && logger.enabled) {
-        console.timeLog(label);
-      }
-    },
-    stop() {
-      if (started && !stopped) {
-        stopped = true;
-        console.timeEnd(label);
-      }
-    }
-  });
-};
 if (globalThis._atomic_logging == null) {
   globalThis._atomic_logging = true;
 }
-var types = new Set([
-  "dir",
-  "debug",
-  "error",
-  "info",
-  "log",
-  "table",
-  "trace",
-  "warn"
-]);
-var logger = (() => {
-  const instance = Object.create(null);
-  Object.defineProperties(instance, {
-    enabled: {
-      get() {
-        return _atomic_logging ?? true;
-      },
-      set(value2) {
-        _atomic_logging = value2;
-      }
-    },
-    time: {
-      value: time
-    }
-  });
-  for (const type of types) {
-    Object.defineProperty(instance, type, {
-      get() {
-        return instance.enabled ? console[type] : noop;
-      }
-    });
+
+class Logger {
+  get debug() {
+    return this.enabled ? console.debug : noop;
   }
-  return instance;
-})();
+  get dir() {
+    return this.enabled ? console.dir : noop;
+  }
+  get enabled() {
+    return globalThis._atomic_logging ?? true;
+  }
+  set enabled(value2) {
+    globalThis._atomic_logging = value2;
+  }
+  get error() {
+    return this.enabled ? console.error : noop;
+  }
+  get info() {
+    return this.enabled ? console.info : noop;
+  }
+  get log() {
+    return this.enabled ? console.log : noop;
+  }
+  get table() {
+    return this.enabled ? console.table : noop;
+  }
+  get trace() {
+    return this.enabled ? console.trace : noop;
+  }
+  get warn() {
+    return this.enabled ? console.warn : noop;
+  }
+  time(label) {
+    return new Time(label);
+  }
+}
+
+class Time {
+  constructor(label) {
+    this.state = {
+      label,
+      started: globalThis._atomic_logging ?? true,
+      stopped: false
+    };
+    if (this.state.started) {
+      console.time(label);
+    }
+  }
+  log() {
+    if (this.state.started && !this.state.stopped && logger.enabled) {
+      console.timeLog(this.state.label);
+    }
+  }
+  stop() {
+    if (this.state.started && !this.state.stopped) {
+      this.state.stopped = true;
+      console.timeEnd(this.state.label);
+    }
+  }
+}
+var logger = new Logger;
 // src/js/math.ts
 function average(values) {
   return values.length > 0 ? sum(values) / values.length : Number.NaN;
@@ -1816,12 +1823,12 @@ if (globalThis._atomic_queued == null) {
   });
 }
 // src/js/timer.ts
-function delay(time2, timeout) {
+function delay(time, timeout) {
   return new Promise((resolve, reject) => {
     wait(resolve, {
       timeout,
       errorCallback: reject,
-      interval: time2
+      interval: time
     });
   });
 }
@@ -2020,14 +2027,14 @@ var work = function(type, timer2, state, options, isRepeated2) {
     }
     current ??= timestamp;
     start ??= timestamp;
-    const time2 = timestamp - current;
+    const time = timestamp - current;
     state.elapsed = elapsed + (current - start);
-    const finished = time2 - elapsed >= total;
+    const finished = time - elapsed >= total;
     if (timestamp - start >= timeout - elapsed) {
       finish(finished, !finished);
       return;
     }
-    if (finished || time2 >= minimum) {
+    if (finished || time >= minimum) {
       if (state.active) {
         state.callback(isRepeated2 ? index : undefined);
       }

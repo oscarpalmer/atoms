@@ -3,63 +3,70 @@ function noop() {
 }
 
 // src/js/logger.ts
-var time = function(label) {
-  const started = logger.enabled;
-  let stopped = false;
-  if (started) {
-    console.time(label);
-  }
-  return Object.create({
-    log() {
-      if (started && !stopped && logger.enabled) {
-        console.timeLog(label);
-      }
-    },
-    stop() {
-      if (started && !stopped) {
-        stopped = true;
-        console.timeEnd(label);
-      }
-    }
-  });
-};
 if (globalThis._atomic_logging == null) {
   globalThis._atomic_logging = true;
 }
-var types = new Set([
-  "dir",
-  "debug",
-  "error",
-  "info",
-  "log",
-  "table",
-  "trace",
-  "warn"
-]);
-var logger = (() => {
-  const instance = Object.create(null);
-  Object.defineProperties(instance, {
-    enabled: {
-      get() {
-        return _atomic_logging ?? true;
-      },
-      set(value) {
-        _atomic_logging = value;
-      }
-    },
-    time: {
-      value: time
-    }
-  });
-  for (const type of types) {
-    Object.defineProperty(instance, type, {
-      get() {
-        return instance.enabled ? console[type] : noop;
-      }
-    });
+
+class Logger {
+  get debug() {
+    return this.enabled ? console.debug : noop;
   }
-  return instance;
-})();
+  get dir() {
+    return this.enabled ? console.dir : noop;
+  }
+  get enabled() {
+    return globalThis._atomic_logging ?? true;
+  }
+  set enabled(value) {
+    globalThis._atomic_logging = value;
+  }
+  get error() {
+    return this.enabled ? console.error : noop;
+  }
+  get info() {
+    return this.enabled ? console.info : noop;
+  }
+  get log() {
+    return this.enabled ? console.log : noop;
+  }
+  get table() {
+    return this.enabled ? console.table : noop;
+  }
+  get trace() {
+    return this.enabled ? console.trace : noop;
+  }
+  get warn() {
+    return this.enabled ? console.warn : noop;
+  }
+  time(label) {
+    return new Time(label);
+  }
+}
+
+class Time {
+  constructor(label) {
+    this.state = {
+      label,
+      started: globalThis._atomic_logging ?? true,
+      stopped: false
+    };
+    if (this.state.started) {
+      console.time(label);
+    }
+  }
+  log() {
+    if (this.state.started && !this.state.stopped && logger.enabled) {
+      console.timeLog(this.state.label);
+    }
+  }
+  stop() {
+    if (this.state.started && !this.state.stopped) {
+      this.state.stopped = true;
+      console.timeEnd(this.state.label);
+    }
+  }
+}
+var logger = new Logger;
 export {
   logger
 };
