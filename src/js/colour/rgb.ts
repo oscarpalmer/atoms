@@ -1,101 +1,103 @@
-import {createProperty} from '../internal/colour-property';
-import {createHex} from './hex';
-import {createHsl} from './hsl';
-import type {HSLColour, HexColour, RGBColour, RGBColourValue} from './models';
+import {clamp} from '../number';
+import {Colour} from './base';
+import {rgbToHex, rgbToHsl} from './functions';
+import type {HexColour} from './hex';
+import type {HSLColour} from './hsl';
 
-export function createRgb(original: RGBColourValue): RGBColour {
-	const value = {...original};
+export type RGBColourValue = {
+	blue: number;
+	green: number;
+	red: number;
+};
 
-	const instance = Object.create({
-		toHex() {
-			return rgbToHex(value);
-		},
-		toHsl() {
-			return rgbToHsl(value);
-		},
-		toString() {
-			return `rgb(${value.red}, ${value.green}, ${value.blue})`;
-		},
-	});
+export class RGBColour extends Colour<RGBColourValue> {
+	/**
+	 * Gets the current blue value
+	 */
+	get blue(): number {
+		return +this.state.value.blue;
+	}
 
-	Object.defineProperties(instance, {
-		blue: createProperty(value, 'blue', 0, 255),
-		green: createProperty(value, 'green', 0, 255),
-		red: createProperty(value, 'red', 0, 255),
-		value: {value},
-	});
+	/**
+	 * Sets the current blue value
+	 */
+	set blue(value: number) {
+		this.state.value.blue = clamp(value, 0, 255);
+	}
 
-	return instance;
+	/**
+	 * Gets the current green value
+	 */
+	get green(): number {
+		return +this.state.value.green;
+	}
+
+	/**
+	 * Sets the current green value
+	 */
+	set green(value: number) {
+		this.state.value.green = clamp(value, 0, 255);
+	}
+
+	/**
+	 * Gets the current red value
+	 */
+	get red(): number {
+		return +this.state.value.red;
+	}
+
+	/**
+	 * Sets the current red value
+	 */
+	set red(value: number) {
+		this.state.value.red = clamp(value, 0, 255);
+	}
+
+	constructor(value: RGBColourValue) {
+		super('rgb', value, defaults, properties);
+	}
+
+	toHex(): HexColour {
+		return RGBColour.toHex(this.value);
+	}
+
+	/**
+	 * Convert the colour to an HSL-colour
+	 */
+	toHsl(): HSLColour {
+		return RGBColour.toHsl(this.value);
+	}
+
+	toString(): string {
+		return `rgb(${this.value.red}, ${this.value.green}, ${this.value.blue})`;
+	}
+
+	/**
+	 * Convert an RGB-colour to a hex-colour
+	 */
+	static toHex(value: RGBColourValue): HexColour {
+		return rgbToHex(value);
+	}
+
+	/**
+	 * - Convert an RGB-colour to an HSL-colour
+	 */
+	static toHsl(rgb: RGBColourValue): HSLColour {
+		return rgbToHsl(rgb);
+	}
 }
 
-/**
- * Convert an RGB-colour to a hex-colour
- */
-export function rgbToHex(value: RGBColourValue): HexColour {
-	return createHex(
-		`${[value.red, value.green, value.blue]
-			.map(colour => {
-				const hex = colour.toString(16);
+const defaults: RGBColourValue = {
+	blue: 0,
+	green: 0,
+	red: 0,
+};
 
-				return hex.length === 1 ? `0${hex}` : hex;
-			})
-			.join('')}`,
-	);
-}
+const properties: Array<keyof RGBColourValue> = ['blue', 'green', 'red'];
 
 /**
- * - Convert an RGB-colour to an HSL-colour
- * - Thanks, https://github.com/color-js/color.js/blob/main/src/spaces/hsl.js#L26
+ * Get an RGB-colour from a value-object
  */
-export function rgbToHsl(rgb: RGBColourValue): HSLColour {
-	const blue = rgb.blue / 255;
-	const green = rgb.green / 255;
-	const red = rgb.red / 255;
-
-	const max = Math.max(blue, green, red);
-	const min = Math.min(blue, green, red);
-
-	const delta = max - min;
-	const lightness = (min + max) / 2;
-
-	let hue = 0;
-	let saturation = 0;
-
-	if (delta !== 0) {
-		saturation =
-			lightness === 0 || lightness === 1
-				? 0
-				: (max - lightness) / Math.min(lightness, 1 - lightness);
-
-		switch (max) {
-			case blue:
-				hue = (red - green) / delta + 4;
-				break;
-			case green:
-				hue = (blue - red) / delta + 2;
-				break;
-			case red:
-				hue = (green - blue) / delta + (green < blue ? 6 : 0);
-				break;
-			default:
-				break;
-		}
-
-		hue *= 60;
-	}
-
-	if (saturation < 0) {
-		hue += 180;
-		saturation = Math.abs(saturation);
-	}
-
-	if (hue >= 360) {
-		hue -= 360;
-	}
-
-	return createHsl({
-		hue: +hue.toFixed(2),
-		lightness: +(lightness * 100).toFixed(2),
-		saturation: +(saturation * 100).toFixed(2),
-	});
+export function getRGBColour(value: RGBColourValue): RGBColour {
+	return new RGBColour(value);
 }

@@ -12,12 +12,12 @@ function delay(time, timeout) {
     });
   });
 }
-function getValueOrDefault(value, defaultValue, minimum) {
+var getValueOrDefault = function(value, defaultValue, minimum) {
   return typeof value === "number" && value > (minimum ?? 0) ? value : defaultValue;
-}
-function is(value, pattern) {
+};
+var is = function(value, pattern) {
   return pattern.test(value?.$timer);
-}
+};
 function isRepeated(value) {
   return is(value, /^repeat$/);
 }
@@ -33,7 +33,7 @@ function isWhen(value) {
 function repeat(callback, options) {
   return timer("repeat", callback, options ?? {}, true);
 }
-function timer(type, callback, partial, start) {
+var timer = function(type, callback, partial, start) {
   const isRepeated2 = type === "repeat";
   const options = {
     afterCallback: partial.afterCallback,
@@ -92,7 +92,7 @@ function timer(type, callback, partial, start) {
     instance.start();
   }
   return instance;
-}
+};
 function wait(callback, options) {
   return timer("wait", callback, options == null || typeof options === "number" ? {
     interval: options
@@ -159,7 +159,7 @@ function when(condition, options) {
   });
   return instance;
 }
-function work(type, timer2, state, options, isRepeated2) {
+var work = function(type, timer2, state, options, isRepeated2) {
   if (["continue", "start"].includes(type) && state.active || ["pause", "stop"].includes(type) && !state.active) {
     return timer2;
   }
@@ -232,7 +232,7 @@ function work(type, timer2, state, options, isRepeated2) {
   activeTimers.add(timer2);
   state.frame = requestAnimationFrame(step);
   return timer2;
-}
+};
 if (globalThis._atomic_timers == null) {
   Object.defineProperty(globalThis, "_atomic_timers", {
     get() {

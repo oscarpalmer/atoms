@@ -1,9 +1,9 @@
-import type { RGBColourValue } from './models';
+import type { RGBColourValue } from './rgb';
 /**
  * Get a foreground colour _(usually text)_ based on a background colour's luminance
  */
 export declare function getForegroundColour(value: RGBColourValue): string;
-export { getHexColour, hexToRgb } from './hex';
-export { hslToRgb } from './hsl';
-export * from './models';
-export { rgbToHex, rgbToHsl } from './rgb';
+export { getHexColour, HexColour } from './hex';
+export { getHSLColour, HSLColour, type HSLColourValue } from './hsl';
+export { isColour, isHexColour, isHSLColour, isRGBColour } from './is';
+export { getRGBColour, RGBColour, type RGBColourValue } from './rgb';

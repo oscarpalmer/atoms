@@ -1,11 +1,53 @@
-import type { HSLColour, HexColour, RGBColour, RGBColourValue } from './models';
-export declare function createRgb(original: RGBColourValue): RGBColour;
+import { Colour } from './base';
+import type { HexColour } from './hex';
+import type { HSLColour } from './hsl';
+export type RGBColourValue = {
+    blue: number;
+    green: number;
+    red: number;
+};
+export declare class RGBColour extends Colour<RGBColourValue> {
+    /**
+     * Gets the current blue value
+     */
+    get blue(): number;
+    /**
+     * Sets the current blue value
+     */
+    set blue(value: number);
+    /**
+     * Gets the current green value
+     */
+    get green(): number;
+    /**
+     * Sets the current green value
+     */
+    set green(value: number);
+    /**
+     * Gets the current red value
+     */
+    get red(): number;
+    /**
+     * Sets the current red value
+     */
+    set red(value: number);
+    constructor(value: RGBColourValue);
+    toHex(): HexColour;
+    /**
+     * Convert the colour to an HSL-colour
+     */
+    toHsl(): HSLColour;
+    toString(): string;
+    /**
+     * Convert an RGB-colour to a hex-colour
+     */
+    static toHex(value: RGBColourValue): HexColour;
+    /**
+     * - Convert an RGB-colour to an HSL-colour
+     */
+    static toHsl(rgb: RGBColourValue): HSLColour;
+}
 /**
- * Convert an RGB-colour to a hex-colour
+ * Get an RGB-colour from a value-object
  */
-export declare function rgbToHex(value: RGBColourValue): HexColour;
-/**
- * - Convert an RGB-colour to an HSL-colour
- * - Thanks, https://github.com/color-js/color.js/blob/main/src/spaces/hsl.js#L26
- */
-export declare function rgbToHsl(rgb: RGBColourValue): HSLColour;
+export declare function getRGBColour(value: RGBColourValue): RGBColour;

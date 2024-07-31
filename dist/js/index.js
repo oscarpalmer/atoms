@@ -264,12 +264,12 @@ function snakeCase(value) {
 function titleCase(value) {
   return words(value).map(capitalise).join(" ");
 }
-function toCase(value, delimiter, capitaliseAny, capitaliseFirst) {
+var toCase = function(value, delimiter, capitaliseAny, capitaliseFirst) {
   return words(value).map((word, index) => {
     const parts = word.replace(/(\p{Lu}*)(\p{Lu})(\p{Ll}+)/gu, (full, one, two, three) => three === "s" ? full : `${one}-${two}${three}`).replace(/(\p{Ll})(\p{Lu})/gu, "$1-$2").split("-");
     return parts.filter((part) => part.length > 0).map((part, partIndex) => !capitaliseAny || partIndex === 0 && index === 0 && !capitaliseFirst ? part.toLocaleLowerCase() : capitalise(part)).join(delimiter);
   }).join(delimiter);
-}
+};
 // src/js/value/index.ts
 function partial(value, keys) {
   const result = {};
@@ -315,16 +315,16 @@ function clone(value) {
       return structuredClone(value);
   }
 }
-function cloneArrayBuffer(value) {
+var cloneArrayBuffer = function(value) {
   const cloned = new ArrayBuffer(value.byteLength);
   new Uint8Array(cloned).set(new Uint8Array(value));
   return cloned;
-}
-function cloneDataView(value) {
+};
+var cloneDataView = function(value) {
   const buffer = cloneArrayBuffer(value.buffer);
   return new DataView(buffer, value.byteOffset, value.byteLength);
-}
-function cloneMapOrSet(value) {
+};
+var cloneMapOrSet = function(value) {
   const isMap = value instanceof Map;
   const cloned = isMap ? new Map : new Set;
   const entries = [...value.entries()];
@@ -338,8 +338,8 @@ function cloneMapOrSet(value) {
     }
   }
   return cloned;
-}
-function cloneObject(value) {
+};
+var cloneObject = function(value) {
   const cloned = Array.isArray(value) ? [] : {};
   const keys = Object.keys(value);
   const { length } = keys;
@@ -348,12 +348,12 @@ function cloneObject(value) {
     cloned[key] = clone(value[key]);
   }
   return cloned;
-}
-function cloneRegularExpression(value) {
+};
+var cloneRegularExpression = function(value) {
   const cloned = new RegExp(value.source, value.flags);
   cloned.lastIndex = value.lastIndex;
   return cloned;
-}
+};
 // src/js/value/equal.ts
 function equal(first, second, ignoreCase) {
   switch (true) {
@@ -387,13 +387,13 @@ function equal(first, second, ignoreCase) {
       return Object.is(first, second);
   }
 }
-function equalArrayBuffer(first, second) {
+var equalArrayBuffer = function(first, second) {
   return first.byteLength === second.byteLength ? equalObject(new Uint8Array(first), new Uint8Array(second)) : false;
-}
-function equalDataView(first, second) {
+};
+var equalDataView = function(first, second) {
   return first.byteOffset === second.byteOffset ? equalArrayBuffer(first.buffer, second.buffer) : false;
-}
-function equalMap(first, second) {
+};
+var equalMap = function(first, second) {
   const { size } = first;
   if (size !== second.size) {
     return false;
@@ -410,8 +410,8 @@ function equalMap(first, second) {
     }
   }
   return true;
-}
-function equalObject(first, second) {
+};
+var equalObject = function(first, second) {
   const firstKeys = Object.keys(first);
   const secondKeys = Object.keys(second);
   const { length } = firstKeys;
@@ -425,8 +425,8 @@ function equalObject(first, second) {
     }
   }
   return true;
-}
-function equalProperties(first, second, properties) {
+};
+var equalProperties = function(first, second, properties) {
   const { length } = properties;
   for (let index = 0;index < length; index += 1) {
     const property = properties[index];
@@ -435,8 +435,8 @@ function equalProperties(first, second, properties) {
     }
   }
   return true;
-}
-function equalSet(first, second) {
+};
+var equalSet = function(first, second) {
   const { size } = first;
   if (size !== second.size) {
     return false;
@@ -450,7 +450,7 @@ function equalSet(first, second) {
     }
   }
   return true;
-}
+};
 
 // src/js/value/diff.ts
 function diff(first, second) {
@@ -483,7 +483,7 @@ function diff(first, second) {
   }
   return result;
 }
-function getDiffs(first, second, prefix) {
+var getDiffs = function(first, second, prefix) {
   const changes = [];
   const checked = new Set;
   for (let outerIndex = 0;outerIndex < 2; outerIndex += 1) {
@@ -518,9 +518,9 @@ function getDiffs(first, second, prefix) {
     }
   }
   return changes;
-}
+};
 // src/js/internal/value-handle.ts
-function findKey(needle, haystack, ignoreCase) {
+var findKey = function(needle, haystack, ignoreCase) {
   if (!ignoreCase) {
     return needle;
   }
@@ -528,7 +528,7 @@ function findKey(needle, haystack, ignoreCase) {
   const normalised = keys.map((key) => key.toLowerCase());
   const index = normalised.indexOf(needle.toLowerCase());
   return index > -1 ? keys[index] : needle;
-}
+};
 function handleValue(data, path, value, get, ignoreCase) {
   if (typeof data === "object" && data !== null && !/^(__proto__|constructor|prototype)$/i.test(path)) {
     const key = findKey(path, data, ignoreCase);
@@ -606,7 +606,7 @@ function setValue(data, path, value, ignoreCase) {
   return data;
 }
 // src/js/value/smush.ts
-function flatten(value, prefix) {
+var flatten = function(value, prefix) {
   const keys = Object.keys(value);
   const { length } = keys;
   const smushed = {};
@@ -623,12 +623,12 @@ function flatten(value, prefix) {
     }
   }
   return smushed;
-}
+};
 function smush(value) {
   return flatten(value);
 }
 // src/js/value/unsmush.ts
-function getKeyGroups(value) {
+var getKeyGroups = function(value) {
   const keys = Object.keys(value);
   const { length } = keys;
   const grouped = [];
@@ -642,7 +642,7 @@ function getKeyGroups(value) {
     }
   }
   return grouped;
-}
+};
 function unsmush(value) {
   const groups = getKeyGroups(value);
   const { length } = groups;
@@ -723,14 +723,14 @@ function isPrimitive(value2) {
 }
 
 // src/js/array/sort.ts
-function comparison(first, second) {
+var comparison = function(first, second) {
   if (typeof first === "number" && typeof second === "number") {
     return first - second;
   }
   const firstAsNumber = Number(first);
   const secondAsNumber = Number(second);
   return Number.isNaN(firstAsNumber) || Number.isNaN(secondAsNumber) ? String(first).localeCompare(String(second)) : firstAsNumber - secondAsNumber;
-}
+};
 function sort(array2, first, second) {
   if (array2.length < 2) {
     return array2;
@@ -862,39 +862,158 @@ function getNumber(value2) {
   return +(/^0x[0-9a-f]+$/i.test(trimmed) ? trimmed : trimmed.replace(/_/g, ""));
 }
 
-// src/js/internal/colour-property.ts
-function createProperty(store, key, min, max) {
-  return {
-    get() {
-      return store[key];
-    },
-    set(value2) {
-      store[key] = clamp(value2, min, max);
-    }
-  };
+// src/js/colour/is.ts
+function isColour(value2) {
+  return isInstance(/^(hex|hsl|rgb)$/, value2);
+}
+function isColourValue(value2, properties) {
+  return typeof value2 === "object" && value2 !== null && properties.every((property) => (property in value2) && typeof value2[property] === "number");
+}
+function isHexColour(value2) {
+  return isInstance(/^hex$/, value2);
+}
+function isHSLColour(value2) {
+  return isInstance(/^hsl$/, value2);
+}
+var isInstance = function(pattern, value2) {
+  return typeof value2 === "object" && value2 !== null && "$colour" in value2 && typeof value2.$colour === "string" && pattern.test(value2.$colour);
+};
+function isRGBColour(value2) {
+  return isInstance(/^rgb$/, value2);
+}
+
+// src/js/colour/base.ts
+class Colour {
+  get value() {
+    return { ...this.state.value };
+  }
+  constructor(type, value2, defaults, properties) {
+    this.$colour = type;
+    this.state = {
+      value: isColourValue(value2, properties) ? { ...value2 } : { ...defaults }
+    };
+  }
 }
 
 // src/js/colour/hsl.ts
-function createHsl(original) {
-  const value2 = { ...original };
-  const instance = Object.create({
-    toHex() {
-      return hslToRgb(value2).toHex();
-    },
-    toRgb() {
-      return hslToRgb(value2);
-    },
-    toString() {
-      return `hsl(${value2.hue}, ${value2.saturation}%, ${value2.lightness}%)`;
-    }
+function getHSLColour(value2) {
+  return new HSLColour(value2);
+}
+
+class HSLColour extends Colour {
+  get hue() {
+    return +this.state.value.hue;
+  }
+  set hue(value2) {
+    this.state.value.hue = clamp(value2, 0, 360);
+  }
+  get lightness() {
+    return +this.state.value.lightness;
+  }
+  set lightness(value2) {
+    this.state.value.lightness = clamp(value2, 0, 100);
+  }
+  get saturation() {
+    return +this.state.value.saturation;
+  }
+  set saturation(value2) {
+    this.state.value.saturation = clamp(value2, 0, 100);
+  }
+  constructor(value2) {
+    super("hsl", value2, defaults, properties);
+  }
+  toHex() {
+    return HSLColour.toRgb(this.state.value).toHex();
+  }
+  toRgb() {
+    return HSLColour.toRgb(this.state.value);
+  }
+  toString() {
+    return `hsl(${this.state.value.hue}, ${this.state.value.saturation}%, ${this.state.value.lightness}%)`;
+  }
+  static toRgb(value2) {
+    return hslToRgb(value2);
+  }
+}
+var defaults = {
+  hue: 0,
+  lightness: 0,
+  saturation: 0
+};
+var properties = [
+  "hue",
+  "lightness",
+  "saturation"
+];
+
+// src/js/colour/rgb.ts
+function getRGBColour(value2) {
+  return new RGBColour(value2);
+}
+
+class RGBColour extends Colour {
+  get blue() {
+    return +this.state.value.blue;
+  }
+  set blue(value2) {
+    this.state.value.blue = clamp(value2, 0, 255);
+  }
+  get green() {
+    return +this.state.value.green;
+  }
+  set green(value2) {
+    this.state.value.green = clamp(value2, 0, 255);
+  }
+  get red() {
+    return +this.state.value.red;
+  }
+  set red(value2) {
+    this.state.value.red = clamp(value2, 0, 255);
+  }
+  constructor(value2) {
+    super("rgb", value2, defaults2, properties2);
+  }
+  toHex() {
+    return RGBColour.toHex(this.value);
+  }
+  toHsl() {
+    return RGBColour.toHsl(this.value);
+  }
+  toString() {
+    return `rgb(${this.value.red}, ${this.value.green}, ${this.value.blue})`;
+  }
+  static toHex(value2) {
+    return rgbToHex(value2);
+  }
+  static toHsl(rgb) {
+    return rgbToHsl(rgb);
+  }
+}
+var defaults2 = {
+  blue: 0,
+  green: 0,
+  red: 0
+};
+var properties2 = ["blue", "green", "red"];
+
+// src/js/colour/functions.ts
+function getNormalisedHex(value2) {
+  const normalised = value2.replace(/^#/, "");
+  return normalised.length === 3 ? normalised.split("").map((character) => character.repeat(2)).join("") : normalised;
+}
+function hexToRgb(value2) {
+  const hex2 = anyPattern.test(value2) ? getNormalisedHex(value2) : "";
+  const pairs = groupedPattern.exec(hex2) ?? [];
+  const rgb2 = [];
+  const { length } = pairs;
+  for (let index = 1;index < length; index += 1) {
+    rgb2.push(Number.parseInt(pairs[index], 16));
+  }
+  return new RGBColour({
+    blue: rgb2[2] ?? 0,
+    green: rgb2[1] ?? 0,
+    red: rgb2[0] ?? 0
   });
-  Object.defineProperties(instance, {
-    hue: createProperty(value2, "hue", 0, 360),
-    lightness: createProperty(value2, "lightness", 0, 100),
-    saturation: createProperty(value2, "saturation", 0, 100),
-    value: { value: value2 }
-  });
-  return instance;
 }
 function hslToRgb(value2) {
   let hue = value2.hue % 360;
@@ -908,37 +1027,14 @@ function hslToRgb(value2) {
     const mod = saturation * Math.min(lightness, 1 - lightness);
     return lightness - mod * Math.max(-1, Math.min(part - 3, 9 - part, 1));
   }
-  return createRgb({
+  return new RGBColour({
     blue: clamp(Math.round(get2(4) * 255), 0, 255),
     green: clamp(Math.round(get2(8) * 255), 0, 255),
     red: clamp(Math.round(get2(0) * 255), 0, 255)
   });
 }
-
-// src/js/colour/rgb.ts
-function createRgb(original) {
-  const value2 = { ...original };
-  const instance = Object.create({
-    toHex() {
-      return rgbToHex(value2);
-    },
-    toHsl() {
-      return rgbToHsl(value2);
-    },
-    toString() {
-      return `rgb(${value2.red}, ${value2.green}, ${value2.blue})`;
-    }
-  });
-  Object.defineProperties(instance, {
-    blue: createProperty(value2, "blue", 0, 255),
-    green: createProperty(value2, "green", 0, 255),
-    red: createProperty(value2, "red", 0, 255),
-    value: { value: value2 }
-  });
-  return instance;
-}
 function rgbToHex(value2) {
-  return createHex(`${[value2.red, value2.green, value2.blue].map((colour) => {
+  return new HexColour(`${[value2.red, value2.green, value2.blue].map((colour) => {
     const hex2 = colour.toString(16);
     return hex2.length === 1 ? `0${hex2}` : hex2;
   }).join("")}`);
@@ -977,85 +1073,74 @@ function rgbToHsl(rgb2) {
   if (hue >= 360) {
     hue -= 360;
   }
-  return createHsl({
+  return new HSLColour({
     hue: +hue.toFixed(2),
     lightness: +(lightness * 100).toFixed(2),
     saturation: +(saturation * 100).toFixed(2)
   });
 }
-
-// src/js/colour/hex.ts
-function createHex(original) {
-  let value2 = original.slice();
-  const instance = Object.create({
-    toHsl() {
-      return hexToRgb(value2).toHsl();
-    },
-    toRgb() {
-      return hexToRgb(value2);
-    },
-    toString() {
-      return `#${value2}`;
-    }
-  });
-  Object.defineProperty(instance, "value", {
-    get() {
-      return `#${value2}`;
-    },
-    set(hex2) {
-      if (anyPattern.test(hex2)) {
-        value2 = getNormalisedHex(hex2);
-      }
-    }
-  });
-  return instance;
-}
-function getHexColour(value2) {
-  return createHex(anyPattern.test(value2) ? getNormalisedHex(value2) : "000000");
-}
-function getNormalisedHex(value2) {
-  const normalised = value2.replace(/^#/, "");
-  return normalised.length === 3 ? normalised.split("").map((character) => character.repeat(2)).join("") : normalised;
-}
-function hexToRgb(value2) {
-  const hex2 = anyPattern.test(value2) ? getNormalisedHex(value2) : "";
-  const pairs = groupedPattern.exec(hex2) ?? [];
-  const rgb3 = [];
-  const { length } = pairs;
-  for (let index = 1;index < length; index += 1) {
-    rgb3.push(Number.parseInt(pairs[index], 16));
-  }
-  return createRgb({ blue: rgb3[2] ?? 0, green: rgb3[1] ?? 0, red: rgb3[0] ?? 0 });
-}
 var anyPattern = /^#*([a-f0-9]{3}){1,2}$/i;
 var groupedPattern = /^#*([a-f0-9]{2})([a-f0-9]{2})([a-f0-9]{2})$/i;
+
+// src/js/colour/hex.ts
+function getHexColour(value2) {
+  return new HexColour(value2);
+}
+
+class HexColour {
+  state;
+  get value() {
+    return `#${this.state.value}`;
+  }
+  set value(value2) {
+    this.state.value = anyPattern.test(value2) ? getNormalisedHex(value2) : "000000";
+  }
+  constructor(value2) {
+    this.$colour = "hex";
+    this.state = {
+      value: typeof value2 === "string" && anyPattern.test(value2) ? getNormalisedHex(value2) : "000000"
+    };
+  }
+  toHsl() {
+    return HexColour.toRgb(this.value).toHsl();
+  }
+  toRgb() {
+    return HexColour.toRgb(this.value);
+  }
+  toString() {
+    return this.value;
+  }
+  static toRgb(value2) {
+    return hexToRgb(value2);
+  }
+}
 // src/js/element/focusable.ts
 function getFocusableElements(parent) {
   return getValidElements(parent, getFocusableFilters(), false);
 }
-function getFocusableFilters() {
+var getFocusableFilters = function() {
   return [isDisabled, isInert, isHidden, isSummarised];
-}
-function getItem(element, tabbable) {
+};
+var getItem = function(element, tabbable) {
   return {
     element,
     tabIndex: tabbable ? getTabIndex(element) : -1
   };
-}
-function getTabbableFilters() {
+};
+var getTabbableFilters = function() {
   return [isNotTabbable, isNotTabbableRadio, ...getFocusableFilters()];
-}
+};
 function getTabbableElements(parent) {
   return getValidElements(parent, getTabbableFilters(), true);
 }
-function getTabIndex(element) {
+var getTabIndex = function(element) {
   const tabIndex = element?.tabIndex ?? -1;
   if (tabIndex < 0 && (/^(audio|details|video)$/i.test(element.tagName) || isEditable(element)) && !hasTabIndex(element)) {
     return 0;
   }
   return tabIndex;
-}
-function getValidElements(parent, filters, tabbable) {
+};
+var getValidElements = function(parent, filters, tabbable) {
   const items = Array.from(parent.querySelectorAll(selector)).map((element) => getItem(element, tabbable)).filter((item) => !filters.some((filter3) => filter3(item)));
   if (!tabbable) {
     return items.map((item) => item.element);
@@ -1075,17 +1160,17 @@ function getValidElements(parent, filters, tabbable) {
     }
   }
   return [...indiced.flat(), ...zeroed];
-}
-function hasTabIndex(element) {
+};
+var hasTabIndex = function(element) {
   return !Number.isNaN(Number.parseInt(element.getAttribute("tabindex"), 10));
-}
-function isDisabled(item) {
+};
+var isDisabled = function(item) {
   if (/^(button|input|select|textarea)$/i.test(item.element.tagName) && isDisabledFromFieldset(item.element)) {
     return true;
   }
   return (item.element.disabled ?? false) || item.element.getAttribute("aria-disabled") === "true";
-}
-function isDisabledFromFieldset(element) {
+};
+var isDisabledFromFieldset = function(element) {
   let parent = element.parentElement;
   while (parent !== null) {
     if (parent instanceof HTMLFieldSetElement && parent.disabled) {
@@ -1102,14 +1187,14 @@ function isDisabledFromFieldset(element) {
     parent = parent.parentElement;
   }
   return false;
-}
-function isEditable(element) {
+};
+var isEditable = function(element) {
   return /^(|true)$/i.test(element.getAttribute("contenteditable"));
-}
+};
 function isFocusableElement(element) {
   return isValidElement(element, getFocusableFilters(), false);
 }
-function isHidden(item) {
+var isHidden = function(item) {
   if ((item.element.hidden ?? false) || item.element instanceof HTMLInputElement && item.element.type === "hidden") {
     return true;
   }
@@ -1124,17 +1209,17 @@ function isHidden(item) {
   }
   const { height, width } = item.element.getBoundingClientRect();
   return height === 0 && width === 0;
-}
-function isInert(item) {
+};
+var isInert = function(item) {
   return (item.element.inert ?? false) || /^(|true)$/i.test(item.element.getAttribute("inert")) || item.element.parentElement !== null && isInert({
     element: item.element.parentElement,
     tabIndex: -1
   });
-}
-function isNotTabbable(item) {
+};
+var isNotTabbable = function(item) {
   return (item.tabIndex ?? -1) < 0;
-}
-function isNotTabbableRadio(item) {
+};
+var isNotTabbableRadio = function(item) {
   if (!(item.element instanceof HTMLInputElement) || item.element.type !== "radio" || !item.element.name || item.element.checked) {
     return false;
   }
@@ -1143,17 +1228,17 @@ function isNotTabbableRadio(item) {
   const radios = Array.from(parent.querySelectorAll(`input[type="radio"][name="${realName}"]`));
   const checked = radios.find((radio) => radio.checked);
   return checked !== undefined && checked !== item.element;
-}
-function isSummarised(item) {
+};
+var isSummarised = function(item) {
   return item.element instanceof HTMLDetailsElement && Array.from(item.element.children).some((child) => /^summary$/i.test(child.tagName));
-}
+};
 function isTabbableElement(element) {
   return isValidElement(element, getTabbableFilters(), true);
 }
-function isValidElement(element, filters, tabbable) {
+var isValidElement = function(element, filters, tabbable) {
   const item = getItem(element, tabbable);
   return !filters.some((filter3) => filter3(item));
-}
+};
 var selector = [
   '[contenteditable]:not([contenteditable="false"])',
   "[tabindex]:not(slot)",
@@ -1187,7 +1272,7 @@ function getTextDirection(element) {
 }
 
 // src/js/element/closest.ts
-function calculateDistance(origin, target) {
+var calculateDistance = function(origin, target) {
   if (origin === target || origin.parentElement === target) {
     return 0;
   }
@@ -1203,7 +1288,7 @@ function calculateDistance(origin, target) {
     default:
       return -1;
   }
-}
+};
 function closest(origin, selector2, context) {
   if (origin.matches(selector2)) {
     return [origin];
@@ -1231,7 +1316,7 @@ function closest(origin, selector2, context) {
   }
   return minimum == null ? [] : distances.filter((found) => found.distance === minimum).map((found) => found.element);
 }
-function traverse(from, to) {
+var traverse = function(from, to) {
   const children = [...to.children];
   if (children.includes(from)) {
     return children.indexOf(from) + 1;
@@ -1256,7 +1341,7 @@ function traverse(from, to) {
     parent = parent.parentElement;
   }
   return -1e6;
-}
+};
 // src/js/internal/element-value.ts
 function setElementValues(element, first, second, callback) {
   if (isPlainObject(first)) {
@@ -1291,23 +1376,23 @@ function getData(element, keys) {
   }
   return data;
 }
-function getDataValue(element, key) {
+var getDataValue = function(element, key) {
   const value2 = element.dataset[key];
   if (value2 != null) {
     return parse(value2);
   }
-}
+};
 function setData(element, first, second) {
   setElementValues(element, first, second, updateDataAttribute);
 }
-function updateDataAttribute(element, key, value2) {
+var updateDataAttribute = function(element, key, value2) {
   updateElementValue(element, `data-${key}`, value2, element.setAttribute, element.removeAttribute, true);
-}
+};
 // src/js/element/find.ts
 function findElement(selector2, context) {
   return findElementOrElements(selector2, context, true);
 }
-function findElementOrElements(selector2, context, single) {
+var findElementOrElements = function(selector2, context, single) {
   const callback = single ? document.querySelector : document.querySelectorAll;
   const contexts = context == null ? [document] : findElementOrElements(context, undefined, false);
   const result = [];
@@ -1335,7 +1420,7 @@ function findElementOrElements(selector2, context, single) {
     }
   }
   return result;
-}
+};
 function findElements(selector2, context) {
   return findElementOrElements(selector2, context, false);
 }
@@ -1365,23 +1450,23 @@ function findParentElement(origin, selector2) {
 function setStyles(element, first, second) {
   setElementValues(element, first, second, updateStyleProperty);
 }
-function updateStyleProperty(element, key, value2) {
+var updateStyleProperty = function(element, key, value2) {
   updateElementValue(element, key, value2, function(key2, value3) {
     this.style[key2] = value3;
   }, function(key2) {
     this.style[key2] = "";
   }, false);
-}
+};
 // src/js/emitter.ts
-function createObserable(emitter, observers) {
+var createObserable = function(emitter, observers) {
   const instance = Object.create({
     subscribe(first, second, third) {
       return createSubscription(emitter, observers, getObserver(first, second, third));
     }
   });
   return instance;
-}
-function createSubscription(emitter, observers, observer) {
+};
+var createSubscription = function(emitter, observers, observer) {
   let closed = false;
   const instance = Object.create({
     unsubscribe() {
@@ -1399,8 +1484,8 @@ function createSubscription(emitter, observers, observer) {
   observers.set(instance, observer);
   observer.next?.(emitter.value);
   return instance;
-}
-function getObserver(first, second, third) {
+};
+var getObserver = function(first, second, third) {
   let observer;
   if (typeof first === "object") {
     observer = first;
@@ -1412,7 +1497,7 @@ function getObserver(first, second, third) {
     };
   }
   return observer;
-}
+};
 function emitter(value2) {
   let active = true;
   let stored = value2;
@@ -1557,7 +1642,7 @@ function throttle(callback, time) {
   };
 }
 // src/js/logger.ts
-function time(label) {
+var time = function(label) {
   const started = logger.enabled;
   let stopped = false;
   if (started) {
@@ -1576,7 +1661,7 @@ function time(label) {
       }
     }
   });
-}
+};
 if (globalThis._atomic_logging == null) {
   globalThis._atomic_logging = true;
 }
@@ -1659,7 +1744,7 @@ function fromQuery(query) {
   }
   return parameters;
 }
-function getParts(value3, fromArray, prefix) {
+var getParts = function(value3, fromArray, prefix) {
   const keys = Object.keys(value3);
   const { length } = keys;
   const parts = [];
@@ -1675,8 +1760,8 @@ function getParts(value3, fromArray, prefix) {
     }
   }
   return parts;
-}
-function getValue2(value3) {
+};
+var getValue2 = function(value3) {
   if (/^(false|true)$/.test(value3)) {
     return value3 === "true";
   }
@@ -1685,10 +1770,10 @@ function getValue2(value3) {
     return asNumber;
   }
   return value3;
-}
-function isDecodable(value3) {
+};
+var isDecodable = function(value3) {
   return ["boolean", "number", "string"].includes(typeof value3);
-}
+};
 function toQuery(parameters) {
   return getParts(parameters, false).filter((part) => part.length > 0).join("&");
 }
@@ -1724,28 +1809,28 @@ function delay(time2, timeout) {
     });
   });
 }
-function getValueOrDefault(value3, defaultValue, minimum) {
+var getValueOrDefault = function(value3, defaultValue, minimum) {
   return typeof value3 === "number" && value3 > (minimum ?? 0) ? value3 : defaultValue;
-}
-function is10(value3, pattern) {
+};
+var is11 = function(value3, pattern) {
   return pattern.test(value3?.$timer);
-}
+};
 function isRepeated(value3) {
-  return is10(value3, /^repeat$/);
+  return is11(value3, /^repeat$/);
 }
 function isTimer(value3) {
-  return is10(value3, /^repeat|wait$/);
+  return is11(value3, /^repeat|wait$/);
 }
 function isWaited(value3) {
-  return is10(value3, /^wait$/);
+  return is11(value3, /^wait$/);
 }
 function isWhen(value3) {
-  return is10(value3, /^when$/) && typeof value3.then === "function";
+  return is11(value3, /^when$/) && typeof value3.then === "function";
 }
 function repeat(callback, options) {
   return timer("repeat", callback, options ?? {}, true);
 }
-function timer(type, callback, partial2, start) {
+var timer = function(type, callback, partial2, start) {
   const isRepeated2 = type === "repeat";
   const options = {
     afterCallback: partial2.afterCallback,
@@ -1804,7 +1889,7 @@ function timer(type, callback, partial2, start) {
     instance.start();
   }
   return instance;
-}
+};
 function wait(callback, options) {
   return timer("wait", callback, options == null || typeof options === "number" ? {
     interval: options
@@ -1871,7 +1956,7 @@ function when(condition, options) {
   });
   return instance;
 }
-function work(type, timer2, state, options, isRepeated2) {
+var work = function(type, timer2, state, options, isRepeated2) {
   if (["continue", "start"].includes(type) && state.active || ["pause", "stop"].includes(type) && !state.active) {
     return timer2;
   }
@@ -1944,7 +2029,7 @@ function work(type, timer2, state, options, isRepeated2) {
   activeTimers.add(timer2);
   state.frame = requestAnimationFrame(step);
   return timer2;
-}
+};
 if (globalThis._atomic_timers == null) {
   Object.defineProperty(globalThis, "_atomic_timers", {
     get() {
@@ -2016,8 +2101,6 @@ export {
   setStyles,
   setData,
   round,
-  rgbToHsl,
-  rgbToHex,
   repeat,
   queue,
   push,
@@ -2037,6 +2120,7 @@ export {
   isTimer,
   isTabbableElement,
   isRepeated,
+  isRGBColour,
   isPrimitive,
   isPlainObject,
   isObject,
@@ -2046,13 +2130,14 @@ export {
   isNullableOrEmpty,
   isNullable,
   isKey,
+  isHexColour,
+  isHSLColour,
   isFocusableElement,
   isEmpty,
+  isColour,
   isArrayOrPlainObject,
   insert,
   indexOf,
-  hslToRgb,
-  hexToRgb,
   groupBy,
   getValue,
   getTextDirection,
@@ -2067,9 +2152,11 @@ export {
   getRandomColour,
   getRandomCharacters,
   getRandomBoolean,
+  getRGBColour,
   getPosition,
   getNumber,
   getHexColour,
+  getHSLColour,
   getForegroundColour,
   getFocusableElements,
   getElementUnderPointer,
@@ -2098,6 +2185,9 @@ export {
   camelCase,
   between,
   average,
+  RGBColour,
+  HexColour,
+  HSLColour,
   findElements as $$,
   findElement as $
 };

@@ -20,39 +20,158 @@ function clamp(value, min, max, loop) {
   return value > max ? loop === true ? min : max : value;
 }
 
-// src/js/internal/colour-property.ts
-function createProperty(store, key, min, max) {
-  return {
-    get() {
-      return store[key];
-    },
-    set(value) {
-      store[key] = clamp(value, min, max);
-    }
-  };
+// src/js/colour/is.ts
+function isColour(value) {
+  return isInstance(/^(hex|hsl|rgb)$/, value);
+}
+function isColourValue(value, properties) {
+  return typeof value === "object" && value !== null && properties.every((property) => (property in value) && typeof value[property] === "number");
+}
+function isHexColour(value) {
+  return isInstance(/^hex$/, value);
+}
+function isHSLColour(value) {
+  return isInstance(/^hsl$/, value);
+}
+var isInstance = function(pattern, value) {
+  return typeof value === "object" && value !== null && "$colour" in value && typeof value.$colour === "string" && pattern.test(value.$colour);
+};
+function isRGBColour(value) {
+  return isInstance(/^rgb$/, value);
+}
+
+// src/js/colour/base.ts
+class Colour {
+  get value() {
+    return { ...this.state.value };
+  }
+  constructor(type, value, defaults, properties) {
+    this.$colour = type;
+    this.state = {
+      value: isColourValue(value, properties) ? { ...value } : { ...defaults }
+    };
+  }
 }
 
 // src/js/colour/hsl.ts
-function createHsl(original) {
-  const value = { ...original };
-  const instance = Object.create({
-    toHex() {
-      return hslToRgb(value).toHex();
-    },
-    toRgb() {
-      return hslToRgb(value);
-    },
-    toString() {
-      return `hsl(${value.hue}, ${value.saturation}%, ${value.lightness}%)`;
-    }
+function getHSLColour(value) {
+  return new HSLColour(value);
+}
+
+class HSLColour extends Colour {
+  get hue() {
+    return +this.state.value.hue;
+  }
+  set hue(value) {
+    this.state.value.hue = clamp(value, 0, 360);
+  }
+  get lightness() {
+    return +this.state.value.lightness;
+  }
+  set lightness(value) {
+    this.state.value.lightness = clamp(value, 0, 100);
+  }
+  get saturation() {
+    return +this.state.value.saturation;
+  }
+  set saturation(value) {
+    this.state.value.saturation = clamp(value, 0, 100);
+  }
+  constructor(value) {
+    super("hsl", value, defaults, properties);
+  }
+  toHex() {
+    return HSLColour.toRgb(this.state.value).toHex();
+  }
+  toRgb() {
+    return HSLColour.toRgb(this.state.value);
+  }
+  toString() {
+    return `hsl(${this.state.value.hue}, ${this.state.value.saturation}%, ${this.state.value.lightness}%)`;
+  }
+  static toRgb(value) {
+    return hslToRgb(value);
+  }
+}
+var defaults = {
+  hue: 0,
+  lightness: 0,
+  saturation: 0
+};
+var properties = [
+  "hue",
+  "lightness",
+  "saturation"
+];
+
+// src/js/colour/rgb.ts
+function getRGBColour(value) {
+  return new RGBColour(value);
+}
+
+class RGBColour extends Colour {
+  get blue() {
+    return +this.state.value.blue;
+  }
+  set blue(value) {
+    this.state.value.blue = clamp(value, 0, 255);
+  }
+  get green() {
+    return +this.state.value.green;
+  }
+  set green(value) {
+    this.state.value.green = clamp(value, 0, 255);
+  }
+  get red() {
+    return +this.state.value.red;
+  }
+  set red(value) {
+    this.state.value.red = clamp(value, 0, 255);
+  }
+  constructor(value) {
+    super("rgb", value, defaults2, properties2);
+  }
+  toHex() {
+    return RGBColour.toHex(this.value);
+  }
+  toHsl() {
+    return RGBColour.toHsl(this.value);
+  }
+  toString() {
+    return `rgb(${this.value.red}, ${this.value.green}, ${this.value.blue})`;
+  }
+  static toHex(value) {
+    return rgbToHex(value);
+  }
+  static toHsl(rgb) {
+    return rgbToHsl(rgb);
+  }
+}
+var defaults2 = {
+  blue: 0,
+  green: 0,
+  red: 0
+};
+var properties2 = ["blue", "green", "red"];
+
+// src/js/colour/functions.ts
+function getNormalisedHex(value) {
+  const normalised = value.replace(/^#/, "");
+  return normalised.length === 3 ? normalised.split("").map((character) => character.repeat(2)).join("") : normalised;
+}
+function hexToRgb(value) {
+  const hex2 = anyPattern.test(value) ? getNormalisedHex(value) : "";
+  const pairs = groupedPattern.exec(hex2) ?? [];
+  const rgb2 = [];
+  const { length } = pairs;
+  for (let index = 1;index < length; index += 1) {
+    rgb2.push(Number.parseInt(pairs[index], 16));
+  }
+  return new RGBColour({
+    blue: rgb2[2] ?? 0,
+    green: rgb2[1] ?? 0,
+    red: rgb2[0] ?? 0
   });
-  Object.defineProperties(instance, {
-    hue: createProperty(value, "hue", 0, 360),
-    lightness: createProperty(value, "lightness", 0, 100),
-    saturation: createProperty(value, "saturation", 0, 100),
-    value: { value }
-  });
-  return instance;
 }
 function hslToRgb(value) {
   let hue = value.hue % 360;
@@ -66,37 +185,14 @@ function hslToRgb(value) {
     const mod = saturation * Math.min(lightness, 1 - lightness);
     return lightness - mod * Math.max(-1, Math.min(part - 3, 9 - part, 1));
   }
-  return createRgb({
+  return new RGBColour({
     blue: clamp(Math.round(get(4) * 255), 0, 255),
     green: clamp(Math.round(get(8) * 255), 0, 255),
     red: clamp(Math.round(get(0) * 255), 0, 255)
   });
 }
-
-// src/js/colour/rgb.ts
-function createRgb(original) {
-  const value = { ...original };
-  const instance = Object.create({
-    toHex() {
-      return rgbToHex(value);
-    },
-    toHsl() {
-      return rgbToHsl(value);
-    },
-    toString() {
-      return `rgb(${value.red}, ${value.green}, ${value.blue})`;
-    }
-  });
-  Object.defineProperties(instance, {
-    blue: createProperty(value, "blue", 0, 255),
-    green: createProperty(value, "green", 0, 255),
-    red: createProperty(value, "red", 0, 255),
-    value: { value }
-  });
-  return instance;
-}
 function rgbToHex(value) {
-  return createHex(`${[value.red, value.green, value.blue].map((colour) => {
+  return new HexColour(`${[value.red, value.green, value.blue].map((colour) => {
     const hex2 = colour.toString(16);
     return hex2.length === 1 ? `0${hex2}` : hex2;
   }).join("")}`);
@@ -135,63 +231,57 @@ function rgbToHsl(rgb2) {
   if (hue >= 360) {
     hue -= 360;
   }
-  return createHsl({
+  return new HSLColour({
     hue: +hue.toFixed(2),
     lightness: +(lightness * 100).toFixed(2),
     saturation: +(saturation * 100).toFixed(2)
   });
 }
-
-// src/js/colour/hex.ts
-function createHex(original) {
-  let value = original.slice();
-  const instance = Object.create({
-    toHsl() {
-      return hexToRgb(value).toHsl();
-    },
-    toRgb() {
-      return hexToRgb(value);
-    },
-    toString() {
-      return `#${value}`;
-    }
-  });
-  Object.defineProperty(instance, "value", {
-    get() {
-      return `#${value}`;
-    },
-    set(hex2) {
-      if (anyPattern.test(hex2)) {
-        value = getNormalisedHex(hex2);
-      }
-    }
-  });
-  return instance;
-}
-function getHexColour(value) {
-  return createHex(anyPattern.test(value) ? getNormalisedHex(value) : "000000");
-}
-function getNormalisedHex(value) {
-  const normalised = value.replace(/^#/, "");
-  return normalised.length === 3 ? normalised.split("").map((character) => character.repeat(2)).join("") : normalised;
-}
-function hexToRgb(value) {
-  const hex2 = anyPattern.test(value) ? getNormalisedHex(value) : "";
-  const pairs = groupedPattern.exec(hex2) ?? [];
-  const rgb3 = [];
-  const { length } = pairs;
-  for (let index = 1;index < length; index += 1) {
-    rgb3.push(Number.parseInt(pairs[index], 16));
-  }
-  return createRgb({ blue: rgb3[2] ?? 0, green: rgb3[1] ?? 0, red: rgb3[0] ?? 0 });
-}
 var anyPattern = /^#*([a-f0-9]{3}){1,2}$/i;
 var groupedPattern = /^#*([a-f0-9]{2})([a-f0-9]{2})([a-f0-9]{2})$/i;
+
+// src/js/colour/hex.ts
+function getHexColour(value) {
+  return new HexColour(value);
+}
+
+class HexColour {
+  state;
+  get value() {
+    return `#${this.state.value}`;
+  }
+  set value(value) {
+    this.state.value = anyPattern.test(value) ? getNormalisedHex(value) : "000000";
+  }
+  constructor(value) {
+    this.$colour = "hex";
+    this.state = {
+      value: typeof value === "string" && anyPattern.test(value) ? getNormalisedHex(value) : "000000"
+    };
+  }
+  toHsl() {
+    return HexColour.toRgb(this.value).toHsl();
+  }
+  toRgb() {
+    return HexColour.toRgb(this.value);
+  }
+  toString() {
+    return this.value;
+  }
+  static toRgb(value) {
+    return hexToRgb(value);
+  }
+}
 export {
-  rgbToHsl,
-  rgbToHex,
-  hslToRgb,
-  hexToRgb,
+  isRGBColour,
+  isHexColour,
+  isHSLColour,
+  isColour,
+  getRGBColour,
   getHexColour,
-  getForegroundColour
+  getHSLColour,
+  getForegroundColour,
+  RGBColour,
+  HexColour,
+  HSLColour
 };

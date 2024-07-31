@@ -1,57 +1,100 @@
-import {createProperty} from '../internal/colour-property';
 import {clamp} from '../number';
-import type {HSLColour, HSLColourValue, RGBColour} from './models';
-import {createRgb} from './rgb';
+import {Colour} from './base';
+import {hslToRgb} from './functions';
+import type {HexColour} from './hex';
+import type {RGBColour} from './rgb';
 
-export function createHsl(original: HSLColourValue): HSLColour {
-	const value = {...original};
+export type HSLColourValue = {
+	hue: number;
+	lightness: number;
+	saturation: number;
+};
 
-	const instance = Object.create({
-		toHex() {
-			return hslToRgb(value).toHex();
-		},
-		toRgb() {
-			return hslToRgb(value);
-		},
-		toString() {
-			return `hsl(${value.hue}, ${value.saturation}%, ${value.lightness}%)`;
-		},
-	});
+export class HSLColour extends Colour<HSLColourValue> {
+	/**
+	 * Gets the current hue
+	 */
+	get hue(): number {
+		return +this.state.value.hue;
+	}
 
-	Object.defineProperties(instance, {
-		hue: createProperty(value, 'hue', 0, 360),
-		lightness: createProperty(value, 'lightness', 0, 100),
-		saturation: createProperty(value, 'saturation', 0, 100),
-		value: {value},
-	});
+	/**
+	 * Sets the current hue
+	 */
+	set hue(value: number) {
+		this.state.value.hue = clamp(value, 0, 360);
+	}
 
-	return instance;
+	/**
+	 * Gets the current lightness
+	 */
+	get lightness(): number {
+		return +this.state.value.lightness;
+	}
+
+	/**
+	 * Sets the current lightness
+	 */
+	set lightness(value: number) {
+		this.state.value.lightness = clamp(value, 0, 100);
+	}
+
+	/**
+	 * Gets the current saturation
+	 */
+	get saturation(): number {
+		return +this.state.value.saturation;
+	}
+
+	/**
+	 * Sets the current saturation
+	 */
+	set saturation(value: number) {
+		this.state.value.saturation = clamp(value, 0, 100);
+	}
+
+	constructor(value: HSLColourValue) {
+		super('hsl', value, defaults, properties);
+	}
+
+	toHex(): HexColour {
+		return HSLColour.toRgb(this.state.value).toHex();
+	}
+
+	/**
+	 * Converts the colour to an RGB-colour
+	 */
+	toRgb(): RGBColour {
+		return HSLColour.toRgb(this.state.value);
+	}
+
+	toString(): string {
+		return `hsl(${this.state.value.hue}, ${this.state.value.saturation}%, ${this.state.value.lightness}%)`;
+	}
+
+	/**
+	 * Convert an HSL-colour to an RGB-colour
+	 */
+	static toRgb(value: HSLColourValue): RGBColour {
+		return hslToRgb(value);
+	}
 }
 
+const defaults: HSLColourValue = {
+	hue: 0,
+	lightness: 0,
+	saturation: 0,
+};
+
+const properties: Array<keyof HSLColourValue> = [
+	'hue',
+	'lightness',
+	'saturation',
+];
+
 /**
- * - Convert an HSL-colour to an RGB-colour
- * - Thanks, https://github.com/color-js/color.js/blob/main/src/spaces/hsl.js#L61
+ * Get an HSL-colour from a value-object
  */
-export function hslToRgb(value: HSLColourValue): RGBColour {
-	let hue = value.hue % 360;
-
-	if (hue < 0) {
-		hue += 360;
-	}
-
-	const saturation = value.saturation / 100;
-	const lightness = value.lightness / 100;
-
-	function get(value: number) {
-		const part = (value + hue / 30) % 12;
-		const mod = saturation * Math.min(lightness, 1 - lightness);
-
-		return lightness - mod * Math.max(-1, Math.min(part - 3, 9 - part, 1));
-	}
-
-	return createRgb({
-		blue: clamp(Math.round(get(4) * 255), 0, 255),
-		green: clamp(Math.round(get(8) * 255), 0, 255),
-		red: clamp(Math.round(get(0) * 255), 0, 255),
-	});
+export function getHSLColour(value: HSLColourValue): HSLColour {
+	return new HSLColour(value);
 }

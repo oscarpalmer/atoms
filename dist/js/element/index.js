@@ -18,7 +18,7 @@ function getTextDirection(element) {
 }
 
 // src/js/element/closest.ts
-function calculateDistance(origin, target) {
+var calculateDistance = function(origin, target) {
   if (origin === target || origin.parentElement === target) {
     return 0;
   }
@@ -34,7 +34,7 @@ function calculateDistance(origin, target) {
     default:
       return -1;
   }
-}
+};
 function closest(origin, selector, context) {
   if (origin.matches(selector)) {
     return [origin];
@@ -62,7 +62,7 @@ function closest(origin, selector, context) {
   }
   return minimum == null ? [] : distances.filter((found) => found.distance === minimum).map((found) => found.element);
 }
-function traverse(from, to) {
+var traverse = function(from, to) {
   const children = [...to.children];
   if (children.includes(from)) {
     return children.indexOf(from) + 1;
@@ -87,7 +87,7 @@ function traverse(from, to) {
     parent = parent.parentElement;
   }
   return -1e6;
-}
+};
 // src/js/string/index.ts
 function getString(value2) {
   if (typeof value2 === "string") {
@@ -152,23 +152,23 @@ function getData(element, keys) {
   }
   return data;
 }
-function getDataValue(element, key) {
+var getDataValue = function(element, key) {
   const value2 = element.dataset[key];
   if (value2 != null) {
     return parse(value2);
   }
-}
+};
 function setData(element, first, second) {
   setElementValues(element, first, second, updateDataAttribute);
 }
-function updateDataAttribute(element, key, value2) {
+var updateDataAttribute = function(element, key, value2) {
   updateElementValue(element, `data-${key}`, value2, element.setAttribute, element.removeAttribute, true);
-}
+};
 // src/js/element/find.ts
 function findElement(selector, context) {
   return findElementOrElements(selector, context, true);
 }
-function findElementOrElements(selector, context, single) {
+var findElementOrElements = function(selector, context, single) {
   const callback = single ? document.querySelector : document.querySelectorAll;
   const contexts = context == null ? [document] : findElementOrElements(context, undefined, false);
   const result = [];
@@ -196,7 +196,7 @@ function findElementOrElements(selector, context, single) {
     }
   }
   return result;
-}
+};
 function findElements(selector, context) {
   return findElementOrElements(selector, context, false);
 }
@@ -226,13 +226,13 @@ function findParentElement(origin, selector) {
 function setStyles(element, first, second) {
   setElementValues(element, first, second, updateStyleProperty);
 }
-function updateStyleProperty(element, key, value2) {
+var updateStyleProperty = function(element, key, value2) {
   updateElementValue(element, key, value2, function(key2, value3) {
     this.style[key2] = value3;
   }, function(key2) {
     this.style[key2] = "";
   }, false);
-}
+};
 export {
   setStyles,
   setData,

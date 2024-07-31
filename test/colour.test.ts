@@ -1,11 +1,14 @@
 import {expect, test} from 'bun:test';
 import {
+	HSLColour,
+	HexColour,
+	RGBColour,
 	getForegroundColour,
 	getHexColour,
-	hexToRgb,
-	hslToRgb,
-	rgbToHex,
-	rgbToHsl,
+	isColour,
+	isHSLColour,
+	isHexColour,
+	isRGBColour,
 } from '../src/js/colour';
 
 const foregrounds = [
@@ -76,9 +79,31 @@ test('getHexColour', () => {
 	expect(getHexColour('invalid').value).toBe('#000000');
 });
 
+test('is', () => {
+	const hex = getHexColour(hexes[0]);
+	const hsl = hex.toHsl();
+	const rgb = hsl.toRgb();
+
+	expect(isHexColour(hex)).toBe(true);
+	expect(isHexColour(hsl)).toBe(false);
+	expect(isHexColour(rgb)).toBe(false);
+
+	expect(isHSLColour(hex)).toBe(false);
+	expect(isHSLColour(hsl)).toBe(true);
+	expect(isHSLColour(rgb)).toBe(false);
+
+	expect(isRGBColour(hex)).toBe(false);
+	expect(isRGBColour(hsl)).toBe(false);
+	expect(isRGBColour(rgb)).toBe(true);
+
+	expect(isColour(hex)).toBe(true);
+	expect(isColour(hsl)).toBe(true);
+	expect(isColour(rgb)).toBe(true);
+});
+
 test('hexToRgb', () => {
 	for (let index = 0; index < length; index += 1) {
-		const {blue, green, red} = hexToRgb(hexes[index]);
+		const {blue, green, red} = HexColour.toRgb(hexes[index]);
 
 		expect(blue).toBe(rgbs[index].blue);
 		expect(green).toBe(rgbs[index].green);
@@ -88,7 +113,7 @@ test('hexToRgb', () => {
 
 test('hslToRgb', () => {
 	expect(
-		hslToRgb({
+		HSLColour.toRgb({
 			hue: -90,
 			lightness: 50,
 			saturation: 50,
@@ -98,13 +123,13 @@ test('hslToRgb', () => {
 
 test('rgbToHex', () => {
 	for (let index = 0; index < length; index += 1) {
-		expect(rgbToHex(rgbs[index]).value).toBe(hexes[index]);
+		expect(RGBColour.toHex(rgbs[index]).value).toBe(hexes[index]);
 	}
 });
 
 test('HexColour', () => {
 	for (let index = 0; index < length; index += 1) {
-		const rgb = hexToRgb(hexes[index]);
+		const rgb = HexColour.toRgb(hexes[index]);
 		const hex = rgb.toHex();
 
 		const {value} = hex;
@@ -117,7 +142,7 @@ test('HexColour', () => {
 
 		hex.value = 'invalid';
 
-		expect(hex.value).toBe(value);
+		expect(hex.value).toBe('#000000');
 
 		hex.value = 'fab';
 
@@ -127,7 +152,7 @@ test('HexColour', () => {
 
 test('HSLColour', () => {
 	for (let index = 0; index < length; index += 1) {
-		const hsl = rgbToHsl(rgbs[index]);
+		const hsl = RGBColour.toHsl(rgbs[index]);
 		const rgb = hsl.toRgb();
 		const hex = hsl.toHex();
 
@@ -144,12 +169,20 @@ test('HSLColour', () => {
 		);
 
 		hsl.hue = 180;
+		hsl.lightness = 50;
+		hsl.saturation = 50;
 
 		expect(hsl.hue).toBe(180);
+		expect(hsl.lightness).toBe(50);
+		expect(hsl.saturation).toBe(50);
 
 		hsl.hue = 999;
+		hsl.lightness = 999;
+		hsl.saturation = 999;
 
 		expect(hsl.hue).toBe(360);
+		expect(hsl.lightness).toBe(100);
+		expect(hsl.saturation).toBe(100);
 
 		expect(rgb.value).toEqual(rgbs[index]);
 
@@ -165,7 +198,7 @@ test('HSLColour', () => {
 
 test('RGBColour', () => {
 	for (let index = 0; index < length; index += 1) {
-		const rgb = hslToRgb(hsls[index]);
+		const rgb = HSLColour.toRgb(hsls[index]);
 
 		expect(rgb.value).toEqual(rgbs[index]);
 
@@ -180,6 +213,22 @@ test('RGBColour', () => {
 		);
 
 		const hsl = rgb.toHsl();
+
+		rgb.blue = 128;
+		rgb.green = 128;
+		rgb.red = 128;
+
+		expect(rgb.blue).toBe(128);
+		expect(rgb.green).toBe(128);
+		expect(rgb.red).toBe(128);
+
+		rgb.blue = blue;
+		rgb.green = green;
+		rgb.red = red;
+
+		expect(rgb.blue).toBe(blue);
+		expect(rgb.green).toBe(green);
+		expect(rgb.red).toBe(red);
 
 		expect(hsl.value).toEqual(hsls[index]);
 

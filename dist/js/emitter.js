@@ -1,13 +1,13 @@
 // src/js/emitter.ts
-function createObserable(emitter, observers) {
+var createObserable = function(emitter, observers) {
   const instance = Object.create({
     subscribe(first, second, third) {
       return createSubscription(emitter, observers, getObserver(first, second, third));
     }
   });
   return instance;
-}
-function createSubscription(emitter, observers, observer) {
+};
+var createSubscription = function(emitter, observers, observer) {
   let closed = false;
   const instance = Object.create({
     unsubscribe() {
@@ -25,8 +25,8 @@ function createSubscription(emitter, observers, observer) {
   observers.set(instance, observer);
   observer.next?.(emitter.value);
   return instance;
-}
-function getObserver(first, second, third) {
+};
+var getObserver = function(first, second, third) {
   let observer;
   if (typeof first === "object") {
     observer = first;
@@ -38,7 +38,7 @@ function getObserver(first, second, third) {
     };
   }
   return observer;
-}
+};
 function emitter(value) {
   let active = true;
   let stored = value;
