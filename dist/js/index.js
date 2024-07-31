@@ -1457,124 +1457,6 @@ var updateStyleProperty = function(element, key, value2) {
     this.style[key2] = "";
   }, false);
 };
-// src/js/emitter.ts
-var createObserable = function(emitter, observers) {
-  const instance = Object.create({
-    subscribe(first, second, third) {
-      return createSubscription(emitter, observers, getObserver(first, second, third));
-    }
-  });
-  return instance;
-};
-var createSubscription = function(emitter, observers, observer) {
-  let closed = false;
-  const instance = Object.create({
-    unsubscribe() {
-      if (!closed) {
-        closed = true;
-        observers.delete(instance);
-      }
-    }
-  });
-  Object.defineProperty(instance, "closed", {
-    get() {
-      return closed || !emitter.active;
-    }
-  });
-  observers.set(instance, observer);
-  observer.next?.(emitter.value);
-  return instance;
-};
-var getObserver = function(first, second, third) {
-  let observer;
-  if (typeof first === "object") {
-    observer = first;
-  } else {
-    observer = {
-      error: second,
-      next: first,
-      complete: third
-    };
-  }
-  return observer;
-};
-function emitter(value2) {
-  let active = true;
-  let stored = value2;
-  function finish(emit) {
-    if (active) {
-      active = false;
-      for (const [subscription, observer] of observers) {
-        if (emit) {
-          observer.complete?.();
-        }
-        subscription.unsubscribe();
-      }
-    }
-  }
-  const observers = new Map;
-  const instance = Object.create({
-    destroy() {
-      finish(false);
-    },
-    emit(value3, complete) {
-      if (active) {
-        stored = value3;
-        for (const [, observer] of observers) {
-          observer.next?.(value3);
-        }
-        if (complete === true) {
-          finish(true);
-        }
-      }
-    },
-    error(error, complete) {
-      if (active) {
-        for (const [, observer] of observers) {
-          observer.error?.(error);
-        }
-        if (complete === true) {
-          finish(true);
-        }
-      }
-    },
-    finish() {
-      finish(true);
-    }
-  });
-  const observable = createObserable(instance, observers);
-  Object.defineProperties(instance, {
-    active: {
-      get() {
-        return active;
-      }
-    },
-    observable: {
-      get() {
-        return observable;
-      }
-    },
-    value: {
-      get() {
-        return stored;
-      }
-    }
-  });
-  return instance;
-}
-// src/js/event.ts
-function getPosition(event) {
-  let x;
-  let y;
-  if (event instanceof MouseEvent) {
-    x = event.clientX;
-    y = event.clientY;
-  } else if (event instanceof TouchEvent) {
-    x = event.touches[0]?.clientX;
-    y = event.touches[0]?.clientY;
-  }
-  return typeof x === "number" && typeof y === "number" ? { x, y } : undefined;
-}
 // src/js/function.ts
 function debounce(callback, time) {
   const interval = clamp(time ?? 0, 0, 1000);
@@ -1640,6 +1522,136 @@ function throttle(callback, time) {
       }, difference + interval);
     }
   };
+}
+
+// src/js/emitter.ts
+var getObserver = function(first, second, third) {
+  let observer = {
+    next: noop
+  };
+  if (typeof first === "object") {
+    observer = first !== null && properties3.every((property) => {
+      const value2 = first[property];
+      return value2 == null || typeof value2 === "function";
+    }) ? first : observer;
+  } else if (typeof first === "function") {
+    observer = {
+      error: typeof second === "function" ? second : noop,
+      next: first,
+      complete: typeof third === "function" ? third : undefined
+    };
+  }
+  return observer;
+};
+function emitter(value2) {
+  return new Emitter(value2);
+}
+var finishEmitter = function(state, emit) {
+  if (state.active) {
+    state.active = false;
+    for (const [subscription, observer] of state.observers) {
+      if (emit) {
+        observer.complete?.();
+      }
+      subscription.unsubscribe();
+    }
+  }
+};
+
+class Emitter {
+  get active() {
+    return this.state.active;
+  }
+  get observable() {
+    return this.state.observable;
+  }
+  get value() {
+    return this.state.value;
+  }
+  constructor(value2) {
+    const observers = new Map;
+    this.state = {
+      observers,
+      value: value2,
+      active: true,
+      observable: new Observable(this, observers)
+    };
+  }
+  destroy() {
+    finishEmitter(this.state, false);
+  }
+  emit(value2, finish) {
+    if (this.state.active) {
+      this.state.value = value2;
+      for (const [, observer] of this.state.observers) {
+        observer.next?.(value2);
+      }
+      if (finish === true) {
+        finishEmitter(this.state, true);
+      }
+    }
+  }
+  error(error, finish) {
+    if (this.state.active) {
+      for (const [, observer] of this.state.observers) {
+        observer.error?.(error);
+      }
+      if (finish === true) {
+        finishEmitter(this.state, true);
+      }
+    }
+  }
+  finish() {
+    finishEmitter(this.state, true);
+  }
+}
+
+class Observable {
+  constructor(emitter2, observers) {
+    this.state = {
+      emitter: emitter2,
+      observers
+    };
+  }
+  subscribe(first, second, third) {
+    const observer = getObserver(first, second, third);
+    const instance = new Subscription(this.state);
+    this.state.observers.set(instance, observer);
+    observer.next?.(this.state.emitter.value);
+    return instance;
+  }
+}
+
+class Subscription {
+  constructor(state) {
+    this.state = {
+      ...state,
+      closed: false
+    };
+  }
+  get closed() {
+    return this.state.closed || !this.state.emitter.active;
+  }
+  unsubscribe() {
+    if (!this.state.closed) {
+      this.state.closed = true;
+      this.state.observers.delete(this);
+    }
+  }
+}
+var properties3 = ["complete", "error", "next"];
+// src/js/event.ts
+function getPosition(event) {
+  let x;
+  let y;
+  if (event instanceof MouseEvent) {
+    x = event.clientX;
+    y = event.clientY;
+  } else if (event instanceof TouchEvent) {
+    x = event.touches[0]?.clientX;
+    y = event.touches[0]?.clientY;
+  }
+  return typeof x === "number" && typeof y === "number" ? { x, y } : undefined;
 }
 // src/js/logger.ts
 var time = function(label) {

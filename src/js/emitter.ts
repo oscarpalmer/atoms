@@ -1,39 +1,112 @@
-export type Emitter<Value> = {
+import {noop} from './function';
+
+class Emitter<Value> {
+	private declare readonly state: EmitterState<Value>;
+
 	/**
 	 * Is the emitter active?
 	 */
-	readonly active: boolean;
+	get active() {
+		return this.state.active;
+	}
+
 	/**
 	 * The observable that can be subscribed to
 	 */
-	readonly observable: Observable<Value>;
+	get observable() {
+		return this.state.observable;
+	}
+
 	/**
 	 * The current value
 	 */
-	readonly value: Value;
+	get value() {
+		return this.state.value;
+	}
+
+	constructor(value: Value) {
+		const observers = new Map<Subscription<Value>, Observer<Value>>();
+
+		this.state = {
+			observers,
+			value,
+			active: true,
+			observable: new Observable(this, observers),
+		};
+	}
+
 	/**
 	 * Destroys the emitter
 	 */
-	destroy(): void;
+	destroy(): void {
+		finishEmitter(this.state, false);
+	}
+
 	/**
 	 * Emits a new value _(and optionally finishes the emitter)_
 	 */
-	emit(value: Value, finish?: boolean): void;
+	emit(value: Value, finish?: boolean): void {
+		if (this.state.active) {
+			this.state.value = value;
+
+			for (const [, observer] of this.state.observers) {
+				observer.next?.(value);
+			}
+
+			if (finish === true) {
+				finishEmitter(this.state, true);
+			}
+		}
+	}
+
 	/**
 	 * Emits an error _(and optionally finishes the emitter)_
 	 */
-	error(error: Error, finish?: boolean): void;
+	error(error: Error, finish?: boolean): void {
+		if (this.state.active) {
+			for (const [, observer] of this.state.observers) {
+				observer.error?.(error);
+			}
+
+			if (finish === true) {
+				finishEmitter(this.state, true);
+			}
+		}
+	}
+
 	/**
 	 * Finishes the emitter
 	 */
-	finish(): void;
+	finish(): void {
+		finishEmitter(this.state, true);
+	}
+}
+
+type EmitterState<Value> = {
+	active: boolean;
+	observable: Observable<Value>;
+	observers: Map<Subscription<Value>, Observer<Value>>;
+	value: Value;
 };
 
-export type Observable<Value> = {
+class Observable<Value> {
+	private declare readonly state: ObservableState<Value>;
+
+	constructor(
+		emitter: Emitter<Value>,
+		observers: Map<Subscription<Value>, Observer<Value>>,
+	) {
+		this.state = {
+			emitter,
+			observers,
+		};
+	}
+
 	/**
 	 * Subscribes to value changes
 	 */
-	subscribe(observer: Observer<Value>): Subscription;
+	subscribe(observer: Observer<Value>): Subscription<Value>;
+
 	/**
 	 * Subscribes to value changes
 	 */
@@ -41,10 +114,30 @@ export type Observable<Value> = {
 		onNext: (value: Value) => void,
 		onError?: (error: Error) => void,
 		onComplete?: () => void,
-	): Subscription;
+	): Subscription<Value>;
+
+	subscribe(
+		first: Observer<Value> | ((value: Value) => void),
+		second?: (error: Error) => void,
+		third?: () => void,
+	): Subscription<Value> {
+		const observer = getObserver(first, second, third);
+		const instance = new Subscription(this.state);
+
+		this.state.observers.set(instance, observer);
+
+		observer.next?.(this.state.emitter.value);
+
+		return instance;
+	}
+}
+
+type ObservableState<Value> = {
+	emitter: Emitter<Value>;
+	observers: Map<Subscription<Value>, Observer<Value>>;
 };
 
-export type Observer<Value> = {
+type Observer<Value> = {
 	/**
 	 * Callback for when the observable is complete
 	 */
@@ -59,78 +152,67 @@ export type Observer<Value> = {
 	next?: (value: Value) => void;
 };
 
-export type Subscription = {
+class Subscription<Value> {
+	private declare readonly state: SubscriptionState<Value>;
+
+	constructor(state: ObservableState<Value>) {
+		this.state = {
+			...state,
+			closed: false,
+		};
+	}
+
 	/**
 	 * Is the subscription closed?
 	 */
-	readonly closed: boolean;
+	get closed() {
+		return this.state.closed || !this.state.emitter.active;
+	}
+
 	/**
 	 * Unsubscribes from the observable
 	 */
-	unsubscribe(): void;
+	unsubscribe(): void {
+		if (!this.state.closed) {
+			this.state.closed = true;
+
+			this.state.observers.delete(this);
+		}
+	}
+}
+
+type SubscriptionState<Value> = {
+	closed: boolean;
+	emitter: Emitter<Value>;
+	observers: Map<Subscription<Value>, Observer<Value>>;
 };
 
-function createObserable<Value>(
-	emitter: Emitter<Value>,
-	observers: Map<Subscription, Observer<Value>>,
-): Observable<Value> {
-	const instance = Object.create({
-		subscribe(first, second, third) {
-			return createSubscription(
-				emitter,
-				observers,
-				getObserver(first, second, third),
-			);
-		},
-	} as Observable<Value>);
-
-	return instance;
-}
-
-function createSubscription<Value>(
-	emitter: Emitter<Value>,
-	observers: Map<Subscription, Observer<Value>>,
-	observer: Observer<Value>,
-): Subscription {
-	let closed = false;
-
-	const instance = Object.create({
-		unsubscribe() {
-			if (!closed) {
-				closed = true;
-
-				observers.delete(instance);
-			}
-		},
-	} as Subscription);
-
-	Object.defineProperty(instance, 'closed', {
-		get() {
-			return closed || !emitter.active;
-		},
-	});
-
-	observers.set(instance, observer);
-
-	observer.next?.(emitter.value);
-
-	return instance;
-}
+const properties: Array<keyof Observer<never>> = ['complete', 'error', 'next'];
 
 function getObserver<Value>(
 	first: Observer<Value> | ((value: Value) => void),
 	second?: (error: Error) => void,
 	third?: () => void,
 ): Observer<Value> {
-	let observer: Observer<Value>;
+	let observer: Observer<Value> = {
+		next: noop,
+	};
 
 	if (typeof first === 'object') {
-		observer = first;
-	} else {
+		observer =
+			first !== null &&
+			properties.every(property => {
+				const value = first[property];
+
+				return value == null || typeof value === 'function';
+			})
+				? first
+				: observer;
+	} else if (typeof first === 'function') {
 		observer = {
-			error: second,
+			error: typeof second === 'function' ? second : noop,
 			next: first,
-			complete: third,
+			complete: typeof third === 'function' ? third : undefined,
 		};
 	}
 
@@ -141,77 +223,22 @@ function getObserver<Value>(
  * Creates a new emitter
  */
 export function emitter<Value>(value: Value): Emitter<Value> {
-	let active = true;
-	let stored = value;
+	return new Emitter(value);
+}
 
-	function finish(emit: boolean): void {
-		if (active) {
-			active = false;
+function finishEmitter<Value>(state: EmitterState<Value>, emit: boolean): void {
+	if (state.active) {
+		state.active = false;
 
-			for (const [subscription, observer] of observers) {
-				if (emit) {
-					observer.complete?.();
-				}
-
-				subscription.unsubscribe();
+		for (const [subscription, observer] of state.observers) {
+			if (emit) {
+				observer.complete?.();
 			}
+
+			subscription.unsubscribe();
 		}
 	}
-
-	const observers = new Map<Subscription, Observer<Value>>();
-
-	const instance = Object.create({
-		destroy() {
-			finish(false);
-		},
-		emit(value: Value, complete?: boolean) {
-			if (active) {
-				stored = value;
-
-				for (const [, observer] of observers) {
-					observer.next?.(value);
-				}
-
-				if (complete === true) {
-					finish(true);
-				}
-			}
-		},
-		error(error: Error, complete?: boolean) {
-			if (active) {
-				for (const [, observer] of observers) {
-					observer.error?.(error);
-				}
-
-				if (complete === true) {
-					finish(true);
-				}
-			}
-		},
-		finish() {
-			finish(true);
-		},
-	} as Emitter<Value>);
-
-	const observable = createObserable<Value>(instance, observers);
-
-	Object.defineProperties(instance, {
-		active: {
-			get() {
-				return active;
-			},
-		},
-		observable: {
-			get() {
-				return observable;
-			},
-		},
-		value: {
-			get() {
-				return stored;
-			},
-		},
-	});
-
-	return instance;
 }
+
+export type {Emitter, Observable, Observer, Subscription};
+

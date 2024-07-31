@@ -1,16 +1,18 @@
-export type Emitter<Value> = {
+declare class Emitter<Value> {
+    private readonly state;
     /**
      * Is the emitter active?
      */
-    readonly active: boolean;
+    get active(): boolean;
     /**
      * The observable that can be subscribed to
      */
-    readonly observable: Observable<Value>;
+    get observable(): Observable<Value>;
     /**
      * The current value
      */
-    readonly value: Value;
+    get value(): Value;
+    constructor(value: Value);
     /**
      * Destroys the emitter
      */
@@ -27,18 +29,24 @@ export type Emitter<Value> = {
      * Finishes the emitter
      */
     finish(): void;
-};
-export type Observable<Value> = {
+}
+declare class Observable<Value> {
+    private readonly state;
+    constructor(emitter: Emitter<Value>, observers: Map<Subscription<Value>, Observer<Value>>);
     /**
      * Subscribes to value changes
      */
-    subscribe(observer: Observer<Value>): Subscription;
+    subscribe(observer: Observer<Value>): Subscription<Value>;
     /**
      * Subscribes to value changes
      */
-    subscribe(onNext: (value: Value) => void, onError?: (error: Error) => void, onComplete?: () => void): Subscription;
+    subscribe(onNext: (value: Value) => void, onError?: (error: Error) => void, onComplete?: () => void): Subscription<Value>;
+}
+type ObservableState<Value> = {
+    emitter: Emitter<Value>;
+    observers: Map<Subscription<Value>, Observer<Value>>;
 };
-export type Observer<Value> = {
+type Observer<Value> = {
     /**
      * Callback for when the observable is complete
      */
@@ -52,17 +60,20 @@ export type Observer<Value> = {
      */
     next?: (value: Value) => void;
 };
-export type Subscription = {
+declare class Subscription<Value> {
+    private readonly state;
+    constructor(state: ObservableState<Value>);
     /**
      * Is the subscription closed?
      */
-    readonly closed: boolean;
+    get closed(): boolean;
     /**
      * Unsubscribes from the observable
      */
     unsubscribe(): void;
-};
+}
 /**
  * Creates a new emitter
  */
 export declare function emitter<Value>(value: Value): Emitter<Value>;
+export type { Emitter, Observable, Observer, Subscription };
