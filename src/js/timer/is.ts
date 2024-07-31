@@ -1,4 +1,5 @@
 import type {PlainObject} from '../models';
+import type {Timer} from './timer';
 import type {When} from './when';
 
 function is(pattern: RegExp, value: unknown) {

@@ -1,3 +1,4 @@
+import type { Timer } from './timer';
 import type { When } from './when';
 /**
  * Is the value a repeating timer?
