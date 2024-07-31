@@ -141,10 +141,10 @@
 			"require": "./dist/js/touch.js"
 		},
 		"./timer": {
-			"types": "./types/timer.d.ts",
-			"bun": "./src/js/timer.ts",
-			"import": "./dist/js/timer.mjs",
-			"require": "./dist/js/timer.js"
+			"types": "./types/timer/index.d.ts",
+			"bun": "./src/js/timer/index.ts",
+			"import": "./dist/js/timer/index.mjs",
+			"require": "./dist/js/timer/index.js"
 		},
 		"./value": {
 			"types": "./types/value/index.d.ts",

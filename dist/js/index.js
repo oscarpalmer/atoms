@@ -1822,172 +1822,33 @@ if (globalThis._atomic_queued == null) {
     }
   });
 }
-// src/js/timer.ts
-function delay(time, timeout) {
-  return new Promise((resolve, reject) => {
-    wait(resolve, {
-      timeout,
-      errorCallback: reject,
-      interval: time
-    });
-  });
+// src/js/timer/constants.ts
+var activeTimers = new Set;
+var hiddenTimers = new Set;
+var milliseconds = 1000 / 60;
+
+// src/js/timer/functions.ts
+function getOptions(options, isRepeated) {
+  return {
+    afterCallback: options.afterCallback,
+    count: getValueOrDefault(options.count, isRepeated ? Number.POSITIVE_INFINITY : 1),
+    errorCallback: options.errorCallback,
+    interval: getValueOrDefault(options.interval, milliseconds, milliseconds),
+    timeout: getValueOrDefault(options.timeout, isRepeated ? Number.POSITIVE_INFINITY : 30000)
+  };
 }
-var getValueOrDefault = function(value3, defaultValue, minimum) {
+function getValueOrDefault(value3, defaultValue, minimum) {
   return typeof value3 === "number" && value3 > (minimum ?? 0) ? value3 : defaultValue;
-};
-var is11 = function(value3, pattern) {
-  return pattern.test(value3?.$timer);
-};
-function isRepeated(value3) {
-  return is11(value3, /^repeat$/);
 }
-function isTimer(value3) {
-  return is11(value3, /^repeat|wait$/);
-}
-function isWaited(value3) {
-  return is11(value3, /^wait$/);
-}
-function isWhen(value3) {
-  return is11(value3, /^when$/) && typeof value3.then === "function";
-}
-function repeat(callback, options) {
-  return timer("repeat", callback, options ?? {}, true);
-}
-var timer = function(type, callback, partial2, start) {
-  const isRepeated2 = type === "repeat";
-  const options = {
-    afterCallback: partial2.afterCallback,
-    count: getValueOrDefault(partial2.count, isRepeated2 ? Number.POSITIVE_INFINITY : 1),
-    errorCallback: partial2.errorCallback,
-    interval: getValueOrDefault(partial2.interval, milliseconds, milliseconds),
-    timeout: getValueOrDefault(partial2.timeout, isRepeated2 ? Number.POSITIVE_INFINITY : 30000)
-  };
-  const state = {
-    callback,
-    active: false,
-    minimum: options.interval - options.interval % milliseconds / 2,
-    paused: false,
-    trace: new TimerTrace
-  };
-  const instance = Object.create({
-    continue() {
-      return work("continue", this, state, options, isRepeated2);
-    },
-    pause() {
-      return work("pause", this, state, options, isRepeated2);
-    },
-    restart() {
-      return work("restart", this, state, options, isRepeated2);
-    },
-    start() {
-      return work("start", this, state, options, isRepeated2);
-    },
-    stop() {
-      return work("stop", this, state, options, isRepeated2);
-    }
-  });
-  Object.defineProperties(instance, {
-    $timer: {
-      get() {
-        return type;
-      }
-    },
-    active: {
-      get() {
-        return state.active;
-      }
-    },
-    paused: {
-      get() {
-        return state.paused;
-      }
-    },
-    trace: {
-      get() {
-        return globalThis._atomic_timer_debug ? state.trace : undefined;
-      }
-    }
-  });
-  if (start) {
-    instance.start();
-  }
-  return instance;
-};
-function wait(callback, options) {
-  return timer("wait", callback, options == null || typeof options === "number" ? {
-    interval: options
-  } : options, true);
-}
-function when(condition, options) {
-  let rejecter;
-  let resolver;
-  const repeated = timer("repeat", () => {
-    if (condition()) {
-      repeated.stop();
-      resolver?.();
-    }
-  }, {
-    afterCallback() {
-      if (!repeated.paused) {
-        if (condition()) {
-          resolver?.();
-        } else {
-          rejecter?.();
-        }
-      }
-    },
-    errorCallback() {
-      rejecter?.();
-    },
-    count: options?.count,
-    interval: options?.interval,
-    timeout: options?.timeout
-  }, false);
-  const promise = new Promise((resolve, reject) => {
-    resolver = resolve;
-    rejecter = reject;
-  });
-  const instance = Object.create({
-    continue() {
-      repeated.continue();
-    },
-    pause() {
-      repeated.pause();
-    },
-    stop() {
-      if (repeated.active) {
-        repeated.stop();
-        rejecter?.();
-      }
-    },
-    then(resolve, reject) {
-      repeated.start();
-      return promise.then(resolve ?? noop, reject ?? noop);
-    }
-  });
-  Object.defineProperties(instance, {
-    $timer: {
-      get() {
-        return "when";
-      }
-    },
-    active: {
-      get() {
-        return repeated.active;
-      }
-    }
-  });
-  return instance;
-}
-var work = function(type, timer2, state, options, isRepeated2) {
+function work(type, timer, state, options) {
   if (["continue", "start"].includes(type) && state.active || ["pause", "stop"].includes(type) && !state.active) {
-    return timer2;
+    return timer;
   }
   const { count: count3, interval, timeout } = options;
-  const { minimum } = state;
+  const { isRepeated, minimum } = state;
   if (["pause", "restart", "stop"].includes(type)) {
     const isStop = type === "stop";
-    activeTimers.delete(timer2);
+    activeTimers.delete(timer);
     cancelAnimationFrame(state.frame);
     if (isStop) {
       options.afterCallback?.(false);
@@ -1999,7 +1860,7 @@ var work = function(type, timer2, state, options, isRepeated2) {
       state.elapsed = undefined;
       state.index = undefined;
     }
-    return type === "restart" ? work("start", timer2, state, options, isRepeated2) : timer2;
+    return type === "restart" ? work("start", timer, state, options) : timer;
   }
   state.active = true;
   state.paused = false;
@@ -2011,7 +1872,7 @@ var work = function(type, timer2, state, options, isRepeated2) {
   let current;
   let start;
   function finish(finished, error) {
-    activeTimers.delete(timer2);
+    activeTimers.delete(timer);
     state.active = false;
     state.elapsed = undefined;
     state.frame = undefined;
@@ -2036,7 +1897,7 @@ var work = function(type, timer2, state, options, isRepeated2) {
     }
     if (finished || time >= minimum) {
       if (state.active) {
-        state.callback(isRepeated2 ? index : undefined);
+        state.callback(isRepeated ? index : undefined);
       }
       index += 1;
       state.index = index;
@@ -2049,16 +1910,73 @@ var work = function(type, timer2, state, options, isRepeated2) {
     }
     state.frame = requestAnimationFrame(step);
   }
-  activeTimers.add(timer2);
+  activeTimers.add(timer);
   state.frame = requestAnimationFrame(step);
-  return timer2;
-};
-if (globalThis._atomic_timers == null) {
-  Object.defineProperty(globalThis, "_atomic_timers", {
-    get() {
-      return globalThis._atomic_timer_debug ? [...activeTimers] : [];
-    }
-  });
+  return timer;
+}
+
+// src/js/timer/timer.ts
+function repeat(callback, options) {
+  return timer("repeat", callback, options ?? {}, true);
+}
+function timer(type, callback, partial2, start) {
+  const isRepeated = type === "repeat";
+  const options = getOptions(partial2, isRepeated);
+  const instance = new Timer(type, {
+    callback,
+    isRepeated,
+    active: false,
+    minimum: options.interval - options.interval % milliseconds / 2,
+    paused: false,
+    trace: new TimerTrace
+  }, options);
+  if (start) {
+    instance.start();
+  }
+  return instance;
+}
+function wait(callback, options) {
+  return timer("wait", callback, options == null || typeof options === "number" ? {
+    interval: options
+  } : options, true);
+}
+
+class BasicTimer {
+  constructor(type, state) {
+    this.$timer = type;
+    this.state = state;
+  }
+}
+
+class Timer extends BasicTimer {
+  get active() {
+    return this.state.active;
+  }
+  get paused() {
+    return this.state.paused;
+  }
+  get trace() {
+    return globalThis._atomic_timer_debug ? this.state.trace : undefined;
+  }
+  constructor(type, state, options) {
+    super(type, state);
+    this.options = options;
+  }
+  continue() {
+    return work("continue", this, this.state, this.options);
+  }
+  pause() {
+    return work("pause", this, this.state, this.options);
+  }
+  restart() {
+    return work("restart", this, this.state, this.options);
+  }
+  start() {
+    return work("start", this, this.state, this.options);
+  }
+  stop() {
+    return work("stop", this, this.state, this.options);
+  }
 }
 
 class TimerTrace extends Error {
@@ -2067,18 +1985,115 @@ class TimerTrace extends Error {
     this.name = "TimerTrace";
   }
 }
-var activeTimers = new Set;
-var hiddenTimers = new Set;
-var milliseconds = 1000 / 60;
+
+// src/js/timer/index.ts
+function delay(time, timeout) {
+  return new Promise((resolve, reject) => {
+    wait(resolve ?? noop, {
+      timeout,
+      errorCallback: reject ?? noop,
+      interval: time
+    });
+  });
+}
+
+// src/js/timer/is.ts
+var is11 = function(pattern, value3) {
+  return pattern.test(value3?.$timer);
+};
+function isRepeated(value3) {
+  return is11(/^repeat$/, value3);
+}
+function isTimer(value3) {
+  return is11(/^repeat|wait$/, value3);
+}
+function isWaited(value3) {
+  return is11(/^wait$/, value3);
+}
+function isWhen(value3) {
+  return is11(/^when$/, value3) && typeof value3.then === "function";
+}
+// src/js/timer/when.ts
+function when(condition, options) {
+  const repeated = timer("repeat", () => {
+    if (condition()) {
+      repeated.stop();
+      state.resolver?.();
+    }
+  }, {
+    afterCallback() {
+      if (!repeated.paused) {
+        if (condition()) {
+          state.resolver?.();
+        } else {
+          state.rejecter?.();
+        }
+      }
+    },
+    errorCallback() {
+      state.rejecter?.();
+    },
+    count: options?.count,
+    interval: options?.interval,
+    timeout: options?.timeout
+  }, false);
+  const state = {};
+  state.promise = new Promise((resolve, reject) => {
+    state.resolver = resolve;
+    state.rejecter = reject;
+  });
+  state.timer = repeated;
+  return new When(state);
+}
+
+class When extends BasicTimer {
+  get active() {
+    return this.state.timer.active;
+  }
+  get paused() {
+    return this.state.timer.paused;
+  }
+  constructor(state) {
+    super("when", state);
+  }
+  continue() {
+    this.state.timer.continue();
+    return this;
+  }
+  pause() {
+    this.state.timer.pause();
+    return this;
+  }
+  stop() {
+    if (this.state.timer.active) {
+      this.state.timer.stop();
+      this.state.rejecter?.();
+    }
+    return this;
+  }
+  then(resolve, reject) {
+    this.state.timer.start();
+    return this.state.promise.then(resolve ?? noop, reject ?? noop);
+  }
+}
+
+// src/js/timer/index.ts
+if (globalThis._atomic_timers == null) {
+  Object.defineProperty(globalThis, "_atomic_timers", {
+    get() {
+      return globalThis._atomic_timer_debug ? [...activeTimers] : [];
+    }
+  });
+}
 document.addEventListener("visibilitychange", () => {
   if (document.hidden) {
-    for (const timer2 of activeTimers) {
-      hiddenTimers.add(timer2);
-      timer2.pause();
+    for (const timer4 of activeTimers) {
+      hiddenTimers.add(timer4);
+      timer4.pause();
     }
   } else {
-    for (const timer2 of hiddenTimers) {
-      timer2.continue();
+    for (const timer4 of hiddenTimers) {
+      timer4.continue();
     }
     hiddenTimers.clear();
   }
