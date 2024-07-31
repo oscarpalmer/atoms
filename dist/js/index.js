@@ -1473,34 +1473,7 @@ function debounce(callback, time) {
   return debounced;
 }
 function memoise(callback) {
-  function get2(...parameters) {
-    const key = parameters[0];
-    if (cache.has(key)) {
-      return cache.get(key);
-    }
-    const value2 = callback(...parameters);
-    cache.set(key, value2);
-    return value2;
-  }
-  const cache = new Map;
-  return Object.create({
-    cache,
-    clear() {
-      cache.clear();
-    },
-    delete(key) {
-      return cache.delete(key);
-    },
-    get(key) {
-      return cache.get(key);
-    },
-    has(key) {
-      return cache.has(key);
-    },
-    run(...parameters) {
-      return get2(...parameters);
-    }
-  });
+  return new Memoised(callback);
 }
 function noop() {
 }
@@ -1522,6 +1495,37 @@ function throttle(callback, time) {
       }, difference + interval);
     }
   };
+}
+
+class Memoised {
+  constructor(callback) {
+    const cache = new Map;
+    const getter = (...parameters) => {
+      const key = parameters[0];
+      if (cache.has(key)) {
+        return cache.get(key);
+      }
+      const value2 = callback(...parameters);
+      cache.set(key, value2);
+      return value2;
+    };
+    this.state = { cache, getter };
+  }
+  clear() {
+    this.state.cache.clear();
+  }
+  delete(key) {
+    return this.state.cache.delete(key);
+  }
+  get(key) {
+    return this.state.cache.get(key);
+  }
+  has(key) {
+    return this.state.cache.has(key);
+  }
+  run(...parameters) {
+    return this.state.getter(...parameters);
+  }
 }
 
 // src/js/emitter.ts

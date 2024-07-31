@@ -5,28 +5,33 @@ type Debounced<Callback extends GenericCallback> = Callback & {
      */
     cancel: () => void;
 };
-type Memoised<Callback extends GenericCallback> = {
-    readonly cache: Map<Parameters<Callback>[0], ReturnType<Callback>>;
+declare class Memoised<Callback extends GenericCallback> {
+    readonly state: MemoisedState<Callback>;
+    constructor(callback: Callback);
     /**
      * Clears the cache
      */
-    clear: () => void;
+    clear(): void;
     /**
      * Deletes a result from the cache
      */
-    delete: (key: Parameters<Callback>[0]) => boolean;
+    delete(key: Parameters<Callback>[0]): boolean;
     /**
      * Retrieves the result from the cache if it exists, or `undefined` otherwise
      */
-    get: (key: Parameters<Callback>[0]) => ReturnType<Callback> | undefined;
+    get(key: Parameters<Callback>[0]): ReturnType<Callback> | undefined;
     /**
      * Checks if the cache has a result for a given key
      */
-    has: (key: Parameters<Callback>[0]) => boolean;
+    has(key: Parameters<Callback>[0]): boolean;
     /**
      * Retrieves the result from the cache if it exists, otherwise runs the callback, caches the result, and returns it
      */
     run(...parameters: Parameters<Callback>): ReturnType<Callback>;
+}
+type MemoisedState<Callback extends GenericCallback> = {
+    cache: Map<Parameters<Callback>[0], ReturnType<Callback>>;
+    getter: (...parameters: Parameters<Callback>) => ReturnType<Callback>;
 };
 /**
  * - Debounces a function, ensuring it is only called after `time` milliseconds have passed
