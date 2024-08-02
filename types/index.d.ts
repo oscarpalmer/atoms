@@ -5,6 +5,7 @@ export * from './element/index';
 export * from './emitter';
 export * from './event';
 export * from './function';
+export * from './html/index';
 export * from './is';
 export * from './logger';
 export * from './math';

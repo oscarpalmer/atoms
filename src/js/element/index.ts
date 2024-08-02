@@ -41,6 +41,7 @@ export function getTextDirection(element: Element): TextDirection {
 	) as TextDirection;
 }
 
+export * from './attribute';
 export * from './closest';
 export * from './data';
 export * from './find';

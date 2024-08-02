@@ -82,6 +82,12 @@
 			"import": "./dist/js/function.mjs",
 			"require": "./dist/js/function.js"
 		},
+		"./html": {
+			"types": "./types/html/index.d.ts",
+			"bun": "./src/js/html/index.ts",
+			"import": "./dist/js/html/index.mjs",
+			"require": "./dist/js/html/index.js"
+		},
 		"./is": {
 			"types": "./types/is.d.ts",
 			"bun": "./src/js/is.ts",
@@ -186,5 +192,5 @@
 	},
 	"type": "module",
 	"types": "./types/index.d.cts",
-	"version": "0.68.1"
+	"version": "0.69.0"
 }

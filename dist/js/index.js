@@ -1271,6 +1271,59 @@ function getTextDirection(element) {
   return getComputedStyle?.(element)?.direction === "rtl" ? "rtl" : "ltr";
 }
 
+// src/js/element/attribute.ts
+function isBadAttribute(name, value2) {
+  return onPrefix.test(name) || sourcePrefix.test(name) && valuePrefix.test(value2);
+}
+function isBooleanAttribute(name) {
+  return booleanAttributes.includes(name.toLowerCase());
+}
+function isEmptyNonBooleanAttribute(name, value2) {
+  return !booleanAttributes.includes(name) && value2.trim().length === 0;
+}
+function isInvalidBooleanAttribute(name, value2) {
+  if (!booleanAttributes.includes(name)) {
+    return true;
+  }
+  const normalised = value2.toLowerCase().trim();
+  return !(normalised.length === 0 || normalised === name || name === "hidden" && normalised === "until-found");
+}
+function setAttribute(element, name, value2) {
+  if (value2 == null) {
+    element.removeAttribute(name);
+  } else {
+    element.setAttribute(name, typeof value2 === "string" ? value2 : JSON.stringify(value2));
+  }
+}
+var booleanAttributes = Object.freeze([
+  "async",
+  "autofocus",
+  "autoplay",
+  "checked",
+  "controls",
+  "default",
+  "defer",
+  "disabled",
+  "formnovalidate",
+  "hidden",
+  "inert",
+  "ismap",
+  "itemscope",
+  "loop",
+  "multiple",
+  "muted",
+  "nomodule",
+  "novalidate",
+  "open",
+  "playsinline",
+  "readonly",
+  "required",
+  "reversed",
+  "selected"
+]);
+var onPrefix = /^on/i;
+var sourcePrefix = /^(href|src|xlink:href)$/i;
+var valuePrefix = /(data:text\/html|javascript:)/i;
 // src/js/element/closest.ts
 function calculateDistance(origin, target) {
   if (origin === target || origin.parentElement === target) {
@@ -1657,6 +1710,74 @@ function getPosition(event) {
   }
   return typeof x === "number" && typeof y === "number" ? { x, y } : undefined;
 }
+// src/js/html/sanitise.ts
+function sanitise(value2, options) {
+  return sanitiseNodes(Array.isArray(value2) ? value2 : [value2], {
+    sanitiseBooleanAttributes: options?.sanitiseBooleanAttributes ?? true
+  });
+}
+function sanitiseAttributes(element2, attributes, options) {
+  const { length } = attributes;
+  for (let index = 0;index < length; index += 1) {
+    const { name, value: value2 } = attributes[index];
+    if (isBadAttribute(name, value2) || isEmptyNonBooleanAttribute(name, value2)) {
+      element2.removeAttribute(name);
+    } else if (options.sanitiseBooleanAttributes && isInvalidBooleanAttribute(name, value2)) {
+      element2.setAttribute(name, "");
+    }
+  }
+}
+function sanitiseNodes(nodes, options) {
+  const { length } = nodes;
+  for (let index = 0;index < length; index += 1) {
+    const node = nodes[index];
+    if (node instanceof Element) {
+      sanitiseAttributes(node, [...node.attributes], options);
+    }
+    sanitiseNodes([...node.childNodes], options);
+  }
+  return nodes;
+}
+
+// src/js/html/index.ts
+function createTemplate(html) {
+  const template3 = document.createElement("template");
+  template3.innerHTML = html;
+  templates[html] = template3;
+  return template3;
+}
+function getNodes(node) {
+  return /^documentfragment$/i.test(node.constructor.name) ? [...node.childNodes] : [node];
+}
+function getTemplate(value2) {
+  if (value2.trim().length === 0) {
+    return;
+  }
+  let template3;
+  if (/^[\w-]+$/.test(value2)) {
+    template3 = document.querySelector(`#${value2}`);
+  }
+  if (template3 instanceof HTMLTemplateElement) {
+    return template3;
+  }
+  return templates[value2] ?? createTemplate(value2);
+}
+function html(value2, sanitisation) {
+  const options = sanitisation == null || sanitisation === true ? {} : isPlainObject(sanitisation) ? { ...sanitisation } : null;
+  const template3 = value2 instanceof HTMLTemplateElement ? value2 : typeof value2 === "string" ? getTemplate(value2) : null;
+  if (template3 == null) {
+    return [];
+  }
+  const cloned = template3.content.cloneNode(true);
+  const scripts = cloned.querySelectorAll("script");
+  const { length } = scripts;
+  for (let index = 0;index < length; index += 1) {
+    scripts[index].remove();
+  }
+  cloned.normalize();
+  return options != null ? sanitise(getNodes(cloned), options) : getNodes(cloned);
+}
+var templates = {};
 // src/js/logger.ts
 if (globalThis._atomic_logging == null) {
   globalThis._atomic_logging = true;
@@ -1998,20 +2119,20 @@ function delay(time, timeout) {
 }
 
 // src/js/timer/is.ts
-function is11(pattern, value3) {
+function is12(pattern, value3) {
   return pattern.test(value3?.$timer);
 }
 function isRepeated(value3) {
-  return is11(/^repeat$/, value3);
+  return is12(/^repeat$/, value3);
 }
 function isTimer(value3) {
-  return is11(/^repeat|wait$/, value3);
+  return is12(/^repeat|wait$/, value3);
 }
 function isWaited(value3) {
-  return is11(/^wait$/, value3);
+  return is12(/^wait$/, value3);
 }
 function isWhen(value3) {
-  return is11(/^when$/, value3) && typeof value3.then === "function";
+  return is12(/^when$/, value3) && typeof value3.then === "function";
 }
 // src/js/timer/when.ts
 function when(condition, options) {
@@ -2138,6 +2259,8 @@ export {
   setValue,
   setStyles,
   setData,
+  setAttribute,
+  sanitise,
   round,
   repeat,
   queue,
@@ -2168,14 +2291,19 @@ export {
   isNullableOrEmpty,
   isNullable,
   isKey,
+  isInvalidBooleanAttribute,
   isHexColour,
   isHSLColour,
   isFocusableElement,
+  isEmptyNonBooleanAttribute,
   isEmpty,
   isColour,
+  isBooleanAttribute,
+  isBadAttribute,
   isArrayOrPlainObject,
   insert,
   indexOf,
+  html,
   groupBy,
   getValue,
   getTextDirection,
@@ -2221,6 +2349,7 @@ export {
   chunk,
   capitalise,
   camelCase,
+  booleanAttributes,
   between,
   average,
   RGBColour,

@@ -2,16 +2,129 @@ import {expect, test} from 'bun:test';
 import {
 	$,
 	$$,
+	booleanAttributes,
 	closest,
 	findElement,
 	findElements,
 	findParentElement,
 	getData,
 	getTextDirection,
+	isBadAttribute,
+	isBooleanAttribute,
+	isEmptyNonBooleanAttribute,
+	isInvalidBooleanAttribute,
+	setAttribute,
 	setData,
 	setStyles,
-	wait,
-} from '../src/js';
+} from '../src/js/element';
+import {wait} from '../src/js/timer';
+
+const nonBooleanAttributes = [
+	'abbr',
+	'accept',
+	'accept-charset',
+	'accesskey',
+	'action',
+	'allow',
+	'alt',
+	'as',
+	'autocapitalize',
+	'autocomplete',
+	'blocking',
+	'charset',
+	'cite',
+	'class',
+	'color',
+	'cols',
+	'colspan',
+	'content',
+	'contenteditable',
+	'coords',
+	'crossorigin',
+	'data',
+	'datetime',
+	'decoding',
+	'dir',
+	'dirname',
+	'download',
+	'draggable',
+	'enctype',
+	'enterkeyhint',
+	'fetchpriority',
+	'for',
+	'form',
+	'formaction',
+	'formenctype',
+	'formmethod',
+	'formtarget',
+	'headers',
+	'height',
+	'high',
+	'href',
+	'hreflang',
+	'http-equiv',
+	'id',
+	'imagesizes',
+	'imagesrcset',
+	'inputmode',
+	'integrity',
+	'is',
+	'itemid',
+	'itemprop',
+	'itemref',
+	'itemtype',
+	'kind',
+	'label',
+	'lang',
+	'list',
+	'loading',
+	'low',
+	'max',
+	'maxlength',
+	'media',
+	'method',
+	'min',
+	'minlength',
+	'name',
+	'nonce',
+	'optimum',
+	'pattern',
+	'ping',
+	'placeholder',
+	'popover',
+	'popovertarget',
+	'popovertargetaction',
+	'poster',
+	'preload',
+	'referrerpolicy',
+	'rel',
+	'rows',
+	'rowspan',
+	'sandbox',
+	'scope',
+	'shape',
+	'size',
+	'sizes',
+	'slot',
+	'span',
+	'spellcheck',
+	'src',
+	'srcdoc',
+	'srclang',
+	'srcset',
+	'start',
+	'step',
+	'style',
+	'tabindex',
+	'target',
+	'title',
+	'translate',
+	'type',
+	'usemap',
+	'value',
+	'width',
+	'wrap',
+];
 
 document.body.innerHTML = `<div>
 	<div class="target">
@@ -243,6 +356,100 @@ test('getTextDirection', () => {
 
 	// Should be inherited from parent and be 'rtl', but does not seem to be; Happy DOM?
 	expect(getTextDirection(innerElement)).toBe('ltr');
+});
+
+test('isBadAttribute', () => {
+	const attributes = [
+		['onclick', 'alert()'],
+		['href', 'data:text/html,'],
+		['src', 'javascript:'],
+		['xlink:href', 'javascript:'],
+		['href', 'https://example.com'],
+		['src', 'https://example.com'],
+		['xlink:href', 'https://example.com'],
+	];
+
+	const {length} = attributes;
+
+	for (let index = 0; index < length; index += 1) {
+		const [name, value] = attributes[index];
+
+		expect(isBadAttribute(name, value)).toBe(index < 4);
+	}
+});
+
+test('isBooleanAttribute', () => {
+	const attributes = [...booleanAttributes, ...nonBooleanAttributes];
+
+	const {length} = attributes;
+
+	for (let index = 0; index < length; index += 1) {
+		const attribute = attributes[index];
+
+		expect(isBooleanAttribute(attribute)).toBe(
+			index < booleanAttributes.length,
+		);
+	}
+});
+
+test('isEmptyNonBooleanAttribute', () => {
+	let {length} = booleanAttributes;
+
+	for (let index = 0; index < length; index += 1) {
+		const attribute = booleanAttributes[index];
+
+		expect(isEmptyNonBooleanAttribute(attribute, '')).toBe(false);
+	}
+
+	length = nonBooleanAttributes.length;
+
+	for (let index = 0; index < length; index += 1) {
+		const attribute = nonBooleanAttributes[index];
+
+		expect(isEmptyNonBooleanAttribute(attribute, '')).toBe(true);
+		expect(isEmptyNonBooleanAttribute(attribute, '  ')).toBe(true);
+		expect(isEmptyNonBooleanAttribute(attribute, attribute)).toBe(false);
+	}
+});
+
+test('isInvalidBooleanAttribute', () => {
+	let {length} = booleanAttributes;
+
+	for (let index = 0; index < length; index += 1) {
+		const attribute = booleanAttributes[index];
+
+		expect(isInvalidBooleanAttribute(attribute, '')).toBe(false);
+		expect(isInvalidBooleanAttribute(attribute, attribute)).toBe(false);
+		expect(isInvalidBooleanAttribute(attribute, '!')).toBe(true);
+	}
+
+	length = nonBooleanAttributes.length;
+
+	for (let index = 0; index < length; index += 1) {
+		const attribute = nonBooleanAttributes[index];
+
+		expect(isInvalidBooleanAttribute(attribute, '')).toBe(true);
+		expect(isInvalidBooleanAttribute(attribute, attribute)).toBe(true);
+		expect(isInvalidBooleanAttribute(attribute, '!')).toBe(true);
+	}
+});
+
+test('setAttribute', done => {
+	const element = document.createElement('div');
+
+	setAttribute(element, 'hidden', '');
+
+	wait(() => {
+		expect(element.getAttribute('hidden')).toBe('');
+
+		setAttribute(element, 'hidden', null);
+
+		wait(() => {
+			expect(element.getAttribute('hidden')).toBe(null);
+
+			done();
+		});
+	});
 });
 
 test('setStyles', done => {
