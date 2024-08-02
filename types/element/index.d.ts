@@ -9,6 +9,7 @@ export declare function getElementUnderPointer(skipIgnore?: boolean): Element | 
  * Get the text direction of an element
  */
 export declare function getTextDirection(element: Element): TextDirection;
+export * from './attribute';
 export * from './closest';
 export * from './data';
 export * from './find';

@@ -17,6 +17,59 @@ function getTextDirection(element) {
   return getComputedStyle?.(element)?.direction === "rtl" ? "rtl" : "ltr";
 }
 
+// src/js/element/attribute.ts
+function isBadAttribute(name, value) {
+  return onPrefix.test(name) || sourcePrefix.test(name) && valuePrefix.test(value);
+}
+function isBooleanAttribute(name) {
+  return booleanAttributes.includes(name.toLowerCase());
+}
+function isEmptyNonBooleanAttribute(name, value) {
+  return !booleanAttributes.includes(name) && value.trim().length === 0;
+}
+function isInvalidBooleanAttribute(name, value) {
+  if (!booleanAttributes.includes(name)) {
+    return true;
+  }
+  const normalised = value.toLowerCase().trim();
+  return !(normalised.length === 0 || normalised === name || name === "hidden" && normalised === "until-found");
+}
+function setAttribute(element, name, value) {
+  if (value == null) {
+    element.removeAttribute(name);
+  } else {
+    element.setAttribute(name, typeof value === "string" ? value : JSON.stringify(value));
+  }
+}
+var booleanAttributes = Object.freeze([
+  "async",
+  "autofocus",
+  "autoplay",
+  "checked",
+  "controls",
+  "default",
+  "defer",
+  "disabled",
+  "formnovalidate",
+  "hidden",
+  "inert",
+  "ismap",
+  "itemscope",
+  "loop",
+  "multiple",
+  "muted",
+  "nomodule",
+  "novalidate",
+  "open",
+  "playsinline",
+  "readonly",
+  "required",
+  "reversed",
+  "selected"
+]);
+var onPrefix = /^on/i;
+var sourcePrefix = /^(href|src|xlink:href)$/i;
+var valuePrefix = /(data:text\/html|javascript:)/i;
 // src/js/element/closest.ts
 function calculateDistance(origin, target) {
   if (origin === target || origin.parentElement === target) {
@@ -236,6 +289,11 @@ function updateStyleProperty(element, key, value2) {
 export {
   setStyles,
   setData,
+  setAttribute,
+  isInvalidBooleanAttribute,
+  isEmptyNonBooleanAttribute,
+  isBooleanAttribute,
+  isBadAttribute,
   getTextDirection,
   getElementUnderPointer,
   getData,
@@ -243,6 +301,7 @@ export {
   findElements,
   findElement,
   closest,
+  booleanAttributes,
   findElements as $$,
   findElement as $
 };
