@@ -1,4 +1,5 @@
 import {expect, test} from 'bun:test';
+import {wait} from '@oscarpalmer/timer';
 import {
 	$,
 	$$,
@@ -17,7 +18,6 @@ import {
 	setData,
 	setStyles,
 } from '../src/js/element';
-import {wait} from '../src/js/timer';
 
 const nonBooleanAttributes = [
 	'abbr',

@@ -1,5 +1,6 @@
 import {expect, test} from 'bun:test';
-import {diff, getRandomInteger, wait} from '../src/js';
+import {wait} from '@oscarpalmer/timer';
+import {diff, getRandomInteger} from '../src/js';
 import {
 	chunk,
 	compact,

@@ -4,6 +4,7 @@
 		"url": "https://oscarpalmer.se"
 	},
 	"dependencies": {
+		"@oscarpalmer/timer": "^0.21.0",
 		"type-fest": "^4.23.0"
 	},
 	"description": "Sweet little atomic goodies…",
@@ -146,12 +147,6 @@
 			"import": "./dist/js/touch.mjs",
 			"require": "./dist/js/touch.js"
 		},
-		"./timer": {
-			"types": "./types/timer/index.d.ts",
-			"bun": "./src/js/timer/index.ts",
-			"import": "./dist/js/timer/index.mjs",
-			"require": "./dist/js/timer/index.js"
-		},
 		"./value": {
 			"types": "./types/value/index.d.ts",
 			"bun": "./src/js/value/index.ts",
@@ -192,5 +187,5 @@
 	},
 	"type": "module",
 	"types": "./types/index.d.cts",
-	"version": "0.69.0"
+	"version": "0.70.0"
 }

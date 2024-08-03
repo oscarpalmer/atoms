@@ -1,6 +1,6 @@
 import {expect, test} from 'bun:test';
 import {debounce, memoise, noop, throttle} from '../src/js/function';
-import {repeat, wait} from '../src/js/timer';
+import {repeat, wait} from '@oscarpalmer/timer';
 
 test('debounce', done => {
 	let value = 0;

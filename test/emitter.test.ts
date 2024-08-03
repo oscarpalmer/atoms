@@ -1,5 +1,6 @@
 import {expect, test} from 'bun:test';
-import {emitter, wait} from '../src/js';
+import {emitter} from '../src/js';
+import {wait} from '@oscarpalmer/timer';
 
 test('emitter', done => {
 	const value = emitter(0);

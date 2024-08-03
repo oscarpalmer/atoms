@@ -1,5 +1,5 @@
 import {expect, test} from 'bun:test';
-import {wait} from '../src/js/timer';
+import {wait} from '@oscarpalmer/timer';
 import {
 	getRandomBoolean,
 	getRandomCharacters,

@@ -15,6 +15,5 @@ export * from './query';
 export * from './queue';
 export * from './random';
 export * from './string/index';
-export * from './timer/index';
 export * from './touch';
 export * from './value/index';
