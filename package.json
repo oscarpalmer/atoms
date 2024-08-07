@@ -4,13 +4,13 @@
 		"url": "https://oscarpalmer.se"
 	},
 	"dependencies": {
-		"@oscarpalmer/timer": "^0.21.0",
 		"type-fest": "^4.23.0"
 	},
 	"description": "Sweet little atomic goodies…",
 	"devDependencies": {
 		"@biomejs/biome": "^1.8.3",
 		"@happy-dom/global-registrator": "^14.12.3",
+		"@oscarpalmer/timer": "^0.21.1",
 		"@types/bun": "^1.1.6",
 		"bun": "^1.1.21",
 		"dts-bundle-generator": "^9.5.1",
@@ -53,12 +53,6 @@
 			"sass": "./src/css/reset.scss",
 			"style": "./dist/css/reset.css"
 		},
-		"./element": {
-			"types": "./types/element/index.d.ts",
-			"bun": "./src/js/element/index.ts",
-			"import": "./dist/js/element/index.mjs",
-			"require": "./dist/js/element/index.js"
-		},
 		"./emitter": {
 			"types": "./types/emitter.d.ts",
 			"bun": "./src/js/emitter.ts",
@@ -71,23 +65,11 @@
 			"import": "./dist/js/event.mjs",
 			"require": "./dist/js/event.js"
 		},
-		"./focusable": {
-			"types": "./types/element/focusable.d.ts",
-			"bun": "./src/js/element/focusable.ts",
-			"import": "./dist/js/element/focusable.mjs",
-			"require": "./dist/js/element/focusable.js"
-		},
 		"./function": {
 			"types": "./types/function.d.ts",
 			"bun": "./src/js/function.ts",
 			"import": "./dist/js/function.mjs",
 			"require": "./dist/js/function.js"
-		},
-		"./html": {
-			"types": "./types/html/index.d.ts",
-			"bun": "./src/js/html/index.ts",
-			"import": "./dist/js/html/index.mjs",
-			"require": "./dist/js/html/index.js"
 		},
 		"./is": {
 			"types": "./types/is.d.ts",
@@ -187,5 +169,5 @@
 	},
 	"type": "module",
 	"types": "./types/index.d.cts",
-	"version": "0.70.1"
+	"version": "0.71.0"
 }

@@ -6,6 +6,7 @@ import {
 	getString,
 	join,
 	kebabCase,
+	parse,
 	pascalCase,
 	snakeCase,
 	template,
@@ -111,6 +112,21 @@ test('kebabCase', () => {
 	expect(kebabCase('XmlHTTPRequest')).toBe('xml-http-request');
 	expect(kebabCase('IDs')).toBe('ids');
 	expect(kebabCase('Product XMLs')).toBe('product-xmls');
+});
+
+test('parse', () => {
+	expect(parse('')).toBe(undefined);
+	expect(parse('null')).toBe(null);
+	expect(parse('undefined')).toBe(undefined);
+	expect(parse('true')).toBe(true);
+	expect(parse('false')).toBe(false);
+	expect(parse('0')).toBe(0);
+	expect(parse('1')).toBe(1);
+	expect(parse('1.5')).toBe(1.5);
+	expect(parse('[]')).toEqual([]);
+	expect(parse('[1,2,3]')).toEqual([1, 2, 3]);
+	expect(parse('{}')).toEqual({});
+	expect(parse('{"a":1}')).toEqual({a: 1});
 });
 
 test('pascalCase', () => {
