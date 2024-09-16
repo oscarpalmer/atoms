@@ -67,6 +67,7 @@ declare class Subscription<Value> {
      * Is the subscription closed?
      */
     get closed(): boolean;
+    destroy(): void;
     /**
      * Unsubscribes from the observable
      */

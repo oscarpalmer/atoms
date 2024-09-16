@@ -37,16 +37,19 @@ class Memoised<Callback extends GenericCallback> {
 	 * Clears the cache
 	 */
 	clear(): void {
-		this.state.cache.clear();
+		this.state.cache?.clear();
 	}
 
 	/**
 	 * Deletes a result from the cache
 	 */
 	delete(key: Parameters<Callback>[0]): boolean {
-		return this.state.cache.delete(key);
+		return this.state.cache?.delete(key);
 	}
 
+	/**
+	 * Destroys the instance, clearing its cache and removing its callback
+	 */
 	destroy(): void {
 		this.state.cache.clear();
 
@@ -58,14 +61,14 @@ class Memoised<Callback extends GenericCallback> {
 	 * Retrieves the result from the cache if it exists, or `undefined` otherwise
 	 */
 	get(key: Parameters<Callback>[0]): ReturnType<Callback> | undefined {
-		return this.state.cache.get(key);
+		return this.state.cache?.get(key);
 	}
 
 	/**
 	 * Checks if the cache has a result for a given key
 	 */
 	has(key: Parameters<Callback>[0]): boolean {
-		return this.state.cache.has(key);
+		return this.state.cache?.has(key) ?? false;
 	}
 
 	/**

@@ -354,6 +354,120 @@ function cloneRegularExpression(value) {
   cloned.lastIndex = value.lastIndex;
   return cloned;
 }
+// src/js/math.ts
+function average(values) {
+  return values.length > 0 ? sum(values) / values.length : Number.NaN;
+}
+function max(values) {
+  return values.length > 0 ? Math.max(...values) : Number.NaN;
+}
+function min(values) {
+  return values.length > 0 ? Math.min(...values) : Number.NaN;
+}
+function round(value, decimals) {
+  if (typeof decimals !== "number" || decimals < 1) {
+    return Math.round(value);
+  }
+  const mod = 10 ** decimals;
+  return Math.round((value + Number.EPSILON) * mod) / mod;
+}
+function sum(values) {
+  return values.reduce((previous, current) => previous + current, 0);
+}
+
+// src/js/number.ts
+function between(value, min2, max2) {
+  return value >= min2 && value <= max2;
+}
+function clamp(value, min2, max2, loop) {
+  if (value < min2) {
+    return loop === true ? max2 : min2;
+  }
+  return value > max2 ? loop === true ? min2 : max2 : value;
+}
+function getNumber(value) {
+  if (typeof value === "number") {
+    return value;
+  }
+  if (typeof value === "symbol") {
+    return Number.NaN;
+  }
+  let parsed = value?.valueOf?.() ?? value;
+  if (typeof parsed === "object") {
+    parsed = parsed?.toString() ?? parsed;
+  }
+  if (typeof parsed !== "string") {
+    return parsed == null ? Number.NaN : typeof parsed === "number" ? parsed : +parsed;
+  }
+  if (/^\s*0+\s*$/.test(parsed)) {
+    return 0;
+  }
+  const trimmed = parsed.trim();
+  if (trimmed.length === 0) {
+    return Number.NaN;
+  }
+  const isBinary = /^0b[01]+$/i.test(trimmed);
+  if (isBinary || /^0o[0-7]+$/i.test(trimmed)) {
+    return Number.parseInt(trimmed.slice(2), isBinary ? 2 : 8);
+  }
+  return +(/^0x[0-9a-f]+$/i.test(trimmed) ? trimmed : trimmed.replace(/_/g, ""));
+}
+
+// src/js/value/compare.ts
+function compare(first, second) {
+  const firstParts = getParts(first);
+  const secondParts = getParts(second);
+  const length = max([firstParts.length, secondParts.length]);
+  const lastIndex = length - 1;
+  for (let index = 0;index < length; index += 1) {
+    const firstPart = firstParts[index];
+    const secondPart = secondParts[index];
+    if (firstPart === secondPart) {
+      if (index === lastIndex) {
+        return 0;
+      }
+      continue;
+    }
+    if (firstPart == null || typeof firstPart === "string" && firstPart.length === 0) {
+      return -1;
+    }
+    if (secondPart == null || typeof secondPart === "string" && secondPart.length === 0) {
+      return 1;
+    }
+    const firstNumber = getNumber(firstPart);
+    const secondNumber = getNumber(secondPart);
+    const firstIsNaN = Number.isNaN(firstNumber);
+    const secondIsNaN = Number.isNaN(secondNumber);
+    if (firstIsNaN || secondIsNaN) {
+      if (firstIsNaN && secondIsNaN) {
+        return getString(firstPart).localeCompare(getString(secondPart));
+      }
+      if (firstIsNaN) {
+        return 1;
+      }
+      if (secondIsNaN) {
+        return -1;
+      }
+    }
+    if (firstNumber === secondNumber) {
+      if (index === lastIndex) {
+        return 0;
+      }
+      continue;
+    }
+    return firstNumber - secondNumber;
+  }
+  return join(firstParts).localeCompare(join(secondParts));
+}
+function getParts(value) {
+  if (value == null) {
+    return [""];
+  }
+  if (Array.isArray(value)) {
+    return value;
+  }
+  return typeof value === "object" ? [value] : words(getString(value));
+}
 // src/js/value/equal.ts
 function equal(first, second, ignoreCase) {
   switch (true) {
@@ -587,7 +701,6 @@ function setValue(data, path, value, ignoreCase) {
   const parts = (shouldIgnoreCase ? path.toLowerCase() : path).split(".");
   const { length } = parts;
   const lastIndex = length - 1;
-  let previous;
   let target = typeof data === "object" && data !== null ? data : {};
   for (let index = 0;index < length; index += 1) {
     const part = parts[index];
@@ -600,7 +713,6 @@ function setValue(data, path, value, ignoreCase) {
       next = {};
       target[part] = next;
     }
-    previous = target;
     target = next;
   }
   return data;
@@ -723,14 +835,6 @@ function isPrimitive(value2) {
 }
 
 // src/js/array/sort.ts
-function comparison(first, second) {
-  if (typeof first === "number" && typeof second === "number") {
-    return first - second;
-  }
-  const firstAsNumber = Number(first);
-  const secondAsNumber = Number(second);
-  return Number.isNaN(firstAsNumber) || Number.isNaN(secondAsNumber) ? String(first).localeCompare(String(second)) : firstAsNumber - secondAsNumber;
-}
 function sort(array2, first, second) {
   if (array2.length < 2) {
     return array2;
@@ -759,13 +863,13 @@ function sort(array2, first, second) {
     return direction === "asc" ? array2.sort() : array2.sort((first2, second2) => second2 - first2);
   }
   if (length === 1) {
-    return array2.sort((first2, second2) => comparison(keys[0].callback(first2), keys[0].callback(second2)) * (keys[0].direction === "asc" ? 1 : -1));
+    return array2.sort((first2, second2) => compare(keys[0].callback(first2), keys[0].callback(second2)) * (keys[0].direction === "asc" ? 1 : -1));
   }
   const sorted = array2.sort((first2, second2) => {
     for (let index = 0;index < length; index += 1) {
       const { callback, direction: direction2 } = keys[index];
       const descending = direction2 === "desc";
-      const compared = comparison(callback(descending ? second2 : first2), callback(descending ? first2 : second2));
+      const compared = compare(callback(descending ? second2 : first2), callback(descending ? first2 : second2));
       if (compared !== 0) {
         return compared;
       }
@@ -822,44 +926,6 @@ function getForegroundColour(value2) {
   }
   const luminance = 0.2126 * values[2] + 0.7152 * values[1] + 0.0722 * values[0];
   return luminance > 0.625 ? "black" : "white";
-}
-
-// src/js/number.ts
-function between(value2, min, max) {
-  return value2 >= min && value2 <= max;
-}
-function clamp(value2, min, max, loop) {
-  if (value2 < min) {
-    return loop === true ? max : min;
-  }
-  return value2 > max ? loop === true ? min : max : value2;
-}
-function getNumber(value2) {
-  if (typeof value2 === "number") {
-    return value2;
-  }
-  if (typeof value2 === "symbol") {
-    return Number.NaN;
-  }
-  let parsed = value2?.valueOf?.() ?? value2;
-  if (typeof parsed === "object") {
-    parsed = parsed?.toString() ?? parsed;
-  }
-  if (typeof parsed !== "string") {
-    return parsed == null ? Number.NaN : typeof parsed === "number" ? parsed : +parsed;
-  }
-  if (/^\s*0+\s*$/.test(parsed)) {
-    return 0;
-  }
-  const trimmed = parsed.trim();
-  if (trimmed.length === 0) {
-    return Number.NaN;
-  }
-  const isBinary = /^0b[01]+$/i.test(trimmed);
-  if (isBinary || /^0o[0-7]+$/i.test(trimmed)) {
-    return Number.parseInt(trimmed.slice(2), isBinary ? 2 : 8);
-  }
-  return +(/^0x[0-9a-f]+$/i.test(trimmed) ? trimmed : trimmed.replace(/_/g, ""));
 }
 
 // src/js/colour/is.ts
@@ -1043,15 +1109,15 @@ function rgbToHsl(rgb2) {
   const blue = rgb2.blue / 255;
   const green = rgb2.green / 255;
   const red = rgb2.red / 255;
-  const max = Math.max(blue, green, red);
-  const min = Math.min(blue, green, red);
-  const delta = max - min;
-  const lightness = (min + max) / 2;
+  const max2 = Math.max(blue, green, red);
+  const min2 = Math.min(blue, green, red);
+  const delta = max2 - min2;
+  const lightness = (min2 + max2) / 2;
   let hue = 0;
   let saturation = 0;
   if (delta !== 0) {
-    saturation = lightness === 0 || lightness === 1 ? 0 : (max - lightness) / Math.min(lightness, 1 - lightness);
-    switch (max) {
+    saturation = lightness === 0 || lightness === 1 ? 0 : (max2 - lightness) / Math.min(lightness, 1 - lightness);
+    switch (max2) {
       case blue:
         hue = (red - green) / delta + 4;
         break;
@@ -1169,10 +1235,10 @@ class Memoised {
     this.state = { cache, getter };
   }
   clear() {
-    this.state.cache.clear();
+    this.state.cache?.clear();
   }
   delete(key) {
-    return this.state.cache.delete(key);
+    return this.state.cache?.delete(key);
   }
   destroy() {
     this.state.cache.clear();
@@ -1180,10 +1246,10 @@ class Memoised {
     this.state.getter = noop;
   }
   get(key) {
-    return this.state.cache.get(key);
+    return this.state.cache?.get(key);
   }
   has(key) {
-    return this.state.cache.has(key);
+    return this.state.cache?.has(key) ?? false;
   }
   run(...parameters) {
     return this.state.getter(...parameters);
@@ -1383,26 +1449,6 @@ class Time {
   }
 }
 var logger = new Logger;
-// src/js/math.ts
-function average(values) {
-  return values.length > 0 ? sum(values) / values.length : Number.NaN;
-}
-function max(values) {
-  return values.length > 0 ? Math.max(...values) : Number.NaN;
-}
-function min(values) {
-  return values.length > 0 ? Math.min(...values) : Number.NaN;
-}
-function round(value2, decimals) {
-  if (typeof decimals !== "number" || decimals < 1) {
-    return Math.round(value2);
-  }
-  const mod = 10 ** decimals;
-  return Math.round((value2 + Number.EPSILON) * mod) / mod;
-}
-function sum(values) {
-  return values.reduce((previous, current) => previous + current, 0);
-}
 // src/js/query.ts
 function fromQuery(query) {
   const parts = query.split("&");
@@ -1428,7 +1474,7 @@ function fromQuery(query) {
   }
   return parameters;
 }
-function getParts(value3, fromArray, prefix) {
+function getParts2(value3, fromArray, prefix) {
   const keys = Object.keys(value3);
   const { length } = keys;
   const parts = [];
@@ -1436,9 +1482,9 @@ function getParts(value3, fromArray, prefix) {
     const key = keys[index];
     const val = value3[key];
     if (Array.isArray(val)) {
-      parts.push(...getParts(val, true, join([prefix, fromArray ? null : key], ".")));
+      parts.push(...getParts2(val, true, join([prefix, fromArray ? null : key], ".")));
     } else if (isPlainObject(val)) {
-      parts.push(...getParts(val, false, join([prefix, key], ".")));
+      parts.push(...getParts2(val, false, join([prefix, key], ".")));
     } else if (isDecodable(val)) {
       parts.push(`${encodeURIComponent(join([prefix, fromArray ? null : key], "."))}=${encodeURIComponent(val)}`);
     }
@@ -1459,7 +1505,7 @@ function isDecodable(value3) {
   return ["boolean", "number", "string"].includes(typeof value3);
 }
 function toQuery(parameters) {
-  return getParts(parameters, false).filter((part) => part.length > 0).join("&");
+  return getParts2(parameters, false).filter((part) => part.length > 0).join("&");
 }
 // src/js/queue.ts
 function queue(callback) {
@@ -1490,14 +1536,20 @@ function getMaximum(first, second) {
 }
 
 class SizedMap extends Map {
-  maximum;
+  maximumSize;
+  get full() {
+    return this.size >= this.maximumSize;
+  }
+  get maximum() {
+    return this.maximumSize;
+  }
   constructor(entries, maximum) {
-    const actualMaximum = getMaximum(typeof entries === "number" ? entries : typeof maximum === "number" ? maximum : undefined);
-    super(Array.isArray(entries) ? entries.slice(0, actualMaximum) : undefined);
-    this.maximum = actualMaximum;
-    if (Array.isArray(entries) && entries.length > actualMaximum) {
-      for (let index = 0;index < actualMaximum; index += 1) {
-        this.set(...entries[entries.length - actualMaximum + index]);
+    const maximumSize = getMaximum(typeof entries === "number" ? entries : typeof maximum === "number" ? maximum : undefined);
+    super(Array.isArray(entries) ? entries.slice(0, maximumSize) : undefined);
+    this.maximumSize = maximumSize;
+    if (Array.isArray(entries) && entries.length > maximumSize) {
+      for (let index = 0;index < maximumSize; index += 1) {
+        this.set(...entries[entries.length - maximumSize + index]);
       }
     }
   }
@@ -1512,7 +1564,7 @@ class SizedMap extends Map {
   set(key, value3) {
     if (this.has(key)) {
       this.delete(key);
-    } else if (this.size >= this.maximum) {
+    } else if (this.size >= this.maximumSize) {
       this.delete(this.keys().next().value);
     }
     return super.set(key, value3);
@@ -1520,24 +1572,47 @@ class SizedMap extends Map {
 }
 
 class SizedSet extends Set {
-  maximum;
+  maximumSize;
+  get full() {
+    return this.size >= this.maximumSize;
+  }
+  get maximum() {
+    return this.maximumSize;
+  }
   constructor(values, maximum) {
-    const actualMaximum = getMaximum(typeof values === "number" ? values : typeof maximum === "number" ? maximum : undefined);
-    super(Array.isArray(values) && values.length <= actualMaximum ? values : undefined);
-    this.maximum = actualMaximum;
-    if (Array.isArray(values) && values.length > actualMaximum) {
-      for (let index = 0;index < actualMaximum; index += 1) {
-        this.add(values[values.length - actualMaximum + index]);
+    const maximumSize = getMaximum(typeof values === "number" ? values : typeof maximum === "number" ? maximum : undefined);
+    super(Array.isArray(values) && values.length <= maximumSize ? values : undefined);
+    this.maximumSize = maximumSize;
+    if (Array.isArray(values) && values.length > maximumSize) {
+      for (let index = 0;index < maximumSize; index += 1) {
+        this.add(values[values.length - maximumSize + index]);
       }
     }
   }
   add(value3) {
     if (this.has(value3)) {
       this.delete(value3);
-    } else if (this.size >= this.maximum) {
+    } else if (this.size >= this.maximumSize) {
       this.delete(this.values().next().value);
     }
     return super.add(value3);
+  }
+  at(index, update) {
+    const value3 = [...this.values()][index < 0 ? this.size + index : index];
+    if ((update ?? false) && this.has(value3)) {
+      this.delete(value3);
+      this.add(value3);
+    }
+    return value3;
+  }
+  get(value3, update) {
+    if (this.has(value3)) {
+      if (update ?? false) {
+        this.delete(value3);
+        this.add(value3);
+      }
+      return value3;
+    }
   }
 }
 // src/js/touch.ts
@@ -1635,6 +1710,7 @@ export {
   debounce,
   createUuid,
   count,
+  compare,
   compact,
   clone,
   clamp,

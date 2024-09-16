@@ -1,5 +1,6 @@
 import {expect, test} from 'bun:test';
 import {
+	compare,
 	diff,
 	getValue,
 	merge,
@@ -31,6 +32,23 @@ type Mergeable = {
 	profession?: string;
 };
 
+test('compare', () => {
+	expect(compare('', '')).toBe(0);
+	expect(compare('a', '')).toBe(1);
+	expect(compare('', 'a')).toBe(-1);
+
+	expect(compare('a', 'a')).toBe(0);
+	expect(compare('a', 'b')).toBe(-1);
+	expect(compare('b', 'a')).toBe(1);
+
+	expect(compare(['a', 1], ['a', '1'])).toBe(0);
+	expect(compare(['a', 1], ['a', 2])).toBe(-1);
+	expect(compare(['a', 2], ['a', 1])).toBe(1);
+
+	expect(compare(['a', 1], ['a', 'x'])).toBe(-1);
+	expect(compare(['a', 'x'], ['a', 1])).toBe(1);
+});
+
 test('diff', () => {
 	expect(diff(1, 1).type).toBe('none');
 	expect(diff(1, 2).type).toBe('full');
@@ -57,7 +75,7 @@ test('diff', () => {
 
 	const second: DiffableExtended = {
 		additional: 'xyz',
-		numbers: Array.from({length: 10}).map((_, i) => i % 3 === 0 ? -1 : i),
+		numbers: Array.from({length: 10}).map((_, i) => (i % 3 === 0 ? -1 : i)),
 		object: {
 			nested: {
 				a: 3,
@@ -65,7 +83,9 @@ test('diff', () => {
 				c: 1,
 			},
 		},
-		strings: Array.from({length: 10}).map((_, i) => String(i % 3 === 0 ? -1 : i)),
+		strings: Array.from({length: 10}).map((_, i) =>
+			String(i % 3 === 0 ? -1 : i),
+		),
 		value: 456,
 	};
 
@@ -74,10 +94,19 @@ test('diff', () => {
 	expect(diffed.type).toBe('partial');
 	expect(Object.keys(diffed.values).length).toBe(16);
 
-	expect(diffed.values.numbers).toEqual({from: first.numbers, to: second.numbers});
+	expect(diffed.values.numbers).toEqual({
+		from: first.numbers,
+		to: second.numbers,
+	});
 	expect(diffed.values.object).toEqual({from: first.object, to: second.object});
-	expect(diffed.values['object.nested']).toEqual({from: first.object.nested, to: second.object.nested});
-	expect(diffed.values.strings).toEqual({from: first.strings, to: second.strings});
+	expect(diffed.values['object.nested']).toEqual({
+		from: first.object.nested,
+		to: second.object.nested,
+	});
+	expect(diffed.values.strings).toEqual({
+		from: first.strings,
+		to: second.strings,
+	});
 
 	expect(diffed.values['numbers.0']).toEqual({from: 0, to: -1});
 	expect(diffed.values['numbers.3']).toEqual({from: 3, to: -1});

@@ -1,19 +1,7 @@
 import {isKey} from '../is';
 import type {Key, PlainObject} from '../models';
+import {compare} from '../value/compare';
 import type {SortKey, SortKeyCallback, SortKeyWithCallback} from './models';
-
-function comparison(first: unknown, second: unknown): number {
-	if (typeof first === 'number' && typeof second === 'number') {
-		return first - second;
-	}
-
-	const firstAsNumber = Number(first);
-	const secondAsNumber = Number(second);
-
-	return Number.isNaN(firstAsNumber) || Number.isNaN(secondAsNumber)
-		? String(first).localeCompare(String(second))
-		: firstAsNumber - secondAsNumber;
-}
 
 /**
  * Sorts an array of items _(ascending by default)_
@@ -98,7 +86,7 @@ export function sort<Value>(
 	if (length === 1) {
 		return array.sort(
 			(first, second) =>
-				comparison(keys[0].callback(first), keys[0].callback(second)) *
+				compare(keys[0].callback(first), keys[0].callback(second)) *
 				(keys[0].direction === 'asc' ? 1 : -1),
 		);
 	}
@@ -109,7 +97,7 @@ export function sort<Value>(
 
 			const descending = direction === 'desc';
 
-			const compared = comparison(
+			const compared = compare(
 				callback(descending ? second : first),
 				callback(descending ? first : second),
 			);

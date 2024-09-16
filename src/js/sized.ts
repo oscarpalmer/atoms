@@ -179,10 +179,12 @@ export class SizedSet<Value = unknown> extends Set<Value> {
 	/**
 	 * Get a value from the Set, if it exists _(and move it to the end)_
 	 */
-	get(value: Value): Value | undefined {
+	get(value: Value, update?: boolean): Value | undefined {
 		if (this.has(value)) {
-			this.delete(value);
-			this.add(value);
+			if (update ?? false) {
+				this.delete(value);
+				this.add(value);
+			}
 
 			return value;
 		}

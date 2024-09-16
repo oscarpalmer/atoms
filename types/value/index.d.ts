@@ -4,6 +4,7 @@ import type { PlainObject } from '../models';
  */
 export declare function partial<Value extends PlainObject, Key extends keyof Value>(value: Value, keys: Key[]): Pick<Value, Key>;
 export * from './clone';
+export * from './compare';
 export * from './diff';
 export * from './equal';
 export * from './get';

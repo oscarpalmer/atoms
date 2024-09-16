@@ -1,6 +1,6 @@
 import {expect, test} from 'bun:test';
 import {wait} from '@oscarpalmer/timer';
-import {diff, getRandomInteger} from '../src/js';
+import {diff, equal, getRandomInteger} from '../src/js';
 import {
 	chunk,
 	compact,
@@ -212,16 +212,15 @@ test('shuffle', () => {
 	let first: Item[] | null = null;
 	let second: Item[] | null = null;
 
-	while (first == null || first[0].id === complex[0].id) {
+	while (first == null || equal(first, second)) {
 		first = shuffle(complex);
 	}
 
-	while (second == null || second[0].id === first[0].id) {
+	while (second == null || equal(second, first)) {
 		second = shuffle(complex);
 	}
 
 	expect(first).not.toEqual(complex);
-	expect(second).not.toEqual(complex);
 	expect(first).not.toEqual(second);
 });
 

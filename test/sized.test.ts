@@ -154,28 +154,27 @@ test('SizedSet', done => {
 		expect(joinSet(shrunkSet)).toBe('d; e; a');
 
 		Timer.wait(() => {
-			valuesSet.get('b');
+			expect(valuesSet.get('b'), 'b');
+			expect(maxSet.get('c', true), 'c');
+			expect(shrunkSet.at(1), 'a');
+			expect(shrunkSet.at(0, true), 'd');
 
 			expect(valuesSet.full).toBe(false);
 			expect(valuesSet.maximum).toBe(niceMax);
 			expect(valuesSet.size).toBe(4);
-			expect(joinSet(valuesSet)).toBe('a; c; d; b');
-
-			// maxSet.get();
+			expect(joinSet(valuesSet)).toBe('a; b; c; d');
 
 			expect(maxSet.full).toBe(true);
 			expect(maxSet.maximum).toBe(2);
 			expect(maxSet.size).toBe(2);
-			// expect(joinMap(maxMap)).toBe('2:c; 1:b');
-
-			// shrunkMap.get(3);
+			expect(joinSet(maxSet)).toBe('b; c');
 
 			expect(shrunkSet.full).toBe(true);
 			expect(shrunkSet.maximum).toBe(3);
 			expect(shrunkSet.size).toBe(3);
-			// expect(joinMap(shrunkMap)).toBe('4:e; 0:a; 3:d');
+			expect(joinSet(shrunkSet)).toBe('e; a; d');
 
 			done();
-		});
+		}, 125);
 	});
 });

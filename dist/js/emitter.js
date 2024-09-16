@@ -3,6 +3,27 @@ function noop() {
 }
 
 // src/js/emitter.ts
+function emitter(value) {
+  return new Emitter(value);
+}
+function finishEmitter(state, emit) {
+  if (state.active) {
+    state.active = false;
+    const entries = [...state.observers.entries()];
+    const { length } = entries;
+    for (let index = 0;index < length; index += 1) {
+      const [subscription, observer] = entries[index];
+      if (emit) {
+        observer.complete?.();
+      }
+      subscription.destroy();
+    }
+    state.observers.clear();
+    state.observable = undefined;
+    state.observers = undefined;
+    state.value = undefined;
+  }
+}
 function getObserver(first, second, third) {
   let observer = {
     next: noop
@@ -20,20 +41,6 @@ function getObserver(first, second, third) {
     };
   }
   return observer;
-}
-function emitter(value) {
-  return new Emitter(value);
-}
-function finishEmitter(state, emit) {
-  if (state.active) {
-    state.active = false;
-    for (const [subscription, observer] of state.observers) {
-      if (emit) {
-        observer.complete?.();
-      }
-      subscription.unsubscribe();
-    }
-  }
 }
 
 class Emitter {
@@ -108,12 +115,17 @@ class Subscription {
     };
   }
   get closed() {
-    return this.state.closed || !this.state.emitter.active;
+    return this.state.closed || !(this.state.emitter?.active ?? false);
+  }
+  destroy() {
+    this.unsubscribe();
+    this.state.emitter = undefined;
+    this.state.observers = undefined;
   }
   unsubscribe() {
     if (!this.state.closed) {
       this.state.closed = true;
-      this.state.observers.delete(this);
+      this.state.observers?.delete(this);
     }
   }
 }

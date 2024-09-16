@@ -108,7 +108,7 @@ function template(value2, variables, options) {
     if (value3 == null) {
       return "";
     }
-    values[key] = String(value3);
+    values[key] = getString(value3);
     return values[key];
   });
 }

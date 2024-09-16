@@ -38,7 +38,6 @@ export function setValue<Data extends PlainObject>(
 	const {length} = parts;
 	const lastIndex = length - 1;
 
-	let previous: PlainObject | undefined;
 	let target: PlainObject =
 		typeof data === 'object' && data !== null ? data : {};
 
@@ -59,7 +58,6 @@ export function setValue<Data extends PlainObject>(
 			target[part] = next;
 		}
 
-		previous = target;
 		target = next as PlainObject;
 	}
 

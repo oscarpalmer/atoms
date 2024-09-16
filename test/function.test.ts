@@ -46,6 +46,9 @@ test('memoise', () => {
 	expect(memoised.get(2)).toBe(4);
 	expect(memoised.get(3)).toBe(6);
 
+	expect(memoised.run(2)).toBe(4);
+	expect(memoised.run(3)).toBe(6);
+
 	memoised.delete(2);
 
 	expect(memoised.has(2)).toBe(false);
@@ -59,6 +62,12 @@ test('memoise', () => {
 	expect(memoised.has(3)).toBe(false);
 	expect(memoised.get(2)).toBeUndefined();
 	expect(memoised.get(3)).toBeUndefined();
+
+	memoised.destroy();
+
+	expect(memoised.run(2)).toBeUndefined();
+	expect(memoised.has(2)).toBe(false);
+	expect(memoised.get(2)).toBeUndefined();
 });
 
 test('noop', () => {

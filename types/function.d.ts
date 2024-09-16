@@ -17,6 +17,10 @@ declare class Memoised<Callback extends GenericCallback> {
      */
     delete(key: Parameters<Callback>[0]): boolean;
     /**
+     * Destroys the instance, clearing its cache and removing its callback
+     */
+    destroy(): void;
+    /**
      * Retrieves the result from the cache if it exists, or `undefined` otherwise
      */
     get(key: Parameters<Callback>[0]): ReturnType<Callback> | undefined;

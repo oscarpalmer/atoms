@@ -85,4 +85,3 @@ export function words(value: string): string[] {
 
 export * from './case';
 export * from './template';
-

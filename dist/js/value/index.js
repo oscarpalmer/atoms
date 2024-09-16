@@ -12,6 +12,95 @@ function partial(value2, keys) {
 function compact(array, strict) {
   return strict === true ? array.filter((item) => !!item) : array.filter((item) => item != null);
 }
+// src/js/math.ts
+function max(values) {
+  return values.length > 0 ? Math.max(...values) : Number.NaN;
+}
+
+// src/js/number.ts
+function getNumber(value) {
+  if (typeof value === "number") {
+    return value;
+  }
+  if (typeof value === "symbol") {
+    return Number.NaN;
+  }
+  let parsed = value?.valueOf?.() ?? value;
+  if (typeof parsed === "object") {
+    parsed = parsed?.toString() ?? parsed;
+  }
+  if (typeof parsed !== "string") {
+    return parsed == null ? Number.NaN : typeof parsed === "number" ? parsed : +parsed;
+  }
+  if (/^\s*0+\s*$/.test(parsed)) {
+    return 0;
+  }
+  const trimmed = parsed.trim();
+  if (trimmed.length === 0) {
+    return Number.NaN;
+  }
+  const isBinary = /^0b[01]+$/i.test(trimmed);
+  if (isBinary || /^0o[0-7]+$/i.test(trimmed)) {
+    return Number.parseInt(trimmed.slice(2), isBinary ? 2 : 8);
+  }
+  return +(/^0x[0-9a-f]+$/i.test(trimmed) ? trimmed : trimmed.replace(/_/g, ""));
+}
+
+// src/js/value/compare.ts
+function compare(first, second) {
+  const firstParts = getParts(first);
+  const secondParts = getParts(second);
+  const length = max([firstParts.length, secondParts.length]);
+  const lastIndex = length - 1;
+  for (let index = 0;index < length; index += 1) {
+    const firstPart = firstParts[index];
+    const secondPart = secondParts[index];
+    if (firstPart === secondPart) {
+      if (index === lastIndex) {
+        return 0;
+      }
+      continue;
+    }
+    if (firstPart == null || typeof firstPart === "string" && firstPart.length === 0) {
+      return -1;
+    }
+    if (secondPart == null || typeof secondPart === "string" && secondPart.length === 0) {
+      return 1;
+    }
+    const firstNumber = getNumber(firstPart);
+    const secondNumber = getNumber(secondPart);
+    const firstIsNaN = Number.isNaN(firstNumber);
+    const secondIsNaN = Number.isNaN(secondNumber);
+    if (firstIsNaN || secondIsNaN) {
+      if (firstIsNaN && secondIsNaN) {
+        return getString(firstPart).localeCompare(getString(secondPart));
+      }
+      if (firstIsNaN) {
+        return 1;
+      }
+      if (secondIsNaN) {
+        return -1;
+      }
+    }
+    if (firstNumber === secondNumber) {
+      if (index === lastIndex) {
+        return 0;
+      }
+      continue;
+    }
+    return firstNumber - secondNumber;
+  }
+  return join(firstParts).localeCompare(join(secondParts));
+}
+function getParts(value) {
+  if (value == null) {
+    return [""];
+  }
+  if (Array.isArray(value)) {
+    return value;
+  }
+  return typeof value === "object" ? [value] : words(getString(value));
+}
 // src/js/string/index.ts
 function getString(value2) {
   if (typeof value2 === "string") {
@@ -27,6 +116,10 @@ function getString(value2) {
 function join(value2, delimiter) {
   return compact(value2).map(getString).filter((value3) => value3.trim().length > 0).join(typeof delimiter === "string" ? delimiter : "");
 }
+function words(value2) {
+  return value2.match(/[^\x00-\x2f\x3a-\x40\x5b-\x60\x7b-\x7f]+/g) ?? [];
+}
+
 // src/js/is.ts
 function isArrayOrPlainObject(value2) {
   return Array.isArray(value2) || isPlainObject(value2);
@@ -345,7 +438,6 @@ function setValue(data, path, value2, ignoreCase) {
   const parts = (shouldIgnoreCase ? path.toLowerCase() : path).split(".");
   const { length } = parts;
   const lastIndex = length - 1;
-  let previous;
   let target = typeof data === "object" && data !== null ? data : {};
   for (let index = 0;index < length; index += 1) {
     const part = parts[index];
@@ -358,7 +450,6 @@ function setValue(data, path, value2, ignoreCase) {
       next = {};
       target[part] = next;
     }
-    previous = target;
     target = next;
   }
   return data;
@@ -425,5 +516,6 @@ export {
   getValue,
   equal,
   diff,
+  compare,
   clone
 };

@@ -42,7 +42,6 @@ function setValue(data, path, value, ignoreCase) {
   const parts = (shouldIgnoreCase ? path.toLowerCase() : path).split(".");
   const { length } = parts;
   const lastIndex = length - 1;
-  let previous;
   let target = typeof data === "object" && data !== null ? data : {};
   for (let index = 0;index < length; index += 1) {
     const part = parts[index];
@@ -55,7 +54,6 @@ function setValue(data, path, value, ignoreCase) {
       next = {};
       target[part] = next;
     }
-    previous = target;
     target = next;
   }
   return data;

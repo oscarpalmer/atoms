@@ -61,16 +61,21 @@ class Memoised {
     this.state = { cache, getter };
   }
   clear() {
-    this.state.cache.clear();
+    this.state.cache?.clear();
   }
   delete(key) {
-    return this.state.cache.delete(key);
+    return this.state.cache?.delete(key);
+  }
+  destroy() {
+    this.state.cache.clear();
+    this.state.cache = undefined;
+    this.state.getter = noop;
   }
   get(key) {
-    return this.state.cache.get(key);
+    return this.state.cache?.get(key);
   }
   has(key) {
-    return this.state.cache.has(key);
+    return this.state.cache?.has(key) ?? false;
   }
   run(...parameters) {
     return this.state.getter(...parameters);
