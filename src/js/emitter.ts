@@ -166,7 +166,14 @@ class Subscription<Value> {
 	 * Is the subscription closed?
 	 */
 	get closed() {
-		return this.state.closed || !this.state.emitter.active;
+		return this.state.closed || !(this.state.emitter?.active ?? false);
+	}
+
+	destroy(): void {
+		this.unsubscribe();
+
+		this.state.emitter = undefined as never;
+		this.state.observers = undefined as never;
 	}
 
 	/**
@@ -176,7 +183,7 @@ class Subscription<Value> {
 		if (!this.state.closed) {
 			this.state.closed = true;
 
-			this.state.observers.delete(this);
+			this.state.observers?.delete(this);
 		}
 	}
 }
@@ -188,6 +195,38 @@ type SubscriptionState<Value> = {
 };
 
 const properties: Array<keyof Observer<never>> = ['complete', 'error', 'next'];
+
+/**
+ * Creates a new emitter
+ */
+export function emitter<Value>(value: Value): Emitter<Value> {
+	return new Emitter(value);
+}
+
+function finishEmitter<Value>(state: EmitterState<Value>, emit: boolean): void {
+	if (state.active) {
+		state.active = false;
+
+		const entries = [...state.observers.entries()];
+		const {length} = entries;
+
+		for (let index = 0; index < length; index += 1) {
+			const [subscription, observer] = entries[index];
+
+			if (emit) {
+				observer.complete?.();
+			}
+
+			subscription.destroy();
+		}
+
+		state.observers.clear();
+
+		state.observable = undefined as never;
+		state.observers = undefined as never;
+		state.value = undefined as never;
+	}
+}
 
 function getObserver<Value>(
 	first: Observer<Value> | ((value: Value) => void),
@@ -219,26 +258,4 @@ function getObserver<Value>(
 	return observer;
 }
 
-/**
- * Creates a new emitter
- */
-export function emitter<Value>(value: Value): Emitter<Value> {
-	return new Emitter(value);
-}
-
-function finishEmitter<Value>(state: EmitterState<Value>, emit: boolean): void {
-	if (state.active) {
-		state.active = false;
-
-		for (const [subscription, observer] of state.observers) {
-			if (emit) {
-				observer.complete?.();
-			}
-
-			subscription.unsubscribe();
-		}
-	}
-}
-
 export type {Emitter, Observable, Observer, Subscription};
-

@@ -47,6 +47,13 @@ class Memoised<Callback extends GenericCallback> {
 		return this.state.cache.delete(key);
 	}
 
+	destroy(): void {
+		this.state.cache.clear();
+
+		this.state.cache = undefined as never;
+		this.state.getter = noop as never;
+	}
+
 	/**
 	 * Retrieves the result from the cache if it exists, or `undefined` otherwise
 	 */

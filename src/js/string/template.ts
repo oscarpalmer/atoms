@@ -1,5 +1,6 @@
 import type {PlainObject} from '../models';
 import {getValue} from '../value';
+import {getString} from './index';
 
 type Options = {
 	/**
@@ -35,7 +36,7 @@ export function template(
 			return '';
 		}
 
-		values[key] = String(value);
+		values[key] = getString(value);
 
 		return values[key];
 	});

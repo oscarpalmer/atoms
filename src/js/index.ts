@@ -1,7 +1,6 @@
 export * from './array/index';
 export * from './colour/index';
 export * from './emitter';
-export * from './event';
 export * from './function';
 export * from './is';
 export * from './logger';
@@ -11,6 +10,7 @@ export * from './number';
 export * from './query';
 export * from './queue';
 export * from './random';
+export * from './sized';
 export * from './string/index';
 export * from './touch';
 export * from './value/index';

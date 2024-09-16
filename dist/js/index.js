@@ -671,7 +671,7 @@ function template(value2, variables, options) {
     if (value3 == null) {
       return "";
     }
-    values[key] = String(value3);
+    values[key] = getString(value3);
     return values[key];
   });
 }
@@ -1174,6 +1174,11 @@ class Memoised {
   delete(key) {
     return this.state.cache.delete(key);
   }
+  destroy() {
+    this.state.cache.clear();
+    this.state.cache = undefined;
+    this.state.getter = noop;
+  }
   get(key) {
     return this.state.cache.get(key);
   }
@@ -1186,6 +1191,27 @@ class Memoised {
 }
 
 // src/js/emitter.ts
+function emitter(value2) {
+  return new Emitter(value2);
+}
+function finishEmitter(state, emit) {
+  if (state.active) {
+    state.active = false;
+    const entries = [...state.observers.entries()];
+    const { length } = entries;
+    for (let index = 0;index < length; index += 1) {
+      const [subscription, observer] = entries[index];
+      if (emit) {
+        observer.complete?.();
+      }
+      subscription.destroy();
+    }
+    state.observers.clear();
+    state.observable = undefined;
+    state.observers = undefined;
+    state.value = undefined;
+  }
+}
 function getObserver(first, second, third) {
   let observer = {
     next: noop
@@ -1203,20 +1229,6 @@ function getObserver(first, second, third) {
     };
   }
   return observer;
-}
-function emitter(value2) {
-  return new Emitter(value2);
-}
-function finishEmitter(state, emit) {
-  if (state.active) {
-    state.active = false;
-    for (const [subscription, observer] of state.observers) {
-      if (emit) {
-        observer.complete?.();
-      }
-      subscription.unsubscribe();
-    }
-  }
 }
 
 class Emitter {
@@ -1291,29 +1303,21 @@ class Subscription {
     };
   }
   get closed() {
-    return this.state.closed || !this.state.emitter.active;
+    return this.state.closed || !(this.state.emitter?.active ?? false);
+  }
+  destroy() {
+    this.unsubscribe();
+    this.state.emitter = undefined;
+    this.state.observers = undefined;
   }
   unsubscribe() {
     if (!this.state.closed) {
       this.state.closed = true;
-      this.state.observers.delete(this);
+      this.state.observers?.delete(this);
     }
   }
 }
 var properties3 = ["complete", "error", "next"];
-// src/js/event.ts
-function getPosition(event) {
-  let x;
-  let y;
-  if (event instanceof MouseEvent) {
-    x = event.clientX;
-    y = event.clientY;
-  } else if (event instanceof TouchEvent) {
-    x = event.touches[0]?.clientX;
-    y = event.touches[0]?.clientY;
-  }
-  return typeof x === "number" && typeof y === "number" ? { x, y } : undefined;
-}
 // src/js/logger.ts
 if (globalThis._atomic_logging == null) {
   globalThis._atomic_logging = true;
@@ -1479,6 +1483,63 @@ if (globalThis._atomic_queued == null) {
     }
   });
 }
+// src/js/sized.ts
+function getMaximum(first, second) {
+  const actual = (typeof first === "number" ? first : typeof second === "number" ? second : undefined) ?? 2 ** 20;
+  return clamp(actual, 1, 2 ** 24);
+}
+
+class SizedMap extends Map {
+  maximum;
+  constructor(entries, maximum) {
+    const actualMaximum = getMaximum(typeof entries === "number" ? entries : typeof maximum === "number" ? maximum : undefined);
+    super(Array.isArray(entries) ? entries.slice(0, actualMaximum) : undefined);
+    this.maximum = actualMaximum;
+    if (Array.isArray(entries) && entries.length > actualMaximum) {
+      for (let index = 0;index < actualMaximum; index += 1) {
+        this.set(...entries[entries.length - actualMaximum + index]);
+      }
+    }
+  }
+  get(key) {
+    const value3 = super.get(key);
+    if (value3 === undefined && !this.has(key)) {
+      return;
+    }
+    this.set(key, value3);
+    return value3;
+  }
+  set(key, value3) {
+    if (this.has(key)) {
+      this.delete(key);
+    } else if (this.size >= this.maximum) {
+      this.delete(this.keys().next().value);
+    }
+    return super.set(key, value3);
+  }
+}
+
+class SizedSet extends Set {
+  maximum;
+  constructor(values, maximum) {
+    const actualMaximum = getMaximum(typeof values === "number" ? values : typeof maximum === "number" ? maximum : undefined);
+    super(Array.isArray(values) && values.length <= actualMaximum ? values : undefined);
+    this.maximum = actualMaximum;
+    if (Array.isArray(values) && values.length > actualMaximum) {
+      for (let index = 0;index < actualMaximum; index += 1) {
+        this.add(values[values.length - actualMaximum + index]);
+      }
+    }
+  }
+  add(value3) {
+    if (this.has(value3)) {
+      this.delete(value3);
+    } else if (this.size >= this.maximum) {
+      this.delete(this.values().next().value);
+    }
+    return super.add(value3);
+  }
+}
 // src/js/touch.ts
 var supportsTouch = (() => {
   let value3 = false;
@@ -1559,7 +1620,6 @@ export {
   getRandomCharacters,
   getRandomBoolean,
   getRGBColour,
-  getPosition,
   getNumber,
   getHexColour,
   getHSLColour,
@@ -1583,6 +1643,8 @@ export {
   camelCase,
   between,
   average,
+  SizedSet,
+  SizedMap,
   RGBColour,
   HexColour,
   HSLColour
