@@ -2,23 +2,17 @@
 	flex: 1;
 }
 
-.flow,
-.stack {
-	:where(&, &-large, &-small, &-text) {
-		display: flex;
-	}
+:where(.flow, .stack) {
+	display: flex;
+}
+
+:where(.flow) {
+	flex-flow: row wrap;
+	align-items: center;
+	gap: var(--flow-gap, 1rem);
 }
 
 .flow {
-	:where(&, &-large, &-small, &-text) {
-		flex-flow: row wrap;
-		align-items: center;
-	}
-
-	:where(&) {
-		gap: var(--flow-gap, 1rem);
-	}
-
 	:where(&-large) {
 		gap: var(--flow-gap-large, calc(2 * var(--flow-gap, 1rem)));
 	}
@@ -36,15 +30,12 @@
 	}
 }
 
+:where(.stack) {
+	flex-flow: column nowrap;
+	gap: var(--stack-gap, 1rem);
+}
+
 .stack {
-	:where(&, &-large, &-small, &-text) {
-		flex-flow: column nowrap;
-	}
-
-	:where(&) {
-		gap: var(--stack-gap, 1rem);
-	}
-
 	:where(&-large) {
 		gap: var(--stack-gap-large, calc(2 * var(--stack-gap, 1rem)));
 	}

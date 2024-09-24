@@ -8,13 +8,13 @@
 	},
 	"description": "Sweet little atomic goodies…",
 	"devDependencies": {
-		"@biomejs/biome": "^1.9.1",
+		"@biomejs/biome": "^1.9.2",
 		"@happy-dom/global-registrator": "^15.7.4",
 		"@oscarpalmer/timer": "^0.24.0",
-		"@types/bun": "^1.1.9",
-		"bun": "^1.1.27",
+		"@types/bun": "^1.1.10",
+		"bun": "^1.1.29",
 		"dts-bundle-generator": "^9.5.1",
-		"sass": "^1.78.0",
+		"sass": "^1.79.3",
 		"typescript": "^5.6.2"
 	},
 	"exports": {
@@ -58,12 +58,6 @@
 			"bun": "./src/js/emitter.ts",
 			"import": "./dist/js/emitter.mjs",
 			"require": "./dist/js/emitter.js"
-		},
-		"./event": {
-			"types": "./types/event.d.ts",
-			"bun": "./src/js/event.ts",
-			"import": "./dist/js/event.mjs",
-			"require": "./dist/js/event.js"
 		},
 		"./function": {
 			"types": "./types/function.d.ts",
@@ -169,5 +163,5 @@
 	},
 	"type": "module",
 	"types": "./types/index.d.cts",
-	"version": "0.72.0"
+	"version": "0.73.0"
 }

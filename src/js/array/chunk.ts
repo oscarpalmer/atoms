@@ -4,7 +4,7 @@
 export function chunk<Value>(array: Value[], size?: number): Value[][] {
 	const {length} = array;
 
-	const chunkSize = typeof size === 'number' && size > 0 ? size : 32_000;
+	const chunkSize = typeof size === 'number' && size > 0 ? size : 64_000;
 
 	if (length <= chunkSize) {
 		return [array];

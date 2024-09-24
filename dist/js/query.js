@@ -3,19 +3,19 @@ function compact(array, strict) {
   return strict === true ? array.filter((item) => !!item) : array.filter((item) => item != null);
 }
 // src/js/string/index.ts
-function getString(value2) {
-  if (typeof value2 === "string") {
-    return value2;
+function getString(value) {
+  if (typeof value === "string") {
+    return value;
   }
-  if (typeof value2 !== "object" || value2 == null) {
-    return String(value2);
+  if (typeof value !== "object" || value == null) {
+    return String(value);
   }
-  const valueOff = value2.valueOf?.() ?? value2;
+  const valueOff = value.valueOf?.() ?? value;
   const asString = valueOff?.toString?.() ?? String(valueOff);
-  return asString.startsWith("[object ") ? JSON.stringify(value2) : asString;
+  return asString.startsWith("[object ") ? JSON.stringify(value) : asString;
 }
-function join(value2, delimiter) {
-  return compact(value2).map(getString).filter((value3) => value3.trim().length > 0).join(typeof delimiter === "string" ? delimiter : "");
+function join(value, delimiter) {
+  return compact(value).map(getString).filter((value2) => value2.trim().length > 0).join(typeof delimiter === "string" ? delimiter : "");
 }
 // src/js/internal/value-handle.ts
 function findKey(needle, haystack, ignoreCase) {
@@ -59,15 +59,15 @@ function setValue(data, path, value, ignoreCase) {
   return data;
 }
 // src/js/is.ts
-function isNullableOrWhitespace(value2) {
-  return value2 == null || /^\s*$/.test(getString(value2));
+function isNullableOrWhitespace(value) {
+  return value == null || /^\s*$/.test(getString(value));
 }
-function isPlainObject(value2) {
-  if (typeof value2 !== "object" || value2 === null) {
+function isPlainObject(value) {
+  if (typeof value !== "object" || value === null) {
     return false;
   }
-  const prototype = Object.getPrototypeOf(value2);
-  return (prototype === null || prototype === Object.prototype || Object.getPrototypeOf(prototype) === null) && !(Symbol.toStringTag in value2) && !(Symbol.iterator in value2);
+  const prototype = Object.getPrototypeOf(value);
+  return (prototype === null || prototype === Object.prototype || Object.getPrototypeOf(prototype) === null) && !(Symbol.toStringTag in value) && !(Symbol.iterator in value);
 }
 
 // src/js/query.ts
@@ -75,33 +75,33 @@ function fromQuery(query) {
   const parts = query.split("&");
   const { length } = parts;
   const parameters = {};
-  for (let outer = 0;outer < length; outer += 1) {
-    const [key, value3] = parts[outer].split("=").map(decodeURIComponent);
+  for (let index = 0;index < length; index += 1) {
+    const [key, value] = parts[index].split("=").map(decodeURIComponent);
     if (isNullableOrWhitespace(key)) {
       continue;
     }
     if (key.includes(".")) {
-      setValue(parameters, key, getValue2(value3));
+      setValue(parameters, key, getValue2(value));
     } else {
       if (key in parameters) {
         if (!Array.isArray(parameters[key])) {
           parameters[key] = [parameters[key]];
         }
-        parameters[key].push(getValue2(value3));
+        parameters[key].push(getValue2(value));
       } else {
-        parameters[key] = getValue2(value3);
+        parameters[key] = getValue2(value);
       }
     }
   }
   return parameters;
 }
-function getParts(value3, fromArray, prefix) {
-  const keys = Object.keys(value3);
+function getParts(value, fromArray, prefix) {
+  const keys = Object.keys(value);
   const { length } = keys;
   const parts = [];
   for (let index = 0;index < length; index += 1) {
     const key = keys[index];
-    const val = value3[key];
+    const val = value[key];
     if (Array.isArray(val)) {
       parts.push(...getParts(val, true, join([prefix, fromArray ? null : key], ".")));
     } else if (isPlainObject(val)) {
@@ -112,18 +112,18 @@ function getParts(value3, fromArray, prefix) {
   }
   return parts;
 }
-function getValue2(value3) {
-  if (/^(false|true)$/.test(value3)) {
-    return value3 === "true";
+function getValue2(value) {
+  if (/^(false|true)$/.test(value)) {
+    return value === "true";
   }
-  const asNumber = Number(value3);
+  const asNumber = Number(value);
   if (!Number.isNaN(asNumber)) {
     return asNumber;
   }
-  return value3;
+  return value;
 }
-function isDecodable(value3) {
-  return ["boolean", "number", "string"].includes(typeof value3);
+function isDecodable(value) {
+  return ["boolean", "number", "string"].includes(typeof value);
 }
 function toQuery(parameters) {
   return getParts(parameters, false).filter((part) => part.length > 0).join("&");

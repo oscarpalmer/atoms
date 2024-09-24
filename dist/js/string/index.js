@@ -6,33 +6,33 @@ function compact(array, strict) {
 function createUuid() {
   return "10000000-1000-4000-8000-100000000000".replace(/[018]/g, (substring) => (substring ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> substring / 4).toString(16));
 }
-function getString(value2) {
-  if (typeof value2 === "string") {
-    return value2;
+function getString(value) {
+  if (typeof value === "string") {
+    return value;
   }
-  if (typeof value2 !== "object" || value2 == null) {
-    return String(value2);
+  if (typeof value !== "object" || value == null) {
+    return String(value);
   }
-  const valueOff = value2.valueOf?.() ?? value2;
+  const valueOff = value.valueOf?.() ?? value;
   const asString = valueOff?.toString?.() ?? String(valueOff);
-  return asString.startsWith("[object ") ? JSON.stringify(value2) : asString;
+  return asString.startsWith("[object ") ? JSON.stringify(value) : asString;
 }
-function join(value2, delimiter) {
-  return compact(value2).map(getString).filter((value3) => value3.trim().length > 0).join(typeof delimiter === "string" ? delimiter : "");
+function join(value, delimiter) {
+  return compact(value).map(getString).filter((value2) => value2.trim().length > 0).join(typeof delimiter === "string" ? delimiter : "");
 }
-function parse(value2, reviver) {
+function parse(value, reviver) {
   try {
-    return JSON.parse(value2, reviver);
+    return JSON.parse(value, reviver);
   } catch {
   }
 }
-function truncate(value2, length, suffix) {
+function truncate(value, length, suffix) {
   const suffixLength = suffix?.length ?? 0;
   const truncatedLength = length - suffixLength;
-  return value2.length <= length ? value2 : `${value2.slice(0, truncatedLength)}${suffix ?? ""}`;
+  return value.length <= length ? value : `${value.slice(0, truncatedLength)}${suffix ?? ""}`;
 }
-function words(value2) {
-  return value2.match(/[^\x00-\x2f\x3a-\x40\x5b-\x60\x7b-\x7f]+/g) ?? [];
+function words(value) {
+  return value.match(/[^\x00-\x2f\x3a-\x40\x5b-\x60\x7b-\x7f]+/g) ?? [];
 }
 
 // src/js/string/case.ts
@@ -96,19 +96,19 @@ function getValue(data, path, ignoreCase) {
   return value;
 }
 // src/js/string/template.ts
-function template(value2, variables, options) {
+function template(value, variables, options) {
   const ignoreCase = options?.ignoreCase === true;
   const pattern = options?.pattern instanceof RegExp ? options.pattern : /{{([\s\S]+?)}}/g;
   const values = {};
-  return value2.replace(pattern, (_, key) => {
+  return value.replace(pattern, (_, key) => {
     if (values[key] != null) {
       return values[key];
     }
-    const value3 = getValue(variables, key, ignoreCase);
-    if (value3 == null) {
+    const value2 = getValue(variables, key, ignoreCase);
+    if (value2 == null) {
       return "";
     }
-    values[key] = getString(value3);
+    values[key] = getString(value2);
     return values[key];
   });
 }

@@ -1,7 +1,7 @@
 // src/js/array/chunk.ts
 function chunk(array, size) {
   const { length } = array;
-  const chunkSize = typeof size === "number" && size > 0 ? size : 32000;
+  const chunkSize = typeof size === "number" && size > 0 ? size : 64000;
   if (length <= chunkSize) {
     return [array];
   }
@@ -33,11 +33,11 @@ function insertValues(type, array, values, start, deleteCount) {
 }
 
 // src/js/array/index.ts
-function flatten2(array2) {
-  return array2.flat(Number.POSITIVE_INFINITY);
+function flatten2(array) {
+  return array.flat(Number.POSITIVE_INFINITY);
 }
-function push(array2, values) {
-  return insertValues("push", array2, values, array2.length, 0);
+function push(array, values) {
+  return insertValues("push", array, values, array.length, 0);
 }
 
 // src/js/array/compact.ts
@@ -164,10 +164,10 @@ function getRandomCharacters(length, selection) {
   if (length < 1) {
     return "";
   }
-  const actualSelection = typeof selection === "string" && selection.length > 0 ? selection : "abcdefghijklmnopqrstuvwxyz";
+  const actual = typeof selection === "string" && selection.length > 0 ? selection : "abcdefghijklmnopqrstuvwxyz";
   let characters = "";
   for (let index = 0;index < length; index += 1) {
-    characters += actualSelection.charAt(getRandomInteger(0, actualSelection.length));
+    characters += actual.charAt(getRandomInteger(0, actual.length));
   }
   return characters;
 }
@@ -196,16 +196,16 @@ function getRandomItems(array, amount) {
   if (amount === 1) {
     return array.length === 0 ? [] : [array[getRandomInteger(0, array.length)]];
   }
-  return amount == null || amount >= array.length ? shuffle2(array) : shuffle2(array).slice(0, amount);
+  return amount == null || amount >= array.length ? shuffle(array) : shuffle(array).slice(0, amount);
 }
 
 // src/js/array/shuffle.ts
-function shuffle2(array) {
+function shuffle(array) {
   const shuffled = array.slice();
   const { length } = shuffled;
   for (let index = 0;index < length; index += 1) {
-    const random2 = getRandomInteger(0, length);
-    [shuffled[index], shuffled[random2]] = [shuffled[random2], shuffled[index]];
+    const random = getRandomInteger(0, length);
+    [shuffled[index], shuffled[random]] = [shuffled[random], shuffled[index]];
   }
   return shuffled;
 }
@@ -213,33 +213,33 @@ function shuffle2(array) {
 function createUuid() {
   return "10000000-1000-4000-8000-100000000000".replace(/[018]/g, (substring) => (substring ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> substring / 4).toString(16));
 }
-function getString(value2) {
-  if (typeof value2 === "string") {
-    return value2;
+function getString(value) {
+  if (typeof value === "string") {
+    return value;
   }
-  if (typeof value2 !== "object" || value2 == null) {
-    return String(value2);
+  if (typeof value !== "object" || value == null) {
+    return String(value);
   }
-  const valueOff = value2.valueOf?.() ?? value2;
+  const valueOff = value.valueOf?.() ?? value;
   const asString = valueOff?.toString?.() ?? String(valueOff);
-  return asString.startsWith("[object ") ? JSON.stringify(value2) : asString;
+  return asString.startsWith("[object ") ? JSON.stringify(value) : asString;
 }
-function join(value2, delimiter) {
-  return compact(value2).map(getString).filter((value3) => value3.trim().length > 0).join(typeof delimiter === "string" ? delimiter : "");
+function join(value, delimiter) {
+  return compact(value).map(getString).filter((value2) => value2.trim().length > 0).join(typeof delimiter === "string" ? delimiter : "");
 }
-function parse(value2, reviver) {
+function parse(value, reviver) {
   try {
-    return JSON.parse(value2, reviver);
+    return JSON.parse(value, reviver);
   } catch {
   }
 }
-function truncate(value2, length, suffix) {
+function truncate(value, length, suffix) {
   const suffixLength = suffix?.length ?? 0;
   const truncatedLength = length - suffixLength;
-  return value2.length <= length ? value2 : `${value2.slice(0, truncatedLength)}${suffix ?? ""}`;
+  return value.length <= length ? value : `${value.slice(0, truncatedLength)}${suffix ?? ""}`;
 }
-function words(value2) {
-  return value2.match(/[^\x00-\x2f\x3a-\x40\x5b-\x60\x7b-\x7f]+/g) ?? [];
+function words(value) {
+  return value.match(/[^\x00-\x2f\x3a-\x40\x5b-\x60\x7b-\x7f]+/g) ?? [];
 }
 
 // src/js/string/case.ts
@@ -771,28 +771,28 @@ function unsmush(value) {
   return unsmushed;
 }
 // src/js/string/template.ts
-function template(value2, variables, options) {
+function template(value, variables, options) {
   const ignoreCase = options?.ignoreCase === true;
   const pattern = options?.pattern instanceof RegExp ? options.pattern : /{{([\s\S]+?)}}/g;
   const values = {};
-  return value2.replace(pattern, (_, key) => {
+  return value.replace(pattern, (_, key) => {
     if (values[key] != null) {
       return values[key];
     }
-    const value3 = getValue(variables, key, ignoreCase);
-    if (value3 == null) {
+    const value2 = getValue(variables, key, ignoreCase);
+    if (value2 == null) {
       return "";
     }
-    values[key] = getString(value3);
+    values[key] = getString(value2);
     return values[key];
   });
 }
 // src/js/is.ts
-function isArrayOrPlainObject(value2) {
-  return Array.isArray(value2) || isPlainObject(value2);
+function isArrayOrPlainObject(value) {
+  return Array.isArray(value) || isPlainObject(value);
 }
-function isEmpty(value2) {
-  const values = Object.values(value2);
+function isEmpty(value) {
+  const values = Object.values(value);
   const { length } = values;
   let count2 = 0;
   for (let index = 0;index < length; index += 1) {
@@ -802,45 +802,45 @@ function isEmpty(value2) {
   }
   return count2 === 0;
 }
-function isKey(value2) {
-  return typeof value2 === "number" || typeof value2 === "string";
+function isKey(value) {
+  return typeof value === "number" || typeof value === "string";
 }
-function isNullable(value2) {
-  return value2 == null;
+function isNullable(value) {
+  return value == null;
 }
-function isNullableOrEmpty(value2) {
-  return value2 == null || getString(value2) === "";
+function isNullableOrEmpty(value) {
+  return value == null || getString(value) === "";
 }
-function isNullableOrWhitespace(value2) {
-  return value2 == null || /^\s*$/.test(getString(value2));
+function isNullableOrWhitespace(value) {
+  return value == null || /^\s*$/.test(getString(value));
 }
-function isNumber(value2) {
-  return typeof value2 === "number" && !Number.isNaN(value2);
+function isNumber(value) {
+  return typeof value === "number" && !Number.isNaN(value);
 }
-function isNumerical(value2) {
-  return isNumber(value2) || typeof value2 === "string" && value2.trim().length > 0 && !Number.isNaN(+value2);
+function isNumerical(value) {
+  return isNumber(value) || typeof value === "string" && value.trim().length > 0 && !Number.isNaN(+value);
 }
-function isObject(value2) {
-  return typeof value2 === "object" && value2 !== null || typeof value2 === "function";
+function isObject(value) {
+  return typeof value === "object" && value !== null || typeof value === "function";
 }
-function isPlainObject(value2) {
-  if (typeof value2 !== "object" || value2 === null) {
+function isPlainObject(value) {
+  if (typeof value !== "object" || value === null) {
     return false;
   }
-  const prototype = Object.getPrototypeOf(value2);
-  return (prototype === null || prototype === Object.prototype || Object.getPrototypeOf(prototype) === null) && !(Symbol.toStringTag in value2) && !(Symbol.iterator in value2);
+  const prototype = Object.getPrototypeOf(value);
+  return (prototype === null || prototype === Object.prototype || Object.getPrototypeOf(prototype) === null) && !(Symbol.toStringTag in value) && !(Symbol.iterator in value);
 }
-function isPrimitive(value2) {
-  return value2 == null || /^(bigint|boolean|number|string|symbol)$/.test(typeof value2);
+function isPrimitive(value) {
+  return value == null || /^(bigint|boolean|number|string|symbol)$/.test(typeof value);
 }
 
 // src/js/array/sort.ts
-function sort(array2, first, second) {
-  if (array2.length < 2) {
-    return array2;
+function sort(array, first, second) {
+  if (array.length < 2) {
+    return array;
   }
   if (first == null || typeof first === "boolean") {
-    return first === true ? array2.sort((first2, second2) => second2 - first2) : array2.sort();
+    return first === true ? array.sort((first2, second2) => second2 - first2) : array.sort();
   }
   const direction = second === true ? "desc" : "asc";
   const keys = (Array.isArray(first) ? first : [first]).map((key) => {
@@ -849,23 +849,23 @@ function sort(array2, first, second) {
       callback: undefined
     };
     if (isKey(key)) {
-      returned.callback = (value2) => value2[key];
+      returned.callback = (value) => value[key];
     } else if (typeof key === "function") {
       returned.callback = key;
     } else if (typeof key?.value === "function" || isKey(key?.value)) {
       returned.direction = key?.direction ?? direction;
-      returned.callback = typeof key.value === "function" ? key.value : (value2) => value2[key.value];
+      returned.callback = typeof key.value === "function" ? key.value : (value) => value[key.value];
     }
     return returned;
   }).filter((key) => typeof key.callback === "function");
   const { length } = keys;
   if (length === 0) {
-    return direction === "asc" ? array2.sort() : array2.sort((first2, second2) => second2 - first2);
+    return direction === "asc" ? array.sort() : array.sort((first2, second2) => second2 - first2);
   }
   if (length === 1) {
-    return array2.sort((first2, second2) => compare(keys[0].callback(first2), keys[0].callback(second2)) * (keys[0].direction === "asc" ? 1 : -1));
+    return array.sort((first2, second2) => compare(keys[0].callback(first2), keys[0].callback(second2)) * (keys[0].direction === "asc" ? 1 : -1));
   }
-  const sorted = array2.sort((first2, second2) => {
+  const sorted = array.sort((first2, second2) => {
     for (let index = 0;index < length; index += 1) {
       const { callback, direction: direction2 } = keys[index];
       const descending = direction2 === "desc";
@@ -879,44 +879,44 @@ function sort(array2, first, second) {
   return sorted;
 }
 // src/js/array/splice.ts
-function splice(array2, start, amountOrValues, values) {
+function splice(array, start, amountOrValues, values) {
   const amoutOrValuesIsArray = Array.isArray(amountOrValues);
-  return insertValues("splice", array2, amoutOrValuesIsArray ? amountOrValues : values ?? [], start, amoutOrValuesIsArray ? array2.length : typeof amountOrValues === "number" && amountOrValues > 0 ? amountOrValues : 0);
+  return insertValues("splice", array, amoutOrValuesIsArray ? amountOrValues : values ?? [], start, amoutOrValuesIsArray ? array.length : typeof amountOrValues === "number" && amountOrValues > 0 ? amountOrValues : 0);
 }
 // src/js/array/to-map.ts
-function toMap(array2, first, second) {
+function toMap(array, first, second) {
   const asArrays = first === true || second === true;
   const callbacks = getCallbacks(undefined, first);
   const hasCallback = typeof callbacks?.key === "function";
   const map = new Map;
-  const { length } = array2;
+  const { length } = array;
   for (let index = 0;index < length; index += 1) {
-    const value2 = array2[index];
-    const key = hasCallback ? callbacks?.key?.(value2, index, array2) ?? index : index;
+    const value = array[index];
+    const key = hasCallback ? callbacks?.key?.(value, index, array) ?? index : index;
     if (asArrays) {
       const existing = map.get(key);
       if (Array.isArray(existing)) {
-        existing.push(value2);
+        existing.push(value);
       } else {
-        map.set(key, [value2]);
+        map.set(key, [value]);
       }
     } else {
-      map.set(key, value2);
+      map.set(key, value);
     }
   }
   return map;
 }
 // src/js/array/to-record.ts
-function toRecord(array2, first, second) {
-  return groupValues(array2, first, first === true || second === true, true);
+function toRecord(array, first, second) {
+  return groupValues(array, first, first === true || second === true, true);
 }
 // src/js/array/unique.ts
-function unique(array2, key) {
-  return findValues("unique", array2, undefined, key);
+function unique(array, key) {
+  return findValues("unique", array, undefined, key);
 }
 // src/js/colour/index.ts
-function getForegroundColour(value2) {
-  const values = [value2.blue / 255, value2.green / 255, value2.red / 255];
+function getForegroundColour(value) {
+  const values = [value.blue / 255, value.green / 255, value.red / 255];
   for (let colour of values) {
     if (colour <= 0.03928) {
       colour /= 12.92;
@@ -929,23 +929,23 @@ function getForegroundColour(value2) {
 }
 
 // src/js/colour/is.ts
-function isColour(value2) {
-  return isInstance(/^(hex|hsl|rgb)$/, value2);
+function isColour(value) {
+  return isInstance(/^(hex|hsl|rgb)$/, value);
 }
-function isColourValue(value2, properties) {
-  return typeof value2 === "object" && value2 !== null && properties.every((property) => (property in value2) && typeof value2[property] === "number");
+function isColourValue(value, properties) {
+  return typeof value === "object" && value !== null && properties.every((property) => (property in value) && typeof value[property] === "number");
 }
-function isHexColour(value2) {
-  return isInstance(/^hex$/, value2);
+function isHexColour(value) {
+  return isInstance(/^hex$/, value);
 }
-function isHSLColour(value2) {
-  return isInstance(/^hsl$/, value2);
+function isHSLColour(value) {
+  return isInstance(/^hsl$/, value);
 }
-function isInstance(pattern, value2) {
-  return typeof value2 === "object" && value2 !== null && "$colour" in value2 && typeof value2.$colour === "string" && pattern.test(value2.$colour);
+function isInstance(pattern, value) {
+  return typeof value === "object" && value !== null && "$colour" in value && typeof value.$colour === "string" && pattern.test(value.$colour);
 }
-function isRGBColour(value2) {
-  return isInstance(/^rgb$/, value2);
+function isRGBColour(value) {
+  return isInstance(/^rgb$/, value);
 }
 
 // src/js/colour/base.ts
@@ -953,40 +953,40 @@ class Colour {
   get value() {
     return { ...this.state.value };
   }
-  constructor(type, value2, defaults, properties) {
+  constructor(type, value, defaults, properties) {
     this.$colour = type;
     this.state = {
-      value: isColourValue(value2, properties) ? { ...value2 } : { ...defaults }
+      value: isColourValue(value, properties) ? { ...value } : { ...defaults }
     };
   }
 }
 
 // src/js/colour/hsl.ts
-function getHSLColour(value2) {
-  return new HSLColour(value2);
+function getHSLColour(value) {
+  return new HSLColour(value);
 }
 
 class HSLColour extends Colour {
   get hue() {
     return +this.state.value.hue;
   }
-  set hue(value2) {
-    this.state.value.hue = clamp(value2, 0, 360);
+  set hue(value) {
+    this.state.value.hue = clamp(value, 0, 360);
   }
   get lightness() {
     return +this.state.value.lightness;
   }
-  set lightness(value2) {
-    this.state.value.lightness = clamp(value2, 0, 100);
+  set lightness(value) {
+    this.state.value.lightness = clamp(value, 0, 100);
   }
   get saturation() {
     return +this.state.value.saturation;
   }
-  set saturation(value2) {
-    this.state.value.saturation = clamp(value2, 0, 100);
+  set saturation(value) {
+    this.state.value.saturation = clamp(value, 0, 100);
   }
-  constructor(value2) {
-    super("hsl", value2, defaults, properties);
+  constructor(value) {
+    super("hsl", value, defaults, properties);
   }
   toHex() {
     return HSLColour.toRgb(this.state.value).toHex();
@@ -997,8 +997,8 @@ class HSLColour extends Colour {
   toString() {
     return `hsl(${this.state.value.hue}, ${this.state.value.saturation}%, ${this.state.value.lightness}%)`;
   }
-  static toRgb(value2) {
-    return hslToRgb(value2);
+  static toRgb(value) {
+    return hslToRgb(value);
   }
 }
 var defaults = {
@@ -1013,31 +1013,31 @@ var properties = [
 ];
 
 // src/js/colour/rgb.ts
-function getRGBColour(value2) {
-  return new RGBColour(value2);
+function getRGBColour(value) {
+  return new RGBColour(value);
 }
 
 class RGBColour extends Colour {
   get blue() {
     return +this.state.value.blue;
   }
-  set blue(value2) {
-    this.state.value.blue = clamp(value2, 0, 255);
+  set blue(value) {
+    this.state.value.blue = clamp(value, 0, 255);
   }
   get green() {
     return +this.state.value.green;
   }
-  set green(value2) {
-    this.state.value.green = clamp(value2, 0, 255);
+  set green(value) {
+    this.state.value.green = clamp(value, 0, 255);
   }
   get red() {
     return +this.state.value.red;
   }
-  set red(value2) {
-    this.state.value.red = clamp(value2, 0, 255);
+  set red(value) {
+    this.state.value.red = clamp(value, 0, 255);
   }
-  constructor(value2) {
-    super("rgb", value2, defaults2, properties2);
+  constructor(value) {
+    super("rgb", value, defaults2, properties2);
   }
   toHex() {
     return RGBColour.toHex(this.value);
@@ -1048,8 +1048,8 @@ class RGBColour extends Colour {
   toString() {
     return `rgb(${this.value.red}, ${this.value.green}, ${this.value.blue})`;
   }
-  static toHex(value2) {
-    return rgbToHex(value2);
+  static toHex(value) {
+    return rgbToHex(value);
   }
   static toHsl(rgb) {
     return rgbToHsl(rgb);
@@ -1063,33 +1063,33 @@ var defaults2 = {
 var properties2 = ["blue", "green", "red"];
 
 // src/js/colour/functions.ts
-function getNormalisedHex(value2) {
-  const normalised = value2.replace(/^#/, "");
+function getNormalisedHex(value) {
+  const normalised = value.replace(/^#/, "");
   return normalised.length === 3 ? normalised.split("").map((character) => character.repeat(2)).join("") : normalised;
 }
-function hexToRgb(value2) {
-  const hex2 = anyPattern.test(value2) ? getNormalisedHex(value2) : "";
-  const pairs = groupedPattern.exec(hex2) ?? [];
-  const rgb2 = [];
+function hexToRgb(value) {
+  const hex = anyPattern.test(value) ? getNormalisedHex(value) : "";
+  const pairs = groupedPattern.exec(hex) ?? [];
+  const rgb = [];
   const { length } = pairs;
   for (let index = 1;index < length; index += 1) {
-    rgb2.push(Number.parseInt(pairs[index], 16));
+    rgb.push(Number.parseInt(pairs[index], 16));
   }
   return new RGBColour({
-    blue: rgb2[2] ?? 0,
-    green: rgb2[1] ?? 0,
-    red: rgb2[0] ?? 0
+    blue: rgb[2] ?? 0,
+    green: rgb[1] ?? 0,
+    red: rgb[0] ?? 0
   });
 }
-function hslToRgb(value2) {
-  let hue = value2.hue % 360;
+function hslToRgb(value) {
+  let hue = value.hue % 360;
   if (hue < 0) {
     hue += 360;
   }
-  const saturation = value2.saturation / 100;
-  const lightness = value2.lightness / 100;
-  function get2(value3) {
-    const part = (value3 + hue / 30) % 12;
+  const saturation = value.saturation / 100;
+  const lightness = value.lightness / 100;
+  function get2(value2) {
+    const part = (value2 + hue / 30) % 12;
     const mod = saturation * Math.min(lightness, 1 - lightness);
     return lightness - mod * Math.max(-1, Math.min(part - 3, 9 - part, 1));
   }
@@ -1099,16 +1099,16 @@ function hslToRgb(value2) {
     red: clamp(Math.round(get2(0) * 255), 0, 255)
   });
 }
-function rgbToHex(value2) {
-  return new HexColour(`${[value2.red, value2.green, value2.blue].map((colour) => {
-    const hex2 = colour.toString(16);
-    return hex2.length === 1 ? `0${hex2}` : hex2;
+function rgbToHex(value) {
+  return new HexColour(`${[value.red, value.green, value.blue].map((colour) => {
+    const hex = colour.toString(16);
+    return hex.length === 1 ? `0${hex}` : hex;
   }).join("")}`);
 }
-function rgbToHsl(rgb2) {
-  const blue = rgb2.blue / 255;
-  const green = rgb2.green / 255;
-  const red = rgb2.red / 255;
+function rgbToHsl(rgb) {
+  const blue = rgb.blue / 255;
+  const green = rgb.green / 255;
+  const red = rgb.red / 255;
   const max2 = Math.max(blue, green, red);
   const min2 = Math.min(blue, green, red);
   const delta = max2 - min2;
@@ -1149,8 +1149,8 @@ var anyPattern = /^#*([a-f0-9]{3}){1,2}$/i;
 var groupedPattern = /^#*([a-f0-9]{2})([a-f0-9]{2})([a-f0-9]{2})$/i;
 
 // src/js/colour/hex.ts
-function getHexColour(value2) {
-  return new HexColour(value2);
+function getHexColour(value) {
+  return new HexColour(value);
 }
 
 class HexColour {
@@ -1158,13 +1158,13 @@ class HexColour {
   get value() {
     return `#${this.state.value}`;
   }
-  set value(value2) {
-    this.state.value = anyPattern.test(value2) ? getNormalisedHex(value2) : "000000";
+  set value(value) {
+    this.state.value = anyPattern.test(value) ? getNormalisedHex(value) : "000000";
   }
-  constructor(value2) {
+  constructor(value) {
     this.$colour = "hex";
     this.state = {
-      value: typeof value2 === "string" && anyPattern.test(value2) ? getNormalisedHex(value2) : "000000"
+      value: typeof value === "string" && anyPattern.test(value) ? getNormalisedHex(value) : "000000"
     };
   }
   toHsl() {
@@ -1176,8 +1176,8 @@ class HexColour {
   toString() {
     return this.value;
   }
-  static toRgb(value2) {
-    return hexToRgb(value2);
+  static toRgb(value) {
+    return hexToRgb(value);
   }
 }
 // src/js/function.ts
@@ -1228,9 +1228,9 @@ class Memoised {
       if (cache.has(key)) {
         return cache.get(key);
       }
-      const value2 = callback(...parameters);
-      cache.set(key, value2);
-      return value2;
+      const value = callback(...parameters);
+      cache.set(key, value);
+      return value;
     };
     this.state = { cache, getter };
   }
@@ -1257,8 +1257,8 @@ class Memoised {
 }
 
 // src/js/emitter.ts
-function emitter(value2) {
-  return new Emitter(value2);
+function emitter(value) {
+  return new Emitter(value);
 }
 function finishEmitter(state, emit) {
   if (state.active) {
@@ -1284,8 +1284,8 @@ function getObserver(first, second, third) {
   };
   if (typeof first === "object") {
     observer = first !== null && properties3.every((property) => {
-      const value2 = first[property];
-      return value2 == null || typeof value2 === "function";
+      const value = first[property];
+      return value == null || typeof value === "function";
     }) ? first : observer;
   } else if (typeof first === "function") {
     observer = {
@@ -1307,11 +1307,11 @@ class Emitter {
   get value() {
     return this.state.value;
   }
-  constructor(value2) {
+  constructor(value) {
     const observers = new Map;
     this.state = {
       observers,
-      value: value2,
+      value,
       active: true,
       observable: new Observable(this, observers)
     };
@@ -1319,11 +1319,11 @@ class Emitter {
   destroy() {
     finishEmitter(this.state, false);
   }
-  emit(value2, finish) {
+  emit(value, finish) {
     if (this.state.active) {
-      this.state.value = value2;
+      this.state.value = value;
       for (const [, observer] of this.state.observers) {
-        observer.next?.(value2);
+        observer.next?.(value);
       }
       if (finish === true) {
         finishEmitter(this.state, true);
@@ -1399,8 +1399,8 @@ class Logger {
   get enabled() {
     return globalThis._atomic_logging ?? true;
   }
-  set enabled(value2) {
-    globalThis._atomic_logging = value2;
+  set enabled(value) {
+    globalThis._atomic_logging = value;
   }
   get error() {
     return this.enabled ? console.error : noop;
@@ -1454,33 +1454,33 @@ function fromQuery(query) {
   const parts = query.split("&");
   const { length } = parts;
   const parameters = {};
-  for (let outer = 0;outer < length; outer += 1) {
-    const [key, value3] = parts[outer].split("=").map(decodeURIComponent);
+  for (let index = 0;index < length; index += 1) {
+    const [key, value] = parts[index].split("=").map(decodeURIComponent);
     if (isNullableOrWhitespace(key)) {
       continue;
     }
     if (key.includes(".")) {
-      setValue(parameters, key, getValue2(value3));
+      setValue(parameters, key, getValue2(value));
     } else {
       if (key in parameters) {
         if (!Array.isArray(parameters[key])) {
           parameters[key] = [parameters[key]];
         }
-        parameters[key].push(getValue2(value3));
+        parameters[key].push(getValue2(value));
       } else {
-        parameters[key] = getValue2(value3);
+        parameters[key] = getValue2(value);
       }
     }
   }
   return parameters;
 }
-function getParts2(value3, fromArray, prefix) {
-  const keys = Object.keys(value3);
+function getParts2(value, fromArray, prefix) {
+  const keys = Object.keys(value);
   const { length } = keys;
   const parts = [];
   for (let index = 0;index < length; index += 1) {
     const key = keys[index];
-    const val = value3[key];
+    const val = value[key];
     if (Array.isArray(val)) {
       parts.push(...getParts2(val, true, join([prefix, fromArray ? null : key], ".")));
     } else if (isPlainObject(val)) {
@@ -1491,18 +1491,18 @@ function getParts2(value3, fromArray, prefix) {
   }
   return parts;
 }
-function getValue2(value3) {
-  if (/^(false|true)$/.test(value3)) {
-    return value3 === "true";
+function getValue2(value) {
+  if (/^(false|true)$/.test(value)) {
+    return value === "true";
   }
-  const asNumber = Number(value3);
+  const asNumber = Number(value);
   if (!Number.isNaN(asNumber)) {
     return asNumber;
   }
-  return value3;
+  return value;
 }
-function isDecodable(value3) {
-  return ["boolean", "number", "string"].includes(typeof value3);
+function isDecodable(value) {
+  return ["boolean", "number", "string"].includes(typeof value);
 }
 function toQuery(parameters) {
   return getParts2(parameters, false).filter((part) => part.length > 0).join("&");
@@ -1554,20 +1554,20 @@ class SizedMap extends Map {
     }
   }
   get(key) {
-    const value3 = super.get(key);
-    if (value3 === undefined && !this.has(key)) {
+    const value = super.get(key);
+    if (value === undefined && !this.has(key)) {
       return;
     }
-    this.set(key, value3);
-    return value3;
+    this.set(key, value);
+    return value;
   }
-  set(key, value3) {
+  set(key, value) {
     if (this.has(key)) {
       this.delete(key);
     } else if (this.size >= this.maximumSize) {
       this.delete(this.keys().next().value);
     }
-    return super.set(key, value3);
+    return super.set(key, value);
   }
 }
 
@@ -1589,49 +1589,49 @@ class SizedSet extends Set {
       }
     }
   }
-  add(value3) {
-    if (this.has(value3)) {
-      this.delete(value3);
+  add(value) {
+    if (this.has(value)) {
+      this.delete(value);
     } else if (this.size >= this.maximumSize) {
       this.delete(this.values().next().value);
     }
-    return super.add(value3);
+    return super.add(value);
   }
   at(index, update) {
-    const value3 = [...this.values()][index < 0 ? this.size + index : index];
-    if ((update ?? false) && this.has(value3)) {
-      this.delete(value3);
-      this.add(value3);
+    const value = [...this.values()][index < 0 ? this.size + index : index];
+    if ((update ?? false) && this.has(value)) {
+      this.delete(value);
+      this.add(value);
     }
-    return value3;
+    return value;
   }
-  get(value3, update) {
-    if (this.has(value3)) {
+  get(value, update) {
+    if (this.has(value)) {
       if (update ?? false) {
-        this.delete(value3);
-        this.add(value3);
+        this.delete(value);
+        this.add(value);
       }
-      return value3;
+      return value;
     }
   }
 }
 // src/js/touch.ts
 var supportsTouch = (() => {
-  let value3 = false;
+  let value = false;
   try {
     if ("matchMedia" in window) {
       const media = matchMedia("(pointer: coarse)");
       if (typeof media?.matches === "boolean") {
-        value3 = media.matches;
+        value = media.matches;
       }
     }
-    if (!value3) {
-      value3 = "ontouchstart" in window || navigator.maxTouchPoints > 0 || (navigator.msMaxTouchPoints ?? 0) > 0;
+    if (!value) {
+      value = "ontouchstart" in window || navigator.maxTouchPoints > 0 || (navigator.msMaxTouchPoints ?? 0) > 0;
     }
   } catch {
-    value3 = false;
+    value = false;
   }
-  return value3;
+  return value;
 })();
 export {
   words,
@@ -1649,7 +1649,7 @@ export {
   sort,
   snakeCase,
   smush,
-  shuffle2 as shuffle,
+  shuffle,
   setValue,
   round,
   queue,

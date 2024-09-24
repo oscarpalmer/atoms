@@ -1,7 +1,7 @@
 // src/js/array/chunk.ts
 function chunk(array, size) {
   const { length } = array;
-  const chunkSize = typeof size === "number" && size > 0 ? size : 32000;
+  const chunkSize = typeof size === "number" && size > 0 ? size : 64000;
   if (length <= chunkSize) {
     return [array];
   }
@@ -33,11 +33,11 @@ function insertValues(type, array, values, start, deleteCount) {
 }
 
 // src/js/array/index.ts
-function flatten(array2) {
-  return array2.flat(Number.POSITIVE_INFINITY);
+function flatten(array) {
+  return array.flat(Number.POSITIVE_INFINITY);
 }
-function push(array2, values) {
-  return insertValues("push", array2, values, array2.length, 0);
+function push(array, values) {
+  return insertValues("push", array, values, array.length, 0);
 }
 
 // src/js/array/compact.ts
@@ -166,32 +166,32 @@ function getRandomInteger(min, max) {
 }
 
 // src/js/array/shuffle.ts
-function shuffle2(array) {
+function shuffle(array) {
   const shuffled = array.slice();
   const { length } = shuffled;
   for (let index = 0;index < length; index += 1) {
-    const random2 = getRandomInteger(0, length);
-    [shuffled[index], shuffled[random2]] = [shuffled[random2], shuffled[index]];
+    const random = getRandomInteger(0, length);
+    [shuffled[index], shuffled[random]] = [shuffled[random], shuffled[index]];
   }
   return shuffled;
 }
 // src/js/string/index.ts
-function getString(value2) {
-  if (typeof value2 === "string") {
-    return value2;
+function getString(value) {
+  if (typeof value === "string") {
+    return value;
   }
-  if (typeof value2 !== "object" || value2 == null) {
-    return String(value2);
+  if (typeof value !== "object" || value == null) {
+    return String(value);
   }
-  const valueOff = value2.valueOf?.() ?? value2;
+  const valueOff = value.valueOf?.() ?? value;
   const asString = valueOff?.toString?.() ?? String(valueOff);
-  return asString.startsWith("[object ") ? JSON.stringify(value2) : asString;
+  return asString.startsWith("[object ") ? JSON.stringify(value) : asString;
 }
-function join(value2, delimiter) {
-  return compact(value2).map(getString).filter((value3) => value3.trim().length > 0).join(typeof delimiter === "string" ? delimiter : "");
+function join(value, delimiter) {
+  return compact(value).map(getString).filter((value2) => value2.trim().length > 0).join(typeof delimiter === "string" ? delimiter : "");
 }
-function words(value2) {
-  return value2.match(/[^\x00-\x2f\x3a-\x40\x5b-\x60\x7b-\x7f]+/g) ?? [];
+function words(value) {
+  return value.match(/[^\x00-\x2f\x3a-\x40\x5b-\x60\x7b-\x7f]+/g) ?? [];
 }
 // src/js/math.ts
 function max(values) {
@@ -283,17 +283,17 @@ function getParts(value) {
   return typeof value === "object" ? [value] : words(getString(value));
 }
 // src/js/is.ts
-function isKey(value2) {
-  return typeof value2 === "number" || typeof value2 === "string";
+function isKey(value) {
+  return typeof value === "number" || typeof value === "string";
 }
 
 // src/js/array/sort.ts
-function sort(array2, first, second) {
-  if (array2.length < 2) {
-    return array2;
+function sort(array, first, second) {
+  if (array.length < 2) {
+    return array;
   }
   if (first == null || typeof first === "boolean") {
-    return first === true ? array2.sort((first2, second2) => second2 - first2) : array2.sort();
+    return first === true ? array.sort((first2, second2) => second2 - first2) : array.sort();
   }
   const direction = second === true ? "desc" : "asc";
   const keys = (Array.isArray(first) ? first : [first]).map((key) => {
@@ -302,23 +302,23 @@ function sort(array2, first, second) {
       callback: undefined
     };
     if (isKey(key)) {
-      returned.callback = (value2) => value2[key];
+      returned.callback = (value) => value[key];
     } else if (typeof key === "function") {
       returned.callback = key;
     } else if (typeof key?.value === "function" || isKey(key?.value)) {
       returned.direction = key?.direction ?? direction;
-      returned.callback = typeof key.value === "function" ? key.value : (value2) => value2[key.value];
+      returned.callback = typeof key.value === "function" ? key.value : (value) => value[key.value];
     }
     return returned;
   }).filter((key) => typeof key.callback === "function");
   const { length } = keys;
   if (length === 0) {
-    return direction === "asc" ? array2.sort() : array2.sort((first2, second2) => second2 - first2);
+    return direction === "asc" ? array.sort() : array.sort((first2, second2) => second2 - first2);
   }
   if (length === 1) {
-    return array2.sort((first2, second2) => compare(keys[0].callback(first2), keys[0].callback(second2)) * (keys[0].direction === "asc" ? 1 : -1));
+    return array.sort((first2, second2) => compare(keys[0].callback(first2), keys[0].callback(second2)) * (keys[0].direction === "asc" ? 1 : -1));
   }
-  const sorted = array2.sort((first2, second2) => {
+  const sorted = array.sort((first2, second2) => {
     for (let index = 0;index < length; index += 1) {
       const { callback, direction: direction2 } = keys[index];
       const descending = direction2 === "desc";
@@ -332,40 +332,40 @@ function sort(array2, first, second) {
   return sorted;
 }
 // src/js/array/splice.ts
-function splice(array2, start, amountOrValues, values) {
+function splice(array, start, amountOrValues, values) {
   const amoutOrValuesIsArray = Array.isArray(amountOrValues);
-  return insertValues("splice", array2, amoutOrValuesIsArray ? amountOrValues : values ?? [], start, amoutOrValuesIsArray ? array2.length : typeof amountOrValues === "number" && amountOrValues > 0 ? amountOrValues : 0);
+  return insertValues("splice", array, amoutOrValuesIsArray ? amountOrValues : values ?? [], start, amoutOrValuesIsArray ? array.length : typeof amountOrValues === "number" && amountOrValues > 0 ? amountOrValues : 0);
 }
 // src/js/array/to-map.ts
-function toMap(array2, first, second) {
+function toMap(array, first, second) {
   const asArrays = first === true || second === true;
   const callbacks = getCallbacks(undefined, first);
   const hasCallback = typeof callbacks?.key === "function";
   const map = new Map;
-  const { length } = array2;
+  const { length } = array;
   for (let index = 0;index < length; index += 1) {
-    const value2 = array2[index];
-    const key = hasCallback ? callbacks?.key?.(value2, index, array2) ?? index : index;
+    const value = array[index];
+    const key = hasCallback ? callbacks?.key?.(value, index, array) ?? index : index;
     if (asArrays) {
       const existing = map.get(key);
       if (Array.isArray(existing)) {
-        existing.push(value2);
+        existing.push(value);
       } else {
-        map.set(key, [value2]);
+        map.set(key, [value]);
       }
     } else {
-      map.set(key, value2);
+      map.set(key, value);
     }
   }
   return map;
 }
 // src/js/array/to-record.ts
-function toRecord(array2, first, second) {
-  return groupValues(array2, first, first === true || second === true, true);
+function toRecord(array, first, second) {
+  return groupValues(array, first, first === true || second === true, true);
 }
 // src/js/array/unique.ts
-function unique(array2, key) {
-  return findValues("unique", array2, undefined, key);
+function unique(array, key) {
+  return findValues("unique", array, undefined, key);
 }
 export {
   unique,
@@ -373,7 +373,7 @@ export {
   toMap,
   splice,
   sort,
-  shuffle2 as shuffle,
+  shuffle,
   push,
   insert,
   indexOf,

@@ -160,17 +160,17 @@ function getNormalisedHex(value) {
   return normalised.length === 3 ? normalised.split("").map((character) => character.repeat(2)).join("") : normalised;
 }
 function hexToRgb(value) {
-  const hex2 = anyPattern.test(value) ? getNormalisedHex(value) : "";
-  const pairs = groupedPattern.exec(hex2) ?? [];
-  const rgb2 = [];
+  const hex = anyPattern.test(value) ? getNormalisedHex(value) : "";
+  const pairs = groupedPattern.exec(hex) ?? [];
+  const rgb = [];
   const { length } = pairs;
   for (let index = 1;index < length; index += 1) {
-    rgb2.push(Number.parseInt(pairs[index], 16));
+    rgb.push(Number.parseInt(pairs[index], 16));
   }
   return new RGBColour({
-    blue: rgb2[2] ?? 0,
-    green: rgb2[1] ?? 0,
-    red: rgb2[0] ?? 0
+    blue: rgb[2] ?? 0,
+    green: rgb[1] ?? 0,
+    red: rgb[0] ?? 0
   });
 }
 function hslToRgb(value) {
@@ -193,14 +193,14 @@ function hslToRgb(value) {
 }
 function rgbToHex(value) {
   return new HexColour(`${[value.red, value.green, value.blue].map((colour) => {
-    const hex2 = colour.toString(16);
-    return hex2.length === 1 ? `0${hex2}` : hex2;
+    const hex = colour.toString(16);
+    return hex.length === 1 ? `0${hex}` : hex;
   }).join("")}`);
 }
-function rgbToHsl(rgb2) {
-  const blue = rgb2.blue / 255;
-  const green = rgb2.green / 255;
-  const red = rgb2.red / 255;
+function rgbToHsl(rgb) {
+  const blue = rgb.blue / 255;
+  const green = rgb.green / 255;
+  const red = rgb.red / 255;
   const max = Math.max(blue, green, red);
   const min = Math.min(blue, green, red);
   const delta = max - min;

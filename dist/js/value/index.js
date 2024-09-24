@@ -1,10 +1,10 @@
 // src/js/value/index.ts
-function partial(value2, keys) {
+function partial(value, keys) {
   const result = {};
   const { length } = keys;
   for (let index = 0;index < length; index += 1) {
     const key = keys[index];
-    result[key] = value2[key];
+    result[key] = value[key];
   }
   return result;
 }
@@ -102,83 +102,83 @@ function getParts(value) {
   return typeof value === "object" ? [value] : words(getString(value));
 }
 // src/js/string/index.ts
-function getString(value2) {
-  if (typeof value2 === "string") {
-    return value2;
+function getString(value) {
+  if (typeof value === "string") {
+    return value;
   }
-  if (typeof value2 !== "object" || value2 == null) {
-    return String(value2);
+  if (typeof value !== "object" || value == null) {
+    return String(value);
   }
-  const valueOff = value2.valueOf?.() ?? value2;
+  const valueOff = value.valueOf?.() ?? value;
   const asString = valueOff?.toString?.() ?? String(valueOff);
-  return asString.startsWith("[object ") ? JSON.stringify(value2) : asString;
+  return asString.startsWith("[object ") ? JSON.stringify(value) : asString;
 }
-function join(value2, delimiter) {
-  return compact(value2).map(getString).filter((value3) => value3.trim().length > 0).join(typeof delimiter === "string" ? delimiter : "");
+function join(value, delimiter) {
+  return compact(value).map(getString).filter((value2) => value2.trim().length > 0).join(typeof delimiter === "string" ? delimiter : "");
 }
-function words(value2) {
-  return value2.match(/[^\x00-\x2f\x3a-\x40\x5b-\x60\x7b-\x7f]+/g) ?? [];
+function words(value) {
+  return value.match(/[^\x00-\x2f\x3a-\x40\x5b-\x60\x7b-\x7f]+/g) ?? [];
 }
 
 // src/js/is.ts
-function isArrayOrPlainObject(value2) {
-  return Array.isArray(value2) || isPlainObject(value2);
+function isArrayOrPlainObject(value) {
+  return Array.isArray(value) || isPlainObject(value);
 }
-function isPlainObject(value2) {
-  if (typeof value2 !== "object" || value2 === null) {
+function isPlainObject(value) {
+  if (typeof value !== "object" || value === null) {
     return false;
   }
-  const prototype = Object.getPrototypeOf(value2);
-  return (prototype === null || prototype === Object.prototype || Object.getPrototypeOf(prototype) === null) && !(Symbol.toStringTag in value2) && !(Symbol.iterator in value2);
+  const prototype = Object.getPrototypeOf(value);
+  return (prototype === null || prototype === Object.prototype || Object.getPrototypeOf(prototype) === null) && !(Symbol.toStringTag in value) && !(Symbol.iterator in value);
 }
 
 // src/js/value/clone.ts
-function clone(value2) {
+function clone(value) {
   switch (true) {
-    case value2 == null:
-      return value2;
-    case typeof value2 === "bigint":
-      return BigInt(value2);
-    case typeof value2 === "boolean":
-      return Boolean(value2);
-    case typeof value2 === "function":
+    case value == null:
+      return value;
+    case typeof value === "bigint":
+      return BigInt(value);
+    case typeof value === "boolean":
+      return Boolean(value);
+    case typeof value === "function":
       return;
-    case typeof value2 === "number":
-      return Number(value2);
-    case typeof value2 === "string":
-      return String(value2);
-    case typeof value2 === "symbol":
-      return Symbol(value2.description);
-    case value2 instanceof ArrayBuffer:
-      return cloneArrayBuffer(value2);
-    case value2 instanceof DataView:
-      return cloneDataView(value2);
-    case value2 instanceof Map:
-    case value2 instanceof Set:
-      return cloneMapOrSet(value2);
-    case value2 instanceof Node:
-      return value2.cloneNode(true);
-    case value2 instanceof RegExp:
-      return cloneRegularExpression(value2);
-    case isArrayOrPlainObject(value2):
-      return cloneObject(value2);
+    case typeof value === "number":
+      return Number(value);
+    case typeof value === "string":
+      return String(value);
+    case typeof value === "symbol":
+      return Symbol(value.description);
+    case value instanceof ArrayBuffer:
+      return cloneArrayBuffer(value);
+    case value instanceof DataView:
+      return cloneDataView(value);
+    case value instanceof Map:
+    case value instanceof Set:
+      return cloneMapOrSet(value);
+    case value instanceof Node:
+      return value.cloneNode(true);
+    case value instanceof RegExp:
+      return cloneRegularExpression(value);
+    case isArrayOrPlainObject(value):
+      return cloneObject(value);
     default:
-      return structuredClone(value2);
+      return structuredClone(value);
   }
 }
-function cloneArrayBuffer(value2) {
-  const cloned = new ArrayBuffer(value2.byteLength);
-  new Uint8Array(cloned).set(new Uint8Array(value2));
+function cloneArrayBuffer(value) {
+  const cloned = new ArrayBuffer(value.byteLength);
+  new Uint8Array(cloned).set(new Uint8Array(value));
   return cloned;
 }
-function cloneDataView(value2) {
-  const buffer = cloneArrayBuffer(value2.buffer);
-  return new DataView(buffer, value2.byteOffset, value2.byteLength);
+function cloneDataView(value) {
+  const buffer = cloneArrayBuffer(value.buffer);
+  return new DataView(buffer, value.byteOffset, value.byteLength);
 }
-function cloneMapOrSet(value2) {
-  const isMap = value2 instanceof Map;
+function cloneMapOrSet(value) {
+  const isMap = value instanceof Map;
   const cloned = isMap ? new Map : new Set;
-  const entries = [...value2.entries()];
+  const entries = [...value.entries()];
   const { length } = entries;
   for (let index = 0;index < length; index += 1) {
     const entry = entries[index];
@@ -190,19 +190,19 @@ function cloneMapOrSet(value2) {
   }
   return cloned;
 }
-function cloneObject(value2) {
-  const cloned = Array.isArray(value2) ? [] : {};
-  const keys = Object.keys(value2);
+function cloneObject(value) {
+  const cloned = Array.isArray(value) ? [] : {};
+  const keys = Object.keys(value);
   const { length } = keys;
   for (let index = 0;index < length; index += 1) {
     const key = keys[index];
-    cloned[key] = clone(value2[key]);
+    cloned[key] = clone(value[key]);
   }
   return cloned;
 }
-function cloneRegularExpression(value2) {
-  const cloned = new RegExp(value2.source, value2.flags);
-  cloned.lastIndex = value2.lastIndex;
+function cloneRegularExpression(value) {
+  const cloned = new RegExp(value.source, value.flags);
+  cloned.lastIndex = value.lastIndex;
   return cloned;
 }
 // src/js/value/equal.ts
@@ -338,11 +338,11 @@ function getDiffs(first, second, prefix) {
   const changes = [];
   const checked = new Set;
   for (let outerIndex = 0;outerIndex < 2; outerIndex += 1) {
-    const value2 = outerIndex === 0 ? first : second;
-    if (!value2) {
+    const value = outerIndex === 0 ? first : second;
+    if (!value) {
       continue;
     }
-    const keys = Object.keys(value2);
+    const keys = Object.keys(value);
     const { length } = keys;
     for (let innerIndex = 0;innerIndex < length; innerIndex += 1) {
       const key = keys[innerIndex];
@@ -380,13 +380,13 @@ function findKey(needle, haystack, ignoreCase) {
   const index = normalised.indexOf(needle.toLowerCase());
   return index > -1 ? keys[index] : needle;
 }
-function handleValue(data, path, value2, get, ignoreCase) {
+function handleValue(data, path, value, get, ignoreCase) {
   if (typeof data === "object" && data !== null && !/^(__proto__|constructor|prototype)$/i.test(path)) {
     const key = findKey(path, data, ignoreCase);
     if (get) {
       return data[key];
     }
-    data[key] = value2;
+    data[key] = value;
   }
 }
 
@@ -396,11 +396,11 @@ function getValue(data, path, ignoreCase) {
   const parts = (shouldIgnoreCase ? path.toLowerCase() : path).split(".");
   const { length } = parts;
   let index = 0;
-  let value2 = typeof data === "object" ? data ?? {} : {};
-  while (index < length && value2 != null) {
-    value2 = handleValue(value2, parts[index++], null, true, shouldIgnoreCase);
+  let value = typeof data === "object" ? data ?? {} : {};
+  while (index < length && value != null) {
+    value = handleValue(value, parts[index++], null, true, shouldIgnoreCase);
   }
-  return value2;
+  return value;
 }
 // src/js/value/merge.ts
 function merge(values, options) {
@@ -408,7 +408,7 @@ function merge(values, options) {
     return {};
   }
   const skipNullable = options?.skipNullable ?? false;
-  const actual = values.filter((value2) => isArrayOrPlainObject(value2));
+  const actual = values.filter((value) => isArrayOrPlainObject(value));
   const result = actual.every(Array.isArray) ? [] : {};
   const isArray = Array.isArray(result);
   const { length } = actual;
@@ -433,7 +433,7 @@ function merge(values, options) {
   return result;
 }
 // src/js/value/set.ts
-function setValue(data, path, value2, ignoreCase) {
+function setValue(data, path, value, ignoreCase) {
   const shouldIgnoreCase = ignoreCase === true;
   const parts = (shouldIgnoreCase ? path.toLowerCase() : path).split(".");
   const { length } = parts;
@@ -442,7 +442,7 @@ function setValue(data, path, value2, ignoreCase) {
   for (let index = 0;index < length; index += 1) {
     const part = parts[index];
     if (index === lastIndex) {
-      handleValue(target, part, value2, false, shouldIgnoreCase);
+      handleValue(target, part, value, false, shouldIgnoreCase);
       break;
     }
     let next = handleValue(target, part, null, true, shouldIgnoreCase);
@@ -455,13 +455,13 @@ function setValue(data, path, value2, ignoreCase) {
   return data;
 }
 // src/js/value/smush.ts
-function flatten(value2, prefix) {
-  const keys = Object.keys(value2);
+function flatten(value, prefix) {
+  const keys = Object.keys(value);
   const { length } = keys;
   const smushed = {};
   for (let index = 0;index < length; index += 1) {
     const key = keys[index];
-    const val = value2[key];
+    const val = value[key];
     if (isArrayOrPlainObject(val)) {
       Object.assign(smushed, {
         [join([prefix, key], ".")]: Array.isArray(val) ? [...val] : { ...val },
@@ -473,12 +473,12 @@ function flatten(value2, prefix) {
   }
   return smushed;
 }
-function smush(value2) {
-  return flatten(value2);
+function smush(value) {
+  return flatten(value);
 }
 // src/js/value/unsmush.ts
-function getKeyGroups(value2) {
-  const keys = Object.keys(value2);
+function getKeyGroups(value) {
+  const keys = Object.keys(value);
   const { length } = keys;
   const grouped = [];
   for (let index = 0;index < length; index += 1) {
@@ -492,8 +492,8 @@ function getKeyGroups(value2) {
   }
   return grouped;
 }
-function unsmush(value2) {
-  const groups = getKeyGroups(value2);
+function unsmush(value) {
+  const groups = getKeyGroups(value);
   const { length } = groups;
   const unsmushed = {};
   for (let groupIndex = 1;groupIndex < length; groupIndex += 1) {
@@ -501,7 +501,7 @@ function unsmush(value2) {
     const groupLength = group.length;
     for (let keyIndex = 0;keyIndex < groupLength; keyIndex += 1) {
       const key = group[keyIndex];
-      const val = value2[key];
+      const val = value[key];
       setValue(unsmushed, key, isArrayOrPlainObject(val) ? Array.isArray(val) ? [...val] : { ...val } : val);
     }
   }

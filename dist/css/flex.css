@@ -2,21 +2,16 @@
   flex: 1;
 }
 
-:where(.flow, .flow-large, .flow-small, .flow-text,
-.stack,
-.stack-large,
-.stack-small,
-.stack-text) {
+:where(.flow, .stack) {
   display: flex;
 }
 
-:where(.flow, .flow-large, .flow-small, .flow-text) {
+:where(.flow) {
   flex-flow: row wrap;
   align-items: center;
-}
-:where(.flow) {
   gap: var(--flow-gap, 1rem);
 }
+
 :where(.flow-large) {
   gap: var(--flow-gap-large, calc(2 * var(--flow-gap, 1rem)));
 }
@@ -30,12 +25,11 @@
   gap: var(--flow-gap-text, 1em);
 }
 
-:where(.stack, .stack-large, .stack-small, .stack-text) {
-  flex-flow: column nowrap;
-}
 :where(.stack) {
+  flex-flow: column nowrap;
   gap: var(--stack-gap, 1rem);
 }
+
 :where(.stack-large) {
   gap: var(--stack-gap-large, calc(2 * var(--stack-gap, 1rem)));
 }

@@ -3,8 +3,8 @@ function shuffle(array) {
   const shuffled = array.slice();
   const { length } = shuffled;
   for (let index = 0;index < length; index += 1) {
-    const random2 = getRandomInteger(0, length);
-    [shuffled[index], shuffled[random2]] = [shuffled[random2], shuffled[index]];
+    const random = getRandomInteger(0, length);
+    [shuffled[index], shuffled[random]] = [shuffled[random], shuffled[index]];
   }
   return shuffled;
 }
@@ -17,10 +17,10 @@ function getRandomCharacters(length, selection) {
   if (length < 1) {
     return "";
   }
-  const actualSelection = typeof selection === "string" && selection.length > 0 ? selection : "abcdefghijklmnopqrstuvwxyz";
+  const actual = typeof selection === "string" && selection.length > 0 ? selection : "abcdefghijklmnopqrstuvwxyz";
   let characters = "";
   for (let index = 0;index < length; index += 1) {
-    characters += actualSelection.charAt(getRandomInteger(0, actualSelection.length));
+    characters += actual.charAt(getRandomInteger(0, actual.length));
   }
   return characters;
 }

@@ -12,8 +12,8 @@ export function fromQuery(query: string): PlainObject {
 
 	const parameters: PlainObject = {};
 
-	for (let outer = 0; outer < length; outer += 1) {
-		const [key, value] = parts[outer].split('=').map(decodeURIComponent);
+	for (let index = 0; index < length; index += 1) {
+		const [key, value] = parts[index].split('=').map(decodeURIComponent);
 
 		if (isNullableOrWhitespace(key)) {
 			continue;

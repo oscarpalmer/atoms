@@ -19,7 +19,7 @@ export function getRandomCharacters(
 		return '';
 	}
 
-	const actualSelection =
+	const actual =
 		typeof selection === 'string' && selection.length > 0
 			? selection
 			: 'abcdefghijklmnopqrstuvwxyz';
@@ -27,9 +27,7 @@ export function getRandomCharacters(
 	let characters = '';
 
 	for (let index = 0; index < length; index += 1) {
-		characters += actualSelection.charAt(
-			getRandomInteger(0, actualSelection.length),
-		);
+		characters += actual.charAt(getRandomInteger(0, actual.length));
 	}
 
 	return characters;
