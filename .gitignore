@@ -1,12 +1,7 @@
 .vscode/
+dist/
 node_modules/
+types/
 www/
 
-dist/**/*.mjs
-dist/**/internal
-dist/js/**/*.js
-
-*.cts
 *.tsbuildinfo
-
-!dist/js/**/index.js
