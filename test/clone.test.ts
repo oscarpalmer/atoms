@@ -1,5 +1,5 @@
-import {expect, test} from 'bun:test';
-import {clone} from '../src/js';
+import {expect, test} from 'vitest';
+import {clone} from '../src/js/value';
 
 class Test {
 	constructor(
@@ -16,7 +16,6 @@ test('array', () => {
 
 	cloned.push('b');
 
-	// @ts-expect-error
 	expect(data[3]).toBe(undefined);
 });
 
@@ -52,7 +51,6 @@ test('function', () => {
 	const data = () => {};
 	const cloned = clone(data);
 
-	// @ts-expect-error
 	expect(cloned).toBe(undefined);
 });
 
@@ -78,7 +76,6 @@ test('map', () => {
 
 	cloned.set('c', 3);
 
-	// @ts-expect-error
 	expect(data.get('c')).toBe(undefined);
 });
 
@@ -103,7 +100,6 @@ test('primitive', () => {
 
 		let cloned = clone(data);
 
-		// @ts-expect-error
 		expect(cloned).toBe(data);
 
 		cloned = replacements[index];

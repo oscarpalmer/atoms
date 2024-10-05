@@ -1,6 +1,6 @@
-import {max} from '../math';
-import {getNumber} from '../number';
-import {words, getString, join} from '../string';
+import {max} from '@/math';
+import {getNumber} from '@/number';
+import {words, getString, join} from '@/string';
 
 /**
  * Compare two values _(for sorting purposes)_

@@ -1,9 +1,8 @@
-import {describe, expect, test} from 'bun:test';
-import {wait} from '@oscarpalmer/timer';
+import {expect, test} from 'vitest';
 import {queue} from '../src/js/queue';
 
-describe('queue', () => {
-	test('same callback', done => {
+test('same callback', () =>
+	new Promise<void>(done => {
 		const size = 5;
 
 		let index = 0;
@@ -17,14 +16,15 @@ describe('queue', () => {
 			queue(callback);
 		}
 
-		wait(() => {
+		setTimeout(() => {
 			expect(value).toBe(1);
 
 			done();
 		}, 125);
-	});
+	}));
 
-	test('different callback', done => {
+test('different callback', () =>
+	new Promise<void>(done => {
 		const size = 5;
 
 		let index = 0;
@@ -36,10 +36,9 @@ describe('queue', () => {
 			});
 		}
 
-		wait(() => {
+		setTimeout(() => {
 			expect(value).toBe(size);
 
 			done();
 		}, 125);
-	});
-});
+	}));

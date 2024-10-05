@@ -1,4 +1,4 @@
-import type {Key} from '../models';
+import type {Key} from '@/models';
 
 export type ArrayCallback<Value, Returned> = (
 	value: Value,

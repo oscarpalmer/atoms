@@ -1,4 +1,4 @@
-import {expect, test} from 'bun:test';
+import {expect, test} from 'vitest';
 import {
 	compare,
 	diff,
@@ -8,7 +8,7 @@ import {
 	setValue,
 	smush,
 	unsmush,
-} from '../src/js';
+} from '../src/js/value';
 
 type Diffable = {
 	numbers: number[];
@@ -175,7 +175,6 @@ test('merge', () => {
 		profession: 'Developer?',
 	});
 
-	// @ts-expect-error
 	expect(merge([])).toEqual({});
 });
 
@@ -217,7 +216,6 @@ test('setValue', () => {
 	setValue(data, 'in.a.nested.set.3', 123);
 	setValue(data, 'in.a.nEw.array.5', 123);
 
-	// @ts-expect-error - Testing created arrays
 	expect(data.in.a.nested.array[3]).toEqual(123);
 	expect(data.in.a.nested.map.get('3')).toEqual(undefined);
 	expect(data.in.a.nested.object['3']).toEqual(123);

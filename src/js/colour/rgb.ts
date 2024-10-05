@@ -1,8 +1,8 @@
-import {clamp} from '../number';
-import {Colour} from './base';
-import {rgbToHex, rgbToHsl} from './functions';
-import type {HexColour} from './hex';
-import type {HSLColour} from './hsl';
+import {Colour} from '@/colour/base';
+import {rgbToHex, rgbToHsl} from '@/colour/functions';
+import type {HexColour} from '@/colour/hex';
+import type {HSLColour} from '@/colour/hsl';
+import {clamp} from '@/number';
 
 export type RGBColourValue = {
 	blue: number;

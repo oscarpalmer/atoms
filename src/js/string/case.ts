@@ -1,4 +1,4 @@
-import {words} from './index';
+import {words} from '@/string/index';
 
 /**
  * Convert a string to camel case _(thisIsCamelCase)_

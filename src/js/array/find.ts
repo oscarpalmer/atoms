@@ -1,6 +1,6 @@
-import {findValue} from '../internal/array-find';
-import type {Key} from '../models';
-import type {BooleanCallback, KeyCallback} from './models';
+import type {BooleanCallback, KeyCallback} from '@/array/models';
+import {findValue} from '@/internal/array-find';
+import type {Key} from '@/models';
 
 /**
  * Returns the first item matching `value`, or `undefined` if no match is found

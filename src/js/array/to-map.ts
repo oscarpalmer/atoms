@@ -1,6 +1,6 @@
-import {getCallbacks} from '../internal/array-callbacks';
-import type {Key} from '../models';
-import type {KeyCallback} from './models';
+import type {KeyCallback} from '@/array/models';
+import {getCallbacks} from '@/internal/array-callbacks';
+import type {Key} from '@/models';
 
 /**
  * Converts an array into a map, using indices as keys
@@ -67,7 +67,7 @@ export function toMap<Value>(
 		const value = array[index];
 
 		const key = hasCallback
-			? callbacks?.key?.(value, index, array) ?? index
+			? (callbacks?.key?.(value, index, array) ?? index)
 			: index;
 
 		if (asArrays) {

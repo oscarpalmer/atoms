@@ -1,4 +1,4 @@
-import {expect, test} from 'bun:test';
+import {expect, test} from 'vitest';
 import {fromQuery, toQuery} from '../src/js/query';
 
 const query = {

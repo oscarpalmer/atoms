@@ -1,6 +1,6 @@
-import {findValues} from '../internal/array-find';
-import type {Key} from '../models';
-import type {BooleanCallback, KeyCallback} from './models';
+import type {BooleanCallback, KeyCallback} from '@/array/models';
+import {findValues} from '@/internal/array-find';
+import type {Key} from '@/models';
 
 /**
  * Returns a filtered array of items matching `value`

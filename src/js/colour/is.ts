@@ -1,6 +1,6 @@
-import type {HexColour} from './hex';
-import type {HSLColour} from './hsl';
-import type {RGBColour} from './rgb';
+import type {HexColour} from '@/colour/hex';
+import type {HSLColour} from '@/colour/hsl';
+import type {RGBColour} from '@/colour/rgb';
 
 /**
  * Is the value a colour?

@@ -1,6 +1,6 @@
-import {findValues} from '../internal/array-find';
-import type {Key} from '../models';
-import type {BooleanCallback, KeyCallback} from './models';
+import type {BooleanCallback, KeyCallback} from '@/array/models';
+import {findValues} from '@/internal/array-find';
+import type {Key} from '@/models';
 
 /**
  * Returns the number of items _(count)_ that match the given value

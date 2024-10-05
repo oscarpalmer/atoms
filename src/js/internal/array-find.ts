@@ -1,6 +1,6 @@
-import type {BooleanCallback, FindType, KeyCallback} from '../array/models';
-import type {Key} from '../models';
-import {getCallbacks} from './array-callbacks';
+import type {BooleanCallback, FindType, KeyCallback} from '@/array/models';
+import {getCallbacks} from '@/internal/array-callbacks';
+import type {Key} from '@/models';
 
 export function findValue<Model, Value = Model>(
 	type: FindType,

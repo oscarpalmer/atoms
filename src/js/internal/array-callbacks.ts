@@ -1,5 +1,5 @@
-import type {BooleanCallback, Callbacks, KeyCallback} from '../array/models';
-import type {Key, PlainObject} from '../models';
+import type {BooleanCallback, Callbacks, KeyCallback} from '@/array/models';
+import type {Key, PlainObject} from '@/models';
 
 export function getCallbacks<Value>(
 	bool: unknown,

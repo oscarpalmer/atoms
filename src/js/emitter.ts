@@ -1,4 +1,4 @@
-import {noop} from './function';
+import {noop} from '@/function';
 
 class Emitter<Value> {
 	private declare readonly state: EmitterState<Value>;

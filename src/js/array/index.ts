@@ -1,5 +1,5 @@
-import type {NestedArrayType} from '../models';
-import {insertValues} from './insert';
+import {insertValues} from '@/array/insert';
+import type {NestedArrayType} from '@/models';
 
 /**
  * Flattens an array _(using native `flat` and maximum depth)_

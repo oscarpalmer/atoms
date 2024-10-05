@@ -1,6 +1,6 @@
-import {findValues} from '../internal/array-find';
-import type {Key} from '../models';
-import type {KeyCallback} from './models';
+import type {KeyCallback} from '@/array/models';
+import {findValues} from '@/internal/array-find';
+import type {Key} from '@/models';
 
 /**
  * Returns an array of unique items

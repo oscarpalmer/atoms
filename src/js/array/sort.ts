@@ -1,7 +1,11 @@
-import {isKey} from '../is';
-import type {Key, PlainObject} from '../models';
-import {compare} from '../value/compare';
-import type {SortKey, SortKeyCallback, SortKeyWithCallback} from './models';
+import type {
+	SortKey,
+	SortKeyCallback,
+	SortKeyWithCallback,
+} from '@/array/models';
+import {isKey} from '@/is';
+import type {Key, PlainObject} from '@/models';
+import {compare} from '@/value/compare';
 
 /**
  * Sorts an array of items _(ascending by default)_

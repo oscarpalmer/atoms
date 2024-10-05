@@ -1,23 +1,23 @@
-import {expect, test} from 'bun:test';
+import {expect, test} from 'vitest';
 import {logger} from '../src/js/logger';
 
 test('log', () => {
 	logger.log('test');
 
-	expect(logger.enabled).toBeTrue();
+	expect(logger.enabled).toBe(true);
 
 	logger.enabled = false;
 
-	expect(logger.enabled).toBeFalse();
+	expect(logger.enabled).toBe(false);
 
-	expect(logger.debug).toBeFunction();
-	expect(logger.dir).toBeFunction();
-	expect(logger.error).toBeFunction();
-	expect(logger.info).toBeFunction();
-	expect(logger.log).toBeFunction();
-	expect(logger.table).toBeFunction();
-	expect(logger.trace).toBeFunction();
-	expect(logger.warn).toBeFunction();
+	expect(logger.debug).toBeTypeOf('function');
+	expect(logger.dir).toBeTypeOf('function');
+	expect(logger.error).toBeTypeOf('function');
+	expect(logger.info).toBeTypeOf('function');
+	expect(logger.log).toBeTypeOf('function');
+	expect(logger.table).toBeTypeOf('function');
+	expect(logger.trace).toBeTypeOf('function');
+	expect(logger.warn).toBeTypeOf('function');
 });
 
 test('log.time', () => {
@@ -25,9 +25,9 @@ test('log.time', () => {
 
 	const time = logger.time('test');
 
-	expect(time).toBeObject();
-	expect(time.log).toBeFunction();
-	expect(time.stop).toBeFunction();
+	expect(time).toBeTypeOf('object');
+	expect(time.log).toBeTypeOf('function');
+	expect(time.stop).toBeTypeOf('function');
 
 	time.log();
 	time.stop();

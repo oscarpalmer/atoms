@@ -1,5 +1,5 @@
-import {chunk} from './chunk';
-import type {InsertType} from './models';
+import {chunk} from '@/array/chunk';
+import type {InsertType} from '@/array/models';
 
 /**
  * - Inserts values into an array at a specified index

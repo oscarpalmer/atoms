@@ -1,4 +1,4 @@
-import {compact} from '../array';
+import {compact} from '@/array';
 
 /**
  * Create a new UUID

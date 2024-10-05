@@ -1,6 +1,6 @@
-import type {Key} from '../models';
-import {groupValues} from './group-by';
-import type {KeyCallback} from './models';
+import {groupValues} from '@/array/group-by';
+import type {KeyCallback} from '@/array/models';
+import type {Key} from '@/models';
 
 /**
  * Converts an array into a record, using indices as keys

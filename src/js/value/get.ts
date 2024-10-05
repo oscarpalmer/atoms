@@ -1,6 +1,6 @@
+import {handleValue} from '@/internal/value-handle';
+import type {Get, Paths, PlainObject} from '@/models';
 import type {ToString} from 'type-fest/source/internal/string';
-import {handleValue} from '../internal/value-handle';
-import type {Get, Paths, PlainObject} from '../models';
 
 /**
  * - Get the value from an object using a known path
@@ -34,7 +34,7 @@ export function getValue(
 	const {length} = parts;
 
 	let index = 0;
-	let value = typeof data === 'object' ? data ?? {} : {};
+	let value = typeof data === 'object' ? (data ?? {}) : {};
 
 	while (index < length && value != null) {
 		value = handleValue(

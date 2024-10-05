@@ -1,7 +1,7 @@
-import {clamp} from '../number';
-import {HexColour} from './hex';
-import {HSLColour, type HSLColourValue} from './hsl';
-import {RGBColour, type RGBColourValue} from './rgb';
+import {HexColour} from '@/colour/hex';
+import {HSLColour, type HSLColourValue} from '@/colour/hsl';
+import {RGBColour, type RGBColourValue} from '@/colour/rgb';
+import {clamp} from '@/number';
 
 export const anyPattern = /^#*([a-f0-9]{3}){1,2}$/i;
 const groupedPattern = /^#*([a-f0-9]{2})([a-f0-9]{2})([a-f0-9]{2})$/i;

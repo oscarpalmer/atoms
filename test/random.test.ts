@@ -1,5 +1,4 @@
-import {expect, test} from 'bun:test';
-import {wait} from '@oscarpalmer/timer';
+import {expect, test} from 'vitest';
 import {
 	getRandomBoolean,
 	getRandomCharacters,
@@ -51,44 +50,45 @@ test('getRandomBoolean', () => {
 	expect(invalid).toBe(0);
 });
 
-test('getRandomCharacters', done => {
-	const alphabet = new Set('abcdefghijklmnopqrstuvwxyz');
-	const size = 100_000;
+test('getRandomCharacters', () =>
+	new Promise<void>(done => {
+		const alphabet = new Set('abcdefghijklmnopqrstuvwxyz');
+		const size = 100_000;
 
-	let defaultFailed = false;
+		let defaultFailed = false;
 
-	for (let index = 0; index < size; index += 1) {
-		const random = getRandomCharacters(5);
+		for (let index = 0; index < size; index += 1) {
+			const random = getRandomCharacters(5);
 
-		if (
-			random.length !== 5 ||
-			!random.split('').every(character => alphabet.has(character))
-		) {
-			defaultFailed = true;
+			if (
+				random.length !== 5 ||
+				!random.split('').every(character => alphabet.has(character))
+			) {
+				defaultFailed = true;
+			}
 		}
-	}
 
-	const selection = 'aeiouåäö';
+		const selection = 'aeiouåäö';
 
-	let selectionFailed = false;
+		let selectionFailed = false;
 
-	for (let index = 0; index < size; index += 1) {
-		const random = getRandomCharacters(5, selection);
+		for (let index = 0; index < size; index += 1) {
+			const random = getRandomCharacters(5, selection);
 
-		if (
-			random.length !== 5 ||
-			!random.split('').every(character => selection.includes(character))
-		) {
-			selectionFailed = true;
+			if (
+				random.length !== 5 ||
+				!random.split('').every(character => selection.includes(character))
+			) {
+				selectionFailed = true;
+			}
 		}
-	}
 
-	wait(() => {
-		expect(defaultFailed).toBe(false);
+		setTimeout(() => {
+			expect(defaultFailed).toBe(false);
 
-		done();
-	}, 250);
-});
+			done();
+		}, 250);
+	}));
 
 test('getRandomColour', () => {
 	const pattern = /^#[0-9A-F]{6}$/;
@@ -123,19 +123,29 @@ test('getRandomDate', () => {
 	expect(getRandomDate(earliest, latest)).toBeInstanceOf(Date);
 });
 
-test('getRandomFloat', async done => {
-	await getRandomNumber(getRandomFloat);
-	await getRandomNumber(getRandomFloat, -123.456, 456.789);
+test('getRandomFloat', () =>
+	new Promise<void>(done => {
+		async function run() {
+			await getRandomNumber(getRandomFloat);
+			await getRandomNumber(getRandomFloat, -123.456, 456.789);
 
-	done();
-});
+			done();
+		}
 
-test('getRandomInteger', async done => {
-	await getRandomNumber(getRandomInteger);
-	await getRandomNumber(getRandomInteger, 0, 100);
+		run();
+	}));
 
-	done();
-});
+test('getRandomInteger', () =>
+	new Promise<void>(done => {
+		async function run() {
+			await getRandomNumber(getRandomInteger);
+			await getRandomNumber(getRandomInteger, 0, 100);
+
+			done();
+		}
+
+		run();
+	}));
 
 test('getRandomHex', () => {
 	const possible = new Set<string>('0123456789ABCDEF');

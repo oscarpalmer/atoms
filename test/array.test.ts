@@ -1,6 +1,4 @@
-import {expect, test} from 'bun:test';
-import {wait} from '@oscarpalmer/timer';
-import {diff, equal, getRandomInteger} from '../src/js';
+import {expect, test} from 'vitest';
 import {
 	chunk,
 	compact,
@@ -20,6 +18,8 @@ import {
 	toRecord,
 	unique,
 } from '../src/js/array';
+import {getRandomInteger} from '../src/js/random';
+import {diff, equal} from '../src/js/value';
 
 type Item = {
 	id: number;
@@ -273,51 +273,52 @@ test('sort: basic', () => {
 	]);
 });
 
-test('sort: large', done => {
-	const firstNames = ['Alice', 'Bob', 'Charlie', 'David'];
-	const lastNames = ['Avery', 'Baker', 'Charlie', 'Davidson'];
+test('sort: large', () =>
+	new Promise<void>(done => {
+		const firstNames = ['Alice', 'Bob', 'Charlie', 'David'];
+		const lastNames = ['Avery', 'Baker', 'Charlie', 'Davidson'];
 
-	const large = Array.from({length: 100_000}, (_, index) => ({
-		id: index + 1,
-		age: getRandomInteger(24, 48),
-		name: {
-			first: firstNames[index % 4],
-			last: lastNames[index % 4],
-		},
-	}));
+		const large = Array.from({length: 100_000}, (_, index) => ({
+			id: index + 1,
+			age: getRandomInteger(24, 48),
+			name: {
+				first: firstNames[index % 4],
+				last: lastNames[index % 4],
+			},
+		}));
 
-	const native = large.slice().sort((first, second) => {
-		const age = first.age - second.age;
+		const native = large.slice().sort((first, second) => {
+			const age = first.age - second.age;
 
-		if (age !== 0) {
-			return age;
-		}
+			if (age !== 0) {
+				return age;
+			}
 
-		const lastName = second.name.last.localeCompare(first.name.last);
+			const lastName = second.name.last.localeCompare(first.name.last);
 
-		if (lastName !== 0) {
-			return lastName;
-		}
+			if (lastName !== 0) {
+				return lastName;
+			}
 
-		return first.name.first.localeCompare(second.name.first);
-	});
+			return first.name.first.localeCompare(second.name.first);
+		});
 
-	const atomic = sort(large, [
-		'age',
-		{direction: 'desc', value: item => item.name.last},
-		item => item.name.first,
-	]);
+		const atomic = sort(large, [
+			'age',
+			{direction: 'desc', value: item => item.name.last},
+			item => item.name.first,
+		]);
 
-	wait(() => {
-		const diffed = diff(native, atomic);
+		setTimeout(() => {
+			const diffed = diff(native, atomic);
 
-		wait(() => {
-			expect(diffed.type).toBe('none');
+			setTimeout(() => {
+				expect(diffed.type).toBe('none');
 
-			done();
+				done();
+			}, 250);
 		}, 250);
-	}, 250);
-});
+	}));
 
 test('splice', () => {
 	const length = 100_000;

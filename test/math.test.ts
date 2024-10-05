@@ -1,4 +1,4 @@
-import {expect, test} from 'bun:test';
+import {expect, test} from 'vitest';
 import {average, max, min, round, sum} from '../src/js/math';
 
 const one = [123];

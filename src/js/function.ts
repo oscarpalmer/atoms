@@ -1,5 +1,5 @@
-import type {GenericCallback} from './models';
-import {clamp} from './number';
+import type {GenericCallback} from '@/models';
+import {clamp} from '@/number';
 
 type Debounced<Callback extends GenericCallback> = Callback & {
 	/**
@@ -96,10 +96,10 @@ export function debounce<Callback extends GenericCallback>(
 ): Debounced<Callback> {
 	const interval = clamp(time ?? 0, 0, 1000);
 
-	let timer: Timer | undefined;
+	let timer: unknown;
 
 	const debounced = ((...parameters: Parameters<Callback>) => {
-		clearTimeout(timer);
+		clearTimeout(timer as never);
 
 		timer = setTimeout(() => {
 			callback(...parameters);
@@ -107,7 +107,7 @@ export function debounce<Callback extends GenericCallback>(
 	}) as Debounced<Callback>;
 
 	debounced.cancel = () => {
-		clearTimeout(timer);
+		clearTimeout(timer as never);
 	};
 
 	return debounced;
@@ -138,10 +138,10 @@ export function throttle<Callback extends GenericCallback>(
 	const interval = clamp(time ?? 0, 0, 1000);
 
 	let timestamp = performance.now();
-	let timer: Timer | undefined;
+	let timer: unknown;
 
 	return ((...parameters: Parameters<Callback>) => {
-		clearTimeout(timer);
+		clearTimeout(timer as never);
 
 		const now = performance.now();
 		const difference = now - timestamp;

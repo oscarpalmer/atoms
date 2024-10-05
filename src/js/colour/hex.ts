@@ -1,6 +1,6 @@
-import {anyPattern, getNormalisedHex, hexToRgb} from './functions';
-import type {HSLColour} from './hsl';
-import type {RGBColour} from './rgb';
+import {anyPattern, getNormalisedHex, hexToRgb} from '@/colour/functions';
+import type {HSLColour} from '@/colour/hsl';
+import type {RGBColour} from '@/colour/rgb';
 
 type State = {
 	value: string;

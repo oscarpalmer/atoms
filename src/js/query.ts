@@ -1,7 +1,7 @@
-import {isNullableOrWhitespace, isPlainObject} from './is';
-import type {ArrayOrPlainObject, PlainObject} from './models';
-import {join} from './string';
-import {setValue} from './value';
+import {isNullableOrWhitespace, isPlainObject} from '@/is';
+import type {ArrayOrPlainObject, PlainObject} from '@/models';
+import {join} from '@/string';
+import {setValue} from '@/value';
 
 /**
  * Converts a query string to a plain _(nested)_ object

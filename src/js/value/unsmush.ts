@@ -1,7 +1,7 @@
+import {isArrayOrPlainObject} from '@/is';
+import type {PlainObject} from '@/models';
+import {setValue} from '@/value/set';
 import type {KeysOfUnion, Simplify} from 'type-fest';
-import {isArrayOrPlainObject} from '../is';
-import type {PlainObject} from '../models';
-import {setValue} from './set';
 
 type Unsmushed<Value extends PlainObject> = Simplify<
 	Omit<

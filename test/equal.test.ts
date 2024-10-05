@@ -1,5 +1,5 @@
-import {expect, test} from 'bun:test';
-import {equal} from '../src/js';
+import {expect, test} from 'vitest';
+import {equal} from '../src/js/value';
 
 test('any', () => {
 	const values = [

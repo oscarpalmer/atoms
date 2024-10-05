@@ -1,5 +1,5 @@
-import type {ArrayOrPlainObject, Key, PlainObject, Primitive} from './models';
-import {getString} from './string';
+import type {ArrayOrPlainObject, Key, PlainObject, Primitive} from '@/models';
+import {getString} from '@/string';
 
 /**
  * Is the value an array or a record?
