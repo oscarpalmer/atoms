@@ -1,4 +1,4 @@
-import type {RGBColourValue} from '@/colour/rgb';
+import type {RGBColourValue} from '~/colour/rgb';
 
 /**
  * Get a foreground colour _(usually text)_ based on a background colour's luminance

@@ -1,12 +1,12 @@
-import type {HexColour} from '@/colour/hex';
-import {isColourValue} from '@/colour/is';
+import type {HexColour} from '~/colour/hex';
+import {isColourValue} from '~/colour/is';
 
 export abstract class Colour<Model> {
 	private declare readonly $colour: string;
 	protected declare readonly state: ColourState<Model>;
 
 	/**
-	 * Gets the current value of the colour
+	 * Get the current value of the colour
 	 */
 	get value(): Model {
 		return {...this.state.value};

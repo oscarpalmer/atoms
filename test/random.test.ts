@@ -3,7 +3,6 @@ import {
 	getRandomBoolean,
 	getRandomCharacters,
 	getRandomColour,
-	getRandomDate,
 	getRandomFloat,
 	getRandomHex,
 	getRandomInteger,
@@ -84,7 +83,9 @@ test('getRandomCharacters', () =>
 		}
 
 		setTimeout(() => {
+			expect(getRandomCharacters(-99)).toBe('');
 			expect(defaultFailed).toBe(false);
+			expect(selectionFailed).toBe(false);
 
 			done();
 		}, 250);
@@ -105,41 +106,11 @@ test('getRandomColour', () => {
 	expect(invalid).toBe(0);
 });
 
-test('getRandomDate', () => {
-	let index = 0;
-	let invalid = 0;
-
-	for (; index < size; index += 1) {
-		if (!(getRandomDate() instanceof Date)) {
-			invalid += 1;
-		}
-	}
-
-	expect(invalid).toBe(0);
-
-	const earliest = new Date(0);
-	const latest = new Date();
-
-	expect(getRandomDate(earliest, latest)).toBeInstanceOf(Date);
-});
-
 test('getRandomFloat', () =>
 	new Promise<void>(done => {
 		async function run() {
 			await getRandomNumber(getRandomFloat);
 			await getRandomNumber(getRandomFloat, -123.456, 456.789);
-
-			done();
-		}
-
-		run();
-	}));
-
-test('getRandomInteger', () =>
-	new Promise<void>(done => {
-		async function run() {
-			await getRandomNumber(getRandomInteger);
-			await getRandomNumber(getRandomInteger, 0, 100);
 
 			done();
 		}
@@ -163,6 +134,18 @@ test('getRandomHex', () => {
 
 	expect(invalid).toBe(0);
 });
+
+test('getRandomInteger', () =>
+	new Promise<void>(done => {
+		async function run() {
+			await getRandomNumber(getRandomInteger);
+			await getRandomNumber(getRandomInteger, 0, 100);
+
+			done();
+		}
+
+		run();
+	}));
 
 test('getRandomItem', () => {
 	const items = Array.from({length: 10}, (_, index) => index);

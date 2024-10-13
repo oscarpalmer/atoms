@@ -12,6 +12,7 @@
 		"@types/node": "^22.7",
 		"@vitest/coverage-istanbul": "^2.1",
 		"dts-bundle-generator": "^9.5",
+		"glob": "^11",
 		"happy-dom": "^15.7",
 		"sass": "^1.79",
 		"typescript": "^5.6",
@@ -223,11 +224,11 @@
 		"build:js": "npx vite build && npm run types",
 		"clean": "rm -rf ./dist && rm -rf ./types && rm -f ./tsconfig.tsbuildinfo",
 		"test": "npx vitest --coverage",
-		"types": "npx tsc && npx dts-bundle-generator --config ./dts.config.ts",
+		"types": "npx tsc && npx dts-bundle-generator --config ./dts.config.ts --silent",
 		"watch:css": "npx sass ./src/css:./dist/css --no-source-map --watch",
 		"watch:js": "npx vite build --watch"
 	},
 	"type": "module",
 	"types": "./types/index.d.cts",
-	"version": "0.75.0"
+	"version": "0.76.0"
 }

@@ -1,30 +1,44 @@
-import {chunk} from '@/array/chunk';
-import type {InsertType} from '@/array/models';
+import {chunk} from '~/array/chunk';
+import type {InsertType} from '~/array/models';
 
 /**
- * - Inserts values into an array at a specified index
- * - Uses chunking to avoid stack overflow
+ * - Insert values into an array _(at the end)_
+ * - _(Uses chunking to avoid stack overflow_)
  */
-export function insert<Value>(
-	array: Value[],
-	index: number,
-	values: Value[],
+export function insert<Item>(array: Item[], items: Item[]): void;
+
+/**
+ * - Insert values into an array at a specified index
+ * - _(Uses chunking to avoid stack overflow_)
+ */
+export function insert<Item>(array: Item[], index: number, items: Item[]): void;
+
+export function insert(
+	array: unknown[],
+	first: unknown,
+	second?: unknown[],
 ): void {
-	insertValues('splice', array, values, index, 0);
+	insertValues(
+		'splice',
+		array,
+		Array.isArray(first) ? first : (second ?? []),
+		typeof first === 'number' ? first : array.length,
+		0,
+	);
 }
 
-export function insertValues<Value>(
+export function insertValues<Item>(
 	type: InsertType,
-	array: Value[],
-	values: Value[],
+	array: Item[],
+	items: Item[],
 	start: number,
 	deleteCount: number,
 ): unknown {
-	const chunked = chunk(values);
+	const chunked = chunk(items);
 	const lastIndex = chunked.length - 1;
 
 	let index = Number(chunked.length);
-	let returned: Value[] | undefined;
+	let returned: Item[] | undefined;
 
 	while (--index >= 0) {
 		const result = array.splice(

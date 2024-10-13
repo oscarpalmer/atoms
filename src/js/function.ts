@@ -1,9 +1,9 @@
-import type {GenericCallback} from '@/models';
-import {clamp} from '@/number';
+import type {GenericCallback} from '~/models';
+import {clamp} from '~/number';
 
 type Debounced<Callback extends GenericCallback> = Callback & {
 	/**
-	 * Cancels the debounce
+	 * Cancel the debounce
 	 */
 	cancel: () => void;
 };
@@ -34,21 +34,21 @@ class Memoised<Callback extends GenericCallback> {
 	}
 
 	/**
-	 * Clears the cache
+	 * Clear the cache
 	 */
 	clear(): void {
 		this.state.cache?.clear();
 	}
 
 	/**
-	 * Deletes a result from the cache
+	 * Delete a result from the cache
 	 */
 	delete(key: Parameters<Callback>[0]): boolean {
 		return this.state.cache?.delete(key);
 	}
 
 	/**
-	 * Destroys the instance, clearing its cache and removing its callback
+	 * Destroy the instance, clearing its cache and removing its callback
 	 */
 	destroy(): void {
 		this.state.cache.clear();
@@ -58,21 +58,21 @@ class Memoised<Callback extends GenericCallback> {
 	}
 
 	/**
-	 * Retrieves the result from the cache if it exists, or `undefined` otherwise
+	 * Get a result from the cache if it exists _(or `undefined` otherwise)_
 	 */
 	get(key: Parameters<Callback>[0]): ReturnType<Callback> | undefined {
 		return this.state.cache?.get(key);
 	}
 
 	/**
-	 * Checks if the cache has a result for a given key
+	 * Does the result exist?
 	 */
 	has(key: Parameters<Callback>[0]): boolean {
 		return this.state.cache?.has(key) ?? false;
 	}
 
 	/**
-	 * Retrieves the result from the cache if it exists, otherwise runs the callback, caches the result, and returns it
+	 * Get the result from the cache if it exists; otherwise runs the callback, caches the result, and returns it
 	 */
 	run(...parameters: Parameters<Callback>): ReturnType<Callback> {
 		return this.state.getter(...parameters);
@@ -85,7 +85,7 @@ type MemoisedState<Callback extends GenericCallback> = {
 };
 
 /**
- * - Debounces a function, ensuring it is only called after `time` milliseconds have passed
+ * - Debounce a function, ensuring it is only called after `time` milliseconds have passed
  * - On subsequent calls, the timer is reset and will wait another `time` milliseconds _(and so on...)_
  * - Time is clamped between _0_ and _1000_ milliseconds
  * - Returns the callback with an added `cancel`-method for manually cancelling the debounce
@@ -114,7 +114,7 @@ export function debounce<Callback extends GenericCallback>(
 }
 
 /**
- * Memoises a function, caching and retrieving results based on the first parameter
+ * Memoise a function, caching and retrieving results based on the first parameter
  */
 export function memoise<Callback extends GenericCallback>(
 	callback: Callback,
@@ -128,7 +128,7 @@ export function memoise<Callback extends GenericCallback>(
 export function noop(): void {}
 
 /**
- * - Throttles a function, ensuring it is only called once every `time` milliseconds
+ * - Throttle a function, ensuring it is only called once every `time` milliseconds
  * - Time is clamped between _0_ and _1000_ milliseconds
  */
 export function throttle<Callback extends GenericCallback>(

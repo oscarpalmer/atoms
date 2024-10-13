@@ -1,4 +1,4 @@
-import {noop} from '@/function';
+import {noop} from '~/function';
 
 declare global {
 	var _atomic_logging: boolean;
@@ -10,14 +10,14 @@ if (globalThis._atomic_logging == null) {
 
 class Logger {
 	/**
-	 * Logs any number of values at the "debug" log level
+	 * Log any number of values at the "debug" log level
 	 */
 	get debug() {
 		return this.enabled ? console.debug : noop;
 	}
 
 	/**
-	 * Logs the value and shows all its properties
+	 * Log the value and shows all its properties
 	 */
 	get dir() {
 		return this.enabled ? console.dir : noop;
@@ -38,49 +38,49 @@ class Logger {
 	}
 
 	/**
-	 * Logs any number of values at the "error" log level
+	 * Log any number of values at the "error" log level
 	 */
 	get error() {
 		return this.enabled ? console.error : noop;
 	}
 
 	/**
-	 * Logs any number of values at the "info" log level
+	 * Log any number of values at the "info" log level
 	 */
 	get info() {
 		return this.enabled ? console.info : noop;
 	}
 
 	/**
-	 * Logs any number of values at the "log" log level
+	 * Log any number of values at the "log" log level
 	 */
 	get log() {
 		return this.enabled ? console.log : noop;
 	}
 
 	/**
-	 * Logs data as a table, with optional properties to use as columns
+	 * Log data as a table, with optional properties to use as columns
 	 */
 	get table() {
 		return this.enabled ? console.table : noop;
 	}
 
 	/**
-	 * Logs any number of values together with a trace from where it was called
+	 * Log any number of values together with a trace from where it was called
 	 */
 	get trace() {
 		return this.enabled ? console.trace : noop;
 	}
 
 	/**
-	 * Logs any number of values at the "warn" log level
+	 * Log any number of values at the "warn" log level
 	 */
 	get warn() {
 		return this.enabled ? console.warn : noop;
 	}
 
 	/**
-	 * - Starts a logged timer with a label
+	 * - Start a logged timer with a label
 	 * - Returns a `Time`-object for logging the current duration of the timer and stopping the timer _(and logging the total duration)_
 	 */
 	time(label: string): Time {
@@ -104,8 +104,8 @@ class Time {
 	}
 
 	/**
-	 * - Logs the current duration of the timer
-	 * - Ignored if logging is disabled
+	 * - Log the current duration of the timer
+	 * - _(Ignored if logging is disabled)_
 	 */
 	log(): void {
 		if (this.state.started && !this.state.stopped && logger.enabled) {
@@ -114,8 +114,8 @@ class Time {
 	}
 
 	/**
-	 * - Stops the timer and logs the total duration
-	 * - Will always log the total duration, even if logging is disabled
+	 * - Stop the timer and logs the total duration
+	 * - _(Will always log the total duration, even if logging is disabled)_
 	 */
 	stop(): void {
 		if (this.state.started && !this.state.stopped) {

@@ -1,18 +1,18 @@
-import type {BooleanCallback, FindType, KeyCallback} from '@/array/models';
-import {getCallbacks} from '@/internal/array-callbacks';
-import type {Key} from '@/models';
+import type {FindType} from '~/array/models';
+import {getCallbacks} from '~/internal/array/callbacks';
 
-export function findValue<Model, Value = Model>(
+export function findValue(
 	type: FindType,
-	array: Model[],
-	value: Value | BooleanCallback<Model>,
-	key?: Key | KeyCallback<Model>,
+	array: unknown[],
+	bool: unknown,
+	key: unknown,
+	value: unknown,
 ): unknown {
-	const callbacks = getCallbacks(value, key);
+	const callbacks = getCallbacks(bool, key);
 
 	if (callbacks?.bool == null && callbacks?.key == null) {
 		return type === 'index'
-			? array.indexOf(value as Model)
+			? array.findIndex(item => item === value)
 			: array.find(item => item === value);
 	}
 
@@ -35,21 +35,21 @@ export function findValue<Model, Value = Model>(
 	return type === 'index' ? -1 : undefined;
 }
 
-export function findValues<Model, Value = Model>(
+export function findValues(
 	type: 'all' | 'unique',
-	array: Model[],
-	value: Value | BooleanCallback<Model>,
-	key?: Key | KeyCallback<Model>,
-): Model[] {
-	const callbacks = getCallbacks(value, key);
-
+	array: unknown[],
+	bool: unknown,
+	key: unknown,
+	value: unknown,
+): unknown[] {
+	const callbacks = getCallbacks(bool, key);
 	const {length} = array;
 
 	if (type === 'unique' && callbacks?.key == null && length >= 100) {
 		return Array.from(new Set(array));
 	}
 
-	if (typeof callbacks?.bool === 'function') {
+	if (callbacks?.bool != null) {
 		return array.filter(callbacks.bool);
 	}
 
@@ -57,20 +57,19 @@ export function findValues<Model, Value = Model>(
 		return array.filter(item => item === value);
 	}
 
-	const hasCallback = typeof callbacks?.key === 'function';
-	const result: Model[] = [];
-	const values: unknown[] = hasCallback ? [] : result;
+	const result: unknown[] = [];
+	const values: unknown[] = callbacks?.key != null ? [] : result;
 
 	for (let index = 0; index < length; index += 1) {
 		const item = array[index];
-		const itemKey = hasCallback ? callbacks.key?.(item, index, array) : item;
+		const keyed = callbacks?.key?.(item, index, array) ?? item;
 
 		if (
-			(type === 'all' && itemKey === value) ||
-			(type === 'unique' && values.indexOf(itemKey) === -1)
+			(type === 'all' && keyed === value) ||
+			(type === 'unique' && values.indexOf(keyed) === -1)
 		) {
 			if (values !== result) {
-				values.push(itemKey);
+				values.push(keyed);
 			}
 
 			result.push(item);

@@ -1,4 +1,4 @@
-const {globSync} = require('node:fs');
+const {globSync} = require('glob');
 
 const entries = globSync('./src/js/**/*.ts').map(file => ({
 	filePath: `${__dirname}/${file}`,

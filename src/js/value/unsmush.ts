@@ -1,7 +1,7 @@
-import {isArrayOrPlainObject} from '@/is';
-import type {PlainObject} from '@/models';
-import {setValue} from '@/value/set';
 import type {KeysOfUnion, Simplify} from 'type-fest';
+import {isArrayOrPlainObject} from '~/is';
+import type {PlainObject} from '~/models';
+import {setValue} from '~/value/set';
 
 type Unsmushed<Value extends PlainObject> = Simplify<
 	Omit<
@@ -32,7 +32,7 @@ function getKeyGroups(value: PlainObject): string[][] {
 }
 
 /**
- * Unsmushes a smushed object _(turning dot notation keys into nested keys)_
+ * Unsmush a smushed object _(turning dot notation keys into nested keys)_
  */
 export function unsmush<Value extends PlainObject>(
 	value: Value,

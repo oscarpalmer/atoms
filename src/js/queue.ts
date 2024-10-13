@@ -13,7 +13,7 @@ if (globalThis._atomic_queued == null) {
 }
 
 /**
- * Queues a callback to be executed at the next best time
+ * Queue a callback to be executed at the next best time
  */
 export function queue(callback: () => void): void {
 	_atomic_queued.add(callback);

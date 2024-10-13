@@ -20,7 +20,7 @@ export function min(values: number[]): number {
 }
 
 /**
- * Rounds a number to a specific number of decimal places _(defaults to 0)_
+ * Round a number to a specific number of decimal places _(defaults to 0)_
  */
 export function round(value: number, decimals?: number): number {
 	if (typeof decimals !== 'number' || decimals < 1) {

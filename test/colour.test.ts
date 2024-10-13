@@ -4,7 +4,9 @@ import {
 	HexColour,
 	RGBColour,
 	getForegroundColour,
+	getHSLColour,
 	getHexColour,
+	getRGBColour,
 	isColour,
 	isHSLColour,
 	isHexColour,
@@ -79,26 +81,32 @@ test('getHexColour', () => {
 	expect(getHexColour('invalid').value).toBe('#000000');
 });
 
-test('is', () => {
-	const hex = getHexColour(hexes[0]);
-	const hsl = hex.toHsl();
-	const rgb = hsl.toRgb();
+test('getHslColour', () => {
+	const {length} = hsls;
 
-	expect(isHexColour(hex)).toBe(true);
-	expect(isHexColour(hsl)).toBe(false);
-	expect(isHexColour(rgb)).toBe(false);
+	for (let index = 0; index < length; index += 1) {
+		const {hue, lightness, saturation} = hsls[index];
 
-	expect(isHSLColour(hex)).toBe(false);
-	expect(isHSLColour(hsl)).toBe(true);
-	expect(isHSLColour(rgb)).toBe(false);
+		const hsl = getHSLColour(hsls[index]);
 
-	expect(isRGBColour(hex)).toBe(false);
-	expect(isRGBColour(hsl)).toBe(false);
-	expect(isRGBColour(rgb)).toBe(true);
+		expect(hsl.hue).toBe(hue);
+		expect(hsl.lightness).toBe(lightness);
+		expect(hsl.saturation).toBe(saturation);
+	}
+});
 
-	expect(isColour(hex)).toBe(true);
-	expect(isColour(hsl)).toBe(true);
-	expect(isColour(rgb)).toBe(true);
+test('getRgbColour', () => {
+	const {length} = hsls;
+
+	for (let index = 0; index < length; index += 1) {
+		const {blue, green, red} = rgbs[index];
+
+		const rgb = getRGBColour(rgbs[index]);
+
+		expect(rgb.blue).toBe(blue);
+		expect(rgb.green).toBe(green);
+		expect(rgb.red).toBe(red);
+	}
 });
 
 test('hexToRgb', () => {
@@ -119,6 +127,28 @@ test('hslToRgb', () => {
 			saturation: 50,
 		}).toString(),
 	).toBe('rgb(128, 64, 191)');
+});
+
+test('is', () => {
+	const hex = getHexColour(hexes[0]);
+	const hsl = hex.toHsl();
+	const rgb = hsl.toRgb();
+
+	expect(isHexColour(hex)).toBe(true);
+	expect(isHexColour(hsl)).toBe(false);
+	expect(isHexColour(rgb)).toBe(false);
+
+	expect(isHSLColour(hex)).toBe(false);
+	expect(isHSLColour(hsl)).toBe(true);
+	expect(isHSLColour(rgb)).toBe(false);
+
+	expect(isRGBColour(hex)).toBe(false);
+	expect(isRGBColour(hsl)).toBe(false);
+	expect(isRGBColour(rgb)).toBe(true);
+
+	expect(isColour(hex)).toBe(true);
+	expect(isColour(hsl)).toBe(true);
+	expect(isColour(rgb)).toBe(true);
 });
 
 test('rgbToHex', () => {

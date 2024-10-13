@@ -1,5 +1,5 @@
-import {isArrayOrPlainObject} from '@/is';
-import type {ArrayOrPlainObject, PlainObject} from '@/models';
+import {isArrayOrPlainObject} from '~/is';
+import type {ArrayOrPlainObject, PlainObject} from '~/models';
 
 type MergeOptions = {
 	/**
@@ -10,7 +10,7 @@ type MergeOptions = {
 };
 
 /**
- * Merges multiple arrays or objects into a single one
+ * Merge multiple arrays or objects into a single one
  */
 export function merge<Model extends ArrayOrPlainObject>(
 	values: Model[],

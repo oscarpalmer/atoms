@@ -1,7 +1,7 @@
-import type {PlainObject} from '@/models';
+import type {PlainObject} from '~/models';
 
 /**
- * Creates a new object with only the specified keys
+ * Create a new object with only the specified keys
  */
 export function partial<Value extends PlainObject, Key extends keyof Value>(
 	value: Value,

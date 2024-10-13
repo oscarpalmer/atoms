@@ -1,4 +1,4 @@
-import {noop} from '@/function';
+import {noop} from '~/function';
 
 class Emitter<Value> {
 	private declare readonly state: EmitterState<Value>;
@@ -36,14 +36,14 @@ class Emitter<Value> {
 	}
 
 	/**
-	 * Destroys the emitter
+	 * Destroy the emitter
 	 */
 	destroy(): void {
 		finishEmitter(this.state, false);
 	}
 
 	/**
-	 * Emits a new value _(and optionally finishes the emitter)_
+	 * Emit a new value _(and optionally finishes the emitter)_
 	 */
 	emit(value: Value, finish?: boolean): void {
 		if (this.state.active) {
@@ -60,7 +60,7 @@ class Emitter<Value> {
 	}
 
 	/**
-	 * Emits an error _(and optionally finishes the emitter)_
+	 * Emit an error _(and optionally finishes the emitter)_
 	 */
 	error(error: Error, finish?: boolean): void {
 		if (this.state.active) {
@@ -75,7 +75,7 @@ class Emitter<Value> {
 	}
 
 	/**
-	 * Finishes the emitter
+	 * Finish the emitter
 	 */
 	finish(): void {
 		finishEmitter(this.state, true);
@@ -103,12 +103,12 @@ class Observable<Value> {
 	}
 
 	/**
-	 * Subscribes to value changes
+	 * Subscribe to value changes
 	 */
 	subscribe(observer: Observer<Value>): Subscription<Value>;
 
 	/**
-	 * Subscribes to value changes
+	 * Subscribe to value changes
 	 */
 	subscribe(
 		onNext: (value: Value) => void,
@@ -169,6 +169,9 @@ class Subscription<Value> {
 		return this.state.closed || !(this.state.emitter?.active ?? false);
 	}
 
+	/**
+	 * Destroy the subscription
+	 */
 	destroy(): void {
 		this.unsubscribe();
 
@@ -177,7 +180,7 @@ class Subscription<Value> {
 	}
 
 	/**
-	 * Unsubscribes from the observable
+	 * Unsubscribe from its observable
 	 */
 	unsubscribe(): void {
 		if (!this.state.closed) {
@@ -197,7 +200,7 @@ type SubscriptionState<Value> = {
 const properties: Array<keyof Observer<never>> = ['complete', 'error', 'next'];
 
 /**
- * Creates a new emitter
+ * Create a new emitter
  */
 export function emitter<Value>(value: Value): Emitter<Value> {
 	return new Emitter(value);

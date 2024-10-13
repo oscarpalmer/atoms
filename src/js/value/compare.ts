@@ -1,6 +1,6 @@
-import {max} from '@/math';
-import {getNumber} from '@/number';
-import {words, getString, join} from '@/string';
+import {max} from '~/math';
+import {getNumber} from '~/number';
+import {words, getString, join} from '~/string';
 
 /**
  * Compare two values _(for sorting purposes)_
@@ -62,8 +62,6 @@ export function compare(first: unknown, second: unknown): number {
 				// Same value on last part? let's not fall through to string comparison
 				return 0;
 			}
-
-			continue;
 		}
 
 		return firstNumber - secondNumber;

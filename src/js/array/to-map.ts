@@ -1,82 +1,170 @@
-import type {KeyCallback} from '@/array/models';
-import {getCallbacks} from '@/internal/array-callbacks';
-import type {Key} from '@/models';
+import type {KeyCallback, ValueCallback} from '~/array/models';
+import {getCallbacks} from '~/internal/array/callbacks';
+import type {Key, KeyedValue} from '~/models';
 
 /**
- * Converts an array into a map, using indices as keys
+ * Create a map from an array of items _(using their indices as keys)_
  */
-export function toMap<Value>(array: Value[]): Map<number, Value>;
+export function toMap<Item>(array: Item[]): Map<number, Item>;
 
 /**
- * Converts an array into a map, using indices as keys and grouping values into arrays
+ * Create a map from an array of items using a specific key
  */
-export function toMap<Value>(
-	array: Value[],
-	arrays: true,
-): Map<number, Value[]>;
+export function toMap<Item, Key extends keyof Item>(
+	array: Item[],
+	key: Key,
+): Map<KeyedValue<Item, Key>, Item>;
 
 /**
- * - Converts an array into a map
- * - Uses `key` to find an identifcation value to use as keys
+ * Create a map from an array of items using a specific key, and grouping them into arrays
  */
-export function toMap<Value>(array: Value[], key: Key): Map<Key, Value>;
-
-/**
- * - Converts an array into a map
- * - Uses `key` to find an identifcation value to use as keys
- * - Groups values into arrays
- */
-export function toMap<Value>(
-	array: Value[],
+export function toMap<Item, Key extends keyof Item>(
+	array: Item[],
 	key: Key,
 	arrays: true,
-): Map<Key, Value[]>;
+): Map<KeyedValue<Item, Key>, Item[]>;
 
 /**
- * - Converts an array into a map
- * - Uses `key` to find an identifcation value to use as keys
+ * Create a map from an array of items using a specific key
  */
-export function toMap<Value>(
-	array: Value[],
-	key: KeyCallback<Value>,
-): Map<Key, Value>;
+export function toMap<Item, Key extends KeyCallback<Item>>(
+	array: Item[],
+	key: Key,
+): Map<ReturnType<Key>, Item>;
 
 /**
- * - Converts an array into a map
- * - Uses `key` to find an identifcation value to use as keys
- * - Groups values into arrays
+ * Create a map from an array of items using a specific key, and grouping them into arrays
  */
-export function toMap<Value>(
-	array: Value[],
-	key: KeyCallback<Value>,
+export function toMap<Item, Key extends KeyCallback<Item>>(
+	array: Item[],
+	key: Key,
 	arrays: true,
-): Map<Key, Value[]>;
+): Map<ReturnType<Key>, Item[]>;
 
-export function toMap<Value>(
-	array: Value[],
-	first?: boolean | Key | KeyCallback<Value>,
-	second?: boolean,
+/**
+ * Create a map from an array of items using a specific key and value
+ */
+export function toMap<Item, Key extends keyof Item, Value extends keyof Item>(
+	array: Item[],
+	key: Key,
+	value: Value,
+): Map<KeyedValue<Item, Key>, KeyedValue<Item, Value>>;
+
+/**
+ * Create a map from an array of items using a specific key and value, and grouping them into arrays
+ */
+export function toMap<Item, Key extends keyof Item, Value extends keyof Item>(
+	array: Item[],
+	key: Key,
+	value: Value,
+	arrays: true,
+): Map<KeyedValue<Item, Key>, Array<KeyedValue<Item, Value>>>;
+
+/**
+ * Create a map from an array of items using a specific key and value
+ */
+export function toMap<
+	Item,
+	Key extends keyof Item,
+	Value extends ValueCallback<Item>,
+>(
+	array: Item[],
+	key: Key,
+	value: Value,
+): Map<KeyedValue<Item, Key>, ReturnType<Value>>;
+
+/**
+ * Create a map from an array of items using a specific key and value, and grouping them into arrays
+ */
+export function toMap<
+	Item,
+	Key extends keyof Item,
+	Value extends ValueCallback<Item>,
+>(
+	array: Item[],
+	key: Key,
+	value: Value,
+	arrays: true,
+): Map<KeyedValue<Item, Key>, Array<ReturnType<Value>>>;
+
+/**
+ * Create a map from an array of items using a specific key and value
+ */
+export function toMap<
+	Item,
+	Key extends KeyCallback<Item>,
+	Value extends keyof Item,
+>(
+	array: Item[],
+	key: Key,
+	value: Value,
+): Map<ReturnType<Key>, KeyedValue<Item, Value>>;
+
+/**
+ * Create a map from an array of items using a specific key and value, and grouping them into arrays
+ */
+export function toMap<
+	Item,
+	Key extends KeyCallback<Item>,
+	Value extends keyof Item,
+>(
+	array: Item[],
+	key: Key,
+	value: Value,
+	arrays: true,
+): Map<ReturnType<Key>, Array<KeyedValue<Item, Value>>>;
+
+/**
+ * Create a map from an array of items using a specific key and value
+ */
+export function toMap<
+	Item,
+	Key extends KeyCallback<Item>,
+	Value extends ValueCallback<Item>,
+>(
+	array: Item[],
+	key: Key,
+	value: Value,
+): Map<ReturnType<Key>, ReturnType<Value>>;
+
+/**
+ * Create a map from an array of items using a specific key and value, and grouping them into arrays
+ */
+export function toMap<
+	Item,
+	Key extends KeyCallback<Item>,
+	Value extends ValueCallback<Item>,
+>(
+	array: Item[],
+	key: Key,
+	value: Value,
+	arrays: true,
+): Map<ReturnType<Key>, Array<ReturnType<Value>>>;
+
+export function toMap(
+	array: unknown[],
+	first?: unknown,
+	second?: unknown,
+	third?: unknown,
 ): Map<Key, unknown> {
-	const asArrays = first === true || second === true;
-	const callbacks = getCallbacks(undefined, first);
-	const hasCallback = typeof callbacks?.key === 'function';
+	const asArrays = first === true || second === true || third === true;
+	const callbacks = getCallbacks(undefined, first, second);
 	const map = new Map<Key, unknown>();
 	const {length} = array;
 
 	for (let index = 0; index < length; index += 1) {
-		const value = array[index];
+		const item = array[index];
 
-		const key = hasCallback
-			? (callbacks?.key?.(value, index, array) ?? index)
-			: index;
+		const key = callbacks?.key?.(item, index, array) ?? index;
+		const value = callbacks?.value?.(item, index, array) ?? item;
 
 		if (asArrays) {
 			const existing = map.get(key);
 
-			if (Array.isArray(existing)) {
-				existing.push(value);
-			} else {
+			if (existing == null) {
 				map.set(key, [value]);
+			} else {
+				(existing as unknown[]).push(value);
 			}
 		} else {
 			map.set(key, value);

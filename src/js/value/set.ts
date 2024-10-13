@@ -1,5 +1,5 @@
-import {handleValue} from '@/internal/value-handle';
-import type {Paths, PlainObject} from '@/models';
+import {handleValue} from '~/internal/value/handle';
+import type {Paths, PlainObject} from '~/models';
 
 /**
  * - Set the value in an object using a known path
@@ -38,8 +38,7 @@ export function setValue<Data extends PlainObject>(
 	const {length} = parts;
 	const lastIndex = length - 1;
 
-	let target: PlainObject =
-		typeof data === 'object' && data !== null ? data : {};
+	let target: PlainObject = data;
 
 	for (let index = 0; index < length; index += 1) {
 		const part = parts[index];

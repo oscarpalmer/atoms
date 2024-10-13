@@ -1,7 +1,7 @@
 /// <reference types="vitest" />
-import {globSync} from 'node:fs';
 import {dirname, extname, relative, resolve} from 'node:path';
 import {fileURLToPath} from 'node:url';
+import {globSync} from 'glob';
 import {defineConfig} from 'vite';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -27,6 +27,7 @@ export default defineConfig({
 		rollupOptions: {
 			input: Object.fromEntries(files),
 			output: {
+				generatedCode: 'es2015',
 				preserveModules: true,
 			},
 		},
@@ -40,6 +41,6 @@ export default defineConfig({
 		watch: false,
 	},
 	resolve: {
-		alias: [{find: '@', replacement: resolve(__dirname, 'src/js')}],
+		alias: [{find: '~', replacement: resolve(__dirname, 'src/js')}],
 	},
 });

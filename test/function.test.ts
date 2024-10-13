@@ -71,9 +71,9 @@ test('memoise', () => {
 });
 
 test('noop', () => {
-	// expect(noop).toBeInstanceOf(Function);
+	expect(noop).toBeInstanceOf(Function);
 	// expect(noop.toString()).toMatch(/\s*function\s*noop\(\)\s*\{\s*\}\s*/);
-	// expect(noop()).toBeUndefined();
+	expect(noop()).toBeUndefined();
 });
 
 test('throttle', () =>

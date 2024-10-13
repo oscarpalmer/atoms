@@ -1,24 +1,29 @@
-import type {KeyCallback} from '@/array/models';
-import {findValues} from '@/internal/array-find';
-import type {Key} from '@/models';
+import type {KeyCallback} from '~/array/models';
+import {findValues} from '~/internal/array/find';
 
 /**
- * Returns an array of unique items
+ * Get an array of unique items
  */
-export function unique<Value>(array: Value[]): Value[];
+export function unique<Item>(array: Item[]): Item[];
 
 /**
- * - Returns an array of unique items
+ * - Get an array of unique items
  * - Use `key` to find a comparison value to match with `value`
  */
-export function unique<Value>(
-	array: Value[],
-	key: Key | KeyCallback<Value>,
-): Value[];
+export function unique<Item, Key extends keyof Item>(
+	array: Item[],
+	key: Key,
+): Item[];
 
-export function unique<Value>(
-	array: Value[],
-	key?: Key | KeyCallback<Value>,
-): Value[] {
-	return findValues('unique', array, undefined, key);
+/**
+ * - Get an array of unique items
+ * - Use `key` to find a comparison value to match with `value`
+ */
+export function unique<Item, Key extends KeyCallback<Item>>(
+	array: Item[],
+	key: Key,
+): Item[];
+
+export function unique(array: unknown[], key?: unknown): unknown[] {
+	return findValues('unique', array, undefined, key, undefined);
 }

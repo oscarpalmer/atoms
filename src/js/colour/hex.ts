@@ -1,6 +1,6 @@
-import {anyPattern, getNormalisedHex, hexToRgb} from '@/colour/functions';
-import type {HSLColour} from '@/colour/hsl';
-import type {RGBColour} from '@/colour/rgb';
+import {anyPattern, getNormalisedHex, hexToRgb} from '~/colour/functions';
+import type {HSLColour} from '~/colour/hsl';
+import type {RGBColour} from '~/colour/rgb';
 
 type State = {
 	value: string;
@@ -11,14 +11,14 @@ export class HexColour {
 	private readonly state: State;
 
 	/**
-	 * Gets the value of the colour
+	 * Get the value of the colour
 	 */
 	get value(): string {
 		return `#${this.state.value}`;
 	}
 
 	/**
-	 * Sets the value of the colour
+	 * Set the value of the colour
 	 */
 	set value(value: string) {
 		this.state.value = anyPattern.test(value)

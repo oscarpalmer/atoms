@@ -1,19 +1,20 @@
-import {insertValues} from '@/array/insert';
-import type {NestedArrayType} from '@/models';
+import {insertValues} from '~/array/insert';
+import type {NestedArrayType} from '~/models';
 
 /**
- * Flattens an array _(using native `flat` and maximum depth)_
+ * Flatten an array _(using native `flat` and maximum depth)_
  */
-export function flatten<Value>(array: Value[]): NestedArrayType<Value>[] {
-	return array.flat(Number.POSITIVE_INFINITY) as NestedArrayType<Value>[];
+export function flatten<Item>(array: Item[]): NestedArrayType<Item>[] {
+	return array.flat(Number.POSITIVE_INFINITY) as NestedArrayType<Item>[];
 }
 
 /**
- * - Pushes values to the end of an array, returning the new length
- * - Uses chunking to avoid stack overflow
+ * - Push values to the end of an array
+ * - Returns the new length
+ * - _(Uses chunking to avoid stack overflow)_
  */
-export function push<Value>(array: Value[], values: Value[]): number {
-	return insertValues('push', array, values, array.length, 0) as number;
+export function push<Item>(array: Item[], pushed: Item[]): number {
+	return insertValues('push', array, pushed, array.length, 0) as number;
 }
 
 export * from './chunk';

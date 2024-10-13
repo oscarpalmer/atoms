@@ -33,9 +33,15 @@ type Mergeable = {
 };
 
 test('compare', () => {
+	expect(compare(null, null)).toBe(0);
+	expect(compare(null, '')).toBe(-1);
 	expect(compare('', '')).toBe(0);
+
 	expect(compare('a', '')).toBe(1);
 	expect(compare('', 'a')).toBe(-1);
+
+	expect(compare(1, 'a')).toBe(-1);
+	expect(compare('a', 1)).toBe(1);
 
 	expect(compare('a', 'a')).toBe(0);
 	expect(compare('a', 'b')).toBe(-1);
@@ -176,6 +182,16 @@ test('merge', () => {
 	});
 
 	expect(merge([])).toEqual({});
+
+	expect(
+		merge(
+			[
+				[1, 2, 3, 4, 5],
+				[null, null, 99],
+			],
+			{skipNullable: true},
+		),
+	).toEqual([1, 2, 99, 4, 5]);
 });
 
 test('partial', () => {

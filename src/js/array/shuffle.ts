@@ -1,9 +1,9 @@
-import {getRandomInteger} from '@/random';
+import {getRandomInteger} from '~/random';
 
 /**
- * Shuffles an array
+ * Shuffle an array
  */
-export function shuffle<Value>(array: Value[]): Value[] {
+export function shuffle<Item>(array: Item[]): Item[] {
 	const shuffled = array.slice();
 	const {length} = shuffled;
 

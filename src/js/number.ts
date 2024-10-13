@@ -6,7 +6,7 @@ export function between(value: number, min: number, max: number): boolean {
 }
 
 /**
- * - Clamps a number between a minimum and maximum value
+ * - Clamp a number between a minimum and maximum value
  * - If `loop` is `true`, when the value is less than the minimum, it will be clamped as the maximum, and vice versa
  */
 export function clamp(
@@ -23,7 +23,7 @@ export function clamp(
 }
 
 /**
- * - Gets the number value from an unknown value
+ * - Get the number value from an unknown value
  * - Returns `NaN` if the value is `undefined`, `null`, or cannot be parsed
  * - Based on Lodash :-)
  */

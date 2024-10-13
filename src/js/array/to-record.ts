@@ -1,66 +1,164 @@
-import {groupValues} from '@/array/group-by';
-import type {KeyCallback} from '@/array/models';
-import type {Key} from '@/models';
+import {groupValues} from '~/array/group-by';
+import type {KeyCallback, ValueCallback} from '~/array/models';
+import type {KeyedValue, PlainObject} from '~/models';
 
 /**
- * Converts an array into a record, using indices as keys
+ * Create a record from an array of items _(using their indices as keys)_
  */
-export function toRecord<Value>(array: Value[]): Record<number, Value>;
+export function toRecord<Item>(array: Item[]): Record<number, Item>;
 
 /**
- * Converts an array into a record, using indices as keys and grouping values into arrays
+ * Create a record from an array of items using a specific key
  */
-export function toRecord<Value>(
-	array: Value[],
-	arrays: true,
-): Record<number, Value[]>;
+export function toRecord<Item, Key extends keyof Item>(
+	array: Item[],
+	key: Key,
+): Record<KeyedValue<Item, Key>, Item>;
 
 /**
- * - Converts an array into a record
- * - Uses `key` to find an identifcation value to use as keys
+ * Create a record from an array of items using a specific key, and grouping them into arrays
  */
-export function toRecord<Value>(array: Value[], key: Key): Record<Key, Value>;
-
-/**
- * - Converts an array into a record
- * - Uses `key` to find an identifcation value to use as keys
- * - Groups values into arrays
- */
-export function toRecord<Value>(
-	array: Value[],
+export function toRecord<Item, Key extends keyof Item>(
+	array: Item[],
 	key: Key,
 	arrays: true,
-): Record<Key, Value[]>;
+): Record<KeyedValue<Item, Key>, Item[]>;
 
 /**
- * - Converts an array into a record
- * - Uses `key` to find an identifcation value to use as keys
+ * Create a record from an array of items using a specific key
  */
-export function toRecord<Value>(
-	array: Value[],
-	key: KeyCallback<Value>,
-): Record<Key, Value>;
+export function toRecord<Item, Key extends KeyCallback<Item>>(
+	array: Item[],
+	key: Key,
+): Record<ReturnType<Key>, Item>;
 
 /**
- * - Converts an array into a record
- * - Uses `key` to find an identifcation value to use as keys
- * - Groups values into arrays
+ * Create a record from an array of items using a specific key, and grouping them into arrays
  */
-export function toRecord<Value>(
-	array: Value[],
-	key: KeyCallback<Value>,
+export function toRecord<Item, Key extends KeyCallback<Item>>(
+	array: Item[],
+	key: Key,
 	arrays: true,
-): Record<Key, Value[]>;
+): Record<ReturnType<Key>, Item[]>;
 
-export function toRecord<Value>(
-	array: Value[],
-	first?: boolean | Key | KeyCallback<Value>,
-	second?: boolean,
-): Record<Key, unknown> {
+/**
+ * Create a record from an array of items using a specific key and value
+ */
+export function toRecord<
+	Item,
+	Key extends keyof Item,
+	Value extends keyof Item,
+>(
+	array: Item[],
+	key: Key,
+	value: Value,
+): Record<KeyedValue<Item, Key>, KeyedValue<Item, Value>>;
+
+/**
+ * Create a record from an array of items using a specific key and value, and grouping them into arrays
+ */
+export function toRecord<
+	Item,
+	Key extends keyof Item,
+	Value extends keyof Item,
+>(
+	array: Item[],
+	key: Key,
+	value: Value,
+	arrays: true,
+): Record<KeyedValue<Item, Key>, Array<KeyedValue<Item, Value>>>;
+
+/**
+ * Create a record from an array of items using a specific key and value
+ */
+export function toRecord<
+	Item,
+	Key extends keyof Item,
+	Value extends ValueCallback<Item>,
+>(
+	array: Item[],
+	key: Key,
+	value: Value,
+): Record<KeyedValue<Item, Key>, ReturnType<Value>>;
+
+/**
+ * Create a record from an array of items using a specific key and value, and grouping them into arrays
+ */
+export function toRecord<
+	Item,
+	Key extends keyof Item,
+	Value extends ValueCallback<Item>,
+>(
+	array: Item[],
+	key: Key,
+	value: Value,
+	arrays: true,
+): Record<KeyedValue<Item, Key>, Array<ReturnType<Value>>>;
+
+/**
+ * Create a record from an array of items using a specific key and value
+ */
+export function toRecord<
+	Item,
+	Key extends KeyCallback<Item>,
+	Value extends keyof Item,
+>(
+	array: Item[],
+	key: Key,
+	value: Value,
+): Record<ReturnType<Key>, KeyedValue<Item, Value>>;
+
+/**
+ * Create a record from an array of items using a specific key and value, and grouping them into arrays
+ */
+export function toRecord<
+	Item,
+	Key extends KeyCallback<Item>,
+	Value extends keyof Item,
+>(
+	array: Item[],
+	key: Key,
+	value: Value,
+	arrays: true,
+): Record<ReturnType<Key>, Array<KeyedValue<Item, Value>>>;
+
+/**
+ * Create a record from an array of items using a specific key and value
+ */
+export function toRecord<
+	Item,
+	Key extends KeyCallback<Item>,
+	Value extends ValueCallback<Item>,
+>(
+	array: Item[],
+	key: Key,
+	value: Value,
+): Record<ReturnType<Key>, ReturnType<Value>>;
+
+/**
+ * Create a record from an array of items using a specific key and value, and grouping them into arrays
+ */
+export function toRecord<
+	Item,
+	Key extends KeyCallback<Item>,
+	Value extends ValueCallback<Item>,
+>(
+	array: Item[],
+	key: Key,
+	value: Value,
+	arrays: true,
+): Record<ReturnType<Key>, Array<ReturnType<Value>>>;
+
+export function toRecord(
+	array: unknown[],
+	first?: unknown,
+	second?: unknown,
+	third?: unknown,
+): PlainObject {
 	return groupValues(
 		array,
-		first as Key | KeyCallback<Value>,
-		first === true || second === true,
-		true,
+		first as never,
+		second,
+		first === true || second === true || third === true,
 	);
 }

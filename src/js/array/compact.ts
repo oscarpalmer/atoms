@@ -1,19 +1,17 @@
 /**
- * Compacts and returns an array with all falsey values removed
+ * Compact an array _(removing all `null` and `undefined` values)_
  */
-export function compact<Value>(
-	array: Value[],
-	strict: true,
-): Exclude<Value, 0 | '' | false | null | undefined>[];
+export function compact<Item>(array: Item[]): Exclude<Item, null | undefined>[];
 
 /**
- * Compacts and returns an array with all `null` and `undefined` values removed
+ * Compact an array _(removing all falsey values)_
  */
-export function compact<Value>(
-	array: Value[],
-): Exclude<Value, null | undefined>[];
+export function compact<Item>(
+	array: Item[],
+	strict: true,
+): Exclude<Item, 0 | '' | false | null | undefined>[];
 
-export function compact<Value>(array: Value[], strict?: boolean): Value[] {
+export function compact<Item>(array: Item[], strict?: boolean): Item[] {
 	return strict === true
 		? array.filter(item => !!item)
 		: array.filter(item => item != null);

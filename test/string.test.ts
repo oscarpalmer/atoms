@@ -164,8 +164,8 @@ test('snakeCase', () => {
 });
 
 test('template', () => {
-	const basic = '{{a.0.b.1.c}}';
-	const custom = '<a.0.b.1.c>';
+	const basic = '{{a.0.b.1.c}}, {{a.0.b.1.c}}!';
+	const custom = '<a.0.b.1.c>, <a.0.b.1.c>!';
 
 	const variables = {
 		a: [
@@ -173,28 +173,28 @@ test('template', () => {
 				B: [
 					null,
 					{
-						c: 'Hello!',
+						c: 'Hello',
 					},
 				],
 			},
 		],
 	};
 
-	expect(template(basic, variables)).toBe('');
-	expect(template(custom, variables)).toBe('<a.0.b.1.c>');
+	expect(template(basic, variables)).toBe(', !');
+	expect(template(custom, variables)).toBe('<a.0.b.1.c>, <a.0.b.1.c>!');
 
 	expect(
 		template(basic, variables, {
 			ignoreCase: true,
 		}),
-	).toBe('Hello!');
+	).toBe('Hello, Hello!');
 
 	expect(
 		template(custom, variables, {
 			ignoreCase: true,
 			pattern: /<([^>]+)>/g,
 		}),
-	).toBe('Hello!');
+	).toBe('Hello, Hello!');
 });
 
 test('truncate', () => {
@@ -219,6 +219,8 @@ test('truncate', () => {
 			expected[index],
 		);
 	}
+
+	expect(truncate('Hello, world!', -99)).toBe('');
 });
 
 test('titleCase', () => {

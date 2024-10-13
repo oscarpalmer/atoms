@@ -39,6 +39,7 @@ test('SizedMap', () =>
 		expect(entriesMap.maximum).toBe(niceMax);
 		expect(entriesMap.size).toBe(3);
 		expect(joinMap(entriesMap)).toBe('0:a; 1:b; 2:c');
+		expect(entriesMap.get(123)).toBeUndefined();
 
 		expect(maxMap.full).toBe(false);
 		expect(maxMap.maximum).toBe(2);
@@ -106,11 +107,8 @@ test('SizedMap', () =>
 test('SizedSet', () =>
 	new Promise<void>(done => {
 		const valuesSet = new Sized.SizedSet(['a', 'b', 'c']);
-
 		const maxSet = new Sized.SizedSet(2);
-
 		const shrunkSet = new Sized.SizedSet(['a', 'b', 'c', 'd', 'e'], 3);
-
 		const clampedSet = new Sized.SizedSet(actualMax + 1);
 
 		expect(valuesSet.full).toBe(false);
@@ -140,6 +138,7 @@ test('SizedSet', () =>
 
 			maxSet.add('a');
 			maxSet.add('b');
+			maxSet.add('c');
 			maxSet.add('c');
 
 			expect(maxSet.full).toBe(true);

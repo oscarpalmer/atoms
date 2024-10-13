@@ -1,12 +1,8 @@
-import {isArrayOrPlainObject} from '@/is';
-import type {ArrayOrPlainObject, PlainObject} from '@/models';
-
-export function clone(fn: (...args: unknown[]) => unknown): null;
-
-export function clone<Value>(value: Value): Value;
+import {isArrayOrPlainObject} from '~/is';
+import type {ArrayOrPlainObject, GenericCallback, PlainObject} from '~/models';
 
 /**
- * Clones any kind of value _(deeply, if needed)_
+ * Clone any kind of value _(deeply, if needed)_
  */
 export function clone(value: unknown) {
 	switch (true) {

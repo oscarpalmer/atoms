@@ -1,5 +1,5 @@
-import {isPlainObject} from '@/is';
-import type {ArrayOrPlainObject, PlainObject} from '@/models';
+import {isPlainObject} from '~/is';
+import type {ArrayOrPlainObject, PlainObject} from '~/models';
 
 /**
  * Are two strings equal? _(Case-sensitive by default)_

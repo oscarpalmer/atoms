@@ -13,17 +13,17 @@ export type EventPosition = {
 	y: number;
 };
 
+export type KeyedValue<
+	Item,
+	Key extends keyof Item,
+> = Item[Key] extends PropertyKey ? Item[Key] : never;
+
 export type NestedArrayType<Value> = Value extends Array<infer NestedValue>
 	? NestedArrayType<NestedValue>
 	: Value;
 
 // biome-ignore lint/suspicious/noExplicitAny: <explanation>
 export type GenericCallback = (...args: any[]) => any;
-
-export type GetterSetter<Value> = {
-	get(): Value;
-	set(value: Value): void;
-};
 
 export type Key = number | string;
 

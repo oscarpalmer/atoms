@@ -1,57 +1,53 @@
-import {insertValues} from '@/array/insert';
+import {insertValues} from '~/array/insert';
 
 /**
  * Removes and returns all items from an array starting from a specific index
  */
-export function splice<Value>(array: Value[], start: number): Value[];
+export function splice<Item>(array: Item[], start: number): Item[];
 
 /**
  * Removes and returns _(up to)_ a specific amount of items from an array, starting from a specific index
  */
-export function splice<Value>(
-	array: Value[],
+export function splice<Item>(
+	array: Item[],
 	start: number,
 	amount: number,
-): Value[];
+): Item[];
 
 /**
  * - Splices values into an array and returns any removed values
  * - Uses chunking to avoid stack overflow
  */
-export function splice<Value>(
-	array: Value[],
+export function splice<Item>(
+	array: Item[],
 	start: number,
-	values: Value[],
-): Value[];
+	added: Item[],
+): Item[];
 
 /**
  * - Splices values into an array and returns any removed values
  * - Uses chunking to avoid stack overflow
  */
-export function splice<Value>(
-	array: Value[],
+export function splice<Item>(
+	array: Item[],
 	start: number,
 	amount: number,
-	values: Value[],
-): Value[];
+	added: Item[],
+): Item[];
 
-export function splice<Value>(
-	array: Value[],
+export function splice(
+	array: unknown[],
 	start: number,
-	amountOrValues?: number | Value[],
-	values?: Value[],
-): Value[] {
-	const amoutOrValuesIsArray = Array.isArray(amountOrValues);
+	first?: number | unknown[],
+	second?: unknown[],
+): unknown[] {
+	const isArray = Array.isArray(first);
 
 	return insertValues(
 		'splice',
 		array,
-		amoutOrValuesIsArray ? amountOrValues : values ?? [],
+		isArray ? first : (second ?? []),
 		start,
-		amoutOrValuesIsArray
-			? array.length
-			: typeof amountOrValues === 'number' && amountOrValues > 0
-				? amountOrValues
-				: 0,
-	) as Value[];
+		isArray ? array.length : typeof first === 'number' && first > 0 ? first : 0,
+	) as unknown[];
 }

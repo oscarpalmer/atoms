@@ -1,8 +1,8 @@
-import {Colour} from '@/colour/base';
-import {hslToRgb} from '@/colour/functions';
-import type {HexColour} from '@/colour/hex';
-import type {RGBColour} from '@/colour/rgb';
-import {clamp} from '@/number';
+import {Colour} from '~/colour/base';
+import {hslToRgb} from '~/colour/functions';
+import type {HexColour} from '~/colour/hex';
+import type {RGBColour} from '~/colour/rgb';
+import {clamp} from '~/number';
 
 export type HSLColourValue = {
 	hue: number;
@@ -12,42 +12,42 @@ export type HSLColourValue = {
 
 export class HSLColour extends Colour<HSLColourValue> {
 	/**
-	 * Gets the current hue
+	 * Get the current hue
 	 */
 	get hue(): number {
 		return +this.state.value.hue;
 	}
 
 	/**
-	 * Sets the current hue
+	 * Set the current hue
 	 */
 	set hue(value: number) {
 		this.state.value.hue = clamp(value, 0, 360);
 	}
 
 	/**
-	 * Gets the current lightness
+	 * Get the current lightness
 	 */
 	get lightness(): number {
 		return +this.state.value.lightness;
 	}
 
 	/**
-	 * Sets the current lightness
+	 * Set the current lightness
 	 */
 	set lightness(value: number) {
 		this.state.value.lightness = clamp(value, 0, 100);
 	}
 
 	/**
-	 * Gets the current saturation
+	 * Get the current saturation
 	 */
 	get saturation(): number {
 		return +this.state.value.saturation;
 	}
 
 	/**
-	 * Sets the current saturation
+	 * Set the current saturation
 	 */
 	set saturation(value: number) {
 		this.state.value.saturation = clamp(value, 0, 100);
@@ -57,17 +57,23 @@ export class HSLColour extends Colour<HSLColourValue> {
 		super('hsl', value, defaults, properties);
 	}
 
+	/**
+	 * @inheritdoc
+	 */
 	toHex(): HexColour {
 		return HSLColour.toRgb(this.state.value).toHex();
 	}
 
 	/**
-	 * Converts the colour to an RGB-colour
+	 * Convert the colour to an RGB-colour
 	 */
 	toRgb(): RGBColour {
 		return HSLColour.toRgb(this.state.value);
 	}
 
+	/**
+	 * @inheritdoc
+	 */
 	toString(): string {
 		return `hsl(${this.state.value.hue}, ${this.state.value.saturation}%, ${this.state.value.lightness}%)`;
 	}

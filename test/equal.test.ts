@@ -155,12 +155,17 @@ test('regular expression', () => {
 });
 
 test('set', () => {
-	const first = new Set([1, 2, 3]);
-	const second = new Set([3, 2, 1]);
+	let first = new Set([1, 2, 3]);
+	let second = new Set([3, 2, 1]);
 
 	expect(equal(first, second)).toBe(true);
 
 	second.add(4);
+
+	expect(equal(first, second)).toBe(false);
+
+	first = new Set([1, 2, 3]);
+	second = new Set([97, 98, 99]);
 
 	expect(equal(first, second)).toBe(false);
 

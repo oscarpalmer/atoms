@@ -1,8 +1,8 @@
-import {Colour} from '@/colour/base';
-import {rgbToHex, rgbToHsl} from '@/colour/functions';
-import type {HexColour} from '@/colour/hex';
-import type {HSLColour} from '@/colour/hsl';
-import {clamp} from '@/number';
+import {Colour} from '~/colour/base';
+import {rgbToHex, rgbToHsl} from '~/colour/functions';
+import type {HexColour} from '~/colour/hex';
+import type {HSLColour} from '~/colour/hsl';
+import {clamp} from '~/number';
 
 export type RGBColourValue = {
 	blue: number;
@@ -12,42 +12,42 @@ export type RGBColourValue = {
 
 export class RGBColour extends Colour<RGBColourValue> {
 	/**
-	 * Gets the current blue value
+	 * Get the current blue value
 	 */
 	get blue(): number {
 		return +this.state.value.blue;
 	}
 
 	/**
-	 * Sets the current blue value
+	 * Set the current blue value
 	 */
 	set blue(value: number) {
 		this.state.value.blue = clamp(value, 0, 255);
 	}
 
 	/**
-	 * Gets the current green value
+	 * Get the current green value
 	 */
 	get green(): number {
 		return +this.state.value.green;
 	}
 
 	/**
-	 * Sets the current green value
+	 * Set the current green value
 	 */
 	set green(value: number) {
 		this.state.value.green = clamp(value, 0, 255);
 	}
 
 	/**
-	 * Gets the current red value
+	 * Get the current red value
 	 */
 	get red(): number {
 		return +this.state.value.red;
 	}
 
 	/**
-	 * Sets the current red value
+	 * Set the current red value
 	 */
 	set red(value: number) {
 		this.state.value.red = clamp(value, 0, 255);
@@ -57,6 +57,9 @@ export class RGBColour extends Colour<RGBColourValue> {
 		super('rgb', value, defaults, properties);
 	}
 
+	/**
+	 * @inheritdoc
+	 */
 	toHex(): HexColour {
 		return RGBColour.toHex(this.value);
 	}
@@ -68,6 +71,9 @@ export class RGBColour extends Colour<RGBColourValue> {
 		return RGBColour.toHsl(this.value);
 	}
 
+	/**
+	 * @inheritdoc
+	 */
 	toString(): string {
 		return `rgb(${this.value.red}, ${this.value.green}, ${this.value.blue})`;
 	}

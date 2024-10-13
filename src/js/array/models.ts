@@ -1,32 +1,35 @@
-import type {Key} from '@/models';
+import type {GenericCallback, Key} from '~/models';
 
-export type ArrayCallback<Value, Returned> = (
-	value: Value,
+export type ArrayCallback<Item, Value> = (
+	item: Item,
 	index: number,
-	array: Value[],
-) => Returned;
+	array: Item[],
+) => Value;
 
-export type BooleanCallback<Value> = ArrayCallback<Value, boolean>;
+export type BooleanCallback<Item> = ArrayCallback<Item, boolean>;
 
-export type Callbacks<Value> = {
-	bool?: BooleanCallback<Value>;
-	key?: KeyCallback<Value>;
+export type Callbacks = {
+	bool?: GenericCallback;
+	key?: GenericCallback;
+	value?: GenericCallback;
 };
 
 export type FindType = 'index' | 'value';
 
 export type InsertType = 'push' | 'splice';
 
-export type KeyCallback<Value> = ArrayCallback<Value, Key>;
+export type KeyCallback<Item> = ArrayCallback<Item, Key>;
 
-export type SortKey<Value> = {
+export type SortKey<Item> = {
 	direction: 'asc' | 'desc';
-	value: Key | SortKeyCallback<Value>;
+	value: Key | SortKeyCallback<Item>;
 };
 
-export type SortKeyCallback<Value> = (value: Value) => Key;
+export type SortKeyCallback<Item> = (item: Item) => unknown;
 
-export type SortKeyWithCallback<Value> = {
-	callback: SortKeyCallback<Value>;
+export type SortKeyWithCallback<Item> = {
+	callback: SortKeyCallback<Item>;
 	direction: 'asc' | 'desc';
 };
+
+export type ValueCallback<Item> = ArrayCallback<Item, unknown>;

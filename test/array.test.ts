@@ -22,16 +22,17 @@ import {getRandomInteger} from '../src/js/random';
 import {diff, equal} from '../src/js/value';
 
 type Item = {
+	age: number;
 	id: number;
 	name: string;
 };
 
 const complex: Item[] = [
-	{id: 1, name: 'Alice'},
-	{id: 2, name: 'Bob'},
-	{id: 3, name: 'Charlie'},
-	{id: 4, name: 'Alice'},
-	{id: 5, name: 'David'},
+	{id: 1, age: 25, name: 'Alice'},
+	{id: 2, age: 30, name: 'Bob'},
+	{id: 3, age: 25, name: 'Charlie'},
+	{id: 4, age: 30, name: 'Alice'},
+	{id: 5, age: 35, name: 'David'},
 ];
 
 const simple = [1, 2, 3, 4];
@@ -66,21 +67,21 @@ test('count', () => {
 	expect(count(simple, 2)).toBe(1);
 	expect(count(simple, 5)).toBe(0);
 
-	const countByKeyValue = count(complex, 3, 'id');
-	const countByKeyCallback = count(complex, 3, item => item.id);
-	const countByValueCallback = count(complex, item => item.id === 3);
+	const countByCallback = count(complex, item => item.id === 3);
+	const countByKeyValue = count(complex, 'id', 3);
+	const countByKeyCallback = count(complex, item => item.id, 3);
 
+	expect(countByCallback).toBe(1);
 	expect(countByKeyValue).toBe(1);
 	expect(countByKeyCallback).toBe(1);
-	expect(countByValueCallback).toBe(1);
 });
 
 test('exists', () => {
 	expect(exists(simple, 2)).toBe(true);
 	expect(exists(simple, 5)).toBe(false);
 
-	const existsByKeyCallback = exists(complex, 3, item => item.id);
-	const existsByKeyValue = exists(complex, 3, 'id');
+	const existsByKeyCallback = exists(complex, item => item.id, 3);
+	const existsByKeyValue = exists(complex, 'id', 3);
 
 	expect(existsByKeyCallback).toEqual(true);
 	expect(existsByKeyValue).toEqual(true);
@@ -94,15 +95,15 @@ test('filter', () => {
 	expect(filter(simple, 2)).toEqual([2]);
 	expect(filter(simple, 5)).toEqual([]);
 
-	const filterByKeyValue = filter(complex, 3, 'id');
-	const filterByKeyCallback = filter(complex, 3, item => item.id);
+	const filterByKeyValue = filter(complex, 'id', 3);
+	const filterByKeyCallback = filter(complex, item => item.id, 3);
 
-	expect(filterByKeyValue).toEqual([{id: 3, name: 'Charlie'}]);
-	expect(filterByKeyCallback).toEqual([{id: 3, name: 'Charlie'}]);
+	expect(filterByKeyValue).toEqual([{id: 3, age: 25, name: 'Charlie'}]);
+	expect(filterByKeyCallback).toEqual([{id: 3, age: 25, name: 'Charlie'}]);
 
 	const filterByValueCallback = filter(complex, item => item.id === 3);
 
-	expect(filterByValueCallback).toEqual([{id: 3, name: 'Charlie'}]);
+	expect(filterByValueCallback).toEqual([{id: 3, age: 25, name: 'Charlie'}]);
 });
 
 test('find', () => {
@@ -110,14 +111,16 @@ test('find', () => {
 	expect(find(simple, 5)).toBeUndefined();
 
 	const findByKeyCallback = find(complex, item => item.id === 3);
-	const findByKeyValue = find(complex, 3, 'id');
+	const findByKeyValue = find(complex, 'id', 3);
 
-	expect(findByKeyCallback).toEqual({id: 3, name: 'Charlie'});
-	expect(findByKeyValue).toEqual({id: 3, name: 'Charlie'});
+	expect(findByKeyCallback).toEqual({id: 3, age: 25, name: 'Charlie'});
+	expect(findByKeyValue).toEqual({id: 3, age: 25, name: 'Charlie'});
 
 	const findByValueCallback = find(complex, item => item.id === 3);
 
-	expect(findByValueCallback).toEqual({id: 3, name: 'Charlie'});
+	expect(findByValueCallback).toEqual({id: 3, age: 25, name: 'Charlie'});
+
+	expect(find(complex, 'id', 99)).toBeUndefined();
 });
 
 test('flatten', () => {
@@ -126,12 +129,45 @@ test('flatten', () => {
 	]);
 });
 
+test('groupBy', () => {
+	const simpleResult: Record<number, Item> = {
+		25: {id: 3, name: 'Charlie', age: 25},
+		30: {id: 4, name: 'Alice', age: 30},
+		35: {id: 5, name: 'David', age: 35},
+	};
+
+	const groupedByAgeCallback = groupBy(complex, item => item.age);
+	const groupedByAgeKey = groupBy(complex, 'age');
+
+	expect(groupedByAgeCallback).toEqual(simpleResult);
+	expect(groupedByAgeKey).toEqual(simpleResult);
+	expect(groupedByAgeCallback).toEqual(groupedByAgeKey);
+
+	const blah = {
+		25: 'Charlie',
+		30: 'Alice',
+		35: 'David',
+	};
+
+	const groupedByAgeWithNameCallback = groupBy(
+		complex,
+		'age',
+		item => item.name,
+	);
+
+	const groupedByAgeWithNameKey = groupBy(complex, 'age', 'name');
+
+	expect(groupedByAgeWithNameCallback).toEqual(blah);
+	expect(groupedByAgeWithNameKey).toEqual(blah);
+	expect(groupedByAgeWithNameCallback).toEqual(groupedByAgeWithNameKey);
+});
+
 test('indexOf', () => {
 	expect(indexOf(simple, 2)).toBe(1);
 	expect(indexOf(simple, 5)).toBe(-1);
 
-	const indexOfByKeyCallback = indexOf(complex, 3, item => item.id);
-	const indexOfByKeyValue = indexOf(complex, 3, 'id');
+	const indexOfByKeyCallback = indexOf(complex, item => item.id, 3);
+	const indexOfByKeyValue = indexOf(complex, 'id', 3);
 
 	expect(indexOfByKeyCallback).toEqual(2);
 	expect(indexOfByKeyValue).toEqual(2);
@@ -139,31 +175,8 @@ test('indexOf', () => {
 	const indexOfByValueCallback = indexOf(complex, item => item.id === 3);
 
 	expect(indexOfByValueCallback).toEqual(2);
-});
 
-test('groupBy', () => {
-	const array = [
-		{name: 'Alice', age: 25},
-		{name: 'Bob', age: 30},
-		{name: 'Charlie', age: 25},
-	];
-
-	const result = {
-		25: [
-			{name: 'Alice', age: 25},
-			{name: 'Charlie', age: 25},
-		],
-		30: [{name: 'Bob', age: 30}],
-	};
-
-	const groupedByAgeCallback = groupBy(array, item => item.age);
-	const groupedByAgeKey = groupBy(array, 'age');
-
-	expect(groupedByAgeCallback).toEqual(result);
-	expect(groupedByAgeKey).toEqual(result);
-	expect(groupedByAgeCallback).toEqual(groupedByAgeKey);
-
-	expect(groupBy(array, 'not.ok')).toEqual({});
+	expect(indexOf(complex, 'id', 99)).toBe(-1);
 });
 
 test('insert', () => {
@@ -188,6 +201,12 @@ test('insert', () => {
 	expect(array[1]).toBe('#1');
 	expect(array[length + 1]).toBe(2);
 	expect(array[length + 2]).toBe(3);
+
+	const appended = [];
+
+	insert(appended, [1, 2, 3]);
+
+	expect(appended).toEqual([1, 2, 3]);
 });
 
 test('push', () => {
@@ -349,30 +368,31 @@ test('toMap', () => {
 
 	expect(indicedObjects).toEqual(
 		new Map([
-			[0, {id: 1, name: 'Alice'}],
-			[1, {id: 2, name: 'Bob'}],
-			[2, {id: 3, name: 'Charlie'}],
-			[3, {id: 4, name: 'Alice'}],
-			[4, {id: 5, name: 'David'}],
+			[0, {id: 1, age: 25, name: 'Alice'}],
+			[1, {id: 2, age: 30, name: 'Bob'}],
+			[2, {id: 3, age: 25, name: 'Charlie'}],
+			[3, {id: 4, age: 30, name: 'Alice'}],
+			[4, {id: 5, age: 35, name: 'David'}],
 		]),
 	);
 
 	expect(keyedObjects).toEqual(
 		new Map([
-			[1, {id: 1, name: 'Alice'}],
-			[2, {id: 2, name: 'Bob'}],
-			[3, {id: 3, name: 'Charlie'}],
-			[4, {id: 4, name: 'Alice'}],
-			[5, {id: 5, name: 'David'}],
+			[1, {id: 1, age: 25, name: 'Alice'}],
+			[2, {id: 2, age: 30, name: 'Bob'}],
+			[3, {id: 3, age: 25, name: 'Charlie'}],
+			[4, {id: 4, age: 30, name: 'Alice'}],
+			[5, {id: 5, age: 35, name: 'David'}],
 		]),
 	);
 
 	expect(callbackedObjects).toEqual(
 		new Map([
-			['Alice', {id: 4, name: 'Alice'}],
-			['Bob', {id: 2, name: 'Bob'}],
-			['Charlie', {id: 3, name: 'Charlie'}],
-			['David', {id: 5, name: 'David'}],
+			['Alice', {id: 1, age: 25, name: 'Alice'}],
+			['Bob', {id: 2, age: 30, name: 'Bob'}],
+			['Charlie', {id: 3, age: 25, name: 'Charlie'}],
+			['Alice', {id: 4, age: 30, name: 'Alice'}],
+			['David', {id: 5, age: 35, name: 'David'}],
 		]),
 	);
 
@@ -382,21 +402,21 @@ test('toMap', () => {
 
 	expect(indicedArrays).toEqual(
 		new Map([
-			[0, [{id: 1, name: 'Alice'}]],
-			[1, [{id: 2, name: 'Bob'}]],
-			[2, [{id: 3, name: 'Charlie'}]],
-			[3, [{id: 4, name: 'Alice'}]],
-			[4, [{id: 5, name: 'David'}]],
+			[0, [{id: 1, age: 25, name: 'Alice'}]],
+			[1, [{id: 2, age: 30, name: 'Bob'}]],
+			[2, [{id: 3, age: 25, name: 'Charlie'}]],
+			[3, [{id: 4, age: 30, name: 'Alice'}]],
+			[4, [{id: 5, age: 35, name: 'David'}]],
 		]),
 	);
 
 	expect(keyedArrays).toEqual(
 		new Map([
-			[1, [{id: 1, name: 'Alice'}]],
-			[2, [{id: 2, name: 'Bob'}]],
-			[3, [{id: 3, name: 'Charlie'}]],
-			[4, [{id: 4, name: 'Alice'}]],
-			[5, [{id: 5, name: 'David'}]],
+			[1, [{id: 1, age: 25, name: 'Alice'}]],
+			[2, [{id: 2, age: 30, name: 'Bob'}]],
+			[3, [{id: 3, age: 25, name: 'Charlie'}]],
+			[4, [{id: 4, age: 30, name: 'Alice'}]],
+			[5, [{id: 5, age: 35, name: 'David'}]],
 		]),
 	);
 
@@ -405,13 +425,13 @@ test('toMap', () => {
 			[
 				'Alice',
 				[
-					{id: 1, name: 'Alice'},
-					{id: 4, name: 'Alice'},
+					{id: 1, age: 25, name: 'Alice'},
+					{id: 4, age: 30, name: 'Alice'},
 				],
 			],
-			['Bob', [{id: 2, name: 'Bob'}]],
-			['Charlie', [{id: 3, name: 'Charlie'}]],
-			['David', [{id: 5, name: 'David'}]],
+			['Bob', [{id: 2, age: 30, name: 'Bob'}]],
+			['Charlie', [{id: 3, age: 25, name: 'Charlie'}]],
+			['David', [{id: 5, age: 35, name: 'David'}]],
 		]),
 	);
 });
@@ -422,26 +442,26 @@ test('toRecord', () => {
 	const callbackedObjects = toRecord(complex, item => item.name);
 
 	expect(indicedObjects).toEqual({
-		0: {id: 1, name: 'Alice'},
-		1: {id: 2, name: 'Bob'},
-		2: {id: 3, name: 'Charlie'},
-		3: {id: 4, name: 'Alice'},
-		4: {id: 5, name: 'David'},
+		0: {id: 1, age: 25, name: 'Alice'},
+		1: {id: 2, age: 30, name: 'Bob'},
+		2: {id: 3, age: 25, name: 'Charlie'},
+		3: {id: 4, age: 30, name: 'Alice'},
+		4: {id: 5, age: 35, name: 'David'},
 	});
 
 	expect(keyedObjects).toEqual({
-		1: {id: 1, name: 'Alice'},
-		2: {id: 2, name: 'Bob'},
-		3: {id: 3, name: 'Charlie'},
-		4: {id: 4, name: 'Alice'},
-		5: {id: 5, name: 'David'},
+		1: {id: 1, age: 25, name: 'Alice'},
+		2: {id: 2, age: 30, name: 'Bob'},
+		3: {id: 3, age: 25, name: 'Charlie'},
+		4: {id: 4, age: 30, name: 'Alice'},
+		5: {id: 5, age: 35, name: 'David'},
 	});
 
 	expect(callbackedObjects).toEqual({
-		Alice: {id: 4, name: 'Alice'},
-		Bob: {id: 2, name: 'Bob'},
-		Charlie: {id: 3, name: 'Charlie'},
-		David: {id: 5, name: 'David'},
+		Alice: {id: 4, age: 30, name: 'Alice'},
+		Bob: {id: 2, age: 30, name: 'Bob'},
+		Charlie: {id: 3, age: 25, name: 'Charlie'},
+		David: {id: 5, age: 35, name: 'David'},
 	});
 
 	const indicedArrays = toRecord(complex, true);
@@ -449,29 +469,29 @@ test('toRecord', () => {
 	const callbackedArrays = toRecord(complex, item => item.name, true);
 
 	expect(indicedArrays).toEqual({
-		0: [{id: 1, name: 'Alice'}],
-		1: [{id: 2, name: 'Bob'}],
-		2: [{id: 3, name: 'Charlie'}],
-		3: [{id: 4, name: 'Alice'}],
-		4: [{id: 5, name: 'David'}],
+		0: [{id: 1, age: 25, name: 'Alice'}],
+		1: [{id: 2, age: 30, name: 'Bob'}],
+		2: [{id: 3, age: 25, name: 'Charlie'}],
+		3: [{id: 4, age: 30, name: 'Alice'}],
+		4: [{id: 5, age: 35, name: 'David'}],
 	});
 
 	expect(keyedArrays).toEqual({
-		1: [{id: 1, name: 'Alice'}],
-		2: [{id: 2, name: 'Bob'}],
-		3: [{id: 3, name: 'Charlie'}],
-		4: [{id: 4, name: 'Alice'}],
-		5: [{id: 5, name: 'David'}],
+		1: [{id: 1, age: 25, name: 'Alice'}],
+		2: [{id: 2, age: 30, name: 'Bob'}],
+		3: [{id: 3, age: 25, name: 'Charlie'}],
+		4: [{id: 4, age: 30, name: 'Alice'}],
+		5: [{id: 5, age: 35, name: 'David'}],
 	});
 
 	expect(callbackedArrays).toEqual({
 		Alice: [
-			{id: 1, name: 'Alice'},
-			{id: 4, name: 'Alice'},
+			{id: 1, age: 25, name: 'Alice'},
+			{id: 4, age: 30, name: 'Alice'},
 		],
-		Bob: [{id: 2, name: 'Bob'}],
-		Charlie: [{id: 3, name: 'Charlie'}],
-		David: [{id: 5, name: 'David'}],
+		Bob: [{id: 2, age: 30, name: 'Bob'}],
+		Charlie: [{id: 3, age: 25, name: 'Charlie'}],
+		David: [{id: 5, age: 35, name: 'David'}],
 	});
 });
 

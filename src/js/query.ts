@@ -1,10 +1,10 @@
-import {isNullableOrWhitespace, isPlainObject} from '@/is';
-import type {ArrayOrPlainObject, PlainObject} from '@/models';
-import {join} from '@/string';
-import {setValue} from '@/value';
+import {isPlainObject} from '~/is';
+import type {ArrayOrPlainObject, PlainObject} from '~/models';
+import {join} from '~/string';
+import {setValue} from '~/value';
 
 /**
- * Converts a query string to a plain _(nested)_ object
+ * Convert a query string to a plain _(nested)_ object
  */
 export function fromQuery(query: string): PlainObject {
 	const parts = query.split('&');
@@ -14,10 +14,6 @@ export function fromQuery(query: string): PlainObject {
 
 	for (let index = 0; index < length; index += 1) {
 		const [key, value] = parts[index].split('=').map(decodeURIComponent);
-
-		if (isNullableOrWhitespace(key)) {
-			continue;
-		}
 
 		if (key.includes('.')) {
 			setValue(parameters, key, getValue(value));
@@ -86,7 +82,7 @@ function isDecodable(value: unknown): value is boolean | number | string {
 }
 
 /**
- * Converts a plain _(nested)_ object to a query string
+ * Convert a plain _(nested)_ object to a query string
  */
 export function toQuery(parameters: PlainObject): string {
 	return getParts(parameters, false)

@@ -2,46 +2,41 @@ import type {
 	SortKey,
 	SortKeyCallback,
 	SortKeyWithCallback,
-} from '@/array/models';
-import {isKey} from '@/is';
-import type {Key, PlainObject} from '@/models';
-import {compare} from '@/value/compare';
+} from '~/array/models';
+import {isKey} from '~/is';
+import type {Key, PlainObject} from '~/models';
+import {compare} from '~/value/compare';
 
 /**
- * Sorts an array of items _(ascending by default)_
+ * Sort an array of items _(defaults to ascending)_
  */
-export function sort<Value>(array: Value[], descending?: boolean): Value[];
+export function sort<Item>(array: Item[], descending?: boolean): Item[];
 
 /**
- * - Sorts an array of items, using a `key` to sort by a specific value
- * - Ascending by default, but can be changed by setting `descending` to `true`, or using a `SortKey`
+ * - Sort an array of items, using a `key` to sort by a specific value
+ * - Defaults to ascending, but can be changed by setting `descending` to `true`, or using a `SortKey`
  */
-export function sort<Value>(
-	array: Value[],
-	key: Key | SortKey<Value> | SortKeyCallback<Value>,
+export function sort<Item>(
+	array: Item[],
+	key: Key | SortKey<Item> | SortKeyCallback<Item>,
 	descending?: boolean,
-): Value[];
+): Item[];
 
 /**
- * - Sorts an array of items, using multiple `keys` to sort by specific values
- * - Ascending by default, but can be changed by setting `descending` to `true`, or using `SortKey`
+ * - Sort an array of items, using multiple `keys` to sort by specific values
+ * - Defaults to ascending, but can be changed by setting `descending` to `true`, or using `SortKey`
  */
-export function sort<Value>(
-	array: Value[],
-	keys: Array<Key | SortKey<Value> | SortKeyCallback<Value>>,
+export function sort<Item>(
+	array: Item[],
+	keys: Array<Key | SortKey<Item> | SortKeyCallback<Item>>,
 	descending?: boolean,
-): Value[];
+): Item[];
 
-export function sort<Value>(
-	array: Value[],
-	first?:
-		| boolean
-		| Key
-		| SortKey<Value>
-		| SortKeyCallback<Value>
-		| Array<Key | SortKey<Value> | SortKeyCallback<Value>>,
-	second?: boolean,
-): Value[] {
+export function sort(
+	array: unknown[],
+	first?: unknown,
+	second?: unknown,
+): unknown[] {
 	if (array.length < 2) {
 		return array;
 	}
@@ -56,23 +51,22 @@ export function sort<Value>(
 
 	const keys = (Array.isArray(first) ? first : [first])
 		.map(key => {
-			const returned: SortKeyWithCallback<Value> = {
+			const returned: SortKeyWithCallback<unknown> = {
 				direction,
 				callback: undefined as never,
 			};
 
 			if (isKey(key)) {
-				returned.callback = (value: Value) =>
-					(value as PlainObject)[key] as never;
+				returned.callback = value => (value as PlainObject)[key] as never;
 			} else if (typeof key === 'function') {
 				returned.callback = key;
 			} else if (typeof key?.value === 'function' || isKey(key?.value)) {
 				returned.direction = key?.direction ?? direction;
+
 				returned.callback =
 					typeof key.value === 'function'
 						? key.value
-						: (value: Value) =>
-								(value as PlainObject)[key.value as Key] as never;
+						: value => (value as PlainObject)[key.value as Key] as never;
 			}
 
 			return returned;

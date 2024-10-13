@@ -1,7 +1,7 @@
-import {isArrayOrPlainObject} from '@/is';
-import type {ArrayOrPlainObject, Key, PlainObject} from '@/models';
-import {join} from '@/string/index';
-import {equal} from '@/value/equal';
+import {isArrayOrPlainObject} from '~/is';
+import type {ArrayOrPlainObject, Key, PlainObject} from '~/models';
+import {join} from '~/string/index';
+import {equal} from '~/value/equal';
 
 export type DiffType = 'full' | 'none' | 'partial';
 

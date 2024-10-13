@@ -1,16 +1,17 @@
-/**
- * Chunks an array into smaller arrays of a specified size
- */
-export function chunk<Value>(array: Value[], size?: number): Value[][] {
-	const {length} = array;
+import {clamp} from '~/number';
 
-	const chunkSize = typeof size === 'number' && size > 0 ? size : 64_000;
+/**
+ * Chunk an array _(into smaller arrays of a specified size)_
+ */
+export function chunk<Item>(array: Item[], size?: number): Item[][] {
+	const chunkSize = clamp(size ?? 64_000, 1, 64_000);
+	const {length} = array;
 
 	if (length <= chunkSize) {
 		return [array];
 	}
 
-	const chunks: Value[][] = [];
+	const chunks: Item[][] = [];
 
 	let remaining = Number(length);
 

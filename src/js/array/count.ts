@@ -1,29 +1,49 @@
-import type {BooleanCallback, KeyCallback} from '@/array/models';
-import {findValues} from '@/internal/array-find';
-import type {Key} from '@/models';
+import {findValues} from '~/internal/array/find';
+import type {BooleanCallback, KeyCallback} from '~/array/models';
 
 /**
- * Returns the number of items _(count)_ that match the given value
+ * Get the number of items _(count)_ that match the given value
  */
-export function count<Model, Value>(
-	array: Model[],
-	value: Value | BooleanCallback<Model>,
+export function count<Item>(array: Item[], value: Item): number;
+
+/**
+ * Get the number of items _(count)_ that match the given value
+ */
+export function count<Item>(
+	array: Item[],
+	matches: BooleanCallback<Item>,
 ): number;
 
 /**
- * - Returns the number of items _(count)_ that match the given value
- * - Use `key` to find a comparison value to match with `value`
+ * Get the number of items _(count)_ that match the given value
  */
-export function count<Model, Value = Model>(
-	array: Model[],
-	value: Value,
-	key: Key | KeyCallback<Model>,
+export function count<Item, Key extends keyof Item>(
+	array: Item[],
+	key: Key,
+	value: Item[Key],
 ): number;
 
-export function count<Model, Value = Model>(
-	array: Model[],
-	value: Value | BooleanCallback<Model>,
-	key?: Key | KeyCallback<Model>,
-): number {
-	return findValues('all', array, value, key).length;
+/**
+ * Get the number of items _(count)_ that match the given value
+ */
+export function count<Item, Key extends KeyCallback<Item>>(
+	array: Item[],
+	key: Key,
+	value: ReturnType<Key>,
+): number;
+
+export function count(array: unknown[], ...parameters: unknown[]): number {
+	const {length} = parameters;
+
+	return findValues(
+		'all',
+		array,
+		length === 1 && typeof parameters[0] === 'function'
+			? parameters[0]
+			: undefined,
+		length === 2 ? parameters[0] : undefined,
+		length === 1 && typeof parameters[0] !== 'function'
+			? parameters[0]
+			: parameters[1],
+	).length;
 }

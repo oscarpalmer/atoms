@@ -1,14 +1,14 @@
-import {shuffle} from '@/array/shuffle';
+import {shuffle} from '~/array/shuffle';
 
 /**
- * Returns a random boolean
+ * Get a random boolean
  */
 export function getRandomBoolean(): boolean {
 	return Math.random() > 0.5;
 }
 
 /**
- * Returns a random string of characters with a specified length
+ * Get a random string of characters with a specified length
  * - `selection` defaults to all lowercase letters in the English alphabet
  */
 export function getRandomCharacters(
@@ -34,24 +34,14 @@ export function getRandomCharacters(
 }
 
 /**
- * Returns a random hexadecimal colour
+ * Get a random hexadecimal colour
  */
 export function getRandomColour(): string {
 	return `#${Array.from({length: 6}, getRandomHex).join('')}`;
 }
 
 /**
- * Returns a random date
- */
-export function getRandomDate(earliest?: Date, latest?: Date): Date {
-	const earliestTime = earliest?.getTime() ?? -8_640_000_000_000_000;
-	const latestTime = latest?.getTime() ?? 8_640_000_000_000_000;
-
-	return new Date(getRandomInteger(earliestTime, latestTime));
-}
-
-/**
- * Returns a random floating-point number
+ * Get a random floating-point number
  */
 export function getRandomFloat(min?: number, max?: number): number {
 	const minimum = min ?? Number.MIN_SAFE_INTEGER;
@@ -60,28 +50,28 @@ export function getRandomFloat(min?: number, max?: number): number {
 }
 
 /**
- * Returns a random hexadecimal character
+ * Get a random hexadecimal character
  */
 export function getRandomHex(): string {
 	return '0123456789ABCDEF'[getRandomInteger(0, 16)];
 }
 
 /**
- * Returns a random integer
+ * Get a random integer
  */
 export function getRandomInteger(min?: number, max?: number): number {
 	return Math.floor(getRandomFloat(min, max));
 }
 
 /**
- * Returns a random item from an array
+ * Get a random item from an array
  */
 export function getRandomItem<Value>(array: Value[]): Value {
 	return array[getRandomInteger(0, array.length)];
 }
 
 /**
- * - Returns an amount of random items from an array
+ * - Get an amount of random items from an array
  * - If `amount` is not specified, a shuffled array will be returned instead
  */
 export function getRandomItems<Value>(
