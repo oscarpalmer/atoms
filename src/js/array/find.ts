@@ -1,5 +1,5 @@
 import {findValue} from '~/internal/array/find';
-import type {Key as SimpleKey} from '~/models';
+import type {Key, PlainObject} from '~/models';
 
 /**
  * Get the first item matching `value` _(or `undefined` if no match is found)_
@@ -18,10 +18,10 @@ export function find<Item>(
  * - Get the first matching item _(or `undefined` if no match is found)_
  * - Use `key` to find a comparison value to match with `value`
  */
-export function find<Item, Key extends keyof Item>(
+export function find<Item extends PlainObject, ItemKey extends keyof Item>(
 	array: Item[],
-	key: Key,
-	value: Item[Key],
+	key: ItemKey,
+	value: Item[ItemKey],
 ): Item | undefined;
 
 /**
@@ -30,8 +30,8 @@ export function find<Item, Key extends keyof Item>(
  */
 export function find<
 	Item,
-	Key extends (item: Item, index: number, array: Item[]) => SimpleKey,
->(array: Item[], key: Key, value: ReturnType<Key>): Item | undefined;
+	ItemKey extends (item: Item, index: number, array: Item[]) => Key,
+>(array: Item[], key: ItemKey, value: ReturnType<ItemKey>): Item | undefined;
 
 export function find<Item>(
 	array: unknown[],

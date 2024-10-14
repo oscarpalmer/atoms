@@ -75,7 +75,10 @@ function equalArrayBuffer(first: ArrayBuffer, second: ArrayBuffer): boolean {
 
 function equalDataView(first: DataView, second: DataView): boolean {
 	return first.byteOffset === second.byteOffset
-		? equalArrayBuffer(first.buffer, second.buffer)
+		? equalArrayBuffer(
+				first.buffer as ArrayBuffer,
+				second.buffer as ArrayBuffer,
+			)
 		: false;
 }
 

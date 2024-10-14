@@ -1,16 +1,16 @@
 import type {ToString} from 'type-fest/source/internal/string';
 import {handleValue} from '~/internal/value/handle';
-import type {Get, Paths, PlainObject} from '~/models';
+import type {ArrayOrPlainObject, Get, Paths} from '~/models';
 
 /**
  * - Get the value from an object using a known path
  * - You can retrieve a nested value by using dot notation, e.g., `foo.bar.baz`
  * - Returns `undefined` if the value is not found
  */
-export function getValue<Data extends PlainObject, Path extends Paths<Data>>(
-	data: Data,
-	path: Path,
-): Get<Data, ToString<Path>>;
+export function getValue<
+	Data extends ArrayOrPlainObject,
+	Path extends Paths<Data>,
+>(data: Data, path: Path): Get<Data, ToString<Path>>;
 
 /**
  * - Get the value from an object using an unknown path
@@ -18,14 +18,14 @@ export function getValue<Data extends PlainObject, Path extends Paths<Data>>(
  * - If `ignoreCase` is `true`, path matching will be case-insensitive
  * - Returns `undefined` if the value is not found
  */
-export function getValue<Data extends PlainObject>(
+export function getValue<Data extends ArrayOrPlainObject>(
 	data: Data,
 	path: string,
 	ignoreCase?: boolean,
 ): unknown;
 
 export function getValue(
-	data: PlainObject,
+	data: ArrayOrPlainObject,
 	path: string,
 	ignoreCase?: boolean,
 ): unknown {
@@ -34,7 +34,7 @@ export function getValue(
 	const {length} = parts;
 
 	let index = 0;
-	let value: PlainObject = data;
+	let value: ArrayOrPlainObject = data;
 
 	while (index < length && value != null) {
 		value = handleValue(
@@ -43,7 +43,7 @@ export function getValue(
 			null,
 			true,
 			shouldIgnoreCase,
-		) as PlainObject;
+		) as ArrayOrPlainObject;
 	}
 
 	return value as never;

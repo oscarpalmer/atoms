@@ -1,5 +1,5 @@
 import {findValue} from '~/internal/array/find';
-import type {Key as SimpleKey} from '~/models';
+import type {Key, PlainObject} from '~/models';
 
 /**
  * Does the value exist in array?
@@ -18,10 +18,10 @@ export function exists<Item>(
  * - Does the value exist in array?
  * - Use `key` to find a comparison value to match with `value`
  */
-export function exists<Item, Key extends keyof Item>(
+export function exists<Item extends PlainObject, ItemKey extends keyof Item>(
 	array: Item[],
-	key: Key,
-	value: Item[Key],
+	key: ItemKey,
+	value: Item[ItemKey],
 ): boolean;
 
 /**
@@ -30,8 +30,8 @@ export function exists<Item, Key extends keyof Item>(
  */
 export function exists<
 	Item,
-	Key extends (item: Item, index: number, array: Item[]) => SimpleKey,
->(array: Item[], key: Key, value: ReturnType<Key>): boolean;
+	ItemKey extends (item: Item, index: number, array: Item[]) => Key,
+>(array: Item[], key: ItemKey, value: ReturnType<ItemKey>): boolean;
 
 export function exists(array: unknown[], ...parameters: unknown[]): boolean {
 	return (findValue('index', array, parameters) as number) > -1;

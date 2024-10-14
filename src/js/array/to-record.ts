@@ -1,5 +1,5 @@
 import {groupValues} from '~/array/group-by';
-import type {KeyedValue, PlainObject, Key as SimpleKey} from '~/models';
+import type {Key, KeyedValue, PlainObject} from '~/models';
 
 /**
  * Create a record from an array of items _(using their indices as keys)_
@@ -9,143 +9,147 @@ export function toRecord<Item>(array: Item[]): Record<number, Item>;
 /**
  * Create a record from an array of items using a specific key
  */
-export function toRecord<Item, Key extends keyof Item>(
+export function toRecord<Item extends PlainObject, ItemKey extends keyof Item>(
 	array: Item[],
-	key: Key,
-): Record<KeyedValue<Item, Key>, Item>;
+	key: ItemKey,
+): Record<KeyedValue<Item, ItemKey>, Item>;
 
 /**
  * Create a record from an array of items using a specific key, and grouping them into arrays
  */
-export function toRecord<Item, Key extends keyof Item>(
+export function toRecord<Item extends PlainObject, ItemKey extends keyof Item>(
 	array: Item[],
-	key: Key,
+	key: ItemKey,
 	arrays: true,
-): Record<KeyedValue<Item, Key>, Item[]>;
+): Record<KeyedValue<Item, ItemKey>, Item[]>;
 
 /**
  * Create a record from an array of items using a specific key
  */
 export function toRecord<
 	Item,
-	Key extends (item: Item, index: number, array: Item[]) => SimpleKey,
->(array: Item[], key: Key): Record<ReturnType<Key>, Item>;
+	ItemKey extends (item: Item, index: number, array: Item[]) => Key,
+>(array: Item[], key: ItemKey): Record<ReturnType<ItemKey>, Item>;
 
 /**
  * Create a record from an array of items using a specific key, and grouping them into arrays
  */
 export function toRecord<
 	Item,
-	Key extends (item: Item, index: number, array: Item[]) => SimpleKey,
->(array: Item[], key: Key, arrays: true): Record<ReturnType<Key>, Item[]>;
+	ItemKey extends (item: Item, index: number, array: Item[]) => Key,
+>(
+	array: Item[],
+	key: ItemKey,
+	arrays: true,
+): Record<ReturnType<ItemKey>, Item[]>;
+
+/**
+ * Create a record from an array of items using a specific key and value
+ */
+export function toRecord<
+	Item extends PlainObject,
+	ItemKey extends keyof Item,
+	ItemValue extends keyof Item,
+>(
+	array: Item[],
+	key: ItemKey,
+	value: ItemValue,
+): Record<KeyedValue<Item, ItemKey>, KeyedValue<Item, ItemValue>>;
+
+/**
+ * Create a record from an array of items using a specific key and value, and grouping them into arrays
+ */
+export function toRecord<
+	Item extends PlainObject,
+	ItemKey extends keyof Item,
+	ItemValue extends keyof Item,
+>(
+	array: Item[],
+	key: ItemKey,
+	value: ItemValue,
+	arrays: true,
+): Record<KeyedValue<Item, ItemKey>, Array<KeyedValue<Item, ItemValue>>>;
+
+/**
+ * Create a record from an array of items using a specific key and value
+ */
+export function toRecord<
+	Item extends PlainObject,
+	ItemKey extends keyof Item,
+	ItemValue extends (item: Item, index: number, array: Item[]) => unknown,
+>(
+	array: Item[],
+	key: ItemKey,
+	value: ItemValue,
+): Record<KeyedValue<Item, ItemKey>, ReturnType<ItemValue>>;
+
+/**
+ * Create a record from an array of items using a specific key and value, and grouping them into arrays
+ */
+export function toRecord<
+	Item extends PlainObject,
+	ItemKey extends keyof Item,
+	ItemValue extends (item: Item, index: number, array: Item[]) => unknown,
+>(
+	array: Item[],
+	key: ItemKey,
+	value: ItemValue,
+	arrays: true,
+): Record<KeyedValue<Item, ItemKey>, Array<ReturnType<ItemValue>>>;
+
+/**
+ * Create a record from an array of items using a specific key and value
+ */
+export function toRecord<
+	Item extends PlainObject,
+	ItemKey extends (item: Item, index: number, array: Item[]) => Key,
+	ItemValue extends keyof Item,
+>(
+	array: Item[],
+	key: ItemKey,
+	value: ItemValue,
+): Record<ReturnType<ItemKey>, KeyedValue<Item, ItemValue>>;
+
+/**
+ * Create a record from an array of items using a specific key and value, and grouping them into arrays
+ */
+export function toRecord<
+	Item extends PlainObject,
+	ItemKey extends (item: Item, index: number, array: Item[]) => Key,
+	ItemValue extends keyof Item,
+>(
+	array: Item[],
+	key: ItemKey,
+	value: ItemValue,
+	arrays: true,
+): Record<ReturnType<ItemKey>, Array<KeyedValue<Item, ItemValue>>>;
 
 /**
  * Create a record from an array of items using a specific key and value
  */
 export function toRecord<
 	Item,
-	Key extends keyof Item,
-	Value extends keyof Item,
+	ItemKey extends (item: Item, index: number, array: Item[]) => Key,
+	ItemValue extends (item: Item, index: number, array: Item[]) => unknown,
 >(
 	array: Item[],
-	key: Key,
-	value: Value,
-): Record<KeyedValue<Item, Key>, KeyedValue<Item, Value>>;
+	key: ItemKey,
+	value: ItemValue,
+): Record<ReturnType<ItemKey>, ReturnType<ItemValue>>;
 
 /**
  * Create a record from an array of items using a specific key and value, and grouping them into arrays
  */
 export function toRecord<
 	Item,
-	Key extends keyof Item,
-	Value extends keyof Item,
+	ItemKey extends (item: Item, index: number, array: Item[]) => Key,
+	ItemValue extends (item: Item, index: number, array: Item[]) => unknown,
 >(
 	array: Item[],
-	key: Key,
-	value: Value,
+	key: ItemKey,
+	value: ItemValue,
 	arrays: true,
-): Record<KeyedValue<Item, Key>, Array<KeyedValue<Item, Value>>>;
-
-/**
- * Create a record from an array of items using a specific key and value
- */
-export function toRecord<
-	Item,
-	Key extends keyof Item,
-	Value extends (item: Item, index: number, array: Item[]) => unknown,
->(
-	array: Item[],
-	key: Key,
-	value: Value,
-): Record<KeyedValue<Item, Key>, ReturnType<Value>>;
-
-/**
- * Create a record from an array of items using a specific key and value, and grouping them into arrays
- */
-export function toRecord<
-	Item,
-	Key extends keyof Item,
-	Value extends (item: Item, index: number, array: Item[]) => unknown,
->(
-	array: Item[],
-	key: Key,
-	value: Value,
-	arrays: true,
-): Record<KeyedValue<Item, Key>, Array<ReturnType<Value>>>;
-
-/**
- * Create a record from an array of items using a specific key and value
- */
-export function toRecord<
-	Item,
-	Key extends (item: Item, index: number, array: Item[]) => SimpleKey,
-	Value extends keyof Item,
->(
-	array: Item[],
-	key: Key,
-	value: Value,
-): Record<ReturnType<Key>, KeyedValue<Item, Value>>;
-
-/**
- * Create a record from an array of items using a specific key and value, and grouping them into arrays
- */
-export function toRecord<
-	Item,
-	Key extends (item: Item, index: number, array: Item[]) => SimpleKey,
-	Value extends keyof Item,
->(
-	array: Item[],
-	key: Key,
-	value: Value,
-	arrays: true,
-): Record<ReturnType<Key>, Array<KeyedValue<Item, Value>>>;
-
-/**
- * Create a record from an array of items using a specific key and value
- */
-export function toRecord<
-	Item,
-	Key extends (item: Item, index: number, array: Item[]) => SimpleKey,
-	Value extends (item: Item, index: number, array: Item[]) => unknown,
->(
-	array: Item[],
-	key: Key,
-	value: Value,
-): Record<ReturnType<Key>, ReturnType<Value>>;
-
-/**
- * Create a record from an array of items using a specific key and value, and grouping them into arrays
- */
-export function toRecord<
-	Item,
-	Key extends (item: Item, index: number, array: Item[]) => SimpleKey,
-	Value extends (item: Item, index: number, array: Item[]) => unknown,
->(
-	array: Item[],
-	key: Key,
-	value: Value,
-	arrays: true,
-): Record<ReturnType<Key>, Array<ReturnType<Value>>>;
+): Record<ReturnType<ItemKey>, Array<ReturnType<ItemValue>>>;
 
 export function toRecord(
 	array: unknown[],

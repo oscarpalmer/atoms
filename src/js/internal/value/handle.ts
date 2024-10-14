@@ -1,8 +1,8 @@
-import type {PlainObject} from '~/models';
+import type {ArrayOrPlainObject, PlainObject} from '~/models';
 
 function findKey(
 	needle: string,
-	haystack: PlainObject,
+	haystack: ArrayOrPlainObject,
 	ignoreCase: boolean,
 ): string {
 	if (!ignoreCase) {
@@ -17,7 +17,7 @@ function findKey(
 }
 
 export function handleValue(
-	data: PlainObject,
+	data: ArrayOrPlainObject,
 	path: string,
 	value: unknown,
 	get: boolean,
@@ -31,9 +31,9 @@ export function handleValue(
 		const key = findKey(path, data, ignoreCase);
 
 		if (get) {
-			return data[key];
+			return data[key as never];
 		}
 
-		data[key] = value;
+		(data as PlainObject)[key] = value;
 	}
 }

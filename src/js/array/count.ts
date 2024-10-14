@@ -1,5 +1,5 @@
 import {findValues} from '~/internal/array/find';
-import type {Key as SimpleKey} from '~/models';
+import type {Key, PlainObject} from '~/models';
 
 /**
  * Get the number of items _(count)_ that match the given value
@@ -17,10 +17,10 @@ export function count<Item>(
 /**
  * Get the number of items _(count)_ that match the given value
  */
-export function count<Item, Key extends keyof Item>(
+export function count<Item extends PlainObject, ItemKey extends keyof Item>(
 	array: Item[],
-	key: Key,
-	value: Item[Key],
+	key: ItemKey,
+	value: Item[ItemKey],
 ): number;
 
 /**
@@ -28,8 +28,8 @@ export function count<Item, Key extends keyof Item>(
  */
 export function count<
 	Item,
-	Key extends (item: Item, index: number, array: Item[]) => SimpleKey,
->(array: Item[], key: Key, value: ReturnType<Key>): number;
+	ItemKey extends (item: Item, index: number, array: Item[]) => Key,
+>(array: Item[], key: ItemKey, value: ReturnType<ItemKey>): number;
 
 export function count(array: unknown[], ...parameters: unknown[]): number {
 	return findValues('all', array, parameters).length;

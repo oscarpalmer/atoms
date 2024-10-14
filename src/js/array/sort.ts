@@ -19,12 +19,32 @@ export function sort<Item>(
 ): Item[];
 
 /**
+ * - Sort an array of items, using a `key` to sort by a specific value
+ * - Defaults to ascending, but can be changed by setting `descending` to `true`, or using a `SortKey`
+ */
+export function sort<Item extends PlainObject, ItemKey extends keyof Item>(
+	array: Item[],
+	key: ItemKey | Key | SortKey<Item> | ((item: Item) => Key),
+	descending?: boolean,
+): Item[];
+
+/**
  * - Sort an array of items, using multiple `keys` to sort by specific values
  * - Defaults to ascending, but can be changed by setting `descending` to `true`, or using `SortKey`
  */
 export function sort<Item>(
 	array: Item[],
 	keys: Array<Key | SortKey<Item> | ((item: Item) => Key)>,
+	descending?: boolean,
+): Item[];
+
+/**
+ * - Sort an array of items, using multiple `keys` to sort by specific values
+ * - Defaults to ascending, but can be changed by setting `descending` to `true`, or using `SortKey`
+ */
+export function sort<Item extends PlainObject, ItemKey extends keyof Item>(
+	array: Item[],
+	keys: Array<ItemKey | Key | SortKey<Item> | ((item: Item) => Key)>,
 	descending?: boolean,
 ): Item[];
 

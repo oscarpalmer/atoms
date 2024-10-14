@@ -1,5 +1,5 @@
 import {findValues} from '~/internal/array/find';
-import type {Key as SimpleKey} from '~/models';
+import type {Key, PlainObject} from '~/models';
 
 /**
  * Get a filtered array of items matching `value`
@@ -18,10 +18,10 @@ export function filter<Item>(
  * - Get a filtered array of items
  * - Use `key` to find a comparison value to match with `value`
  */
-export function filter<Item, Key extends keyof Item>(
+export function filter<Item extends PlainObject, ItemKey extends keyof Item>(
 	array: Item[],
-	key: Key,
-	value: Item[Key],
+	key: ItemKey,
+	value: Item[ItemKey],
 ): Item[];
 
 /**
@@ -30,8 +30,8 @@ export function filter<Item, Key extends keyof Item>(
  */
 export function filter<
 	Item,
-	Key extends (item: Item, index: number, array: Item[]) => SimpleKey,
->(array: Item[], key: Key, value: ReturnType<Key>): Item[];
+	ItemKey extends (item: Item, index: number, array: Item[]) => Key,
+>(array: Item[], key: ItemKey, value: ReturnType<ItemKey>): Item[];
 
 export function filter(array: unknown[], ...parameters: unknown[]): unknown[] {
 	return findValues('all', array, parameters);

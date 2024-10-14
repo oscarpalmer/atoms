@@ -1,5 +1,5 @@
 import {getCallbacks} from '~/internal/array/callbacks';
-import type {KeyedValue, Key as SimpleKey} from '~/models';
+import type {Key, KeyedValue, PlainObject} from '~/models';
 
 /**
  * Create a map from an array of items _(using their indices as keys)_
@@ -9,115 +9,123 @@ export function toMap<Item>(array: Item[]): Map<number, Item>;
 /**
  * Create a map from an array of items using a specific key
  */
-export function toMap<Item, Key extends keyof Item>(
+export function toMap<Item extends PlainObject, ItemKey extends keyof Item>(
 	array: Item[],
-	key: Key,
-): Map<KeyedValue<Item, Key>, Item>;
+	key: ItemKey,
+): Map<KeyedValue<Item, ItemKey>, Item>;
 
 /**
  * Create a map from an array of items using a specific key, and grouping them into arrays
  */
-export function toMap<Item, Key extends keyof Item>(
+export function toMap<Item extends PlainObject, ItemKey extends keyof Item>(
 	array: Item[],
-	key: Key,
+	key: ItemKey,
 	arrays: true,
-): Map<KeyedValue<Item, Key>, Item[]>;
+): Map<KeyedValue<Item, ItemKey>, Item[]>;
 
 /**
  * Create a map from an array of items using a specific key
  */
 export function toMap<
 	Item,
-	Key extends (item: Item, index: number, array: Item[]) => SimpleKey,
->(array: Item[], key: Key): Map<ReturnType<Key>, Item>;
+	ItemKey extends (item: Item, index: number, array: Item[]) => Key,
+>(array: Item[], key: ItemKey): Map<ReturnType<ItemKey>, Item>;
 
 /**
  * Create a map from an array of items using a specific key, and grouping them into arrays
  */
 export function toMap<
 	Item,
-	Key extends (item: Item, index: number, array: Item[]) => SimpleKey,
->(array: Item[], key: Key, arrays: true): Map<ReturnType<Key>, Item[]>;
-
-/**
- * Create a map from an array of items using a specific key and value
- */
-export function toMap<Item, Key extends keyof Item, Value extends keyof Item>(
-	array: Item[],
-	key: Key,
-	value: Value,
-): Map<KeyedValue<Item, Key>, KeyedValue<Item, Value>>;
-
-/**
- * Create a map from an array of items using a specific key and value, and grouping them into arrays
- */
-export function toMap<Item, Key extends keyof Item, Value extends keyof Item>(
-	array: Item[],
-	key: Key,
-	value: Value,
-	arrays: true,
-): Map<KeyedValue<Item, Key>, Array<KeyedValue<Item, Value>>>;
+	ItemKey extends (item: Item, index: number, array: Item[]) => Key,
+>(array: Item[], key: ItemKey, arrays: true): Map<ReturnType<ItemKey>, Item[]>;
 
 /**
  * Create a map from an array of items using a specific key and value
  */
 export function toMap<
-	Item,
-	Key extends keyof Item,
-	Value extends (item: Item, index: number, array: Item[]) => unknown,
+	Item extends PlainObject,
+	ItemKey extends keyof Item,
+	ItemValue extends keyof Item,
 >(
 	array: Item[],
-	key: Key,
-	value: Value,
-): Map<KeyedValue<Item, Key>, ReturnType<Value>>;
+	key: ItemKey,
+	value: ItemValue,
+): Map<KeyedValue<Item, ItemKey>, KeyedValue<Item, ItemValue>>;
 
 /**
  * Create a map from an array of items using a specific key and value, and grouping them into arrays
  */
 export function toMap<
-	Item,
-	Key extends keyof Item,
-	Value extends (item: Item, index: number, array: Item[]) => unknown,
+	Item extends PlainObject,
+	ItemKey extends keyof Item,
+	ItemValue extends keyof Item,
 >(
 	array: Item[],
-	key: Key,
-	value: Value,
+	key: ItemKey,
+	value: ItemValue,
 	arrays: true,
-): Map<KeyedValue<Item, Key>, Array<ReturnType<Value>>>;
+): Map<KeyedValue<Item, ItemKey>, Array<KeyedValue<Item, ItemValue>>>;
 
 /**
  * Create a map from an array of items using a specific key and value
  */
 export function toMap<
-	Item,
-	Key extends (item: Item, index: number, array: Item[]) => SimpleKey,
-	Value extends keyof Item,
+	Item extends PlainObject,
+	ItemKey extends keyof Item,
+	ItemValue extends (item: Item, index: number, array: Item[]) => unknown,
 >(
 	array: Item[],
-	key: Key,
-	value: Value,
-): Map<ReturnType<Key>, KeyedValue<Item, Value>>;
+	key: ItemKey,
+	value: ItemValue,
+): Map<KeyedValue<Item, ItemKey>, ReturnType<ItemValue>>;
 
 /**
  * Create a map from an array of items using a specific key and value, and grouping them into arrays
  */
 export function toMap<
-	Item,
-	Key extends (item: Item, index: number, array: Item[]) => SimpleKey,
-	Value extends keyof Item,
+	Item extends PlainObject,
+	ItemKey extends keyof Item,
+	ItemValue extends (item: Item, index: number, array: Item[]) => unknown,
 >(
 	array: Item[],
-	key: Key,
-	value: Value,
+	key: ItemKey,
+	value: ItemValue,
 	arrays: true,
-): Map<ReturnType<Key>, Array<KeyedValue<Item, Value>>>;
+): Map<KeyedValue<Item, ItemKey>, Array<ReturnType<ItemValue>>>;
+
+/**
+ * Create a map from an array of items using a specific key and value
+ */
+export function toMap<
+	Item extends PlainObject,
+	ItemKey extends (item: Item, index: number, array: Item[]) => Key,
+	ItemValue extends keyof Item,
+>(
+	array: Item[],
+	key: ItemKey,
+	value: ItemValue,
+): Map<ReturnType<ItemKey>, KeyedValue<Item, ItemValue>>;
+
+/**
+ * Create a map from an array of items using a specific key and value, and grouping them into arrays
+ */
+export function toMap<
+	Item extends PlainObject,
+	ItemKey extends (item: Item, index: number, array: Item[]) => Key,
+	ItemValue extends keyof Item,
+>(
+	array: Item[],
+	key: ItemKey,
+	value: ItemValue,
+	arrays: true,
+): Map<ReturnType<ItemKey>, Array<KeyedValue<Item, ItemValue>>>;
 
 /**
  * Create a map from an array of items using a specific key and value
  */
 export function toMap<
 	Item,
-	Key extends (item: Item, index: number, array: Item[]) => SimpleKey,
+	Key extends (item: Item, index: number, array: Item[]) => Key,
 	Value extends (item: Item, index: number, array: Item[]) => unknown,
 >(
 	array: Item[],
@@ -130,7 +138,7 @@ export function toMap<
  */
 export function toMap<
 	Item,
-	Key extends (item: Item, index: number, array: Item[]) => SimpleKey,
+	Key extends (item: Item, index: number, array: Item[]) => Key,
 	Value extends (item: Item, index: number, array: Item[]) => unknown,
 >(
 	array: Item[],
@@ -144,10 +152,10 @@ export function toMap(
 	first?: unknown,
 	second?: unknown,
 	third?: unknown,
-): Map<SimpleKey, unknown> {
+): Map<Key, unknown> {
 	const asArrays = first === true || second === true || third === true;
 	const callbacks = getCallbacks(undefined, first, second);
-	const map = new Map<SimpleKey, unknown>();
+	const map = new Map<Key, unknown>();
 	const {length} = array;
 
 	for (let index = 0; index < length; index += 1) {

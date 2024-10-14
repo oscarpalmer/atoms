@@ -4,6 +4,8 @@ import type {ArrayOrPlainObject, GenericCallback, PlainObject} from '~/models';
 /**
  * Clone any kind of value _(deeply, if needed)_
  */
+export function clone<Value>(value: Value): Value;
+
 export function clone(value: unknown) {
 	switch (true) {
 		case value == null:
@@ -60,7 +62,7 @@ function cloneArrayBuffer(value: ArrayBuffer): ArrayBuffer {
 }
 
 function cloneDataView(value: DataView): DataView {
-	const buffer = cloneArrayBuffer(value.buffer);
+	const buffer = cloneArrayBuffer(value.buffer as ArrayBuffer);
 
 	return new DataView(buffer, value.byteOffset, value.byteLength);
 }
