@@ -1,13 +1,19 @@
 import type {FindType} from '~/array/models';
 import {getCallbacks} from '~/internal/array/callbacks';
 
+type Parameters = {
+	bool?: unknown;
+	key?: unknown;
+	value?: unknown;
+};
+
 export function findValue(
 	type: FindType,
 	array: unknown[],
-	bool: unknown,
-	key: unknown,
-	value: unknown,
+	parameters: unknown[],
 ): unknown {
+	const {bool, key, value} = getParameters(parameters);
+
 	const callbacks = getCallbacks(bool, key);
 
 	if (callbacks?.bool == null && callbacks?.key == null) {
@@ -38,11 +44,12 @@ export function findValue(
 export function findValues(
 	type: 'all' | 'unique',
 	array: unknown[],
-	bool: unknown,
-	key: unknown,
-	value: unknown,
+	parameters: unknown[],
 ): unknown[] {
+	const {bool, key, value} = getParameters(parameters);
+
 	const callbacks = getCallbacks(bool, key);
+
 	const {length} = array;
 
 	if (type === 'unique' && callbacks?.key == null && length >= 100) {
@@ -77,4 +84,20 @@ export function findValues(
 	}
 
 	return result;
+}
+
+function getParameters(original: unknown[]): Parameters {
+	const {length} = original;
+
+	return {
+		bool:
+			length === 1 && typeof original[0] === 'function'
+				? original[0]
+				: undefined,
+		key: length === 2 ? original[0] : undefined,
+		value:
+			length === 1 && typeof original[0] !== 'function'
+				? original[0]
+				: original[1],
+	};
 }

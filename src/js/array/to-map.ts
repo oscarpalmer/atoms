@@ -1,6 +1,5 @@
-import type {KeyCallback, ValueCallback} from '~/array/models';
 import {getCallbacks} from '~/internal/array/callbacks';
-import type {Key, KeyedValue} from '~/models';
+import type {KeyedValue, Key as SimpleKey} from '~/models';
 
 /**
  * Create a map from an array of items _(using their indices as keys)_
@@ -27,19 +26,18 @@ export function toMap<Item, Key extends keyof Item>(
 /**
  * Create a map from an array of items using a specific key
  */
-export function toMap<Item, Key extends KeyCallback<Item>>(
-	array: Item[],
-	key: Key,
-): Map<ReturnType<Key>, Item>;
+export function toMap<
+	Item,
+	Key extends (item: Item, index: number, array: Item[]) => SimpleKey,
+>(array: Item[], key: Key): Map<ReturnType<Key>, Item>;
 
 /**
  * Create a map from an array of items using a specific key, and grouping them into arrays
  */
-export function toMap<Item, Key extends KeyCallback<Item>>(
-	array: Item[],
-	key: Key,
-	arrays: true,
-): Map<ReturnType<Key>, Item[]>;
+export function toMap<
+	Item,
+	Key extends (item: Item, index: number, array: Item[]) => SimpleKey,
+>(array: Item[], key: Key, arrays: true): Map<ReturnType<Key>, Item[]>;
 
 /**
  * Create a map from an array of items using a specific key and value
@@ -66,7 +64,7 @@ export function toMap<Item, Key extends keyof Item, Value extends keyof Item>(
 export function toMap<
 	Item,
 	Key extends keyof Item,
-	Value extends ValueCallback<Item>,
+	Value extends (item: Item, index: number, array: Item[]) => unknown,
 >(
 	array: Item[],
 	key: Key,
@@ -79,7 +77,7 @@ export function toMap<
 export function toMap<
 	Item,
 	Key extends keyof Item,
-	Value extends ValueCallback<Item>,
+	Value extends (item: Item, index: number, array: Item[]) => unknown,
 >(
 	array: Item[],
 	key: Key,
@@ -92,7 +90,7 @@ export function toMap<
  */
 export function toMap<
 	Item,
-	Key extends KeyCallback<Item>,
+	Key extends (item: Item, index: number, array: Item[]) => SimpleKey,
 	Value extends keyof Item,
 >(
 	array: Item[],
@@ -105,7 +103,7 @@ export function toMap<
  */
 export function toMap<
 	Item,
-	Key extends KeyCallback<Item>,
+	Key extends (item: Item, index: number, array: Item[]) => SimpleKey,
 	Value extends keyof Item,
 >(
 	array: Item[],
@@ -119,8 +117,8 @@ export function toMap<
  */
 export function toMap<
 	Item,
-	Key extends KeyCallback<Item>,
-	Value extends ValueCallback<Item>,
+	Key extends (item: Item, index: number, array: Item[]) => SimpleKey,
+	Value extends (item: Item, index: number, array: Item[]) => unknown,
 >(
 	array: Item[],
 	key: Key,
@@ -132,8 +130,8 @@ export function toMap<
  */
 export function toMap<
 	Item,
-	Key extends KeyCallback<Item>,
-	Value extends ValueCallback<Item>,
+	Key extends (item: Item, index: number, array: Item[]) => SimpleKey,
+	Value extends (item: Item, index: number, array: Item[]) => unknown,
 >(
 	array: Item[],
 	key: Key,
@@ -146,10 +144,10 @@ export function toMap(
 	first?: unknown,
 	second?: unknown,
 	third?: unknown,
-): Map<Key, unknown> {
+): Map<SimpleKey, unknown> {
 	const asArrays = first === true || second === true || third === true;
 	const callbacks = getCallbacks(undefined, first, second);
-	const map = new Map<Key, unknown>();
+	const map = new Map<SimpleKey, unknown>();
 	const {length} = array;
 
 	for (let index = 0; index < length; index += 1) {

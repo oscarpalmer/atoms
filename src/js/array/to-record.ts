@@ -1,6 +1,5 @@
 import {groupValues} from '~/array/group-by';
-import type {KeyCallback, ValueCallback} from '~/array/models';
-import type {KeyedValue, PlainObject} from '~/models';
+import type {KeyedValue, PlainObject, Key as SimpleKey} from '~/models';
 
 /**
  * Create a record from an array of items _(using their indices as keys)_
@@ -27,19 +26,18 @@ export function toRecord<Item, Key extends keyof Item>(
 /**
  * Create a record from an array of items using a specific key
  */
-export function toRecord<Item, Key extends KeyCallback<Item>>(
-	array: Item[],
-	key: Key,
-): Record<ReturnType<Key>, Item>;
+export function toRecord<
+	Item,
+	Key extends (item: Item, index: number, array: Item[]) => SimpleKey,
+>(array: Item[], key: Key): Record<ReturnType<Key>, Item>;
 
 /**
  * Create a record from an array of items using a specific key, and grouping them into arrays
  */
-export function toRecord<Item, Key extends KeyCallback<Item>>(
-	array: Item[],
-	key: Key,
-	arrays: true,
-): Record<ReturnType<Key>, Item[]>;
+export function toRecord<
+	Item,
+	Key extends (item: Item, index: number, array: Item[]) => SimpleKey,
+>(array: Item[], key: Key, arrays: true): Record<ReturnType<Key>, Item[]>;
 
 /**
  * Create a record from an array of items using a specific key and value
@@ -74,7 +72,7 @@ export function toRecord<
 export function toRecord<
 	Item,
 	Key extends keyof Item,
-	Value extends ValueCallback<Item>,
+	Value extends (item: Item, index: number, array: Item[]) => unknown,
 >(
 	array: Item[],
 	key: Key,
@@ -87,7 +85,7 @@ export function toRecord<
 export function toRecord<
 	Item,
 	Key extends keyof Item,
-	Value extends ValueCallback<Item>,
+	Value extends (item: Item, index: number, array: Item[]) => unknown,
 >(
 	array: Item[],
 	key: Key,
@@ -100,7 +98,7 @@ export function toRecord<
  */
 export function toRecord<
 	Item,
-	Key extends KeyCallback<Item>,
+	Key extends (item: Item, index: number, array: Item[]) => SimpleKey,
 	Value extends keyof Item,
 >(
 	array: Item[],
@@ -113,7 +111,7 @@ export function toRecord<
  */
 export function toRecord<
 	Item,
-	Key extends KeyCallback<Item>,
+	Key extends (item: Item, index: number, array: Item[]) => SimpleKey,
 	Value extends keyof Item,
 >(
 	array: Item[],
@@ -127,8 +125,8 @@ export function toRecord<
  */
 export function toRecord<
 	Item,
-	Key extends KeyCallback<Item>,
-	Value extends ValueCallback<Item>,
+	Key extends (item: Item, index: number, array: Item[]) => SimpleKey,
+	Value extends (item: Item, index: number, array: Item[]) => unknown,
 >(
 	array: Item[],
 	key: Key,
@@ -140,8 +138,8 @@ export function toRecord<
  */
 export function toRecord<
 	Item,
-	Key extends KeyCallback<Item>,
-	Value extends ValueCallback<Item>,
+	Key extends (item: Item, index: number, array: Item[]) => SimpleKey,
+	Value extends (item: Item, index: number, array: Item[]) => unknown,
 >(
 	array: Item[],
 	key: Key,

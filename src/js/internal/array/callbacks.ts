@@ -1,4 +1,4 @@
-import type {BooleanCallback, Callbacks, KeyCallback} from '~/array/models';
+import type {Callbacks} from '~/array/models';
 import type {GenericCallback, PlainObject} from '~/models';
 
 function getCallback(value: unknown): GenericCallback | undefined {
@@ -23,11 +23,11 @@ export function getCallbacks(
 	value?: unknown,
 ): Callbacks | undefined {
 	if (typeof bool === 'function') {
-		return {bool: bool as BooleanCallback<unknown>};
+		return {bool: bool as GenericCallback};
 	}
 
 	return {
-		key: getCallback(key) as KeyCallback<unknown>,
-		value: getCallback(value) as GenericCallback,
+		key: getCallback(key),
+		value: getCallback(value),
 	};
 }

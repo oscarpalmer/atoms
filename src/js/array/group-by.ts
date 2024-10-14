@@ -1,6 +1,5 @@
-import type {KeyCallback, ValueCallback} from '~/array/models';
 import {getCallbacks} from '~/internal/array/callbacks';
-import type {Key, KeyedValue, PlainObject} from '~/models';
+import type {Key as SimpleKey, KeyedValue, PlainObject} from '~/models';
 
 /**
  * Create a record from an array of items using a specific key
@@ -22,19 +21,18 @@ export function groupBy<Item, Key extends keyof Item>(
 /**
  * Create a record from an array of items using a specific key
  */
-export function groupBy<Item, Key extends KeyCallback<Item>>(
-	array: Item[],
-	key: Key,
-): Record<ReturnType<Key>, Item>;
+export function groupBy<
+	Item,
+	Key extends (item: Item, index: number, array: Item[]) => SimpleKey,
+>(array: Item[], key: Key): Record<ReturnType<Key>, Item>;
 
 /**
  * Create a record from an array of items using a specific key, and grouping them into arrays
  */
-export function groupBy<Item, Key extends KeyCallback<Item>>(
-	array: Item[],
-	key: Key,
-	arrays: true,
-): Record<ReturnType<Key>, Item[]>;
+export function groupBy<
+	Item,
+	Key extends (item: Item, index: number, array: Item[]) => SimpleKey,
+>(array: Item[], key: Key, arrays: true): Record<ReturnType<Key>, Item[]>;
 
 /**
  * Create a record from an array of items using a specific key and value
@@ -61,7 +59,7 @@ export function groupBy<Item, Key extends keyof Item, Value extends keyof Item>(
 export function groupBy<
 	Item,
 	Key extends keyof Item,
-	Value extends ValueCallback<Item>,
+	Value extends (item: Item, index: number, array: Item[]) => unknown,
 >(
 	array: Item[],
 	key: Key,
@@ -74,7 +72,7 @@ export function groupBy<
 export function groupBy<
 	Item,
 	Key extends keyof Item,
-	Value extends ValueCallback<Item>,
+	Value extends (item: Item, index: number, array: Item[]) => unknown,
 >(
 	array: Item[],
 	key: Key,
@@ -87,7 +85,7 @@ export function groupBy<
  */
 export function groupBy<
 	Item,
-	Key extends KeyCallback<Item>,
+	Key extends (item: Item, index: number, array: Item[]) => SimpleKey,
 	Value extends keyof Item,
 >(
 	array: Item[],
@@ -100,7 +98,7 @@ export function groupBy<
  */
 export function groupBy<
 	Item,
-	Key extends KeyCallback<Item>,
+	Key extends (item: Item, index: number, array: Item[]) => SimpleKey,
 	Value extends keyof Item,
 >(
 	array: Item[],
@@ -114,8 +112,8 @@ export function groupBy<
  */
 export function groupBy<
 	Item,
-	Key extends KeyCallback<Item>,
-	Value extends ValueCallback<Item>,
+	Key extends (item: Item, index: number, array: Item[]) => SimpleKey,
+	Value extends (item: Item, index: number, array: Item[]) => unknown,
 >(
 	array: Item[],
 	key: Key,
@@ -127,8 +125,8 @@ export function groupBy<
  */
 export function groupBy<
 	Item,
-	Key extends KeyCallback<Item>,
-	Value extends ValueCallback<Item>,
+	Key extends (item: Item, index: number, array: Item[]) => SimpleKey,
+	Value extends (item: Item, index: number, array: Item[]) => unknown,
 >(
 	array: Item[],
 	key: Key,
@@ -155,9 +153,9 @@ export function groupValues(
 	key: unknown,
 	value: unknown,
 	arrays: boolean,
-): Record<Key, unknown> {
+): Record<SimpleKey, unknown> {
 	const callbacks = getCallbacks(undefined, key, value);
-	const record: Record<Key, unknown> = {};
+	const record: Record<SimpleKey, unknown> = {};
 	const {length} = array;
 
 	for (let index = 0; index < length; index += 1) {

@@ -4,7 +4,7 @@
 		"url": "https://oscarpalmer.se"
 	},
 	"dependencies": {
-		"type-fest": "^4.26.1"
+		"type-fest": "^4.26"
 	},
 	"description": "Sweet little atomic goodies…",
 	"devDependencies": {
@@ -208,8 +208,15 @@
 			}
 		}
 	},
-	"files": ["dist", "src", "types"],
-	"keywords": ["helper", "utility"],
+	"files": [
+		"dist",
+		"src",
+		"types"
+	],
+	"keywords": [
+		"helper",
+		"utility"
+	],
 	"license": "MIT",
 	"main": "./dist/js/index.cjs",
 	"module": "./dist/js/index.js",
@@ -230,5 +237,5 @@
 	},
 	"type": "module",
 	"types": "./types/index.d.cts",
-	"version": "0.76.0"
+	"version": "0.77.0"
 }

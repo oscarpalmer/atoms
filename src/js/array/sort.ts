@@ -1,8 +1,4 @@
-import type {
-	SortKey,
-	SortKeyCallback,
-	SortKeyWithCallback,
-} from '~/array/models';
+import type {SortKey, SortKeyWithCallback} from '~/array/models';
 import {isKey} from '~/is';
 import type {Key, PlainObject} from '~/models';
 import {compare} from '~/value/compare';
@@ -18,7 +14,7 @@ export function sort<Item>(array: Item[], descending?: boolean): Item[];
  */
 export function sort<Item>(
 	array: Item[],
-	key: Key | SortKey<Item> | SortKeyCallback<Item>,
+	key: Key | SortKey<Item> | ((item: Item) => Key),
 	descending?: boolean,
 ): Item[];
 
@@ -28,7 +24,7 @@ export function sort<Item>(
  */
 export function sort<Item>(
 	array: Item[],
-	keys: Array<Key | SortKey<Item> | SortKeyCallback<Item>>,
+	keys: Array<Key | SortKey<Item> | ((item: Item) => Key)>,
 	descending?: boolean,
 ): Item[];
 
