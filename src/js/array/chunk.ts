@@ -4,7 +4,7 @@ import {clamp} from '~/number';
  * Chunk an array _(into smaller arrays of a specified size)_
  */
 export function chunk<Item>(array: Item[], size?: number): Item[][] {
-	const chunkSize = clamp(size ?? 64_000, 1, 64_000);
+	const chunkSize = clamp(size ?? 5_000, 1, 5_000);
 	const {length} = array;
 
 	if (length <= chunkSize) {
