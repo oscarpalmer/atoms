@@ -1,5 +1,5 @@
 import {getCallbacks} from '~/internal/array/callbacks';
-import type {Key, KeyedValue, PlainObject} from '~/models';
+import type {Key, PlainObject} from '~/models';
 
 /**
  * Create a map from an array of items _(using their indices as keys)_
@@ -12,7 +12,7 @@ export function toMap<Item>(array: Item[]): Map<number, Item>;
 export function toMap<Item extends PlainObject, ItemKey extends keyof Item>(
 	array: Item[],
 	key: ItemKey,
-): Map<KeyedValue<Item, ItemKey>, Item>;
+): Map<Item[ItemKey], Item>;
 
 /**
  * Create a map from an array of items using a specific key, and grouping them into arrays
@@ -21,7 +21,7 @@ export function toMap<Item extends PlainObject, ItemKey extends keyof Item>(
 	array: Item[],
 	key: ItemKey,
 	arrays: true,
-): Map<KeyedValue<Item, ItemKey>, Item[]>;
+): Map<Item[ItemKey], Item[]>;
 
 /**
  * Create a map from an array of items using a specific key
@@ -50,7 +50,7 @@ export function toMap<
 	array: Item[],
 	key: ItemKey,
 	value: ItemValue,
-): Map<KeyedValue<Item, ItemKey>, KeyedValue<Item, ItemValue>>;
+): Map<Item[ItemKey], Item[ItemValue]>;
 
 /**
  * Create a map from an array of items using a specific key and value, and grouping them into arrays
@@ -64,7 +64,7 @@ export function toMap<
 	key: ItemKey,
 	value: ItemValue,
 	arrays: true,
-): Map<KeyedValue<Item, ItemKey>, Array<KeyedValue<Item, ItemValue>>>;
+): Map<Item[ItemKey], Array<Item[ItemValue]>>;
 
 /**
  * Create a map from an array of items using a specific key and value
@@ -77,7 +77,7 @@ export function toMap<
 	array: Item[],
 	key: ItemKey,
 	value: ItemValue,
-): Map<KeyedValue<Item, ItemKey>, ReturnType<ItemValue>>;
+): Map<Item[ItemKey], ReturnType<ItemValue>>;
 
 /**
  * Create a map from an array of items using a specific key and value, and grouping them into arrays
@@ -91,7 +91,7 @@ export function toMap<
 	key: ItemKey,
 	value: ItemValue,
 	arrays: true,
-): Map<KeyedValue<Item, ItemKey>, Array<ReturnType<ItemValue>>>;
+): Map<Item[ItemKey], Array<ReturnType<ItemValue>>>;
 
 /**
  * Create a map from an array of items using a specific key and value
@@ -104,7 +104,7 @@ export function toMap<
 	array: Item[],
 	key: ItemKey,
 	value: ItemValue,
-): Map<ReturnType<ItemKey>, KeyedValue<Item, ItemValue>>;
+): Map<ReturnType<ItemKey>, Item[ItemValue]>;
 
 /**
  * Create a map from an array of items using a specific key and value, and grouping them into arrays
@@ -118,41 +118,41 @@ export function toMap<
 	key: ItemKey,
 	value: ItemValue,
 	arrays: true,
-): Map<ReturnType<ItemKey>, Array<KeyedValue<Item, ItemValue>>>;
+): Map<ReturnType<ItemKey>, Array<Item[ItemValue]>>;
 
 /**
  * Create a map from an array of items using a specific key and value
  */
 export function toMap<
 	Item,
-	Key extends (item: Item, index: number, array: Item[]) => Key,
-	Value extends (item: Item, index: number, array: Item[]) => unknown,
+	ItemKey extends (item: Item, index: number, array: Item[]) => Key,
+	ItemValue extends (item: Item, index: number, array: Item[]) => unknown,
 >(
 	array: Item[],
-	key: Key,
-	value: Value,
-): Map<ReturnType<Key>, ReturnType<Value>>;
+	key: ItemKey,
+	value: ItemValue,
+): Map<ReturnType<ItemKey>, ReturnType<ItemValue>>;
 
 /**
  * Create a map from an array of items using a specific key and value, and grouping them into arrays
  */
 export function toMap<
 	Item,
-	Key extends (item: Item, index: number, array: Item[]) => Key,
-	Value extends (item: Item, index: number, array: Item[]) => unknown,
+	ItemKey extends (item: Item, index: number, array: Item[]) => Key,
+	ItemValue extends (item: Item, index: number, array: Item[]) => unknown,
 >(
 	array: Item[],
-	key: Key,
-	value: Value,
+	key: ItemKey,
+	value: ItemValue,
 	arrays: true,
-): Map<ReturnType<Key>, Array<ReturnType<Value>>>;
+): Map<ReturnType<ItemKey>, Array<ReturnType<ItemValue>>>;
 
 export function toMap(
 	array: unknown[],
 	first?: unknown,
 	second?: unknown,
 	third?: unknown,
-): Map<Key, unknown> {
+): Map<unknown, unknown> {
 	const asArrays = first === true || second === true || third === true;
 	const callbacks = getCallbacks(undefined, first, second);
 	const map = new Map<Key, unknown>();

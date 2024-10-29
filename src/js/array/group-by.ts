@@ -1,3 +1,4 @@
+import type {Simplify} from 'type-fest';
 import {getCallbacks} from '~/internal/array/callbacks';
 import type {Key, KeyedValue, PlainObject} from '~/models';
 
@@ -7,7 +8,7 @@ import type {Key, KeyedValue, PlainObject} from '~/models';
 export function groupBy<Item extends PlainObject, ItemKey extends keyof Item>(
 	array: Item[],
 	key: ItemKey,
-): Record<KeyedValue<Item, ItemKey>, Item>;
+): Simplify<Record<KeyedValue<Item, ItemKey>, Item>>;
 
 /**
  * Create a record from an array of items using a specific key, and grouping them into arrays
@@ -16,7 +17,7 @@ export function groupBy<Item extends PlainObject, ItemKey extends keyof Item>(
 	array: Item[],
 	key: ItemKey,
 	arrays: true,
-): Record<KeyedValue<Item, ItemKey>, Item[]>;
+): Simplify<Record<KeyedValue<Item, ItemKey>, Item[]>>;
 
 /**
  * Create a record from an array of items using a specific key
@@ -49,7 +50,7 @@ export function groupBy<
 	array: Item[],
 	key: ItemKey,
 	value: ItemValue,
-): Record<KeyedValue<Item, ItemKey>, KeyedValue<Item, ItemValue>>;
+): Simplify<Record<KeyedValue<Item, ItemKey>, Item[ItemValue]>>;
 
 /**
  * Create a record from an array of items using a specific key and value, and grouping them into arrays
@@ -63,7 +64,7 @@ export function groupBy<
 	key: ItemKey,
 	value: ItemValue,
 	arrays: true,
-): Record<KeyedValue<Item, ItemKey>, Array<KeyedValue<Item, ItemValue>>>;
+): Simplify<Record<KeyedValue<Item, ItemKey>, Array<Item[ItemValue]>>>;
 
 /**
  * Create a record from an array of items using a specific key and value
@@ -76,7 +77,7 @@ export function groupBy<
 	array: Item[],
 	key: ItemKey,
 	value: ItemValue,
-): Record<KeyedValue<Item, ItemKey>, ReturnType<ItemValue>>;
+): Simplify<Record<KeyedValue<Item, ItemKey>, ReturnType<ItemValue>>>;
 
 /**
  * Create a record from an array of items using a specific key and value, and grouping them into arrays
@@ -90,7 +91,7 @@ export function groupBy<
 	key: ItemKey,
 	value: ItemValue,
 	arrays: true,
-): Record<KeyedValue<Item, ItemKey>, Array<ReturnType<ItemValue>>>;
+): Simplify<Record<KeyedValue<Item, ItemKey>, Array<ReturnType<ItemValue>>>>;
 
 /**
  * Create a record from an array of items using a specific key and value
@@ -103,7 +104,7 @@ export function groupBy<
 	array: Item[],
 	key: ItemKey,
 	value: ItemValue,
-): Record<ReturnType<ItemKey>, KeyedValue<Item, ItemValue>>;
+): Record<ReturnType<ItemKey>, Item[ItemValue]>;
 
 /**
  * Create a record from an array of items using a specific key and value, and grouping them into arrays
@@ -117,7 +118,7 @@ export function groupBy<
 	key: ItemKey,
 	value: ItemValue,
 	arrays: true,
-): Record<ReturnType<ItemKey>, Array<KeyedValue<Item, ItemValue>>>;
+): Record<ReturnType<ItemKey>, Array<Item[ItemValue]>>;
 
 /**
  * Create a record from an array of items using a specific key and value
@@ -130,7 +131,7 @@ export function groupBy<
 	array: Item[],
 	key: ItemKey,
 	value: ItemValue,
-): Record<ReturnType<ItemKey>, ReturnType<ItemValue>>;
+): Simplify<Record<ReturnType<ItemKey>, ReturnType<ItemValue>>>;
 
 /**
  * Create a record from an array of items using a specific key and value, and grouping them into arrays
