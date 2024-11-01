@@ -1,5 +1,5 @@
 import {expect, test} from 'vitest';
-import {queue} from '../src/js/queue';
+import {queue} from '../src/queue';
 
 test('same callback', () =>
 	new Promise<void>(done => {

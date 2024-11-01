@@ -1,5 +1,5 @@
 import {expect, test} from 'vitest';
-import {emitter} from '../src/js/emitter';
+import {emitter} from '../src/emitter';
 
 test('emitter', () =>
 	new Promise<void>(done => {

@@ -1,5 +1,5 @@
 import {expect, test} from 'vitest';
-import {logger} from '../src/js/logger';
+import {logger} from '../src/logger';
 
 test('log', () => {
 	logger.log('test');

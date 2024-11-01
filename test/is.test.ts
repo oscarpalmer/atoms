@@ -10,7 +10,7 @@ import {
 	isObject,
 	isPlainObject,
 	isPrimitive,
-} from '../src/js/is';
+} from '../src/is';
 
 const values = [
 	undefined,

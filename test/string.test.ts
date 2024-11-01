@@ -13,7 +13,7 @@ import {
 	titleCase,
 	truncate,
 	words,
-} from '../src/js/string';
+} from '../src/string';
 
 class ItemWithoutToString {
 	constructor(public value: string) {}

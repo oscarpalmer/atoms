@@ -8,7 +8,7 @@ import {
 	getRandomInteger,
 	getRandomItem,
 	getRandomItems,
-} from '../src/js/random';
+} from '../src/random';
 
 const size = 100_000;
 

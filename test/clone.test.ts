@@ -1,5 +1,5 @@
 import {expect, test} from 'vitest';
-import {clone} from '../src/js/value';
+import {clone} from '../src/value';
 
 class Test {
 	constructor(

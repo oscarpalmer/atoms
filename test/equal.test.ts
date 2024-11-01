@@ -1,5 +1,5 @@
 import {expect, test} from 'vitest';
-import {equal} from '../src/js/value';
+import {equal} from '../src/value';
 
 test('any', () => {
 	const values = [

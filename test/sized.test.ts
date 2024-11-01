@@ -1,5 +1,5 @@
 import {expect, test} from 'vitest';
-import * as Sized from '../src/js/sized';
+import * as Sized from '../src/sized';
 
 const actualMax = 2 ** 24;
 const niceMax = 2 ** 20;

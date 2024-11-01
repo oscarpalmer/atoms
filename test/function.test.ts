@@ -1,5 +1,5 @@
 import {expect, test} from 'vitest';
-import {debounce, memoise, noop, throttle} from '../src/js/function';
+import {debounce, memoise, noop, throttle} from '../src/function';
 
 test('debounce', () =>
 	new Promise<void>(done => {

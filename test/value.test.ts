@@ -8,7 +8,7 @@ import {
 	setValue,
 	smush,
 	unsmush,
-} from '../src/js/value';
+} from '../src/value';
 
 type Diffable = {
 	numbers: number[];

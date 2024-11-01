@@ -11,7 +11,7 @@ import {
 	isHSLColour,
 	isHexColour,
 	isRGBColour,
-} from '../src/js/colour';
+} from '../src/colour';
 
 const foregrounds = [
 	'black',

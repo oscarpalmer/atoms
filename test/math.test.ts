@@ -1,5 +1,5 @@
 import {expect, test} from 'vitest';
-import {average, max, min, round, sum} from '../src/js/math';
+import {average, max, min, round, sum} from '../src/math';
 
 const one = [123];
 const two = [123, 456];

@@ -17,9 +17,9 @@ import {
 	toMap,
 	toRecord,
 	unique,
-} from '../src/js/array';
-import {getRandomInteger} from '../src/js/random';
-import {diff, equal} from '../src/js/value';
+} from '../src/array';
+import {getRandomInteger} from '../src/random';
+import {diff, equal} from '../src/value';
 
 type Item = {
 	age: number;

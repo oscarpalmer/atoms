@@ -1,5 +1,5 @@
 import {expect, test} from 'vitest';
-import {fromQuery, toQuery} from '../src/js/query';
+import {fromQuery, toQuery} from '../src/query';
 
 const query = {
 	complex: 'a=1&a=2&a=3&b=x&b=true&b=99&c=H&c=e&c=l&c=l&c=o&d.e=f',
