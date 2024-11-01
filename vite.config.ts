@@ -8,12 +8,10 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 
 const watch = process.argv.includes('--watch');
 
-const files = globSync(watch ? './src/js/index.ts' : './src/js/**/*.ts').map(
-	file => [
-		relative('./src/js', file.slice(0, file.length - extname(file).length)),
-		fileURLToPath(new URL(file, import.meta.url)),
-	],
-);
+const files = globSync(watch ? './src/index.ts' : './src/**/*.ts').map(file => [
+	relative('./src', file.slice(0, file.length - extname(file).length)),
+	fileURLToPath(new URL(file, import.meta.url)),
+]);
 
 export default defineConfig({
 	base: './',
@@ -23,7 +21,7 @@ export default defineConfig({
 			formats: ['cjs', 'es'],
 		},
 		minify: false,
-		outDir: './dist/js',
+		outDir: './dist',
 		rollupOptions: {
 			input: Object.fromEntries(files),
 			output: {
@@ -32,15 +30,16 @@ export default defineConfig({
 			},
 		},
 	},
+	logLevel: 'silent',
 	test: {
 		coverage: {
-			include: ['src/js/**/*.ts'],
+			include: ['src/**/*.ts'],
 			provider: 'istanbul',
 		},
 		environment: 'happy-dom',
 		watch: false,
 	},
 	resolve: {
-		alias: [{find: '~', replacement: resolve(__dirname, 'src/js')}],
+		alias: [{find: '~', replacement: resolve(__dirname, 'src')}],
 	},
 });

@@ -1,8 +1,8 @@
 # Atoms
 
-[![npm](https://badge.fury.io/js/@oscarpalmer%2Fatoms.svg)](https://www.npmjs.com/package/@oscarpalmer/atoms)
+[![npm](https://badge.fury.io/js/@oscarpalmer%2Fatoms.svg)](https://www.npmjs.com/package/@oscarpalmer/atoms) [![Tests](https://github.com/oscarpalmer/atoms/actions/workflows/test.yml/badge.svg)](https://github.com/oscarpalmer/atoms/actions/workflows/test.yml)
 
-Sweet little atomic goodies…
+Atomic utilities for making your _JavaScript_ better.
 
 ## License
 

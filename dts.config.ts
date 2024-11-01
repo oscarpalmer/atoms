@@ -1,12 +1,12 @@
 const {globSync} = require('glob');
 
-const entries = globSync('./src/js/**/*.ts').map(file => ({
+const entries = globSync('./src/**/*.ts').map(file => ({
 	filePath: `${__dirname}/${file}`,
 	libraries: {
 		inlinedLibraries: ['type-fest'],
 	},
 	noCheck: true,
-	outFile: `${__dirname}/types/${file.replace('src/js/', '').replace('.ts', '.d.cts')}`,
+	outFile: `${__dirname}/types/${file.replace('src/', '').replace('.ts', '.d.cts')}`,
 }));
 
 module.exports = {

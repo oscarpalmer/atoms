@@ -6,15 +6,14 @@
 	"dependencies": {
 		"type-fest": "^4.26"
 	},
-	"description": "Sweet little atomic goodies…",
+	"description": "Atomic utilities for making your JavaScript better.",
 	"devDependencies": {
 		"@biomejs/biome": "^1.9",
-		"@types/node": "^22.7",
+		"@types/node": "^22.8",
 		"@vitest/coverage-istanbul": "^2.1",
 		"dts-bundle-generator": "^9.5",
 		"glob": "^11",
 		"happy-dom": "^15.7",
-		"sass": "^1.79",
 		"typescript": "^5.6",
 		"vite": "^5.4",
 		"vitest": "^2.1"
@@ -22,107 +21,86 @@
 	"exports": {
 		"./package.json": "./package.json",
 		".": {
-			"bun": "./src/js/index.ts",
 			"import": {
 				"types": "./types/index.d.ts",
-				"default": "./dist/js/index.js"
+				"default": "./dist/index.js"
 			},
 			"require": {
 				"types": "./types/index.d.cts",
-				"default": "./dist/js/index.cjs"
+				"default": "./dist/index.cjs"
 			}
 		},
 		"./array": {
-			"bun": "./src/js/array/index.ts",
 			"import": {
 				"types": "./types/array/index.d.ts",
-				"default": "./dist/js/array/index.js"
+				"default": "./dist/array/index.js"
 			},
 			"require": {
 				"types": "./types/array/index.d.cts",
-				"default": "./dist/js/array/index.cjs"
+				"default": "./dist/array/index.cjs"
 			}
 		},
 		"./colour": {
-			"bun": "./src/js/colour/index.ts",
 			"import": {
 				"types": "./types/colour/index.d.ts",
-				"default": "./dist/js/colour/index.js"
+				"default": "./dist/colour/index.js"
 			},
 			"require": {
 				"types": "./types/colour/index.d.cts",
-				"default": "./dist/js/colour/index.cjs"
+				"default": "./dist/colour/index.cjs"
 			}
 		},
-		"./css/a11y": {
-			"sass": "./src/css/a11y.scss",
-			"style": "./dist/css/a11y.css"
-		},
-		"./css/flex": {
-			"sass": "./src/css/flex.scss",
-			"style": "./dist/css/flex.css"
-		},
-		"./css/reset": {
-			"sass": "./src/css/reset.scss",
-			"style": "./dist/css/reset.css"
-		},
 		"./emitter": {
-			"bun": "./src/js/emitter.ts",
 			"import": {
 				"types": "./types/emitter.d.ts",
-				"default": "./dist/js/emitter.js"
+				"default": "./dist/emitter.js"
 			},
 			"require": {
 				"types": "./types/emitter.d.cts",
-				"default": "./dist/js/emitter.cjs"
+				"default": "./dist/emitter.cjs"
 			}
 		},
 		"./function": {
-			"bun": "./src/js/function.ts",
 			"import": {
 				"types": "./types/function.d.ts",
-				"default": "./dist/js/function.js"
+				"default": "./dist/function.js"
 			},
 			"require": {
 				"types": "./types/function.d.cts",
-				"default": "./dist/js/function.cjs"
+				"default": "./dist/function.cjs"
 			}
 		},
 		"./is": {
-			"bun": "./src/js/is.ts",
 			"import": {
 				"types": "./types/is.d.ts",
-				"default": "./dist/js/is.js"
+				"default": "./dist/is.js"
 			},
 			"require": {
 				"types": "./types/is.d.cts",
-				"default": "./dist/js/is.cjs"
+				"default": "./dist/is.cjs"
 			}
 		},
 		"./logger": {
-			"bun": "./src/js/logger.ts",
 			"import": {
 				"types": "./types/logger.d.ts",
-				"default": "./dist/js/logger.js"
+				"default": "./dist/logger.js"
 			},
 			"require": {
 				"types": "./types/logger.d.cts",
-				"default": "./dist/js/logger.cjs"
+				"default": "./dist/logger.cjs"
 			}
 		},
 		"./math": {
-			"bun": "./src/js/math.ts",
 			"import": {
 				"types": "./types/math.d.ts",
-				"default": "./dist/js/math.js"
+				"default": "./dist/math.js"
 			},
 			"require": {
 				"types": "./types/math.d.cts",
-				"default": "./dist/js/math.cjs"
+				"default": "./dist/math.cjs"
 			}
 		},
 		"./models": {
-			"bun": "./src/js/models.ts",
 			"import": {
 				"types": "./types/models.d.ts"
 			},
@@ -131,111 +109,94 @@
 			}
 		},
 		"./number": {
-			"bun": "./src/js/number.ts",
 			"import": {
 				"types": "./types/number.d.ts",
-				"default": "./dist/js/number.js"
+				"default": "./dist/number.js"
 			},
 			"require": {
 				"types": "./types/number.d.cts",
-				"default": "./dist/js/number.cjs"
+				"default": "./dist/number.cjs"
 			}
 		},
 		"./query": {
-			"bun": "./src/js/query.ts",
 			"import": {
 				"types": "./types/query.d.ts",
-				"default": "./dist/js/query.js"
+				"default": "./dist/query.js"
 			},
 			"require": {
 				"types": "./types/query.d.cts",
-				"default": "./dist/js/query.cjs"
+				"default": "./dist/query.cjs"
 			}
 		},
 		"./queue": {
-			"bun": "./src/js/queue.ts",
 			"import": {
 				"types": "./types/queue.d.ts",
-				"default": "./dist/js/queue.js"
+				"default": "./dist/queue.js"
 			},
 			"require": {
 				"types": "./types/queue.d.cts",
-				"default": "./dist/js/queue.cjs"
+				"default": "./dist/queue.cjs"
 			}
 		},
 		"./random": {
-			"bun": "./src/js/random.ts",
 			"import": {
 				"types": "./types/random.d.ts",
-				"default": "./dist/js/random.js"
+				"default": "./dist/random.js"
 			},
 			"require": {
 				"types": "./types/random.d.cts",
-				"default": "./dist/js/random.cjs"
+				"default": "./dist/random.cjs"
 			}
 		},
 		"./string": {
-			"bun": "./src/js/string/index.ts",
 			"import": {
 				"types": "./types/string/index.d.ts",
-				"default": "./dist/js/string/index.js"
+				"default": "./dist/string/index.js"
 			},
 			"require": {
 				"types": "./types/string/index.d.cts",
-				"default": "./dist/js/string/index.cjs"
+				"default": "./dist/string/index.cjs"
 			}
 		},
 		"./supports-touch": {
-			"bun": "./src/js/touch.ts",
 			"import": {
 				"types": "./types/touch.d.ts",
-				"default": "./dist/js/touch.js"
+				"default": "./dist/touch.js"
 			},
 			"require": {
 				"types": "./types/touch.d.cts",
-				"default": "./dist/js/touch.cjs"
+				"default": "./dist/touch.cjs"
 			}
 		},
 		"./value": {
-			"bun": "./src/js/value/index.ts",
 			"import": {
 				"types": "./types/value/index.d.ts",
-				"default": "./dist/js/value/index.js"
+				"default": "./dist/value/index.js"
 			},
 			"require": {
 				"types": "./types/value/index.d.cts",
-				"default": "./dist/js/value/index.cjs"
+				"default": "./dist/value/index.cjs"
 			}
 		}
 	},
-	"files": [
-		"dist",
-		"src",
-		"types"
-	],
-	"keywords": [
-		"helper",
-		"utility"
-	],
+	"files": ["dist", "src", "types"],
+	"keywords": ["helper", "utility"],
 	"license": "MIT",
-	"main": "./dist/js/index.cjs",
-	"module": "./dist/js/index.js",
+	"main": "./dist/index.cjs",
+	"module": "./dist/index.js",
 	"name": "@oscarpalmer/atoms",
 	"repository": {
 		"type": "git",
 		"url": "git+https://github.com/oscarpalmer/atoms.git"
 	},
 	"scripts": {
-		"build": "npm run clean && npm run build:css && npm run build:js",
-		"build:css": "npx sass ./src/css:./dist/css --no-source-map",
-		"build:js": "npx vite build && npm run types",
+		"build": "npm run clean && npx vite build && npm run types",
 		"clean": "rm -rf ./dist && rm -rf ./types && rm -f ./tsconfig.tsbuildinfo",
 		"test": "npx vitest --coverage",
 		"types": "npx tsc && npx dts-bundle-generator --config ./dts.config.ts --silent",
-		"watch:css": "npx sass ./src/css:./dist/css --no-source-map --watch",
-		"watch:js": "npx vite build --watch"
+		"watch": "npx vite build --watch"
 	},
 	"type": "module",
 	"types": "./types/index.d.cts",
-	"version": "0.77.3"
+	"version": "0.78.0"
 }
