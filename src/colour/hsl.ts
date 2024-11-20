@@ -1,8 +1,8 @@
-import {Colour} from '~/colour/base';
-import {hslToRgb} from '~/colour/functions';
-import type {HexColour} from '~/colour/hex';
-import type {RGBColour} from '~/colour/rgb';
-import {clamp} from '~/number';
+import {clamp} from '../number';
+import {Colour} from './base';
+import {hslToRgb} from './functions';
+import type {HexColour} from './hex';
+import type {RGBColour} from './rgb';
 
 export type HSLColourValue = {
 	hue: number;

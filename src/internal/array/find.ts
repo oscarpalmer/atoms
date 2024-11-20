@@ -1,5 +1,5 @@
-import type {FindType} from '~/array/models';
-import {getCallbacks} from '~/internal/array/callbacks';
+import type {FindType} from '../../array/models';
+import {getCallbacks} from './callbacks';
 
 type Parameters = {
 	bool?: unknown;

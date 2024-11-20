@@ -1,7 +1,7 @@
-import type {SortKey, SortKeyWithCallback} from '~/array/models';
-import {isKey} from '~/is';
-import type {Key, PlainObject} from '~/models';
-import {compare} from '~/value/compare';
+import {isKey} from '../is';
+import type {Key, PlainObject} from '../models';
+import {compare} from '../value/compare';
+import type {SortKey, SortKeyWithCallback} from './models';
 
 /**
  * Sort an array of items _(defaults to ascending)_
@@ -57,13 +57,7 @@ export function sort(
 		return array;
 	}
 
-	if (first == null || typeof first === 'boolean') {
-		return first === true
-			? (array as never[]).sort((first, second) => second - first)
-			: array.sort();
-	}
-
-	const direction = second === true ? 'desc' : 'asc';
+	const direction = first === true || second === true ? 'desc' : 'asc';
 
 	const keys = (Array.isArray(first) ? first : [first])
 		.map(key => {
@@ -92,9 +86,11 @@ export function sort(
 	const {length} = keys;
 
 	if (length === 0) {
-		return direction === 'asc'
-			? array.sort()
-			: (array as never[]).sort((first, second) => second - first);
+		return array.sort(
+			(first, second) =>
+				compare(first as never, second as never) *
+				(direction === 'asc' ? 1 : -1),
+		);
 	}
 
 	if (length === 1) {

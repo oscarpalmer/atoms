@@ -1,5 +1,5 @@
-import {getCallbacks} from '~/internal/array/callbacks';
-import type {Key, PlainObject} from '~/models';
+import {getCallbacks} from '../internal/array/callbacks';
+import type {Key, PlainObject} from '../models';
 
 /**
  * Create a map from an array of items _(using their indices as keys)_

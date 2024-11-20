@@ -1,4 +1,4 @@
-import {getRandomInteger} from '~/random';
+import {getRandomInteger} from '../random';
 
 /**
  * Shuffle an array

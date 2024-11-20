@@ -1,5 +1,5 @@
-import {chunk} from '~/array/chunk';
-import type {InsertType} from '~/array/models';
+import {chunk} from './chunk';
+import type {InsertType} from './models';
 
 /**
  * - Insert values into an array _(at the end)_

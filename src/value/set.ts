@@ -1,5 +1,5 @@
-import {handleValue} from '~/internal/value/handle';
-import type {ArrayOrPlainObject, Paths, PlainObject} from '~/models';
+import {handleValue} from '../internal/value/handle';
+import type {ArrayOrPlainObject, Paths, PlainObject} from '../models';
 
 /**
  * - Set the value in an object using a known path

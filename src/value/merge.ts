@@ -1,5 +1,5 @@
-import {isArrayOrPlainObject} from '~/is';
-import type {ArrayOrPlainObject, PlainObject} from '~/models';
+import {isArrayOrPlainObject} from '../is';
+import type {ArrayOrPlainObject, PlainObject} from '../models';
 
 type MergeOptions = {
 	/**

@@ -9,11 +9,11 @@
 	"description": "Atomic utilities for making your JavaScript better.",
 	"devDependencies": {
 		"@biomejs/biome": "^1.9",
-		"@types/node": "^22.8",
+		"@types/node": "^22.9",
 		"@vitest/coverage-istanbul": "^2.1",
 		"dts-bundle-generator": "^9.5",
 		"glob": "^11",
-		"happy-dom": "^15.7",
+		"happy-dom": "^15.11",
 		"typescript": "^5.6",
 		"vite": "^5.4",
 		"vitest": "^2.1"
@@ -179,8 +179,15 @@
 			}
 		}
 	},
-	"files": ["dist", "src", "types"],
-	"keywords": ["helper", "utility"],
+	"files": [
+		"dist",
+		"src",
+		"types"
+	],
+	"keywords": [
+		"helper",
+		"utility"
+	],
 	"license": "MIT",
 	"main": "./dist/index.cjs",
 	"module": "./dist/index.js",
@@ -198,5 +205,5 @@
 	},
 	"type": "module",
 	"types": "./types/index.d.cts",
-	"version": "0.78.0"
+	"version": "0.79.0"
 }

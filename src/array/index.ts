@@ -1,5 +1,5 @@
-import {insertValues} from '~/array/insert';
-import type {NestedArrayType} from '~/models';
+import {insertValues} from '../array/insert';
+import type {NestedArrayType} from '../models';
 
 /**
  * Flatten an array _(using native `flat` and maximum depth)_
@@ -32,3 +32,4 @@ export * from './splice';
 export * from './to-map';
 export * from './to-record';
 export * from './unique';
+

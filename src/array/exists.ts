@@ -1,5 +1,5 @@
-import {findValue} from '~/internal/array/find';
-import type {Key, PlainObject} from '~/models';
+import {findValue} from '../internal/array/find';
+import type {Key, PlainObject} from '../models';
 
 /**
  * Does the value exist in array?

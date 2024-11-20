@@ -16,9 +16,6 @@
 		"module": "esnext",
 		"moduleDetection": "force",
 		"moduleResolution": "bundler",
-		"paths": {
-			"~/*": ["./src/*"]
-		},
 		"skipLibCheck": true,
 		"strict": true,
 		"target": "esnext",

@@ -1,5 +1,5 @@
-import {isPlainObject} from '~/is';
-import type {ArrayOrPlainObject, PlainObject} from '~/models';
+import {isPlainObject} from '../is';
+import type {ArrayOrPlainObject, PlainObject} from '../models';
 
 /**
  * Are two strings equal? _(Case-sensitive by default)_
@@ -54,7 +54,10 @@ export function equal(
 
 		case Array.isArray(first) && Array.isArray(second):
 		case isPlainObject(first) && isPlainObject(second):
-			return equalObject(first, second);
+			return equalObject(
+				first as ArrayOrPlainObject,
+				second as ArrayOrPlainObject,
+			);
 
 		case typeof first === 'string' && ignoreCase === true:
 			return Object.is(first.toLowerCase(), (second as string).toLowerCase());

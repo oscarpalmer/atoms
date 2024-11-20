@@ -1,5 +1,5 @@
-import {isArrayOrPlainObject} from '~/is';
-import type {ArrayOrPlainObject, GenericCallback, PlainObject} from '~/models';
+import {isArrayOrPlainObject} from '../is';
+import type {ArrayOrPlainObject, PlainObject} from '../models';
 
 /**
  * Clone any kind of value _(deeply, if needed)_
@@ -46,7 +46,7 @@ export function clone(value: unknown) {
 			return cloneRegularExpression(value);
 
 		case isArrayOrPlainObject(value):
-			return cloneObject(value);
+			return cloneObject(value as ArrayOrPlainObject);
 
 		default:
 			return structuredClone(value);

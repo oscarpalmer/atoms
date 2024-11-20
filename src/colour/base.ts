@@ -1,5 +1,5 @@
-import type {HexColour} from '~/colour/hex';
-import {isColourValue} from '~/colour/is';
+import type {HexColour} from './hex';
+import {isColourValue} from './is';
 
 export abstract class Colour<Model> {
 	private declare readonly $colour: string;

@@ -1,4 +1,4 @@
-import type {PlainObject} from '~/models';
+import type {PlainObject} from '../models';
 
 /**
  * Create a new object with only the specified keys
@@ -28,3 +28,4 @@ export * from './merge';
 export * from './set';
 export * from './smush';
 export * from './unsmush';
+

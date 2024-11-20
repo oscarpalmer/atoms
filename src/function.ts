@@ -1,5 +1,5 @@
-import type {GenericCallback} from '~/models';
-import {clamp} from '~/number';
+import type {GenericCallback} from './models';
+import {clamp} from './number';
 
 type Debounced<Callback extends GenericCallback> = Callback & {
 	/**

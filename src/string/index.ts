@@ -1,4 +1,4 @@
-import {compact} from '~/array';
+import {compact} from '../array/compact';
 
 /**
  * Create a new UUID
@@ -91,3 +91,4 @@ export function words(value: string): string[] {
 
 export * from './case';
 export * from './template';
+

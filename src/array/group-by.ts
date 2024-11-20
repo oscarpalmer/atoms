@@ -1,6 +1,6 @@
 import type {Simplify} from 'type-fest';
-import {getCallbacks} from '~/internal/array/callbacks';
-import type {Key, KeyedValue, PlainObject} from '~/models';
+import {getCallbacks} from '../internal/array/callbacks';
+import type {Key, KeyedValue, PlainObject} from '../models';
 
 /**
  * Create a record from an array of items using a specific key

@@ -1,5 +1,5 @@
-import {findValue} from '~/internal/array/find';
-import type {Key, PlainObject} from '~/models';
+import {findValue} from '../internal/array/find';
+import type {Key, PlainObject} from '../models';
 
 /**
  * Get the first item matching `value` _(or `undefined` if no match is found)_

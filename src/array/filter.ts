@@ -1,5 +1,5 @@
-import {findValues} from '~/internal/array/find';
-import type {Key, PlainObject} from '~/models';
+import {findValues} from '../internal/array/find';
+import type {Key, PlainObject} from '../models';
 
 /**
  * Get a filtered array of items matching `value`

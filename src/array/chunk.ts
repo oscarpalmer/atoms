@@ -1,4 +1,4 @@
-import {clamp} from '~/number';
+import {clamp} from '../number';
 
 /**
  * Chunk an array _(into smaller arrays of a specified size)_

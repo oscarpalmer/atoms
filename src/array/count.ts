@@ -1,5 +1,5 @@
-import {findValues} from '~/internal/array/find';
-import type {Key, PlainObject} from '~/models';
+import {findValues} from '../internal/array/find';
+import type {Key, PlainObject} from '../models';
 
 /**
  * Get the number of items _(count)_ that match the given value

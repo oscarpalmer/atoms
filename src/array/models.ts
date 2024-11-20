@@ -1,4 +1,4 @@
-import type {GenericCallback, Key} from '~/models';
+import type {GenericCallback, Key} from '../models';
 
 export type Callbacks = {
 	bool?: GenericCallback;

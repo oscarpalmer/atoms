@@ -1,5 +1,5 @@
-import {findValue} from '~/internal/array/find';
-import type {Key, PlainObject} from '~/models';
+import {findValue} from '../internal/array/find';
+import type {Key, PlainObject} from '../models';
 
 /**
  * Get the index for the first item matching `value` _(or `-1` if no match is found)_

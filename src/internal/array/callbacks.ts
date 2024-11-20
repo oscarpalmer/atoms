@@ -1,5 +1,5 @@
-import type {Callbacks} from '~/array/models';
-import type {GenericCallback, PlainObject} from '~/models';
+import type {Callbacks} from '../../array/models';
+import type {GenericCallback, PlainObject} from '../../models';
 
 function getCallback(value: unknown): GenericCallback | undefined {
 	switch (typeof value) {

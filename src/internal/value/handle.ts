@@ -1,4 +1,4 @@
-import type {ArrayOrPlainObject, PlainObject} from '~/models';
+import type {ArrayOrPlainObject, PlainObject} from '../../models';
 
 function findKey(
 	needle: string,

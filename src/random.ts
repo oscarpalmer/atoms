@@ -1,4 +1,4 @@
-import {shuffle} from '~/array/shuffle';
+import {shuffle} from './array/shuffle';
 
 /**
  * Get a random boolean

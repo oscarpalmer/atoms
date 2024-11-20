@@ -1,10 +1,8 @@
 /// <reference types="vitest" />
-import {dirname, extname, relative, resolve} from 'node:path';
+import {extname, relative} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {globSync} from 'glob';
 import {defineConfig} from 'vite';
-
-const __dirname = dirname(fileURLToPath(import.meta.url));
 
 const watch = process.argv.includes('--watch');
 
@@ -18,7 +16,7 @@ export default defineConfig({
 	build: {
 		lib: {
 			entry: [],
-			formats: ['cjs', 'es'],
+			formats: watch ? ['es'] : ['cjs', 'es'],
 		},
 		minify: false,
 		outDir: './dist',
@@ -37,9 +35,6 @@ export default defineConfig({
 			provider: 'istanbul',
 		},
 		environment: 'happy-dom',
-		watch: false,
-	},
-	resolve: {
-		alias: [{find: '~', replacement: resolve(__dirname, 'src')}],
+		watch: watch,
 	},
 });
