@@ -18,7 +18,7 @@ export function findValue(
 
 	if (callbacks?.bool == null && callbacks?.key == null) {
 		return type === 'index'
-			? array.findIndex(item => item === value)
+			? array.indexOf(value)
 			: array.find(item => item === value);
 	}
 
@@ -64,24 +64,23 @@ export function findValues(
 		return array.filter(item => item === value);
 	}
 
+	const keys = new Set();
 	const result: unknown[] = [];
-	const values: unknown[] = callbacks?.key != null ? [] : result;
 
 	for (let index = 0; index < length; index += 1) {
 		const item = array[index];
-		const keyed = callbacks?.key?.(item, index, array) ?? item;
+		const key = callbacks?.key?.(item, index, array) ?? item;
 
 		if (
-			(type === 'all' && keyed === value) ||
-			(type === 'unique' && values.indexOf(keyed) === -1)
+			(type === 'all' && key === value) ||
+			(type === 'unique' && !keys.has(key))
 		) {
-			if (values !== result) {
-				values.push(keyed);
-			}
-
+			keys.add(key);
 			result.push(item);
 		}
 	}
+
+	keys.clear();
 
 	return result;
 }

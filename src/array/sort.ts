@@ -105,12 +105,9 @@ export function sort(
 		for (let index = 0; index < length; index += 1) {
 			const {callback, direction} = keys[index];
 
-			const descending = direction === 'desc';
-
-			const compared = compare(
-				callback(descending ? second : first),
-				callback(descending ? first : second),
-			);
+			const compared =
+				compare(callback(first), callback(second)) *
+				(direction === 'asc' ? 1 : -1);
 
 			if (compared !== 0) {
 				return compared;

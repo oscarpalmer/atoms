@@ -11,10 +11,7 @@ export function isColour(
 	return isInstance(/^(hex|hsl|rgb)$/, value);
 }
 
-export function isColourValue<Expected>(
-	value: unknown,
-	properties: Array<keyof Expected>,
-): value is Expected {
+export function isColourValue(value: unknown, properties: string[]): boolean {
 	return (
 		typeof value === 'object' &&
 		value !== null &&

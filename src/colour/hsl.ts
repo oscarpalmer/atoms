@@ -54,7 +54,7 @@ export class HSLColour extends Colour<HSLColourValue> {
 	}
 
 	constructor(value: HSLColourValue) {
-		super('hsl', value, defaults, properties);
+		super('hsl', value);
 	}
 
 	/**
@@ -85,18 +85,6 @@ export class HSLColour extends Colour<HSLColourValue> {
 		return hslToRgb(value);
 	}
 }
-
-const defaults: HSLColourValue = {
-	hue: 0,
-	lightness: 0,
-	saturation: 0,
-};
-
-const properties: Array<keyof HSLColourValue> = [
-	'hue',
-	'lightness',
-	'saturation',
-];
 
 /**
  * Get an HSL-colour from a value-object

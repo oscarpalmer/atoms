@@ -21,6 +21,7 @@ export function getForegroundColour(value: RGBColourValue): string {
 	return luminance > 0.625 ? 'black' : 'white';
 }
 
+export {hexToRgb, hslToRgb, rgbToHex, rgbToHsl} from './functions';
 export {getHexColour, HexColour} from './hex';
 export {getHSLColour, HSLColour, type HSLColourValue} from './hsl';
 export {isColour, isHexColour, isHSLColour, isRGBColour} from './is';

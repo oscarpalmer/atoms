@@ -54,7 +54,7 @@ export class RGBColour extends Colour<RGBColourValue> {
 	}
 
 	constructor(value: RGBColourValue) {
-		super('rgb', value, defaults, properties);
+		super('rgb', value);
 	}
 
 	/**
@@ -92,14 +92,6 @@ export class RGBColour extends Colour<RGBColourValue> {
 		return rgbToHsl(rgb);
 	}
 }
-
-const defaults: RGBColourValue = {
-	blue: 0,
-	green: 0,
-	red: 0,
-};
-
-const properties: Array<keyof RGBColourValue> = ['blue', 'green', 'red'];
 
 /**
  * Get an RGB-colour from a value-object
