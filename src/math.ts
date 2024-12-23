@@ -1,22 +1,98 @@
+import type {GenericCallback, PlainObject} from './models';
+
+type OnlyNumericalKeys<Item> = {
+	[Key in keyof Item as Item[Key] extends number ? Key : never]: Item[Key];
+};
+
 /**
  * Get the average value from a list of numbers
  */
-export function average(values: number[]): number {
-	return values.length > 0 ? sum(values) / values.length : Number.NaN;
+export function average(values: number[]): number;
+
+export function average<Item extends PlainObject>(
+	array: Item[],
+	key: keyof OnlyNumericalKeys<Item>,
+): number;
+
+export function average<Item extends PlainObject>(
+	array: Item[],
+	callback: (item: Item, index: number, array: Item[]) => number,
+): number;
+
+export function average(array: unknown[], key?: unknown): number {
+	return array.length === 0
+		? Number.NaN
+		: sum(array as never[], key as never) / array.length;
 }
 
 /**
  * Get the maximum value from a list of numbers
  */
-export function max(values: number[]): number {
-	return values.length > 0 ? Math.max(...values) : Number.NaN;
+export function max(values: number[]): number;
+
+export function max<Item extends PlainObject>(
+	array: Item[],
+	key: keyof OnlyNumericalKeys<Item>,
+): number;
+
+export function max<Item extends PlainObject>(
+	array: Item[],
+	callback: (item: Item, index: number, array: Item[]) => number,
+): number;
+
+export function max(array: unknown[], key?: unknown): number {
+	const isCallback = typeof key === 'function';
+	const {length} = array;
+	let max: number | undefined;
+
+	for (let index = 0; index < length; index += 1) {
+		const item = array[index];
+
+		const value = isCallback
+			? (key as GenericCallback)(item, index, array)
+			: ((item as PlainObject)[key as never] ?? item);
+
+		if (max == null || value > max) {
+			max = value;
+		}
+	}
+
+	return max ?? Number.NaN;
 }
 
 /**
  * Get the minimum value from a list of numbers
  */
-export function min(values: number[]): number {
-	return values.length > 0 ? Math.min(...values) : Number.NaN;
+export function min(values: number[]): number;
+
+export function min<Item extends PlainObject>(
+	array: Item[],
+	key: keyof OnlyNumericalKeys<Item>,
+): number;
+
+export function min<Item extends PlainObject>(
+	array: Item[],
+	callback: (item: Item, index: number, array: Item[]) => number,
+): number;
+
+export function min(array: unknown[], key?: unknown): number {
+	const isCallback = typeof key === 'function';
+	const {length} = array;
+	let min: number | undefined;
+
+	for (let index = 0; index < length; index += 1) {
+		const item = array[index];
+
+		const value = isCallback
+			? (key as GenericCallback)(item, index, array)
+			: ((item as PlainObject)[key as never] ?? item);
+
+		if (min == null || value < min) {
+			min = value;
+		}
+	}
+
+	return min ?? Number.NaN;
 }
 
 /**
@@ -35,6 +111,30 @@ export function round(value: number, decimals?: number): number {
 /**
  * Get the sum of a list of numbers
  */
-export function sum(values: number[]): number {
-	return values.reduce((previous, current) => previous + current, 0);
+export function sum(values: number[]): number;
+
+export function sum<Item extends PlainObject>(
+	array: Item[],
+	key: keyof OnlyNumericalKeys<Item>,
+): number;
+
+export function sum<Item extends PlainObject>(
+	array: Item[],
+	callback: (item: Item, index: number, array: Item[]) => number,
+): number;
+
+export function sum(array: unknown[], key?: unknown): number {
+	const isCallback = typeof key === 'function';
+	const {length} = array;
+	let sum = 0;
+
+	for (let index = 0; index < length; index += 1) {
+		const value = array[index];
+
+		sum += isCallback
+			? (key as GenericCallback)(value, index, array)
+			: ((value as PlainObject)[key as never] ?? value);
+	}
+
+	return sum;
 }

@@ -1,24 +1,21 @@
-import {clamp} from '../number';
-
 /**
- * Chunk an array _(into smaller arrays of a specified size)_
+ * Chunk an array _(into smaller arrays)_
  */
-export function chunk<Item>(array: Item[], size?: number): Item[][] {
-	const chunkSize = clamp(size ?? 5_000, 1, 5_000);
+export function chunk<Item>(array: Item[]): Item[][] {
 	const {length} = array;
 
-	if (length <= chunkSize) {
+	if (length <= 5_000) {
 		return [array];
 	}
 
 	const chunks: Item[][] = [];
 
-	let remaining = Number(length);
+	let index = 0;
 
-	while (remaining > 0) {
-		chunks.push(array.splice(0, chunkSize));
+	while (index < length) {
+		chunks.push(array.slice(index, index + 5_000));
 
-		remaining -= chunkSize;
+		index += 5_000;
 	}
 
 	return chunks;

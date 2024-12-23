@@ -125,7 +125,11 @@ function getDiffs(
 					changes.push(change);
 				}
 
-				changes.push(...diffs);
+				const diffsLength = diffs.length;
+
+				for (let diffIndex = 0; diffIndex < diffsLength; diffIndex += 1) {
+					changes.push(diffs[diffIndex]);
+				}
 			}
 
 			checked.add(key);

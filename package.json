@@ -179,15 +179,8 @@
 			}
 		}
 	},
-	"files": [
-		"dist",
-		"src",
-		"types"
-	],
-	"keywords": [
-		"helper",
-		"utility"
-	],
+	"files": ["dist", "src", "types"],
+	"keywords": ["helper", "utility"],
 	"license": "MIT",
 	"main": "./dist/index.cjs",
 	"module": "./dist/index.js",
@@ -205,5 +198,5 @@
 	},
 	"type": "module",
 	"types": "./types/index.d.cts",
-	"version": "0.80.0"
+	"version": "0.81.0"
 }

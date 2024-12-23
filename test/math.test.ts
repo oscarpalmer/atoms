@@ -5,11 +5,19 @@ const one = [123];
 const two = [123, 456];
 const three = [123, 456, 789];
 
+const four = [
+	{age: 25, name: 'John'},
+	{age: 30, name: 'Jane'},
+	{age: 35, name: 'Joe'},
+];
+
 test('average', () => {
 	expect(average([])).toBeNaN();
 	expect(average(one)).toBe(123);
 	expect(average(two)).toBe(289.5);
 	expect(average(three)).toBe(456);
+	expect(average(four, 'age')).toBe(30);
+	expect(average(four, item => item.age)).toBe(30);
 });
 
 test('max', () => {
@@ -17,6 +25,8 @@ test('max', () => {
 	expect(max(one)).toBe(123);
 	expect(max(two)).toBe(456);
 	expect(max(three)).toBe(789);
+	expect(max(four, 'age')).toBe(35);
+	expect(max(four, item => item.age)).toBe(35);
 });
 
 test('min', () => {
@@ -24,6 +34,8 @@ test('min', () => {
 	expect(min(one)).toBe(123);
 	expect(min(two)).toBe(123);
 	expect(min(three)).toBe(123);
+	expect(min(four, 'age')).toBe(25);
+	expect(min(four, item => item.age)).toBe(25);
 });
 
 test('round', () => {

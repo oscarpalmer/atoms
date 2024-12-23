@@ -12,7 +12,17 @@ export function compact<Item>(
 ): Exclude<Item, 0 | '' | false | null | undefined>[];
 
 export function compact<Item>(array: Item[], strict?: boolean): Item[] {
-	return strict === true
-		? array.filter(item => !!item)
-		: array.filter(item => item != null);
+	const isStrict = strict ?? false;
+	const {length} = array;
+	const compacted: Item[] = [];
+
+	for (let index = 0; index < length; index += 1) {
+		const item = array[index];
+
+		if ((isStrict && !!item) || (!isStrict && item != null)) {
+			compacted.push(item);
+		}
+	}
+
+	return compacted;
 }

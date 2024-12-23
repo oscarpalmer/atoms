@@ -38,11 +38,9 @@ const complex: Item[] = [
 const simple = [1, 2, 3, 4];
 
 test('chunk', () => {
-	const array = Array.from({length: 10}, (_, i) => i + 1);
+	const array = Array.from({length: 10_000}, (_, i) => i + 1);
 
-	expect(chunk(array, 3)).toEqual([[1, 2, 3], [4, 5, 6], [7, 8, 9], [10]]);
-
-	expect(chunk(array, 100)).toEqual([array]);
+	expect(chunk(array).length).toBe(2);
 });
 
 test('compact', () => {
