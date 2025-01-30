@@ -1,16 +1,16 @@
 import {clamp} from '../number';
-import {Colour} from './base';
+import {Color} from './base';
 import {hslToRgb} from './functions';
-import type {HexColour} from './hex';
-import type {RGBColour} from './rgb';
+import type {HexColor} from './hex';
+import type {RGBColor} from './rgb';
 
-export type HSLColourValue = {
+export type HSLColorValue = {
 	hue: number;
 	lightness: number;
 	saturation: number;
 };
 
-export class HSLColour extends Colour<HSLColourValue> {
+export class HSLColor extends Color<HSLColorValue> {
 	/**
 	 * Get the current hue
 	 */
@@ -53,22 +53,22 @@ export class HSLColour extends Colour<HSLColourValue> {
 		this.state.value.saturation = clamp(value, 0, 100);
 	}
 
-	constructor(value: HSLColourValue) {
+	constructor(value: HSLColorValue) {
 		super('hsl', value);
 	}
 
 	/**
 	 * @inheritdoc
 	 */
-	toHex(): HexColour {
-		return HSLColour.toRgb(this.state.value).toHex();
+	toHex(): HexColor {
+		return HSLColor.toRgb(this.state.value).toHex();
 	}
 
 	/**
-	 * Convert the colour to an RGB-colour
+	 * Convert the color to an RGB-color
 	 */
-	toRgb(): RGBColour {
-		return HSLColour.toRgb(this.state.value);
+	toRgb(): RGBColor {
+		return HSLColor.toRgb(this.state.value);
 	}
 
 	/**
@@ -79,16 +79,16 @@ export class HSLColour extends Colour<HSLColourValue> {
 	}
 
 	/**
-	 * Convert an HSL-colour to an RGB-colour
+	 * Convert an HSL-color to an RGB-color
 	 */
-	static toRgb(value: HSLColourValue): RGBColour {
+	static toRgb(value: HSLColorValue): RGBColor {
 		return hslToRgb(value);
 	}
 }
 
 /**
- * Get an HSL-colour from a value-object
+ * Get an HSL-color from a value-object
  */
-export function getHSLColour(value: HSLColourValue): HSLColour {
-	return new HSLColour(value);
+export function getHSLColor(value: HSLColorValue): HSLColor {
+	return new HSLColor(value);
 }

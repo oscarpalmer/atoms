@@ -1,16 +1,16 @@
 import {clamp} from '../number';
-import {Colour} from './base';
+import {Color} from './base';
 import {rgbToHex, rgbToHsl} from './functions';
-import type {HexColour} from './hex';
-import type {HSLColour} from './hsl';
+import type {HexColor} from './hex';
+import type {HSLColor} from './hsl';
 
-export type RGBColourValue = {
+export type RGBColorValue = {
 	blue: number;
 	green: number;
 	red: number;
 };
 
-export class RGBColour extends Colour<RGBColourValue> {
+export class RGBColor extends Color<RGBColorValue> {
 	/**
 	 * Get the current blue value
 	 */
@@ -53,22 +53,22 @@ export class RGBColour extends Colour<RGBColourValue> {
 		this.state.value.red = clamp(value, 0, 255);
 	}
 
-	constructor(value: RGBColourValue) {
+	constructor(value: RGBColorValue) {
 		super('rgb', value);
 	}
 
 	/**
 	 * @inheritdoc
 	 */
-	toHex(): HexColour {
-		return RGBColour.toHex(this.value);
+	toHex(): HexColor {
+		return RGBColor.toHex(this.value);
 	}
 
 	/**
-	 * Convert the colour to an HSL-colour
+	 * Convert the color to an HSL-color
 	 */
-	toHsl(): HSLColour {
-		return RGBColour.toHsl(this.value);
+	toHsl(): HSLColor {
+		return RGBColor.toHsl(this.value);
 	}
 
 	/**
@@ -79,23 +79,23 @@ export class RGBColour extends Colour<RGBColourValue> {
 	}
 
 	/**
-	 * Convert an RGB-colour to a hex-colour
+	 * Convert an RGB-color to a hex-color
 	 */
-	static toHex(value: RGBColourValue): HexColour {
+	static toHex(value: RGBColorValue): HexColor {
 		return rgbToHex(value);
 	}
 
 	/**
-	 * - Convert an RGB-colour to an HSL-colour
+	 * - Convert an RGB-color to an HSL-color
 	 */
-	static toHsl(rgb: RGBColourValue): HSLColour {
+	static toHsl(rgb: RGBColorValue): HSLColor {
 		return rgbToHsl(rgb);
 	}
 }
 
 /**
- * Get an RGB-colour from a value-object
+ * Get an RGB-color from a value-object
  */
-export function getRGBColour(value: RGBColourValue): RGBColour {
-	return new RGBColour(value);
+export function getRGBColor(value: RGBColorValue): RGBColor {
+	return new RGBColor(value);
 }

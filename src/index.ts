@@ -1,5 +1,5 @@
 export * from './array/index';
-export * from './colour/index';
+export * from './color/index';
 export * from './emitter';
 export * from './function';
 export * from './is';

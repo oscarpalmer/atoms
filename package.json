@@ -4,19 +4,19 @@
 		"url": "https://oscarpalmer.se"
 	},
 	"dependencies": {
-		"type-fest": "^4.30"
+		"type-fest": "^4.33"
 	},
 	"description": "Atomic utilities for making your JavaScript better.",
 	"devDependencies": {
 		"@biomejs/biome": "^1.9",
-		"@types/node": "^22.10",
-		"@vitest/coverage-istanbul": "^2.1",
+		"@types/node": "^22.12",
+		"@vitest/coverage-istanbul": "^3",
 		"dts-bundle-generator": "^9.5",
 		"glob": "^11",
-		"happy-dom": "^15.11",
+		"happy-dom": "^16.7",
 		"typescript": "^5.7",
 		"vite": "^6",
-		"vitest": "^2.1"
+		"vitest": "^3"
 	},
 	"exports": {
 		"./package.json": "./package.json",
@@ -40,14 +40,14 @@
 				"default": "./dist/array/index.cjs"
 			}
 		},
-		"./colour": {
+		"./color": {
 			"import": {
-				"types": "./types/colour/index.d.ts",
-				"default": "./dist/colour/index.js"
+				"types": "./types/color/index.d.ts",
+				"default": "./dist/color/index.js"
 			},
 			"require": {
-				"types": "./types/colour/index.d.cts",
-				"default": "./dist/colour/index.cjs"
+				"types": "./types/color/index.d.cts",
+				"default": "./dist/color/index.cjs"
 			}
 		},
 		"./emitter": {
@@ -179,8 +179,15 @@
 			}
 		}
 	},
-	"files": ["dist", "src", "types"],
-	"keywords": ["helper", "utility"],
+	"files": [
+		"dist",
+		"src",
+		"types"
+	],
+	"keywords": [
+		"helper",
+		"utility"
+	],
 	"license": "MIT",
 	"main": "./dist/index.cjs",
 	"module": "./dist/index.js",
@@ -193,10 +200,10 @@
 		"build": "npm run clean && npx vite build && npm run types",
 		"clean": "rm -rf ./dist && rm -rf ./types && rm -f ./tsconfig.tsbuildinfo",
 		"test": "npx vitest --coverage",
-		"types": "npx tsc && npx dts-bundle-generator --config ./dts.config.ts --silent",
+		"types": "npx tsc && npx dts-bundle-generator --config ./dts.config.cts --silent",
 		"watch": "npx vite build --watch"
 	},
 	"type": "module",
 	"types": "./types/index.d.cts",
-	"version": "0.81.0"
+	"version": "0.82.0"
 }

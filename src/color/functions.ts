@@ -1,7 +1,7 @@
 import {clamp} from '../number';
-import {HexColour} from './hex';
-import {HSLColour, type HSLColourValue} from './hsl';
-import {RGBColour, type RGBColourValue} from './rgb';
+import {HexColor} from './hex';
+import {HSLColor, type HSLColorValue} from './hsl';
+import {RGBColor, type RGBColorValue} from './rgb';
 
 export const anyPattern = /^#*([a-f0-9]{3}){1,2}$/i;
 const groupedPattern = /^#*([a-f0-9]{2})([a-f0-9]{2})([a-f0-9]{2})$/i;
@@ -18,9 +18,9 @@ export function getNormalisedHex(value: string): string {
 }
 
 /**
- * Convert a hex-colour to an RGB-colour
+ * Convert a hex-color to an RGB-color
  */
-export function hexToRgb(value: string): RGBColour {
+export function hexToRgb(value: string): RGBColor {
 	const hex = anyPattern.test(value) ? getNormalisedHex(value) : '';
 	const pairs = groupedPattern.exec(hex) ?? [];
 	const rgb = [];
@@ -31,7 +31,7 @@ export function hexToRgb(value: string): RGBColour {
 		rgb.push(Number.parseInt(pairs[index], 16));
 	}
 
-	return new RGBColour({
+	return new RGBColor({
 		blue: rgb[2] ?? 0,
 		green: rgb[1] ?? 0,
 		red: rgb[0] ?? 0,
@@ -39,10 +39,10 @@ export function hexToRgb(value: string): RGBColour {
 }
 
 /**
- * - Convert an HSL-colour to an RGB-colour
+ * - Convert an HSL-color to an RGB-color
  * - Thanks, https://github.com/color-js/color.js/blob/main/src/spaces/hsl.js#L61
  */
-export function hslToRgb(value: HSLColourValue): RGBColour {
+export function hslToRgb(value: HSLColorValue): RGBColor {
 	let hue = value.hue % 360;
 
 	if (hue < 0) {
@@ -59,7 +59,7 @@ export function hslToRgb(value: HSLColourValue): RGBColour {
 		return lightness - mod * Math.max(-1, Math.min(part - 3, 9 - part, 1));
 	}
 
-	return new RGBColour({
+	return new RGBColor({
 		blue: clamp(Math.round(get(4) * 255), 0, 255),
 		green: clamp(Math.round(get(8) * 255), 0, 255),
 		red: clamp(Math.round(get(0) * 255), 0, 255),
@@ -67,13 +67,13 @@ export function hslToRgb(value: HSLColourValue): RGBColour {
 }
 
 /**
- * Convert an RGB-colour to a hex-colour
+ * Convert an RGB-color to a hex-color
  */
-export function rgbToHex(value: RGBColourValue): HexColour {
-	return new HexColour(
+export function rgbToHex(value: RGBColorValue): HexColor {
+	return new HexColor(
 		`${[value.red, value.green, value.blue]
-			.map(colour => {
-				const hex = colour.toString(16);
+			.map(color => {
+				const hex = color.toString(16);
 
 				return hex.length === 1 ? `0${hex}` : hex;
 			})
@@ -82,10 +82,10 @@ export function rgbToHex(value: RGBColourValue): HexColour {
 }
 
 /**
- * - Convert an RGB-colour to an HSL-colour
+ * - Convert an RGB-color to an HSL-color
  * - Thanks, https://github.com/color-js/color.js/blob/main/src/spaces/hsl.js#L26
  */
-export function rgbToHsl(rgb: RGBColourValue): HSLColour {
+export function rgbToHsl(rgb: RGBColorValue): HSLColor {
 	const blue = rgb.blue / 255;
 	const green = rgb.green / 255;
 	const red = rgb.red / 255;
@@ -129,7 +129,7 @@ export function rgbToHsl(rgb: RGBColourValue): HSLColour {
 		hue -= 360;
 	}
 
-	return new HSLColour({
+	return new HSLColor({
 		hue: +hue.toFixed(2),
 		lightness: +(lightness * 100).toFixed(2),
 		saturation: +(saturation * 100).toFixed(2),
