@@ -205,5 +205,5 @@
 	},
 	"type": "module",
 	"types": "./types/index.d.cts",
-	"version": "0.82.0"
+	"version": "0.82.1"
 }

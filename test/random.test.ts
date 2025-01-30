@@ -2,7 +2,7 @@ import {expect, test} from 'vitest';
 import {
 	getRandomBoolean,
 	getRandomCharacters,
-	getRandomColour,
+	getRandomColor,
 	getRandomFloat,
 	getRandomHex,
 	getRandomInteger,
@@ -91,14 +91,14 @@ test('getRandomCharacters', () =>
 		}, 250);
 	}));
 
-test('getRandomColour', () => {
+test('getRandomColor', () => {
 	const pattern = /^#[0-9A-F]{6}$/;
 
 	let index = 0;
 	let invalid = 0;
 
 	for (; index < size; index += 1) {
-		if (!pattern.test(getRandomColour())) {
+		if (!pattern.test(getRandomColor())) {
 			invalid += 1;
 		}
 	}

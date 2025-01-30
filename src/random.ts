@@ -34,9 +34,9 @@ export function getRandomCharacters(
 }
 
 /**
- * Get a random hexadecimal colour
+ * Get a random hexadecimal color
  */
-export function getRandomColour(): string {
+export function getRandomColor(): string {
 	return `#${Array.from({length: 6}, getRandomHex).join('')}`;
 }
 
