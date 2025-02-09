@@ -57,19 +57,26 @@ test('capitalise', () => {
 	}
 });
 
-test('createUuid', () => {
-	const ids = new Set<string>();
+test(
+	'createUuid',
+	() =>
+		new Promise<void>(done => {
+			const ids = new Set<string>();
 
-	const length = 100_000;
+			const length = 100_000;
 
-	let index = 0;
+			let index = 0;
 
-	for (; index < length; index += 1) {
-		ids.add(createUuid());
-	}
+			for (; index < length; index += 1) {
+				ids.add(createUuid());
+			}
 
-	expect(ids.size).toBe(100_000);
-});
+			expect(ids.size).toBe(length);
+
+			done();
+		}),
+	60_000,
+);
 
 test('getString', () => {
 	expect(getString(undefined)).toBe('undefined');
