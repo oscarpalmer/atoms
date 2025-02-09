@@ -1,4 +1,5 @@
-import type {PlainObject} from './models';
+import {isPlainObject} from './is';
+import type {PlainObject, Primitive} from './models';
 
 type Defaults = {
 	/**
@@ -116,14 +117,19 @@ function getLanguage(value: unknown): Language | undefined {
 /**
  * Get translation for a key from a translatable object
  */
-function getTranslation(value: unknown, key?: string): string {
-	if (typeof value !== 'object' || value == null || key == null) {
-		return '';
+function getTranslation(
+	value: PlainObject,
+	key: string | undefined,
+	delimiter: string,
+	languages: Partial<Languages>,
+): string {
+	if (key != null) {
+		return translateValue((value as PlainObject)[key], delimiter, languages);
 	}
 
-	const translation = (value as PlainObject)[key];
+	const asString = value.toString();
 
-	return typeof translation === 'string' ? translation : String(translation);
+	return asString === '[object Object]' ? '' : asString;
 }
 
 /**
@@ -157,7 +163,22 @@ export function translate(
 	value: unknown | unknown[],
 	options?: Partial<TranslateOptions>,
 ): string {
-	return translateValue(value, null as never, null as never, options);
+	let delimiter = defaults.delimiter;
+	let languages: Partial<Languages> = defaults.languages;
+
+	if (options != null) {
+		delimiter =
+			typeof options.delimiter === 'string'
+				? options.delimiter
+				: defaults.delimiter;
+
+		languages = {
+			fallback: getLanguage(options.fallback),
+			preferred: getLanguage(options.language),
+		};
+	}
+
+	return translateUnknown(value, delimiter, languages);
 }
 
 /**
@@ -191,20 +212,10 @@ translate.configuration = (): TranslateConfiguration => {
 };
 
 /**
- * Translates a primitive value _(into a string)_
+ * Translates a primitive value into a string
  */
-function translatePrimitive(value: unknown): string {
-	let actual = value;
-
-	if (typeof value === 'function') {
-		actual = value();
-	}
-
-	return actual == null
-		? ''
-		: typeof actual === 'string'
-			? actual
-			: String(actual);
+function translatePrimitive(value: Primitive): string {
+	return value == null ? '' : typeof value === 'string' ? value : String(value);
 }
 
 /**
@@ -214,34 +225,37 @@ function translateTranslatable(
 	value: PlainObject | PlainObject[],
 	delimiter: string,
 	languages: Partial<Languages>,
-	options?: Partial<TranslateOptions>,
 ): string {
-	let actualDelimiter = delimiter ?? defaults.delimiter;
-	let actualLanguages = languages;
-
-	if (options != null) {
-		actualDelimiter =
-			typeof options.delimiter === 'string'
-				? options.delimiter
-				: defaults.delimiter;
-
-		actualLanguages = {
-			fallback: getLanguage(options.fallback),
-			preferred: getLanguage(options.language),
-		};
-	}
-
 	if (Array.isArray(value)) {
 		return value
-			.map(item => translateValue(item, actualDelimiter, actualLanguages))
+			.map(item => translateValue(item, delimiter, languages))
 			.filter(translated => translated.trim().length > 0)
-			.join(actualDelimiter);
+			.join(delimiter);
 	}
 
 	return getTranslation(
 		value,
-		getKey(value, actualLanguages) ?? getKey(value, defaults.languages),
+		getKey(value, languages) ?? getKey(value, defaults.languages),
+		delimiter,
+		languages,
 	);
+}
+
+/**
+ * Translates a value _(into a string)_
+ */
+function translateUnknown(
+	value: unknown,
+	delimiter: string,
+	languages: Partial<Languages>,
+): string {
+	return typeof value !== 'object' || value == null
+		? translateValue(value, delimiter, languages)
+		: translateTranslatable(
+				value as PlainObject | PlainObject[],
+				delimiter,
+				languages,
+			);
 }
 
 /**
@@ -250,17 +264,31 @@ function translateTranslatable(
 function translateValue(
 	value: unknown,
 	delimiter: string,
-	language: Partial<Languages>,
-	options?: Partial<TranslateOptions>,
+	languages: Partial<Languages>,
 ): string {
-	return typeof value !== 'object' || value == null
-		? translatePrimitive(value)
-		: translateTranslatable(
-				value as PlainObject | PlainObject[],
-				delimiter,
-				language,
-				options,
-			);
+	let actual = value;
+
+	if (typeof value === 'function') {
+		actual = value();
+
+		if (typeof actual === 'function') {
+			return '';
+		}
+	}
+
+	if (Array.isArray(actual)) {
+		return translateTranslatable(actual, delimiter, languages);
+	}
+
+	if (typeof actual === 'object' && actual != null) {
+		const asString = actual.toString();
+
+		return asString === '[object Object]'
+			? translateTranslatable(actual as PlainObject, delimiter, languages)
+			: asString;
+	}
+
+	return translatePrimitive(actual as Primitive);
 }
 
 const defaultLanguage =

@@ -1,7 +1,21 @@
 import {expect, test} from 'vitest';
 import {type Translatable, translate} from '../src/i18n';
 
-const primitives = [
+class Test {
+	toString() {
+		return 'I am a test instance!';
+	}
+}
+
+function obj() {
+	return Object.create({
+		toString() {
+			return 'I am an object!';
+		},
+	});
+}
+
+const values = [
 	null,
 	undefined,
 	99n,
@@ -11,6 +25,9 @@ const primitives = [
 	[],
 	{},
 	() => '!?',
+	() => () => '???',
+	obj(),
+	new Test(),
 ];
 
 const translation: Translatable = {
@@ -55,10 +72,12 @@ test('translate', () => {
 		'BonjourBonjour',
 	);
 
-	expect(translate(primitives)).toBe('99true123Hello, world!!?');
+	expect(translate(values)).toBe(
+		'99true123Hello, world!!?I am an object!I am a test instance!',
+	);
 
-	expect(translate(primitives, {delimiter: ', '})).toBe(
-		'99, true, 123, Hello, world!, !?',
+	expect(translate(values, {delimiter: ', '})).toBe(
+		'99, true, 123, Hello, world!, !?, I am an object!, I am a test instance!',
 	);
 
 	expect(translate({})).toBe('');
@@ -66,7 +85,32 @@ test('translate', () => {
 	expect(translate([])).toBe('');
 	expect(translate([{}])).toBe('');
 	expect(translate([{foo: 'bar'}])).toBe('');
+
+	expect(translate({en: null})).toBe('');
+	expect(translate({en: undefined})).toBe('');
+	expect(translate({en: 99n})).toBe('99');
+	expect(translate({en: true})).toBe('true');
 	expect(translate({en: 123})).toBe('123');
+	expect(translate({en: 'xyz'})).toBe('xyz');
+	expect(translate({en: [1, 2, 3]})).toBe('123');
+	expect(translate({en: {foo: 'bar'}})).toBe('');
+	expect(translate({en: () => 'xyz'})).toBe('xyz');
+	expect(translate({en: () => () => 'xyz'})).toBe('');
+	expect(translate({en: obj()})).toBe('I am an object!');
+	expect(translate({en: new Test()})).toBe('I am a test instance!');
+
+	expect(translate(null)).toBe('');
+	expect(translate(undefined)).toBe('');
+	expect(translate(99n)).toBe('99');
+	expect(translate(true)).toBe('true');
+	expect(translate(123)).toBe('123');
+	expect(translate('xyz')).toBe('xyz');
+	expect(translate([1, 2, 3])).toBe('123');
+	expect(translate({foo: 'bar'})).toBe('');
+	expect(translate(() => 'xyz')).toBe('xyz');
+	expect(translate(() => () => 'xyz')).toBe('');
+	expect(translate(obj())).toBe('I am an object!');
+	expect(translate(new Test())).toBe('I am a test instance!');
 
 	translate.configure({
 		fallback: 'sv',
