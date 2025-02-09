@@ -9,13 +9,13 @@
 	"description": "Atomic utilities for making your JavaScript better.",
 	"devDependencies": {
 		"@biomejs/biome": "^1.9",
-		"@types/node": "^22.12",
+		"@types/node": "^22.13",
 		"@vitest/coverage-istanbul": "^3",
 		"dts-bundle-generator": "^9.5",
 		"glob": "^11",
-		"happy-dom": "^16.7",
+		"happy-dom": "^17",
 		"typescript": "^5.7",
-		"vite": "^6",
+		"vite": "^6.1",
 		"vitest": "^3"
 	},
 	"exports": {
@@ -68,6 +68,16 @@
 			"require": {
 				"types": "./types/function.d.cts",
 				"default": "./dist/function.cjs"
+			}
+		},
+		"./i18n": {
+			"import": {
+				"types": "./types/i18n.d.ts",
+				"default": "./dist/i18n.js"
+			},
+			"require": {
+				"types": "./types/i18n.d.cts",
+				"default": "./dist/i18n.cjs"
 			}
 		},
 		"./is": {
@@ -179,15 +189,8 @@
 			}
 		}
 	},
-	"files": [
-		"dist",
-		"src",
-		"types"
-	],
-	"keywords": [
-		"helper",
-		"utility"
-	],
+	"files": ["dist", "src", "types"],
+	"keywords": ["helper", "utility"],
 	"license": "MIT",
 	"main": "./dist/index.cjs",
 	"module": "./dist/index.js",
@@ -205,5 +208,5 @@
 	},
 	"type": "module",
 	"types": "./types/index.d.cts",
-	"version": "0.82.1"
+	"version": "0.83.0"
 }

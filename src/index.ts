@@ -2,6 +2,7 @@ export * from './array/index';
 export * from './color/index';
 export * from './emitter';
 export * from './function';
+export * from './i18n';
 export * from './is';
 export * from './logger';
 export * from './math';
