@@ -17,7 +17,7 @@ type ReverseInferred<Model extends Typed> = {
 		: never;
 };
 
-export type Schema = Record<string, keyof Values>;
+export type Schema = Record<string, keyof Values | (keyof Values)[]>;
 
 export type Schematic<Model> = {
 	/**
@@ -27,6 +27,12 @@ export type Schematic<Model> = {
 };
 
 type Typed = Record<string, unknown>;
+
+type ValidatedSchema = {
+	keys: string[];
+	length: number;
+	schema: Record<string, (keyof Values)[]>;
+};
 
 type Values = {
 	array: unknown[];
@@ -41,8 +47,62 @@ type Values = {
 	symbol: symbol;
 };
 
-function getKeys(value: unknown): string[] {
-	return value && typeof value === 'object' ? Object.keys(value) : [];
+const valueTypes = new Set<keyof Values>([
+	'array',
+	'bigint',
+	'boolean',
+	'date',
+	'function',
+	'number',
+	'object',
+	'string',
+	'symbol',
+]);
+
+function getValidatedSchema(schema: unknown): ValidatedSchema {
+	const validated: ValidatedSchema = {
+		keys: [],
+		length: 0,
+		schema: {},
+	};
+
+	if (typeof schema !== 'object' || schema === null) {
+		return validated;
+	}
+
+	const keys = Object.keys(schema);
+	const {length} = keys;
+
+	for (let index = 0; index < length; index += 1) {
+		const key = keys[index];
+		const value = (schema as Schema)[key];
+
+		const types: (keyof Values)[] = [];
+
+		if (valueTypes.has(value as never)) {
+			types.push(value as never);
+		} else if (Array.isArray(value)) {
+			const typesLength = value.length;
+
+			for (let typeIndex = 0; typeIndex < typesLength; typeIndex += 1) {
+				const type = value[typeIndex];
+
+				if (valueTypes.has(type)) {
+					types.push(type);
+				}
+			}
+		}
+
+		if (types.length > 0) {
+			validated.keys.push(key);
+
+			validated.schema[key] = types;
+
+			validated.length += 1;
+		}
+	}
+
+	return validated;
 }
 
 /**
@@ -60,33 +120,42 @@ export function schematic<Model extends Schema>(
 ): Schematic<Simplify<Inferred<Model>>>;
 
 export function schematic<Model extends Schema>(schema: Model) {
-	const keys = getKeys(schema);
-	const {length} = keys;
+	const validated = getValidatedSchema(schema);
 
-	const canValidate = length > 0;
+	const canValidate = validated.length > 0;
 
 	return Object.freeze({
-		is: (value: unknown) =>
-			canValidate && validate(schema, keys, length, value),
+		is: (value: unknown) => canValidate && validate(validated, value),
 	});
 }
 
-function validate(
-	schema: Schema,
-	keys: string[],
-	length: number,
-	value: unknown,
-): boolean {
-	if (getKeys(value).length !== length) {
+function validate(validated: ValidatedSchema, value: unknown): boolean {
+	if (typeof value !== 'object' || value === null) {
 		return false;
 	}
 
-	for (let index = 0; index < length; index += 1) {
-		const key = keys[index];
+	outer: for (let index = 0; index < validated.length; index += 1) {
+		const key = validated.keys[index];
+		const types = validated.schema[key];
+		const val = (value as PlainObject)[key];
 
-		if (!validators[schema[key]]((value as PlainObject)[key])) {
-			return false;
+		const typesLength = types.length;
+
+		if (typesLength === 1) {
+			if (!validators[types[0]](val)) {
+				return false;
+			}
+
+			continue;
 		}
+
+		for (let typeIndex = 0; typeIndex < typesLength; typeIndex += 1) {
+			if (validators[types[typeIndex]](val)) {
+				continue outer;
+			}
+		}
+
+		return false;
 	}
 
 	return true;

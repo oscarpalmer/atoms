@@ -11,6 +11,7 @@ export * from './number';
 export * from './query';
 export * from './queue';
 export * from './random';
+export * from './schema';
 export * from './sized';
 export * from './string/index';
 export * from './touch';
