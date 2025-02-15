@@ -8,13 +8,15 @@ type FindKey<Model, Value> = {
 type Inferred<Model extends Schema> = {
 	[Key in keyof Model]: Model[Key] extends keyof Values
 		? Values[Model[Key]]
-		: never;
+		: Model[Key] extends (keyof Values)[]
+			? Values[Model[Key][number]]
+			: never;
 };
 
 type ReverseInferred<Model extends Typed> = {
 	[Key in keyof Model]: Model[Key] extends Values[keyof Values]
 		? FindKey<Values, Model[Key]>
-		: never;
+		: FindKey<Values, Model[Key]>[];
 };
 
 export type Schema = Record<string, keyof Values | (keyof Values)[]>;
