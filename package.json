@@ -4,7 +4,7 @@
 		"url": "https://oscarpalmer.se"
 	},
 	"dependencies": {
-		"type-fest": "^4.34"
+		"type-fest": "^4.36"
 	},
 	"description": "Atomic utilities for making your JavaScript better.",
 	"devDependencies": {
@@ -14,8 +14,8 @@
 		"dts-bundle-generator": "^9.5",
 		"glob": "^11",
 		"happy-dom": "^17.1",
-		"typescript": "^5.7",
-		"vite": "^6.1",
+		"typescript": "^5.8",
+		"vite": "^6.2",
 		"vitest": "^3"
 	},
 	"exports": {
@@ -218,5 +218,5 @@
 	},
 	"type": "module",
 	"types": "./types/index.d.cts",
-	"version": "0.86.1"
+	"version": "0.87.0"
 }

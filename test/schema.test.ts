@@ -8,10 +8,12 @@ test('basic schema', () => {
 		boolean: 'boolean',
 		date: 'date',
 		function: 'function',
+		null: 'null',
 		number: 'number',
 		object: 'object',
 		string: 'string',
 		symbol: 'symbol',
+		undefined: 'undefined',
 	} satisfies Schema.Schema;
 
 	const basicSchematic = Schema.schematic(schema);
@@ -22,10 +24,12 @@ test('basic schema', () => {
 		boolean: true,
 		date: new Date(),
 		function: () => {},
+		null: null,
 		number: 1,
 		object: {},
 		string: 'hello, world!',
 		symbol: Symbol('a symbol?'),
+		undefined: undefined,
 	};
 
 	const second = {};
@@ -55,11 +59,22 @@ test('complex schema', () => {
 		bigintOrString: ['bigint', 'string'],
 		booleanOrDateOrNumber: ['boolean', 'date', 'number'],
 		dateOrFunction: ['date', 'function'],
-		functionOrNumber: ['function', 'number'],
+		functionOrNumber: {
+			required: 'maybe?' as never,
+			type: ['function', 'number'],
+		},
 		invalid: 'invalid' as never,
 		multipleInvalid: ['invalid', 'invalid'] as never,
 		none: [],
 		numberOrObject: ['number', 'object'],
+		optionalMultiple: {
+			required: false,
+			type: ['boolean', 'number'],
+		},
+		optionalSingle: {
+			required: false,
+			type: 'string',
+		},
 		someInvalid: ['number', 'invalid', 'object'] as never,
 		symbol: 'symbol',
 	} satisfies Schema.Schema;
@@ -78,17 +93,22 @@ test('complex schema', () => {
 	};
 
 	expect(complexSchematic.is(first)).toBe(true);
+	expect(complexSchematic.is({...first, someInvalid: false})).toBe(false);
 
-	const second = {
-		arrayOrBoolean: 'invalid',
-		bigintOrString: BigInt(1),
-		booleanOrDateOrNumber: 'invalid',
-		dateOrFunction: 'invalid',
-		functionOrNumber: 'invalid',
-		numberOrObject: 'invalid',
-		someInvalid: 'invalid',
-		symbol: 'invalid',
-	};
+	const keys = Object.keys(first);
+	const {length} = keys;
 
-	expect(complexSchematic.is(second)).toBe(false);
+	for (let index = 0; index < length; index += 1) {
+		const key = keys[index];
+		const second = {...first, [key]: undefined};
+
+		expect(complexSchematic.is(second)).toBe(false);
+	}
+
+	expect(complexSchematic.is({...first, optionalSingle: 'abc'})).toBe(true);
+	expect(complexSchematic.is({...first, optionalSingle: 123})).toBe(false);
+
+	expect(complexSchematic.is({...first, optionalMultiple: true})).toBe(true);
+	expect(complexSchematic.is({...first, optionalMultiple: 123})).toBe(true);
+	expect(complexSchematic.is({...first, optionalMultiple: 'abc'})).toBe(false);
 });
