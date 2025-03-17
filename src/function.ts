@@ -1,9 +1,11 @@
 import type {GenericCallback} from './models';
 import {clamp} from './number';
+import {SizedMap} from './sized';
+import {getString, join} from './string';
 
-type Debounced<Callback extends GenericCallback> = Callback & {
+type CancellableCallback<Callback extends GenericCallback> = Callback & {
 	/**
-	 * Cancel the debounce
+	 * Cancel the callback
 	 */
 	cancel: () => void;
 };
@@ -11,21 +13,26 @@ type Debounced<Callback extends GenericCallback> = Callback & {
 class Memoised<Callback extends GenericCallback> {
 	declare readonly state: MemoisedState<Callback>;
 
-	constructor(callback: Callback) {
-		const cache = new Map();
+	constructor(callback: Callback, cacheSize?: number) {
+		const cache = new SizedMap<unknown, ReturnType<Callback>>(
+			cacheSize ?? 2 ** 16,
+		);
 
 		const getter = (
 			...parameters: Parameters<Callback>
 		): ReturnType<Callback> => {
-			const key = parameters[0];
+			const key =
+				parameters.length === 1
+					? parameters[0]
+					: join(parameters.map(getString));
 
-			if (cache.has(key)) {
-				return cache.get(key);
+			if (cache?.has(key) ?? false) {
+				return cache?.get(key) as ReturnType<Callback>;
 			}
 
 			const value = callback(...parameters);
 
-			cache.set(key, value);
+			cache?.set(key, value);
 
 			return value;
 		};
@@ -43,31 +50,31 @@ class Memoised<Callback extends GenericCallback> {
 	/**
 	 * Delete a result from the cache
 	 */
-	delete(key: Parameters<Callback>[0]): boolean {
-		return this.state.cache?.delete(key);
+	delete(key: unknown): boolean {
+		return this.state.cache?.delete(key) ?? false;
 	}
 
 	/**
 	 * Destroy the instance, clearing its cache and removing its callback
 	 */
 	destroy(): void {
-		this.state.cache.clear();
+		this.state.cache?.clear();
 
-		this.state.cache = undefined as never;
-		this.state.getter = noop as never;
+		this.state.cache = undefined;
+		this.state.getter = undefined;
 	}
 
 	/**
 	 * Get a result from the cache if it exists _(or `undefined` otherwise)_
 	 */
-	get(key: Parameters<Callback>[0]): ReturnType<Callback> | undefined {
+	get(key: unknown): ReturnType<Callback> | undefined {
 		return this.state.cache?.get(key);
 	}
 
 	/**
 	 * Does the result exist?
 	 */
-	has(key: Parameters<Callback>[0]): boolean {
+	has(key: unknown): boolean {
 		return this.state.cache?.has(key) ?? false;
 	}
 
@@ -75,13 +82,17 @@ class Memoised<Callback extends GenericCallback> {
 	 * Get the result from the cache if it exists; otherwise runs the callback, caches the result, and returns it
 	 */
 	run(...parameters: Parameters<Callback>): ReturnType<Callback> {
+		if (this.state.cache == null || this.state.getter == null) {
+			throw new Error('The memoised instance has been destroyed');
+		}
+
 		return this.state.getter(...parameters);
 	}
 }
 
 type MemoisedState<Callback extends GenericCallback> = {
-	cache: Map<Parameters<Callback>[0], ReturnType<Callback>>;
-	getter: (...parameters: Parameters<Callback>) => ReturnType<Callback>;
+	cache?: SizedMap<unknown, ReturnType<Callback>>;
+	getter?: (...parameters: Parameters<Callback>) => ReturnType<Callback>;
 };
 
 /**
@@ -93,21 +104,25 @@ type MemoisedState<Callback extends GenericCallback> = {
 export function debounce<Callback extends GenericCallback>(
 	callback: Callback,
 	time?: number,
-): Debounced<Callback> {
+): CancellableCallback<Callback> {
 	const interval = clamp(time ?? 0, 0, 1000);
 
-	let timer: unknown;
+	let timer: number;
 
 	const debounced = ((...parameters: Parameters<Callback>) => {
-		clearTimeout(timer as never);
+		if (timer != null) {
+			clearTimeout(timer);
+		}
 
-		timer = setTimeout(() => {
+		timer = +setTimeout(() => {
 			callback(...parameters);
 		}, interval);
-	}) as Debounced<Callback>;
+	}) as CancellableCallback<Callback>;
 
 	debounced.cancel = () => {
-		clearTimeout(timer as never);
+		if (timer != null) {
+			clearTimeout(timer);
+		}
 	};
 
 	return debounced;
@@ -118,8 +133,9 @@ export function debounce<Callback extends GenericCallback>(
  */
 export function memoise<Callback extends GenericCallback>(
 	callback: Callback,
+	cacheSize?: number,
 ): Memoised<Callback> {
-	return new Memoised(callback);
+	return new Memoised(callback, cacheSize);
 }
 
 /**
@@ -134,14 +150,16 @@ export function noop(): void {}
 export function throttle<Callback extends GenericCallback>(
 	callback: Callback,
 	time?: number,
-): Callback {
+): CancellableCallback<Callback> {
 	const interval = clamp(time ?? 0, 0, 1000);
 
 	let timestamp = performance.now();
-	let timer: unknown;
+	let timer: number;
 
-	return ((...parameters: Parameters<Callback>) => {
-		clearTimeout(timer as never);
+	const throttler = (...parameters: Parameters<Callback>) => {
+		if (timer != null) {
+			clearTimeout(timer);
+		}
 
 		const now = performance.now();
 		const difference = now - timestamp;
@@ -151,11 +169,19 @@ export function throttle<Callback extends GenericCallback>(
 
 			callback(...parameters);
 		} else {
-			timer = setTimeout(() => {
+			timer = +setTimeout(() => {
 				timestamp = performance.now();
 
 				callback(...parameters);
 			}, difference + interval);
 		}
-	}) as Callback;
+	};
+
+	throttler.cancel = () => {
+		if (timer != null) {
+			clearTimeout(timer);
+		}
+	};
+
+	return throttler as CancellableCallback<Callback>;
 }

@@ -1,4 +1,5 @@
 import {handleValue} from '../internal/value/handle';
+import {getPaths} from '../internal/value/paths';
 import type {ArrayOrPlainObject, Paths, PlainObject} from '../models';
 
 /**
@@ -32,28 +33,45 @@ export function setValue<Data extends ArrayOrPlainObject>(
 	value: unknown,
 	ignoreCase?: boolean,
 ): Data {
+	if (
+		typeof data !== 'object' ||
+		data === null ||
+		typeof path !== 'string' ||
+		path.trim().length === 0
+	) {
+		return data;
+	}
+
 	const shouldIgnoreCase = ignoreCase === true;
-	const parts = (shouldIgnoreCase ? path.toLowerCase() : path).split('.');
-	const {length} = parts;
+	const paths = getPaths(path, shouldIgnoreCase);
+	const {length} = paths;
 	const lastIndex = length - 1;
 
 	let target: ArrayOrPlainObject = data;
 
 	for (let index = 0; index < length; index += 1) {
-		const part = parts[index];
+		const path = paths[index];
 
 		if (index === lastIndex) {
-			handleValue(target, part, value, false, shouldIgnoreCase);
+			handleValue(target, path, value, false, shouldIgnoreCase);
 
 			break;
 		}
 
-		let next = handleValue(target, part, null, true, shouldIgnoreCase);
+		let next = handleValue(target, path, null, true, shouldIgnoreCase);
 
 		if (typeof next !== 'object' || next === null) {
-			next = {};
+			const nextPath = paths[index + 1];
 
-			(target as PlainObject)[part] = next;
+			if (indexExpression.test(nextPath)) {
+				const length = Number.parseInt(nextPath, 10) + 1;
+
+				next = Array.from({length}, () => undefined);
+			} else {
+				next = {};
+			}
+
+			(target as PlainObject)[path] = next;
 		}
 
 		target = next as ArrayOrPlainObject;
@@ -61,3 +79,5 @@ export function setValue<Data extends ArrayOrPlainObject>(
 
 	return data;
 }
+
+const indexExpression = /^\d+$/;

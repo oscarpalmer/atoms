@@ -1,4 +1,4 @@
-import {words} from './index';
+import {join, words} from './index';
 
 /**
  * Convert a string to camel case _(thisIsCamelCase)_
@@ -8,11 +8,11 @@ export function camelCase(value: string): string {
 }
 
 /**
- * Capitalise the first letter of a string _(and lowercase the rest)_
+ * Capitalize the first letter of a string _(and lowercase the rest)_
  */
-export function capitalise(value: string): string {
-	if (value.length === 0) {
-		return value;
+export function capitalize(value: string): string {
+	if (typeof value !== 'string' || value.length === 0) {
+		return '';
 	}
 
 	return value.length === 1
@@ -42,41 +42,78 @@ export function snakeCase(value: string): string {
 }
 
 /**
- * Convert a string to title case _(capitalising every word)_
+ * Convert a string to title case _(Capitalizing Every Word)_
  */
 export function titleCase(value: string): string {
-	return words(value).map(capitalise).join(' ');
+	return typeof value === 'string'
+		? value.length < 1
+			? capitalize(value)
+			: words(value).map(capitalize).join(' ')
+		: '';
 }
 
 function toCase(
 	value: string,
 	delimiter: string,
-	capitaliseAny: boolean,
-	capitaliseFirst: boolean,
+	capitalizeAny: boolean,
+	capitalizeFirst: boolean,
 ): string {
-	return words(value)
-		.map((word, index) => {
-			/**
-			 * Splitting formatted words into parts:
-			 * 1. `IDs` -> `['IDs']`
-			 * 2. `safeHTML` -> `['safe', 'HTML']`
-			 * 3. `escapeHTMLEntities` -> `['escape', 'HTML', 'Entities']`
-			 */
-			const parts = word
-				.replace(/(\p{Lu}*)(\p{Lu})(\p{Ll}+)/gu, (full, one, two, three) =>
-					three === 's' ? full : `${one}-${two}${three}`,
-				)
-				.replace(/(\p{Ll})(\p{Lu})/gu, '$1-$2')
-				.split('-');
+	if (typeof value !== 'string') {
+		return '';
+	}
 
-			return parts
-				.filter(part => part.length > 0)
-				.map((part, partIndex) =>
-					!capitaliseAny || (partIndex === 0 && index === 0 && !capitaliseFirst)
-						? part.toLocaleLowerCase()
-						: capitalise(part),
-				)
-				.join(delimiter);
-		})
-		.join(delimiter);
+	if (value.length < 1) {
+		return value;
+	}
+
+	const parts = words(value);
+	const partsLength = parts.length;
+
+	const result: string[] = [];
+
+	for (let partIndex = 0; partIndex < partsLength; partIndex += 1) {
+		const part = parts[partIndex];
+
+		const acronymParts = part.replace(
+			acronymExpression,
+			(full, one, two, three) =>
+				three === 's' ? full : `${one}-${two}${three}`,
+		);
+
+		const camelCaseParts = acronymParts.replace(camelCaseExpression, '$1-$2');
+
+		const items = camelCaseParts.split('-');
+		const itemsLength = items.length;
+
+		const partResult: string[] = [];
+
+		let itemCount = 0;
+
+		for (let itemIndex = 0; itemIndex < itemsLength; itemIndex += 1) {
+			const item = items[itemIndex];
+
+			if (item.length === 0) {
+				continue;
+			}
+
+			if (
+				!capitalizeAny ||
+				(itemCount === 0 && partIndex === 0 && !capitalizeFirst)
+			) {
+				partResult.push(item.toLocaleLowerCase());
+			} else {
+				partResult.push(capitalize(item));
+			}
+
+			itemCount += 1;
+		}
+
+		result.push(join(partResult, delimiter));
+	}
+
+	return join(result, delimiter);
 }
+
+const camelCaseExpression = /(\p{Ll})(\p{Lu})/gu;
+
+const acronymExpression = /(\p{Lu}*)(\p{Lu})(\p{Ll}+)/gu;

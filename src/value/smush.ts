@@ -8,31 +8,48 @@ type Smushed<Value> = Simplify<{
 	[Key in Paths<Value>]: Get<Value, ToString<Key>>;
 }>;
 
-function flatten(value: ArrayOrPlainObject, prefix?: string): PlainObject {
+function flatten(
+	value: ArrayOrPlainObject,
+	depth: number,
+	smushed: WeakMap<WeakKey, PlainObject>,
+	prefix?: string,
+): PlainObject {
+	if (depth >= 100) {
+		return {};
+	}
+
+	if (smushed.has(value)) {
+		return smushed.get(value) as never;
+	}
+
 	const keys = Object.keys(value);
 	const {length} = keys;
-	const smushed = {} as Record<string, unknown>;
+	const flattened = {} as Record<string, unknown>;
 
 	for (let index = 0; index < length; index += 1) {
 		const key = keys[index];
 		const val = value[key as never];
 
 		if (isArrayOrPlainObject(val)) {
-			Object.assign(smushed, {
+			Object.assign(flattened, {
 				[join([prefix, key], '.')]: Array.isArray(val) ? [...val] : {...val},
-				...flatten(val, join([prefix, key], '.')),
+				...flatten(val, depth + 1, smushed, join([prefix, key], '.')),
 			});
 		} else {
-			smushed[join([prefix, key], '.')] = val;
+			flattened[join([prefix, key], '.')] = val;
 		}
 	}
 
-	return smushed as never;
+	smushed.set(value, flattened);
+
+	return flattened as never;
 }
 
 /**
  * Smush an object into a flat object that uses dot notation keys
  */
 export function smush<Value extends PlainObject>(value: Value): Smushed<Value> {
-	return flatten(value) as never;
+	return typeof value === 'object' && value !== null
+		? (flatten(value, 0, new WeakMap()) as never)
+		: ({} as never);
 }

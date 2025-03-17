@@ -156,8 +156,9 @@ test('SizedSet', () =>
 			setTimeout(() => {
 				expect(valuesSet.get('b'), 'b');
 				expect(maxSet.get('c', true), 'c');
-				expect(shrunkSet.at(1), 'a');
-				expect(shrunkSet.at(0, true), 'd');
+				expect(shrunkSet.get('a'), 'a');
+				expect(shrunkSet.get('d', true), 'd');
+				expect(shrunkSet.get('x'), undefined);
 
 				expect(valuesSet.full).toBe(false);
 				expect(valuesSet.maximum).toBe(niceMax);

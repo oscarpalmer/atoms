@@ -9,7 +9,6 @@ export * from './math';
 export * from './models';
 export * from './number';
 export * from './query';
-export * from './queue';
 export * from './random';
 export * from './schema';
 export * from './sized';

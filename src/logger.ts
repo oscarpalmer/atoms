@@ -1,82 +1,76 @@
 import {noop} from './function';
 
-declare global {
-	var _atomic_logging: boolean;
-}
-
-if (globalThis._atomic_logging == null) {
-	globalThis._atomic_logging = true;
-}
+let enabled = true;
 
 class Logger {
 	/**
 	 * Log any number of values at the "debug" log level
 	 */
 	get debug() {
-		return this.enabled ? console.debug : noop;
+		return enabled ? console.debug : noop;
 	}
 
 	/**
 	 * Log the value and shows all its properties
 	 */
 	get dir() {
-		return this.enabled ? console.dir : noop;
+		return enabled ? console.dir : noop;
 	}
 
 	/**
 	 * Is logging to the console enabled? _(defaults to `true`)_
 	 */
 	get enabled() {
-		return globalThis._atomic_logging ?? true;
+		return enabled;
 	}
 
 	/**
 	 * Enable or disable logging to the console
 	 */
 	set enabled(value: boolean) {
-		globalThis._atomic_logging = value;
+		enabled = typeof value === 'boolean' ? value : enabled;
 	}
 
 	/**
 	 * Log any number of values at the "error" log level
 	 */
 	get error() {
-		return this.enabled ? console.error : noop;
+		return enabled ? console.error : noop;
 	}
 
 	/**
 	 * Log any number of values at the "info" log level
 	 */
 	get info() {
-		return this.enabled ? console.info : noop;
+		return enabled ? console.info : noop;
 	}
 
 	/**
 	 * Log any number of values at the "log" log level
 	 */
 	get log() {
-		return this.enabled ? console.log : noop;
+		return enabled ? console.log : noop;
 	}
 
 	/**
 	 * Log data as a table, with optional properties to use as columns
 	 */
 	get table() {
-		return this.enabled ? console.table : noop;
+		return enabled ? console.table : noop;
 	}
 
 	/**
 	 * Log any number of values together with a trace from where it was called
 	 */
 	get trace() {
-		return this.enabled ? console.trace : noop;
+		return enabled ? console.trace : noop;
 	}
 
 	/**
 	 * Log any number of values at the "warn" log level
 	 */
 	get warn() {
-		return this.enabled ? console.warn : noop;
+		return enabled ? console.warn : noop;
 	}
 
 	/**
@@ -94,7 +88,7 @@ class Time {
 	constructor(label: string) {
 		this.state = {
 			label,
-			started: globalThis._atomic_logging ?? true,
+			started: enabled,
 			stopped: false,
 		};
 
@@ -108,7 +102,7 @@ class Time {
 	 * - _(Ignored if logging is disabled)_
 	 */
 	log(): void {
-		if (this.state.started && !this.state.stopped && logger.enabled) {
+		if (this.state.started && !this.state.stopped && enabled) {
 			console.timeLog(this.state.label);
 		}
 	}

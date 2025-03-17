@@ -32,5 +32,31 @@ export function count<
 >(array: Item[], key: ItemKey, value: ReturnType<ItemKey>): number;
 
 export function count(array: unknown[], ...parameters: unknown[]): number {
-	return findValues('all', array, parameters).length;
+	if (
+		Array.isArray(parameters) &&
+		parameters.length === 1 &&
+		typeof parameters[0] !== 'function'
+	) {
+		if (!Array.isArray(array)) {
+			return Number.NaN;
+		}
+
+		const {length} = array;
+
+		if (length === 0) {
+			return 0;
+		}
+
+		const value = parameters[0];
+
+		let result = 0;
+
+		for (let index = 0; index < length; index += 1) {
+			result += Object.is(array[index], value) ? 1 : 0;
+		}
+
+		return result;
+	}
+
+	return findValues('all', array, parameters, true)?.length ?? Number.NaN;
 }

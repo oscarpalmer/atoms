@@ -1,4 +1,10 @@
-import type {ArrayOrPlainObject, Key, PlainObject, Primitive} from './models';
+import type {
+	ArrayOrPlainObject,
+	Key,
+	PlainObject,
+	Primitive,
+	TypedArray,
+} from './models';
 import {getString} from './string/index';
 
 /**
@@ -17,15 +23,13 @@ export function isEmpty(value: ArrayOrPlainObject): boolean {
 	const values = Object.values(value);
 	const {length} = values;
 
-	let count = 0;
-
 	for (let index = 0; index < length; index += 1) {
 		if (values[index] != null) {
-			count += 1;
+			return false;
 		}
 	}
 
-	return count === 0;
+	return true;
 }
 
 /**
@@ -57,7 +61,7 @@ export function isNullableOrEmpty(
 export function isNullableOrWhitespace(
 	value: unknown,
 ): value is undefined | null | '' {
-	return value == null || /^\s*$/.test(getString(value));
+	return value == null || whiteSpaceExpression.test(getString(value));
 }
 
 /**
@@ -92,18 +96,20 @@ export function isObject(value: unknown): value is object {
  * Is the value a plain object?
  */
 export function isPlainObject(value: unknown): value is PlainObject {
-	if (typeof value !== 'object' || value === null) {
+	if (value === null || typeof value !== 'object') {
+		return false;
+	}
+
+	if (Symbol.toStringTag in value || Symbol.iterator in value) {
 		return false;
 	}
 
 	const prototype = Object.getPrototypeOf(value);
 
 	return (
-		(prototype === null ||
-			prototype === Object.prototype ||
-			Object.getPrototypeOf(prototype) === null) &&
-		!(Symbol.toStringTag in value) &&
-		!(Symbol.iterator in value)
+		prototype === null ||
+		prototype === Object.prototype ||
+		Object.getPrototypeOf(prototype) === null
 	);
 }
 
@@ -111,8 +117,26 @@ export function isPlainObject(value: unknown): value is PlainObject {
  * Is the value a primitive value?
  */
 export function isPrimitive(value: unknown): value is Primitive {
+	return value == null || primitiveExpression.test(typeof value);
+}
+
+export function isTypedArray(value: unknown): value is TypedArray {
 	return (
-		value == null ||
-		/^(bigint|boolean|number|string|symbol)$/.test(typeof value)
+		value instanceof Int8Array ||
+		value instanceof Uint8Array ||
+		value instanceof Uint8ClampedArray ||
+		value instanceof Int16Array ||
+		value instanceof Uint16Array ||
+		value instanceof Int32Array ||
+		value instanceof Uint32Array ||
+		value instanceof Float32Array ||
+		value instanceof Float64Array ||
+		value instanceof BigInt64Array ||
+		value instanceof BigUint64Array
 	);
 }
+
+//
+
+const primitiveExpression = /^(bigint|boolean|number|string|symbol)$/;
+const whiteSpaceExpression = /^\s*$/;

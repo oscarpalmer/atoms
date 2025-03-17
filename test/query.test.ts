@@ -3,6 +3,7 @@ import {fromQuery, toQuery} from '../src/query';
 
 const query = {
 	complex: 'a=1&a=2&a=3&b=x&b=true&b=99&c=H&c=e&c=l&c=l&c=o&d.e=f',
+	ignored: '__proto__=ignored&nested.prototype=ignored&constructor=ignored',
 	simple: 'a=1&b=Hello%20World&c=true',
 };
 
@@ -21,8 +22,13 @@ const parameters = {
 };
 
 test('fromQuery', () => {
-	expect(fromQuery(query.simple)).toEqual(parameters.simple);
-	expect(fromQuery(query.complex)).toEqual(parameters.complex);
+	expect(fromQuery(`${query.simple}&${query.ignored}`)).toEqual(
+		parameters.simple,
+	);
+
+	expect(fromQuery(`${query.complex}&${query.ignored}`)).toEqual(
+		parameters.complex,
+	);
 });
 
 test('toQuery', () => {

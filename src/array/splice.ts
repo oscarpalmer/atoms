@@ -16,7 +16,7 @@ export function splice<Item>(
 
 /**
  * - Splices values into an array and returns any removed values
- * - Uses chunking to avoid stack overflow
+ * - _(Uses chunking to avoid call stack size being exceeded)_
  */
 export function splice<Item>(
 	array: Item[],
@@ -26,7 +26,7 @@ export function splice<Item>(
 
 /**
  * - Splices values into an array and returns any removed values
- * - Uses chunking to avoid stack overflow
+ * - _(Uses chunking to avoid call stack size being exceeded)_
  */
 export function splice<Item>(
 	array: Item[],
@@ -36,18 +36,16 @@ export function splice<Item>(
 ): Item[];
 
 export function splice(
-	array: unknown[],
-	start: number,
-	first?: number | unknown[],
-	second?: unknown[],
+	array: unknown,
+	start: unknown,
+	deleteCountOrItems?: unknown,
+	items?: unknown,
 ): unknown[] {
-	const isArray = Array.isArray(first);
-
 	return insertValues(
 		'splice',
 		array,
-		isArray ? first : (second ?? []),
+		typeof deleteCountOrItems === 'number' ? items : deleteCountOrItems,
 		start,
-		isArray ? array.length : typeof first === 'number' && first > 0 ? first : 0,
+		typeof deleteCountOrItems === 'number' ? deleteCountOrItems : 0,
 	) as unknown[];
 }

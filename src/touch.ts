@@ -6,29 +6,42 @@ type NavigatorWithMsMaxTouchPoints = Navigator & {
  * Does the browser/device support touch?
  */
 const supportsTouch = (() => {
-	let value = false;
+	if (typeof window === 'undefined' || typeof navigator === 'undefined') {
+		return false;
+	}
 
 	try {
 		if ('matchMedia' in window) {
 			const media = matchMedia('(pointer: coarse)');
 
-			if (typeof media?.matches === 'boolean') {
-				value = media.matches;
+			if (typeof media?.matches === 'boolean' && media.matches) {
+				return true;
 			}
 		}
 
-		if (!value) {
-			value =
-				'ontouchstart' in window ||
-				navigator.maxTouchPoints > 0 ||
-				((navigator as NavigatorWithMsMaxTouchPoints).msMaxTouchPoints ?? 0) >
-					0;
+		if ('ontouchstart' in window) {
+			return true;
 		}
-	} catch {
-		value = false;
-	}
 
-	return value;
+		if (
+			typeof navigator.maxTouchPoints === 'number' &&
+			navigator.maxTouchPoints > 0
+		) {
+			return true;
+		}
+
+		if (
+			typeof (navigator as NavigatorWithMsMaxTouchPoints).msMaxTouchPoints ===
+				'number' &&
+			(navigator as NavigatorWithMsMaxTouchPoints).msMaxTouchPoints > 0
+		) {
+			return true;
+		}
+
+		return false;
+	} catch {
+		return false;
+	}
 })();
 
 export default supportsTouch;

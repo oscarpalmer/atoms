@@ -1,5 +1,6 @@
 import {expect, test} from 'vitest';
-import {clone} from '../src/value';
+import {PlainObject} from '../src/models';
+import {clone, getValue} from '../src/value';
 
 class Test {
 	constructor(
@@ -131,4 +132,129 @@ test('symbol', () => {
 	const cloned = clone(data);
 
 	expect(cloned).not.toBe(data);
+});
+
+test('typed array', () => {
+	const arrays = [
+		new Uint8Array([1, 2, 3]),
+		new Uint8ClampedArray([1, 2, 3]),
+		new Uint16Array([1, 2, 3]),
+		new Uint32Array([1, 2, 3]),
+		new Int8Array([1, 2, 3]),
+		new Int16Array([1, 2, 3]),
+		new Int32Array([1, 2, 3]),
+		new Float32Array([1, 2, 3]),
+		new Float64Array([1, 2, 3]),
+		new BigUint64Array([1n, 2n, 3n]),
+		new BigInt64Array([1n, 2n, 3n]),
+	];
+
+	for (const array of arrays) {
+		const cloned = clone(array);
+
+		expect(cloned).not.toBe(array);
+		expect(cloned).toBeInstanceOf(array.constructor);
+		expect(cloned).toEqual(array);
+	}
+});
+
+test('depth', () => {
+	const values = [
+		[1, 2, 3],
+		{a: 1, b: 2},
+		new ArrayBuffer(8),
+		new DataView(new ArrayBuffer(8)),
+		new Date('2000-01-01'),
+		new Map([
+			['a', 1],
+			['b', 2],
+		]),
+		document.createElement('div'),
+		/test/,
+		new Set([1, 2, 3]),
+		new Int8Array([1, 2, 3]),
+		new WeakMap(),
+		new WeakSet(),
+	];
+
+	for (const value of values) {
+		const index = values.indexOf(value);
+
+		const data: PlainObject = {};
+		const parts: number[] = [];
+
+		let current = data;
+
+		for (let index = 0; index < 100; index += 1) {
+			parts.push(index);
+
+			if (index === 99) {
+				current[index] = value;
+
+				current = current[index] as PlainObject;
+			} else {
+				current = current[index] = {};
+			}
+		}
+
+		const cloned = clone(data);
+
+		const key = parts.join('.');
+
+		const last = getValue(cloned, key) as PlainObject;
+
+		if (index < 2) {
+			expect(last).toEqual(value);
+		} else {
+			expect(last).toBe(value);
+		}
+	}
+});
+
+test('references', () => {
+	const values = [
+		[1, 2, 3],
+		{a: 1, b: 2},
+		new ArrayBuffer(8),
+		new DataView(new ArrayBuffer(8)),
+		new Date('2000-01-01'),
+		new Map([
+			['a', 1],
+			['b', 2],
+		]),
+		document.createElement('div'),
+		/test/,
+		new Set([1, 2, 3]),
+		new Int8Array([1, 2, 3]),
+		new WeakMap(),
+		new WeakSet(),
+	];
+
+	for (const value of values) {
+		const index = values.indexOf(value);
+
+		const data = {
+			value,
+			nested: {
+				value,
+			},
+		};
+
+		const cloned = clone(data);
+
+		expect(cloned).not.toBe(data);
+
+		if (values.length - index < 3) {
+			expect(cloned.value).toBe(data.value);
+			expect(cloned.nested.value).toBe(data.nested.value);
+		} else {
+			expect(cloned.value).not.toBe(data.value);
+			expect(cloned.nested.value).not.toBe(data.nested.value);
+		}
+
+		expect(cloned.value).toEqual(data.value);
+		expect(cloned.nested.value).toEqual(data.nested.value);
+
+		expect(cloned.value).toBe(cloned.nested.value);
+	}
 });

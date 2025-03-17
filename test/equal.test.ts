@@ -40,6 +40,27 @@ test('array', () => {
 	expect(equal([1, 2, 3], [1, 2, 3])).toBe(true);
 	expect(equal([1, 2, 3], [3, 2, 1])).toBe(false);
 	expect(equal([1, 2, 3], [1, 2])).toBe(false);
+
+	const first_1 = Array.from({length: 100}, (_, index) => index);
+	const second_1 = Array.from({length: 100}, (_, index) => index);
+
+	second_1[2] = second_1[2] + 1;
+
+	expect(equal(first_1, second_1)).toBe(false);
+
+	const first_2 = Array.from({length: 100}, (_, index) => index);
+	const second_2 = Array.from({length: 100}, (_, index) => index);
+
+	second_2[98] = second_2[98] + 1;
+
+	expect(equal(first_2, second_2)).toBe(false);
+
+	const first_3 = Array.from({length: 100}, (_, index) => index);
+	const second_3 = Array.from({length: 100}, (_, index) => index);
+
+	second_3[50] = second_3[50] + 1;
+
+	expect(equal(first_3, second_3)).toBe(false);
 });
 
 test('arry buffer', () => {
@@ -58,6 +79,11 @@ test('data view', () => {
 
 	expect(equal(first, second)).toBe(true);
 	expect(equal(first, third)).toBe(false);
+
+	const fourth = new DataView(new ArrayBuffer(8), 0);
+	const fifth = new DataView(new ArrayBuffer(8), 1);
+
+	expect(equal(fourth, fifth)).toBe(false);
 });
 
 test('date', () => {
@@ -180,5 +206,115 @@ test('symbol', () => {
 	const second = Symbol('abc');
 
 	expect(equal(first, first)).toBe(true);
+	expect(equal(first, second)).toBe(false);
+});
+
+test('typed array', () => {
+	const base = [
+		new Int8Array([1, 2, 3]),
+		new Uint8Array([1, 2, 3]),
+		new Uint8ClampedArray([1, 2, 3]),
+		new Int16Array([1, 2, 3]),
+		new Uint16Array([1, 2, 3]),
+		new Int32Array([1, 2, 3]),
+		new Uint32Array([1, 2, 3]),
+		new Float32Array([1, 2, 3]),
+		new Float64Array([1, 2, 3]),
+		new BigInt64Array([1n, 2n, 3n]),
+		new BigUint64Array([1n, 2n, 3n]),
+	];
+
+	const first = [
+		new Int8Array([1, 2, 3]),
+		new Uint8Array([1, 2, 3]),
+		new Uint8ClampedArray([1, 2, 3]),
+		new Int16Array([1, 2, 3]),
+		new Uint16Array([1, 2, 3]),
+		new Int32Array([1, 2, 3]),
+		new Uint32Array([1, 2, 3]),
+		new Float32Array([1, 2, 3]),
+		new Float64Array([1, 2, 3]),
+		new BigInt64Array([1n, 2n, 3n]),
+		new BigUint64Array([1n, 2n, 3n]),
+	];
+
+	const second = [
+		new Int8Array([3, 2, 1]),
+		new Uint8Array([3, 2, 1]),
+		new Uint8ClampedArray([3, 2, 1]),
+		new Int16Array([3, 2, 1]),
+		new Uint16Array([3, 2, 1]),
+		new Int32Array([3, 2, 1]),
+		new Uint32Array([3, 2, 1]),
+		new Float32Array([3, 2, 1]),
+		new Float64Array([3, 2, 1]),
+		new BigInt64Array([3n, 2n, 1n]),
+		new BigUint64Array([3n, 2n, 1n]),
+	];
+
+	const third = [
+		new Int8Array([4, 5, 6, 7, 8, 9]),
+		new Uint8Array([4, 5, 6, 7, 8, 9]),
+		new Uint8ClampedArray([4, 5, 6, 7, 8, 9]),
+		new Int16Array([4, 5, 6, 7, 8, 9]),
+		new Uint16Array([4, 5, 6, 7, 8, 9]),
+		new Int32Array([4, 5, 6, 7, 8, 9]),
+		new Uint32Array([4, 5, 6, 7, 8, 9]),
+		new Float32Array([4, 5, 6, 7, 8, 9]),
+		new Float64Array([4, 5, 6, 7, 8, 9]),
+		new BigInt64Array([4n, 5n, 6n, 7n, 8n, 9n]),
+		new BigUint64Array([4n, 5n, 6n, 7n, 8n, 9n]),
+	];
+
+	const {length} = base;
+
+	for (let baseIndex = 0; baseIndex < length; baseIndex += 1) {
+		const baseItem = base[baseIndex];
+
+		for (let sameIndex = 0; sameIndex < length; sameIndex += 1) {
+			const sameItem = base[sameIndex];
+
+			expect(equal(baseItem, sameItem)).toBe(baseIndex === sameIndex);
+		}
+
+		for (let firstIndex = 0; firstIndex < length; firstIndex += 1) {
+			const firstItem = first[firstIndex];
+
+			expect(equal(baseItem, firstItem)).toBe(baseIndex === firstIndex);
+		}
+
+		for (let secondIndex = 0; secondIndex < length; secondIndex += 1) {
+			const secondItem = second[secondIndex];
+
+			expect(equal(baseItem, secondItem)).toBe(false);
+		}
+
+		for (let thirdIndex = 0; thirdIndex < length; thirdIndex += 1) {
+			const thirdItem = third[thirdIndex];
+
+			expect(equal(baseItem, thirdItem)).toBe(false);
+		}
+	}
+});
+
+test('references', () => {
+	const date = new Date();
+
+	const first = {
+		date,
+		nested: {
+			date,
+			type: 0,
+		},
+	};
+
+	const second = {
+		date,
+		nested: {
+			date,
+			type: 1,
+		},
+	};
+
 	expect(equal(first, second)).toBe(false);
 });

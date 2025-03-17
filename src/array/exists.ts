@@ -34,5 +34,9 @@ export function exists<
 >(array: Item[], key: ItemKey, value: ReturnType<ItemKey>): boolean;
 
 export function exists(array: unknown[], ...parameters: unknown[]): boolean {
+	if (parameters.length === 1 && typeof parameters[0] !== 'function') {
+		return Array.isArray(array) ? array.includes(parameters[0]) : false;
+	}
+
 	return (findValue('index', array, parameters) as number) > -1;
 }

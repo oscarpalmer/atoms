@@ -1,5 +1,6 @@
 import type {ToString} from 'type-fest/source/internal/string';
 import {handleValue} from '../internal/value/handle';
+import {getPaths} from '../internal/value/paths';
 import type {ArrayOrPlainObject, Get, Paths} from '../models';
 
 /**
@@ -29,9 +30,18 @@ export function getValue(
 	path: string,
 	ignoreCase?: boolean,
 ): unknown {
+	if (
+		typeof data !== 'object' ||
+		data === null ||
+		typeof path !== 'string' ||
+		path.trim().length === 0
+	) {
+		return;
+	}
+
 	const shouldIgnoreCase = ignoreCase === true;
-	const parts = (shouldIgnoreCase ? path.toLowerCase() : path).split('.');
-	const {length} = parts;
+	const paths = getPaths(path, shouldIgnoreCase);
+	const {length} = paths;
 
 	let index = 0;
 	let value: ArrayOrPlainObject = data;
@@ -39,7 +49,7 @@ export function getValue(
 	while (index < length && value != null) {
 		value = handleValue(
 			value,
-			parts[index++],
+			paths[index++],
 			null,
 			true,
 			shouldIgnoreCase,
@@ -48,3 +58,5 @@ export function getValue(
 
 	return value as never;
 }
+
+

@@ -16,22 +16,28 @@ export function merge<Model extends ArrayOrPlainObject>(
 	values: Model[],
 	options?: Partial<MergeOptions>,
 ): Model {
-	if (values.length === 0) {
+	if (!Array.isArray(values) || values.length === 0) {
 		return {} as Model;
 	}
 
-	const skipNullable = options?.skipNullable ?? false;
+	const skipNullable = options?.skipNullable === true;
 
-	const actual = values.filter(value =>
-		isArrayOrPlainObject(value),
-	) as PlainObject[];
+	const actual = values.filter(value => isArrayOrPlainObject(value)) as Model[];
+
+	if (actual.length === 0) {
+		return {} as Model;
+	}
+
+	if (actual.length === 1) {
+		return actual[0];
+	}
 
 	const result = (actual.every(Array.isArray) ? [] : {}) as PlainObject;
 	const isArray = Array.isArray(result);
 	const {length} = actual;
 
 	for (let outerIndex = 0; outerIndex < length; outerIndex += 1) {
-		const item = actual[outerIndex];
+		const item = actual[outerIndex] as PlainObject;
 		const keys = Object.keys(item);
 		const size = keys.length;
 

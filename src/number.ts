@@ -32,26 +32,22 @@ export function getNumber(value: unknown): number {
 		return value;
 	}
 
-	if (typeof value === 'symbol') {
+	if (typeof value === 'bigint' || typeof value === 'boolean') {
+		return Number(value);
+	}
+
+	if (value == null || typeof value === 'symbol') {
 		return Number.NaN;
 	}
 
-	let parsed = value?.valueOf?.() ?? value;
+	let parsed = value.valueOf();
 
 	if (typeof parsed === 'object') {
-		parsed = parsed?.toString() ?? parsed;
+		parsed = parsed.toString();
 	}
 
 	if (typeof parsed !== 'string') {
-		return parsed == null
-			? Number.NaN
-			: typeof parsed === 'number'
-				? parsed
-				: +parsed;
-	}
-
-	if (/^\s*0+\s*$/.test(parsed)) {
-		return 0;
+		return getNumber(parsed);
 	}
 
 	const trimmed = parsed.trim();
@@ -60,13 +56,27 @@ export function getNumber(value: unknown): number {
 		return Number.NaN;
 	}
 
-	const isBinary = /^0b[01]+$/i.test(trimmed);
+	if (zeroIshExpression.test(parsed)) {
+		return 0;
+	}
 
-	if (isBinary || /^0o[0-7]+$/i.test(trimmed)) {
+	const isBinary = binaryExpression.test(trimmed);
+
+	if (isBinary || octalExpression.test(trimmed)) {
 		return Number.parseInt(trimmed.slice(2), isBinary ? 2 : 8);
 	}
 
-	return +(/^0x[0-9a-f]+$/i.test(trimmed)
-		? trimmed
-		: trimmed.replace(/_/g, ''));
+	return Number(
+		hexExpression.test(trimmed)
+			? trimmed
+			: trimmed.replace(underscoreExpression, ''),
+	);
 }
+
+//
+
+const binaryExpression = /^0b[01]+$/i;
+const hexExpression = /^0x[0-9a-f]+$/i;
+const octalExpression = /^0o[0-7]+$/i;
+const underscoreExpression = /_/g;
+const zeroIshExpression = /^\s*0+\s*$/;

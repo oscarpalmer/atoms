@@ -1,11 +1,28 @@
 import {max} from '../math';
-import {getNumber} from '../number';
-import {getString, join, words} from '../string/index';
+import {getString, words} from '../string/index';
 
 /**
  * Compare two values _(for sorting purposes)_
  */
 export function compare(first: unknown, second: unknown): number {
+	if (Object.is(first, second)) {
+		return 0;
+	}
+
+	if (first == null) {
+		return -1;
+	}
+
+	if (second == null) {
+		return 1;
+	}
+
+	const comparison = compareValue(first, second, false);
+
+	if (comparison != null) {
+		return comparison;
+	}
+
 	const firstParts = getParts(first);
 	const secondParts = getParts(second);
 	const length = max([firstParts.length, secondParts.length]);
@@ -15,7 +32,9 @@ export function compare(first: unknown, second: unknown): number {
 		const firstPart = firstParts[index];
 		const secondPart = secondParts[index];
 
-		if (firstPart === secondPart) {
+		const comparison = compareValue(firstPart, secondPart, true);
+
+		if (comparison === 0) {
 			if (index === lastIndex) {
 				return 0;
 			}
@@ -23,61 +42,67 @@ export function compare(first: unknown, second: unknown): number {
 			continue;
 		}
 
-		if (
-			firstPart == null ||
-			(typeof firstPart === 'string' && firstPart.length === 0)
-		) {
-			return -1;
-		}
-
-		if (
-			secondPart == null ||
-			(typeof secondPart === 'string' && secondPart.length === 0)
-		) {
-			return 1;
-		}
-
-		const firstNumber = getNumber(firstPart);
-		const secondNumber = getNumber(secondPart);
-
-		const firstIsNaN = Number.isNaN(firstNumber);
-		const secondIsNaN = Number.isNaN(secondNumber);
-
-		if (firstIsNaN || secondIsNaN) {
-			if (firstIsNaN && secondIsNaN) {
-				return getString(firstPart).localeCompare(getString(secondPart));
-			}
-
-			if (firstIsNaN) {
-				return 1;
-			}
-
-			if (secondIsNaN) {
-				return -1;
-			}
-		}
-
-		if (firstNumber === secondNumber) {
-			if (index === lastIndex) {
-				// Same value on last part? let's not fall through to string comparison
-				return 0;
-			}
-		}
-
-		return firstNumber - secondNumber;
+		return comparison as number;
 	}
 
-	return join(firstParts).localeCompare(join(secondParts));
+	return 0;
+}
+
+function compareNumbers(
+	first: bigint | boolean | number,
+	second: bigint | boolean | number,
+): number {
+	const firstNumber = Number(first);
+	const secondNumber = Number(second);
+
+	if (firstNumber === secondNumber) {
+		return 0;
+	}
+
+	return firstNumber > secondNumber ? 1 : -1;
+}
+
+function compareSymbols(first: symbol, second: symbol): number {
+	return getString(first.description ?? first).localeCompare(
+		getString(second.description ?? second),
+	);
+}
+
+function compareValue(
+	first: unknown,
+	second: unknown,
+	compareStrings: boolean,
+): number | undefined {
+	const firstType = typeof first;
+	const secondType = typeof second;
+
+	if (firstType === secondType && firstType in comparators) {
+		return comparators[firstType as keyof typeof comparators](
+			first as never,
+			second as never,
+		);
+	}
+
+	if (first instanceof Date && second instanceof Date) {
+		return compareNumbers(first.getTime(), second.getTime());
+	}
+
+	if (compareStrings) {
+		return getString(first).localeCompare(getString(second));
+	}
 }
 
 function getParts(value: unknown): unknown[] {
-	if (value == null) {
-		return [''];
-	}
-
 	if (Array.isArray(value)) {
 		return value;
 	}
 
 	return typeof value === 'object' ? [value] : words(getString(value));
 }
+
+const comparators = {
+	bigint: compareNumbers,
+	boolean: compareNumbers,
+	number: compareNumbers,
+	symbol: compareSymbols,
+};

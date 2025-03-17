@@ -6,9 +6,11 @@ export type Callbacks = {
 	value?: GenericCallback;
 };
 
-export type FindType = 'index' | 'value';
+export type FindValueType = 'index' | 'value';
 
-export type InsertType = 'push' | 'splice';
+export type FindValuesType = 'all' | 'unique';
+
+export type InsertType = 'insert' | 'push' | 'splice';
 
 export type SortKey<Item> = {
 	direction: 'asc' | 'desc';

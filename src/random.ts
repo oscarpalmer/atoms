@@ -1,5 +1,7 @@
 import {shuffle} from './array/shuffle';
 
+const characters = 'abcdefghijklmnopqrstuvwxyz';
+
 /**
  * Get a random boolean
  */
@@ -15,22 +17,22 @@ export function getRandomCharacters(
 	length: number,
 	selection?: string,
 ): string {
-	if (length < 1) {
+	if (typeof length !== 'number' || length <= 0) {
 		return '';
 	}
 
 	const actual =
 		typeof selection === 'string' && selection.length > 0
 			? selection
-			: 'abcdefghijklmnopqrstuvwxyz';
+			: characters;
 
-	let characters = '';
+	let result = '';
 
 	for (let index = 0; index < length; index += 1) {
-		characters += actual.charAt(getRandomInteger(0, actual.length));
+		result += actual.charAt(getRandomInteger(0, actual.length - 1));
 	}
 
-	return characters;
+	return result;
 }
 
 /**
@@ -44,9 +46,25 @@ export function getRandomColor(): string {
  * Get a random floating-point number
  */
 export function getRandomFloat(min?: number, max?: number): number {
-	const minimum = min ?? Number.MIN_SAFE_INTEGER;
+	let maximum =
+		typeof max === 'number' && max <= Number.MAX_SAFE_INTEGER
+			? max
+			: Number.MAX_SAFE_INTEGER;
 
-	return Math.random() * ((max ?? Number.MAX_SAFE_INTEGER) - minimum) + minimum;
+	let minimum =
+		typeof min === 'number' && min >= Number.MIN_SAFE_INTEGER
+			? min
+			: Number.MIN_SAFE_INTEGER;
+
+	if (minimum === maximum) {
+		return minimum;
+	}
+
+	if (minimum > maximum) {
+		[minimum, maximum] = [maximum, minimum];
+	}
+
+	return Math.random() * (maximum - minimum) + minimum;
 }
 
 /**
@@ -66,8 +84,12 @@ export function getRandomInteger(min?: number, max?: number): number {
 /**
  * Get a random item from an array
  */
-export function getRandomItem<Value>(array: Value[]): Value {
-	return array[getRandomInteger(0, array.length)];
+export function getRandomItem<Value>(array: Value[]): Value | undefined {
+	return array.length === 0
+		? undefined
+		: array.length === 1
+			? array[0]
+			: array[getRandomInteger(0, array.length - 1)];
 }
 
 /**
@@ -78,11 +100,19 @@ export function getRandomItems<Value>(
 	array: Value[],
 	amount?: number,
 ): Value[] {
-	if (amount === 1) {
-		return array.length === 0 ? [] : [array[getRandomInteger(0, array.length)]];
+	if (array.length === 0 || amount === 0) {
+		return [];
 	}
 
-	return amount == null || amount >= array.length
+	if (array.length < 2) {
+		return array;
+	}
+
+	if (amount === 1) {
+		return [array[getRandomInteger(0, array.length - 1)]];
+	}
+
+	return typeof amount !== 'number' || amount <= 0 || amount >= array.length
 		? shuffle(array)
 		: shuffle(array).slice(0, amount);
 }

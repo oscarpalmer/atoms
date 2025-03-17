@@ -1,4 +1,4 @@
-import type {FindType} from '../../array/models';
+import type {FindValueType, FindValuesType} from '../../array/models';
 import {getCallbacks} from './callbacks';
 
 type Parameters = {
@@ -8,10 +8,14 @@ type Parameters = {
 };
 
 export function findValue(
-	type: FindType,
+	type: FindValueType,
 	array: unknown[],
 	parameters: unknown[],
 ): unknown {
+	if (!Array.isArray(array) || array.length === 0) {
+		return type === 'index' ? -1 : undefined;
+	}
+
 	const {bool, key, value} = getParameters(parameters);
 
 	const callbacks = getCallbacks(bool, key);
@@ -25,7 +29,7 @@ export function findValue(
 	if (callbacks.bool != null) {
 		const index = array.findIndex(callbacks.bool);
 
-		return type === 'index' ? index : index > -1 ? array[index] : undefined;
+		return type === 'index' ? index : array[index];
 	}
 
 	const {length} = array;
@@ -42,10 +46,32 @@ export function findValue(
 }
 
 export function findValues(
-	type: 'all' | 'unique',
+	type: FindValuesType,
 	array: unknown[],
 	parameters: unknown[],
-): unknown[] {
+): unknown[];
+
+export function findValues(
+	type: FindValuesType,
+	array: unknown[],
+	parameters: unknown[],
+	count: boolean,
+): unknown[] | undefined;
+
+export function findValues(
+	type: FindValuesType,
+	array: unknown[],
+	parameters: unknown[],
+	count?: boolean,
+): unknown[] | undefined {
+	if (!Array.isArray(array)) {
+		return count ? undefined : [];
+	}
+
+	if (array.length === 0) {
+		return [];
+	}
+
 	const {bool, key, value} = getParameters(parameters);
 
 	const callbacks = getCallbacks(bool, key);
@@ -53,7 +79,7 @@ export function findValues(
 	const {length} = array;
 
 	if (type === 'unique' && callbacks?.key == null && length >= 100) {
-		return Array.from(new Set(array));
+		return [...new Set(array)];
 	}
 
 	if (callbacks?.bool != null) {
@@ -69,13 +95,13 @@ export function findValues(
 
 	for (let index = 0; index < length; index += 1) {
 		const item = array[index];
-		const key = callbacks?.key?.(item, index, array) ?? item;
+		const keyed = callbacks?.key?.(item, index, array) ?? item;
 
 		if (
-			(type === 'all' && key === value) ||
-			(type === 'unique' && !keys.has(key))
+			(type === 'all' && Object.is(keyed, value)) ||
+			(type === 'unique' && !keys.has(keyed))
 		) {
-			keys.add(key);
+			keys.add(keyed);
 			result.push(item);
 		}
 	}

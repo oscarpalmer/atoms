@@ -25,5 +25,13 @@ export function unique<
 >(array: Item[], key: ItemKey): Item[];
 
 export function unique(array: unknown[], key?: unknown): unknown[] {
+	if (!Array.isArray(array)) {
+		return [];
+	}
+
+	if (array.length < 2) {
+		return array;
+	}
+
 	return findValues('unique', array, [key, undefined]);
 }

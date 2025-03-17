@@ -4,7 +4,7 @@
 export function compact<Item>(array: Item[]): Exclude<Item, null | undefined>[];
 
 /**
- * Compact an array _(removing all falsey values)_
+ * Compact an array _(removing all false-y values)_
  */
 export function compact<Item>(
 	array: Item[],
@@ -12,6 +12,10 @@ export function compact<Item>(
 ): Exclude<Item, 0 | '' | false | null | undefined>[];
 
 export function compact<Item>(array: Item[], strict?: boolean): Item[] {
+	if (!Array.isArray(array)) {
+		return [];
+	}
+
 	const isStrict = strict ?? false;
 	const {length} = array;
 	const compacted: Item[] = [];

@@ -3,6 +3,11 @@ import {isArrayOrPlainObject} from '../is';
 import type {PlainObject} from '../models';
 import {setValue} from '../value/set';
 
+type OrderedKey = {
+	order: number;
+	value: string;
+};
+
 type Unsmushed<Value extends PlainObject> = Simplify<
 	Omit<
 		{
@@ -12,23 +17,22 @@ type Unsmushed<Value extends PlainObject> = Simplify<
 	>
 >;
 
-function getKeyGroups(value: PlainObject): string[][] {
+function getKeys(value: PlainObject): OrderedKey[] {
 	const keys = Object.keys(value);
 	const {length} = keys;
-	const grouped: string[][] = [];
+
+	const result: OrderedKey[] = [];
 
 	for (let index = 0; index < length; index += 1) {
 		const key = keys[index];
-		const dots = key.split('.');
 
-		if (grouped[dots.length] == null) {
-			grouped[dots.length] = [key];
-		} else {
-			grouped[dots.length].push(key);
-		}
+		result.push({
+			order: key.split('.').length,
+			value: key,
+		});
 	}
 
-	return grouped;
+	return result.sort((first, second) => first.order - second.order);
 }
 
 /**
@@ -37,28 +41,27 @@ function getKeyGroups(value: PlainObject): string[][] {
 export function unsmush<Value extends PlainObject>(
 	value: Value,
 ): Unsmushed<Value> {
-	const groups = getKeyGroups(value);
-	const {length} = groups;
+	if (typeof value !== 'object' || value === null) {
+		return {} as never;
+	}
+
+	const keys = getKeys(value);
+	const {length} = keys;
 	const unsmushed: PlainObject = {};
 
-	for (let groupIndex = 1; groupIndex < length; groupIndex += 1) {
-		const group = groups[groupIndex];
-		const groupLength = group.length;
+	for (let index = 0; index < length; index += 1) {
+		const key = keys[index].value;
+		const val = value[key];
 
-		for (let keyIndex = 0; keyIndex < groupLength; keyIndex += 1) {
-			const key = group[keyIndex];
-			const val = value[key as never];
-
-			setValue(
-				unsmushed,
-				key,
-				isArrayOrPlainObject(val)
-					? Array.isArray(val)
-						? [...val]
-						: {...val}
-					: val,
-			);
-		}
+		setValue(
+			unsmushed,
+			key,
+			isArrayOrPlainObject(val)
+				? Array.isArray(val)
+					? [...val]
+					: {...val}
+				: val,
+		);
 	}
 
 	return unsmushed as never;

@@ -1,12 +1,6 @@
-import type {
-	Get,
-	Paths,
-	Primitive,
-	UnknownArray,
-	UnknownRecord,
-} from 'type-fest';
+import type {Get, Paths} from 'type-fest';
 
-export type ArrayOrPlainObject = UnknownArray | UnknownRecord;
+export type ArrayOrPlainObject = unknown[] | Record<PropertyKey, unknown>;
 
 export type EventPosition = {
 	x: number;
@@ -22,14 +16,33 @@ export type NestedArrayType<Value> = Value extends Array<infer NestedValue>
 	? NestedArrayType<NestedValue>
 	: Value;
 
-// biome-ignore lint/suspicious/noExplicitAny: <explanation>
+// biome-ignore lint/suspicious/noExplicitAny: It's meant to be generic and permissive, so `any`is fine
 export type GenericCallback = (...args: any[]) => any;
 
 export type Key = number | string;
 
-export type PlainObject = UnknownRecord;
+export type PlainObject = Record<PropertyKey, unknown>;
 
-export type UnknownArrayOrRecord = UnknownArray | UnknownRecord;
+export type Primitive =
+	| bigint
+	| boolean
+	| null
+	| number
+	| string
+	| symbol
+	| undefined;
 
-export type {Get, Paths, Primitive, UnknownArray, UnknownRecord};
+export type TypedArray =
+	| Int8Array
+	| Uint8Array
+	| Uint8ClampedArray
+	| Int16Array
+	| Uint16Array
+	| Int32Array
+	| Uint32Array
+	| Float32Array
+	| Float64Array
+	| BigInt64Array
+	| BigUint64Array;
 
+export type {Get, Paths};

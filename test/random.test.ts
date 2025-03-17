@@ -14,19 +14,34 @@ const size = 100_000;
 
 async function getRandomNumber(
 	callback: (min?: number, max?: number) => number,
+	flipped: boolean,
 	min?: number,
 	max?: number,
 ): Promise<void> {
-	const maxActual = max ?? Number.MAX_SAFE_INTEGER;
-	const minActual = min ?? Number.MIN_SAFE_INTEGER;
+	const maxActual =
+		typeof max === 'number'
+			? max
+			: flipped
+				? Number.MIN_SAFE_INTEGER
+				: Number.MAX_SAFE_INTEGER;
+
+	const minActual =
+		typeof min === 'number'
+			? min
+			: flipped
+				? Number.MAX_SAFE_INTEGER
+				: Number.MIN_SAFE_INTEGER;
 
 	let index = 0;
 	let invalid = 0;
 
 	for (; index < size; index += 1) {
-		const value = callback(minActual, maxActual);
+		const value = callback(min, max);
 
-		if (value > maxActual || value < minActual) {
+		if (
+			value > (flipped ? minActual : maxActual) ||
+			value < (flipped ? maxActual : minActual)
+		) {
 			invalid += 1;
 		}
 	}
@@ -109,8 +124,16 @@ test('getRandomColor', () => {
 test('getRandomFloat', () =>
 	new Promise<void>(done => {
 		async function run() {
-			await getRandomNumber(getRandomFloat);
-			await getRandomNumber(getRandomFloat, -123.456, 456.789);
+			await getRandomNumber(getRandomFloat, false);
+			await getRandomNumber(getRandomFloat, false, -123.456, 456.789);
+			await getRandomNumber(getRandomFloat, true, 456.789, -123.456);
+
+			await getRandomNumber(
+				getRandomFloat,
+				false,
+				'blah' as never,
+				'blah' as never,
+			);
 
 			done();
 		}
@@ -138,8 +161,16 @@ test('getRandomHex', () => {
 test('getRandomInteger', () =>
 	new Promise<void>(done => {
 		async function run() {
-			await getRandomNumber(getRandomInteger);
-			await getRandomNumber(getRandomInteger, 0, 100);
+			await getRandomNumber(getRandomInteger, false);
+			await getRandomNumber(getRandomInteger, false, 0, 100);
+			await getRandomNumber(getRandomInteger, true, 100, 0);
+
+			await getRandomNumber(
+				getRandomInteger,
+				false,
+				'blah' as never,
+				'blah' as never,
+			);
 
 			done();
 		}
@@ -155,12 +186,15 @@ test('getRandomItem', () => {
 	for (let index = 0; index < size; index += 1) {
 		const item = getRandomItem(items);
 
-		if (!items.includes(item)) {
+		if (item === undefined || !items.includes(item)) {
 			invalid += 1;
 		}
 	}
 
 	expect(invalid).toBe(0);
+
+	expect(getRandomItem([])).toBe(undefined);
+	expect(getRandomItem([1])).toBe(1);
 });
 
 test('getRandomItems', () => {
@@ -169,4 +203,10 @@ test('getRandomItems', () => {
 	expect(getRandomItems(original, 0)).toEqual([]);
 	expect(getRandomItems(original, 1)).toHaveLength(1);
 	expect(getRandomItems(original, 2)).toHaveLength(2);
+
+	expect(getRandomItems(original, -1).length).toBe(original.length);
+	expect(getRandomItems(original, 99).length).toBe(original.length);
+
+	expect(getRandomItems([])).toEqual([]);
+	expect(getRandomItems([1])).toEqual([1]);
 });

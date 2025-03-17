@@ -14,6 +14,15 @@ test('emitter', () =>
 		setTimeout(() => {
 			expect(value.active).toBe(false);
 
+			try {
+				const {observable} = value;
+			} catch (error) {
+				expect(error).toBeInstanceOf(Error);
+				expect(error.message).toBe(
+					'Cannot retrieve observable from a destroyed emitter',
+				);
+			}
+
 			done();
 		});
 	}));
@@ -61,7 +70,9 @@ test('emitter: observable + subscription', () =>
 			},
 		);
 
-		const three = first.observable.subscribe({});
+		let three = third.observable.subscribe({});
+
+		first.observable.subscribe('blah' as never);
 
 		expect(first.active).toBe(true);
 		expect(second.active).toBe(true);
@@ -81,11 +92,8 @@ test('emitter: observable + subscription', () =>
 
 		first.emit(1);
 		second.error(new Error('test'));
-		third.finish();
 
 		setTimeout(() => {
-			expect(third.active).toBe(false);
-
 			expect(results.first.complete).toBe(false);
 			expect(results.first.count).toBe(2);
 			expect(results.first.error).toBe(null);
@@ -98,24 +106,52 @@ test('emitter: observable + subscription', () =>
 			second.error(new Error('test'), true);
 
 			three.unsubscribe();
+			three.unsubscribe();
+			three.destroy();
+		}, 25);
 
-			setTimeout(() => {
-				expect(first.active).toBe(false);
-				expect(second.active).toBe(false);
+		setTimeout(() => {
+			expect(first.active).toBe(false);
+			expect(second.active).toBe(false);
 
-				expect(one.closed).toBe(true);
-				expect(two.closed).toBe(true);
-				expect(three.closed).toBe(true);
+			expect(one.closed).toBe(true);
+			expect(two.closed).toBe(true);
+			expect(three.closed).toBe(true);
 
-				expect(results.first.complete).toBe(true);
-				expect(results.first.count).toBe(3);
-				expect(results.first.error).toBe(null);
+			expect(results.first.complete).toBe(true);
+			expect(results.first.count).toBe(3);
+			expect(results.first.error).toBe(null);
 
-				expect(results.second.complete).toBe(true);
-				expect(results.second.count).toBe(1);
-				expect(results.second.error).toBeInstanceOf(Error);
+			expect(results.second.complete).toBe(true);
+			expect(results.second.count).toBe(1);
+			expect(results.second.error).toBeInstanceOf(Error);
+		}, 50);
 
-				done();
-			});
-		});
+		setTimeout(() => {
+			three = third.observable.subscribe({});
+
+			third.destroy();
+		}, 75);
+
+		setTimeout(() => {
+			expect(third.active).toBe(false);
+			expect(three.closed).toBe(true);
+
+			third.emit(1);
+			third.error(new Error('test'));
+			third.finish();
+
+			const thirdObservable = third.observable;
+
+			try {
+				thirdObservable.subscribe({});
+			} catch (error) {
+				expect(error).toBeInstanceOf(Error);
+				expect(error.message).toBe(
+					'Cannot subscribe to a destroyed observable',
+				);
+			}
+
+			done();
+		}, 100);
 	}));

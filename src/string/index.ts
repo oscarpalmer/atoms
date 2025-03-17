@@ -4,15 +4,12 @@ import {compact} from '../array/compact';
  * Create a new UUID
  */
 export function createUuid(): string {
-	return '10000000-1000-4000-8000-100000000000'.replace(
-		/[018]/g,
-		(substring: string) =>
-			(
-				(substring as never) ^
-				(crypto.getRandomValues(new Uint8Array(1))[0] &
-					(15 >> ((substring as never) / 4)))
-			).toString(16),
-	);
+	return uuidTemplate.replace(/[018]/g, (substring: string) => {
+		const digit = Number.parseInt(substring, 10);
+		const random = crypto.getRandomValues(new Uint8Array(1))[0];
+
+		return (digit ^ (random & (15 >> (digit / 4)))).toString(16);
+	});
 }
 
 /**
@@ -23,12 +20,15 @@ export function getString(value: unknown): string {
 		return value;
 	}
 
-	if (typeof value !== 'object' || value == null) {
+	if (value == null) {
+		return '';
+	}
+
+	if (typeof value !== 'object') {
 		return String(value);
 	}
 
-	const valueOff = value.valueOf?.() ?? value;
-	const asString = valueOff?.toString?.() ?? String(valueOff);
+	const asString = String(value.valueOf?.() ?? value);
 
 	return asString.startsWith('[object ') ? JSON.stringify(value) : asString;
 }
@@ -53,7 +53,7 @@ export function parse(
 	try {
 		return JSON.parse(value, reviver);
 	} catch {
-		// ?
+		return undefined;
 	}
 }
 
@@ -67,7 +67,7 @@ export function truncate(
 	length: number,
 	suffix?: string,
 ): string {
-	if (length <= 0) {
+	if (typeof value !== 'string' || typeof length !== 'number' || length <= 0) {
 		return '';
 	}
 
@@ -75,20 +75,23 @@ export function truncate(
 		return value;
 	}
 
-	const suffixLength = suffix?.length ?? 0;
-	const truncatedLength = length - suffixLength;
+	const actualSuffix = typeof suffix === 'string' ? suffix : '';
+	const truncatedLength = length - actualSuffix.length;
 
-	return `${value.slice(0, truncatedLength)}${suffix ?? ''}`;
+	return `${value.slice(0, truncatedLength)}${actualSuffix}`;
 }
 
 /**
  * Split a string into words _(and other readable parts)_
  */
 export function words(value: string): string[] {
-	// biome-ignore lint/suspicious/noControlCharactersInRegex: Lodash uses it, so it's fine ;-)
-	return value.match(/[^\x00-\x2f\x3a-\x40\x5b-\x60\x7b-\x7f]+/g) ?? [];
+	return typeof value === 'string' ? (value.match(wordsExpression) ?? []) : [];
 }
 
 export * from './case';
 export * from './template';
 
+const uuidTemplate = '10000000-1000-4000-8000-100000000000';
+
+// biome-ignore lint/suspicious/noControlCharactersInRegex: Lodash uses it, so it's fine ;-)
+const wordsExpression = /[^\x00-\x2f\x3a-\x40\x5b-\x60\x7b-\x7f]+/g;

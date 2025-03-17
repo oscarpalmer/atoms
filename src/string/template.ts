@@ -21,10 +21,18 @@ export function template(
 	variables: PlainObject,
 	options?: Partial<Options>,
 ): string {
+	if (typeof value !== 'string') {
+		return '';
+	}
+
+	if (typeof variables !== 'object' || variables === null) {
+		return value;
+	}
+
 	const ignoreCase = options?.ignoreCase === true;
 
 	const pattern =
-		options?.pattern instanceof RegExp ? options.pattern : /{{([\s\S]+?)}}/g;
+		options?.pattern instanceof RegExp ? options.pattern : variablePattern;
 
 	const values: Record<string, string> = {};
 
@@ -34,13 +42,12 @@ export function template(
 		}
 
 		const value = getValue(variables, key, ignoreCase);
+		const nullish = value == null;
 
-		if (value == null) {
-			return '';
-		}
-
-		values[key] = getString(value);
+		values[key] = nullish ? '' : getString(value);
 
 		return values[key];
 	});
 }
+
+const variablePattern = /{{([\s\S]+?)}}/g;

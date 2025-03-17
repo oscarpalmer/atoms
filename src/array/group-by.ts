@@ -148,18 +148,18 @@ export function groupBy<
 ): Record<ReturnType<ItemKey>, Array<ReturnType<ItemValue>>>;
 
 export function groupBy(
-	array: unknown[],
-	first?: boolean,
-	second?: unknown,
-	third?: boolean,
-): PlainObject {
-	return groupValues(
-		array,
-		first,
-		second,
-		first === true || second === true || third === true,
-	) as never;
-}
+		array: unknown[],
+		key?: boolean,
+		valueOrArrays?: unknown,
+		arrays?: boolean,
+	): PlainObject {
+		return groupValues(
+			array,
+			key,
+			valueOrArrays,
+			key === true || valueOrArrays === true || arrays === true,
+		);
+	}
 
 export function groupValues(
 	array: unknown[],
@@ -167,6 +167,10 @@ export function groupValues(
 	value: unknown,
 	arrays: boolean,
 ): Record<Key, unknown> {
+	if (!Array.isArray(array) || array.length === 0) {
+		return {};
+	}
+
 	const callbacks = getCallbacks(undefined, key, value);
 	const record: Record<Key, unknown> = {};
 	const {length} = array;
@@ -174,19 +178,19 @@ export function groupValues(
 	for (let index = 0; index < length; index += 1) {
 		const item = array[index];
 
-		const key = callbacks?.key?.(item, index, array) ?? index;
-		const value = callbacks?.value?.(item, index, array) ?? item;
+		const keyed = callbacks?.key?.(item, index, array) ?? index;
+		const valued = callbacks?.value?.(item, index, array) ?? item;
 
 		if (arrays) {
-			const existing = record[key];
+			const existing = record[keyed];
 
 			if (existing == null) {
-				record[key] = [value];
+				record[keyed] = [valued];
 			} else {
-				(existing as unknown[]).push(value);
+				(existing as unknown[]).push(valued);
 			}
 		} else {
-			record[key] = value;
+			record[keyed] = valued;
 		}
 	}
 

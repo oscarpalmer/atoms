@@ -23,13 +23,22 @@ test('clamp', () => {
 });
 
 test('getNumber', () => {
-	const obj = {};
+	const a = {};
+	const b = {};
+	const c = {};
 
-	obj.valueOf = () => 123;
+	a.toString = () => '123';
+	a.valueOf = () => 123;
+
+	b.valueOf = () => a;
+
+	c.valueOf = () => b;
 
 	expect(getNumber(123)).toBe(123);
 	expect(getNumber(undefined)).toBeNaN();
 	expect(getNumber(null)).toBeNaN();
+	expect(getNumber(true)).toBe(1);
+	expect(getNumber(false)).toBe(0);
 	expect(getNumber(' ')).toBeNaN();
 	expect(getNumber('0')).toBe(0);
 	expect(getNumber('000')).toBe(0);
@@ -41,5 +50,7 @@ test('getNumber', () => {
 	expect(getNumber('0x10')).toBe(16);
 	expect(getNumber(Symbol())).toBeNaN();
 	expect(getNumber({})).toBeNaN();
-	expect(getNumber(obj)).toBe(123);
+	expect(getNumber(a)).toBe(123);
+	expect(getNumber(b)).toBe(123);
+	expect(getNumber(c)).toBeNaN();
 });

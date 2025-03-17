@@ -7,6 +7,16 @@ export function partial<Value extends PlainObject, Key extends keyof Value>(
 	value: Value,
 	keys: Key[],
 ): Pick<Value, Key> {
+	if (
+		typeof value !== 'object' ||
+		value === null ||
+		Object.keys(value).length === 0 ||
+		!Array.isArray(keys) ||
+		keys.length === 0
+	) {
+		return {} as Pick<Value, Key>;
+	}
+
 	const result = {} as Pick<Value, Key>;
 	const {length} = keys;
 

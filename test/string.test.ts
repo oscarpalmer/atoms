@@ -1,7 +1,7 @@
 import {expect, test} from 'vitest';
 import {
 	camelCase,
-	capitalise,
+	capitalize,
 	createUuid,
 	getString,
 	join,
@@ -42,9 +42,12 @@ test('camelCase', () => {
 	expect(camelCase('XmlHTTPRequest')).toBe('xmlHttpRequest');
 	expect(camelCase('IDs')).toBe('ids');
 	expect(camelCase('Product XMLs')).toBe('productXmls');
+
+	expect(camelCase(123 as never)).toBe('');
+	expect(camelCase('')).toBe('');
 });
 
-test('capitalise', () => {
+test('capitalize', () => {
 	const original = ['', 'a', 'A', 'aPpLe', 'ö', 'Ç', 'η', 'ф'];
 	const expected = ['', 'A', 'A', 'Apple', 'Ö', 'Ç', 'Η', 'Ф'];
 
@@ -53,8 +56,11 @@ test('capitalise', () => {
 	let index = 0;
 
 	for (; index < length; index += 1) {
-		expect(capitalise(original[index])).toBe(expected[index]);
+		expect(capitalize(original[index])).toBe(expected[index]);
 	}
+
+	expect(capitalize(123 as never)).toBe('');
+	expect(capitalize('')).toBe('');
 });
 
 test(
@@ -79,8 +85,8 @@ test(
 );
 
 test('getString', () => {
-	expect(getString(undefined)).toBe('undefined');
-	expect(getString(null)).toBe('null');
+	expect(getString(undefined)).toBe('');
+	expect(getString(null)).toBe('');
 	expect(getString('')).toBe('');
 	expect(getString('test')).toBe('test');
 	expect(getString(0)).toBe('0');
@@ -92,6 +98,12 @@ test('getString', () => {
 	expect(getString([1, 2, 3])).toBe('1,2,3');
 	expect(getString(new ItemWithoutToString('test'))).toBe('{"value":"test"}');
 	expect(getString(new ItemWithToString('test'))).toBe('test');
+
+	const obj = {};
+
+	obj.valueOf = undefined as never;
+
+	expect(getString(obj)).toBe('{}');
 });
 
 test('join', () => {
@@ -119,6 +131,9 @@ test('kebabCase', () => {
 	expect(kebabCase('XmlHTTPRequest')).toBe('xml-http-request');
 	expect(kebabCase('IDs')).toBe('ids');
 	expect(kebabCase('Product XMLs')).toBe('product-xmls');
+
+	expect(kebabCase(123 as never)).toBe('');
+	expect(kebabCase('')).toBe('');
 });
 
 test('parse', () => {
@@ -151,6 +166,9 @@ test('pascalCase', () => {
 	expect(pascalCase('XmlHTTPRequest')).toBe('XmlHttpRequest');
 	expect(pascalCase('IDs')).toBe('Ids');
 	expect(pascalCase('Product XMLs')).toBe('ProductXmls');
+
+	expect(pascalCase(123 as never)).toBe('');
+	expect(pascalCase('')).toBe('');
 });
 
 test('snakeCase', () => {
@@ -168,6 +186,9 @@ test('snakeCase', () => {
 	expect(snakeCase('XmlHTTPRequest')).toBe('xml_http_request');
 	expect(snakeCase('IDs')).toBe('ids');
 	expect(snakeCase('Product XMLs')).toBe('product_xmls');
+
+	expect(snakeCase(123 as never)).toBe('');
+	expect(snakeCase('')).toBe('');
 });
 
 test('template', () => {
@@ -202,6 +223,12 @@ test('template', () => {
 			pattern: /<([^>]+)>/g,
 		}),
 	).toBe('Hello, Hello!');
+
+	expect(template(123 as never, variables)).toBe('');
+
+	expect(template('This will not be {{templated}}', 'blah' as never)).toBe(
+		'This will not be {{templated}}',
+	);
 });
 
 test('truncate', () => {
@@ -228,6 +255,8 @@ test('truncate', () => {
 	}
 
 	expect(truncate('Hello, world!', -99)).toBe('');
+	expect(truncate('Hello, world!', 'blah' as never)).toBe('');
+	expect(truncate('Hello, world!', 5, 123 as never)).toBe('Hello');
 });
 
 test('titleCase', () => {
@@ -250,6 +279,9 @@ test('titleCase', () => {
 	for (; index < length; index += 1) {
 		expect(titleCase(original[index])).toBe(expected[index]);
 	}
+
+	expect(titleCase(123 as never)).toBe('');
+	expect(titleCase('')).toBe('');
 });
 
 test('words', () => {
@@ -283,4 +315,7 @@ test('words', () => {
 	for (let index = 0; index < length; index += 1) {
 		expect(words(original[index])).toEqual(expected[index]);
 	}
+
+	expect(words('')).toEqual([]);
+	expect(words(123 as never)).toEqual([]);
 });

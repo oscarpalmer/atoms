@@ -154,14 +154,14 @@ export function toRecord<
 
 export function toRecord(
 	array: unknown[],
-	first?: unknown,
-	second?: unknown,
-	third?: unknown,
+	key?: unknown,
+	valueOrArrays?: unknown,
+	arrays?: boolean,
 ): PlainObject {
 	return groupValues(
 		array,
-		first as never,
-		second,
-		first === true || second === true || third === true,
+		key,
+		valueOrArrays,
+		key === true || valueOrArrays === true || arrays === true,
 	);
 }

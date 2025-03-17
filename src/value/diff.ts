@@ -56,6 +56,8 @@ export function diff<First, Second = First>(
 
 	if (firstIsArrayOrObject !== secondIsArrayOrObject) {
 		result.type = 'full';
+
+		return result;
 	}
 
 	const diffs = getDiffs(
@@ -84,16 +86,29 @@ function getDiffs(
 	prefix?: string,
 ): KeyedDiffValue[] {
 	const changes: KeyedDiffValue[] = [];
-	const checked = new Set<Key>();
+	const checked = new Set<PropertyKey>();
+
+	if (Array.isArray(first) && Array.isArray(second)) {
+		const maximumLength = Math.max(first.length, second.length);
+		const minimumLength = Math.min(first.length, second.length);
+
+		let index = minimumLength;
+
+		for (; index < maximumLength; index += 1) {
+			const key = join([prefix, index], '.');
+
+			changes.push({
+				key,
+				from: index >= first.length ? undefined : first[index],
+				to: index >= first.length ? second[index] : undefined,
+			});
+		}
+	}
 
 	for (let outerIndex = 0; outerIndex < 2; outerIndex += 1) {
 		const value = outerIndex === 0 ? first : second;
 
-		if (!value) {
-			continue;
-		}
-
-		const keys = Object.keys(value);
+		const keys = [...Object.keys(value), ...Object.getOwnPropertySymbols(value)];
 		const {length} = keys;
 
 		for (let innerIndex = 0; innerIndex < length; innerIndex += 1) {

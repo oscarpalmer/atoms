@@ -1,3 +1,4 @@
+import {ignoreKey} from './internal/string/key';
 import {isPlainObject} from './is';
 import type {ArrayOrPlainObject, PlainObject} from './models';
 import {join} from './string/index';
@@ -13,7 +14,11 @@ export function fromQuery(query: string): PlainObject {
 	const parameters: PlainObject = {};
 
 	for (let index = 0; index < length; index += 1) {
-		const [key, value] = parts[index].split('=').map(decodeURIComponent);
+		const [key, value] = parts[index].split('=').map(tryDecode);
+
+		if (ignoreKey(key)) {
+			continue;
+		}
 
 		if (key.includes('.')) {
 			setValue(parameters, key, getValue(value));
@@ -55,7 +60,7 @@ function getParts(
 			parts.push(...getParts(val, false, join([prefix, key], '.')));
 		} else if (isDecodable(val)) {
 			parts.push(
-				`${encodeURIComponent(join([prefix, fromArray ? null : key], '.'))}=${encodeURIComponent(val)}`,
+				`${tryEncode(join([prefix, fromArray ? null : key], '.'))}=${tryEncode(val)}`,
 			);
 		}
 	}
@@ -88,4 +93,20 @@ export function toQuery(parameters: PlainObject): string {
 	return getParts(parameters, false)
 		.filter(part => part.length > 0)
 		.join('&');
+}
+
+function tryCallback<T, U>(value: T, callback: (value: T) => U): U {
+	try {
+		return callback(value);
+	} catch {
+		return value as never;
+	}
+}
+
+function tryDecode(value: string): string {
+	return tryCallback(value, decodeURIComponent);
+}
+
+function tryEncode(value: boolean | number | string): unknown {
+	return tryCallback(value, encodeURIComponent);
 }

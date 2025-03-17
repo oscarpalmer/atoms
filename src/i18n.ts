@@ -1,4 +1,3 @@
-import {isPlainObject} from './is';
 import type {PlainObject, Primitive} from './models';
 
 type Defaults = {
@@ -60,11 +59,16 @@ export type TranslateOptions = {
  */
 export type Translatable = Record<string, unknown>;
 
+const english: Language = {
+	base: 'en',
+	full: 'en',
+};
+
 const defaults: Defaults = {
 	delimiter: '',
 	languages: {
-		fallback: null as never,
-		preferred: null as never,
+		fallback: english,
+		preferred: english,
 	},
 };
 
@@ -130,6 +134,35 @@ function getTranslation(
 	const asString = value.toString();
 
 	return asString === '[object Object]' ? '' : asString;
+}
+
+function initialize(): void {
+	let defaultLanguage: string | undefined;
+
+	try {
+		if (
+			typeof window !== 'undefined' &&
+			typeof document !== 'undefined' &&
+			typeof navigator !== 'undefined'
+		) {
+			if (document.documentElement) {
+				const documentLanguage = document.documentElement.lang?.trim() ?? '';
+
+				if (documentLanguage.length > 0) {
+					defaultLanguage = documentLanguage;
+				}
+			}
+
+			if (navigator.language && !defaultLanguage) {
+				defaultLanguage = navigator.language;
+			}
+		}
+	} catch {}
+
+	defaultLanguage ??= 'en';
+
+	setLanguage('fallback', defaultLanguage);
+	setLanguage('preferred', defaultLanguage);
 }
 
 /**
@@ -291,10 +324,4 @@ function translateValue(
 	return translatePrimitive(actual as Primitive);
 }
 
-const defaultLanguage =
-	(document?.documentElement?.lang?.trim()?.length ?? 0) > 0
-		? document.documentElement.lang
-		: (navigator?.language ?? 'en');
-
-setLanguage('fallback', defaultLanguage);
-setLanguage('preferred', defaultLanguage);
+initialize();

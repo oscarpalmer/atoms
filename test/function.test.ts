@@ -65,7 +65,13 @@ test('memoise', () => {
 
 	memoised.destroy();
 
-	expect(memoised.run(2)).toBeUndefined();
+	try {
+		expect(memoised.run(2)).toBeUndefined();
+	} catch (error) {
+		expect(error).toBeInstanceOf(Error);
+		expect(error.message).toBe('The memoised instance has been destroyed');
+	}
+
 	expect(memoised.has(2)).toBe(false);
 	expect(memoised.get(2)).toBeUndefined();
 });
@@ -92,7 +98,20 @@ test('throttle', () =>
 			clearInterval(interval);
 
 			expect(value).toBeLessThanOrEqual(10);
+			expect(cancelValue).toBe(0);
 
 			done();
 		}, 2500);
+
+		let cancelValue = 0;
+
+		const cancelleable = throttle(() => {
+			cancelValue = 999;
+		}, 500);
+
+		cancelleable();
+
+		setTimeout(() => {
+			cancelleable.cancel();
+		}, 250);
 	}));

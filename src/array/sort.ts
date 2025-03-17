@@ -53,37 +53,57 @@ export function sort(
 	first?: unknown,
 	second?: unknown,
 ): unknown[] {
+	if (!Array.isArray(array)) {
+		return [];
+	}
+
 	if (array.length < 2) {
 		return array;
 	}
 
 	const direction = first === true || second === true ? 'desc' : 'asc';
 
-	const keys = (Array.isArray(first) ? first : [first])
-		.map(key => {
-			const returned: SortKeyWithCallback<unknown> = {
-				direction,
-				callback: undefined as never,
-			};
+	const unknownKeys = Array.isArray(first) ? first : [first];
+	let {length} = unknownKeys;
 
-			if (isKey(key)) {
-				returned.callback = value => (value as PlainObject)[key] as never;
-			} else if (typeof key === 'function') {
-				returned.callback = key;
-			} else if (typeof key?.value === 'function' || isKey(key?.value)) {
-				returned.direction = key?.direction ?? direction;
+	const keys: SortKeyWithCallback<unknown>[] = [];
 
-				returned.callback =
-					typeof key.value === 'function'
-						? key.value
-						: value => (value as PlainObject)[key.value as Key] as never;
+	for (let index = 0; index < length; index += 1) {
+		const key = unknownKeys[index];
+
+		const keyWithCallback: SortKeyWithCallback<unknown> = {
+			direction,
+			callback: undefined as never,
+		};
+
+		if (isKey(key)) {
+			keyWithCallback.callback = value => (value as PlainObject)[key] as never;
+		} else if (typeof key === 'function') {
+			keyWithCallback.callback = key;
+		} else if (typeof key?.value === 'function' || isKey(key?.value)) {
+			keyWithCallback.direction = key?.direction ?? direction;
+
+			keyWithCallback.callback =
+				typeof key.value === 'function'
+					? key.value
+					: value => (value as PlainObject)[key.value as Key] as never;
+		}
+
+		if (typeof keyWithCallback.callback === 'function') {
+			const existing = keys.findIndex(
+				existing =>
+					existing.callback.toString() === keyWithCallback.callback.toString(),
+			);
+
+			if (existing > -1) {
+				keys.splice(existing, 1);
 			}
 
-			return returned;
-		})
-		.filter(key => typeof key.callback === 'function');
+			keys.push(keyWithCallback);
+		}
+	}
 
-	const {length} = keys;
+	length = keys.length;
 
 	if (length === 0) {
 		return array.sort(

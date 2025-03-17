@@ -149,12 +149,18 @@ export function toMap<
 
 export function toMap(
 	array: unknown[],
-	first?: unknown,
-	second?: unknown,
-	third?: unknown,
+	keyOrArrays?: unknown,
+	valueOrArrays?: unknown,
+	arrays?: unknown,
 ): Map<unknown, unknown> {
-	const asArrays = first === true || second === true || third === true;
-	const callbacks = getCallbacks(undefined, first, second);
+	if (!Array.isArray(array)) {
+		return new Map();
+	}
+
+	const asArrays =
+		keyOrArrays === true || valueOrArrays === true || arrays === true;
+
+	const callbacks = getCallbacks(undefined, keyOrArrays, valueOrArrays);
 	const map = new Map<Key, unknown>();
 	const {length} = array;
 

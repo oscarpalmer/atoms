@@ -41,6 +41,11 @@ test('chunk', () => {
 	const array = Array.from({length: 10_000}, (_, i) => i + 1);
 
 	expect(chunk(array).length).toBe(2);
+	expect(chunk(array, 4_000).length).toBe(3);
+	expect(chunk(array, 10_000).length).toBe(2);
+
+	expect(chunk('blah' as never)).toEqual([]);
+	expect(chunk([])).toEqual([]);
 });
 
 test('compact', () => {
@@ -59,6 +64,8 @@ test('compact', () => {
 	expect(compact([0, 1, null, 2, undefined, 3, false, 4, ''], true)).toEqual([
 		1, 2, 3, 4,
 	]);
+
+	expect(compact('blah' as never)).toEqual([]);
 });
 
 test('count', () => {
@@ -72,6 +79,9 @@ test('count', () => {
 	expect(countByCallback).toBe(1);
 	expect(countByKeyValue).toBe(1);
 	expect(countByKeyCallback).toBe(1);
+
+	expect(count('blah' as never, 99)).toBe(Number.NaN);
+	expect(count([], 99)).toBe(0);
 });
 
 test('exists', () => {
@@ -87,6 +97,9 @@ test('exists', () => {
 	const existsByValueCallback = exists(complex, item => item.id === 3);
 
 	expect(existsByValueCallback).toEqual(true);
+
+	expect(exists('blah' as never, 99)).toBe(false);
+	expect(exists([], 99)).toBe(false);
 });
 
 test('filter', () => {
@@ -102,6 +115,9 @@ test('filter', () => {
 	const filterByValueCallback = filter(complex, item => item.id === 3);
 
 	expect(filterByValueCallback).toEqual([{id: 3, age: 25, name: 'Charlie'}]);
+
+	expect(filter('blah' as never, 99)).toEqual([]);
+	expect(filter([], 99)).toEqual([]);
 });
 
 test('find', () => {
@@ -119,12 +135,18 @@ test('find', () => {
 	expect(findByValueCallback).toEqual({id: 3, age: 25, name: 'Charlie'});
 
 	expect(find(complex, 'id', 99)).toBeUndefined();
+
+	expect(find('blah' as never, 99)).toBeUndefined();
+	expect(find([], 99)).toBeUndefined();
 });
 
 test('flatten', () => {
 	expect(flatten([1, [2, [3, [4, [5, [6, [7, [8, [9, [10]]]]]]]]]])).toEqual([
 		1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
 	]);
+
+	expect(flatten('blah' as never)).toEqual([]);
+	expect(flatten([])).toEqual([]);
 });
 
 test('groupBy', () => {
@@ -221,6 +243,9 @@ test('groupBy', () => {
 
 	expect(keyToValues).toEqual(valueToKeys);
 	expect(valueToValues).toEqual(valueToKeys);
+
+	expect(groupBy('blah' as never, 'x')).toEqual({});
+	expect(groupBy([], 'x')).toEqual({});
 });
 
 test('indexOf', () => {
@@ -238,6 +263,9 @@ test('indexOf', () => {
 	expect(indexOfByValueCallback).toEqual(2);
 
 	expect(indexOf(complex, 'id', 99)).toBe(-1);
+
+	expect(indexOf('blah' as never, 99)).toBe(-1);
+	expect(indexOf([], 99)).toBe(-1);
 });
 
 test('insert', () => {
@@ -255,7 +283,7 @@ test('insert', () => {
 
 	const array: Array<number | string> = [1, 2, 3];
 
-	insert(array, 1, values);
+	expect(insert(array, 1, values)).toEqual([1, ...values, 2, 3]);
 
 	expect(array).toHaveLength(length + 3);
 	expect(array[0]).toBe(1);
@@ -265,9 +293,13 @@ test('insert', () => {
 
 	const appended = [];
 
-	insert(appended, [1, 2, 3]);
+	expect(insert(appended, [1, 2, 3])).toEqual([1, 2, 3]);
 
-	expect(appended).toEqual([1, 2, 3]);
+	expect(insert('blah' as never, [])).toEqual([]);
+	expect(insert([], 'blah' as never)).toEqual([]);
+	expect(insert([], [])).toEqual([]);
+	expect(insert([], 'blah' as never, [])).toEqual([]);
+	expect(insert([], 0, 'blah' as never)).toEqual([]);
 });
 
 test('push', () => {
@@ -286,6 +318,10 @@ test('push', () => {
 	const array: number[] = [];
 
 	expect(push(array, values)).toBe(length);
+
+	expect(push('blah' as never, [])).toBe(0);
+	expect(push([], 'blah' as never)).toBe(0);
+	expect(push([], [])).toBe(0);
 });
 
 test('shuffle', () => {
@@ -302,6 +338,10 @@ test('shuffle', () => {
 
 	expect(first).not.toEqual(complex);
 	expect(first).not.toEqual(second);
+
+	expect(shuffle('blah' as never)).toEqual([]);
+	expect(shuffle([])).toEqual([]);
+	expect(shuffle([1])).toEqual([1]);
 });
 
 test('sort: basic', () => {
@@ -329,6 +369,18 @@ test('sort: basic', () => {
 
 	expect(
 		sort(
+			[{id: 2}, {id: 1}, {id: 3}],
+			[
+				{
+					value: 'id',
+				} as never,
+			],
+			true,
+		),
+	).toEqual([{id: 3}, {id: 2}, {id: 1}]);
+
+	expect(
+		sort(
 			[
 				{age: 24, firstName: 'B', lastName: 'B'},
 				{age: 48, firstName: 'C', lastName: 'C'},
@@ -339,6 +391,7 @@ test('sort: basic', () => {
 			[
 				item => item.age,
 				'firstName',
+				{direction: 'desc', value: 'lastName'},
 				{direction: 'asc', value: 'lastName'},
 				{} as never,
 			],
@@ -351,6 +404,8 @@ test('sort: basic', () => {
 		{age: 24, firstName: 'A', lastName: 'A'},
 		{age: 24, firstName: 'A', lastName: 'B'},
 	]);
+
+	expect(sort('blah' as never)).toEqual([]);
 });
 
 test('sort: large', () =>
@@ -416,10 +471,22 @@ test('splice', () => {
 	const array: Array<number | string> = [1, 2, 3];
 
 	expect(splice(array, 1, 1, values)).toEqual([2]);
+	expect(splice(array, 0, -99)).toEqual([]);
 	expect(array).toHaveLength(length + 2);
 	expect(array[0]).toBe(1);
 	expect(array[1]).toBe('#1');
 	expect(array[length + 1]).toBe(3);
+
+	expect(splice('blah' as never, 0)).toEqual([]);
+	expect(splice([], 'blah' as never)).toEqual([]);
+	expect(splice([], 0, [])).toEqual([]);
+	expect(splice([], 0, 'blah' as never)).toEqual([]);
+
+	const x = Array.from({length: 7777}, (_, i) => i + 1);
+	const y = [];
+
+	expect(splice(y, 0, -1, x)).toEqual([]);
+	expect(y).toEqual(x);
 });
 
 test('toMap', () => {
@@ -547,6 +614,8 @@ test('toMap', () => {
 
 	expect(keyToValues).toEqual(valueToKeys);
 	expect(valueToValues).toEqual(valueToKeys);
+
+	expect(toMap('blah' as never)).toEqual(new Map());
 });
 
 test('toRecord', () => {
@@ -685,4 +754,8 @@ test('unique', () => {
 
 	expect(uniqueByKeyCallback).toEqual(result);
 	expect(uniqueByKeyValue).toEqual(result);
+
+	expect(unique('blah' as never)).toEqual([]);
+	expect(unique([])).toEqual([]);
+	expect(unique([1])).toEqual([1]);
 });

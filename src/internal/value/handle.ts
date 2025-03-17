@@ -1,4 +1,5 @@
 import type {ArrayOrPlainObject, PlainObject} from '../../models';
+import {ignoreKey} from '../string/key';
 
 function findKey(
 	needle: string,
@@ -10,8 +11,8 @@ function findKey(
 	}
 
 	const keys = Object.keys(haystack);
-	const normalised = keys.map(key => key.toLowerCase());
-	const index = normalised.indexOf(needle.toLowerCase());
+	const normalized = keys.map(key => key.toLowerCase());
+	const index = normalized.indexOf(needle.toLowerCase());
 
 	return index > -1 ? keys[index] : needle;
 }
@@ -23,11 +24,7 @@ export function handleValue(
 	get: boolean,
 	ignoreCase: boolean,
 ): unknown {
-	if (
-		typeof data === 'object' &&
-		data !== null &&
-		!/^(__proto__|constructor|prototype)$/i.test(path)
-	) {
+	if (typeof data === 'object' && data !== null && !ignoreKey(path)) {
 		const key = findKey(path, data, ignoreCase);
 
 		if (get) {
@@ -37,3 +34,5 @@ export function handleValue(
 		(data as PlainObject)[key] = value;
 	}
 }
+
+//

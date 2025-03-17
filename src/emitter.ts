@@ -13,7 +13,7 @@ class Emitter<Value> {
 	/**
 	 * The observable that can be subscribed to
 	 */
-	get observable() {
+	get observable(): Observable<Value> {
 		return this.state.observable;
 	}
 
@@ -99,7 +99,15 @@ class Observable<Value> {
 		this.state = {
 			emitter,
 			observers,
+			closed: false,
 		};
+	}
+
+	/**
+	 * Destroy the observable
+	 */
+	destroy(): void {
+		this.state.closed = true;
 	}
 
 	/**
@@ -121,6 +129,10 @@ class Observable<Value> {
 		second?: (error: Error) => void,
 		third?: () => void,
 	): Subscription<Value> {
+		if (this.state.closed) {
+			throw new Error('Cannot subscribe to a destroyed observable');
+		}
+
 		const observer = getObserver(first, second, third);
 		const instance = new Subscription(this.state);
 
@@ -133,6 +145,7 @@ class Observable<Value> {
 }
 
 type ObservableState<Value> = {
+	closed: boolean;
 	emitter: Emitter<Value>;
 	observers: Map<Subscription<Value>, Observer<Value>>;
 };
@@ -166,17 +179,16 @@ class Subscription<Value> {
 	 * Is the subscription closed?
 	 */
 	get closed() {
-		return this.state.closed || !(this.state.emitter?.active ?? false);
+		return this.state.closed || !this.state.emitter.active;
 	}
 
 	/**
 	 * Destroy the subscription
 	 */
 	destroy(): void {
-		this.unsubscribe();
-
-		this.state.emitter = undefined as never;
-		this.state.observers = undefined as never;
+		if (!this.state.closed) {
+			this.unsubscribe();
+		}
 	}
 
 	/**
@@ -186,7 +198,7 @@ class Subscription<Value> {
 		if (!this.state.closed) {
 			this.state.closed = true;
 
-			this.state.observers?.delete(this);
+			this.state.observers.delete(this);
 		}
 	}
 }
@@ -196,8 +208,6 @@ type SubscriptionState<Value> = {
 	emitter: Emitter<Value>;
 	observers: Map<Subscription<Value>, Observer<Value>>;
 };
-
-const properties: Array<keyof Observer<never>> = ['complete', 'error', 'next'];
 
 /**
  * Create a new emitter
@@ -223,12 +233,17 @@ function finishEmitter<Value>(state: EmitterState<Value>, emit: boolean): void {
 			subscription.destroy();
 		}
 
-		state.observers.clear();
+		state.observable?.destroy();
 
-		state.observable = undefined as never;
-		state.observers = undefined as never;
-		state.value = undefined as never;
+		state.observers.clear();
 	}
+}
+
+function getFunction<Callback>(
+	value: Callback,
+	defaultValue: Callback,
+): Callback {
+	return typeof value === 'function' ? value : defaultValue;
 }
 
 function getObserver<Value>(
@@ -240,22 +255,16 @@ function getObserver<Value>(
 		next: noop,
 	};
 
-	if (typeof first === 'object') {
-		observer =
-			first !== null &&
-			properties.every(property => {
-				const value = first[property];
-
-				return value == null || typeof value === 'function';
-			})
-				? first
-				: observer;
-	} else if (typeof first === 'function') {
+	if (typeof first === 'function') {
 		observer = {
-			error: typeof second === 'function' ? second : noop,
-			next: first,
-			complete: typeof third === 'function' ? third : undefined,
+			error: getFunction(second, noop),
+			next: getFunction(first, noop),
+			complete: getFunction(third, noop),
 		};
+	} else if (typeof first === 'object') {
+		observer.complete = getFunction(first?.complete, noop);
+		observer.error = getFunction(first?.error, noop);
+		observer.next = getFunction(first?.next, noop);
 	}
 
 	return observer;
