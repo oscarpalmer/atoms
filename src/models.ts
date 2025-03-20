@@ -1,4 +1,4 @@
-import type {Get, Paths} from 'type-fest';
+import type {Get, Paths, Primitive} from 'type-fest';
 
 export type ArrayOrPlainObject = unknown[] | Record<PropertyKey, unknown>;
 
@@ -23,15 +23,6 @@ export type Key = number | string;
 
 export type PlainObject = Record<PropertyKey, unknown>;
 
-export type Primitive =
-	| bigint
-	| boolean
-	| null
-	| number
-	| string
-	| symbol
-	| undefined;
-
 export type TypedArray =
 	| Int8Array
 	| Uint8Array
@@ -45,4 +36,4 @@ export type TypedArray =
 	| BigInt64Array
 	| BigUint64Array;
 
-export type {Get, Paths};
+export type {Get, Paths, Primitive};
