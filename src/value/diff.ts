@@ -1,5 +1,5 @@
 import {isArrayOrPlainObject} from '../is';
-import type {ArrayOrPlainObject, Key, PlainObject} from '../models';
+import type {ArrayOrPlainObject, PlainObject} from '../models';
 import {join} from '../string/index';
 import {equal} from '../value/equal';
 
@@ -92,9 +92,7 @@ function getDiffs(
 		const maximumLength = Math.max(first.length, second.length);
 		const minimumLength = Math.min(first.length, second.length);
 
-		let index = minimumLength;
-
-		for (; index < maximumLength; index += 1) {
+		for (let index = minimumLength; index < maximumLength; index += 1) {
 			const key = join([prefix, index], '.');
 
 			changes.push({
@@ -133,7 +131,11 @@ function getDiffs(
 				const nested = isArrayOrPlainObject(from) || isArrayOrPlainObject(to);
 
 				const diffs = nested
-					? getDiffs(from as PlainObject, to as PlainObject, prefixed)
+					? getDiffs(
+							(from ?? {}) as PlainObject,
+							(to ?? {}) as PlainObject,
+							prefixed,
+						)
 					: [];
 
 				if (!nested || (nested && diffs.length > 0)) {

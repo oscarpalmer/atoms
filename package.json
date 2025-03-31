@@ -4,19 +4,19 @@
 		"url": "https://oscarpalmer.se"
 	},
 	"dependencies": {
-		"type-fest": "^4.36"
+		"type-fest": "^4.38"
 	},
 	"description": "Atomic utilities for making your JavaScript better.",
 	"devDependencies": {
 		"@biomejs/biome": "^1.9",
 		"@types/node": "^22.13",
-		"@vitest/coverage-istanbul": "^3",
+		"@vitest/coverage-istanbul": "^3.1",
 		"dts-bundle-generator": "^9.5",
 		"glob": "^11",
 		"happy-dom": "^17.4",
 		"typescript": "^5.8",
 		"vite": "^6.2",
-		"vitest": "^3"
+		"vitest": "^3.1"
 	},
 	"exports": {
 		"./package.json": "./package.json",
@@ -208,5 +208,5 @@
 	},
 	"type": "module",
 	"types": "./types/index.d.cts",
-	"version": "0.89.1"
+	"version": "0.90.0"
 }
