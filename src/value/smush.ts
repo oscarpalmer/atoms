@@ -2,7 +2,7 @@ import type {Get, Paths, Simplify} from 'type-fest';
 import type {ToString} from 'type-fest/source/internal/string';
 import {isArrayOrPlainObject} from '../is';
 import type {ArrayOrPlainObject, PlainObject} from '../models';
-import {join} from '../string/index';
+import {join} from '../string/misc';
 
 type Smushed<Value> = Simplify<{
 	[Key in Paths<Value>]: Get<Value, ToString<Key>>;

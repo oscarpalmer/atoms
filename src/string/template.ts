@@ -1,5 +1,5 @@
 import type {PlainObject} from '../models';
-import {getString} from '../string/index';
+import {getString} from '../string/misc';
 import {getValue} from '../value/get';
 
 type Options = {

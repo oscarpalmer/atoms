@@ -1,8 +1,6 @@
 import {expect, test} from 'vitest';
 import {
-	HSLColor,
-	HexColor,
-	RGBColor,
+	getColor,
 	getForegroundColor,
 	getHSLColor,
 	getHexColor,
@@ -12,32 +10,31 @@ import {
 	isHexColor,
 	isRGBColor,
 } from '../src/color';
-import {hslToRgb} from '../src/color/functions';
 
 const foregrounds = [
-	'black',
-	'white',
-	'white',
-	'white',
-	'black',
-	'black',
-	'white',
-	'white',
-	'white',
-	'white',
+	'000000',
+	'ffffff',
+	'ffffff',
+	'ffffff',
+	'000000',
+	'000000',
+	'ffffff',
+	'ffffff',
+	'ffffff',
+	'ffffff',
 ];
 
 const hexes = [
-	'#faf0e6',
-	'#3a75c4',
-	'#964b00',
-	'#006994',
-	'#9bddff',
-	'#ff9933',
-	'#122faa',
-	'#536872',
-	'#686c5e',
-	'#483c32',
+	'faf0e6',
+	'3a75c4',
+	'964b00',
+	'006994',
+	'9bddff',
+	'ff9933',
+	'122faa',
+	'536872',
+	'686c5e',
+	'483c32',
 ];
 
 const hsls = [
@@ -68,18 +65,55 @@ const rgbs = [
 
 const {length} = hexes;
 
+test('getColor + isColor', () => {
+	const values = [
+		...hexes,
+		...hsls,
+		...rgbs,
+		true,
+		123,
+		BigInt(123),
+		{},
+		[],
+		() => {},
+	];
+
+	const {length} = values;
+
+	for (let index = 0; index < length; index += 1) {
+		const value = values[index];
+		const color = getColor(value);
+
+		expect(isColor(color)).toBe(true);
+		expect(isColor(value)).toBe(false);
+	}
+});
+
 test('getForegroundColor', () => {
 	for (let index = 0; index < length; index += 1) {
-		expect(getForegroundColor(rgbs[index])).toBe(foregrounds[index]);
+		expect(getForegroundColor(rgbs[index]).hex).toBe(foregrounds[index]);
 	}
 });
 
 test('getHexColor', () => {
 	for (let index = 0; index < length; index += 1) {
-		expect(getHexColor(hexes[index]).value).toEqual(hexes[index]);
+		expect(getHexColor(hexes[index])).toEqual(hexes[index]);
 	}
 
-	expect(getHexColor('invalid').value).toBe('#000000');
+	const short = hexes.map(
+		hex => `${hex.slice(0, 1)}${hex.slice(2, 3)}${hex.slice(4, 5)}`,
+	);
+
+	const long = short.map(
+		hex =>
+			`${hex.slice(0, 1).repeat(2)}${hex.slice(1, 2).repeat(2)}${hex.slice(2, 3).repeat(2)}`,
+	);
+
+	for (let index = 0; index < length; index += 1) {
+		expect(getHexColor(short[index])).toEqual(long[index]);
+	}
+
+	expect(getHexColor('invalid')).toBe('000000');
 });
 
 test('getHslColor', () => {
@@ -110,26 +144,18 @@ test('getRgbColor', () => {
 	}
 });
 
-test('hexToRgb', () => {
-	for (let index = 0; index < length; index += 1) {
-		const {blue, green, red} = HexColor.toRgb(hexes[index]);
-
-		expect(blue).toBe(rgbs[index].blue);
-		expect(green).toBe(rgbs[index].green);
-		expect(red).toBe(rgbs[index].red);
-	}
-});
-
-test('hslToRgb', () => {
-	for (let index = 0; index < length; index += 1) {
-		expect(hslToRgb(hsls[index]).value).toEqual(rgbs[index]);
-	}
-});
-
 test('is', () => {
 	const hex = getHexColor(hexes[0]);
-	const hsl = hex.toHsl();
-	const rgb = hsl.toRgb();
+	const hsl = getHSLColor(hex);
+	const rgb = getRGBColor(hex);
+
+	expect(isHexColor('aaa')).toBe(true);
+	expect(isHexColor('aaaa')).toBe(false);
+	expect(isHexColor('aaaaaa')).toBe(true);
+	expect(isHexColor('aaaaaaa')).toBe(false);
+	expect(isHexColor('ööö')).toBe(false);
+	expect(isHexColor('öööö')).toBe(false);
+	expect(isHexColor('ööööööö')).toBe(false);
 
 	expect(isHexColor(hex)).toBe(true);
 	expect(isHexColor(hsl)).toBe(false);
@@ -143,157 +169,7 @@ test('is', () => {
 	expect(isRGBColor(hsl)).toBe(false);
 	expect(isRGBColor(rgb)).toBe(true);
 
-	expect(isColor(hex)).toBe(true);
-	expect(isColor(hsl)).toBe(true);
-	expect(isColor(rgb)).toBe(true);
-});
-
-test('rgbToHex', () => {
-	for (let index = 0; index < length; index += 1) {
-		expect(RGBColor.toHex(rgbs[index]).value).toBe(hexes[index]);
-	}
-});
-
-test('rgbToHsl', () => {
-	for (let index = 0; index < length; index += 1) {
-		expect(RGBColor.toHsl(rgbs[index]).value).toEqual(hsls[index]);
-	}
-});
-
-test('HexColor', () => {
-	for (let index = 0; index < length; index += 1) {
-		const rgb = HexColor.toRgb(hexes[index]);
-		const hex = rgb.toHex();
-
-		const {value} = hex;
-
-		expect(value).toBe(hexes[index]);
-		expect(String(hex)).toBe(hexes[index]);
-
-		expect(hex.toHsl().value).toEqual(hsls[index]);
-		expect(hex.toRgb().value).toEqual(rgbs[index]);
-
-		hex.value = 'invalid';
-
-		expect(hex.value).toBe('#000000');
-
-		hex.value = 'fab';
-
-		expect(hex.value).toBe('#ffaabb');
-	}
-});
-
-test('HSLColor', () => {
-	for (let index = 0; index < length; index += 1) {
-		const hsl = RGBColor.toHsl(rgbs[index]);
-		const rgb = hsl.toRgb();
-		const hex = hsl.toHex();
-
-		expect(hsl.value).toEqual(hsls[index]);
-
-		const {hue, lightness, saturation} = hsl;
-
-		expect(hue).toBe(hsls[index].hue);
-		expect(lightness).toBe(hsls[index].lightness);
-		expect(saturation).toBe(hsls[index].saturation);
-
-		expect(hsl.toString()).toBe(
-			`hsl(${hsls[index].hue}, ${hsls[index].saturation}%, ${hsls[index].lightness}%)`,
-		);
-
-		hsl.hue = 180;
-		hsl.lightness = 50;
-		hsl.saturation = 50;
-
-		expect(hsl.hue).toBe(180);
-		expect(hsl.lightness).toBe(50);
-		expect(hsl.saturation).toBe(50);
-
-		hsl.hue = 999;
-		hsl.lightness = 999;
-		hsl.saturation = 999;
-
-		expect(hsl.hue).toBe(360);
-		expect(hsl.lightness).toBe(100);
-		expect(hsl.saturation).toBe(100);
-
-		expect(rgb.value).toEqual(rgbs[index]);
-
-		const {blue, green, red} = rgb;
-
-		expect(blue).toBe(rgbs[index].blue);
-		expect(green).toBe(rgbs[index].green);
-		expect(red).toBe(rgbs[index].red);
-
-		expect(hex.value).toBe(hexes[index]);
-
-		hsl.value = {hue: 0, lightness: 100, saturation: 0};
-
-		expect(hsl.hue).toBe(0);
-		expect(hsl.lightness).toBe(100);
-		expect(hsl.saturation).toBe(0);
-
-		expect(hsl.toRgb().value).toEqual({blue: 255, green: 255, red: 255});
-		expect(hsl.toHex().value).toBe('#ffffff');
-	}
-});
-
-test('RGBColor', () => {
-	for (let index = 0; index < length; index += 1) {
-		const rgb = HSLColor.toRgb(hsls[index]);
-
-		expect(rgb.value).toEqual(rgbs[index]);
-
-		const {blue, green, red} = rgb;
-
-		expect(blue).toBe(rgbs[index].blue);
-		expect(green).toBe(rgbs[index].green);
-		expect(red).toBe(rgbs[index].red);
-
-		expect(rgb.toString()).toBe(
-			`rgb(${rgbs[index].red}, ${rgbs[index].green}, ${rgbs[index].blue})`,
-		);
-
-		let hsl = rgb.toHsl();
-
-		rgb.blue = 128;
-		rgb.green = 128;
-		rgb.red = 128;
-
-		expect(rgb.blue).toBe(128);
-		expect(rgb.green).toBe(128);
-		expect(rgb.red).toBe(128);
-
-		rgb.blue = blue;
-		rgb.green = green;
-		rgb.red = red;
-
-		expect(rgb.blue).toBe(blue);
-		expect(rgb.green).toBe(green);
-		expect(rgb.red).toBe(red);
-
-		expect(hsl.value).toEqual(hsls[index]);
-
-		const {hue, lightness, saturation} = hsl;
-
-		expect(hue).toBe(hsls[index].hue);
-		expect(lightness).toBe(hsls[index].lightness);
-		expect(saturation).toBe(hsls[index].saturation);
-
-		expect(rgb.toHex().value).toBe(hexes[index]);
-
-		rgb.value = {blue: 255, green: 255, red: 255};
-
-		expect(rgb.blue).toBe(255);
-		expect(rgb.green).toBe(255);
-		expect(rgb.red).toBe(255);
-
-		expect(rgb.toHex().value).toBe('#ffffff');
-
-		hsl = rgb.toHsl();
-
-		expect(hsl.hue).toBe(0);
-		expect(hsl.lightness).toBe(100);
-		expect(hsl.saturation).toBe(0);
-	}
+	expect(isColor(hex)).toBe(false);
+	expect(isColor(hsl)).toBe(false);
+	expect(isColor(rgb)).toBe(false);
 });

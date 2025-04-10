@@ -1,7 +1,7 @@
 import type {GenericCallback} from './models';
 import {clamp} from './number';
 import {SizedMap} from './sized';
-import {getString, join} from './string';
+import {getString, join} from './string/misc';
 
 type CancellableCallback<Callback extends GenericCallback> = Callback & {
 	/**

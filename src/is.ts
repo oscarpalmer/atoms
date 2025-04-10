@@ -5,7 +5,7 @@ import type {
 	Primitive,
 	TypedArray,
 } from './models';
-import {getString} from './string/index';
+import {getString} from './string/misc';
 
 /**
  * Is the value an array or a record?

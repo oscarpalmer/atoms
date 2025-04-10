@@ -1,7 +1,7 @@
 import {ignoreKey} from './internal/string/key';
 import {isPlainObject} from './is';
 import type {ArrayOrPlainObject, PlainObject} from './models';
-import {join} from './string/index';
+import {join} from './string/misc';
 import {setValue} from './value/set';
 
 /**

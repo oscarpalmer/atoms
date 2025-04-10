@@ -1,5 +1,5 @@
 import {max} from '../math';
-import {getString, words} from '../string/index';
+import {getString, words} from '../string/misc';
 
 /**
  * Compare two values _(for sorting purposes)_

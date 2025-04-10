@@ -1,4 +1,4 @@
-import {join, words} from './index';
+import {join, words} from './misc';
 
 /**
  * Convert a string to camel case _(thisIsCamelCase)_

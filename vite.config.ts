@@ -27,6 +27,7 @@ export default defineConfig({
 				preserveModules: true,
 			},
 		},
+		target: 'esnext',
 	},
 	logLevel: 'silent',
 	test: {

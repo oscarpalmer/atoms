@@ -1,6 +1,6 @@
 import {isArrayOrPlainObject} from '../is';
 import type {ArrayOrPlainObject, PlainObject} from '../models';
-import {join} from '../string/index';
+import {join} from '../string/misc';
 import {equal} from '../value/equal';
 
 export type DiffType = 'full' | 'none' | 'partial';
