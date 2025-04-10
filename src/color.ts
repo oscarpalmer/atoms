@@ -13,6 +13,8 @@ export type RGBColor = {
 	red: number;
 };
 
+type Property = 'blue' | 'green' | 'hue' | 'lightness' | 'red' | 'saturation';
+
 type State = {
 	hex: string;
 	hsl: HSLColor;
@@ -24,16 +26,57 @@ export class Color {
 
 	private readonly state: State;
 
+	/**
+	 * Get the color as a hex-color
+	 */
 	get hex(): string {
 		return this.state.hex;
 	}
 
+	/**
+	 * Set colors from a hex-color
+	 */
+	set hex(value: string) {
+		if (isHexColor(value) && value !== this.state.hex) {
+			const hex = getNormalisedHex(value);
+			const rgb = hexToRgb(hex);
+
+			this.state.hex = hex;
+			this.state.hsl = rgbToHsl(rgb);
+			this.state.rgb = rgb;
+		}
+	}
+
+	/**
+	 * Get the color as an HSL-color
+	 */
 	get hsl(): HSLColor {
 		return this.state.hsl;
 	}
 
+	set hsl(value: HSLColor) {
+		if (isHSLColor(value)) {
+			const rgb = hslToRgb(value);
+
+			this.state.hex = rgbToHex(rgb);
+			this.state.hsl = value;
+			this.state.rgb = rgb;
+		}
+	}
+
+	/**
+	 * Get the color as an RGB-color
+	 */
 	get rgb(): RGBColor {
 		return this.state.rgb;
+	}
+
+	set rgb(value: RGBColor) {
+		if (isRGBColor(value)) {
+			this.state.hex = rgbToHex(value);
+			this.state.hsl = rgbToHsl(value);
+			this.state.rgb = value;
+		}
 	}
 
 	constructor(value: unknown) {
@@ -238,6 +281,19 @@ export function isHSLColor(value: unknown): value is HSLColor {
 	return isObject(value, hslKeys);
 }
 
+function isInRange(value: unknown, min: number, max: number): boolean {
+	if (
+		typeof value === 'number' ||
+		(typeof value === 'string' && numberPattern.test(value))
+	) {
+		const asNumber = Number(value);
+
+		return asNumber >= min && asNumber <= max;
+	}
+
+	return false;
+}
+
 /**
  * Is the value an RGB-color?
  */
@@ -245,12 +301,15 @@ export function isRGBColor(value: unknown): value is RGBColor {
 	return isObject(value, rgbKeys);
 }
 
-function isObject(value: unknown, properties: Set<string>): boolean {
-	if (typeof value !== 'object' || value === null) {
+/**
+ * Is the value an object with the given properties and value requirements?
+ */
+function isObject(obj: unknown, properties: Set<Property>): boolean {
+	if (typeof obj !== 'object' || obj === null) {
 		return false;
 	}
 
-	const keys = Object.keys(value);
+	const keys = Object.keys(obj);
 	const {length} = keys;
 
 	if (length !== properties.size) {
@@ -259,14 +318,10 @@ function isObject(value: unknown, properties: Set<string>): boolean {
 
 	for (let index = 0; index < length; index += 1) {
 		const key = keys[index];
-		const val = (value as PlainObject)[key];
 
 		if (
-			!properties.has(key) ||
-			!(
-				typeof val === 'number' ||
-				(typeof val === 'string' && /^\d+$/.test(val))
-			)
+			!properties.has(key as never) ||
+			!validators[key as Property]((obj as PlainObject)[key])
 		) {
 			return false;
 		}
@@ -361,5 +416,17 @@ const defaultRgb: RGBColor = {
 
 const groupedPattern = /^#?([a-f0-9]{2})([a-f0-9]{2})([a-f0-9]{2})$/i;
 
-const hslKeys = new Set(['hue', 'lightness', 'saturation']);
-const rgbKeys = new Set(['blue', 'green', 'red']);
+const hslKeys = new Set<Property>(['hue', 'lightness', 'saturation']);
+
+const numberPattern = /^\d+$/;
+
+const rgbKeys = new Set<Property>(['blue', 'green', 'red']);
+
+const validators: Record<Property, (value: unknown) => boolean> = {
+	blue: value => isInRange(value, 0, 255),
+	green: value => isInRange(value, 0, 255),
+	hue: value => isInRange(value, 0, 360),
+	lightness: value => isInRange(value, 0, 100),
+	saturation: value => isInRange(value, 0, 100),
+	red: value => isInRange(value, 0, 255),
+};

@@ -10,6 +10,7 @@ import {
 	isHexColor,
 	isRGBColor,
 } from '../src/color';
+import {getRandomItem} from '../src/random';
 
 const foregrounds = [
 	'000000',
@@ -66,6 +67,46 @@ const rgbs = [
 const {length} = hexes;
 
 test('getColor + isColor', () => {
+	const indices = Array.from({length}).map((_, index) => index);
+
+	for (let index = 0; index < length; index += 1) {
+		const color = getColor(hexes[index]);
+
+		expect(color.hex).toEqual(hexes[index]);
+		expect(color.hsl).toEqual(hsls[index]);
+		expect(color.rgb).toEqual(rgbs[index]);
+
+		let next = getRandomItem(indices.filter(value => value !== index));
+
+		if (next != null) {
+			color.hex = hexes[next];
+
+			expect(color.hex).toEqual(hexes[next]);
+			expect(color.hsl).toEqual(hsls[next]);
+			expect(color.rgb).toEqual(rgbs[next]);
+		}
+
+		next = getRandomItem(indices.filter(value => value !== index));
+
+		if (next != null) {
+			color.hsl = hsls[next];
+
+			expect(color.hex).toEqual(hexes[next]);
+			expect(color.hsl).toEqual(hsls[next]);
+			expect(color.rgb).toEqual(rgbs[next]);
+		}
+
+		next = getRandomItem(indices.filter(value => value !== index));
+
+		if (next != null) {
+			color.rgb = rgbs[next];
+
+			expect(color.hex).toEqual(hexes[next]);
+			expect(color.hsl).toEqual(hsls[next]);
+			expect(color.rgb).toEqual(rgbs[next]);
+		}
+	}
+
 	const values = [
 		...hexes,
 		...hsls,
@@ -78,9 +119,9 @@ test('getColor + isColor', () => {
 		() => {},
 	];
 
-	const {length} = values;
+	const size = values.length;
 
-	for (let index = 0; index < length; index += 1) {
+	for (let index = 0; index < size; index += 1) {
 		const value = values[index];
 		const color = getColor(value);
 
@@ -163,11 +204,17 @@ test('is', () => {
 
 	expect(isHSLColor(hex)).toBe(false);
 	expect(isHSLColor(hsl)).toBe(true);
+	expect(isHSLColor({hello: 'world'})).toBe(false);
+	expect(isHSLColor({hue: 'x', lightness: 0, saturation: 0})).toBe(false);
+	expect(isHSLColor({hue: 900, lightness: 0, saturation: 0})).toBe(false);
 	expect(isHSLColor(rgb)).toBe(false);
 
 	expect(isRGBColor(hex)).toBe(false);
 	expect(isRGBColor(hsl)).toBe(false);
 	expect(isRGBColor(rgb)).toBe(true);
+	expect(isRGBColor({hello: 'world'})).toBe(false);
+	expect(isRGBColor({red: 'x', green: 0, blue: 0})).toBe(false);
+	expect(isRGBColor({red: 900, green: 0, blue: 0})).toBe(false);
 
 	expect(isColor(hex)).toBe(false);
 	expect(isColor(hsl)).toBe(false);
