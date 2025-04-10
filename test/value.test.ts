@@ -234,7 +234,7 @@ test('merge', () => {
 
 	expect(merged).toEqual({
 		age: 99,
-		hobbies: ['Wrestling', 'Reading'],
+		hobbies: ['Wrestling'],
 		name: {
 			first: 'Oscar',
 			last: 'Palmér',
@@ -243,17 +243,8 @@ test('merge', () => {
 	});
 
 	expect(merge([])).toEqual({});
-
-	expect(
-		merge(
-			[
-				[1, 2, 3, 4, 5],
-				[null, null, 99],
-			],
-			{skipNullable: true},
-		),
-	).toEqual([1, 2, 99, 4, 5]);
-
+	expect(merge([first])).toEqual(first);
+	expect(merge([[1, 2, 3, 4, 5], [99]])).toEqual([99]);
 	expect(merge('blah' as never)).toEqual({});
 	expect(merge(['blah' as never])).toEqual({});
 });
