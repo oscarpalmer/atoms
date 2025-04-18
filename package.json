@@ -15,7 +15,7 @@
 		"glob": "^11",
 		"happy-dom": "^17.4",
 		"typescript": "^5.8",
-		"vite": "^6.2",
+		"vite": "^6.3",
 		"vitest": "^3.1"
 	},
 	"exports": {
@@ -148,16 +148,6 @@
 				"default": "./dist/random.cjs"
 			}
 		},
-		"./schema": {
-			"import": {
-				"types": "./types/schema.d.ts",
-				"default": "./dist/schema.js"
-			},
-			"require": {
-				"types": "./types/schema.d.cts",
-				"default": "./dist/schema.cjs"
-			}
-		},
 		"./string": {
 			"import": {
 				"types": "./types/string/index.d.ts",
@@ -208,5 +198,5 @@
 	},
 	"type": "module",
 	"types": "./types/index.d.cts",
-	"version": "0.94.0"
+	"version": "0.95.0"
 }
