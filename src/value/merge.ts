@@ -1,31 +1,68 @@
 import {isArrayOrPlainObject} from '../is';
-import type {ArrayOrPlainObject, PlainObject} from '../models';
+import type {ArrayOrPlainObject, NestedPartial, PlainObject} from '../models';
+import {join} from '../string/misc';
 
 type MergeOptions = {
+	/**
+	 * - Key _(or key epxressions)_ for values that should be replaced
+	 * - E.g. `merge([{items: [1, 2, 3]}, {items: [99]}])` => `{items: [99]}`
+	 */
+	replaceableObjects: string | RegExp | Array<string | RegExp>;
 	/**
 	 * - Skip nullable values when merging arrays?
 	 * - E.g. `merge([1, 2, 3], [null, null, 99])` => `[1, 2, 99]`
 	 */
-	skipNullable?: boolean;
+	skipNullableInArrays: boolean;
 };
+
+type MergeValuesOptions = {
+	replaceableObjects: ReplaceableObjectsCallback | undefined;
+	skipNullableInArrays: boolean;
+};
+
+type ReplaceableObjectsCallback = (name: string) => boolean;
+
+function getReplaceableObjects(
+	value: unknown,
+): ReplaceableObjectsCallback | undefined {
+	const items = (Array.isArray(value) ? value : [value]).filter(
+		item => typeof item === 'string' || item instanceof RegExp,
+	);
+
+	if (items.length > 0) {
+		return (name: string) =>
+			items.some(item =>
+				typeof item === 'string' ? item === name : item.test(name),
+			);
+	}
+}
 
 /**
  * Merge multiple arrays or objects into a single one
  */
 export function merge<Model extends ArrayOrPlainObject>(
-	values: Model[],
-	options?: Partial<MergeOptions>,
-): Model {
-	if (!Array.isArray(values) || values.length === 0) {
-		return {} as Model;
+		values: Array<NestedPartial<Model>>,
+		options?: Partial<MergeOptions>,
+	): Model {
+		if (!Array.isArray(values) || values.length === 0) {
+			return {} as Model;
+		}
+
+		return mergeValues(values, {
+			replaceableObjects: getReplaceableObjects(options?.replaceableObjects),
+			skipNullableInArrays: options?.skipNullableInArrays === true,
+		}) as Model;
 	}
 
-	const skipNullable = options?.skipNullable === true;
-
-	const actual = values.filter(value => isArrayOrPlainObject(value)) as Model[];
+function mergeValues(
+	values: ArrayOrPlainObject[],
+	options: MergeValuesOptions,
+	prefix?: string,
+): ArrayOrPlainObject {
+	const actual = values.filter(isArrayOrPlainObject);
 
 	if (actual.length === 0) {
-		return {} as Model;
+		return {};
 	}
 
 	if (actual.length === 1) {
@@ -43,20 +80,26 @@ export function merge<Model extends ArrayOrPlainObject>(
 
 		for (let innerIndex = 0; innerIndex < size; innerIndex += 1) {
 			const key = keys[innerIndex];
+			const full = join([prefix ?? '', key], '.');
+
 			const next = item[key];
 			const previous = result[key];
 
-			if (isArray && skipNullable && next == null) {
+			if (isArray && options.skipNullableInArrays && next == null) {
 				continue;
 			}
 
-			if (isArrayOrPlainObject(next) && isArrayOrPlainObject(previous)) {
-				result[key] = merge([previous, next], {skipNullable});
-			} else {
+			if (
+				!isArrayOrPlainObject(next) ||
+				!isArrayOrPlainObject(previous) ||
+				(options.replaceableObjects?.(full) ?? false)
+			) {
 				result[key] = next;
+			} else {
+				result[key] = mergeValues([previous, next], options, full);
 			}
 		}
 	}
 
-	return result as Model;
+	return result;
 }

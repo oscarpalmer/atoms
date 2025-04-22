@@ -1,4 +1,5 @@
 import type {PlainObject, Primitive} from './models';
+import {getString} from './string/misc';
 
 type Defaults = {
 	/**
@@ -220,6 +221,10 @@ export function translate(
 translate.configure = (
 	configuration: Partial<TranslateConfiguration>,
 ): void => {
+	if (typeof configuration !== 'object' || configuration == null) {
+		return;
+	}
+
 	if (typeof configuration.delimiter === 'string') {
 		defaults.delimiter = configuration.delimiter;
 	}
@@ -243,13 +248,6 @@ translate.configuration = (): TranslateConfiguration => {
 		language: String(defaults.languages.preferred.full),
 	};
 };
-
-/**
- * Translates a primitive value into a string
- */
-function translatePrimitive(value: Primitive): string {
-	return value == null ? '' : typeof value === 'string' ? value : String(value);
-}
 
 /**
  * Translates a translatable object _(or array of translatable objects)_ into a string
@@ -321,7 +319,7 @@ function translateValue(
 			: asString;
 	}
 
-	return translatePrimitive(actual as Primitive);
+	return getString(actual as Primitive);
 }
 
 initialize();

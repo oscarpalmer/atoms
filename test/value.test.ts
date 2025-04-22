@@ -1,4 +1,5 @@
 import {expect, test} from 'vitest';
+import type {NestedPartial} from '../src/models';
 import {
 	compare,
 	diff,
@@ -26,10 +27,11 @@ type DiffableExtended = {
 } & Diffable;
 
 type Mergeable = {
-	age?: number;
-	hobbies?: string[];
-	name?: {first?: string; last?: string};
-	profession?: string;
+	age: number;
+	cars: string[];
+	hobbies: string[];
+	name: {first: string; last: string};
+	profession: string;
 };
 
 test('compare', () => {
@@ -211,8 +213,9 @@ test('getValue', () => {
 });
 
 test('merge', () => {
-	const first: Mergeable = {
+	const first: NestedPartial<Mergeable> = {
 		age: 99,
+		cars: ['Alfa Romeo Spider', 'Lamborghini Miura'],
 		hobbies: ['Gaming', 'Reading'],
 		name: {
 			first: 'Oscar',
@@ -220,20 +223,24 @@ test('merge', () => {
 		profession: 'Developer?',
 	};
 
-	const second: Mergeable = {
+	const second: NestedPartial<Mergeable> = {
 		name: {
 			last: 'Palmér',
 		},
 	};
 
-	const third: Mergeable = {
+	const third: NestedPartial<Mergeable> = {
+		cars: ['Ferrari 250 GT California'],
 		hobbies: ['Wrestling'],
 	};
 
-	const merged = merge([first, second, third]);
+	const merged = merge([first, second, third], {
+		replaceableObjects: 'cars',
+	});
 
 	expect(merged).toEqual({
 		age: 99,
+		cars: ['Ferrari 250 GT California'],
 		hobbies: ['Wrestling', 'Reading'],
 		name: {
 			first: 'Oscar',
@@ -243,16 +250,58 @@ test('merge', () => {
 	});
 
 	expect(merge([])).toEqual({});
+	expect(merge([{hello: 'world'}])).toEqual({hello: 'world'});
 
 	expect(
-		merge(
-			[
-				[1, 2, 3, 4, 5],
-				[null, null, 99],
-			],
-			{skipNullable: true},
-		),
+		merge([[1, 2, 3, 4, 5], [null, null, 99] as never], {
+			skipNullableInArrays: true,
+		}),
 	).toEqual([1, 2, 99, 4, 5]);
+
+	const replaceableFirst = {
+		a: {
+			b: {
+				c: {
+					d: [1, 2, 3],
+					d2: ['x', 'y', 'z'],
+				},
+				c9x: {msg: '!', value: 99},
+			},
+			b2: ['a', 'b', 'c'],
+			bx: {value: '?'},
+		},
+	};
+
+	const replaceableSecond = {
+		a: {
+			b: {
+				c: {
+					d: [4, 5, 6],
+					d2: ['å', 'ä', 'ö'],
+				},
+				c9x: {msg: '!!!'},
+			},
+			b2: ['d', 'e', 'f'],
+		},
+	};
+
+	const replaceableMerged = merge([replaceableFirst, replaceableSecond], {
+		replaceableObjects: ['d', /c9x/, /\w\d$/],
+	});
+
+	expect(replaceableMerged).toEqual({
+		a: {
+			b: {
+				c: {
+					d: [4, 5, 6],
+					d2: ['å', 'ä', 'ö'],
+				},
+				c9x: {msg: '!!!'},
+			},
+			b2: ['d', 'e', 'f'],
+			bx: {value: '?'},
+		},
+	});
 
 	expect(merge('blah' as never)).toEqual({});
 	expect(merge(['blah' as never])).toEqual({});

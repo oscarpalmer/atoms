@@ -1,6 +1,8 @@
 import {ignoreKey} from './internal/string/key';
+import {tryDecode, tryEncode} from './internal/string/uri';
 import {isPlainObject} from './is';
 import type {ArrayOrPlainObject, PlainObject} from './models';
+import {getNumber} from './number';
 import {join} from './string/misc';
 import {setValue} from './value/set';
 
@@ -8,13 +10,19 @@ import {setValue} from './value/set';
  * Convert a query string to a plain _(nested)_ object
  */
 export function fromQuery(query: string): PlainObject {
+	if (typeof query !== 'string' || query.trim().length === 0) {
+		return {};
+	}
+
 	const parts = query.split('&');
 	const {length} = parts;
 
 	const parameters: PlainObject = {};
 
 	for (let index = 0; index < length; index += 1) {
-		const [key, value] = parts[index].split('=').map(tryDecode);
+		const decoded = parts[index].split('=').map(tryDecode);
+		const key = decoded[0].replace(arraySuffixPattern, '');
+		const value = decoded[1];
 
 		if (ignoreKey(key)) {
 			continue;
@@ -52,61 +60,61 @@ function getParts(
 		const key = keys[index];
 		const val = value[key as never];
 
+		const full = join([prefix, fromArray ? null : key], '.');
+
 		if (Array.isArray(val)) {
-			parts.push(
-				...getParts(val, true, join([prefix, fromArray ? null : key], '.')),
-			);
+			parts.push(...getParts(val, true, full));
 		} else if (isPlainObject(val)) {
-			parts.push(...getParts(val, false, join([prefix, key], '.')));
+			parts.push(...getParts(val, false, full));
 		} else if (isDecodable(val)) {
-			parts.push(
-				`${tryEncode(join([prefix, fromArray ? null : key], '.'))}=${tryEncode(val)}`,
-			);
+			parts.push(`${tryEncode(full)}=${tryEncode(val)}`);
+		} else if (val instanceof Date) {
+			parts.push(`${tryEncode(full)}=${val.toJSON()}`);
 		}
 	}
 
 	return parts;
 }
 
-function getValue(value: string): boolean | number | string {
-	if (/^(false|true)$/.test(value)) {
+function getValue(value: string): unknown {
+	if (booleanPattern.test(value)) {
 		return value === 'true';
 	}
 
-	const asNumber = Number(value);
+	const asNumber = getNumber(value);
 
 	if (!Number.isNaN(asNumber)) {
 		return asNumber;
 	}
 
-	return value;
+	const parsed = Date.parse(value);
+
+	if (Number.isNaN(parsed)) {
+		return value;
+	}
+
+	const date = new Date(parsed);
+
+	return date.toJSON() === value ? date : value;
 }
 
 function isDecodable(value: unknown): value is boolean | number | string {
-	return ['boolean', 'number', 'string'].includes(typeof value);
+	return types.has(typeof value);
 }
 
 /**
  * Convert a plain _(nested)_ object to a query string
  */
 export function toQuery(parameters: PlainObject): string {
-	return getParts(parameters, false)
-		.filter(part => part.length > 0)
-		.join('&');
+	return isPlainObject(parameters)
+		? getParts(parameters, false)
+				.filter(part => part.length > 0)
+				.join('&')
+		: '';
 }
 
-function tryCallback<T, U>(value: T, callback: (value: T) => U): U {
-	try {
-		return callback(value);
-	} catch {
-		return value as never;
-	}
-}
+const arraySuffixPattern = /\[\]$/;
 
-function tryDecode(value: string): string {
-	return tryCallback(value, decodeURIComponent);
-}
+const booleanPattern = /^(false|true)$/;
 
-function tryEncode(value: boolean | number | string): unknown {
-	return tryCallback(value, encodeURIComponent);
-}
+const types = new Set(['boolean', 'number', 'string']);

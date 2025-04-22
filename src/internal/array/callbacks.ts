@@ -8,13 +8,9 @@ function getCallback(value: unknown): GenericCallback | undefined {
 
 		case 'number':
 		case 'string':
-		case 'symbol':
 			return typeof value === 'string' && value.includes('.')
 				? undefined
 				: (obj: PlainObject) => obj[value];
-
-		default:
-			return;
 	}
 }
 
@@ -28,7 +24,7 @@ export function getCallbacks(
 	}
 
 	return {
-		key: getCallback(key),
+		keyed: getCallback(key),
 		value: getCallback(value),
 	};
 }

@@ -1,7 +1,7 @@
 import {isKey} from '../is';
 import type {Key, PlainObject} from '../models';
 import {compare} from '../value/compare';
-import type {SortKey, SortKeyWithCallback} from './models';
+import type {Sorter, SortKeyWithCallback} from './models';
 
 /**
  * Sort an array of items _(defaults to ascending)_
@@ -9,12 +9,12 @@ import type {SortKey, SortKeyWithCallback} from './models';
 export function sort<Item>(array: Item[], descending?: boolean): Item[];
 
 /**
- * - Sort an array of items, using a `key` to sort by a specific value
+ * - Sort an array of items, using a sorter to sort by a specific value
  * - Defaults to ascending, but can be changed by setting `descending` to `true`, or using a `SortKey`
  */
 export function sort<Item>(
 	array: Item[],
-	key: Key | SortKey<Item> | ((item: Item) => Key),
+	sorter: Key | Sorter<Item> | ((item: Item) => unknown),
 	descending?: boolean,
 ): Item[];
 
@@ -23,28 +23,28 @@ export function sort<Item>(
  * - Defaults to ascending, but can be changed by setting `descending` to `true`, or using a `SortKey`
  */
 export function sort<Item extends PlainObject, ItemKey extends keyof Item>(
-	array: Item[],
-	key: ItemKey | Key | SortKey<Item> | ((item: Item) => Key),
-	descending?: boolean,
-): Item[];
+		array: Item[],
+		sorter: ItemKey | Key | Sorter<Item> | ((item: Item) => unknown),
+		descending?: boolean,
+	): Item[];
 
 /**
- * - Sort an array of items, using multiple `keys` to sort by specific values
+ * - Sort an array of items, using multiple sorters to sort by specific values
  * - Defaults to ascending, but can be changed by setting `descending` to `true`, or using `SortKey`
  */
 export function sort<Item>(
 	array: Item[],
-	keys: Array<Key | SortKey<Item> | ((item: Item) => Key)>,
+	sorters: Array<Key | Sorter<Item> | ((item: Item) => unknown)>,
 	descending?: boolean,
 ): Item[];
 
 /**
- * - Sort an array of items, using multiple `keys` to sort by specific values
+ * - Sort an array of items, using multiple sorters to sort by specific values
  * - Defaults to ascending, but can be changed by setting `descending` to `true`, or using `SortKey`
  */
 export function sort<Item extends PlainObject, ItemKey extends keyof Item>(
 	array: Item[],
-	keys: Array<ItemKey | Key | SortKey<Item> | ((item: Item) => Key)>,
+	sorters: Array<ItemKey | Key | Sorter<Item> | ((item: Item) => unknown)>,
 	descending?: boolean,
 ): Item[];
 
@@ -63,47 +63,50 @@ export function sort(
 
 	const direction = first === true || second === true ? 'desc' : 'asc';
 
-	const unknownKeys = Array.isArray(first) ? first : [first];
-	let {length} = unknownKeys;
+	const unknownSorters = Array.isArray(first) ? first : [first];
+	let {length} = unknownSorters;
 
-	const keys: SortKeyWithCallback<unknown>[] = [];
+	const sorters: SortKeyWithCallback<unknown>[] = [];
 
 	for (let index = 0; index < length; index += 1) {
-		const key = unknownKeys[index];
+		const unknownSorter = unknownSorters[index];
 
-		const keyWithCallback: SortKeyWithCallback<unknown> = {
+		const sorter: SortKeyWithCallback<unknown> = {
 			direction,
 			callback: undefined as never,
 		};
 
-		if (isKey(key)) {
-			keyWithCallback.callback = value => (value as PlainObject)[key] as never;
-		} else if (typeof key === 'function') {
-			keyWithCallback.callback = key;
-		} else if (typeof key?.value === 'function' || isKey(key?.value)) {
-			keyWithCallback.direction = key?.direction ?? direction;
+		if (isKey(unknownSorter)) {
+			sorter.callback = value => (value as PlainObject)[unknownSorter] as never;
+		} else if (typeof unknownSorter === 'function') {
+			sorter.callback = unknownSorter;
+		} else if (
+			typeof unknownSorter?.value === 'function' ||
+			isKey(unknownSorter?.value)
+		) {
+			sorter.direction = unknownSorter?.direction ?? direction;
 
-			keyWithCallback.callback =
-				typeof key.value === 'function'
-					? key.value
-					: value => (value as PlainObject)[key.value as Key] as never;
+			sorter.callback =
+				typeof unknownSorter.value === 'function'
+					? unknownSorter.value
+					: value =>
+							(value as PlainObject)[unknownSorter.value as Key] as never;
 		}
 
-		if (typeof keyWithCallback.callback === 'function') {
-			const existing = keys.findIndex(
-				existing =>
-					existing.callback.toString() === keyWithCallback.callback.toString(),
+		if (typeof sorter.callback === 'function') {
+			const existing = sorters.findIndex(
+				existing => existing.callback.toString() === sorter.callback.toString(),
 			);
 
 			if (existing > -1) {
-				keys.splice(existing, 1);
+				sorters.splice(existing, 1);
 			}
 
-			keys.push(keyWithCallback);
+			sorters.push(sorter);
 		}
 	}
 
-	length = keys.length;
+	length = sorters.length;
 
 	if (length === 0) {
 		return array.sort(
@@ -116,14 +119,14 @@ export function sort(
 	if (length === 1) {
 		return array.sort(
 			(first, second) =>
-				compare(keys[0].callback(first), keys[0].callback(second)) *
-				(keys[0].direction === 'asc' ? 1 : -1),
+				compare(sorters[0].callback(first), sorters[0].callback(second)) *
+				(sorters[0].direction === 'asc' ? 1 : -1),
 		);
 	}
 
 	const sorted = array.sort((first, second) => {
 		for (let index = 0; index < length; index += 1) {
-			const {callback, direction} = keys[index];
+			const {callback, direction} = sorters[index];
 
 			const compared =
 				compare(callback(first), callback(second)) *

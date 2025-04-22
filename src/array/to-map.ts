@@ -167,7 +167,7 @@ export function toMap(
 	for (let index = 0; index < length; index += 1) {
 		const item = array[index];
 
-		const key = callbacks?.key?.(item, index, array) ?? index;
+		const key = callbacks?.keyed?.(item, index, array) ?? index;
 		const value = callbacks?.value?.(item, index, array) ?? item;
 
 		if (asArrays) {

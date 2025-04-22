@@ -149,7 +149,7 @@ test('translate', () => {
 	expect(configuration.fallback).toBe('en');
 	expect(configuration.language).toBe('en');
 
-	translate.configure({});
+	translate.configure(123 as never);
 
 	configuration = translate.configuration();
 

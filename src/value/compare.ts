@@ -36,7 +36,7 @@ export function compare(first: unknown, second: unknown): number {
 
 		if (comparison === 0) {
 			if (index === lastIndex) {
-				return 0;
+				break;
 			}
 
 			continue;

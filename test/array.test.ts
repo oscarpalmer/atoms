@@ -18,6 +18,7 @@ import {
 	toRecord,
 	unique,
 } from '../src/array';
+import {getCallbacks} from '../src/internal/array/callbacks';
 import {getRandomInteger} from '../src/random';
 import {diff, equal} from '../src/value';
 
@@ -81,6 +82,7 @@ test('count', () => {
 	expect(countByKeyCallback).toBe(1);
 
 	expect(count('blah' as never, 99)).toBe(Number.NaN);
+	expect(count('blah' as never, x => 123)).toBe(Number.NaN);
 	expect(count([], 99)).toBe(0);
 });
 
@@ -116,6 +118,9 @@ test('filter', () => {
 
 	expect(filterByValueCallback).toEqual([{id: 3, age: 25, name: 'Charlie'}]);
 
+	const filterByInvalidKey = filter(complex, 'name.length' as never);
+	expect(filterByInvalidKey).toEqual([]);
+
 	expect(filter('blah' as never, 99)).toEqual([]);
 	expect(filter([], 99)).toEqual([]);
 });
@@ -147,6 +152,32 @@ test('flatten', () => {
 
 	expect(flatten('blah' as never)).toEqual([]);
 	expect(flatten([])).toEqual([]);
+});
+
+test('getCallbacks', () => {
+	const withBoolean = getCallbacks(null, true);
+	expect(withBoolean?.keyed).toBeUndefined();
+
+	const withDotNotation = getCallbacks(null, 'prop.nested');
+	expect(withDotNotation?.keyed).toBeUndefined();
+
+	const withFunction = getCallbacks(() => true);
+	expect(typeof withFunction?.bool).toBe('function');
+
+	const withNumber = getCallbacks(null, 123);
+	expect(typeof withNumber?.keyed).toBe('function');
+
+	const withObject = getCallbacks(null, {});
+	expect(withObject?.keyed).toBeUndefined();
+
+	const withNull = getCallbacks(null, null);
+	expect(withNull?.keyed).toBeUndefined();
+
+	const withString = getCallbacks(null, 'id');
+	expect(typeof withString?.keyed).toBe('function');
+
+	const withUndefined = getCallbacks(null, undefined);
+	expect(withUndefined?.keyed).toBeUndefined();
 });
 
 test('groupBy', () => {

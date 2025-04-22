@@ -30,6 +30,7 @@ export * from './find';
 export {groupBy} from './group-by';
 export * from './index-of';
 export {insert} from './insert';
+export type {Sorter} from './models';
 export * from './shuffle';
 export {sort} from './sort';
 export * from './splice';

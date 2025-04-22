@@ -10,6 +10,8 @@ import {
 	isHexColor,
 	isRGBColor,
 } from '../src/color';
+import {defaultRgb} from '../src/color/constants';
+import {hexToRgb, hslToRgb, rgbToHex, rgbToHsl} from '../src/color/value';
 import {getRandomItem} from '../src/random';
 
 const foregrounds = [
@@ -65,6 +67,48 @@ const rgbs = [
 ];
 
 const {length} = hexes;
+
+test('color', () => {
+	const color = getColor('hello, world!');
+
+	expect(color.hex).toEqual('000000');
+
+	color.hex = 'ffffff';
+
+	expect(color.hex).toEqual('ffffff');
+
+	color.hex = 'ffffff';
+
+	expect(color.hex).toEqual('ffffff');
+
+	color.hex = 'hello, world!';
+
+	expect(color.hex).toEqual('ffffff');
+
+	color.hsl = {hue: 0, lightness: 0, saturation: 0};
+
+	expect(color.hsl).toEqual({hue: 0, lightness: 0, saturation: 0});
+
+	color.hsl = {hue: 0, lightness: 0, saturation: 0};
+
+	expect(color.hsl).toEqual({hue: 0, lightness: 0, saturation: 0});
+
+	color.hsl = {hue: 900, lightness: 0, saturation: 0};
+
+	expect(color.hsl).toEqual({hue: 0, lightness: 0, saturation: 0});
+
+	color.rgb = {red: 0, green: 0, blue: 0};
+
+	expect(color.rgb).toEqual({red: 0, green: 0, blue: 0});
+
+	color.rgb = {red: 0, green: 0, blue: 0};
+
+	expect(color.rgb).toEqual({red: 0, green: 0, blue: 0});
+
+	color.rgb = {red: 552, green: 0, blue: 0};
+
+	expect(color.rgb).toEqual({red: 0, green: 0, blue: 0});
+});
 
 test('getColor + isColor', () => {
 	const indices = Array.from({length}).map((_, index) => index);
@@ -128,6 +172,11 @@ test('getColor + isColor', () => {
 		expect(isColor(color)).toBe(true);
 		expect(isColor(value)).toBe(false);
 	}
+
+	const first = getColor(null);
+	const second = getColor(first);
+
+	expect(first).toBe(second);
 });
 
 test('getForegroundColor', () => {
@@ -219,4 +268,14 @@ test('is', () => {
 	expect(isColor(hex)).toBe(false);
 	expect(isColor(hsl)).toBe(false);
 	expect(isColor(rgb)).toBe(false);
+});
+
+test('value', () => {
+	expect(
+		hslToRgb({
+			hue: -900,
+			lightness: 0,
+			saturation: 0,
+		}),
+	).toEqual(defaultRgb);
 });

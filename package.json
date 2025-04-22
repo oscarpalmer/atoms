@@ -4,7 +4,7 @@
 		"url": "https://oscarpalmer.se"
 	},
 	"dependencies": {
-		"type-fest": "^4.39"
+		"type-fest": "^4.40"
 	},
 	"description": "Atomic utilities for making your JavaScript better.",
 	"devDependencies": {
@@ -42,12 +42,12 @@
 		},
 		"./color": {
 			"import": {
-				"types": "./types/color.d.ts",
-				"default": "./dist/color.js"
+				"types": "./types/color/index.d.ts",
+				"default": "./dist/color/index.js"
 			},
 			"require": {
-				"types": "./types/color.d.cts",
-				"default": "./dist/color.cjs"
+				"types": "./types/color/index.d.cts",
+				"default": "./dist/color/index.cjs"
 			}
 		},
 		"./emitter": {
@@ -198,5 +198,5 @@
 	},
 	"type": "module",
 	"types": "./types/index.d.cts",
-	"version": "0.95.0"
+	"version": "0.96.0"
 }

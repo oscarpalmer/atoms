@@ -20,7 +20,7 @@ export function findValue(
 
 	const callbacks = getCallbacks(bool, key);
 
-	if (callbacks?.bool == null && callbacks?.key == null) {
+	if (callbacks?.bool == null && callbacks?.keyed == null) {
 		return type === 'index'
 			? array.indexOf(value)
 			: array.find(item => item === value);
@@ -37,7 +37,7 @@ export function findValue(
 	for (let index = 0; index < length; index += 1) {
 		const item = array[index];
 
-		if (callbacks.key?.(item, index, array) === value) {
+		if (callbacks.keyed?.(item, index, array) === value) {
 			return type === 'index' ? index : item;
 		}
 	}
@@ -73,12 +73,10 @@ export function findValues(
 	}
 
 	const {bool, key, value} = getParameters(parameters);
-
 	const callbacks = getCallbacks(bool, key);
-
 	const {length} = array;
 
-	if (type === 'unique' && callbacks?.key == null && length >= 100) {
+	if (type === 'unique' && callbacks?.keyed == null && length >= 100) {
 		return [...new Set(array)];
 	}
 
@@ -95,7 +93,7 @@ export function findValues(
 
 	for (let index = 0; index < length; index += 1) {
 		const item = array[index];
-		const keyed = callbacks?.key?.(item, index, array) ?? item;
+		const keyed = callbacks?.keyed?.(item, index, array) ?? item;
 
 		if (
 			(type === 'all' && Object.is(keyed, value)) ||

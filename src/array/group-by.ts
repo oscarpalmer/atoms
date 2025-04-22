@@ -178,7 +178,7 @@ export function groupValues(
 	for (let index = 0; index < length; index += 1) {
 		const item = array[index];
 
-		const keyed = callbacks?.key?.(item, index, array) ?? index;
+		const keyed = callbacks?.keyed?.(item, index, array) ?? index;
 		const valued = callbacks?.value?.(item, index, array) ?? item;
 
 		if (arrays) {

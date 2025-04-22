@@ -1,11 +1,22 @@
 import type {Get, Paths, Primitive} from 'type-fest';
 
+/**
+ * A generic array or object
+ */
 export type ArrayOrPlainObject = unknown[] | Record<PropertyKey, unknown>;
 
 export type EventPosition = {
 	x: number;
 	y: number;
 };
+
+// biome-ignore lint/suspicious/noExplicitAny: It's meant to be generic and permissive, so `any`is fine
+export type GenericCallback = (...args: any[]) => any;
+
+/**
+ * A useful key type
+ */
+export type Key = number | string;
 
 export type KeyedValue<
 	Item,
@@ -16,11 +27,13 @@ export type NestedArrayType<Value> = Value extends Array<infer NestedValue>
 	? NestedArrayType<NestedValue>
 	: Value;
 
-// biome-ignore lint/suspicious/noExplicitAny: It's meant to be generic and permissive, so `any`is fine
-export type GenericCallback = (...args: any[]) => any;
+export type NestedPartial<T> = {
+	[K in keyof T]?: T[K] extends object ? NestedPartial<T[K]> : T[K];
+};
 
-export type Key = number | string;
-
+/**
+ * A generic object
+ */
 export type PlainObject = Record<PropertyKey, unknown>;
 
 export type TypedArray =

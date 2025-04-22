@@ -61,6 +61,13 @@ test('array', () => {
 	second_3[50] = second_3[50] + 1;
 
 	expect(equal(first_3, second_3)).toBe(false);
+
+	const first_4 = Array.from({length: 1000}, (_, index) => index);
+	const second_4 = Array.from({length: 1000}, (_, index) => index);
+
+	second_4[999] = second_4[999] + 1;
+
+	expect(equal(first_4, second_4)).toBe(false);
 });
 
 test('arry buffer', () => {

@@ -131,7 +131,7 @@ export function debounce<Callback extends GenericCallback>(
 /**
  * Memoise a function, caching and retrieving results based on the first parameter
  */
-export function memoise<Callback extends GenericCallback>(
+export function memoize<Callback extends GenericCallback>(
 	callback: Callback,
 	cacheSize?: number,
 ): Memoised<Callback> {
@@ -173,7 +173,7 @@ export function throttle<Callback extends GenericCallback>(
 				timestamp = performance.now();
 
 				callback(...parameters);
-			}, difference + interval);
+			}, difference + interval) as never;
 		}
 	};
 

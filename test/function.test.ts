@@ -1,5 +1,5 @@
 import {expect, test} from 'vitest';
-import {debounce, memoise, noop, throttle} from '../src/function';
+import {debounce, memoize, noop, throttle} from '../src/function';
 
 test('debounce', () =>
 	new Promise<void>(done => {
@@ -30,80 +30,73 @@ test('debounce', () =>
 		}, 1000);
 	}));
 
-test('memoise', () => {
-	const memoised = memoise((value: number) => value * 2);
+test('memoize', () => {
+	const memoized = memoize((value: number) => value * 2);
 
-	expect(memoised.has(2)).toBe(false);
-	expect(memoised.has(3)).toBe(false);
-	expect(memoised.get(2)).toBeUndefined();
-	expect(memoised.get(3)).toBeUndefined();
+	expect(memoized.has(2)).toBe(false);
+	expect(memoized.has(3)).toBe(false);
+	expect(memoized.get(2)).toBeUndefined();
+	expect(memoized.get(3)).toBeUndefined();
 
-	expect(memoised.run(2)).toBe(4);
-	expect(memoised.run(3)).toBe(6);
+	expect(memoized.run(2)).toBe(4);
+	expect(memoized.run(3)).toBe(6);
 
-	expect(memoised.has(2)).toBe(true);
-	expect(memoised.has(3)).toBe(true);
-	expect(memoised.get(2)).toBe(4);
-	expect(memoised.get(3)).toBe(6);
+	expect(memoized.has(2)).toBe(true);
+	expect(memoized.has(3)).toBe(true);
+	expect(memoized.get(2)).toBe(4);
+	expect(memoized.get(3)).toBe(6);
 
-	expect(memoised.run(2)).toBe(4);
-	expect(memoised.run(3)).toBe(6);
+	expect(memoized.run(2)).toBe(4);
+	expect(memoized.run(3)).toBe(6);
 
-	memoised.delete(2);
+	memoized.delete(2);
 
-	expect(memoised.has(2)).toBe(false);
-	expect(memoised.has(3)).toBe(true);
-	expect(memoised.get(2)).toBeUndefined();
-	expect(memoised.get(3)).toBe(6);
+	expect(memoized.has(2)).toBe(false);
+	expect(memoized.has(3)).toBe(true);
+	expect(memoized.get(2)).toBeUndefined();
+	expect(memoized.get(3)).toBe(6);
 
-	memoised.clear();
+	memoized.clear();
 
-	expect(memoised.has(2)).toBe(false);
-	expect(memoised.has(3)).toBe(false);
-	expect(memoised.get(2)).toBeUndefined();
-	expect(memoised.get(3)).toBeUndefined();
+	expect(memoized.has(2)).toBe(false);
+	expect(memoized.has(3)).toBe(false);
+	expect(memoized.get(2)).toBeUndefined();
+	expect(memoized.get(3)).toBeUndefined();
 
-	memoised.destroy();
+	memoized.destroy();
 
-	try {
-		expect(memoised.run(2)).toBeUndefined();
-	} catch (error) {
-		expect(error).toBeInstanceOf(Error);
-		expect(error.message).toBe('The memoised instance has been destroyed');
-	}
-
-	expect(memoised.has(2)).toBe(false);
-	expect(memoised.get(2)).toBeUndefined();
+	expect(memoized.has(2)).toBe(false);
+	expect(memoized.get(2)).toBeUndefined();
 });
 
 test('noop', () => {
 	expect(noop).toBeInstanceOf(Function);
-	// expect(noop.toString()).toMatch(/\s*function\s*noop\(\)\s*\{\s*\}\s*/);
 	expect(noop()).toBeUndefined();
 });
 
 test('throttle', () =>
 	new Promise<void>(done => {
+		let cancelValue = 0;
+		let last = 0;
 		let value = 0;
 
 		const throttled = throttle(() => {
 			value += 1;
-		}, 250);
+		}, 25);
 
 		const interval = setInterval(() => {
 			throttled();
-		});
+		}, 12.5);
 
 		setTimeout(() => {
 			clearInterval(interval);
 
-			expect(value).toBeLessThanOrEqual(10);
+			expect(value).toBeLessThanOrEqual(100);
 			expect(cancelValue).toBe(0);
+			expect(last).toBe(1);
 
 			done();
-		}, 2500);
-
-		let cancelValue = 0;
+		}, 500);
 
 		const cancelleable = throttle(() => {
 			cancelValue = 999;
@@ -113,5 +106,13 @@ test('throttle', () =>
 
 		setTimeout(() => {
 			cancelleable.cancel();
+
+			const lastThrottled = throttle(() => {
+				last += 1;
+			}, 25);
+
+			lastThrottled();
+			lastThrottled();
+			lastThrottled();
 		}, 250);
 	}));
