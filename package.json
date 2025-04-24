@@ -13,7 +13,7 @@
 		"@vitest/coverage-istanbul": "^3.1",
 		"dts-bundle-generator": "^9.5",
 		"glob": "^11",
-		"happy-dom": "^17.4",
+		"jsdom": "^26.1",
 		"typescript": "^5.8",
 		"vite": "^6.3",
 		"vitest": "^3.1"
@@ -198,5 +198,5 @@
 	},
 	"type": "module",
 	"types": "./types/index.d.cts",
-	"version": "0.96.0"
+	"version": "0.97.0"
 }

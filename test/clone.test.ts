@@ -1,5 +1,5 @@
 import {expect, test} from 'vitest';
-import {PlainObject} from '../src/models';
+import type {PlainObject} from '../src/models';
 import {clone, getValue} from '../src/value';
 
 class Test {
@@ -149,11 +149,28 @@ test('typed array', () => {
 		new BigInt64Array([1n, 2n, 3n]),
 	];
 
-	for (const array of arrays) {
+	const constructors = [
+		Uint8Array,
+		Uint8ClampedArray,
+		Uint16Array,
+		Uint32Array,
+		Int8Array,
+		Int16Array,
+		Int32Array,
+		Float32Array,
+		Float64Array,
+		BigUint64Array,
+		BigInt64Array,
+	];
+
+	const {length} = arrays;
+
+	for (let index = 0; index < length; index += 1) {
+		const array = arrays[index];
 		const cloned = clone(array);
 
 		expect(cloned).not.toBe(array);
-		expect(cloned).toBeInstanceOf(array.constructor);
+		expect(cloned).toBeInstanceOf(constructors[index]);
 		expect(cloned).toEqual(array);
 	}
 });

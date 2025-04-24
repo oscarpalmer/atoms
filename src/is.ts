@@ -120,23 +120,29 @@ export function isPrimitive(value: unknown): value is Primitive {
 	return value == null || primitiveExpression.test(typeof value);
 }
 
+/**
+ * Is the value a typed array?
+ */
 export function isTypedArray(value: unknown): value is TypedArray {
-	return (
-		value instanceof Int8Array ||
-		value instanceof Uint8Array ||
-		value instanceof Uint8ClampedArray ||
-		value instanceof Int16Array ||
-		value instanceof Uint16Array ||
-		value instanceof Int32Array ||
-		value instanceof Uint32Array ||
-		value instanceof Float32Array ||
-		value instanceof Float64Array ||
-		value instanceof BigInt64Array ||
-		value instanceof BigUint64Array
-	);
+	return typeArrays.has((value as TypedArray)?.constructor);
 }
 
 //
 
 const primitiveExpression = /^(bigint|boolean|number|string|symbol)$/;
+
+const typeArrays = new Set<unknown>([
+	Int8Array,
+	Uint8Array,
+	Uint8ClampedArray,
+	Int16Array,
+	Uint16Array,
+	Int32Array,
+	Uint32Array,
+	Float32Array,
+	Float64Array,
+	BigInt64Array,
+	BigUint64Array,
+]);
+
 const whiteSpaceExpression = /^\s*$/;

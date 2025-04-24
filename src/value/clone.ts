@@ -140,6 +140,26 @@ function cloneRegularExpression(
 	return cloned;
 }
 
+function cloneTypedArray(
+	value: TypedArray,
+	depth: number,
+	references: WeakMap<WeakKey, unknown>,
+): TypedArray {
+	if (depth >= 100) {
+		return value;
+	}
+
+	const cloned = new (
+		value.constructor as new (
+			...args: unknown[]
+		) => TypedArray
+	)(value);
+
+	references.set(value, cloned);
+
+	return cloned as TypedArray;
+}
+
 function cloneValue(
 	value: unknown,
 	depth: number,
@@ -188,6 +208,9 @@ function cloneValue(
 
 		case isArrayOrPlainObject(value):
 			return cloneObject(value, depth, references);
+
+		case isTypedArray(value):
+			return cloneTypedArray(value, depth, references);
 
 		default:
 			return tryStructuredClone(value, depth, references);
