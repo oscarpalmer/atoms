@@ -1,41 +1,11 @@
-import type {PlainObject} from '../models';
-
-/**
- * Create a new object with only the specified keys
- */
-export function partial<Value extends PlainObject, Key extends keyof Value>(
-	value: Value,
-	keys: Key[],
-): Pick<Value, Key> {
-	if (
-		typeof value !== 'object' ||
-		value === null ||
-		Object.keys(value).length === 0 ||
-		!Array.isArray(keys) ||
-		keys.length === 0
-	) {
-		return {} as Pick<Value, Key>;
-	}
-
-	const result = {} as Pick<Value, Key>;
-	const {length} = keys;
-
-	for (let index = 0; index < length; index += 1) {
-		const key = keys[index];
-
-		result[key] = value[key];
-	}
-
-	return result;
-}
-
+export * from '../internal/value/compare';
+export * from '../internal/value/equal';
+export * from '../internal/value/get';
+export * from '../internal/value/set';
 export * from './clone';
-export * from './compare';
 export * from './diff';
-export * from './equal';
-export * from './get';
 export * from './merge';
-export * from './set';
+export * from './partial';
 export * from './smush';
 export * from './unsmush';
 

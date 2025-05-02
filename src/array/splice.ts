@@ -1,4 +1,4 @@
-import {insertValues} from './insert';
+import {insertValues} from '../internal/array/insert';
 
 /**
  * Removes and returns all items from an array starting from a specific index

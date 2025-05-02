@@ -1,6 +1,6 @@
-import {isArrayOrPlainObject} from '../is';
+import {isArrayOrPlainObject} from '../internal/is';
+import {join} from '../internal/string';
 import type {ArrayOrPlainObject, NestedPartial, PlainObject} from '../models';
-import {join} from '../string/misc';
 
 type MergeOptions = {
 	/**
@@ -41,18 +41,18 @@ function getReplaceableObjects(
  * Merge multiple arrays or objects into a single one
  */
 export function merge<Model extends ArrayOrPlainObject>(
-		values: Array<NestedPartial<Model>>,
-		options?: Partial<MergeOptions>,
-	): Model {
-		if (!Array.isArray(values) || values.length === 0) {
-			return {} as Model;
-		}
-
-		return mergeValues(values, {
-			replaceableObjects: getReplaceableObjects(options?.replaceableObjects),
-			skipNullableInArrays: options?.skipNullableInArrays === true,
-		}) as Model;
+	values: Array<NestedPartial<Model>>,
+	options?: Partial<MergeOptions>,
+): Model {
+	if (!Array.isArray(values) || values.length === 0) {
+		return {} as Model;
 	}
+
+	return mergeValues(values, {
+		replaceableObjects: getReplaceableObjects(options?.replaceableObjects),
+		skipNullableInArrays: options?.skipNullableInArrays === true,
+	}) as Model;
+}
 
 function mergeValues(
 	values: ArrayOrPlainObject[],

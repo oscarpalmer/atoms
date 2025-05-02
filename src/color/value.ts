@@ -1,6 +1,6 @@
-import {clamp} from '../number';
+import {clamp} from '../internal/number';
 import {anyPattern, groupedPattern} from './constants';
-import {getNormalisedHex} from './get';
+import {getNormalizedHex} from './misc';
 import type {HSLColor, RGBColor} from './models';
 
 function getHexyValue(
@@ -21,7 +21,7 @@ function getHexyValue(
  * Convert a hex-color to an RGB-color
  */
 export function hexToRgb(value: string): RGBColor {
-	const hex = anyPattern.test(value) ? getNormalisedHex(value) : '';
+	const hex = anyPattern.test(value) ? getNormalizedHex(value) : '';
 	const pairs = groupedPattern.exec(hex) ?? [];
 	const rgb = [];
 

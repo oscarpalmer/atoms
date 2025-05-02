@@ -1,7 +1,7 @@
-import {isArrayOrPlainObject} from '../is';
+import {isArrayOrPlainObject} from '../internal/is';
+import {join} from '../internal/string';
+import {equal} from '../internal/value/equal';
 import type {ArrayOrPlainObject, PlainObject} from '../models';
-import {join} from '../string/misc';
-import {equal} from '../value/equal';
 
 export type DiffType = 'full' | 'none' | 'partial';
 
@@ -106,7 +106,10 @@ function getDiffs(
 	for (let outerIndex = 0; outerIndex < 2; outerIndex += 1) {
 		const value = outerIndex === 0 ? first : second;
 
-		const keys = [...Object.keys(value), ...Object.getOwnPropertySymbols(value)];
+		const keys = [
+			...Object.keys(value),
+			...Object.getOwnPropertySymbols(value),
+		];
 		const {length} = keys;
 
 		for (let innerIndex = 0; innerIndex < length; innerIndex += 1) {

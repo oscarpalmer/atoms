@@ -1,5 +1,8 @@
-import type {FindValueType, FindValuesType} from '../../array/models';
 import {getCallbacks} from './callbacks';
+
+type FindValueType = 'index' | 'value';
+
+type FindValuesType = 'all' | 'unique';
 
 type Parameters = {
 	bool?: unknown;

@@ -1,20 +1,5 @@
-import type {
-	ArrayOrPlainObject,
-	Key,
-	PlainObject,
-	Primitive,
-	TypedArray,
-} from './models';
-import {getString} from './string/misc';
-
-/**
- * Is the value an array or a record?
- */
-export function isArrayOrPlainObject(
-	value: unknown,
-): value is ArrayOrPlainObject {
-	return Array.isArray(value) || isPlainObject(value);
-}
+import {getString} from './internal/string';
+import type {ArrayOrPlainObject, Primitive} from './models';
 
 /**
  * Is the array or object completely empty or only containing `null` or `undefined` values?
@@ -30,13 +15,6 @@ export function isEmpty(value: ArrayOrPlainObject): boolean {
 	}
 
 	return true;
-}
-
-/**
- * Is the value a key?
- */
-export function isKey(value: unknown): value is Key {
-	return typeof value === 'number' || typeof value === 'string';
 }
 
 /**
@@ -93,56 +71,16 @@ export function isObject(value: unknown): value is object {
 }
 
 /**
- * Is the value a plain object?
- */
-export function isPlainObject(value: unknown): value is PlainObject {
-	if (value === null || typeof value !== 'object') {
-		return false;
-	}
-
-	if (Symbol.toStringTag in value || Symbol.iterator in value) {
-		return false;
-	}
-
-	const prototype = Object.getPrototypeOf(value);
-
-	return (
-		prototype === null ||
-		prototype === Object.prototype ||
-		Object.getPrototypeOf(prototype) === null
-	);
-}
-
-/**
  * Is the value a primitive value?
  */
 export function isPrimitive(value: unknown): value is Primitive {
 	return value == null || primitiveExpression.test(typeof value);
 }
 
-/**
- * Is the value a typed array?
- */
-export function isTypedArray(value: unknown): value is TypedArray {
-	return typeArrays.has((value as TypedArray)?.constructor);
-}
+export * from './internal/is';
 
 //
 
 const primitiveExpression = /^(bigint|boolean|number|string|symbol)$/;
-
-const typeArrays = new Set<unknown>([
-	Int8Array,
-	Uint8Array,
-	Uint8ClampedArray,
-	Int16Array,
-	Uint16Array,
-	Int32Array,
-	Uint32Array,
-	Float32Array,
-	Float64Array,
-	BigInt64Array,
-	BigUint64Array,
-]);
 
 const whiteSpaceExpression = /^\s*$/;

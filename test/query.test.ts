@@ -1,5 +1,5 @@
 import {expect, test} from 'vitest';
-import {tryDecode, tryEncode} from '../src/internal/string/uri';
+import {tryDecode, tryEncode} from '../src/internal/string';
 import {fromQuery, toQuery} from '../src/query';
 
 const date = new Date();

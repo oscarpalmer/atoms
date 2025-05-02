@@ -1,33 +1,16 @@
-import {clamp} from '../number';
-import {defaultHex, defaultHsl, defaultRgb, prefixPattern} from './constants';
-import {isHSLColor, isHexColor, isRGBColor} from './is';
+import {clamp} from '../internal/number';
+import {defaultHex, defaultHsl, defaultRgb} from './constants';
+import {isHSLColor, isRGBColor} from './is';
+import {getNormalizedHex} from './misc';
 import type {ColorState, HSLColor, RGBColor} from './models';
 import {hexToRgb, hslToRgb, rgbToHex, rgbToHsl} from './value';
-
-/**
- * Try to get the normalized hex-color from a value _(defaults to `#000000`)_
- */
-export function getNormalisedHex(value: unknown): string {
-	if (!isHexColor(value)) {
-		return String(defaultHex);
-	}
-
-	const normalized = value.replace(prefixPattern, '');
-
-	return normalized.length === 3
-		? normalized
-				.split('')
-				.map(character => character.repeat(2))
-				.join('')
-		: normalized;
-}
 
 /**
  * Get color state from any kind of value
  */
 export function getState(value: unknown): ColorState {
 	if (typeof value === 'string') {
-		const hex = getNormalisedHex(value);
+		const hex = getNormalizedHex(value);
 		const rgb = hexToRgb(hex);
 
 		return {

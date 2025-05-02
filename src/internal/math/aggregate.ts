@@ -13,6 +13,10 @@ type AggregationCallback = (
 
 type AggregationType = 'average' | 'max' | 'min' | 'sum';
 
+export type OnlyNumericalKeys<Item> = {
+	[Key in keyof Item as Item[Key] extends number ? Key : never]: Item[Key];
+};
+
 export function aggregate(
 	type: AggregationType,
 	array: unknown[],
@@ -53,6 +57,31 @@ export function aggregate(
 		count,
 		value: aggregated,
 	};
+}
+
+/**
+ * Get the maximum value from a list of numbers
+ */
+export function max(values: number[]): number;
+
+/**
+ * Get the maximum value from a list of objects
+ */
+export function max<Item extends PlainObject>(
+	array: Item[],
+	key: keyof OnlyNumericalKeys<Item>,
+): number;
+
+/**
+ * Get the maximum value from a list of objects
+ */
+export function max<Item extends PlainObject>(
+	items: Item[],
+	callback: (item: Item, index: number, items: Item[]) => number,
+): number;
+
+export function max(array: unknown[], key?: unknown): number {
+	return aggregate('max', array, key).value;
 }
 
 function sum(current: number, value: number, isNotANumber: boolean): number {

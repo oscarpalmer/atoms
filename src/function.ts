@@ -1,7 +1,7 @@
+import {clamp} from './internal/number';
+import {getString, join} from './internal/string';
 import type {GenericCallback} from './models';
-import {clamp} from './number';
 import {SizedMap} from './sized';
-import {getString, join} from './string/misc';
 
 type CancellableCallback<Callback extends GenericCallback> = Callback & {
 	/**
@@ -139,11 +139,6 @@ export function memoize<Callback extends GenericCallback>(
 }
 
 /**
- * A function that does nothing, which can be useful, I guess…
- */
-export function noop(): void {}
-
-/**
  * - Throttle a function, ensuring it is only called once every `time` milliseconds
  * - Time is clamped between _0_ and _1000_ milliseconds
  */
@@ -185,3 +180,5 @@ export function throttle<Callback extends GenericCallback>(
 
 	return throttler as CancellableCallback<Callback>;
 }
+
+export {noop} from './internal/function';

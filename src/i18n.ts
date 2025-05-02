@@ -1,5 +1,5 @@
+import {getString} from './internal/string';
 import type {PlainObject, Primitive} from './models';
-import {getString} from './string/misc';
 
 type Defaults = {
 	/**

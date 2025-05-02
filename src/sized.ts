@@ -1,4 +1,4 @@
-import {clamp} from './number';
+import {clamp} from './internal/number';
 
 /**
  * A Map with a maximum size

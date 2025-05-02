@@ -1,4 +1,4 @@
-import {noop} from './function';
+import {noop} from './internal/function';
 
 let enabled = true;
 

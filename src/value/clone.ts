@@ -1,4 +1,4 @@
-import {isArrayOrPlainObject, isTypedArray} from '../is';
+import {isArrayOrPlainObject, isTypedArray} from '../internal/is';
 import type {ArrayOrPlainObject, PlainObject, TypedArray} from '../models';
 
 /**

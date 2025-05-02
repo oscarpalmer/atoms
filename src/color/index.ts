@@ -1,5 +1,6 @@
-import {getNormalisedHex, getState} from './get';
+import {getState} from './get';
 import {isColor, isHSLColor, isHexColor, isRGBColor} from './is';
+import {getNormalizedHex} from './misc';
 import type {ColorState, HSLColor, RGBColor} from './models';
 import {hexToRgb, hslToRgb, rgbToHex, rgbToHsl} from './value';
 
@@ -20,7 +21,7 @@ export class Color {
 	 */
 	set hex(value: string) {
 		if (isHexColor(value) && value !== this.state.hex) {
-			const hex = getNormalisedHex(value);
+			const hex = getNormalizedHex(value);
 			const rgb = hexToRgb(hex);
 
 			this.state.hex = hex;
@@ -119,3 +120,4 @@ export function getRGBColor(value: unknown): RGBColor {
 }
 
 export {isColor, isHSLColor, isHexColor, isRGBColor};
+

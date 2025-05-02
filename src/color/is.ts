@@ -1,5 +1,5 @@
+import {between} from '../internal/number';
 import type {PlainObject} from '../models';
-import {between} from '../number';
 import {anyPattern, hslKeys, rgbKeys} from './constants';
 import type {Color} from './index';
 import type {ColorProperty, HSLColor, RGBColor} from './models';

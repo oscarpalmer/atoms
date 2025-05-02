@@ -1,10 +1,8 @@
-import {ignoreKey} from './internal/string/key';
-import {tryDecode, tryEncode} from './internal/string/uri';
-import {isPlainObject} from './is';
+import {isPlainObject} from './internal/is';
+import {getNumber} from './internal/number';
+import {ignoreKey, join, tryDecode, tryEncode} from './internal/string';
+import {setValue} from './internal/value/set';
 import type {ArrayOrPlainObject, PlainObject} from './models';
-import {getNumber} from './number';
-import {join} from './string/misc';
-import {setValue} from './value/set';
 
 /**
  * Convert a query string to a plain _(nested)_ object

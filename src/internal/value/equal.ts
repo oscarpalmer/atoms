@@ -1,5 +1,5 @@
+import type {ArrayOrPlainObject, PlainObject, TypedArray} from '../../models';
 import {isPlainObject, isTypedArray} from '../is';
-import type {ArrayOrPlainObject, PlainObject, TypedArray} from '../models';
 
 /**
  * Are two strings equal? _(Case-sensitive by default)_

@@ -1,5 +1,5 @@
 import type {Simplify} from 'type-fest';
-import {getCallbacks} from '../internal/array/callbacks';
+import {groupValues} from '../internal/array/group';
 import type {Key, KeyedValue, PlainObject} from '../models';
 
 /**
@@ -148,51 +148,15 @@ export function groupBy<
 ): Record<ReturnType<ItemKey>, Array<ReturnType<ItemValue>>>;
 
 export function groupBy(
-		array: unknown[],
-		key?: boolean,
-		valueOrArrays?: unknown,
-		arrays?: boolean,
-	): PlainObject {
-		return groupValues(
-			array,
-			key,
-			valueOrArrays,
-			key === true || valueOrArrays === true || arrays === true,
-		);
-	}
-
-export function groupValues(
 	array: unknown[],
-	key: unknown,
-	value: unknown,
-	arrays: boolean,
-): Record<Key, unknown> {
-	if (!Array.isArray(array) || array.length === 0) {
-		return {};
-	}
-
-	const callbacks = getCallbacks(undefined, key, value);
-	const record: Record<Key, unknown> = {};
-	const {length} = array;
-
-	for (let index = 0; index < length; index += 1) {
-		const item = array[index];
-
-		const keyed = callbacks?.keyed?.(item, index, array) ?? index;
-		const valued = callbacks?.value?.(item, index, array) ?? item;
-
-		if (arrays) {
-			const existing = record[keyed];
-
-			if (existing == null) {
-				record[keyed] = [valued];
-			} else {
-				(existing as unknown[]).push(valued);
-			}
-		} else {
-			record[keyed] = valued;
-		}
-	}
-
-	return record;
+	key?: boolean,
+	valueOrArrays?: unknown,
+	arrays?: boolean,
+): PlainObject {
+	return groupValues(
+		array,
+		key,
+		valueOrArrays,
+		key === true || valueOrArrays === true || arrays === true,
+	);
 }

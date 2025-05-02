@@ -11,7 +11,7 @@ import {
 	isRGBColor,
 } from '../src/color';
 import {defaultRgb} from '../src/color/constants';
-import {hexToRgb, hslToRgb, rgbToHex, rgbToHsl} from '../src/color/value';
+import {hslToRgb} from '../src/color/value';
 import {getRandomItem} from '../src/random';
 
 const foregrounds = [

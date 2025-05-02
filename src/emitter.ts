@@ -1,4 +1,4 @@
-import {noop} from './function';
+import {noop} from './internal/function';
 
 class Emitter<Value> {
 	private declare readonly state: EmitterState<Value>;
@@ -271,3 +271,4 @@ function getObserver<Value>(
 }
 
 export type {Emitter, Observable, Observer, Subscription};
+

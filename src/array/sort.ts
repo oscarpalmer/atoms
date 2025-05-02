@@ -1,7 +1,12 @@
-import {isKey} from '../is';
+import {isKey} from '../internal/is';
+import {compare} from '../internal/value/compare';
 import type {Key, PlainObject} from '../models';
-import {compare} from '../value/compare';
-import type {Sorter, SortKeyWithCallback} from './models';
+import type {Sorter} from './models';
+
+type SortKeyWithCallback<Item> = {
+	callback: (item: Item) => unknown;
+	direction: 'asc' | 'desc';
+};
 
 /**
  * Sort an array of items _(defaults to ascending)_
@@ -23,10 +28,10 @@ export function sort<Item>(
  * - Defaults to ascending, but can be changed by setting `descending` to `true`, or using a `SortKey`
  */
 export function sort<Item extends PlainObject, ItemKey extends keyof Item>(
-		array: Item[],
-		sorter: ItemKey | Key | Sorter<Item> | ((item: Item) => unknown),
-		descending?: boolean,
-	): Item[];
+	array: Item[],
+	sorter: ItemKey | Key | Sorter<Item> | ((item: Item) => unknown),
+	descending?: boolean,
+): Item[];
 
 /**
  * - Sort an array of items, using multiple sorters to sort by specific values

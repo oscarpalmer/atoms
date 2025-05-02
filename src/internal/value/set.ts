@@ -1,6 +1,5 @@
-import {handleValue} from '../internal/value/handle';
-import {getPaths} from '../internal/value/paths';
-import type {ArrayOrPlainObject, Paths, PlainObject} from '../models';
+import type {ArrayOrPlainObject, Paths, PlainObject} from '../../models';
+import {getPaths, handleValue} from './misc';
 
 /**
  * - Set the value in an object using a known path

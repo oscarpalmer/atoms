@@ -1,7 +1,6 @@
 import type {ToString} from 'type-fest/source/internal/string';
-import {handleValue} from '../internal/value/handle';
-import {getPaths} from '../internal/value/paths';
-import type {ArrayOrPlainObject, Get, Paths} from '../models';
+import type {ArrayOrPlainObject, Get, Paths} from '../../models';
+import {getPaths, handleValue} from './misc';
 
 /**
  * - Get the value from an object using a known path
@@ -58,5 +57,3 @@ export function getValue(
 
 	return value as never;
 }
-
-

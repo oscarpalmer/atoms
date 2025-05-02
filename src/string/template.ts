@@ -1,6 +1,6 @@
+import {getString} from '../internal/string';
+import {getValue} from '../internal/value/get';
 import type {PlainObject} from '../models';
-import {getString} from '../string/misc';
-import {getValue} from '../value/get';
 
 type Options = {
 	/**

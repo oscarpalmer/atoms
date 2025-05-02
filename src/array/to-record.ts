@@ -1,5 +1,5 @@
 import type {Simplify} from 'type-fest';
-import {groupValues} from '../array/group-by';
+import {groupValues} from '../internal/array/group';
 import type {Key, KeyedValue, PlainObject} from '../models';
 
 /**

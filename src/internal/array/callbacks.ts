@@ -1,5 +1,10 @@
-import type {Callbacks} from '../../array/models';
 import type {GenericCallback, PlainObject} from '../../models';
+
+export type Callbacks = {
+	bool?: GenericCallback;
+	keyed?: GenericCallback;
+	value?: GenericCallback;
+};
 
 function getCallback(value: unknown): GenericCallback | undefined {
 	switch (typeof value) {

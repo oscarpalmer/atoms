@@ -1,9 +1,5 @@
-import {aggregate} from './internal/math/aggregate';
+import {aggregate, type OnlyNumericalKeys} from './internal/math/aggregate';
 import type {PlainObject} from './models';
-
-type OnlyNumericalKeys<Item> = {
-	[Key in keyof Item as Item[Key] extends number ? Key : never]: Item[Key];
-};
 
 /**
  * Get the average value from a list of numbers
@@ -36,31 +32,6 @@ export function average(array: unknown[], key?: unknown): number {
 	return aggregated.count > 0
 		? aggregated.value / aggregated.count
 		: Number.NaN;
-}
-
-/**
- * Get the maximum value from a list of numbers
- */
-export function max(values: number[]): number;
-
-/**
- * Get the maximum value from a list of objects
- */
-export function max<Item extends PlainObject>(
-	array: Item[],
-	key: keyof OnlyNumericalKeys<Item>,
-): number;
-
-/**
- * Get the maximum value from a list of objects
- */
-export function max<Item extends PlainObject>(
-	items: Item[],
-	callback: (item: Item, index: number, items: Item[]) => number,
-): number;
-
-export function max(array: unknown[], key?: unknown): number {
-	return aggregate('max', array, key).value;
 }
 
 /**
@@ -119,3 +90,5 @@ export function sum<Item extends PlainObject>(
 export function sum(array: unknown[], key?: unknown): number {
 	return aggregate('sum', array, key).value;
 }
+
+export {max} from './internal/math/aggregate';

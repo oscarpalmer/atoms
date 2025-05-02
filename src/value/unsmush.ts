@@ -1,7 +1,7 @@
 import type {KeysOfUnion, Simplify} from 'type-fest';
-import {isArrayOrPlainObject} from '../is';
+import {isArrayOrPlainObject} from '../internal/is';
+import {setValue} from '../internal/value/set';
 import type {PlainObject} from '../models';
-import {setValue} from '../value/set';
 
 type OrderedKey = {
 	order: number;
