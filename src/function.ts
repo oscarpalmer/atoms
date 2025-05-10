@@ -1,4 +1,3 @@
-import {clamp} from './internal/number';
 import {getString, join} from './internal/string';
 import type {GenericCallback} from './models';
 import {SizedMap} from './sized';
@@ -10,13 +9,11 @@ type CancellableCallback<Callback extends GenericCallback> = Callback & {
 	cancel: () => void;
 };
 
-class Memoised<Callback extends GenericCallback> {
-	declare readonly state: MemoisedState<Callback>;
+class Memoized<Callback extends GenericCallback> {
+	declare readonly state: MemoizedState<Callback>;
 
-	constructor(callback: Callback, cacheSize?: number) {
-		const cache = new SizedMap<unknown, ReturnType<Callback>>(
-			cacheSize ?? 2 ** 16,
-		);
+	constructor(callback: Callback, size?: number) {
+		const cache = new SizedMap<unknown, ReturnType<Callback>>(size ?? 2 ** 16);
 
 		const getter = (
 			...parameters: Parameters<Callback>
@@ -90,7 +87,7 @@ class Memoised<Callback extends GenericCallback> {
 	}
 }
 
-type MemoisedState<Callback extends GenericCallback> = {
+type MemoizedState<Callback extends GenericCallback> = {
 	cache?: SizedMap<unknown, ReturnType<Callback>>;
 	getter?: (...parameters: Parameters<Callback>) => ReturnType<Callback>;
 };
@@ -98,34 +95,49 @@ type MemoisedState<Callback extends GenericCallback> = {
 /**
  * - Debounce a function, ensuring it is only called after `time` milliseconds have passed
  * - On subsequent calls, the timer is reset and will wait another `time` milliseconds _(and so on...)_
- * - Time is clamped between _0_ and _1000_ milliseconds
  * - Returns the callback with an added `cancel`-method for manually cancelling the debounce
  */
 export function debounce<Callback extends GenericCallback>(
 	callback: Callback,
 	time?: number,
 ): CancellableCallback<Callback> {
-	const interval = clamp(time ?? 0, 0, 1000);
+	const interval = typeof time === 'number' && time >= 0 ? time : 0;
 
-	let timer: number;
-
-	const debounced = ((...parameters: Parameters<Callback>) => {
-		if (timer != null) {
-			clearTimeout(timer);
-		}
-
-		timer = +setTimeout(() => {
+	function step(
+		now: DOMHighResTimeStamp,
+		parameters: Parameters<Callback>,
+	): void {
+		if (now - start >= interval) {
 			callback(...parameters);
-		}, interval);
-	}) as CancellableCallback<Callback>;
+		} else {
+			frame = requestAnimationFrame(next => {
+				step(next, parameters);
+			});
+		}
+	}
+
+	let frame: DOMHighResTimeStamp | undefined;
+	let start: DOMHighResTimeStamp;
+
+	const debounced = (...parameters: Parameters<Callback>) => {
+		debounced.cancel();
+
+		start ??= performance.now();
+
+		frame = requestAnimationFrame(now => {
+			step(now, parameters);
+		});
+	};
 
 	debounced.cancel = () => {
-		if (timer != null) {
-			clearTimeout(timer);
+		if (frame != null) {
+			cancelAnimationFrame(frame);
+
+			frame = undefined;
 		}
 	};
 
-	return debounced;
+	return debounced as CancellableCallback<Callback>;
 }
 
 /**
@@ -134,47 +146,56 @@ export function debounce<Callback extends GenericCallback>(
 export function memoize<Callback extends GenericCallback>(
 	callback: Callback,
 	cacheSize?: number,
-): Memoised<Callback> {
-	return new Memoised(callback, cacheSize);
+): Memoized<Callback> {
+	return new Memoized(
+		callback,
+		typeof cacheSize === 'number' ? cacheSize : undefined,
+	);
 }
 
 /**
- * - Throttle a function, ensuring it is only called once every `time` milliseconds
- * - Time is clamped between _0_ and _1000_ milliseconds
+ * Throttle a function, ensuring it is only called once every `time` milliseconds
  */
 export function throttle<Callback extends GenericCallback>(
 	callback: Callback,
 	time?: number,
 ): CancellableCallback<Callback> {
-	const interval = clamp(time ?? 0, 0, 1000);
+	const interval = typeof time === 'number' && time >= 0 ? time : 0;
 
-	let timestamp = performance.now();
-	let timer: number;
-
-	const throttler = (...parameters: Parameters<Callback>) => {
-		if (timer != null) {
-			clearTimeout(timer);
-		}
-
-		const now = performance.now();
-		const difference = now - timestamp;
-
-		if (difference >= interval) {
-			timestamp = now;
+	function step(
+		now: DOMHighResTimeStamp,
+		parameters: Parameters<Callback>,
+	): void {
+		if (now - last >= interval) {
+			last = now;
 
 			callback(...parameters);
 		} else {
-			timer = +setTimeout(() => {
-				timestamp = performance.now();
-
-				callback(...parameters);
-			}, difference + interval) as never;
+			frame = requestAnimationFrame(next => {
+				step(next, parameters);
+			});
 		}
+	}
+
+	let last: number;
+
+	let frame: DOMHighResTimeStamp | undefined;
+
+	const throttler = (...parameters: Parameters<Callback>) => {
+		throttler.cancel();
+
+		last ??= performance.now();
+
+		frame = requestAnimationFrame(now => {
+			step(now, parameters);
+		});
 	};
 
 	throttler.cancel = () => {
-		if (timer != null) {
-			clearTimeout(timer);
+		if (frame != null) {
+			cancelAnimationFrame(frame);
+
+			frame = undefined;
 		}
 	};
 

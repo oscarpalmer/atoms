@@ -4,6 +4,10 @@ import {anyPattern, hslKeys, rgbKeys} from './constants';
 import type {Color} from './index';
 import type {ColorProperty, HSLColor, RGBColor} from './models';
 
+function isBytey(value: unknown): value is number {
+	return typeof value === 'number' && between(value, 0, 255);
+}
+
 /**
  * Is the value a color?
  */
@@ -25,10 +29,6 @@ function isDegree(value: unknown): value is number {
  */
 export function isHexColor(value: unknown): value is string {
 	return typeof value === 'string' && anyPattern.test(value);
-}
-
-function isHexy(value: unknown): value is number {
-	return typeof value === 'number' && between(value, 0, 255);
 }
 
 /**
@@ -79,10 +79,10 @@ function isPercentage(value: unknown): value is number {
 }
 
 const validators: Record<ColorProperty, (value: unknown) => value is number> = {
-	blue: isHexy,
-	green: isHexy,
+	blue: isBytey,
+	green: isBytey,
 	hue: isDegree,
 	lightness: isPercentage,
 	saturation: isPercentage,
-	red: isHexy,
+	red: isBytey,
 };

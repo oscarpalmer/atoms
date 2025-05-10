@@ -8,6 +8,12 @@ test('between', () => {
 	expect(between(max - min, min, max)).toBe(true);
 	expect(between(min, min, max)).toBe(true);
 	expect(between(max, min, max)).toBe(true);
+	expect(between(max - min, max, min)).toBe(true);
+	expect(between(max, max, max)).toBe(true);
+
+	expect(between('blah' as never, min, max)).toBe(false);
+	expect(between(max - min, 'blah' as never, max)).toBe(false);
+	expect(between(max - min, min, 'blah' as never)).toBe(false);
 });
 
 test('clamp', () => {
@@ -20,6 +26,10 @@ test('clamp', () => {
 
 	expect(clamp(min - min, min, max, true)).toBe(max);
 	expect(clamp(max + max, min, max, true)).toBe(min);
+
+	expect(clamp('blah' as never, min, max)).toBeNaN();
+	expect(clamp(max - min, 'blah' as never, max)).toBeNaN();
+	expect(clamp(max - min, min, 'blah' as never)).toBeNaN();
 });
 
 test('getNumber', () => {

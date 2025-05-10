@@ -1,15 +1,7 @@
 import type {ArrayOrPlainObject, PlainObject} from '../../models';
 import {ignoreKey} from '../string';
 
-function findKey(
-	needle: string,
-	haystack: ArrayOrPlainObject,
-	ignoreCase: boolean,
-): string {
-	if (!ignoreCase) {
-		return needle;
-	}
-
+function findKey(needle: string, haystack: ArrayOrPlainObject): string {
 	const keys = Object.keys(haystack);
 	const normalized = keys.map(key => key.toLowerCase());
 	const index = normalized.indexOf(needle.toLowerCase());
@@ -17,8 +9,14 @@ function findKey(
 	return index > -1 ? keys[index] : needle;
 }
 
-export function getPaths(path: string, lowercase: boolean): string[] {
-	return (lowercase ? path.toLowerCase() : path)
+export function getPaths(path: string, lowercase: boolean): string | string[] {
+	const normalized = lowercase ? path.toLowerCase() : path;
+
+	if (!nestedExpression.test(normalized)) {
+		return normalized;
+	}
+
+	return normalized
 		.replace(bracketExpression, '.$1')
 		.replace(dotsExpression, '')
 		.split('.');
@@ -26,6 +24,7 @@ export function getPaths(path: string, lowercase: boolean): string[] {
 
 const bracketExpression = /\[(\w+)\]/g;
 const dotsExpression = /^\.|\.$/g;
+const nestedExpression = /\.|\[\w+\]/;
 
 export function handleValue(
 	data: ArrayOrPlainObject,
@@ -35,7 +34,7 @@ export function handleValue(
 	ignoreCase: boolean,
 ): unknown {
 	if (typeof data === 'object' && data !== null && !ignoreKey(path)) {
-		const key = findKey(path, data, ignoreCase);
+		const key = ignoreCase ? findKey(path, data) : path;
 
 		if (get) {
 			return data[key as never];

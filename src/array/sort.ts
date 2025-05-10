@@ -29,7 +29,7 @@ export function sort<Item>(
  */
 export function sort<Item extends PlainObject, ItemKey extends keyof Item>(
 	array: Item[],
-	sorter: ItemKey | Key | Sorter<Item> | ((item: Item) => unknown),
+	sorter: ItemKey | Sorter<Item> | ((item: Item) => unknown),
 	descending?: boolean,
 ): Item[];
 
@@ -49,7 +49,7 @@ export function sort<Item>(
  */
 export function sort<Item extends PlainObject, ItemKey extends keyof Item>(
 	array: Item[],
-	sorters: Array<ItemKey | Key | Sorter<Item> | ((item: Item) => unknown)>,
+	sorters: Array<ItemKey | Sorter<Item> | ((item: Item) => unknown)>,
 	descending?: boolean,
 ): Item[];
 

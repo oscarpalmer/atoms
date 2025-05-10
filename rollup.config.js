@@ -16,9 +16,8 @@ tsConfig.compilerOptions = {
 export default {
 	input: './src/index.ts',
 	output: {
-		file: './dist/attoms.full.js',
-		format: 'iife',
-		name: 'Mora',
+		file: './dist/atoms.full.js',
+		format: 'es',
 	},
 	plugins: [pluginNodeResolve(), pluginTypescript(tsConfig)],
 };

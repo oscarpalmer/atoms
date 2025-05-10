@@ -17,6 +17,13 @@ export function isKey(value: unknown): value is Key {
 }
 
 /**
+ * Is the value a number?
+ */
+export function isNumber(value: unknown): value is number {
+	return typeof value === 'number' && !Number.isNaN(value);
+}
+
+/**
  * Is the value a plain object?
  */
 export function isPlainObject(value: unknown): value is PlainObject {

@@ -1,3 +1,7 @@
+/**
+ * @vitest-environment happy-dom
+ */
+
 import {expect, test} from 'vitest';
 import {debounce, memoize, noop, throttle} from '../src/function';
 
@@ -77,6 +81,7 @@ test('noop', () => {
 test('throttle', () =>
 	new Promise<void>(done => {
 		let cancelValue = 0;
+		let count = 0;
 		let last = 0;
 		let value = 0;
 
@@ -85,13 +90,15 @@ test('throttle', () =>
 		}, 25);
 
 		const interval = setInterval(() => {
+			count += 1;
 			throttled();
 		}, 12.5);
 
 		setTimeout(() => {
 			clearInterval(interval);
 
-			expect(value).toBeLessThanOrEqual(100);
+			expect(value).toBeGreaterThan(count / 2 - 2);
+			expect(value).toBeLessThan(count / 2 + 2);
 			expect(cancelValue).toBe(0);
 			expect(last).toBe(1);
 

@@ -271,4 +271,3 @@ function getObserver<Value>(
 }
 
 export type {Emitter, Observable, Observer, Subscription};
-

@@ -40,6 +40,11 @@ export function getValue(
 
 	const shouldIgnoreCase = ignoreCase === true;
 	const paths = getPaths(path, shouldIgnoreCase);
+
+	if (typeof paths === 'string') {
+		return handleValue(data, paths, null, true, shouldIgnoreCase);
+	}
+
 	const {length} = paths;
 
 	let index = 0;

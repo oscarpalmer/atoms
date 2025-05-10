@@ -1,13 +1,31 @@
+import {isNumber} from './is';
+
 /**
  * Is the number between a minimum and maximum value?
  */
-export function between(value: number, min: number, max: number): boolean {
+export function between(
+	value: number,
+	minimum: number,
+	maximum: number,
+): boolean {
+	if (!isNumber(value) || !isNumber(minimum) || !isNumber(maximum)) {
+		return false;
+	}
+
+	if (minimum === maximum) {
+		return value === minimum;
+	}
+
+	const max = maximum > minimum ? maximum : minimum;
+	const min = maximum > minimum ? minimum : maximum;
+
 	return value >= min && value <= max;
 }
 
 /**
  * - Clamp a number between a minimum and maximum value
  * - If `loop` is `true`, when the value is less than the minimum, it will be clamped as the maximum, and vice versa
+ * - Returns `NaN` if the value is unable to be clamped
  */
 export function clamp(
 	value: number,
@@ -15,6 +33,10 @@ export function clamp(
 	max: number,
 	loop?: boolean,
 ): number {
+	if (!isNumber(value) || !isNumber(min) || !isNumber(max)) {
+		return Number.NaN;
+	}
+
 	if (value < min) {
 		return loop === true ? max : min;
 	}

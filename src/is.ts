@@ -1,3 +1,4 @@
+import {isNumber} from './internal/is';
 import {getString} from './internal/string';
 import type {ArrayOrPlainObject, Primitive} from './models';
 
@@ -40,13 +41,6 @@ export function isNullableOrWhitespace(
 	value: unknown,
 ): value is undefined | null | '' {
 	return value == null || whiteSpaceExpression.test(getString(value));
-}
-
-/**
- * Is the value a number?
- */
-export function isNumber(value: unknown): value is number {
-	return typeof value === 'number' && !Number.isNaN(value);
 }
 
 /**

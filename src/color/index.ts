@@ -120,4 +120,3 @@ export function getRGBColor(value: unknown): RGBColor {
 }
 
 export {isColor, isHSLColor, isHexColor, isRGBColor};
-

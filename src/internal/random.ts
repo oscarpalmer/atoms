@@ -1,31 +1,33 @@
+import {isNumber} from './is';
+
 /**
  * Get a random floating-point number
  */
-export function getRandomFloat(min?: number, max?: number): number {
-	let maximum =
-		typeof max === 'number' && max <= Number.MAX_SAFE_INTEGER
-			? max
+export function getRandomFloat(minimum?: number, maximum?: number): number {
+	let max =
+		isNumber(maximum) && maximum <= Number.MAX_SAFE_INTEGER
+			? maximum
 			: Number.MAX_SAFE_INTEGER;
 
-	let minimum =
-		typeof min === 'number' && min >= Number.MIN_SAFE_INTEGER
-			? min
+	let min =
+		isNumber(minimum) && minimum >= Number.MIN_SAFE_INTEGER
+			? minimum
 			: Number.MIN_SAFE_INTEGER;
 
-	if (minimum === maximum) {
-		return minimum;
+	if (min === max) {
+		return min;
 	}
 
-	if (minimum > maximum) {
-		[minimum, maximum] = [maximum, minimum];
+	if (min > max) {
+		[min, max] = [max, min];
 	}
 
-	return Math.random() * (maximum - minimum) + minimum;
+	return Math.random() * (max - min) + min;
 }
 
 /**
  * Get a random integer
  */
-export function getRandomInteger(min?: number, max?: number): number {
-	return Math.floor(getRandomFloat(min, max));
+export function getRandomInteger(minimum?: number, maximum?: number): number {
+	return Math.floor(getRandomFloat(minimum, maximum));
 }

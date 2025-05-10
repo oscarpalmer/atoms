@@ -43,6 +43,13 @@ export function setValue<Data extends ArrayOrPlainObject>(
 
 	const shouldIgnoreCase = ignoreCase === true;
 	const paths = getPaths(path, shouldIgnoreCase);
+
+	if (typeof paths === 'string') {
+		handleValue(data, paths, value, false, shouldIgnoreCase);
+
+		return data;
+	}
+
 	const {length} = paths;
 	const lastIndex = length - 1;
 

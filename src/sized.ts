@@ -6,20 +6,16 @@ import {clamp} from './internal/number';
  * - Behaviour is similar to a _LRU_-cache, where the least recently used entries are removed
  */
 export class SizedMap<Key = unknown, Value = unknown> extends Map<Key, Value> {
-	private readonly maximumSize: number;
+	/**
+	 * The maximum size of the Map
+	 */
+	readonly maximum: number;
 
 	/**
 	 * Is the Map full?
 	 */
 	get full() {
-		return this.size >= this.maximumSize;
-	}
-
-	/**
-	 * The maximum size of the Map
-	 */
-	get maximum() {
-		return this.maximumSize;
+		return this.size >= this.maximum;
 	}
 
 	/**
@@ -38,22 +34,22 @@ export class SizedMap<Key = unknown, Value = unknown> extends Map<Key, Value> {
 	constructor(entries?: Array<[Key, Value]>, maximum?: number);
 
 	constructor(first?: Array<[Key, Value]> | number, second?: number) {
-		const maximumSize = getMaximum(first, second);
+		const maximum = getMaximum(first, second);
 
 		super();
 
-		this.maximumSize = maximumSize;
+		this.maximum = maximum;
 
 		if (Array.isArray(first)) {
 			const {length} = first;
 
-			if (length <= maximumSize) {
+			if (length <= maximum) {
 				for (let index = 0; index < length; index += 1) {
 					this.set(...first[index]);
 				}
 			} else {
-				for (let index = 0; index < maximumSize; index += 1) {
-					this.set(...first[length - maximumSize + index]);
+				for (let index = 0; index < maximum; index += 1) {
+					this.set(...first[length - maximum + index]);
 				}
 			}
 		}
@@ -78,7 +74,7 @@ export class SizedMap<Key = unknown, Value = unknown> extends Map<Key, Value> {
 	set(key: Key, value: Value): this {
 		if (this.has(key)) {
 			this.delete(key);
-		} else if (this.size >= this.maximumSize) {
+		} else if (this.size >= this.maximum) {
 			this.delete(this.keys().next().value as Key);
 		}
 
@@ -92,20 +88,16 @@ export class SizedMap<Key = unknown, Value = unknown> extends Map<Key, Value> {
  * - Behaviour is similar to a _LRU_-cache, where the oldest values are removed
  */
 export class SizedSet<Value = unknown> extends Set<Value> {
-	private readonly maximumSize: number;
+	/**
+	 * The maximum size of the Set
+	 */
+	readonly maximum: number;
 
 	/**
 	 * Is the Set full?
 	 */
 	get full() {
-		return this.size >= this.maximumSize;
-	}
-
-	/**
-	 * The maximum size of the Set
-	 */
-	get maximum() {
-		return this.maximumSize;
+		return this.size >= this.maximum;
 	}
 
 	/**
@@ -124,22 +116,22 @@ export class SizedSet<Value = unknown> extends Set<Value> {
 	constructor(values?: Value[], maximum?: number);
 
 	constructor(first?: Value[] | number, second?: number) {
-		const maximumSize = getMaximum(first, second);
+		const maximum = getMaximum(first, second);
 
 		super();
 
-		this.maximumSize = maximumSize;
+		this.maximum = maximum;
 
 		if (Array.isArray(first)) {
 			const {length} = first;
 
-			if (length <= maximumSize) {
+			if (length <= maximum) {
 				for (let index = 0; index < length; index += 1) {
 					this.add(first[index]);
 				}
 			} else {
-				for (let index = 0; index < maximumSize; index += 1) {
-					this.add(first[length - maximumSize + index]);
+				for (let index = 0; index < maximum; index += 1) {
+					this.add(first[length - maximum + index]);
 				}
 			}
 		}
@@ -151,7 +143,7 @@ export class SizedSet<Value = unknown> extends Set<Value> {
 	add(value: Value): this {
 		if (this.has(value)) {
 			this.delete(value);
-		} else if (this.size >= this.maximumSize) {
+		} else if (this.size >= this.maximum) {
 			this.delete(this.values().next().value as Value);
 		}
 
@@ -178,8 +170,8 @@ function getMaximum(first?: unknown, second?: unknown): number {
 		(typeof first === 'number'
 			? first
 			: typeof second === 'number'
-				? second
-				: undefined) ?? 2 ** 20;
+			? second
+			: undefined) ?? 2 ** 20;
 
 	return clamp(actual, 1, 2 ** 24);
 }
