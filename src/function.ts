@@ -1,3 +1,4 @@
+import {milliseconds} from './internal/function';
 import {getString, join} from './internal/string';
 import type {GenericCallback} from './models';
 import {SizedMap} from './sized';
@@ -101,13 +102,14 @@ export function debounce<Callback extends GenericCallback>(
 	callback: Callback,
 	time?: number,
 ): CancellableCallback<Callback> {
-	const interval = typeof time === 'number' && time >= 0 ? time : 0;
+	const interval =
+		typeof time === 'number' && time >= milliseconds ? time : milliseconds;
 
 	function step(
 		now: DOMHighResTimeStamp,
 		parameters: Parameters<Callback>,
 	): void {
-		if (now - start >= interval) {
+		if (interval === milliseconds || now - start >= interval) {
 			callback(...parameters);
 		} else {
 			frame = requestAnimationFrame(next => {
@@ -122,9 +124,9 @@ export function debounce<Callback extends GenericCallback>(
 	const debounced = (...parameters: Parameters<Callback>) => {
 		debounced.cancel();
 
-		start ??= performance.now();
-
 		frame = requestAnimationFrame(now => {
+			start = now - milliseconds;
+
 			step(now, parameters);
 		});
 	};
@@ -160,13 +162,14 @@ export function throttle<Callback extends GenericCallback>(
 	callback: Callback,
 	time?: number,
 ): CancellableCallback<Callback> {
-	const interval = typeof time === 'number' && time >= 0 ? time : 0;
+	const interval =
+		typeof time === 'number' && time >= milliseconds ? time : milliseconds;
 
 	function step(
 		now: DOMHighResTimeStamp,
 		parameters: Parameters<Callback>,
 	): void {
-		if (now - last >= interval) {
+		if (interval === milliseconds || now - last >= interval) {
 			last = now;
 
 			callback(...parameters);
@@ -184,9 +187,9 @@ export function throttle<Callback extends GenericCallback>(
 	const throttler = (...parameters: Parameters<Callback>) => {
 		throttler.cancel();
 
-		last ??= performance.now();
-
 		frame = requestAnimationFrame(now => {
+			last ??= now - milliseconds;
+
 			step(now, parameters);
 		});
 	};

@@ -1,17 +1,21 @@
-/**
- * @vitest-environment happy-dom
- */
-
 import {expect, test} from 'vitest';
 import {debounce, memoize, noop, throttle} from '../src/function';
+import {milliseconds} from '../src/internal/function';
 
 test('debounce', () =>
 	new Promise<void>(done => {
+		let diff = 0;
 		let value = 0;
 
 		const debounced = debounce(() => {
 			value += 1;
 		}, 50);
+
+		const start = performance.now();
+
+		debounce(() => {
+			diff = performance.now() - start;
+		}, 160)();
 
 		for (let index = 0; index < 100; index += 1) {
 			debounced();
@@ -26,6 +30,8 @@ test('debounce', () =>
 
 			setTimeout(() => {
 				setTimeout(() => {
+					expect(diff).toBeGreaterThanOrEqual(9 * milliseconds);
+					expect(diff).toBeLessThanOrEqual(11 * milliseconds);
 					expect(value).toBe(1);
 
 					done();
@@ -87,23 +93,13 @@ test('throttle', () =>
 
 		const throttled = throttle(() => {
 			value += 1;
-		}, 25);
+		}, 32);
 
 		const interval = setInterval(() => {
 			count += 1;
+
 			throttled();
-		}, 12.5);
-
-		setTimeout(() => {
-			clearInterval(interval);
-
-			expect(value).toBeGreaterThan(count / 2 - 2);
-			expect(value).toBeLessThan(count / 2 + 2);
-			expect(cancelValue).toBe(0);
-			expect(last).toBe(1);
-
-			done();
-		}, 500);
+		}, 16);
 
 		const cancelleable = throttle(() => {
 			cancelValue = 999;
@@ -122,4 +118,15 @@ test('throttle', () =>
 			lastThrottled();
 			lastThrottled();
 		}, 250);
+
+		setTimeout(() => {
+			clearInterval(interval);
+
+			expect(value).toBeGreaterThan(count / 2 - 2);
+			expect(value).toBeLessThan(count / 2 + 2);
+			expect(cancelValue).toBe(0);
+			expect(last).toBe(1);
+
+			done();
+		}, 500);
 	}));

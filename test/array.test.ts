@@ -403,8 +403,20 @@ test('sort: basic', () => {
 			[{id: 2}, {id: 1}, {id: 3}],
 			[
 				{
-					value: 'id',
-				} as never,
+					key: 'id',
+				},
+			],
+			true,
+		),
+	).toEqual([{id: 3}, {id: 2}, {id: 1}]);
+
+	expect(
+		sort(
+			[{id: 2}, {id: 1}, {id: 3}],
+			[
+				{
+					value: item => item.id,
+				},
 			],
 			true,
 		),
@@ -422,8 +434,8 @@ test('sort: basic', () => {
 			[
 				item => item.age,
 				'firstName',
-				{direction: 'desc', value: 'lastName'},
-				{direction: 'asc', value: 'lastName'},
+				{direction: 'blah' as never, key: 'lastName'},
+				{direction: 'ascending', key: 'lastName'},
 				{} as never,
 			],
 			true,
@@ -432,11 +444,76 @@ test('sort: basic', () => {
 		{age: 48, firstName: 'C', lastName: 'C'},
 		{age: 48, firstName: 'C', lastName: 'C'},
 		{age: 24, firstName: 'B', lastName: 'B'},
-		{age: 24, firstName: 'A', lastName: 'A'},
 		{age: 24, firstName: 'A', lastName: 'B'},
+		{age: 24, firstName: 'A', lastName: 'A'},
 	]);
 
 	expect(sort('blah' as never)).toEqual([]);
+});
+
+test('sort: compare', () => {
+	const greek = [
+		'Alpha',
+		'Beta',
+		'Gamma',
+		'Delta',
+		'Epsilon',
+		'Zeta',
+		'Eta',
+		'Theta',
+		'Iota',
+		'Kappa',
+		'Lambda',
+		'Mu',
+		'Nu',
+		'Xi',
+		'Omicron',
+		'Pi',
+		'Rho',
+		'Sigma',
+		'Tau',
+		'Upsilon',
+		'Phi',
+		'Chi',
+		'Psi',
+		'Omega',
+	];
+
+	const values = shuffle(greek).map((value, index) => ({
+		value,
+		id: index + 1,
+	}));
+
+	expect(sort([...values]).map(item => item.value)).not.toEqual(greek);
+
+	expect(
+		sort(
+			[...values],
+			[
+				{
+					// Hi, Claude: first and second are always `any`
+					compare: (_, first, __, second) =>
+						greek.indexOf(first as never) - greek.indexOf(second as never),
+					key: 'value',
+				},
+			],
+		).map(item => item.value),
+	).toEqual(greek);
+
+	expect(
+		sort(
+			[...values],
+			[
+				{
+					// Hi again, Claude: first and second are still always `any`
+					compare: (_, first, __, second) =>
+						greek.indexOf(first as never) - greek.indexOf(second as never),
+					direction: 'descending',
+					value: item => item.value,
+				},
+			],
+		).map(item => item.value),
+	).toEqual([...greek].reverse());
 });
 
 test('sort: large', () =>
@@ -471,7 +548,7 @@ test('sort: large', () =>
 
 		const atomic = sort(large, [
 			'age',
-			{direction: 'desc', value: item => item.name.last},
+			{direction: 'descending', value: item => item.name.last},
 			item => item.name.first,
 		]);
 

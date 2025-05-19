@@ -12,7 +12,7 @@ export function shuffle<Item>(array: Item[]): Item[] {
 		return array;
 	}
 
-	const shuffled = array.slice();
+	const shuffled = [...array];
 
 	let index = Number(shuffled.length);
 
