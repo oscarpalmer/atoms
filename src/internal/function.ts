@@ -1,40 +1,44 @@
+function calculate(): Promise<number> {
+	return new Promise(resolve => {
+		const values: number[] = [];
+
+		let last: DOMHighResTimeStamp | undefined;
+
+		function step(now: DOMHighResTimeStamp): void {
+			if (last != null) {
+				values.push(now - last);
+			}
+
+			last = now;
+
+			if (values.length >= 10) {
+				const median =
+					values
+						.sort()
+						.slice(2, -2)
+						.reduce((first, second) => first + second, 0) /
+					(values.length - 4);
+
+				resolve(median);
+			} else {
+				requestAnimationFrame(step);
+			}
+		}
+
+		requestAnimationFrame(step);
+	});
+}
+
 /**
  * A function that does nothing, which can be useful, I guess…
  */
 export function noop(): void {}
 
-function step(now: DOMHighResTimeStamp): void {
-	if (values.length === 7) {
-		milliseconds =
-			Math.floor(
-				(values.slice(2).reduce((first, second) => first + second) / 5) * 2,
-			) / 2;
-
-		last = undefined;
-		values.length = 0;
-	} else {
-		last ??= now;
-
-		const difference = now - last;
-
-		if (difference > 0) {
-			values.push(difference);
-		}
-
-		last = now;
-
-		requestAnimationFrame(step);
-	}
-}
-
-//
-
-const values: number[] = [];
-let last: DOMHighResTimeStamp | undefined;
-
 /**
  * A calculated average of the refresh rate of the display _(in milliseconds)_
  */
-export let milliseconds = Math.floor((1000 / 60) * 2) / 2;
+export let milliseconds = 1000 / 60;
 
-requestAnimationFrame(step);
+calculate().then(value => {
+	milliseconds = value;
+});
