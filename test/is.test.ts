@@ -2,6 +2,7 @@ import {expect, test} from 'vitest';
 import {
 	isArrayOrPlainObject,
 	isEmpty,
+	isKey,
 	isNullable,
 	isNullableOrEmpty,
 	isNullableOrWhitespace,
@@ -55,6 +56,14 @@ test('isEmpty', () => {
 	expect(isEmpty({key: null})).toBe(true);
 	expect(isEmpty({key: undefined})).toBe(true);
 	expect(isEmpty({key: 123})).toBe(false);
+});
+
+test('isKey', () => {
+	const indices = [2, 3, 4, 5, 6, 7, 8, 9];
+
+	for (let index = 0; index < length; index += 1) {
+		expect(isKey(values[index])).toBe(indices.includes(index));
+	}
 });
 
 test('isNullable', () => {

@@ -6,6 +6,7 @@ export * from './exists';
 export * from './filter';
 export * from './find';
 export * from './flatten';
+export * from './get';
 export * from './group-by';
 export * from './index-of';
 export * from './insert';

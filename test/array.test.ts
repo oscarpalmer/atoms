@@ -7,6 +7,7 @@ import {
 	filter,
 	find,
 	flatten,
+	getArray,
 	groupBy,
 	indexOf,
 	insert,
@@ -152,6 +153,35 @@ test('flatten', () => {
 
 	expect(flatten('blah' as never)).toEqual([]);
 	expect(flatten([])).toEqual([]);
+});
+
+test('getArray', () => {
+	const values = [null, undefined, '', 123, true, Symbol('test'), () => {}];
+
+	const {length} = values;
+
+	for (let index = 0; index < length; index += 1) {
+		expect(getArray(values[index])).toEqual([values[index]]);
+	}
+
+	expect(getArray(complex)).toEqual(complex);
+	expect(getArray(simple)).toEqual(simple);
+
+	const object = {
+		123: 'one two three',
+		alpha: 'omega',
+		999: 'nine nine nine',
+		value: {hello: 'world'},
+	};
+
+	expect(getArray(object)).toEqual([
+		'one two three',
+		'nine nine nine',
+		'omega',
+		{hello: 'world'},
+	]);
+
+	expect(getArray(object, true)).toEqual(['one two three', 'nine nine nine']);
 });
 
 test('getCallbacks', () => {
