@@ -23,8 +23,8 @@ export type KeyedValue<
 	Key extends keyof Item,
 > = Item[Key] extends PropertyKey ? Item[Key] : never;
 
-export type NestedArrayType<Value> = Value extends Array<infer NestedValue>
-	? NestedArrayType<NestedValue>
+export type NestedArray<Value> = Value extends Array<infer NestedValue>
+	? NestedArray<NestedValue>
 	: Value;
 
 export type NestedPartial<T> = {

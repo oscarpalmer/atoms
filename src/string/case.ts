@@ -114,6 +114,8 @@ function toCase(
 	return join(result, delimiter);
 }
 
+//
+
 const camelCaseExpression = /(\p{Ll})(\p{Lu})/gu;
 
 const acronymExpression = /(\p{Lu}*)(\p{Lu})(\p{Ll}+)/gu;

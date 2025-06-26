@@ -128,4 +128,4 @@ type TimeState = {
 
 const logger = new Logger();
 
-export {logger};
+export {logger, type Logger, type Time};

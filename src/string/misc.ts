@@ -48,6 +48,8 @@ export function truncate(
 	return `${value.slice(0, truncatedLength)}${actualSuffix}`;
 }
 
+//
+
 const uuidPartExpression = /[018]/g;
 
 const uuidTemplate = '10000000-1000-4000-8000-100000000000';

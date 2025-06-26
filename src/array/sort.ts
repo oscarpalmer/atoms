@@ -1,6 +1,6 @@
 import {compare} from '../internal/value/compare';
 import {isPlainObject} from '../is';
-import type {Key, PlainObject} from '../models';
+import type {PlainObject} from '../models';
 import type {CallbackSorter, KeySorter} from './models';
 
 type Sorter = {

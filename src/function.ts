@@ -205,4 +205,5 @@ export function throttle<Callback extends GenericCallback>(
 	return throttler as CancellableCallback<Callback>;
 }
 
+export type {CancellableCallback, GenericCallback, Memoized};
 export {noop} from './internal/function';

@@ -72,6 +72,13 @@ export function isPrimitive(value: unknown): value is Primitive {
 }
 
 export * from './internal/is';
+export type {
+	ArrayOrPlainObject,
+	Key,
+	PlainObject,
+	Primitive,
+	TypedArray,
+} from './models';
 
 //
 

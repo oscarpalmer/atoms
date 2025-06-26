@@ -1,13 +1,6 @@
 import {isPlainObject} from '../internal/is';
 import type {PlainObject} from '../models';
-
-type NumericalKeys<Value> = {
-	[Key in keyof Value]: Key extends number
-		? Key
-		: Key extends `${number}`
-			? Key
-			: never;
-}[keyof Value];
+import type {NumericalKeys} from './models';
 
 /**
  * Get an array from a value

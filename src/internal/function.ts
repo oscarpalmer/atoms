@@ -34,6 +34,8 @@ function calculate(): Promise<number> {
  */
 export function noop(): void {}
 
+//
+
 /**
  * A calculated average of the refresh rate of the display _(in milliseconds)_
  */

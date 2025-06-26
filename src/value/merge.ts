@@ -2,7 +2,7 @@ import {isArrayOrPlainObject} from '../internal/is';
 import {join} from '../internal/string';
 import type {ArrayOrPlainObject, NestedPartial, PlainObject} from '../models';
 
-type MergeOptions = {
+export type MergeOptions = {
 	/**
 	 * - Key _(or key epxressions)_ for values that should be replaced
 	 * - E.g. `merge([{items: [1, 2, 3]}, {items: [99]}])` => `{items: [99]}`

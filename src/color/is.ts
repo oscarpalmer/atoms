@@ -78,6 +78,8 @@ function isPercentage(value: unknown): value is number {
 	return typeof value === 'number' && between(value, 0, 100);
 }
 
+//
+
 const validators: Record<ColorProperty, (value: unknown) => value is number> = {
 	blue: isBytey,
 	green: isBytey,

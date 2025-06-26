@@ -111,8 +111,14 @@ export function toQuery(parameters: PlainObject): string {
 		: '';
 }
 
+//
+
 const arraySuffixPattern = /\[\]$/;
 
 const booleanPattern = /^(false|true)$/;
 
 const types = new Set(['boolean', 'number', 'string']);
+
+//
+
+export type {PlainObject} from './models';

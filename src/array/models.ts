@@ -37,3 +37,16 @@ export type KeySorter<Item> = {
 	 */
 	key: keyof Item;
 };
+
+/**
+ * The numerical keys of an object
+ */
+export type NumericalKeys<Value> = {
+	[Key in keyof Value]: Key extends number
+		? Key
+		: Key extends `${number}`
+			? Key
+			: never;
+}[keyof Value];
+
+export type {Key, KeyedValue, NestedArray, PlainObject} from '../models';

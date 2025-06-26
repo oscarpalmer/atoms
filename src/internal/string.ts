@@ -58,6 +58,8 @@ export function words(value: string): string[] {
 	return typeof value === 'string' ? (value.match(wordsExpression) ?? []) : [];
 }
 
+//
+
 const ignoreExpression = /(^|\.)(__proto__|constructor|prototype)(\.|$)/i;
 
 // biome-ignore lint/suspicious/noControlCharactersInRegex: Lodash uses it, so it's fine ;-)

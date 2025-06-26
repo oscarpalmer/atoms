@@ -1,10 +1,10 @@
 import {getState} from './get';
-import {isColor, isHSLColor, isHexColor, isRGBColor} from './is';
+import {isColor, isHexColor, isHSLColor, isRGBColor} from './is';
 import {getNormalizedHex} from './misc';
 import type {ColorState, HSLColor, RGBColor} from './models';
 import {hexToRgb, hslToRgb, rgbToHex, rgbToHsl} from './value';
 
-export class Color {
+class Color {
 	private readonly $color = true;
 
 	private readonly state: ColorState;
@@ -119,4 +119,12 @@ export function getRGBColor(value: unknown): RGBColor {
 	return getColor(value).rgb;
 }
 
-export {isColor, isHSLColor, isHexColor, isRGBColor};
+export {
+	isColor,
+	isHexColor,
+	isHSLColor,
+	isRGBColor,
+	type Color,
+	type HSLColor,
+	type RGBColor,
+};

@@ -91,4 +91,4 @@ export function sum(array: unknown[], key?: unknown): number {
 	return aggregate('sum', array, key).value;
 }
 
-export {max} from './internal/math/aggregate';
+export {max, type OnlyNumericalKeys} from './internal/math/aggregate';

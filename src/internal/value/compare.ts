@@ -100,6 +100,8 @@ function getParts(value: unknown): unknown[] {
 	return typeof value === 'object' ? [value] : words(getString(value));
 }
 
+//
+
 const comparators = {
 	bigint: compareNumbers,
 	boolean: compareNumbers,

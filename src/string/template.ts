@@ -2,7 +2,7 @@ import {getString} from '../internal/string';
 import {getValue} from '../internal/value/get';
 import type {PlainObject} from '../models';
 
-type Options = {
+export type TemplateOptions = {
 	/**
 	 * Ignore case when searching for variables?
 	 */
@@ -19,7 +19,7 @@ type Options = {
 export function template(
 	value: string,
 	variables: PlainObject,
-	options?: Partial<Options>,
+	options?: Partial<TemplateOptions>,
 ): string {
 	if (typeof value !== 'string') {
 		return '';
@@ -49,5 +49,7 @@ export function template(
 		return values[key];
 	});
 }
+
+//
 
 const variablePattern = /{{([\s\S]+?)}}/g;
