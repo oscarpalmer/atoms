@@ -141,6 +141,16 @@
 				"default": "./dist/random.cjs"
 			}
 		},
+		"./sized": {
+			"import": {
+				"types": "./types/sized.d.ts",
+				"default": "./dist/sized.js"
+			},
+			"require": {
+				"types": "./types/sized.d.cts",
+				"default": "./dist/sized.cjs"
+			}
+		},
 		"./string": {
 			"import": {
 				"types": "./types/string/index.d.ts",
@@ -192,5 +202,5 @@
 	},
 	"type": "module",
 	"types": "./types/index.d.cts",
-	"version": "0.103.0"
+	"version": "0.104.0"
 }
