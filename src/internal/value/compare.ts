@@ -3,6 +3,9 @@ import {getString, words} from '../string';
 
 /**
  * Compare two values _(for sorting purposes)_
+ * @param first First value to compare
+ * @param second Second value to compare
+ * @returns `0` if equal; `-1` first comes before second; `1` first comes after second
  */
 export function compare(first: unknown, second: unknown): number {
 	if (Object.is(first, second)) {

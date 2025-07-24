@@ -13,6 +13,9 @@ type AggregationCallback = (
 
 type AggregationType = 'average' | 'max' | 'min' | 'sum';
 
+/**
+ * The numerical values of an object
+ */
 export type OnlyNumericalKeys<Item> = {
 	[Key in keyof Item as Item[Key] extends number ? Key : never]: Item[Key];
 };
@@ -24,7 +27,7 @@ export function aggregate(
 ): Aggregation {
 	const {length} = array;
 
-	if (length === 0) {
+	if (!Array.isArray(array) || length === 0) {
 		return {
 			count: 0,
 			value: Number.NaN,
@@ -61,11 +64,16 @@ export function aggregate(
 
 /**
  * Get the maximum value from a list of numbers
+ * @param values List of numbers to get the maximum from
+ * @returns Maximum value, or `NaN` if no maximum can be found
  */
 export function max(values: number[]): number;
 
 /**
  * Get the maximum value from a list of objects
+ * @param array List of objects to get the maximum from
+ * @param key key for a value in object to get the maximum from
+ * @returns Maximum value, or `NaN` if no maximum can be found
  */
 export function max<Item extends PlainObject>(
 	array: Item[],
@@ -74,6 +82,9 @@ export function max<Item extends PlainObject>(
 
 /**
  * Get the maximum value from a list of objects
+ * @param array List of objects to get the maximum from
+ * @param callback Function to get a value in object to get the maximum from
+ * @returns Maximum value, or `NaN` if no maximum can be found
  */
 export function max<Item extends PlainObject>(
 	items: Item[],

@@ -10,6 +10,8 @@ function isBytey(value: unknown): value is number {
 
 /**
  * Is the value a color?
+ * @param value The value to check
+ * @returns `true` if the value is a color, `false` otherwise
  */
 export function isColor(value: unknown): value is Color {
 	return (
@@ -26,6 +28,8 @@ function isDegree(value: unknown): value is number {
 
 /**
  * Is the value a hex-color?
+ * @param value The value to check
+ * @returns `true` if the value is a hex-color, `false` otherwise
  */
 export function isHexColor(value: unknown): value is string {
 	return typeof value === 'string' && anyPattern.test(value);
@@ -33,6 +37,8 @@ export function isHexColor(value: unknown): value is string {
 
 /**
  * Is the value an HSL-color?
+ * @param value The value to check
+ * @returns `true` if the value is an HSL-color, `false` otherwise
  */
 export function isHSLColor(value: unknown): value is HSLColor {
 	return isObject(value, hslKeys);
@@ -40,6 +46,8 @@ export function isHSLColor(value: unknown): value is HSLColor {
 
 /**
  * Is the value an RGB-color?
+ * @param value The value to check
+ * @returns `true` if the value is an RGB-color, `false` otherwise
  */
 export function isRGBColor(value: unknown): value is RGBColor {
 	return isObject(value, rgbKeys);

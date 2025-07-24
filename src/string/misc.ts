@@ -1,5 +1,6 @@
 /**
  * Create a new UUID
+ * @returns A new UUID string
  */
 export function createUuid(): string {
 	return uuidTemplate.replace(uuidPartExpression, (substring: string) => {
@@ -12,6 +13,9 @@ export function createUuid(): string {
 
 /**
  * Parse a JSON string into its proper value _(or `undefined` if it fails)_
+ * @param value JSON string to parse
+ * @param reviver Reviver function to transform the parsed values
+ * @returns Parsed value or `undefined` if parsing fails
  */
 export function parse(
 	value: string,
@@ -26,8 +30,10 @@ export function parse(
 
 /**
  * Truncate a string to a specified length, when possible
- * - Returned as-is if the string is already short enough
- * - A suffix may be appended to the truncated string, e.g., an ellipsis
+ * @param value String to truncate
+ * @param length Maximum length of the string after truncation
+ * @param suffix Suffix to append to the truncated string
+ * @returns Truncated string
  */
 export function truncate(
 	value: string,

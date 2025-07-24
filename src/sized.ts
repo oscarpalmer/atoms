@@ -1,8 +1,7 @@
 import {clamp} from './internal/number';
 
 /**
- * A Map with a maximum size
- * - Maximum size defaults to _2^20_; any provided size will be clamped at _2^24_
+ * - A Map with a maximum size
  * - Behaviour is similar to a _LRU_-cache, where the least recently used entries are removed
  */
 export class SizedMap<Key = unknown, Value = unknown> extends Map<Key, Value> {
@@ -19,17 +18,27 @@ export class SizedMap<Key = unknown, Value = unknown> extends Map<Key, Value> {
 	}
 
 	/**
-	 * Create a new Map with entries and a maximum size _(2^20)_
+	 * Create a new SizedMap with entries and a maximum size _(2^20)_
+	 * @param entries Array of key-value pairs to initialize the SizedMap with
+	 * @typeparam Key Type of the keys in the SizedMap
+	 * @typeparam Value Type of the values in the SizedMap
 	 */
 	constructor(entries: Array<[Key, Value]>);
 
 	/**
-	 * Create a new Map with a maximum size _(but clamped at 2^24)_
+	 * Create a new SizedMap with a maximum size _(but clamped at 2^24)_
+	 * @param maximum Maximum size of the SizedMap
+	 * @typeparam Key Type of the keys in the SizedMap
+	 * @typeparam Value Type of the values in the SizedMap
 	 */
 	constructor(maximum: number);
 
 	/**
-	 * Create a new Map with _(optional)_ entries and a maximum size _(defaults to 2^20; clamped at 2^24)_
+	 * Create a new SizedMap with _(optional)_ entries and a maximum size _(defaults to 2^20; clamped at 2^24)_
+	 * @param entries Array of key-value pairs to initialize the SizedMap with
+	 * @param maximum Maximum size of the SizedMap
+	 * @typeparam Key Type of the keys in the SizedMap
+	 * @typeparam Value Type of the values in the SizedMap
 	 */
 	constructor(entries?: Array<[Key, Value]>, maximum?: number);
 
@@ -83,8 +92,7 @@ export class SizedMap<Key = unknown, Value = unknown> extends Map<Key, Value> {
 }
 
 /**
- * A Set with a maximum size
- * - Maximum size defaults to _2^20_; any provided size will be clamped at _2^24_
+ * - A Set with a maximum size
  * - Behaviour is similar to a _LRU_-cache, where the oldest values are removed
  */
 export class SizedSet<Value = unknown> extends Set<Value> {
@@ -101,17 +109,24 @@ export class SizedSet<Value = unknown> extends Set<Value> {
 	}
 
 	/**
-	 * Create a new Set with values and a maximum size _(2^20)_
+	 * Create a new SizedSet with values and a maximum size _(2^20)_
+	 * @param values Array of values to initialize the SizedSet with
+	 * @typeparam Value Type of the values in the SizedSet
 	 */
 	constructor(values: Value[]);
 
 	/**
-	 * Create a new Set with a maximum size _(but clamped at 2^24)_
+	 * Create a new SizedSet with a maximum size _(but clamped at 2^24)_
+	 * @param maximum Maximum size of the SizedSet
+	 * @typeparam Value Type of the values in the SizedSet
 	 */
 	constructor(maximum: number);
 
 	/**
-	 * Create a new Set with _(optional)_ values and a maximum size _(defaults to 2^20; clamped at 2^24)_
+	 * Create a new SizedSet with _(optional)_ values and a maximum size _(defaults to 2^20; clamped at 2^24)_
+	 * @param values Array of values to initialize the SizedSet with
+	 * @param maximum Maximum size of the SizedSet
+	 * @typeparam Value Type of the values in the SizedSet
 	 */
 	constructor(values?: Value[], maximum?: number);
 
@@ -151,7 +166,10 @@ export class SizedSet<Value = unknown> extends Set<Value> {
 	}
 
 	/**
-	 * Get a value from the Set, if it exists _(and move it to the end)_
+	 * Get a value from the SizedSet, if it exists _(and move it to the end)_
+	 * @param value Value to get from the SizedSet
+	 * @param update Update the value's position in the SizedSet? _(defaults to `false`)_
+	 * @returns The value if it exists, otherwise `undefined`
 	 */
 	get(value: Value, update?: boolean): Value | undefined {
 		if (this.has(value)) {

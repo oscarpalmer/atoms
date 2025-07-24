@@ -5,9 +5,6 @@ import {getNormalizedHex} from './misc';
 import type {ColorState, HSLColor, RGBColor} from './models';
 import {hexToRgb, hslToRgb, rgbToHex, rgbToHsl} from './value';
 
-/**
- * Get color state from any kind of value
- */
 export function getState(value: unknown): ColorState {
 	if (typeof value === 'string') {
 		const hex = getNormalizedHex(value);

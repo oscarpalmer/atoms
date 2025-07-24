@@ -2,6 +2,8 @@ import {compact} from './array/compact';
 
 /**
  * Get the string value from any value
+ * @param Value Value to get the string from
+ * @returns String representation of the value
  */
 export function getString(value: unknown): string {
 	if (typeof value === 'string') {
@@ -26,7 +28,10 @@ export function ignoreKey(key: string): boolean {
 }
 
 /**
- * Join an array into a string while ignoring empty values _(with an optional delimiter)_
+ * Join an array into a string while ignoring empty values
+ * @param value Array of values to join
+ * @param delimiter Delimiter to use between values
+ * @returns Joined string with non-empty values
  */
 export function join(value: unknown[], delimiter?: string): string {
 	return compact(value)
@@ -53,6 +58,8 @@ export function tryEncode(value: boolean | number | string): unknown {
 
 /**
  * Split a string into words _(and other readable parts)_
+ * @param value String to split into words
+ * @returns Array of words found in the string
  */
 export function words(value: string): string[] {
 	return typeof value === 'string' ? (value.match(wordsExpression) ?? []) : [];

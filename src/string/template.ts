@@ -15,6 +15,10 @@ export type TemplateOptions = {
 
 /**
  * Render a string from a template with variables
+ * @param value Template string with variables
+ * @param variables Variables to use in the template
+ * @param options Options for the template rendering
+ * @returns Templated string
  */
 export function template(
 	value: string,

@@ -1,3 +1,6 @@
+/**
+ * Sorting information for arrays _(using a callback)_
+ */
 export type CallbackSorter<Item> = {
 	/**
 	 * Comparator to use when comparing items and values
@@ -18,6 +21,9 @@ export type CallbackSorter<Item> = {
 	value: (item: Item) => unknown;
 };
 
+/**
+ * Sorting information for arrays _(using a key)_
+ */
 export type KeySorter<Item> = {
 	/**
 	 * Comparator to use when comparing items and values

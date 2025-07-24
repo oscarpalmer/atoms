@@ -1,18 +1,20 @@
 import {getRandomInteger} from '../random';
 
 /**
- * Shuffle an array
+ * Shuffle items in array
+ * @param array Array to shuffle
+ * @returns New array with shuffled values
  */
 export function shuffle<Item>(array: Item[]): Item[] {
 	if (!Array.isArray(array)) {
 		return [];
 	}
 
-	if (array.length < 2) {
-		return array;
-	}
-
 	const shuffled = [...array];
+
+	if (shuffled.length < 2) {
+		return shuffled;
+	}
 
 	let index = Number(shuffled.length);
 

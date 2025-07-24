@@ -2,21 +2,30 @@ import {findValue} from '../internal/array/find';
 import type {Key, PlainObject} from '../models';
 
 /**
- * Does the value exist in array?
+ * Does the value exist in the array?
+ * @param array Array to search in
+ * @param value Value to search for
+ * @returns `true` if the value exists in the array, otherwise `false`
  */
 export function exists<Item>(array: Item[], value: Item): boolean;
 
 /**
- * Does the value exist in array?
+ * Does any item in the array match the filter?
+ * @param array Array to search in
+ * @param filter Function to match items
+ * @returns `true` if a matching item exists, otherwise `false`
  */
 export function exists<Item>(
 	array: Item[],
-	matches: (item: Item, index: number, array: Item[]) => boolean,
+	filter: (item: Item, index: number, array: Item[]) => boolean,
 ): boolean;
 
 /**
- * - Does the value exist in array?
- * - Use `key` to find a comparison value to match with `value`
+ * Does the value exist in the array?
+ * @param array Array to search in
+ * @param key Key to search items by
+ * @param value Value to search for
+ * @returns `true` if the value exists in the array, otherwise `false`
  */
 export function exists<Item extends PlainObject, ItemKey extends keyof Item>(
 	array: Item[],
@@ -25,13 +34,16 @@ export function exists<Item extends PlainObject, ItemKey extends keyof Item>(
 ): boolean;
 
 /**
- * - Does the value exist in array?
- * - Use `key` to find a comparison value to match with `value`
+ * Does the value exist in the array?
+ * @param array Array to search in
+ * @param callback Function to get a value from each item
+ * @param value Value to search for
+ * @returns `true` if the value exists in the array, otherwise `false`
  */
 export function exists<
 	Item,
 	ItemKey extends (item: Item, index: number, array: Item[]) => Key,
->(array: Item[], key: ItemKey, value: ReturnType<ItemKey>): boolean;
+>(array: Item[], callback: ItemKey, value: ReturnType<ItemKey>): boolean;
 
 export function exists(array: unknown[], ...parameters: unknown[]): boolean {
 	if (parameters.length === 1 && typeof parameters[0] !== 'function') {

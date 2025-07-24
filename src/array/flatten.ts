@@ -2,6 +2,8 @@ import type {NestedArray} from '../models';
 
 /**
  * Flatten an array _(using native `flat` and maximum depth)_
+ * @param array Array to flatten
+ * @returns Flattened array
  */
 export function flatten<Item>(array: Item[]): NestedArray<Item>[] {
 	return (

@@ -3,6 +3,8 @@ import type {ArrayOrPlainObject, PlainObject, TypedArray} from '../models';
 
 /**
  * Clone any kind of value _(deeply, if needed)_
+ * @param value Value to clone
+ * @returns Cloned value
  */
 export function clone<Value>(value: Value): Value;
 

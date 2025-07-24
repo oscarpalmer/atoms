@@ -47,6 +47,8 @@ function flatten(
 
 /**
  * Smush an object into a flat object that uses dot notation keys
+ * @param value Object to smush
+ * @returns Smushed object with dot notation keys
  */
 export function smush<Value extends PlainObject>(value: Value): Smushed<Value> {
 	return typeof value === 'object' && value !== null

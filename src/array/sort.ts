@@ -1,6 +1,6 @@
 import {compare} from '../internal/value/compare';
 import {isPlainObject} from '../is';
-import type {PlainObject} from '../models';
+import type {PlainObject, Primitive} from '../models';
 import type {CallbackSorter, KeySorter} from './models';
 
 type Sorter = {
@@ -39,16 +39,16 @@ function getSorter(value: unknown, modifier: number): Sorter | undefined {
 		isObject && typeof value.key === 'string'
 			? value.key
 			: typeof value === 'string'
-			? value
-			: undefined;
+				? value
+				: undefined;
 
 	sorter.callback =
 		sorter.key == null
 			? isObject && typeof value.value === 'function'
 				? (value.value as never)
 				: typeof value === 'function'
-				? (value as never)
-				: undefined
+					? (value as never)
+					: undefined
 			: undefined;
 
 	if (isObject && typeof value.direction === 'string') {
@@ -56,8 +56,8 @@ function getSorter(value: unknown, modifier: number): Sorter | undefined {
 			value.direction === 'ascending'
 				? 1
 				: value.direction === 'descending'
-				? -1
-				: modifier;
+					? -1
+					: modifier;
 	}
 
 	if (sorter.key != null || sorter.callback != null) {
@@ -68,23 +68,32 @@ function getSorter(value: unknown, modifier: number): Sorter | undefined {
 }
 
 /**
- * Sort an array of items _(defaults to ascending)_
+ * Sort an array of items
+ * @param array Array to sort
+ * @param descending Sort in descending order? _(defaults to `false`)_
+ * @returns Sorted array
  */
 export function sort<Item>(array: Item[], descending?: boolean): Item[];
 
 /**
- * - Sort an array of items, using a sorter to sort by a specific value
- * - Defaults to ascending, but can be changed by setting `descending` to `true`
+ * Sort an array of items, using a sorter to sort by a specific value
+ * @param array Array to sort
+ * @param sorter Sorter to use for sorting
+ * @param descending Sort in descending order? _(defaults to `false`; overridden by the sorter)_
+ * @returns Sorted array
  */
-export function sort<Item extends PlainObject>(
+export function sort<Item extends Primitive>(
 	array: Item[],
 	sorter: (item: Item) => unknown,
 	descending?: boolean,
 ): Item[];
 
 /**
- * - Sort an array of items, using a sorter to sort by a specific value
- * - Defaults to ascending, but can be changed by setting `descending` to `true`
+ * Sort an array of items, using a sorter to sort by a specific value
+ * @param array Array to sort
+ * @param sorter Sorter to use for sorting
+ * @param descending Sort in descending order? _(defaults to `false`; overridden by the sorter)_
+ * @returns Sorted array
  */
 export function sort<Item extends PlainObject>(
 	array: Item[],
@@ -97,18 +106,24 @@ export function sort<Item extends PlainObject>(
 ): Item[];
 
 /**
- * - Sort an array of items, using multiple sorters to sort by specific values
- * - Defaults to ascending, but can be changed by setting `descending` to `true`
+ * Sort an array of items, using multiple sorters to sort by specific values
+ * @param array Array to sort
+ * @param sorters Sorters to use for sorting
+ * @param descending Sort in descending order? _(defaults to `false`; overridden by individual sorters)_
+ * @returns Sorted array
  */
-export function sort<Item>(
+export function sort<Item extends Primitive>(
 	array: Item[],
 	sorters: ((item: Item) => unknown)[],
 	descending?: boolean,
 ): Item[];
 
 /**
- * - Sort an array of items, using multiple sorters to sort by specific values
- * - Defaults to ascending, but can be changed by setting `descending` to `true`, either for all sorter or in a specific `Sorter`
+ * Sort an array of items, using multiple sorters to sort by specific values
+ * @param array Array to sort
+ * @param sorters Sorters to use for sorting
+ * @param descending Sort in descending order? _(defaults to `false`; overridden by individual sorters)_
+ * @returns Sorted array
  */
 export function sort<Item extends PlainObject>(
 	array: Item[],

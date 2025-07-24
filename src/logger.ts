@@ -74,8 +74,9 @@ class Logger {
 	}
 
 	/**
-	 * - Start a logged timer with a label
-	 * - Returns a `Time`-object for logging the current duration of the timer and stopping the timer _(and logging the total duration)_
+	 * Start a logged timer with a label
+	 * @param label Label for the timer
+	 * @returns Time instance
 	 */
 	time(label: string): Time {
 		return new Time(label);
@@ -83,27 +84,26 @@ class Logger {
 }
 
 class Time {
-	private declare readonly state: TimeState;
+	#state: TimeState;
 
 	constructor(label: string) {
-		this.state = {
+		this.#state = {
 			label,
 			started: enabled,
 			stopped: false,
 		};
 
-		if (this.state.started) {
+		if (this.#state.started) {
 			console.time(label);
 		}
 	}
 
 	/**
-	 * - Log the current duration of the timer
-	 * - _(Ignored if logging is disabled)_
+	 * Log the current duration of the timer _(ignored if logging is disabled)_
 	 */
 	log(): void {
-		if (this.state.started && !this.state.stopped && enabled) {
-			console.timeLog(this.state.label);
+		if (this.#state.started && !this.#state.stopped && enabled) {
+			console.timeLog(this.#state.label);
 		}
 	}
 
@@ -112,10 +112,10 @@ class Time {
 	 * - _(Will always log the total duration, even if logging is disabled)_
 	 */
 	stop(): void {
-		if (this.state.started && !this.state.stopped) {
-			this.state.stopped = true;
+		if (this.#state.started && !this.#state.stopped) {
+			this.#state.stopped = true;
 
-			console.timeEnd(this.state.label);
+			console.timeEnd(this.#state.label);
 		}
 	}
 }

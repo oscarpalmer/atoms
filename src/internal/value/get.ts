@@ -3,9 +3,10 @@ import type {ArrayOrPlainObject, Get, Paths} from '../../models';
 import {getPaths, handleValue} from './misc';
 
 /**
- * - Get the value from an object using a known path
- * - You can retrieve a nested value by using dot notation, e.g., `foo.bar.baz`
- * - Returns `undefined` if the value is not found
+ * Get the value from an object using a known path
+ * @param data Object to retrieve the value from
+ * @param path Path to the value, e.g., `foo.bar.baz`
+ * @returns Value at the specified path, or `undefined` if not found
  */
 export function getValue<
 	Data extends ArrayOrPlainObject,
@@ -13,10 +14,11 @@ export function getValue<
 >(data: Data, path: Path): Get<Data, ToString<Path>>;
 
 /**
- * - Get the value from an object using an unknown path
- * - You can retrieve a nested value by using dot notation, e.g., `foo.bar.baz`
- * - If `ignoreCase` is `true`, path matching will be case-insensitive
- * - Returns `undefined` if the value is not found
+ * Get the value from an object using an unknown path
+ * @param data Object to retrieve the value from
+ * @param path Path to the value, e.g., `foo.bar.baz`
+ * @param ignoreCase If `true`, the path matching is case-insensitive
+ * @returns Value at the specified path, or `undefined` if not found
  */
 export function getValue<Data extends ArrayOrPlainObject>(
 	data: Data,

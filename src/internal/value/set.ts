@@ -2,10 +2,11 @@ import type {ArrayOrPlainObject, Paths, PlainObject} from '../../models';
 import {getPaths, handleValue} from './misc';
 
 /**
- * - Set the value in an object using a known path
- * - You can set a nested value by using dot notation, e.g., `foo.bar.baz`
- * - If a part of the path does not exist, it will be created, either as an array or a generic object, depending on the path
- * - Returns the original object
+ * Set the value in an object using a known path
+ * @param data Object to set the value in
+ * @param path Path to the value, e.g., `foo.bar.baz`
+ * @param value Value to set at the specified path
+ * @returns Original object with the value set
  */
 export function setValue<
 	Data extends ArrayOrPlainObject,
@@ -13,11 +14,12 @@ export function setValue<
 >(data: Data, path: Path, value: unknown): Data;
 
 /**
- * - Set the value in an object using an unknown path
- * - You can set a nested value by using dot notation, e.g., `foo.bar.baz`
- * - If a part of the path does not exist, it will be created, either as an array or a generic object, depending on the path
- * - If `ignoreCase` is `true`, path matching will be case-insensitive
- * - Returns the original object
+ * Set the value in an object using an unknown path
+ * @param data Object to set the value in
+ * @param path Path to the value, e.g., `foo.bar.baz`
+ * @param value Value to set at the specified path
+ * @param ignoreCase If `true`, the path matching is case-insensitive
+ * @returns Original object with the value set
  */
 export function setValue<Data extends ArrayOrPlainObject>(
 	data: Data,

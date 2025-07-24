@@ -11,7 +11,7 @@ type CancellableCallback<Callback extends GenericCallback> = Callback & {
 };
 
 class Memoized<Callback extends GenericCallback> {
-	declare readonly state: MemoizedState<Callback>;
+	#state: MemoizedState<Callback>;
 
 	constructor(callback: Callback, size?: number) {
 		const cache = new SizedMap<unknown, ReturnType<Callback>>(size ?? 2 ** 16);
@@ -35,56 +35,64 @@ class Memoized<Callback extends GenericCallback> {
 			return value;
 		};
 
-		this.state = {cache, getter};
+		this.#state = {cache, getter};
 	}
 
 	/**
 	 * Clear the cache
 	 */
 	clear(): void {
-		this.state.cache?.clear();
+		this.#state.cache?.clear();
 	}
 
 	/**
 	 * Delete a result from the cache
+	 * @param key Key to delete
+	 * @returns `true` if the key existed and was removed, `false` otherwise
 	 */
 	delete(key: unknown): boolean {
-		return this.state.cache?.delete(key) ?? false;
+		return this.#state.cache?.delete(key) ?? false;
 	}
 
 	/**
-	 * Destroy the instance, clearing its cache and removing its callback
+	 * Destroy the instance _(clearing its cache and removing its callback)_
 	 */
 	destroy(): void {
-		this.state.cache?.clear();
+		this.#state.cache?.clear();
 
-		this.state.cache = undefined;
-		this.state.getter = undefined;
+		this.#state.cache = undefined;
+		this.#state.getter = undefined;
 	}
 
 	/**
-	 * Get a result from the cache if it exists _(or `undefined` otherwise)_
+	 * Get a result from the cache
+	 * @param key Key to get
+	 * @returns The cached result or `undefined` if it does not exist
 	 */
 	get(key: unknown): ReturnType<Callback> | undefined {
-		return this.state.cache?.get(key);
+		return this.#state.cache?.get(key);
 	}
 
 	/**
 	 * Does the result exist?
+	 * @param key Key to check
+	 * @returns `true` if the result exists, `false` otherwise
 	 */
 	has(key: unknown): boolean {
-		return this.state.cache?.has(key) ?? false;
+		return this.#state.cache?.has(key) ?? false;
 	}
 
 	/**
-	 * Get the result from the cache if it exists; otherwise runs the callback, caches the result, and returns it
+	 * Run the callback with the provided parameters
+	 * @param parameters Parameters to pass to the callback
+	 * @returns Cached or computed _(then cached)_ result
 	 */
 	run(...parameters: Parameters<Callback>): ReturnType<Callback> {
-		if (this.state.cache == null || this.state.getter == null) {
-			throw new Error('The memoised instance has been destroyed');
+		if (this.#state.cache == null || this.#state.getter == null) {
+			throw new Error('The memoized instance has been destroyed');
 		}
 
-		return this.state.getter(...parameters);
+		return this.#state.getter(...parameters);
 	}
 }
 
@@ -96,7 +104,9 @@ type MemoizedState<Callback extends GenericCallback> = {
 /**
  * - Debounce a function, ensuring it is only called after `time` milliseconds have passed
  * - On subsequent calls, the timer is reset and will wait another `time` milliseconds _(and so on...)_
- * - Returns the callback with an added `cancel`-method for manually cancelling the debounce
+ * @param callback Callback to debounce
+ * @param time Time in milliseconds to wait before calling the callback _(defaults to match frame rate)_
+ * @returns Debounced callback with a `cancel` method
  */
 export function debounce<Callback extends GenericCallback>(
 	callback: Callback,
@@ -143,7 +153,10 @@ export function debounce<Callback extends GenericCallback>(
 }
 
 /**
- * Memoise a function, caching and retrieving results based on the first parameter
+ * Memoize a function, caching and retrieving results based on the first parameter
+ * @param callback Callback to memoize
+ * @param cacheSize Size of the cache
+ * @returns Memoized instance
  */
 export function memoize<Callback extends GenericCallback>(
 	callback: Callback,
@@ -157,6 +170,9 @@ export function memoize<Callback extends GenericCallback>(
 
 /**
  * Throttle a function, ensuring it is only called once every `time` milliseconds
+ * @param callback Callback to throttle
+ * @param time Time in milliseconds to wait before calling the callback again _(defaults to match frame rate)_
+ * @returns Throttled callback with a `cancel` method
  */
 export function throttle<Callback extends GenericCallback>(
 	callback: Callback,

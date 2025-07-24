@@ -3,19 +3,25 @@ import type {PlainObject} from '../models';
 import type {NumericalKeys} from './models';
 
 /**
- * Get an array from a value
+ * Get an array
+ * @param value Original array
+ * @returns Original array
  */
 export function getArray<Item>(value: Item[]): Item[];
 
 /**
  * Get an array from an object
+ * @param value Object to convert to an array
+ * @returns Array holding the values of the object
  */
 export function getArray<Value extends PlainObject>(
 	value: Value,
 ): Array<Value[keyof Value]>;
 
 /**
- * Get an array from an object, where only values with numeric keys will be included
+ * Get an array from an object, where only values with numerical keys will be included
+ * @param value Object to convert to an array
+ * @returns Array holding the values of the object with numerical keys
  */
 export function getArray<Value extends PlainObject>(
 	value: Value,
@@ -24,11 +30,15 @@ export function getArray<Value extends PlainObject>(
 
 /**
  * Get an array from a value
+ * @param value Value to convert to an array
+ * @returns Array holding the value
  */
 export function getArray<Item>(value: Item): Item[];
 
 /**
- * Get an array from a value
+ * Get an array from an unknown value
+ * @param value Value to convert to an array
+ * @returns Array of value
  */
 export function getArray(value: unknown): unknown[];
 

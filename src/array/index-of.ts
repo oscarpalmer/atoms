@@ -1,22 +1,31 @@
 import {findValue} from '../internal/array/find';
-import type {Key, PlainObject} from '../models';
+import type {PlainObject} from '../models';
 
 /**
- * Get the index for the first item matching `value` _(or `-1` if no match is found)_
+ * Get the index for the first item matching the given item
+ * @param array Array to search in
+ * @param value Item to search for
+ * @returns Index of the first matching item, or `-1` if no match is found
  */
 export function indexOf<Item>(array: Item[], value: Item): number;
 
 /**
- * Get the index for the first item matching `value` _(or `-1` if no match is found)_
+ * Get the index for the first item matching the filter
+ * @param array Array to search in
+ * @param filter Function to match items
+ * @returns Index of the first matching item, or `-1` if no match is found
  */
 export function indexOf<Item>(
 	array: Item[],
-	matches: (item: Item, index: number, array: Item[]) => boolean,
+	filter: (item: Item, index: number, array: Item[]) => boolean,
 ): number;
 
 /**
- * - Get the index for the first matching item _(or `-1` if no match is found)_
- * - Use `key` to find a comparison value to match with `value`
+ * Get the index for the first matching item by key
+ * @param array Array to search in
+ * @param key Key to match items by
+ * @param value Value to search for
+ * @returns Index of the first matching item, or `-1` if no match is found
  */
 export function indexOf<Item extends PlainObject, ItemKey extends keyof Item>(
 	array: Item[],
@@ -25,13 +34,16 @@ export function indexOf<Item extends PlainObject, ItemKey extends keyof Item>(
 ): number;
 
 /**
- * - Get the index for the first matching item _(or `-1` if no match is found)_
- * - Use `key` to find a comparison value to match with `value`
+ * Get the index for the first matching item by callback
+ * @param array Array to search in
+ * @param callback Function to get a value from each item
+ * @param value Value to search for
+ * @returns Index of the first matching item, or `-1` if no match is found
  */
 export function indexOf<
 	Item,
-	ItemKey extends (item: Item, index: number, array: Item[]) => Key,
->(array: Item[], key: ItemKey, value: ReturnType<ItemKey>): number;
+	Callback extends (item: Item, index: number, array: Item[]) => unknown,
+>(array: Item[], callback: Callback, value: ReturnType<Callback>): number;
 
 export function indexOf(array: unknown[], ...parameters: unknown[]): number {
 	return findValue('index', array, parameters) as number;

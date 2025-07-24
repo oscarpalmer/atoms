@@ -5,14 +5,37 @@ import type {ArrayOrPlainObject, PlainObject} from '../models';
 
 export type DiffType = 'full' | 'none' | 'partial';
 
+/**
+ * The result of a comparison beteen two values
+ */
 export type DiffResult<First, Second = First> = {
+	/**
+	 * The original values that were compared
+	 */
 	original: DiffValue<First, Second>;
+	/**
+	 * The type of difference between the two values
+	 */
 	type: DiffType;
+	/**
+	 * - The differences between the two values
+	 * - Keys are in dot notation
+	 * - Values are objects with `from` and `to` properties
+	 */
 	values: Record<string, DiffValue>;
 };
 
+/**
+ * The difference between two values
+ */
 export type DiffValue<First = unknown, Second = First> = {
+	/**
+	 * The value from the first value
+	 */
 	from: First;
+	/**
+	 * The value from the second value
+	 */
 	to: Second;
 };
 
@@ -21,14 +44,10 @@ type KeyedDiffValue = {
 } & DiffValue;
 
 /**
- * - Find the differences between two values
- * - Returns an object holding the result:
- * 	- `original` holds the original values
- * 	- `type` is the type of difference:
- * 		- `full` if the values are completely different
- * 		- `none` if the values are the same
- * 		- `partial` if the values are partially different
- * 	- `values` holds the differences with dot notation keys
+ * Find the differences between two values
+ * @param first First value to compare
+ * @param second Second value to compare
+ * @returns The differences between the two values
  */
 export function diff<First, Second = First>(
 	first: First,

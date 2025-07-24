@@ -2,7 +2,9 @@ import {defaultHex, prefixPattern} from './constants';
 import {isHexColor} from './is';
 
 /**
- * Try to get the normalized hex-color from a value _(defaults to `#000000`)_
+ * Try to get the normalized hex-color from a value
+ * @param value The value to normalize
+ * @returns The normalized hex-color string, or `#000000` if the value is unable to be parsed
  */
 export function getNormalizedHex(value: unknown): string {
 	if (!isHexColor(value)) {

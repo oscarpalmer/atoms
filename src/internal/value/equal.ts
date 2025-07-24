@@ -3,6 +3,10 @@ import {isPlainObject, isTypedArray} from '../is';
 
 /**
  * Are two strings equal? _(Case-sensitive by default)_
+ * @param first First string to compare
+ * @param second Second string to compare
+ * @param ignoreCase If `true`, the comparison is case-insensitive
+ * @returns `true` if the strings are equal, `false` otherwise
  */
 export function equal(
 	first: string,
@@ -12,6 +16,9 @@ export function equal(
 
 /**
  * Are two values equal? _(Does a deep comparison, if needed)_
+ * @param first First value to compare
+ * @param second Second value to compare
+ * @returns `true` if the values are equal, `false` otherwise
  */
 export function equal(first: unknown, second: unknown): boolean;
 

@@ -2,18 +2,25 @@ import {isArrayOrPlainObject} from '../internal/is';
 import {join} from '../internal/string';
 import type {ArrayOrPlainObject, NestedPartial, PlainObject} from '../models';
 
+/**
+ * Options for merging values
+ */
 export type MergeOptions = {
-	/**
-	 * - Key _(or key epxressions)_ for values that should be replaced
-	 * - E.g. `merge([{items: [1, 2, 3]}, {items: [99]}])` => `{items: [99]}`
-	 */
-	replaceableObjects: string | RegExp | Array<string | RegExp>;
-	/**
-	 * - Skip nullable values when merging arrays?
-	 * - E.g. `merge([1, 2, 3], [null, null, 99])` => `[1, 2, 99]`
-	 */
-	skipNullableInArrays: boolean;
-};
+		/**
+		 * Key _(or key epxressions)_ for values that should be replaced
+		 * ```ts
+		 * merge([{items: [1, 2, 3]}, {items: [99]}]); // {items: [99]}
+		 * ```
+		 */
+		replaceableObjects: string | RegExp | Array<string | RegExp>;
+		/**
+		 * Skip nullable values when merging arrays?
+		 * ```ts
+		 * merge([1, 2, 3], [null, null, 99]); // [1, 2, 99]
+		 * ```
+		 */
+		skipNullableInArrays: boolean;
+	};
 
 type MergeValuesOptions = {
 	replaceableObjects: ReplaceableObjectsCallback | undefined;
@@ -39,6 +46,9 @@ function getReplaceableObjects(
 
 /**
  * Merge multiple arrays or objects into a single one
+ * @param values Values to merge
+ * @param options Options for merging
+ * @returns Merged value
  */
 export function merge<Model extends ArrayOrPlainObject>(
 	values: Array<NestedPartial<Model>>,

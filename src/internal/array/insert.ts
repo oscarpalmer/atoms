@@ -33,6 +33,8 @@ export function insertValues<Item>(
 
 		if (returned == null) {
 			returned = result;
+		} else {
+			returned.push(...result);
 		}
 	}
 

@@ -1,22 +1,31 @@
 import {findValue} from '../internal/array/find';
-import type {Key, PlainObject} from '../models';
+import type {PlainObject} from '../models';
 
 /**
- * Get the first item matching `value` _(or `undefined` if no match is found)_
+ * Get the first item matching the given value
+ * @param array Array to search in
+ * @param value Value to search for
+ * @returns First item that matches the value, or `undefined` if no match is found
  */
 export function find<Item>(array: Item[], value: Item): Item | undefined;
 
 /**
- * Get the first item matching `value` _(or `undefined` if no match is found)_
+ * Get the first item matching the filter
+ * @param array Array to search in
+ * @param filter Function to match items in the array
+ * @returns First item that matches the filter, or `undefined` if no match is found
  */
 export function find<Item>(
 	array: Item[],
-	matches: (item: Item, index: number, array: Item[]) => boolean,
+	filter: (item: Item, index: number, array: Item[]) => boolean,
 ): Item | undefined;
 
 /**
- * - Get the first matching item _(or `undefined` if no match is found)_
- * - Use `key` to find a comparison value to match with `value`
+ * Get the first item matching the given value by key
+ * @param array Array to search in
+ * @param key Key to match items by
+ * @param value Value to search for
+ * @returns First item that matches the value, or `undefined` if no match is found
  */
 export function find<Item extends PlainObject, ItemKey extends keyof Item>(
 	array: Item[],
@@ -25,13 +34,20 @@ export function find<Item extends PlainObject, ItemKey extends keyof Item>(
 ): Item | undefined;
 
 /**
- * - Get the first matching item _(or `undefined` if no match is found)_
- * - Use `key` to find a comparison value to match with `value`
+ * Get the first items matching the given value
+ * @param array Array to search in
+ * @param callback Function to get a value from each item
+ * @param value Value to search for
+ * @returns First item that matches the value, or `undefined` if no match is found
  */
 export function find<
 	Item,
-	ItemKey extends (item: Item, index: number, array: Item[]) => Key,
->(array: Item[], key: ItemKey, value: ReturnType<ItemKey>): Item | undefined;
+	Callback extends (item: Item, index: number, array: Item[]) => unknown,
+>(
+	array: Item[],
+	callback: Callback,
+	value: ReturnType<Callback>,
+): Item | undefined;
 
 export function find<Item>(
 	array: unknown[],

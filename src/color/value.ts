@@ -19,6 +19,8 @@ function getHexyValue(
 
 /**
  * Convert a hex-color to an RGB-color
+ * @param value The hex-color to convert
+ * @returns RGBColor object
  */
 export function hexToRgb(value: string): RGBColor {
 	const hex = anyPattern.test(value) ? getNormalizedHex(value) : '';
@@ -41,6 +43,8 @@ export function hexToRgb(value: string): RGBColor {
 /**
  * - Convert an HSL-color to an RGB-color
  * - Thanks, https://github.com/color-js/color.js/blob/main/src/spaces/hsl.js#L61
+ * @param value The HSL-color to convert
+ * @returns RGBColor object
  */
 export function hslToRgb(value: HSLColor): RGBColor {
 	let hue = value.hue % 360;
@@ -69,6 +73,8 @@ export function hslToRgb(value: HSLColor): RGBColor {
 
 /**
  * Convert an RGB-color to a hex-color
+ * @param value The RGB-color to convert
+ * @returns Hex-color string
  */
 export function rgbToHex(value: RGBColor): string {
 	return `${[value.red, value.green, value.blue]
@@ -83,6 +89,8 @@ export function rgbToHex(value: RGBColor): string {
 /**
  * - Convert an RGB-color to an HSL-color
  * - Thanks, https://github.com/color-js/color.js/blob/main/src/spaces/hsl.js#L26
+ * @param rgb The RGB-color to convert
+ * @returns HSLColor object
  */
 export function rgbToHsl(rgb: RGBColor): HSLColor {
 	const blue = rgb.blue / 255;

@@ -1,5 +1,8 @@
 /**
- * Chunk an array _(into smaller arrays)_, with an optional size _(default and maximum is 5000)_.
+ * Chunk an array into smaller arrays
+ * @param array Array to chunk
+ * @param size Size of each chunk _(defaults to 5000)_
+ * @returns Array of arrays
  */
 export function chunk<Item>(array: Item[], size?: number): Item[][] {
 	if (!Array.isArray(array)) {

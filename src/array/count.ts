@@ -1,21 +1,31 @@
 import {findValues} from '../internal/array/find';
-import type {Key, PlainObject} from '../models';
+import type {PlainObject} from '../models';
 
 /**
- * Get the number of items _(count)_ that match the given value
+ * Get the number of items that match the given value
+ * @param array Array to count items in
+ * @param value Value to count in the array
+ * @returns Matching count
  */
 export function count<Item>(array: Item[], value: Item): number;
 
 /**
- * Get the number of items _(count)_ that match the given value
+ * Get the number of items that match the filter
+ * @param array Array to count items in
+ * @param filter Function to match items
+ * @returns Matching count
  */
 export function count<Item>(
 	array: Item[],
-	matches: (item: Item, index: number, array: Item[]) => boolean,
+	filter: (item: Item, index: number, array: Item[]) => boolean,
 ): number;
 
 /**
- * Get the number of items _(count)_ that match the given value
+ * Get the number of items that match the given value by key
+ * @param array Array to count items in
+ * @param key Key to match items by
+ * @param value Value to count in the array
+ * @returns Matching count
  */
 export function count<Item extends PlainObject, ItemKey extends keyof Item>(
 	array: Item[],
@@ -24,12 +34,16 @@ export function count<Item extends PlainObject, ItemKey extends keyof Item>(
 ): number;
 
 /**
- * Get the number of items _(count)_ that match the given value
+ * Get the number of items that match the given value
+ * @param array Array to count items in
+ * @param callback Function to get a value from each item
+ * @param value Value to count in the array
+ * @returns Matching count
  */
 export function count<
 	Item,
-	ItemKey extends (item: Item, index: number, array: Item[]) => Key,
->(array: Item[], key: ItemKey, value: ReturnType<ItemKey>): number;
+	Callback extends (item: Item, index: number, array: Item[]) => unknown,
+>(array: Item[], callback: Callback, value: ReturnType<Callback>): number;
 
 export function count(array: unknown[], ...parameters: unknown[]): number {
 	if (

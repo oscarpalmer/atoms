@@ -3,7 +3,9 @@ import {getString} from './internal/string';
 import type {ArrayOrPlainObject, Primitive} from './models';
 
 /**
- * Is the array or object completely empty or only containing `null` or `undefined` values?
+ * Is the array or object completely empty, or only containing `null` or `undefined` values?
+ * @param value Array or object to check
+ * @returns `true` if the value is considered empty, `false` otherwise
  */
 export function isEmpty(value: ArrayOrPlainObject): boolean {
 	const values = Object.values(value);
@@ -19,14 +21,18 @@ export function isEmpty(value: ArrayOrPlainObject): boolean {
 }
 
 /**
- * Is the value undefined or null?
+ * Is the value `undefined` or `null`?
+ * @param value Value to check
+ * @returns `true` if the value is `undefined` or `null`, `false` otherwise
  */
 export function isNullable(value: unknown): value is undefined | null {
 	return value == null;
 }
 
 /**
- * Is the value undefined, null, or an empty string?
+ * Is the value `undefined`, `null`, or an empty _(no whitespace)_ string?
+ * @param value Value to check
+ * @returns `true` if the value is nullable or an empty string, `false` otherwise
  */
 export function isNullableOrEmpty(
 	value: unknown,
@@ -35,7 +41,9 @@ export function isNullableOrEmpty(
 }
 
 /**
- * Is the value undefined, null, or a whitespace-only string?
+ * Is the value `undefined`, `null`, or a whitespace-only string?
+ * @param value Value to check
+ * @returns `true` if the value is nullable or a whitespace-only string, `false` otherwise
  */
 export function isNullableOrWhitespace(
 	value: unknown,
@@ -44,7 +52,9 @@ export function isNullableOrWhitespace(
 }
 
 /**
- * Is the value a number, or a number-like string?
+ * Is the value a number or a number-like string?
+ * @param value Value to check
+ * @returns `true` if the value is a number or a parseable string, `false` otherwise
  */
 export function isNumerical(value: unknown): value is number | `${number}` {
 	return (
@@ -56,7 +66,9 @@ export function isNumerical(value: unknown): value is number | `${number}` {
 }
 
 /**
- * Is the value an object?
+ * Is the value an object _(or function)_?
+ * @param value Value to check
+ * @returns `true` if the value matches, `false` otherwise
  */
 export function isObject(value: unknown): value is object {
 	return (
@@ -65,7 +77,9 @@ export function isObject(value: unknown): value is object {
 }
 
 /**
- * Is the value a primitive value?
+ * - Is the value a primitive value?
+ * @param value Value to check
+ * @returns `true` if the value matches, `false` otherwise
  */
 export function isPrimitive(value: unknown): value is Primitive {
 	return value == null || primitiveExpression.test(typeof value);

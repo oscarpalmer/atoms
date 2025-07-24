@@ -1,33 +1,33 @@
 import {noop} from './internal/function';
 
 class Emitter<Value> {
-	private declare readonly state: EmitterState<Value>;
+	#state: EmitterState<Value>;
 
 	/**
 	 * Is the emitter active?
 	 */
 	get active() {
-		return this.state.active;
+		return this.#state.active;
 	}
 
 	/**
 	 * The observable that can be subscribed to
 	 */
 	get observable(): Observable<Value> {
-		return this.state.observable;
+		return this.#state.observable;
 	}
 
 	/**
 	 * The current value
 	 */
 	get value() {
-		return this.state.value;
+		return this.#state.value;
 	}
 
 	constructor(value: Value) {
 		const observers = new Map<Subscription<Value>, Observer<Value>>();
 
-		this.state = {
+		this.#state = {
 			observers,
 			value,
 			active: true,
@@ -39,46 +39,52 @@ class Emitter<Value> {
 	 * Destroy the emitter
 	 */
 	destroy(): void {
-		finishEmitter(this.state, false);
+		finishEmitter(this.#state, false);
 	}
 
 	/**
-	 * Emit a new value _(and optionally finishes the emitter)_
+	 * Emit a new value
+	 * @param value Value to set and emit
+	 * @param finish Finish the emitter after emitting? _(defaults to `false`)_
 	 */
 	emit(value: Value, finish?: boolean): void {
-		if (this.state.active) {
-			this.state.value = value;
-
-			for (const [, observer] of this.state.observers) {
-				observer.next?.(value);
-			}
-
-			if (finish === true) {
-				finishEmitter(this.state, true);
-			}
-		}
+		this.#on('next', finish ?? false, value);
 	}
 
 	/**
-	 * Emit an error _(and optionally finishes the emitter)_
+	 * Emit an error
+	 * @param error Error to emit
+	 * @param finish Finish the emitter after emitting? _(defaults to `false`)_
 	 */
 	error(error: Error, finish?: boolean): void {
-		if (this.state.active) {
-			for (const [, observer] of this.state.observers) {
-				observer.error?.(error);
-			}
-
-			if (finish === true) {
-				finishEmitter(this.state, true);
-			}
-		}
+		this.#on('error', finish ?? false, error);
 	}
 
 	/**
 	 * Finish the emitter
 	 */
 	finish(): void {
-		finishEmitter(this.state, true);
+		finishEmitter(this.#state, true);
+	}
+
+	#on(
+		type: keyof Observer<never>,
+		finish: boolean,
+		value: Error | Value,
+	): void {
+		if (this.#state.active) {
+			if (type === 'next') {
+				this.#state.value = value as Value;
+			}
+
+			for (const [, observer] of this.#state.observers) {
+				observer[type]?.(value as never);
+			}
+
+			if (finish === true) {
+				finishEmitter(this.#state, true);
+			}
+		}
 	}
 }
 
@@ -90,13 +96,13 @@ type EmitterState<Value> = {
 };
 
 class Observable<Value> {
-	private declare readonly state: ObservableState<Value>;
+	#state: ObservableState<Value>;
 
 	constructor(
 		emitter: Emitter<Value>,
 		observers: Map<Subscription<Value>, Observer<Value>>,
 	) {
-		this.state = {
+		this.#state = {
 			emitter,
 			observers,
 			closed: false,
@@ -107,16 +113,22 @@ class Observable<Value> {
 	 * Destroy the observable
 	 */
 	destroy(): void {
-		this.state.closed = true;
+		this.#state.closed = true;
 	}
 
 	/**
 	 * Subscribe to value changes
+	 * @param observer Observer for changes
+	 * @returns Subscription to the observable
 	 */
 	subscribe(observer: Observer<Value>): Subscription<Value>;
 
 	/**
 	 * Subscribe to value changes
+	 * @param onNext Callback for when the observable receives a new value
+	 * @param onError Callback for when the observable receives an error
+	 * @param onComplete Callback for when the observable is completed
+	 * @returns Subscription to the observable
 	 */
 	subscribe(
 		onNext: (value: Value) => void,
@@ -129,16 +141,16 @@ class Observable<Value> {
 		second?: (error: Error) => void,
 		third?: () => void,
 	): Subscription<Value> {
-		if (this.state.closed) {
+		if (this.#state.closed) {
 			throw new Error('Cannot subscribe to a destroyed observable');
 		}
 
 		const observer = getObserver(first, second, third);
-		const instance = new Subscription(this.state);
+		const instance = new Subscription(this.#state);
 
-		this.state.observers.set(instance, observer);
+		this.#state.observers.set(instance, observer);
 
-		observer.next?.(this.state.emitter.value);
+		observer.next?.(this.#state.emitter.value);
 
 		return instance;
 	}
@@ -152,24 +164,24 @@ type ObservableState<Value> = {
 
 type Observer<Value> = {
 	/**
-	 * Callback for when the observable is complete
+	 * Callback for when the observable is completed
 	 */
 	complete?: () => void;
 	/**
-	 * Callback for when the observable has an error
+	 * Callback for when the observable receives an error
 	 */
 	error?: (error: Error) => void;
 	/**
-	 * Callback for when the observable has a new value
+	 * Callback for when the observable receives a new value
 	 */
 	next?: (value: Value) => void;
 };
 
 class Subscription<Value> {
-	private declare readonly state: SubscriptionState<Value>;
+	#state: SubscriptionState<Value>;
 
 	constructor(state: ObservableState<Value>) {
-		this.state = {
+		this.#state = {
 			...state,
 			closed: false,
 		};
@@ -179,14 +191,14 @@ class Subscription<Value> {
 	 * Is the subscription closed?
 	 */
 	get closed() {
-		return this.state.closed || !this.state.emitter.active;
+		return this.#state.closed || !this.#state.emitter.active;
 	}
 
 	/**
 	 * Destroy the subscription
 	 */
 	destroy(): void {
-		if (!this.state.closed) {
+		if (!this.#state.closed) {
 			this.unsubscribe();
 		}
 	}
@@ -195,10 +207,10 @@ class Subscription<Value> {
 	 * Unsubscribe from its observable
 	 */
 	unsubscribe(): void {
-		if (!this.state.closed) {
-			this.state.closed = true;
+		if (!this.#state.closed) {
+			this.#state.closed = true;
 
-			this.state.observers.delete(this);
+			this.#state.observers.delete(this);
 		}
 	}
 }
@@ -211,6 +223,8 @@ type SubscriptionState<Value> = {
 
 /**
  * Create a new emitter
+ * @param value Initial value
+ * @returns Emitter instance
  */
 export function emitter<Value>(value: Value): Emitter<Value> {
 	return new Emitter(value);

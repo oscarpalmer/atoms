@@ -2,6 +2,10 @@ import {isNumber} from './is';
 
 /**
  * Is the number between a minimum and maximum value?
+ * @param value Value to check
+ * @param minimum Minimum value
+ * @param maximum Maximum value
+ * @returns `true` if the value is between the minimum and maximum, `false` otherwise
  */
 export function between(
 	value: number,
@@ -23,9 +27,12 @@ export function between(
 }
 
 /**
- * - Clamp a number between a minimum and maximum value
- * - If `loop` is `true`, when the value is less than the minimum, it will be clamped as the maximum, and vice versa
- * - Returns `NaN` if the value is unable to be clamped
+ * Clamp a number between a minimum and maximum value
+ * @param value Value to clamp
+ * @param min Minimum value
+ * @param max Maximum value
+ * @param loop If `true`, the value will loop around when smaller than the minimum or larger than the maximum _(defaults to `false`)_
+ * @returns Clamped value between the minimum and maximum
  */
 export function clamp(
 	value: number,
@@ -45,9 +52,9 @@ export function clamp(
 }
 
 /**
- * - Get the number value from an unknown value
- * - Returns `NaN` if the value is `undefined`, `null`, or cannot be parsed
- * - Based on Lodash :-)
+ * Get the number value from an unknown value _(based on Lodash)_
+ * @param value Value to get the number from
+ * @returns The number value of the value, or `NaN` if the value is unable to be parsed
  */
 export function getNumber(value: unknown): number {
 	if (typeof value === 'number') {

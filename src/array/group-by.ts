@@ -4,6 +4,9 @@ import type {Key, KeyedValue, PlainObject} from '../models';
 
 /**
  * Create a record from an array of items using a specific key
+ * @param array Array to group
+ * @param key Key to use for grouping
+ * @returns Record grouped by keyed values, holding the latest matching item
  */
 export function groupBy<Item extends PlainObject, ItemKey extends keyof Item>(
 	array: Item[],
@@ -12,6 +15,10 @@ export function groupBy<Item extends PlainObject, ItemKey extends keyof Item>(
 
 /**
  * Create a record from an array of items using a specific key, and grouping them into arrays
+ * @param array Array to group
+ * @param key Key to use for grouping
+ * @param arrays Group the values into arrays
+ * @returns Record grouped by keyed values, holding arrays of items
  */
 export function groupBy<Item extends PlainObject, ItemKey extends keyof Item>(
 	array: Item[],
@@ -21,26 +28,37 @@ export function groupBy<Item extends PlainObject, ItemKey extends keyof Item>(
 
 /**
  * Create a record from an array of items using a specific key
+ * @param array Array to group
+ * @param callback Function to get a grouping value from each item
+ * @returns Record grouped by keyed values, holding the latest matching item
  */
 export function groupBy<
-	Item,
-	ItemKey extends (item: Item, index: number, array: Item[]) => Key,
->(array: Item[], key: ItemKey): Record<ReturnType<ItemKey>, Item>;
+		Item,
+		Callback extends (item: Item, index: number, array: Item[]) => Key,
+	>(array: Item[], callback: Callback): Record<ReturnType<Callback>, Item>;
 
 /**
  * Create a record from an array of items using a specific key, and grouping them into arrays
+ * @param array Array to group
+ * @param callback Function to get a grouping value from each item
+ * @param arrays Group the values into arrays
+ * @returns Record grouped by keyed values, holding arrays of items
  */
 export function groupBy<
-	Item,
-	ItemKey extends (item: Item, index: number, array: Item[]) => Key,
->(
-	array: Item[],
-	key: ItemKey,
-	arrays: true,
-): Record<ReturnType<ItemKey>, Item[]>;
+		Item,
+		Callback extends (item: Item, index: number, array: Item[]) => Key,
+	>(
+		array: Item[],
+		callback: Callback,
+		arrays: true,
+	): Record<ReturnType<Callback>, Item[]>;
 
 /**
  * Create a record from an array of items using a specific key and value
+ * @param array Array to group
+ * @param key Key to use for grouping
+ * @param value Key to use for value
+ * @returns Record grouped by keyed values, holding the latest matching item's value
  */
 export function groupBy<
 	Item extends PlainObject,
@@ -54,6 +72,11 @@ export function groupBy<
 
 /**
  * Create a record from an array of items using a specific key and value, and grouping them into arrays
+ * @param array Array to group
+ * @param key Key to use for grouping
+ * @param value Key to use for value
+ * @param arrays Group the values into arrays
+ * @returns Record grouped by keyed values, holding arrays of values
  */
 export function groupBy<
 	Item extends PlainObject,
@@ -68,84 +91,113 @@ export function groupBy<
 
 /**
  * Create a record from an array of items using a specific key and value
+ * @param array Array to group
+ * @param key Key to use for grouping
+ * @param value Function to get a value from each item
+ * @returns Record grouped by keyed values, holding the latest matching item's value
+ */
+export function groupBy<
+		Item extends PlainObject,
+		ItemKey extends keyof Item,
+		ValueCallback extends (item: Item, index: number, array: Item[]) => unknown,
+	>(
+		array: Item[],
+		key: ItemKey,
+		value: ValueCallback,
+	): Simplify<Record<KeyedValue<Item, ItemKey>, ReturnType<ValueCallback>>>;
+
+/**
+ * Create a record from an array of items using a specific key and value, and grouping them into arrays
+ * @param array Array to group
+ * @param key Key to use for grouping
+ * @param value Function to get a value from each item
+ * @param arrays Group the values into arrays
+ * @returns Record grouped by keyed values, holding arrays of values
  */
 export function groupBy<
 	Item extends PlainObject,
 	ItemKey extends keyof Item,
-	ItemValue extends (item: Item, index: number, array: Item[]) => unknown,
+	ValueCallback extends (item: Item, index: number, array: Item[]) => unknown,
 >(
 	array: Item[],
 	key: ItemKey,
-	value: ItemValue,
-): Simplify<Record<KeyedValue<Item, ItemKey>, ReturnType<ItemValue>>>;
-
-/**
- * Create a record from an array of items using a specific key and value, and grouping them into arrays
- */
-export function groupBy<
-	Item extends PlainObject,
-	ItemKey extends keyof Item,
-	ItemValue extends (item: Item, index: number, array: Item[]) => unknown,
->(
-	array: Item[],
-	key: ItemKey,
-	value: ItemValue,
+	value: ValueCallback,
 	arrays: true,
-): Simplify<Record<KeyedValue<Item, ItemKey>, Array<ReturnType<ItemValue>>>>;
+): Simplify<
+	Record<KeyedValue<Item, ItemKey>, Array<ReturnType<ValueCallback>>>
+>;
 
 /**
  * Create a record from an array of items using a specific key and value
+ * @param array Array to group
+ * @param key Function to get a grouping value from each item
+ * @param value Key to use for value
+ * @returns Record grouped by keyed values, holding the latest matching item's value
  */
 export function groupBy<
-	Item extends PlainObject,
-	ItemKey extends (item: Item, index: number, array: Item[]) => Key,
-	ItemValue extends keyof Item,
->(
-	array: Item[],
-	key: ItemKey,
-	value: ItemValue,
-): Record<ReturnType<ItemKey>, Item[ItemValue]>;
+		Item extends PlainObject,
+		KeyCallback extends (item: Item, index: number, array: Item[]) => Key,
+		ItemValue extends keyof Item,
+	>(
+		array: Item[],
+		key: KeyCallback,
+		value: ItemValue,
+	): Record<ReturnType<KeyCallback>, Item[ItemValue]>;
 
 /**
  * Create a record from an array of items using a specific key and value, and grouping them into arrays
+ * @param array Array to group
+ * @param key Function to get a grouping value from each item
+ * @param value Key to use for value
+ * @param arrays Group the values into arrays
+ * @returns Record grouped by keyed values, holding arrays of values
  */
 export function groupBy<
-	Item extends PlainObject,
-	ItemKey extends (item: Item, index: number, array: Item[]) => Key,
-	ItemValue extends keyof Item,
->(
-	array: Item[],
-	key: ItemKey,
-	value: ItemValue,
-	arrays: true,
-): Record<ReturnType<ItemKey>, Array<Item[ItemValue]>>;
+		Item extends PlainObject,
+		KeyCallback extends (item: Item, index: number, array: Item[]) => Key,
+		ItemValue extends keyof Item,
+	>(
+		array: Item[],
+		key: KeyCallback,
+		value: ItemValue,
+		arrays: true,
+	): Record<ReturnType<KeyCallback>, Array<Item[ItemValue]>>;
 
 /**
  * Create a record from an array of items using a specific key and value
+ * @param array Array to group
+ * @param key Function to get a grouping value from each item
+ * @param value Function to get a value from each item
+ * @returns Record grouped by keyed values, holding the latest matching item's value
  */
 export function groupBy<
-	Item,
-	ItemKey extends (item: Item, index: number, array: Item[]) => Key,
-	ItemValue extends (item: Item, index: number, array: Item[]) => unknown,
->(
-	array: Item[],
-	key: ItemKey,
-	value: ItemValue,
-): Simplify<Record<ReturnType<ItemKey>, ReturnType<ItemValue>>>;
+		Item,
+		KeyCallback extends (item: Item, index: number, array: Item[]) => Key,
+		ValueCallback extends (item: Item, index: number, array: Item[]) => unknown,
+	>(
+		array: Item[],
+		key: KeyCallback,
+		value: ValueCallback,
+	): Simplify<Record<ReturnType<KeyCallback>, ReturnType<ValueCallback>>>;
 
 /**
  * Create a record from an array of items using a specific key and value, and grouping them into arrays
+ * @param array Array to group
+ * @param key Function to get a grouping value from each item
+ * @param value Function to get a value from each item
+ * @param arrays Group the values into arrays
+ * @returns Record grouped by keyed values, holding arrays of values
  */
 export function groupBy<
-	Item,
-	ItemKey extends (item: Item, index: number, array: Item[]) => Key,
-	ItemValue extends (item: Item, index: number, array: Item[]) => unknown,
->(
-	array: Item[],
-	key: ItemKey,
-	value: ItemValue,
-	arrays: true,
-): Record<ReturnType<ItemKey>, Array<ReturnType<ItemValue>>>;
+		Item,
+		KeyCallback extends (item: Item, index: number, array: Item[]) => Key,
+		ValueCallback extends (item: Item, index: number, array: Item[]) => unknown,
+	>(
+		array: Item[],
+		key: KeyCallback,
+		value: ValueCallback,
+		arrays: true,
+	): Record<ReturnType<KeyCallback>, Array<ReturnType<ValueCallback>>>;
 
 export function groupBy(
 	array: unknown[],

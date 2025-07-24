@@ -5,6 +5,7 @@ const characters = 'abcdefghijklmnopqrstuvwxyz';
 
 /**
  * Get a random boolean
+ * @return Random boolean value
  */
 export function getRandomBoolean(): boolean {
 	return Math.random() > 0.5;
@@ -12,7 +13,9 @@ export function getRandomBoolean(): boolean {
 
 /**
  * Get a random string of characters with a specified length
- * - `selection` defaults to all lowercase letters in the English alphabet
+ * @param length Length of the string to return
+ * @param selection String of characters to select from _(defaults to lowercase English alphabet)_
+ * @returns Random string of characters
  */
 export function getRandomCharacters(
 	length: number,
@@ -38,6 +41,7 @@ export function getRandomCharacters(
 
 /**
  * Get a random hexadecimal color
+ * @returns Random hexadecimal color string in the format `#RRGGBB`
  */
 export function getRandomColor(): string {
 	return `#${Array.from({length: 6}, getRandomHex).join('')}`;
@@ -45,6 +49,7 @@ export function getRandomColor(): string {
 
 /**
  * Get a random hexadecimal character
+ * @returns Random hexadecimal character from `0-9` and `A-F`
  */
 export function getRandomHex(): string {
 	return '0123456789ABCDEF'[getRandomInteger(0, 16)];
@@ -52,6 +57,8 @@ export function getRandomHex(): string {
 
 /**
  * Get a random item from an array
+ * @param array Array to get a random item from
+ * @returns Random item from the array, or `undefined` if the array is empty
  */
 export function getRandomItem<Value>(array: Value[]): Value | undefined {
 	return array.length === 0
@@ -62,14 +69,25 @@ export function getRandomItem<Value>(array: Value[]): Value | undefined {
 }
 
 /**
- * - Get an amount of random items from an array
- * - If `amount` is not specified, a shuffled array will be returned instead
+ * Get an shuffled array
+ * @param array Array to get random items from
+ * @returns A shuffled version of the original array
  */
+export function getRandomItems<Value>(array: Value[]): Value[];
+
+/**
+ * Get an amount of random items from an array
+ * @param array Array to get random items from
+ * @param amount Amount of items to return
+ * @returns Array of random items from the original array
+ */
+export function getRandomItems<Value>(array: Value[], amount: number): Value[];
+
 export function getRandomItems<Value>(
 	array: Value[],
 	amount?: number,
 ): Value[] {
-	if (array.length === 0 || amount === 0) {
+	if (!Array.isArray(array) || array.length === 0 || amount === 0) {
 		return [];
 	}
 
