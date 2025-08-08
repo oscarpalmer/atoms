@@ -25,7 +25,7 @@ export function getRandomFloat(minimum?: number, maximum?: number): number {
 		[min, max] = [max, min];
 	}
 
-	return Math.random() * (max - min) + min;
+	return Math.random() * (max + 1 - min) + min;
 }
 
 /**

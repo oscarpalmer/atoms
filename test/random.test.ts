@@ -39,7 +39,7 @@ async function getRandomNumber(
 		const value = callback(min, max);
 
 		if (
-			value > (flipped ? minActual : maxActual) ||
+			(value > (flipped ? minActual : maxActual) + 1) ||
 			value < (flipped ? maxActual : minActual)
 		) {
 			invalid += 1;

@@ -52,7 +52,7 @@ export function getRandomColor(): string {
  * @returns Random hexadecimal character from `0-9` and `A-F`
  */
 export function getRandomHex(): string {
-	return '0123456789ABCDEF'[getRandomInteger(0, 16)];
+	return '0123456789ABCDEF'[getRandomInteger(0, 15)];
 }
 
 /**
