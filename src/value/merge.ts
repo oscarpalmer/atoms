@@ -90,7 +90,7 @@ function mergeValues(
 
 		for (let innerIndex = 0; innerIndex < size; innerIndex += 1) {
 			const key = keys[innerIndex];
-			const full = join([prefix ?? '', key], '.');
+			const full = join([prefix, key], '.');
 
 			const next = item[key];
 			const previous = result[key];

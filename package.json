@@ -8,7 +8,7 @@
 	},
 	"description": "Atomic utilities for making your JavaScript better.",
 	"devDependencies": {
-		"@biomejs/biome": "^2.1",
+		"@biomejs/biome": "^2.2",
 		"@rollup/plugin-node-resolve": "^16",
 		"@rollup/plugin-typescript": "^12.1",
 		"@types/node": "^24.2",
@@ -202,5 +202,5 @@
 	},
 	"type": "module",
 	"types": "./types/index.d.cts",
-	"version": "0.105.1"
+	"version": "0.106.0"
 }

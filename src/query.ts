@@ -60,7 +60,7 @@ function getParts(
 		const key = keys[index];
 		const val = value[key as never];
 
-		const full = join([prefix, fromArray ? null : key], '.');
+		const full = join([prefix, fromArray ? undefined : key], '.');
 
 		if (Array.isArray(val)) {
 			parts.push(...getParts(val, true, full));
@@ -109,9 +109,10 @@ function isDecodable(value: unknown): value is boolean | number | string {
  */
 export function toQuery(parameters: PlainObject): string {
 	return isPlainObject(parameters)
-		? getParts(parameters, false)
-				.filter(part => part.length > 0)
-				.join('&')
+		? join(
+				getParts(parameters, false).filter(part => part.length > 0),
+				'&',
+			)
 		: '';
 }
 

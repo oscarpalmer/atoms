@@ -1,5 +1,6 @@
 import {shuffle} from './internal/array/shuffle';
 import {getRandomInteger} from './internal/random';
+import {join} from './internal/string';
 
 const characters = 'abcdefghijklmnopqrstuvwxyz';
 
@@ -44,7 +45,7 @@ export function getRandomCharacters(
  * @returns Random hexadecimal color string in the format `#RRGGBB`
  */
 export function getRandomColor(): string {
-	return `#${Array.from({length: 6}, getRandomHex).join('')}`;
+	return `#${join(Array.from({length: 6}, getRandomHex))}`;
 }
 
 /**
@@ -105,3 +106,4 @@ export function getRandomItems<Value>(
 }
 
 export {getRandomFloat, getRandomInteger} from './internal/random';
+

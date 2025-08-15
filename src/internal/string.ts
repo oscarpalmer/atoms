@@ -28,15 +28,14 @@ export function ignoreKey(key: string): boolean {
 }
 
 /**
- * Join an array into a string while ignoring empty values
+ * Join an array of values into a string
  * @param value Array of values to join
  * @param delimiter Delimiter to use between values
- * @returns Joined string with non-empty values
+ * @returns Joined string
  */
 export function join(value: unknown[], delimiter?: string): string {
 	return compact(value)
 		.map(getString)
-		.filter(value => value.trim().length > 0)
 		.join(typeof delimiter === 'string' ? delimiter : '');
 }
 

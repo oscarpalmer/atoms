@@ -1,4 +1,5 @@
 import {clamp} from '../internal/number';
+import {join} from '../internal/string';
 import {anyPattern, groupedPattern} from './constants';
 import {getNormalizedHex} from './misc';
 import type {HSLColor, RGBColor} from './models';
@@ -77,13 +78,13 @@ export function hslToRgb(value: HSLColor): RGBColor {
  * @returns Hex-color string
  */
 export function rgbToHex(value: RGBColor): string {
-	return `${[value.red, value.green, value.blue]
-		.map(color => {
+	return `${join(
+		[value.red, value.green, value.blue].map(color => {
 			const hex = color.toString(16);
 
 			return hex.length === 1 ? `0${hex}` : hex;
-		})
-		.join('')}`;
+		}),
+	)}`;
 }
 
 /**

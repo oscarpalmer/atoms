@@ -60,7 +60,7 @@ export function titleCase(value: string): string {
 	return typeof value === 'string'
 		? value.length < 1
 			? capitalize(value)
-			: words(value).map(capitalize).join(' ')
+			: join(words(value).map(capitalize), ' ')
 		: '';
 }
 
