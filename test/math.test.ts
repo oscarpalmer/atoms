@@ -48,8 +48,10 @@ test('round', () => {
 	const expected = [123, 123, 123, 123.5, 123.46, 123.457, 123.4568, 123.45679];
 
 	for (let index = 0; index < decimals.length; index += 1) {
-	expect(round(value, decimals[index] as never)).toBe(expected[index]);
+		expect(round(value, decimals[index] as never)).toBe(expected[index]);
 	}
+
+	expect(round('abc' as never)).toBeNaN();
 });
 
 test('sum', () => {

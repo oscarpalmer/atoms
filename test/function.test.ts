@@ -77,6 +77,13 @@ test('memoize', () => {
 
 	expect(memoized.has(2)).toBe(false);
 	expect(memoized.get(2)).toBeUndefined();
+
+	/* try {
+		memoized.run(2);
+	} catch (error) {
+		expect(error).toBeInstanceOf(Error);
+		expect(error.message).toBe('The Memoized instance has been destroyed');
+	} */
 });
 
 test('noop', () => {

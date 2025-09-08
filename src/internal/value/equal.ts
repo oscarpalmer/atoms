@@ -1,11 +1,36 @@
 import type {ArrayOrPlainObject, PlainObject, TypedArray} from '../../models';
+import {chunk} from '../array/chunk';
 import {isPlainObject, isTypedArray} from '../is';
 
+type EqualOptions = {
+	/**
+	 * When `true`, strings are compared case-insensitively
+	 */
+	ignoreCase?: boolean;
+	/**
+	 * Keys _(or key expressions)_ to ignore when comparing objects
+	 */
+	ignoreKeys?: string | RegExp | Array<string | RegExp>;
+};
+
+type Options = {
+	ignoreCase: boolean;
+	ignoreExpressions: OptionsKeys<RegExp[]>;
+	ignoreKeys: OptionsKeys<Set<string>>;
+};
+
+type OptionsKeys<Values> = {
+	enabled: boolean;
+	values: Values;
+};
+
+//
+
 /**
- * Are two strings equal? _(Case-sensitive by default)_
+ * Are two strings equal?
  * @param first First string to compare
  * @param second Second string to compare
- * @param ignoreCase If `true`, the comparison is case-insensitive
+ * @param ignoreCase If `true`, comparison will be case-insensitive
  * @returns `true` if the strings are equal, `false` otherwise
  */
 export function equal(
@@ -15,32 +40,87 @@ export function equal(
 ): boolean;
 
 /**
- * Are two values equal? _(Does a deep comparison, if needed)_
+ * Are two values equal?
  * @param first First value to compare
  * @param second Second value to compare
+ * @param options Comparison options
  * @returns `true` if the values are equal, `false` otherwise
  */
-export function equal(first: unknown, second: unknown): boolean;
-
 export function equal(
 	first: unknown,
 	second: unknown,
-	ignoreCase?: boolean,
+	options?: EqualOptions,
+): boolean;
+
+export function equal(
+		first: unknown,
+		second: unknown,
+		options?: boolean | EqualOptions,
+	): boolean {
+		return equalValue(first, second, getOptions(options));
+	}
+
+function equalArray(
+	first: unknown[],
+	second: unknown[],
+	options: Options,
 ): boolean {
-	return equalValue(first, second, ignoreCase === true);
+	const {length} = first;
+
+	if (length !== second.length) {
+		return false;
+	}
+
+	let offset = 0;
+
+	if (length >= 100) {
+		offset = Math.round(length / 10);
+		offset = offset > 100 ? 100 : offset;
+
+		for (let index = 0; index < offset; index += 1) {
+			if (
+				!equalValue(first[index], second[index], options) ||
+				!equalValue(
+					first[length - index - 1],
+					second[length - index - 1],
+					options,
+				)
+			) {
+				return false;
+			}
+		}
+	}
+
+	const firstChunks = chunk(first.slice(offset, length - offset), 100);
+	const secondChunks = chunk(second.slice(offset, length - offset), 100);
+
+	const chunksLength = firstChunks.length;
+
+	for (let chunkIndex = 0; chunkIndex < chunksLength; chunkIndex += 1) {
+		const firstChunk = firstChunks[chunkIndex];
+		const secondChunk = secondChunks[chunkIndex];
+		const chunkLength = firstChunk.length;
+
+		for (let index = 0; index < chunkLength; index += 1) {
+			if (!equalValue(firstChunk[index], secondChunk[index], options)) {
+				return false;
+			}
+		}
+	}
+
+	return true;
 }
 
 function equalArrayBuffer(
 	first: ArrayBuffer,
 	second: ArrayBuffer,
-	ignoreCase: boolean,
+	options: Options,
 ): boolean {
 	return first.byteLength === second.byteLength
-		? equalObject(
+		? equalArray(
 				new Uint8Array(first) as never,
 				new Uint8Array(second) as never,
-				true,
-				ignoreCase,
+				options,
 			)
 		: false;
 }
@@ -48,13 +128,13 @@ function equalArrayBuffer(
 function equalDataView(
 	first: DataView,
 	second: DataView,
-	ignoreCase: boolean,
+	options: Options,
 ): boolean {
 	return first.byteOffset === second.byteOffset
 		? equalArrayBuffer(
 				first.buffer as ArrayBuffer,
 				second.buffer as ArrayBuffer,
-				ignoreCase,
+				options,
 			)
 		: false;
 }
@@ -62,7 +142,7 @@ function equalDataView(
 function equalMap(
 	first: Map<unknown, unknown>,
 	second: Map<unknown, unknown>,
-	ignoreCase: boolean,
+	options: Options,
 ): boolean {
 	const {size} = first;
 
@@ -80,7 +160,7 @@ function equalMap(
 	for (let index = 0; index < size; index += 1) {
 		const key = firstKeys[index];
 
-		if (!equalValue(first.get(key), second.get(key), ignoreCase)) {
+		if (!equalValue(first.get(key), second.get(key), options)) {
 			return false;
 		}
 	}
@@ -91,50 +171,19 @@ function equalMap(
 function equalObject(
 	first: ArrayOrPlainObject,
 	second: ArrayOrPlainObject,
-	arrays: boolean,
-	ignoreCase: boolean,
+	options: Options,
 ): boolean {
-	let offset = 0;
-
-	if (arrays) {
-		const firstArray = first as unknown[];
-		const secondArray = second as unknown[];
-		const {length} = firstArray;
-
-		if (length !== secondArray.length) {
-			return false;
-		}
-
-		if (length >= 100) {
-			offset = Math.round(length / 10);
-			offset = offset > 25 ? 25 : offset;
-
-			for (let index = 0; index < offset; index += 1) {
-				if (
-					!equalValue(firstArray[index], secondArray[index], ignoreCase) ||
-					!equalValue(
-						firstArray[length - index - 1],
-						secondArray[length - index - 1],
-						ignoreCase,
-					)
-				) {
-					return false;
-				}
-			}
-		}
-	}
-
 	const firstKeys = [
 		...Object.keys(first),
 		...Object.getOwnPropertySymbols(first),
-	];
+	].filter(key => filterKey(key, options));
 
 	const secondKeys = [
 		...Object.keys(second),
 		...Object.getOwnPropertySymbols(second),
-	];
+	].filter(key => filterKey(key, options));
 
-	let {length} = firstKeys;
+	const {length} = firstKeys;
 
 	if (
 		length !== secondKeys.length ||
@@ -143,12 +192,10 @@ function equalObject(
 		return false;
 	}
 
-	length -= offset;
-
-	for (let index = offset; index < length; index += 1) {
+	for (let index = 0; index < length; index += 1) {
 		const key = firstKeys[index];
 
-		if (!equalValue(first[key as never], second[key as never], ignoreCase)) {
+		if (!equalValue(first[key as never], second[key as never], options)) {
 			return false;
 		}
 	}
@@ -160,7 +207,7 @@ function equalProperties(
 	first: object,
 	second: object,
 	properties: string[],
-	ignoreCase: boolean,
+	options: Options,
 ): boolean {
 	const {length} = properties;
 
@@ -171,7 +218,7 @@ function equalProperties(
 			!equalValue(
 				(first as PlainObject)[property],
 				(second as PlainObject)[property],
-				ignoreCase,
+				options,
 			)
 		) {
 			return false;
@@ -184,7 +231,7 @@ function equalProperties(
 function equalSet(
 	first: Set<unknown>,
 	second: Set<unknown>,
-	ignoreCase: boolean,
+	options: Options,
 ): boolean {
 	const {size} = first;
 
@@ -200,7 +247,7 @@ function equalSet(
 
 		if (
 			!secondValues.some(secondValue =>
-				equalValue(firstValue, secondValue, ignoreCase),
+				equalValue(firstValue, secondValue, options),
 			)
 		) {
 			return false;
@@ -233,7 +280,7 @@ function equalTypedArray(first: TypedArray, second: TypedArray): boolean {
 function equalValue(
 	first: unknown,
 	second: unknown,
-	ignoreCase: boolean,
+	options: Options,
 ): boolean {
 	switch (true) {
 		case Object.is(first, second):
@@ -245,7 +292,7 @@ function equalValue(
 		case typeof first !== typeof second:
 			return false;
 
-		case typeof first === 'string' && ignoreCase === true:
+		case typeof first === 'string' && options.ignoreCase === true:
 			return Object.is(
 				first.toLocaleLowerCase(),
 				(second as string).toLocaleLowerCase(),
@@ -257,31 +304,31 @@ function equalValue(
 
 	switch (true) {
 		case first instanceof ArrayBuffer && second instanceof ArrayBuffer:
-			return equalArrayBuffer(first, second, ignoreCase);
+			return equalArrayBuffer(first, second, options);
 
 		case first instanceof Date && second instanceof Date:
 			return Object.is(Number(first), Number(second));
 
 		case first instanceof DataView && second instanceof DataView:
-			return equalDataView(first, second, ignoreCase);
+			return equalDataView(first, second, options);
 
 		case first instanceof Error && second instanceof Error:
-			return equalProperties(first, second, ['name', 'message'], ignoreCase);
+			return equalProperties(first, second, ['name', 'message'], options);
 
 		case first instanceof Map && second instanceof Map:
-			return equalMap(first, second, ignoreCase);
+			return equalMap(first, second, options);
 
 		case first instanceof RegExp && second instanceof RegExp:
-			return equalProperties(first, second, ['source', 'flags'], ignoreCase);
+			return equalProperties(first, second, ['source', 'flags'], options);
 
 		case first instanceof Set && second instanceof Set:
-			return equalSet(first, second, ignoreCase);
+			return equalSet(first, second, options);
 
 		case Array.isArray(first) && Array.isArray(second):
-			return equalObject(first, second, true, ignoreCase);
+			return equalArray(first, second, options);
 
 		case isPlainObject(first) && isPlainObject(second):
-			return equalObject(first, second, false, ignoreCase);
+			return equalObject(first, second, options);
 
 		case isTypedArray(first) && isTypedArray(second):
 			return equalTypedArray(first as TypedArray, second as TypedArray);
@@ -289,4 +336,68 @@ function equalValue(
 		default:
 			return Object.is(first, second);
 	}
+}
+
+function filterKey(key: string | symbol, options: Options): boolean {
+	if (typeof key !== 'string') {
+		return true;
+	}
+
+	if (
+		options.ignoreExpressions.enabled &&
+		options.ignoreExpressions.values.some(expression => expression.test(key))
+	) {
+		return false;
+	}
+
+	if (options.ignoreKeys.enabled && options.ignoreKeys.values.has(key)) {
+		return false;
+	}
+
+	return true;
+}
+
+function getOptions(input?: boolean | EqualOptions): Options {
+	const options: Options = {
+		ignoreCase: false,
+		ignoreExpressions: {
+			enabled: false,
+			values: [],
+		},
+		ignoreKeys: {
+			enabled: false,
+			values: new Set(),
+		},
+	};
+
+	if (typeof input === 'boolean') {
+		options.ignoreCase = input;
+
+		return options;
+	}
+
+	if (!isPlainObject(input)) {
+		return options;
+	}
+
+	options.ignoreCase =
+		typeof input.ignoreCase === 'boolean' ? input.ignoreCase : false;
+
+	options.ignoreExpressions.values = (
+		Array.isArray(input.ignoreKeys) ? input.ignoreKeys : [input.ignoreKeys]
+	).filter(key => key instanceof RegExp);
+
+	options.ignoreKeys.values = new Set(
+		(Array.isArray(input.ignoreKeys)
+			? input.ignoreKeys
+			: [input.ignoreKeys]
+		).filter(key => typeof key === 'string'),
+	);
+
+	options.ignoreExpressions.enabled =
+		options.ignoreExpressions.values.length > 0;
+
+	options.ignoreKeys.enabled = options.ignoreKeys.values.size > 0;
+
+	return options;
 }

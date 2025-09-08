@@ -89,7 +89,7 @@ class Memoized<Callback extends GenericCallback> {
 	 */
 	run(...parameters: Parameters<Callback>): ReturnType<Callback> {
 		if (this.#state.cache == null || this.#state.getter == null) {
-			throw new Error('The memoized instance has been destroyed');
+			throw new Error('The Memoized instance has been destroyed');
 		}
 
 		return this.#state.getter(...parameters);

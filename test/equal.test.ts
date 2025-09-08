@@ -58,14 +58,14 @@ test('array', () => {
 	const first_3 = Array.from({length: 100}, (_, index) => index);
 	const second_3 = Array.from({length: 100}, (_, index) => index);
 
-	second_3[50] = second_3[50] + 1;
+	second_3[50] = 9999;
 
 	expect(equal(first_3, second_3)).toBe(false);
 
-	const first_4 = Array.from({length: 1000}, (_, index) => index);
-	const second_4 = Array.from({length: 1000}, (_, index) => index);
+	const first_4 = Array.from({length: 10_000}, (_, index) => index);
+	const second_4 = Array.from({length: 10_000}, (_, index) => index);
 
-	second_4[999] = second_4[999] + 1;
+	second_4[9999] = second_4[9999] + 1;
 
 	expect(equal(first_4, second_4)).toBe(false);
 });
@@ -147,6 +147,28 @@ test('object', () => {
 	expect(equal({a: 1, b: 2}, {b: 2, a: 1})).toBe(true);
 	expect(equal({a: 1, b: 2}, {a: 1, b: 3})).toBe(false);
 	expect(equal({a: 1, b: 2}, {a: 1})).toBe(false);
+});
+
+test('options', () => {
+	const symbol = Symbol('test');
+
+	const firstObject = {[symbol]: 99, a: 1, b: 2};
+	const secondObject = {[symbol]: 99, a: 1, b: 2, c: 3};
+
+	expect(equal(firstObject, secondObject)).toBe(false);
+
+	expect(equal(firstObject, secondObject, {ignoreKeys: 'c'})).toBe(true);
+	expect(equal(firstObject, secondObject, {ignoreKeys: ['c']})).toBe(true);
+	expect(equal(firstObject, secondObject, {ignoreKeys: /^c/})).toBe(true);
+	expect(equal(firstObject, secondObject, {ignoreKeys: [/^c/]})).toBe(true);
+
+	const firstString = 'alpha';
+	const secondString = 'aLpHa';
+
+	expect(equal(firstString, secondString)).toBe(false);
+	expect(equal(firstString, secondString), {ignoreCase: 123} as never).toBe(false);
+	expect(equal(firstString, secondString, true)).toBe(true);
+	expect(equal(firstString, secondString, {ignoreCase: true})).toBe(true);
 });
 
 test('primitive', () => {
