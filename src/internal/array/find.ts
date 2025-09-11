@@ -75,9 +75,9 @@ export function findValues(
 		return [];
 	}
 
+	const {length} = array;
 	const {bool, key, value} = getParameters(parameters);
 	const callbacks = getCallbacks(bool, key);
-	const {length} = array;
 
 	if (type === 'unique' && callbacks?.keyed == null && length >= 100) {
 		return [...new Set(array)];

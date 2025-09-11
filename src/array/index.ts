@@ -16,4 +16,5 @@ export * from './sort';
 export * from './splice';
 export * from './to-map';
 export * from './to-record';
+export * from './to-set';
 export * from './unique';

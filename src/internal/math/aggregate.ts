@@ -25,9 +25,9 @@ export function aggregate(
 	array: unknown[],
 	key: unknown,
 ): Aggregation {
-	const {length} = array;
+	const length = Array.isArray(array) ? array.length : 0;
 
-	if (!Array.isArray(array) || length === 0) {
+	if (length === 0) {
 		return {
 			count: 0,
 			value: Number.NaN,

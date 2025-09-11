@@ -13,10 +13,10 @@ export function chunk<Item>(array: Item[], size?: number): Item[][] {
 		return [];
 	}
 
+	const {length} = array;
+
 	const actualSize =
 		typeof size === 'number' && size > 0 && size <= 5_000 ? size : 5_000;
-
-	const {length} = array;
 
 	if (length <= actualSize) {
 		return [array];

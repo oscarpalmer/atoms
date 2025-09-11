@@ -20,8 +20,8 @@ export function partial<Value extends PlainObject, Key extends keyof Value>(
 		return {} as Pick<Value, Key>;
 	}
 
-	const result = {} as Pick<Value, Key>;
 	const {length} = keys;
+	const result = {} as Pick<Value, Key>;
 
 	for (let index = 0; index < length; index += 1) {
 		const key = keys[index];

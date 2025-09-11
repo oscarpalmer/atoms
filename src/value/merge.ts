@@ -79,9 +79,9 @@ function mergeValues(
 		return actual[0];
 	}
 
+	const {length} = actual;
 	const isArray = actual.every(Array.isArray);
 	const result = (isArray ? [] : {}) as PlainObject;
-	const {length} = actual;
 
 	for (let outerIndex = 0; outerIndex < length; outerIndex += 1) {
 		const item = actual[outerIndex] as PlainObject;

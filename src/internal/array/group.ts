@@ -11,9 +11,9 @@ export function groupValues(
 		return {};
 	}
 
+	const {length} = array;
 	const callbacks = getCallbacks(undefined, key, value);
 	const record: Record<Key, unknown> = {};
-	const {length} = array;
 
 	for (let index = 0; index < length; index += 1) {
 		const item = array[index];
