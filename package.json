@@ -25,168 +25,72 @@
 	"exports": {
 		"./package.json": "./package.json",
 		".": {
-			"import": {
 				"types": "./types/index.d.ts",
 				"default": "./dist/index.js"
-			},
-			"require": {
-				"types": "./types/index.d.cts",
-				"default": "./dist/index.cjs"
-			}
 		},
 		"./array": {
-			"import": {
 				"types": "./types/array/index.d.ts",
 				"default": "./dist/array/index.js"
-			},
-			"require": {
-				"types": "./types/array/index.d.cts",
-				"default": "./dist/array/index.cjs"
-			}
 		},
 		"./color": {
-			"import": {
 				"types": "./types/color/index.d.ts",
 				"default": "./dist/color/index.js"
-			},
-			"require": {
-				"types": "./types/color/index.d.cts",
-				"default": "./dist/color/index.cjs"
-			}
 		},
 		"./emitter": {
-			"import": {
 				"types": "./types/emitter.d.ts",
 				"default": "./dist/emitter.js"
-			},
-			"require": {
-				"types": "./types/emitter.d.cts",
-				"default": "./dist/emitter.cjs"
-			}
 		},
 		"./function": {
-			"import": {
 				"types": "./types/function.d.ts",
 				"default": "./dist/function.js"
-			},
-			"require": {
-				"types": "./types/function.d.cts",
-				"default": "./dist/function.cjs"
-			}
 		},
 		"./is": {
-			"import": {
 				"types": "./types/is.d.ts",
 				"default": "./dist/is.js"
-			},
-			"require": {
-				"types": "./types/is.d.cts",
-				"default": "./dist/is.cjs"
-			}
 		},
 		"./logger": {
-			"import": {
 				"types": "./types/logger.d.ts",
 				"default": "./dist/logger.js"
-			},
-			"require": {
-				"types": "./types/logger.d.cts",
-				"default": "./dist/logger.cjs"
-			}
 		},
 		"./math": {
-			"import": {
 				"types": "./types/math.d.ts",
 				"default": "./dist/math.js"
-			},
-			"require": {
-				"types": "./types/math.d.cts",
-				"default": "./dist/math.cjs"
-			}
 		},
 		"./models": {
-			"import": {
 				"types": "./types/models.d.ts"
-			},
-			"require": {
-				"types": "./types/models.d.cts"
-			}
 		},
 		"./number": {
-			"import": {
 				"types": "./types/number.d.ts",
 				"default": "./dist/number.js"
-			},
-			"require": {
-				"types": "./types/number.d.cts",
-				"default": "./dist/number.cjs"
-			}
 		},
 		"./query": {
-			"import": {
 				"types": "./types/query.d.ts",
 				"default": "./dist/query.js"
-			},
-			"require": {
-				"types": "./types/query.d.cts",
-				"default": "./dist/query.cjs"
-			}
 		},
 		"./random": {
-			"import": {
 				"types": "./types/random.d.ts",
 				"default": "./dist/random.js"
-			},
-			"require": {
-				"types": "./types/random.d.cts",
-				"default": "./dist/random.cjs"
-			}
 		},
 		"./sized": {
-			"import": {
 				"types": "./types/sized.d.ts",
 				"default": "./dist/sized.js"
-			},
-			"require": {
-				"types": "./types/sized.d.cts",
-				"default": "./dist/sized.cjs"
-			}
 		},
 		"./string": {
-			"import": {
 				"types": "./types/string/index.d.ts",
 				"default": "./dist/string/index.js"
-			},
-			"require": {
-				"types": "./types/string/index.d.cts",
-				"default": "./dist/string/index.cjs"
-			}
 		},
 		"./supports-touch": {
-			"import": {
 				"types": "./types/touch.d.ts",
 				"default": "./dist/touch.js"
-			},
-			"require": {
-				"types": "./types/touch.d.cts",
-				"default": "./dist/touch.cjs"
-			}
 		},
 		"./value": {
-			"import": {
 				"types": "./types/value/index.d.ts",
 				"default": "./dist/value/index.js"
-			},
-			"require": {
-				"types": "./types/value/index.d.cts",
-				"default": "./dist/value/index.cjs"
-			}
 		}
 	},
 	"files": ["dist", "src", "types"],
 	"keywords": ["helper", "utility"],
 	"license": "MIT",
-	"main": "./dist/index.cjs",
 	"module": "./dist/index.js",
 	"name": "@oscarpalmer/atoms",
 	"repository": {
@@ -194,15 +98,13 @@
 		"url": "git+https://github.com/oscarpalmer/atoms.git"
 	},
 	"scripts": {
-		"build": "npm run clean && npx vite build && npm run rollup:build && npm run types",
+		"build": "npm run clean && npx vite build && npm run rollup:build && npx tsc",
 		"clean": "rm -rf ./dist && rm -rf ./types && rm -f ./tsconfig.tsbuildinfo",
 		"rollup:build": "npx rollup -c",
 		"rollup:watch": "npx rollup -c --watch",
-		"test": "npx vitest --coverage",
-		"types": "npx tsc && npx dts-bundle-generator --config ./dts.config.cts --silent",
-		"watch": "npx vite build --watch"
+		"test": "npx vitest --coverage"
 	},
 	"type": "module",
-	"types": "./types/index.d.cts",
-	"version": "0.108.0"
+	"types": "./types/index.d.ts",
+	"version": "0.109.0"
 }

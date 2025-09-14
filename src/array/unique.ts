@@ -11,7 +11,7 @@ export function unique<Item>(array: Item[]): Item[];
 /**
  * Get an array of unique items
  * @param array Array to get unique items from
- * @param key Key to use for comparison
+ * @param key Key to use for value
  * @returns Array of unique items
  */
 export function unique<Item extends PlainObject, ItemKey extends keyof Item>(
@@ -22,14 +22,13 @@ export function unique<Item extends PlainObject, ItemKey extends keyof Item>(
 /**
  * Get an array of unique items
  * @param array Array to get unique items from
- * @param key Key to use for comparison
- * @param value Value to use for comparison
+ * @param callback Function to get a value from each item
  * @returns Array of unique items
  */
 export function unique<
 	Item,
-	ItemKey extends (item: Item, index: number, array: Item[]) => Key,
->(array: Item[], key: ItemKey): Item[];
+	ItemCallback extends (item: Item, index: number, array: Item[]) => Key,
+>(array: Item[], callback: ItemCallback): Item[];
 
 export function unique(array: unknown[], key?: unknown): unknown[] {
 	if (!Array.isArray(array)) {

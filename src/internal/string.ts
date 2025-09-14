@@ -2,7 +2,7 @@ import {compact} from './array/compact';
 
 /**
  * Get the string value from any value
- * @param Value Value to get the string from
+ * @param value Value to get the string from
  * @returns String representation of the value
  */
 export function getString(value: unknown): string {

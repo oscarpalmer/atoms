@@ -352,7 +352,7 @@ test('setValue', () => {
 
 	expect(data.in.a.nested.array[3]).toEqual(123);
 	expect(data.in.a.nested.map.get('3')).toEqual(undefined);
-	expect(data.in.a.nested.object['3']).toEqual(123);
+	expect((data.in.a.nested.object as never)['3']).toEqual(123);
 
 	setValue(data, 'change.hmm.huh', 123);
 
@@ -446,20 +446,20 @@ test('smush & unsmush', () => {
 	for (let index = 0; index < 101; index += 1) {
 		parts.push(index);
 
-		current[index] =
+		(current as unknown[])[index] =
 			index === 100
 				? {
 						message: 'Max depth reached',
-					}
+				  }
 				: {};
 
-		current = current[index];
+		current = (current as unknown[])[index] as never;
 	}
 
 	const smushedDepth = smush(depth);
 	const smushedKey = parts.slice(0, -1).join('.');
 
-	expect(smushedDepth[smushedKey]).toEqual({
+	expect((smushedDepth as never)[smushedKey]).toEqual({
 		'100': {
 			message: 'Max depth reached',
 		},

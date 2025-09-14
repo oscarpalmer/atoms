@@ -196,7 +196,9 @@ test('getHexColor', () => {
 
 	const long = short.map(
 		hex =>
-			`${hex.slice(0, 1).repeat(2)}${hex.slice(1, 2).repeat(2)}${hex.slice(2, 3).repeat(2)}`,
+			`${hex.slice(0, 1).repeat(2)}${hex.slice(1, 2).repeat(2)}${hex
+				.slice(2, 3)
+				.repeat(2)}`,
 	);
 
 	for (let index = 0; index < length; index += 1) {

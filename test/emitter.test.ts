@@ -16,9 +16,9 @@ test('emitter', () =>
 
 			try {
 				const {observable} = value;
-			} catch (error) {
+			} catch (error: unknown) {
 				expect(error).toBeInstanceOf(Error);
-				expect(error.message).toBe(
+				expect((error as Error)?.message).toBe(
 					'Cannot retrieve observable from a destroyed emitter',
 				);
 			}
@@ -145,9 +145,9 @@ test('emitter: observable + subscription', () =>
 
 			try {
 				thirdObservable.subscribe({});
-			} catch (error) {
+			} catch (error: unknown) {
 				expect(error).toBeInstanceOf(Error);
-				expect(error.message).toBe(
+				expect((error as Error)?.message).toBe(
 					'Cannot subscribe to a destroyed observable',
 				);
 			}

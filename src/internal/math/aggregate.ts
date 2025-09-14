@@ -87,8 +87,8 @@ export function max<Item extends PlainObject>(
  * @returns Maximum value, or `NaN` if no maximum can be found
  */
 export function max<Item extends PlainObject>(
-	items: Item[],
-	callback: (item: Item, index: number, items: Item[]) => number,
+	array: Item[],
+	callback: (item: Item, index: number, array: Item[]) => number,
 ): number;
 
 export function max(array: unknown[], key?: unknown): number {

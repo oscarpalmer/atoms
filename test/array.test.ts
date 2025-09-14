@@ -84,7 +84,7 @@ test('count', () => {
 	expect(countByKeyCallback).toBe(1);
 
 	expect(count('blah' as never, 99)).toBe(Number.NaN);
-	expect(count('blah' as never, x => 123)).toBe(Number.NaN);
+	expect(count('blah' as never, () => 123)).toBe(Number.NaN);
 	expect(count([], 99)).toBe(0);
 });
 
@@ -352,7 +352,7 @@ test('insert', () => {
 	expect(array[length + 1]).toBe(2);
 	expect(array[length + 2]).toBe(3);
 
-	const appended = [];
+	const appended: unknown[] = [];
 
 	expect(insert(appended, [1, 2, 3])).toEqual([1, 2, 3]);
 
@@ -621,7 +621,7 @@ test('splice', () => {
 	expect(splice([], 0, 'blah' as never)).toEqual([]);
 
 	const x = Array.from({length: 7777}, (_, i) => i + 1);
-	const y = [];
+	const y: unknown[] = [];
 
 	expect(splice(y, 0, -1, x)).toEqual([]);
 	expect(y).toEqual(x);
@@ -864,22 +864,12 @@ test('toSet', () => {
 	const keyed = toSet(complex, 'id');
 	const callbacked = toSet(complex, item => item.name);
 
-	expect(simple).toEqual(
-		new Set(complex),
-	);
+	expect(simple).toEqual(new Set(complex));
 
-	expect(keyed).toEqual(
-		new Set([1, 2, 3, 4, 5]),
-	);
+	expect(keyed).toEqual(new Set([1, 2, 3, 4, 5]));
 
 	expect(callbacked).toEqual(
-		new Set([
-			'Alice',
-			'Bob',
-			'Charlie',
-			'Alice',
-			'David',
-		]),
+		new Set(['Alice', 'Bob', 'Charlie', 'Alice', 'David']),
 	);
 
 	expect(toSet(complex, [] as never)).toEqual(new Set(complex));
