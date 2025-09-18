@@ -58,17 +58,15 @@ export function findValues(
 	type: FindValuesType,
 	array: unknown[],
 	parameters: unknown[],
-	count: boolean,
 ): unknown[] | undefined;
 
 export function findValues(
 	type: FindValuesType,
 	array: unknown[],
 	parameters: unknown[],
-	count?: boolean,
 ): unknown[] | undefined {
 	if (!Array.isArray(array)) {
-		return count ? undefined : [];
+		return [];
 	}
 
 	if (array.length === 0) {

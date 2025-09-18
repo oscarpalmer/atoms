@@ -1,7 +1,6 @@
 import {clamp} from '../internal/number';
 import {join} from '../internal/string';
-import {anyPattern, groupedPattern} from './constants';
-import {getNormalizedHex} from './misc';
+import {groupedPattern} from './constants';
 import type {HSLColor, RGBColor} from './models';
 
 function getHexyValue(
@@ -24,8 +23,7 @@ function getHexyValue(
  * @returns RGBColor object
  */
 export function hexToRgb(value: string): RGBColor {
-	const hex = anyPattern.test(value) ? getNormalizedHex(value) : '';
-	const pairs = groupedPattern.exec(hex) ?? [];
+	const pairs = groupedPattern.exec(value) as RegExpExecArray;
 	const rgb = [];
 
 	const {length} = pairs;
@@ -35,9 +33,9 @@ export function hexToRgb(value: string): RGBColor {
 	}
 
 	return {
-		blue: rgb[2] ?? 0,
-		green: rgb[1] ?? 0,
-		red: rgb[0] ?? 0,
+		blue: rgb[2],
+		green: rgb[1],
+		red: rgb[0],
 	};
 }
 
@@ -117,9 +115,11 @@ export function rgbToHsl(rgb: RGBColor): HSLColor {
 			case blue:
 				hue = (red - green) / delta + 4;
 				break;
+
 			case green:
 				hue = (blue - red) / delta + 2;
 				break;
+
 			case red:
 				hue = (green - blue) / delta + (green < blue ? 6 : 0);
 				break;

@@ -149,11 +149,14 @@ test('diff', () => {
 		from: first.numbers,
 		to: second.numbers,
 	});
+
 	expect(diffed.values.object).toEqual({from: first.object, to: second.object});
+
 	expect(diffed.values['object.nested']).toEqual({
 		from: first.object.nested,
 		to: second.object.nested,
 	});
+
 	expect(diffed.values.strings).toEqual({
 		from: first.strings,
 		to: second.strings,
@@ -224,17 +227,22 @@ test('merge', () => {
 	};
 
 	const second: NestedPartial<Mergeable> = {
+		cars: undefined,
 		name: {
 			last: 'Palmér',
 		},
 	};
 
 	const third: NestedPartial<Mergeable> = {
+		cars: ['Toyota 2000GT'],
+	};
+
+	const fourth: NestedPartial<Mergeable> = {
 		cars: ['Ferrari 250 GT California'],
 		hobbies: ['Wrestling'],
 	};
 
-	const merged = merge([first, second, third], {
+	const merged = merge([first, second, third, fourth], {
 		replaceableObjects: 'cars',
 	});
 
@@ -450,7 +458,7 @@ test('smush & unsmush', () => {
 			index === 100
 				? {
 						message: 'Max depth reached',
-				  }
+					}
 				: {};
 
 		current = (current as unknown[])[index] as never;

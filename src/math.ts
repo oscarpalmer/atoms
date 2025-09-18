@@ -10,7 +10,7 @@ export function average(values: number[]): number;
 
 /**
  * Get the average value from a list of objects
- * @param array List of objects
+ * @param array List of objects to calculate the average for
  * @param key Key to get a numerical value from each object
  * @returns Average value, or `NaN` if no average can be calculated
  */
@@ -20,9 +20,9 @@ export function average<Item extends PlainObject>(
 ): number;
 
 /**
- * Get the average value from a list of objects
- * @param array List of objects to
- * @param callback Function to get a numerical value from each object
+ * Get the average value from a list of values
+ * @param array List of values to calculate the average for
+ * @param callback Function to get a numerical value from each value
  * @returns Average value, or `NaN` if no average can be calculated
  */
 export function average<Item extends PlainObject>(
@@ -36,6 +36,74 @@ export function average(array: unknown[], key?: unknown): number {
 	return aggregated.count > 0
 		? aggregated.value / aggregated.count
 		: Number.NaN;
+}
+
+/**
+ * Count the number of items in an array
+ * @param values Array to count for
+ * @return Number of items, or `NaN` if no count can be calculated
+ */
+export function count(values: unknown[]): number;
+
+/**
+ * Count the number of items in an array that have a specific key value
+ * @param array Array to count for
+ * @param key Key to get value from each item
+ * @param value Value to count for each item
+ * @returns Number of items with the specified key value, or `NaN` if no count can be calculated
+ */
+export function count<Item extends PlainObject>(
+	array: Item[],
+	key: keyof Item,
+	value: unknown,
+): number;
+
+/**
+ * Count the number of items in an array that match a specific condition value
+ * @param array Array to count for
+ * @param callback Function to get value from each item
+ * @param value Value to count for each item
+ * @returns Number of items that match the condition, or `NaN` if no count can be calculated
+ */
+export function count<Item extends PlainObject>(
+	array: Item[],
+	callback: (item: Item, index: number, array: Item[]) => unknown,
+	value: unknown,
+): number;
+
+export function count(
+	array: unknown[],
+	key?: unknown,
+	value?: unknown,
+): number {
+	if (!Array.isArray(array)) {
+		return Number.NaN;
+	}
+
+	const {length} = array;
+
+	if (key == null) {
+		return length;
+	}
+
+	if (typeof key !== 'string' && typeof key !== 'function') {
+		return Number.NaN;
+	}
+
+	const callback =
+		typeof key === 'function' ? key : (item: PlainObject) => item[key as never];
+
+	let count = 0;
+
+	for (let index = 0; index < length; index += 1) {
+		const item = array[index];
+
+		if (Object.is(callback(item as never, index, array), value)) {
+			count += 1;
+		}
+	}
+
+	return count;
 }
 
 /**

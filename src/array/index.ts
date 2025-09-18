@@ -1,7 +1,6 @@
 export * from '../internal/array/chunk';
 export * from '../internal/array/compact';
 export * from '../internal/array/shuffle';
-export * from './count';
 export * from './exists';
 export * from './filter';
 export * from './find';

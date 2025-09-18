@@ -11,5 +11,4 @@ export * from './query';
 export * from './random';
 export * from './sized';
 export * from './string/index';
-export * from './touch';
 export * from './value/index';

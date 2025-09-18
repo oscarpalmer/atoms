@@ -49,6 +49,13 @@ export type NestedPartial<T> = {
 export type PlainObject = Record<PropertyKey, unknown>;
 
 /**
+ * Get the value's type as a string
+ */
+export type ToString<Value> = Value extends string | number
+	? `${Value}`
+	: never;
+
+/**
  * A union type of all typed arrays
  */
 export type TypedArray =

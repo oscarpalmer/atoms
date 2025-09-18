@@ -1,5 +1,5 @@
 import {findValue} from '../internal/array/find';
-import type {Key, PlainObject} from '../models';
+import type {PlainObject} from '../models';
 
 /**
  * Does the value exist in the array?
@@ -27,10 +27,10 @@ export function exists<Item>(
  * @param value Value to search for
  * @returns `true` if the value exists in the array, otherwise `false`
  */
-export function exists<Item extends PlainObject, ItemKey extends keyof Item>(
+export function exists<Item extends PlainObject>(
 	array: Item[],
-	key: ItemKey,
-	value: Item[ItemKey],
+	key: keyof Item,
+	value: unknown,
 ): boolean;
 
 /**
@@ -40,10 +40,11 @@ export function exists<Item extends PlainObject, ItemKey extends keyof Item>(
  * @param value Value to search for
  * @returns `true` if the value exists in the array, otherwise `false`
  */
-export function exists<
-	Item,
-	ItemKey extends (item: Item, index: number, array: Item[]) => Key,
->(array: Item[], callback: ItemKey, value: ReturnType<ItemKey>): boolean;
+export function exists<Item>(
+	array: Item[],
+	callback: (item: Item, index: number, array: Item[]) => unknown,
+	value: unknown,
+): boolean;
 
 export function exists(array: unknown[], ...parameters: unknown[]): boolean {
 	if (parameters.length === 1 && typeof parameters[0] !== 'function') {

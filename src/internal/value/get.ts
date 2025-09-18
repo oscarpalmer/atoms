@@ -1,5 +1,4 @@
-import type {ToString} from 'type-fest/source/internal/string';
-import type {ArrayOrPlainObject, Get, Paths} from '../../models';
+import type {ArrayOrPlainObject, Get, Paths, ToString} from '../../models';
 import {getPaths, handleValue} from './misc';
 
 /**

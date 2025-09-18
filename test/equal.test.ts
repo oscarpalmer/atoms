@@ -166,7 +166,9 @@ test('options', () => {
 	const secondString = 'aLpHa';
 
 	expect(equal(firstString, secondString)).toBe(false);
-	expect(equal(firstString, secondString), {ignoreCase: 123} as never).toBe(false);
+	expect(equal(firstString, secondString), {ignoreCase: 123} as never).toBe(
+		false,
+	);
 	expect(equal(firstString, secondString, true)).toBe(true);
 	expect(equal(firstString, secondString, {ignoreCase: true})).toBe(true);
 });

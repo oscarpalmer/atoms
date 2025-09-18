@@ -6,21 +6,21 @@ import type {ArrayOrPlainObject, NestedPartial, PlainObject} from '../models';
  * Options for merging values
  */
 export type MergeOptions = {
-		/**
-		 * Key _(or key epxressions)_ for values that should be replaced
-		 * ```ts
-		 * merge([{items: [1, 2, 3]}, {items: [99]}]); // {items: [99]}
-		 * ```
-		 */
-		replaceableObjects: string | RegExp | Array<string | RegExp>;
-		/**
-		 * Skip nullable values when merging arrays?
-		 * ```ts
-		 * merge([1, 2, 3], [null, null, 99]); // [1, 2, 99]
-		 * ```
-		 */
-		skipNullableInArrays: boolean;
-	};
+	/**
+	 * Key _(or key epxressions)_ for values that should be replaced
+	 * ```ts
+	 * merge([{items: [1, 2, 3]}, {items: [99]}]); // {items: [99]}
+	 * ```
+	 */
+	replaceableObjects: string | RegExp | Array<string | RegExp>;
+	/**
+	 * Skip nullable values when merging arrays?
+	 * ```ts
+	 * merge([1, 2, 3], [null, null, 99]); // [1, 2, 99]
+	 * ```
+	 */
+	skipNullableInArrays: boolean;
+};
 
 type MergeValuesOptions = {
 	replaceableObjects: ReplaceableObjectsCallback | undefined;

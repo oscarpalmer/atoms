@@ -13,8 +13,22 @@ type CancellableCallback<Callback extends GenericCallback> = Callback & {
 class Memoized<Callback extends GenericCallback> {
 	#state: MemoizedState<Callback>;
 
-	constructor(callback: Callback, size?: number) {
-		const cache = new SizedMap<unknown, ReturnType<Callback>>(size ?? 2 ** 16);
+	/**
+	 * Maximum cache size
+	 */
+	get maximum(): number {
+		return this.#state.cache?.maximum ?? Number.NaN;
+	}
+
+	/**
+	 * Current cache size
+	 */
+	get size(): number {
+		return this.#state.cache?.size ?? Number.NaN;
+	}
+
+	constructor(callback: Callback, size: number) {
+		const cache = new SizedMap<unknown, ReturnType<Callback>>(size);
 
 		const getter = (
 			...parameters: Parameters<Callback>
@@ -22,15 +36,15 @@ class Memoized<Callback extends GenericCallback> {
 			const key =
 				parameters.length === 1
 					? parameters[0]
-					: join(parameters.map(getString));
+					: join(parameters.map(getString), '_');
 
-			if (cache?.has(key) ?? false) {
-				return cache?.get(key) as ReturnType<Callback>;
+			if (cache.has(key)) {
+				return cache.get(key) as ReturnType<Callback>;
 			}
 
 			const value = callback(...parameters);
 
-			cache?.set(key, value);
+			cache.set(key, value);
 
 			return value;
 		};
@@ -89,6 +103,7 @@ class Memoized<Callback extends GenericCallback> {
 	 */
 	run(...parameters: Parameters<Callback>): ReturnType<Callback> {
 		if (this.#state.cache == null || this.#state.getter == null) {
+			/* istanbul ignore next */
 			throw new Error('The Memoized instance has been destroyed');
 		}
 
@@ -164,7 +179,7 @@ export function memoize<Callback extends GenericCallback>(
 ): Memoized<Callback> {
 	return new Memoized(
 		callback,
-		typeof cacheSize === 'number' ? cacheSize : undefined,
+		typeof cacheSize === 'number' && cacheSize > 0 ? cacheSize : 2 ** 16,
 	);
 }
 

@@ -27,10 +27,10 @@ export function find<Item>(
  * @param value Value to search for
  * @returns First item that matches the value, or `undefined` if no match is found
  */
-export function find<Item extends PlainObject, ItemKey extends keyof Item>(
+export function find<Item extends PlainObject>(
 	array: Item[],
-	key: ItemKey,
-	value: Item[ItemKey],
+	key: keyof Item,
+	value: unknown,
 ): Item | undefined;
 
 /**
@@ -40,13 +40,10 @@ export function find<Item extends PlainObject, ItemKey extends keyof Item>(
  * @param value Value to search for
  * @returns First item that matches the value, or `undefined` if no match is found
  */
-export function find<
-	Item,
-	Callback extends (item: Item, index: number, array: Item[]) => unknown,
->(
+export function find<Item>(
 	array: Item[],
-	callback: Callback,
-	value: ReturnType<Callback>,
+	callback: (item: Item, index: number, array: Item[]) => unknown,
+	value: unknown,
 ): Item | undefined;
 
 export function find<Item>(

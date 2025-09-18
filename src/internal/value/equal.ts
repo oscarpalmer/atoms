@@ -53,12 +53,12 @@ export function equal(
 ): boolean;
 
 export function equal(
-		first: unknown,
-		second: unknown,
-		options?: boolean | EqualOptions,
-	): boolean {
-		return equalValue(first, second, getOptions(options));
-	}
+	first: unknown,
+	second: unknown,
+	options?: boolean | EqualOptions,
+): boolean {
+	return equalValue(first, second, getOptions(options));
+}
 
 function equalArray(
 	first: unknown[],

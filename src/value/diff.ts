@@ -1,7 +1,7 @@
 import {isArrayOrPlainObject} from '../internal/is';
 import {join} from '../internal/string';
 import {equal} from '../internal/value/equal';
-import type {ArrayOrPlainObject, PlainObject} from '../models';
+import type {ArrayOrPlainObject} from '../models';
 
 export type DiffType = 'full' | 'none' | 'partial';
 
@@ -154,8 +154,8 @@ function getDiffs(
 
 				const diffs = nested
 					? getDiffs(
-							(from ?? {}) as PlainObject,
-							(to ?? {}) as PlainObject,
+							from as ArrayOrPlainObject,
+							to as ArrayOrPlainObject,
 							prefixed,
 						)
 					: [];

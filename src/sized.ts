@@ -188,8 +188,8 @@ function getMaximum(first?: unknown, second?: unknown): number {
 		(typeof first === 'number'
 			? first
 			: typeof second === 'number'
-			? second
-			: undefined) ?? 2 ** 20;
+				? second
+				: undefined) ?? 2 ** 20;
 
 	return clamp(actual, 1, 2 ** 24);
 }

@@ -142,4 +142,3 @@ export {
 	type HSLColor,
 	type RGBColor,
 };
-

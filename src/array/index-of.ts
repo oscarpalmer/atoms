@@ -27,10 +27,10 @@ export function indexOf<Item>(
  * @param value Value to search for
  * @returns Index of the first matching item, or `-1` if no match is found
  */
-export function indexOf<Item extends PlainObject, ItemKey extends keyof Item>(
+export function indexOf<Item extends PlainObject>(
 	array: Item[],
-	key: ItemKey,
-	value: Item[ItemKey],
+	key: keyof Item,
+	value: unknown,
 ): number;
 
 /**
@@ -40,10 +40,11 @@ export function indexOf<Item extends PlainObject, ItemKey extends keyof Item>(
  * @param value Value to search for
  * @returns Index of the first matching item, or `-1` if no match is found
  */
-export function indexOf<
-	Item,
-	Callback extends (item: Item, index: number, array: Item[]) => unknown,
->(array: Item[], callback: Callback, value: ReturnType<Callback>): number;
+export function indexOf<Item extends PlainObject>(
+	array: Item[],
+	callback: (item: Item, index: number, array: Item[]) => unknown,
+	value: unknown,
+): number;
 
 export function indexOf(array: unknown[], ...parameters: unknown[]): number {
 	return findValue('index', array, parameters) as number;

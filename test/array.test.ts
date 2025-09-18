@@ -2,7 +2,6 @@ import {expect, test} from 'vitest';
 import {
 	chunk,
 	compact,
-	count,
 	exists,
 	filter,
 	find,
@@ -69,23 +68,6 @@ test('compact', () => {
 	]);
 
 	expect(compact('blah' as never)).toEqual([]);
-});
-
-test('count', () => {
-	expect(count(simple, 2)).toBe(1);
-	expect(count(simple, 5)).toBe(0);
-
-	const countByCallback = count(complex, item => item.id === 3);
-	const countByKeyValue = count(complex, 'id', 3);
-	const countByKeyCallback = count(complex, item => item.id, 3);
-
-	expect(countByCallback).toBe(1);
-	expect(countByKeyValue).toBe(1);
-	expect(countByKeyCallback).toBe(1);
-
-	expect(count('blah' as never, 99)).toBe(Number.NaN);
-	expect(count('blah' as never, () => 123)).toBe(Number.NaN);
-	expect(count([], 99)).toBe(0);
 });
 
 test('exists', () => {
