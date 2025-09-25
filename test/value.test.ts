@@ -192,6 +192,23 @@ test('diff', () => {
 		'3': {from: 4, to: undefined},
 		'4': {from: 5, to: undefined},
 	});
+
+	const nullish = diff({
+		a: {
+			b: {
+				c: 123,
+			},
+		},
+	}, {
+		a: {
+			x: 'y',
+		}
+	});
+
+	expect(nullish.type).toBe('partial');
+
+	expect(nullish.values['a.b.c']).toEqual({from: 123, to: undefined});
+	expect(nullish.values['a.x']).toEqual({from: undefined, to: 'y'});
 });
 
 test('getValue', () => {

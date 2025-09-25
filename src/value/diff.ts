@@ -80,8 +80,8 @@ export function diff<First, Second = First>(
 	}
 
 	const diffs = getDiffs(
-		(first ?? {}) as ArrayOrPlainObject,
-		(second ?? {}) as ArrayOrPlainObject,
+		first as ArrayOrPlainObject,
+		second as ArrayOrPlainObject,
 	);
 
 	const {length} = diffs;
@@ -123,7 +123,7 @@ function getDiffs(
 	}
 
 	for (let outerIndex = 0; outerIndex < 2; outerIndex += 1) {
-		const value = outerIndex === 0 ? first : second;
+		const value = (outerIndex === 0 ? first : second) ?? {};
 
 		const keys = [
 			...Object.keys(value),
