@@ -1,7 +1,6 @@
 import {isArrayOrPlainObject} from '../internal/is';
 import {join} from '../internal/string';
 import {equal} from '../internal/value/equal';
-import type {ArrayOrPlainObject} from '../models';
 
 type DiffOptions = {
 	/**
@@ -93,11 +92,7 @@ export function diff<First, Second = First>(
 		return result;
 	}
 
-	const diffs = getDiffs(
-		first as ArrayOrPlainObject,
-		second as ArrayOrPlainObject,
-		relaxedNullish,
-	);
+	const diffs = getDiffs(first, second, relaxedNullish);
 
 	const {length} = diffs;
 
@@ -115,8 +110,8 @@ export function diff<First, Second = First>(
 }
 
 function getDiffs(
-	first: ArrayOrPlainObject,
-	second: ArrayOrPlainObject,
+	first: unknown,
+	second: unknown,
 	relaxedNullish: boolean,
 	prefix?: string,
 ): KeyedDiffValue[] {
@@ -154,41 +149,36 @@ function getDiffs(
 				continue;
 			}
 
+			checked.add(key);
+
 			const from = first?.[key as never];
 			const to = second?.[key as never];
 
-			if ((relaxedNullish && from == null && to == null) || !equal(from, to)) {
-				const prefixed = join([prefix, key], '.');
-
-				const change = {
-					from,
-					to,
-					key: prefixed,
-				};
-
-				const nested = isArrayOrPlainObject(from) || isArrayOrPlainObject(to);
-
-				const diffs = nested
-					? getDiffs(
-							from as ArrayOrPlainObject,
-							to as ArrayOrPlainObject,
-							relaxedNullish,
-							prefixed,
-						)
-					: [];
-
-				if (!nested || (nested && diffs.length > 0)) {
-					changes.push(change);
-				}
-
-				const diffsLength = diffs.length;
-
-				for (let diffIndex = 0; diffIndex < diffsLength; diffIndex += 1) {
-					changes.push(diffs[diffIndex]);
-				}
+			if ((relaxedNullish && from == null && to == null) || equal(from, to)) {
+				continue;
 			}
 
-			checked.add(key);
+			const prefixed = join([prefix, key], '.');
+
+			const change = {
+				from,
+				to,
+				key: prefixed,
+			};
+
+			const nested = isArrayOrPlainObject(from) || isArrayOrPlainObject(to);
+
+			const diffs = nested ? getDiffs(from, to, relaxedNullish, prefixed) : [];
+
+			if (!nested || (nested && diffs.length > 0)) {
+				changes.push(change);
+			}
+
+			const diffsLength = diffs.length;
+
+			for (let diffIndex = 0; diffIndex < diffsLength; diffIndex += 1) {
+				changes.push(diffs[diffIndex]);
+			}
 		}
 	}
 
