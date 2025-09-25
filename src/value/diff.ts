@@ -80,8 +80,8 @@ export function diff<First, Second = First>(
 	}
 
 	const diffs = getDiffs(
-		first as ArrayOrPlainObject,
-		second as ArrayOrPlainObject,
+		(first ?? {}) as ArrayOrPlainObject,
+		(second ?? {}) as ArrayOrPlainObject,
 	);
 
 	const {length} = diffs;
