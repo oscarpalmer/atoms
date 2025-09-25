@@ -101,6 +101,12 @@ test('compare', () => {
 });
 
 test('diff', () => {
+	expect(diff(null, null).type).toBe('none');
+	expect(diff(undefined, undefined).type).toBe('none');
+
+	expect(diff(null, undefined).type).toBe('full');
+	expect(diff(null, undefined, {relaxedNullish: true}).type).toBe('none');
+
 	expect(diff(1, 1).type).toBe('none');
 	expect(diff(1, 2).type).toBe('full');
 
@@ -193,22 +199,44 @@ test('diff', () => {
 		'4': {from: 5, to: undefined},
 	});
 
-	const nullish = diff({
+	let nullish = diff({
 		a: {
 			b: {
 				c: 123,
 			},
 		},
+		nullish: null,
 	}, {
 		a: {
 			x: 'y',
-		}
+		},
+		nullish: undefined,
 	});
 
 	expect(nullish.type).toBe('partial');
 
 	expect(nullish.values['a.b.c']).toEqual({from: 123, to: undefined});
 	expect(nullish.values['a.x']).toEqual({from: undefined, to: 'y'});
+	expect(nullish.values.nullish).toEqual({from: null, to: undefined});
+
+	nullish = diff({
+		a: {
+			b: {
+				c: 123,
+			},
+		},
+		nullish: null,
+	}, {
+		a: {
+			x: 'y',
+		},
+		nullish: undefined,
+	}, {
+		relaxedNullish: true,
+	});
+
+	expect(nullish.type).toBe('partial');
+	expect(nullish.values.relaxedNull).toBeUndefined();
 });
 
 test('getValue', () => {

@@ -3,7 +3,12 @@ import {join} from '../internal/string';
 import {equal} from '../internal/value/equal';
 import type {ArrayOrPlainObject} from '../models';
 
-export type DiffType = 'full' | 'none' | 'partial';
+type DiffOptions = {
+	/**
+	 * Should `null` and `undefined` be considered equal and ignored in results?
+	 */
+	relaxedNullish?: boolean;
+};
 
 /**
  * The result of a comparison beteen two values
@@ -24,6 +29,8 @@ export type DiffResult<First, Second = First> = {
 	 */
 	values: Record<string, DiffValue>;
 };
+
+export type DiffType = 'full' | 'none' | 'partial';
 
 /**
  * The difference between two values
@@ -47,12 +54,17 @@ type KeyedDiffValue = {
  * Find the differences between two values
  * @param first First value to compare
  * @param second Second value to compare
+ * @param options Comparison options
  * @returns The differences between the two values
  */
 export function diff<First, Second = First>(
 	first: First,
 	second: Second,
+	options?: DiffOptions,
 ): DiffResult<First, Second> {
+	const relaxedNullish =
+		typeof options === 'object' && options?.relaxedNullish === true;
+
 	const result: DiffResult<First, Second> = {
 		original: {
 			from: first,
@@ -62,7 +74,9 @@ export function diff<First, Second = First>(
 		values: {},
 	};
 
-	const same = Object.is(first, second);
+	const same =
+		(relaxedNullish && first == null && second == null) ||
+		Object.is(first, second);
 
 	const firstIsArrayOrObject = isArrayOrPlainObject(first);
 	const secondIsArrayOrObject = isArrayOrPlainObject(second);
@@ -82,6 +96,7 @@ export function diff<First, Second = First>(
 	const diffs = getDiffs(
 		first as ArrayOrPlainObject,
 		second as ArrayOrPlainObject,
+		relaxedNullish,
 	);
 
 	const {length} = diffs;
@@ -102,6 +117,7 @@ export function diff<First, Second = First>(
 function getDiffs(
 	first: ArrayOrPlainObject,
 	second: ArrayOrPlainObject,
+	relaxedNullish: boolean,
 	prefix?: string,
 ): KeyedDiffValue[] {
 	const changes: KeyedDiffValue[] = [];
@@ -141,7 +157,7 @@ function getDiffs(
 			const from = first?.[key as never];
 			const to = second?.[key as never];
 
-			if (!equal(from, to)) {
+			if ((relaxedNullish && from == null && to == null) || !equal(from, to)) {
 				const prefixed = join([prefix, key], '.');
 
 				const change = {
@@ -156,6 +172,7 @@ function getDiffs(
 					? getDiffs(
 							from as ArrayOrPlainObject,
 							to as ArrayOrPlainObject,
+							relaxedNullish,
 							prefixed,
 						)
 					: [];
