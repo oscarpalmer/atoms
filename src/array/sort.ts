@@ -1,6 +1,6 @@
 import {compare} from '../internal/value/compare';
 import {isPlainObject} from '../is';
-import type {PlainObject, Primitive} from '../models';
+import type {GenericCallback, PlainObject, Primitive} from '../models';
 import type {CallbackSorter, KeySorter} from './models';
 
 type Sorter = {
@@ -22,6 +22,48 @@ type Sorter = {
 	) => number;
 };
 
+//
+
+function getCallback(
+	value: unknown,
+	key: string | undefined,
+	isObject: boolean,
+): GenericCallback | undefined {
+	if (key != null) {
+		return;
+	}
+
+	if (isObject && typeof (value as PlainObject).value === 'function') {
+		return (value as PlainObject).value as never;
+	}
+
+	return typeof value === 'function' ? (value as never) : undefined;
+}
+
+function getKey(value: unknown, isObject: boolean): string | undefined {
+	if (isObject && typeof (value as PlainObject).key === 'string') {
+		return (value as PlainObject).key as string;
+	}
+
+	return typeof value === 'string' ? value : undefined;
+}
+
+function getModifier(
+	value: unknown,
+	modifier: number,
+	isObject: boolean,
+): number {
+	if (!isObject || typeof (value as PlainObject).direction !== 'string') {
+		return modifier;
+	}
+
+	if ((value as PlainObject).direction === 'ascending') {
+		return 1;
+	}
+
+	return (value as PlainObject).direction === 'descending' ? -1 : modifier;
+}
+
 function getSorter(value: unknown, modifier: number): Sorter | undefined {
 	const isObject = isPlainObject(value);
 
@@ -35,30 +77,10 @@ function getSorter(value: unknown, modifier: number): Sorter | undefined {
 			? (value.compare as never)
 			: undefined;
 
-	sorter.key =
-		isObject && typeof value.key === 'string'
-			? value.key
-			: typeof value === 'string'
-				? value
-				: undefined;
+	sorter.key = getKey(value, isObject);
+	sorter.modifier = getModifier(value, modifier, isObject);
 
-	sorter.callback =
-		sorter.key == null
-			? isObject && typeof value.value === 'function'
-				? (value.value as never)
-				: typeof value === 'function'
-					? (value as never)
-					: undefined
-			: undefined;
-
-	if (isObject && typeof value.direction === 'string') {
-		sorter.modifier =
-			value.direction === 'ascending'
-				? 1
-				: value.direction === 'descending'
-					? -1
-					: modifier;
-	}
+	sorter.callback = getCallback(value, sorter.key, isObject);
 
 	if (sorter.key != null || sorter.callback != null) {
 		sorter.identifier = `${sorter.key ?? sorter.callback}`;

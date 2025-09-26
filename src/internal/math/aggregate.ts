@@ -104,8 +104,8 @@ function sum(current: number, value: number, isNotANumber: boolean): number {
 const aggregators: Record<AggregationType, AggregationCallback> = {
 	sum,
 	average: sum,
-	max: (current, value, isNotANumber) =>
+	max: (current: number, value: number, isNotANumber: boolean) =>
 		isNotANumber || value > current ? value : current,
-	min: (current, value, isNotANumber) =>
+	min: (current: number, value: number, isNotANumber: boolean) =>
 		isNotANumber || value < current ? value : current,
 };

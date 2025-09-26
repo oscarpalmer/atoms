@@ -136,7 +136,7 @@ type ToMap = {
 		array: Item[],
 		key: ItemKey,
 		value: ItemValue,
-	): Map<Item[ItemKey], Array<Item[ItemValue]>>;
+	): Map<Item[ItemKey], Item[ItemValue][]>;
 
 	/**
 	 * Create a Map from an array of items using a key and callback, and grouping them into arrays
@@ -153,7 +153,7 @@ type ToMap = {
 		array: Item[],
 		key: ItemKey,
 		value: ValueCallback,
-	): Map<Item[ItemKey], Array<ReturnType<ValueCallback>>>;
+	): Map<Item[ItemKey], ReturnType<ValueCallback>[]>;
 
 	/**
 	 * Create a Map from an array of items using a callback and value, and grouping them into arrays
@@ -170,7 +170,7 @@ type ToMap = {
 		array: Item[],
 		key: KeyCallback,
 		value: ItemValue,
-	): Map<ReturnType<KeyCallback>, Array<Item[ItemValue]>>;
+	): Map<ReturnType<KeyCallback>, Item[ItemValue][]>;
 
 	/**
 	 * Create a Map from an array of items using callbacks, and grouping them into arrays
@@ -187,7 +187,7 @@ type ToMap = {
 		array: Item[],
 		key: KeyCallback,
 		value: ValueCallback,
-	): Map<ReturnType<KeyCallback>, Array<ReturnType<ValueCallback>>>;
+	): Map<ReturnType<KeyCallback>, ReturnType<ValueCallback>[]>;
 };
 
 function getMapValues(

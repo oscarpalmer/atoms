@@ -16,7 +16,7 @@ export function getArray<Item>(value: Item[]): Item[];
  */
 export function getArray<Value extends PlainObject>(
 	value: Value,
-): Array<Value[keyof Value]>;
+): Value[keyof Value][];
 
 /**
  * Get an array from an object, where only values with numerical keys will be included
@@ -26,7 +26,7 @@ export function getArray<Value extends PlainObject>(
 export function getArray<Value extends PlainObject>(
 	value: Value,
 	indiced: true,
-): Array<Value[NumericalKeys<Value>]>;
+): Value[NumericalKeys<Value>][];
 
 /**
  * Get an array from a value

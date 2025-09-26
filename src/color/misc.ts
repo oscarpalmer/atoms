@@ -1,5 +1,5 @@
 import {join} from '../internal/string';
-import {defaultHex, prefixPattern} from './constants';
+import {DEFAULT_HEX, EXPRESSION_PREFIX} from './constants';
 import {isHexColor} from './is';
 
 /**
@@ -9,12 +9,16 @@ import {isHexColor} from './is';
  */
 export function getNormalizedHex(value: unknown): string {
 	if (!isHexColor(value)) {
-		return String(defaultHex);
+		return String(DEFAULT_HEX);
 	}
 
-	const normalized = value.replace(prefixPattern, '');
+	const normalized = value.replace(EXPRESSION_PREFIX, '');
 
-	return normalized.length === 3
+	return normalized.length === SHORT_LENGTH
 		? join(normalized.split('').map(character => character.repeat(2)))
 		: normalized;
 }
+
+//
+
+const SHORT_LENGTH = 3;

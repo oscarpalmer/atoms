@@ -77,7 +77,11 @@ export function findValues(
 	const {bool, key, value} = getParameters(parameters);
 	const callbacks = getCallbacks(bool, key);
 
-	if (type === 'unique' && callbacks?.keyed == null && length >= 100) {
+	if (
+		type === 'unique' &&
+		callbacks?.keyed == null &&
+		length >= UNIQUE_THRESHOLD
+	) {
 		return [...new Set(array)];
 	}
 
@@ -125,3 +129,7 @@ function getParameters(original: unknown[]): Parameters {
 				: original[1],
 	};
 }
+
+//
+
+const UNIQUE_THRESHOLD = 100;

@@ -8,7 +8,7 @@ import type {ArrayOrPlainObject, PlainObject, TypedArray} from '../models';
  */
 export function clone<Value>(value: Value): Value;
 
-export function clone(value: unknown) {
+export function clone(value: unknown): unknown {
 	return cloneValue(value, 0, new WeakMap());
 }
 
@@ -17,7 +17,7 @@ function cloneArrayBuffer(
 	depth?: number,
 	references?: WeakMap<WeakKey, unknown>,
 ): ArrayBuffer {
-	if (typeof depth === 'number' && depth >= 100) {
+	if (typeof depth === 'number' && depth >= MAX_DEPTH) {
 		return value;
 	}
 
@@ -35,7 +35,7 @@ function cloneDataView(
 	depth: number,
 	references: WeakMap<WeakKey, unknown>,
 ): DataView {
-	if (depth >= 100) {
+	if (depth >= MAX_DEPTH) {
 		return value;
 	}
 
@@ -53,7 +53,7 @@ function cloneMapOrSet<Value extends Map<unknown, unknown> | Set<unknown>>(
 	depth: number,
 	references: WeakMap<WeakKey, unknown>,
 ): Value {
-	if (depth >= 100) {
+	if (depth >= MAX_DEPTH) {
 		return value;
 	}
 
@@ -85,7 +85,7 @@ function cloneNode(
 	depth: number,
 	references: WeakMap<WeakKey, unknown>,
 ): Node {
-	if (depth >= 100) {
+	if (depth >= MAX_DEPTH) {
 		return node;
 	}
 
@@ -101,7 +101,7 @@ function cloneObject(
 	depth: number,
 	references: WeakMap<WeakKey, unknown>,
 ): ArrayOrPlainObject {
-	if (depth >= 100) {
+	if (depth >= MAX_DEPTH) {
 		return Array.isArray(value) ? [...value] : {...value};
 	}
 
@@ -129,7 +129,7 @@ function cloneRegularExpression(
 	depth: number,
 	references: WeakMap<WeakKey, unknown>,
 ): RegExp {
-	if (depth >= 100) {
+	if (depth >= MAX_DEPTH) {
 		return value;
 	}
 
@@ -147,7 +147,7 @@ function cloneTypedArray(
 	depth: number,
 	references: WeakMap<WeakKey, unknown>,
 ): TypedArray {
-	if (depth >= 100) {
+	if (depth >= MAX_DEPTH) {
 		return value;
 	}
 
@@ -223,8 +223,8 @@ function tryStructuredClone(
 	value: object,
 	depth: number,
 	references: WeakMap<WeakKey, unknown>,
-) {
-	if (depth >= 100) {
+): unknown {
+	if (depth >= MAX_DEPTH) {
 		return value;
 	}
 
@@ -240,3 +240,7 @@ function tryStructuredClone(
 		return value;
 	}
 }
+
+//
+
+const MAX_DEPTH = 100;

@@ -57,11 +57,13 @@ export function snakeCase(value: string): string {
  * @returns Title cased string
  */
 export function titleCase(value: string): string {
-	return typeof value === 'string'
-		? value.length < 1
-			? capitalize(value)
-			: join(words(value).map(capitalize), ' ')
-		: '';
+	if (typeof value !== 'string') {
+		return '';
+	}
+
+	return value.length < 1
+		? capitalize(value)
+		: join(words(value).map(capitalize), ' ');
 }
 
 function toCase(

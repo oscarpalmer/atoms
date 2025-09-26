@@ -6,21 +6,21 @@ class Logger {
 	/**
 	 * Log any number of values at the "debug" log level
 	 */
-	get debug() {
+	get debug(): typeof console.debug {
 		return enabled ? console.debug : noop;
 	}
 
 	/**
 	 * Log the value and shows all its properties
 	 */
-	get dir() {
+	get dir(): typeof console.dir {
 		return enabled ? console.dir : noop;
 	}
 
 	/**
 	 * Is logging to the console enabled? _(defaults to `true`)_
 	 */
-	get enabled() {
+	get enabled(): boolean {
 		return enabled;
 	}
 
@@ -34,42 +34,42 @@ class Logger {
 	/**
 	 * Log any number of values at the "error" log level
 	 */
-	get error() {
+	get error(): typeof console.error {
 		return enabled ? console.error : noop;
 	}
 
 	/**
 	 * Log any number of values at the "info" log level
 	 */
-	get info() {
+	get info(): typeof console.info {
 		return enabled ? console.info : noop;
 	}
 
 	/**
 	 * Log any number of values at the "log" log level
 	 */
-	get log() {
+	get log(): typeof console.log {
 		return enabled ? console.log : noop;
 	}
 
 	/**
 	 * Log data as a table, with optional properties to use as columns
 	 */
-	get table() {
+	get table(): typeof console.table {
 		return enabled ? console.table : noop;
 	}
 
 	/**
 	 * Log any number of values together with a trace from where it was called
 	 */
-	get trace() {
+	get trace(): typeof console.trace {
 		return enabled ? console.trace : noop;
 	}
 
 	/**
 	 * Log any number of values at the "warn" log level
 	 */
-	get warn() {
+	get warn(): typeof console.warn {
 		return enabled ? console.warn : noop;
 	}
 
@@ -84,7 +84,7 @@ class Logger {
 }
 
 class Time {
-	#state: TimeState;
+	readonly #state: TimeState;
 
 	constructor(label: string) {
 		this.#state = {
@@ -126,6 +126,6 @@ type TimeState = {
 	stopped: boolean;
 };
 
-const logger = new Logger();
+const logger: Logger = new Logger();
 
 export {logger, type Logger, type Time};

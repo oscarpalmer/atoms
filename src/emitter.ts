@@ -1,12 +1,12 @@
 import {noop} from './internal/function';
 
 class Emitter<Value> {
-	#state: EmitterState<Value>;
+	readonly #state: EmitterState<Value>;
 
 	/**
 	 * Is the emitter active?
 	 */
-	get active() {
+	get active(): boolean {
 		return this.#state.active;
 	}
 
@@ -20,7 +20,7 @@ class Emitter<Value> {
 	/**
 	 * The current value
 	 */
-	get value() {
+	get value(): Value {
 		return this.#state.value;
 	}
 
@@ -96,7 +96,7 @@ type EmitterState<Value> = {
 };
 
 class Observable<Value> {
-	#state: ObservableState<Value>;
+	readonly #state: ObservableState<Value>;
 
 	constructor(
 		emitter: Emitter<Value>,
@@ -178,7 +178,7 @@ type Observer<Value> = {
 };
 
 class Subscription<Value> {
-	#state: SubscriptionState<Value>;
+	readonly #state: SubscriptionState<Value>;
 
 	constructor(state: ObservableState<Value>) {
 		this.#state = {
@@ -190,7 +190,7 @@ class Subscription<Value> {
 	/**
 	 * Is the subscription closed?
 	 */
-	get closed() {
+	get closed(): boolean {
 		return this.#state.closed || !this.#state.emitter.active;
 	}
 

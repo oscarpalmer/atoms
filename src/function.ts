@@ -11,7 +11,7 @@ type CancellableCallback<Callback extends GenericCallback> = Callback & {
 };
 
 class Memoized<Callback extends GenericCallback> {
-	#state: MemoizedState<Callback>;
+	readonly #state: MemoizedState<Callback>;
 
 	/**
 	 * Maximum cache size
@@ -146,7 +146,7 @@ export function debounce<Callback extends GenericCallback>(
 	let frame: DOMHighResTimeStamp | undefined;
 	let start: DOMHighResTimeStamp;
 
-	const debounced = (...parameters: Parameters<Callback>) => {
+	const debounced = (...parameters: Parameters<Callback>): void => {
 		debounced.cancel();
 
 		frame = requestAnimationFrame(now => {
@@ -156,7 +156,7 @@ export function debounce<Callback extends GenericCallback>(
 		});
 	};
 
-	debounced.cancel = () => {
+	debounced.cancel = (): void => {
 		if (frame != null) {
 			cancelAnimationFrame(frame);
 
@@ -179,7 +179,9 @@ export function memoize<Callback extends GenericCallback>(
 ): Memoized<Callback> {
 	return new Memoized(
 		callback,
-		typeof cacheSize === 'number' && cacheSize > 0 ? cacheSize : 2 ** 16,
+		typeof cacheSize === 'number' && cacheSize > 0
+			? cacheSize
+			: DEFAULT_CACHE_SIZE,
 	);
 }
 
@@ -215,7 +217,7 @@ export function throttle<Callback extends GenericCallback>(
 
 	let frame: DOMHighResTimeStamp | undefined;
 
-	const throttler = (...parameters: Parameters<Callback>) => {
+	const throttler = (...parameters: Parameters<Callback>): void => {
 		throttler.cancel();
 
 		frame = requestAnimationFrame(now => {
@@ -225,7 +227,7 @@ export function throttle<Callback extends GenericCallback>(
 		});
 	};
 
-	throttler.cancel = () => {
+	throttler.cancel = (): void => {
 		if (frame != null) {
 			cancelAnimationFrame(frame);
 
@@ -238,3 +240,7 @@ export function throttle<Callback extends GenericCallback>(
 
 export type {CancellableCallback, GenericCallback, Memoized};
 export {noop} from './internal/function';
+
+//
+
+const DEFAULT_CACHE_SIZE = 65_536;

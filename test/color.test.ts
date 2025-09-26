@@ -10,7 +10,7 @@ import {
 	isHexColor,
 	isRGBColor,
 } from '../src/color';
-import {defaultRgb} from '../src/color/constants';
+import {DEFAULT_RGB} from '../src/color/constants';
 import {hslToRgb} from '../src/color/value';
 import {getRandomItem} from '../src/random';
 
@@ -279,5 +279,5 @@ test('value', () => {
 			lightness: 0,
 			saturation: 0,
 		}),
-	).toEqual(defaultRgb);
+	).toEqual(DEFAULT_RGB);
 });

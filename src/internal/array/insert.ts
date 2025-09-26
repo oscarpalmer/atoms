@@ -38,9 +38,9 @@ export function insertValues<Item>(
 		}
 	}
 
-	return type === 'insert'
-		? array
-		: type === 'splice'
-			? returned
-			: array.length;
+	if (type === 'insert') {
+		return array;
+	}
+
+	return type === 'splice' ? returned : array.length;
 }

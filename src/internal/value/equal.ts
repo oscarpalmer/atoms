@@ -73,9 +73,9 @@ function equalArray(
 
 	let offset = 0;
 
-	if (length >= 100) {
+	if (length >= ARRAY_THRESHOLD) {
 		offset = Math.round(length / 10);
-		offset = offset > 100 ? 100 : offset;
+		offset = offset > ARRAY_THRESHOLD ? ARRAY_THRESHOLD : offset;
 
 		for (let index = 0; index < offset; index += 1) {
 			if (
@@ -91,8 +91,15 @@ function equalArray(
 		}
 	}
 
-	const firstChunks = chunk(first.slice(offset, length - offset), 100);
-	const secondChunks = chunk(second.slice(offset, length - offset), 100);
+	const firstChunks = chunk(
+		first.slice(offset, length - offset),
+		ARRAY_THRESHOLD,
+	);
+
+	const secondChunks = chunk(
+		second.slice(offset, length - offset),
+		ARRAY_THRESHOLD,
+	);
 
 	const chunksLength = firstChunks.length;
 
@@ -401,3 +408,7 @@ function getOptions(input?: boolean | EqualOptions): Options {
 
 	return options;
 }
+
+//
+
+const ARRAY_THRESHOLD = 100;

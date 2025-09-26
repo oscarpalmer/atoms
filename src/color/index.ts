@@ -7,7 +7,7 @@ import {hexToRgb, hslToRgb, rgbToHex, rgbToHsl} from './value';
 class Color {
 	private declare readonly $color: boolean;
 
-	#state: ColorState;
+	readonly #state: ColorState;
 
 	/**
 	 * Get the color as a hex-color

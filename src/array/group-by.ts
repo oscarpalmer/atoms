@@ -130,7 +130,7 @@ interface GroupBy {
 		array: Item[],
 		key: ItemKey,
 		value: ItemValue,
-	): Simplify<Record<KeyedValue<Item, ItemKey>, Array<Item[ItemValue]>>>;
+	): Simplify<Record<KeyedValue<Item, ItemKey>, Item[ItemValue][]>>;
 
 	/**
 	 * Create a record from an array of items using a specific key and value, and grouping them into arrays
@@ -148,7 +148,7 @@ interface GroupBy {
 		key: ItemKey,
 		value: ValueCallback,
 	): Simplify<
-		Record<KeyedValue<Item, ItemKey>, Array<ReturnType<ValueCallback>>>
+		Record<KeyedValue<Item, ItemKey>, ReturnType<ValueCallback>[]>
 	>;
 
 	/**
@@ -166,7 +166,7 @@ interface GroupBy {
 		array: Item[],
 		key: KeyCallback,
 		value: ItemValue,
-	): Record<ReturnType<KeyCallback>, Array<Item[ItemValue]>>;
+	): Record<ReturnType<KeyCallback>, Item[ItemValue][]>;
 
 	/**
 	 * Create a record from an array of items using a specific key and value, and grouping them into arrays
@@ -183,7 +183,7 @@ interface GroupBy {
 		array: Item[],
 		key: KeyCallback,
 		value: ValueCallback,
-	): Record<ReturnType<KeyCallback>, Array<ReturnType<ValueCallback>>>;
+	): Record<ReturnType<KeyCallback>, ReturnType<ValueCallback>[]>;
 }
 
 const groupBy = ((array: unknown[], first: unknown, second: unknown) =>

@@ -122,7 +122,7 @@ const arraySuffixPattern = /\[\]$/;
 
 const booleanPattern = /^(false|true)$/;
 
-const types = new Set(['boolean', 'number', 'string']);
+const types: Set<string> = new Set(['boolean', 'number', 'string']);
 
 //
 

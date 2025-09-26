@@ -137,7 +137,7 @@ type ToRecord = {
 		array: Item[],
 		key: ItemKey,
 		value: ItemValue,
-	): Simplify<Record<KeyedValue<Item, ItemKey>, Array<Item[ItemValue]>>>;
+	): Simplify<Record<KeyedValue<Item, ItemKey>, Item[ItemValue][]>>;
 
 	/**
 	 * Create a record from an array of items using a key and callback, and grouping them into arrays
@@ -154,7 +154,7 @@ type ToRecord = {
 		array: Item[],
 		key: ItemKey,
 		callback: Callback,
-	): Simplify<Record<KeyedValue<Item, ItemKey>, Array<ReturnType<Callback>>>>;
+	): Simplify<Record<KeyedValue<Item, ItemKey>, ReturnType<Callback>[]>>;
 
 	/**
 	 * Create a record from an array of items using a callback and value, and grouping them into arrays
@@ -171,7 +171,7 @@ type ToRecord = {
 		array: Item[],
 		callback: Callback,
 		value: ItemValue,
-	): Record<ReturnType<Callback>, Array<Item[ItemValue]>>;
+	): Record<ReturnType<Callback>, Item[ItemValue][]>;
 
 	/**
 	 * Create a record from an array of items using callbacks, and grouping them into arrays
@@ -188,7 +188,7 @@ type ToRecord = {
 		array: Item[],
 		key: KeyCallback,
 		value: ValueCallback,
-	): Record<ReturnType<KeyCallback>, Array<ReturnType<ValueCallback>>>;
+	): Record<ReturnType<KeyCallback>, ReturnType<ValueCallback>[]>;
 };
 
 const toRecord: ToRecord = ((

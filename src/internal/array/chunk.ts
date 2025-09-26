@@ -16,7 +16,9 @@ export function chunk<Item>(array: Item[], size?: number): Item[][] {
 	const {length} = array;
 
 	const actualSize =
-		typeof size === 'number' && size > 0 && size <= 5_000 ? size : 5_000;
+		typeof size === 'number' && size > 0 && size <= DEFAULT_SIZE
+			? size
+			: DEFAULT_SIZE;
 
 	if (length <= actualSize) {
 		return [array];
@@ -34,3 +36,7 @@ export function chunk<Item>(array: Item[], size?: number): Item[][] {
 
 	return chunks;
 }
+
+//
+
+const DEFAULT_SIZE = 5_000;

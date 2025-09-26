@@ -51,7 +51,7 @@ function getReplaceableObjects(
  * @returns Merged value
  */
 export function merge<Model extends ArrayOrPlainObject>(
-	values: Array<NestedPartial<Model>>,
+	values: NestedPartial<Model>[],
 	options?: Partial<MergeOptions>,
 ): Model {
 	if (!Array.isArray(values) || values.length === 0) {

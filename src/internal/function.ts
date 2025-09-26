@@ -39,7 +39,7 @@ export function noop(): void {}
 /**
  * A calculated average of the refresh rate of the display _(in milliseconds)_
  */
-export let milliseconds = 1000 / 60;
+export let milliseconds: number = 1000 / 60;
 
 calculate().then(value => {
 	milliseconds = value;

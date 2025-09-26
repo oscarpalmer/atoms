@@ -91,7 +91,7 @@ export function count(
 	}
 
 	const callback =
-		typeof key === 'function' ? key : (item: PlainObject) => item[key as never];
+		typeof key === 'function' ? key : (item: PlainObject): unknown => item[key as never];
 
 	let count = 0;
 

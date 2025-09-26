@@ -62,11 +62,13 @@ export function getRandomHex(): string {
  * @returns Random item from the array, or `undefined` if the array is empty
  */
 export function getRandomItem<Value>(array: Value[]): Value | undefined {
-	return array.length === 0
-		? undefined
-		: array.length === 1
-			? array[0]
-			: array[getRandomInteger(0, array.length - 1)];
+	if (!Array.isArray(array) || array.length === 0) {
+		return;
+	}
+
+	return array.length === 1
+		? array[0]
+		: array[getRandomInteger(0, array.length - 1)];
 }
 
 /**

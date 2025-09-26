@@ -1,7 +1,10 @@
 {
 	"$schema": "https://biomejs.dev/schemas/2.2.4/schema.json",
 	"files": {
-		"includes": ["./src/**/*", "./test/**/*"]
+		"includes": [
+			"./src/**/*",
+			"./test/**/*"
+		]
 	},
 	"javascript": {
 		"formatter": {
@@ -12,8 +15,54 @@
 	},
 	"linter": {
 		"enabled": true,
+		"includes": [
+			"./src/**/*"
+		],
 		"rules": {
-			"recommended": true
+			"recommended": true,
+			"complexity": {
+				"noExcessiveCognitiveComplexity": "warn",
+				"noForEach": "error",
+				"useFlatMap": "warn",
+				"useLiteralKeys": "warn",
+				"useSimplifiedLogicExpression": "warn"
+			},
+			"nursery": {
+				"useConsistentTypeDefinitions": {
+					"level": "warn",
+					"options": {
+						"style": "type"
+					}
+				},
+				"useExplicitType": "warn",
+				"useMaxParams": {
+					"level": "warn",
+					"options": {
+						"max": 5
+					}
+				}
+			},
+			"performance": {
+				"noAwaitInLoops": "warn"
+			},
+			"style": {
+				"noEnum": "error",
+				"noMagicNumbers": "warn",
+				"noNegationElse": "warn",
+				"noNestedTernary": "warn",
+				"noParameterAssign": "warn",
+				"useConsistentArrayType": "warn",
+				"useConsistentMemberAccessibility": "warn",
+				"useDefaultParameterLast": "warn",
+				"useDefaultSwitchClause": "warn",
+				"useGroupedAccessorPairs": "warn",
+				"useNamingConvention": "warn",
+				"useObjectSpread": "warn",
+				"useReadonlyClassProperties": "warn"
+			},
+			"suspicious": {
+				"useAwait": "warn"
+			}
 		}
 	}
 }

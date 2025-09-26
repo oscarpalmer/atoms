@@ -105,7 +105,10 @@ function getParts(value: unknown): unknown[] {
 
 //
 
-const comparators = {
+const comparators: Record<
+	string,
+	(first: never, second: never) => number | undefined
+> = {
 	bigint: compareNumbers,
 	boolean: compareNumbers,
 	number: compareNumbers,

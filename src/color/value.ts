@@ -1,6 +1,11 @@
 import {clamp} from '../internal/number';
 import {join} from '../internal/string';
-import {groupedPattern} from './constants';
+import {
+	EXPRESSION_GROUPED,
+	MAX_DEGREE,
+	MAX_HEX,
+	MAX_PERCENT,
+} from './constants';
 import type {HSLColor, RGBColor} from './models';
 
 function getHexyValue(
@@ -13,7 +18,7 @@ function getHexyValue(
 	const mod = saturation * Math.min(lightness, 1 - lightness);
 
 	return (
-		(lightness - mod * Math.max(-1, Math.min(part - 3, 9 - part, 1))) * 255
+		(lightness - mod * Math.max(-1, Math.min(part - 3, 9 - part, 1))) * MAX_HEX
 	);
 }
 
@@ -23,7 +28,7 @@ function getHexyValue(
  * @returns RGBColor object
  */
 export function hexToRgb(value: string): RGBColor {
-	const pairs = groupedPattern.exec(value) as RegExpExecArray;
+	const pairs = EXPRESSION_GROUPED.exec(value) as RegExpExecArray;
 	const rgb = [];
 
 	const {length} = pairs;
@@ -46,27 +51,31 @@ export function hexToRgb(value: string): RGBColor {
  * @returns RGBColor object
  */
 export function hslToRgb(value: HSLColor): RGBColor {
-	let hue = value.hue % 360;
+	let hue = value.hue % MAX_DEGREE;
 
 	if (hue < 0) {
-		hue += 360;
+		hue += MAX_DEGREE;
 	}
 
-	const saturation = value.saturation / 100;
-	const lightness = value.lightness / 100;
+	const saturation = value.saturation / MAX_PERCENT;
+	const lightness = value.lightness / MAX_PERCENT;
 
 	return {
 		blue: clamp(
 			Math.round(getHexyValue(hue, lightness, saturation, 4)),
 			0,
-			255,
+			MAX_HEX,
 		),
 		green: clamp(
 			Math.round(getHexyValue(hue, lightness, saturation, 8)),
 			0,
-			255,
+			MAX_HEX,
 		),
-		red: clamp(Math.round(getHexyValue(hue, lightness, saturation, 0)), 0, 255),
+		red: clamp(
+			Math.round(getHexyValue(hue, lightness, saturation, 0)),
+			0,
+			MAX_HEX,
+		),
 	};
 }
 
@@ -92,9 +101,9 @@ export function rgbToHex(value: RGBColor): string {
  * @returns HSLColor object
  */
 export function rgbToHsl(rgb: RGBColor): HSLColor {
-	const blue = rgb.blue / 255;
-	const green = rgb.green / 255;
-	const red = rgb.red / 255;
+	const blue = rgb.blue / MAX_HEX;
+	const green = rgb.green / MAX_HEX;
+	const red = rgb.red / MAX_HEX;
 
 	const max = Math.max(blue, green, red);
 	const min = Math.min(blue, green, red);
@@ -123,6 +132,10 @@ export function rgbToHsl(rgb: RGBColor): HSLColor {
 			case red:
 				hue = (green - blue) / delta + (green < blue ? 6 : 0);
 				break;
+
+			default:
+				/* istanbul ignore next */
+				break;
 		}
 
 		hue *= 60;
@@ -139,7 +152,7 @@ export function rgbToHsl(rgb: RGBColor): HSLColor {
 
 	return {
 		hue: +hue.toFixed(2),
-		lightness: +(lightness * 100).toFixed(2),
-		saturation: +(saturation * 100).toFixed(2),
+		lightness: +(lightness * MAX_PERCENT).toFixed(2),
+		saturation: +(saturation * MAX_PERCENT).toFixed(2),
 	};
 }

@@ -1,11 +1,18 @@
 import {between} from '../internal/number';
 import type {PlainObject} from '../models';
-import {anyPattern, hslKeys, rgbKeys} from './constants';
+import {
+	EXPRESSION_ANY,
+	KEYS_HSL,
+	KEYS_RGB,
+	MAX_DEGREE,
+	MAX_HEX,
+	MAX_PERCENT,
+} from './constants';
 import type {Color} from './index';
 import type {ColorProperty, HSLColor, RGBColor} from './models';
 
 function isBytey(value: unknown): value is number {
-	return typeof value === 'number' && between(value, 0, 255);
+	return typeof value === 'number' && between(value, 0, MAX_HEX);
 }
 
 /**
@@ -23,7 +30,7 @@ export function isColor(value: unknown): value is Color {
 }
 
 function isDegree(value: unknown): value is number {
-	return typeof value === 'number' && between(value, 0, 360);
+	return typeof value === 'number' && between(value, 0, MAX_DEGREE);
 }
 
 /**
@@ -32,7 +39,7 @@ function isDegree(value: unknown): value is number {
  * @returns `true` if the value is a hex-color, `false` otherwise
  */
 export function isHexColor(value: unknown): value is string {
-	return typeof value === 'string' && anyPattern.test(value);
+	return typeof value === 'string' && EXPRESSION_ANY.test(value);
 }
 
 /**
@@ -41,7 +48,7 @@ export function isHexColor(value: unknown): value is string {
  * @returns `true` if the value is an HSL-color, `false` otherwise
  */
 export function isHSLColor(value: unknown): value is HSLColor {
-	return isObject(value, hslKeys);
+	return isObject(value, KEYS_HSL);
 }
 
 /**
@@ -50,7 +57,7 @@ export function isHSLColor(value: unknown): value is HSLColor {
  * @returns `true` if the value is an RGB-color, `false` otherwise
  */
 export function isRGBColor(value: unknown): value is RGBColor {
-	return isObject(value, rgbKeys);
+	return isObject(value, KEYS_RGB);
 }
 
 /**
@@ -83,7 +90,7 @@ function isObject(obj: unknown, properties: Set<ColorProperty>): boolean {
 }
 
 function isPercentage(value: unknown): value is number {
-	return typeof value === 'number' && between(value, 0, 100);
+	return typeof value === 'number' && between(value, 0, MAX_PERCENT);
 }
 
 //

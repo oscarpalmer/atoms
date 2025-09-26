@@ -13,7 +13,7 @@ export class SizedMap<Key = unknown, Value = unknown> extends Map<Key, Value> {
 	/**
 	 * Is the Map full?
 	 */
-	get full() {
+	get full(): boolean {
 		return this.size >= this.maximum;
 	}
 
@@ -23,7 +23,7 @@ export class SizedMap<Key = unknown, Value = unknown> extends Map<Key, Value> {
 	 * @typeparam Key Type of the keys in the SizedMap
 	 * @typeparam Value Type of the values in the SizedMap
 	 */
-	constructor(entries: Array<[Key, Value]>);
+	constructor(entries: [Key, Value][]);
 
 	/**
 	 * Create a new SizedMap with a maximum size _(but clamped at 2^24)_
@@ -40,9 +40,9 @@ export class SizedMap<Key = unknown, Value = unknown> extends Map<Key, Value> {
 	 * @typeparam Key Type of the keys in the SizedMap
 	 * @typeparam Value Type of the values in the SizedMap
 	 */
-	constructor(entries?: Array<[Key, Value]>, maximum?: number);
+	constructor(entries?: [Key, Value][], maximum?: number);
 
-	constructor(first?: Array<[Key, Value]> | number, second?: number) {
+	constructor(first?: [Key, Value][] | number, second?: number) {
 		const maximum = getMaximum(first, second);
 
 		super();
@@ -104,7 +104,7 @@ export class SizedSet<Value = unknown> extends Set<Value> {
 	/**
 	 * Is the Set full?
 	 */
-	get full() {
+	get full(): boolean {
 		return this.size >= this.maximum;
 	}
 
@@ -184,12 +184,19 @@ export class SizedSet<Value = unknown> extends Set<Value> {
 }
 
 function getMaximum(first?: unknown, second?: unknown): number {
-	const actual =
-		(typeof first === 'number'
-			? first
-			: typeof second === 'number'
-				? second
-				: undefined) ?? 2 ** 20;
+	let actual: number;
 
-	return clamp(actual, 1, 2 ** 24);
+	if (typeof first === 'number') {
+		actual = first;
+	} else {
+		actual = typeof second === 'number' ? second : MAXIMUM_DEFAULT;
+	}
+
+	return clamp(actual, 1, MAXIMUM_ABSOLUTE);
 }
+
+//
+
+const MAXIMUM_ABSOLUTE = 16_777_216;
+
+const MAXIMUM_DEFAULT = 1_048_576;

@@ -12,7 +12,7 @@ export function between(
 	minimum: number,
 	maximum: number,
 ): boolean {
-	if (!isNumber(value) || !isNumber(minimum) || !isNumber(maximum)) {
+	if (![value, minimum, maximum].every(isNumber)) {
 		return false;
 	}
 
@@ -29,26 +29,26 @@ export function between(
 /**
  * Clamp a number between a minimum and maximum value
  * @param value Value to clamp
- * @param min Minimum value
- * @param max Maximum value
+ * @param minimum Minimum value
+ * @param maximum Maximum value
  * @param loop If `true`, the value will loop around when smaller than the minimum or larger than the maximum _(defaults to `false`)_
  * @returns Clamped value between the minimum and maximum
  */
 export function clamp(
 	value: number,
-	min: number,
-	max: number,
+	minimum: number,
+	maximum: number,
 	loop?: boolean,
 ): number {
-	if (!isNumber(value) || !isNumber(min) || !isNumber(max)) {
+	if (![value, minimum, maximum].every(isNumber)) {
 		return Number.NaN;
 	}
 
-	if (value < min) {
-		return loop === true ? max : min;
+	if (value < minimum) {
+		return loop === true ? maximum : minimum;
 	}
 
-	return value > max ? (loop === true ? min : max) : value;
+	return value > maximum ? (loop === true ? minimum : maximum) : value;
 }
 
 /**
@@ -85,27 +85,33 @@ export function getNumber(value: unknown): number {
 		return Number.NaN;
 	}
 
-	if (zeroIshExpression.test(parsed)) {
+	if (EXPRESSION_ZEROISH.test(parsed)) {
 		return 0;
 	}
 
-	const isBinary = binaryExpression.test(trimmed);
+	const isBinary = EXPRESSION_BINARY.test(trimmed);
 
-	if (isBinary || octalExpression.test(trimmed)) {
-		return Number.parseInt(trimmed.slice(2), isBinary ? 2 : 8);
+	if (isBinary || EXPRESSION_OCTAL.test(trimmed)) {
+		return Number.parseInt(trimmed.slice(2), isBinary ? 2 : OCTAL_VALUE);
 	}
 
 	return Number(
-		hexExpression.test(trimmed)
+		EXPRESSION_HEX.test(trimmed)
 			? trimmed
-			: trimmed.replace(underscoreExpression, ''),
+			: trimmed.replace(EXPRESSION_UNDERSCORE, ''),
 	);
 }
 
 //
 
-const binaryExpression = /^0b[01]+$/i;
-const hexExpression = /^0x[0-9a-f]+$/i;
-const octalExpression = /^0o[0-7]+$/i;
-const underscoreExpression = /_/g;
-const zeroIshExpression = /^\s*0+\s*$/;
+const EXPRESSION_BINARY = /^0b[01]+$/i;
+
+const EXPRESSION_HEX = /^0x[0-9a-f]+$/i;
+
+const EXPRESSION_OCTAL = /^0o[0-7]+$/i;
+
+const EXPRESSION_UNDERSCORE = /_/g;
+
+const EXPRESSION_ZEROISH = /^\s*0+\s*$/;
+
+const OCTAL_VALUE = 8;

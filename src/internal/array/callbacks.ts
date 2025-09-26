@@ -16,6 +16,9 @@ function getCallback(value: unknown): GenericCallback | undefined {
 			return typeof value === 'string' && value.includes('.')
 				? undefined
 				: (obj: PlainObject) => obj[value];
+
+		default:
+			break;
 	}
 }
 
