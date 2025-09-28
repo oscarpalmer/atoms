@@ -2,7 +2,7 @@ import type {Simplify} from 'type-fest';
 import {groupValues} from '../internal/array/group';
 import type {Key, KeyedValue, PlainObject} from '../models';
 
-interface GroupBy {
+type GroupBy = {
 	/**
 	 * Create a record from an array of items using a specific key
 	 * @param array Array to group
@@ -113,7 +113,10 @@ interface GroupBy {
 	arrays<
 		Item,
 		Callback extends (item: Item, index: number, array: Item[]) => Key,
-	>(array: Item[], callback: Callback): Record<ReturnType<Callback>, Item[]>;
+	>(
+		array: Item[],
+		callback: Callback,
+	): Record<ReturnType<Callback>, Item[]>;
 
 	/**
 	 * Create a record from an array of items using a specific key and value, and grouping them into arrays
@@ -147,9 +150,7 @@ interface GroupBy {
 		array: Item[],
 		key: ItemKey,
 		value: ValueCallback,
-	): Simplify<
-		Record<KeyedValue<Item, ItemKey>, ReturnType<ValueCallback>[]>
-	>;
+	): Simplify<Record<KeyedValue<Item, ItemKey>, ReturnType<ValueCallback>[]>>;
 
 	/**
 	 * Create a record from an array of items using a specific key and value, and grouping them into arrays
@@ -184,7 +185,7 @@ interface GroupBy {
 		key: KeyCallback,
 		value: ValueCallback,
 	): Record<ReturnType<KeyCallback>, ReturnType<ValueCallback>[]>;
-}
+};
 
 const groupBy = ((array: unknown[], first: unknown, second: unknown) =>
 	groupValues(array, first, second, false)) as GroupBy;

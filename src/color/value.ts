@@ -13,7 +13,7 @@ function getHexyValue(
 	lightness: number,
 	saturation: number,
 	value: number,
-) {
+): number {
 	const part = (value + hue / 30) % 12;
 	const mod = saturation * Math.min(lightness, 1 - lightness);
 

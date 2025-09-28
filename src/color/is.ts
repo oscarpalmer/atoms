@@ -79,8 +79,10 @@ function isObject(obj: unknown, properties: Set<ColorProperty>): boolean {
 		const key = keys[index];
 
 		if (
-			!properties.has(key as never) ||
-			!validators[key as ColorProperty]((obj as PlainObject)[key])
+			!(
+				properties.has(key as never) &&
+				validators[key as ColorProperty]((obj as PlainObject)[key])
+			)
 		) {
 			return false;
 		}

@@ -8,7 +8,7 @@ type Aggregation = {
 type AggregationCallback = (
 	current: number,
 	value: number,
-	isNotANumber: boolean,
+	notNumber: boolean,
 ) => number;
 
 type AggregationType = 'average' | 'max' | 'min' | 'sum';
@@ -38,21 +38,21 @@ export function aggregate(
 	const isCallback = typeof key === 'function';
 
 	let count = 0;
-	let isNotANumber = true;
 	let aggregated = Number.NaN;
+	let notNumber = true;
 
 	for (let index = 0; index < length; index += 1) {
 		const item = array[index];
 
 		const value = isCallback
 			? (key as GenericCallback)(item, index, array)
-			: ((item as PlainObject)[key as never] ?? item);
+			: (item as PlainObject)[key as never] ?? item;
 
 		if (typeof value === 'number' && !Number.isNaN(value)) {
-			aggregated = aggregator(aggregated, value, isNotANumber);
+			aggregated = aggregator(aggregated, value, notNumber);
 
 			count += 1;
-			isNotANumber = false;
+			notNumber = false;
 		}
 	}
 
@@ -95,8 +95,8 @@ export function max(array: unknown[], key?: unknown): number {
 	return aggregate('max', array, key).value;
 }
 
-function sum(current: number, value: number, isNotANumber: boolean): number {
-	return isNotANumber ? value : current + value;
+function sum(current: number, value: number, notNumber: boolean): number {
+	return notNumber ? value : current + value;
 }
 
 //
@@ -104,8 +104,8 @@ function sum(current: number, value: number, isNotANumber: boolean): number {
 const aggregators: Record<AggregationType, AggregationCallback> = {
 	sum,
 	average: sum,
-	max: (current: number, value: number, isNotANumber: boolean) =>
-		isNotANumber || value > current ? value : current,
-	min: (current: number, value: number, isNotANumber: boolean) =>
-		isNotANumber || value < current ? value : current,
+	max: (current: number, value: number, notNumber: boolean) =>
+		notNumber || value > current ? value : current,
+	min: (current: number, value: number, notNumber: boolean) =>
+		notNumber || value < current ? value : current,
 };

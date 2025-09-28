@@ -11,13 +11,13 @@ function calculate(): Promise<number> {
 
 			last = now;
 
-			if (values.length >= 10) {
+			if (values.length >= CALCULATION_TOTAL) {
 				const median =
 					values
 						.sort()
 						.slice(2, -2)
 						.reduce((first, second) => first + second, 0) /
-					(values.length - 4);
+					(values.length - CALCULATION_TRIM);
 
 				resolve(median);
 			} else {
@@ -36,10 +36,18 @@ export function noop(): void {}
 
 //
 
+const CALCULATION_TOTAL = 10;
+
+const CALCULATION_TRIM = 4;
+
+const DEFAULT_FPS = 60;
+
+const MILLISECONDS_IN_SECOND = 1000;
+
 /**
  * A calculated average of the refresh rate of the display _(in milliseconds)_
  */
-export let milliseconds: number = 1000 / 60;
+export let milliseconds: number = MILLISECONDS_IN_SECOND / DEFAULT_FPS;
 
 calculate().then(value => {
 	milliseconds = value;

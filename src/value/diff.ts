@@ -49,6 +49,16 @@ type KeyedDiffValue = {
 	key: string;
 } & DiffValue;
 
+type Parameters = {
+	changes: KeyedDiffValue[];
+	key: PropertyKey;
+	values: {first: unknown; second: unknown};
+	relaxedNullish: boolean;
+	prefix?: string;
+};
+
+//
+
 /**
  * Find the differences between two values
  * @param first First value to compare
@@ -80,7 +90,7 @@ export function diff<First, Second = First>(
 	const firstIsArrayOrObject = isArrayOrPlainObject(first);
 	const secondIsArrayOrObject = isArrayOrPlainObject(second);
 
-	if (same || (!firstIsArrayOrObject && !secondIsArrayOrObject)) {
+	if (same || !(firstIsArrayOrObject || secondIsArrayOrObject)) {
 		result.type = same ? 'none' : 'full';
 
 		return result;
@@ -109,6 +119,47 @@ export function diff<First, Second = First>(
 	return result;
 }
 
+function getChanges(
+	changes: KeyedDiffValue[],
+	first: unknown,
+	second: unknown,
+	relaxedNullish: boolean,
+	prefix?: string,
+): KeyedDiffValue[] {
+	const checked = new Set<PropertyKey>();
+
+	for (let outerIndex = 0; outerIndex < 2; outerIndex += 1) {
+		const value = (outerIndex === 0 ? first : second) ?? {};
+
+		const keys = [
+			...Object.keys(value),
+			...Object.getOwnPropertySymbols(value),
+		];
+
+		const {length} = keys;
+
+		for (let innerIndex = 0; innerIndex < length; innerIndex += 1) {
+			const key = keys[innerIndex];
+
+			if (checked.has(key)) {
+				continue;
+			}
+
+			checked.add(key);
+
+			setChanges({
+				changes,
+				key,
+				relaxedNullish,
+				prefix,
+				values: {first, second},
+			});
+		}
+	}
+
+	return changes;
+}
+
 function getDiffs(
 	first: unknown,
 	second: unknown,
@@ -116,7 +167,6 @@ function getDiffs(
 	prefix?: string,
 ): KeyedDiffValue[] {
 	const changes: KeyedDiffValue[] = [];
-	const checked = new Set<PropertyKey>();
 
 	if (Array.isArray(first) && Array.isArray(second)) {
 		const maximumLength = Math.max(first.length, second.length);
@@ -133,54 +183,38 @@ function getDiffs(
 		}
 	}
 
-	for (let outerIndex = 0; outerIndex < 2; outerIndex += 1) {
-		const value = (outerIndex === 0 ? first : second) ?? {};
+	return getChanges(changes, first, second, relaxedNullish, prefix);
+}
 
-		const keys = [
-			...Object.keys(value),
-			...Object.getOwnPropertySymbols(value),
-		];
-		const {length} = keys;
+function setChanges(parameters: Parameters): void {
+	const {changes, key, prefix, relaxedNullish, values} = parameters;
 
-		for (let innerIndex = 0; innerIndex < length; innerIndex += 1) {
-			const key = keys[innerIndex];
+	const from = values.first?.[key as never];
+	const to = values.second?.[key as never];
 
-			if (checked.has(key)) {
-				continue;
-			}
-
-			checked.add(key);
-
-			const from = first?.[key as never];
-			const to = second?.[key as never];
-
-			if ((relaxedNullish && from == null && to == null) || equal(from, to)) {
-				continue;
-			}
-
-			const prefixed = join([prefix, key], '.');
-
-			const change = {
-				from,
-				to,
-				key: prefixed,
-			};
-
-			const nested = isArrayOrPlainObject(from) || isArrayOrPlainObject(to);
-
-			const diffs = nested ? getDiffs(from, to, relaxedNullish, prefixed) : [];
-
-			if (!nested || (nested && diffs.length > 0)) {
-				changes.push(change);
-			}
-
-			const diffsLength = diffs.length;
-
-			for (let diffIndex = 0; diffIndex < diffsLength; diffIndex += 1) {
-				changes.push(diffs[diffIndex]);
-			}
-		}
+	if ((relaxedNullish && from == null && to == null) || equal(from, to)) {
+		return;
 	}
 
-	return changes;
+	const prefixed = join([prefix, key], '.');
+
+	const change = {
+		from,
+		to,
+		key: prefixed,
+	};
+
+	const nested = isArrayOrPlainObject(from) || isArrayOrPlainObject(to);
+
+	const diffs = nested ? getDiffs(from, to, relaxedNullish, prefixed) : [];
+
+	if (!nested || (nested && diffs.length > 0)) {
+		changes.push(change);
+	}
+
+	const diffsLength = diffs.length;
+
+	for (let diffIndex = 0; diffIndex < diffsLength; diffIndex += 1) {
+		changes.push(diffs[diffIndex]);
+	}
 }

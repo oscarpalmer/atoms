@@ -22,24 +22,9 @@ export function fromQuery(query: string): PlainObject {
 	for (let index = 0; index < length; index += 1) {
 		const decoded = parts[index].split('=').map(tryDecode);
 		const key = decoded[0].replace(arraySuffixPattern, '');
-		const value = decoded[1];
 
-		if (ignoreKey(key)) {
-			continue;
-		}
-
-		if (key.includes('.')) {
-			setValue(parameters, key, getValue(value));
-		} else {
-			if (key in parameters) {
-				if (!Array.isArray(parameters[key])) {
-					parameters[key] = [parameters[key]];
-				}
-
-				(parameters[key] as unknown[]).push(getValue(value) as never);
-			} else {
-				parameters[key] = getValue(value) as never;
-			}
+		if (!ignoreKey(key)) {
+			setQueryValue(parameters, key, decoded[1]);
 		}
 	}
 
@@ -100,6 +85,26 @@ function getValue(value: string): unknown {
 
 function isDecodable(value: unknown): value is boolean | number | string {
 	return types.has(typeof value);
+}
+
+function setQueryValue(
+	parameters: PlainObject,
+	key: string,
+	value: string,
+): void {
+	if (key.includes('.')) {
+		setValue(parameters, key, getValue(value));
+	} else {
+		if (key in parameters) {
+			if (!Array.isArray(parameters[key])) {
+				parameters[key] = [parameters[key]];
+			}
+
+			(parameters[key] as unknown[]).push(getValue(value) as never);
+		} else {
+			parameters[key] = getValue(value) as never;
+		}
+	}
 }
 
 /**

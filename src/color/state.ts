@@ -1,8 +1,8 @@
 import {clamp} from '../internal/number';
 import {
-	DEFAULT_HEX,
 	DEFAULT_HSL,
 	DEFAULT_RGB,
+	HEX_BLACK,
 	MAX_DEGREE,
 	MAX_HEX,
 	MAX_PERCENT,
@@ -54,7 +54,7 @@ export function getState(value: unknown): ColorState {
 		}
 	}
 
-	state.hex = String(DEFAULT_HEX);
+	state.hex = String(HEX_BLACK);
 	state.hsl = {...DEFAULT_HSL};
 	state.rgb = {...DEFAULT_RGB};
 

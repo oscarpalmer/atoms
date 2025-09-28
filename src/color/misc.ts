@@ -1,5 +1,5 @@
 import {join} from '../internal/string';
-import {DEFAULT_HEX, EXPRESSION_PREFIX} from './constants';
+import {EXPRESSION_PREFIX, HEX_BLACK} from './constants';
 import {isHexColor} from './is';
 
 /**
@@ -9,7 +9,7 @@ import {isHexColor} from './is';
  */
 export function getNormalizedHex(value: unknown): string {
 	if (!isHexColor(value)) {
-		return String(DEFAULT_HEX);
+		return String(HEX_BLACK);
 	}
 
 	const normalized = value.replace(EXPRESSION_PREFIX, '');

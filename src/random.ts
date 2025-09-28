@@ -2,14 +2,12 @@ import {shuffle} from './internal/array/shuffle';
 import {getRandomInteger} from './internal/random';
 import {join} from './internal/string';
 
-const characters = 'abcdefghijklmnopqrstuvwxyz';
-
 /**
  * Get a random boolean
  * @return Random boolean value
  */
 export function getRandomBoolean(): boolean {
-	return Math.random() > 0.5;
+	return Math.random() > BOOLEAN_MODIFIER;
 }
 
 /**
@@ -29,7 +27,7 @@ export function getRandomCharacters(
 	const actual =
 		typeof selection === 'string' && selection.length > 0
 			? selection
-			: characters;
+			: ALPHABET;
 
 	let result = '';
 
@@ -53,7 +51,7 @@ export function getRandomColor(): string {
  * @returns Random hexadecimal character from `0-9` and `A-F`
  */
 export function getRandomHex(): string {
-	return '0123456789ABCDEF'[getRandomInteger(0, 15)];
+	return HEX_CHARACTERS[getRandomInteger(0, HEX_MAXIMUM)];
 }
 
 /**
@@ -106,5 +104,17 @@ export function getRandomItems<Value>(
 		? shuffle(array)
 		: shuffle(array).slice(0, amount);
 }
+
+//
+
+const ALPHABET = 'abcdefghijklmnopqrstuvwxyz';
+
+const BOOLEAN_MODIFIER = 0.5;
+
+const HEX_CHARACTERS = '0123456789ABCDEF';
+
+const HEX_MAXIMUM = 15;
+
+//
 
 export {getRandomFloat, getRandomInteger} from './internal/random';

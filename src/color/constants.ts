@@ -1,7 +1,5 @@
 import type {ColorProperty, HSLColor, RGBColor} from './models';
 
-export const DEFAULT_HEX = '000000';
-
 export const DEFAULT_HSL: HSLColor = {
 	hue: 0,
 	lightness: 0,
@@ -16,9 +14,14 @@ export const DEFAULT_RGB: RGBColor = {
 
 export const EXPRESSION_ANY = /^#?([a-f0-9]{3}){1,2}$/i;
 
-export const EXPRESSION_GROUPED = /^#?([a-f0-9]{2})([a-f0-9]{2})([a-f0-9]{2})$/i;
+export const EXPRESSION_GROUPED =
+	/^#?([a-f0-9]{2})([a-f0-9]{2})([a-f0-9]{2})$/i;
 
 export const EXPRESSION_PREFIX = /^#/;
+
+export const HEX_BLACK = '000000';
+
+export const HEX_WHITE = 'ffffff';
 
 export const KEYS_HSL: Set<ColorProperty> = new Set([
 	'hue',
@@ -33,3 +36,23 @@ export const MAX_DEGREE = 360;
 export const MAX_HEX = 255;
 
 export const MAX_PERCENT = 100;
+
+// https://www.w3.org/TR/WCAG20/#relativeluminancedef
+
+export const SRGB_LUMINANCE_BLUE = 0.0722;
+
+export const SRGB_LUMINANCE_EXPONENT = 2.4;
+
+export const SRGB_LUMINANCE_GREEN = 0.7152;
+
+export const SRGB_LUMINANCE_MINIMUM = 0.03928;
+
+export const SRGB_LUMINANCE_MODIFIER = 1.055;
+
+export const SRGB_LUMINANCE_MULTIPLIER = 12.92;
+
+export const SRGB_LUMINANCE_OFFSET = 0.055;
+
+export const SRGB_LUMINANCE_RED = 0.2126;
+
+export const SRGB_LUMINANCE_THRESHOLD = 0.625;

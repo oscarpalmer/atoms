@@ -1,28 +1,18 @@
 import {chunk} from './chunk';
 
-export function insertValues<Item>(
+function insertChunkedValues(
 	type: 'insert' | 'push' | 'splice',
-	array: unknown,
-	items: unknown,
-	start: unknown,
+	array: unknown[],
+	items: unknown[],
+	start: number,
 	deleteCount: number,
 ): unknown {
-	const splice = type === 'insert' || type === 'splice';
-
-	if (!Array.isArray(array) || typeof start !== 'number') {
-		return splice ? [] : 0;
-	}
-
-	if (!Array.isArray(items) || items.length === 0) {
-		return splice ? [] : 0;
-	}
-
 	const actualStart = Math.min(Math.max(0, start), array.length);
 	const chunked = chunk(items);
 	const lastIndex = chunked.length - 1;
 
 	let index = Number(chunked.length);
-	let returned: Item[] | undefined;
+	let returned: unknown[] | undefined;
 
 	while (--index >= 0) {
 		const result = array.splice(
@@ -43,4 +33,30 @@ export function insertValues<Item>(
 	}
 
 	return type === 'splice' ? returned : array.length;
+}
+
+export function insertValues(
+	type: 'insert' | 'push' | 'splice',
+	array: unknown,
+	items: unknown,
+	start: unknown,
+	deleteCount: number,
+): unknown {
+	const splice = type === 'insert' || type === 'splice';
+
+	if (!Array.isArray(array) || typeof start !== 'number') {
+		return splice ? [] : 0;
+	}
+
+	if (!Array.isArray(items) || items.length === 0) {
+		return splice ? [] : 0;
+	}
+
+	return insertChunkedValues(
+		type,
+		array,
+		items,
+		start,
+		splice ? deleteCount : 0,
+	);
 }

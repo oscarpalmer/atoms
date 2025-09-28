@@ -1,3 +1,17 @@
+import {
+	HEX_BLACK,
+	HEX_WHITE,
+	MAX_HEX,
+	SRGB_LUMINANCE_BLUE,
+	SRGB_LUMINANCE_EXPONENT,
+	SRGB_LUMINANCE_GREEN,
+	SRGB_LUMINANCE_MINIMUM,
+	SRGB_LUMINANCE_MODIFIER,
+	SRGB_LUMINANCE_MULTIPLIER,
+	SRGB_LUMINANCE_OFFSET,
+	SRGB_LUMINANCE_RED,
+	SRGB_LUMINANCE_THRESHOLD,
+} from './constants';
 import {isColor, isHexColor, isHSLColor, isRGBColor} from './is';
 import {getNormalizedHex} from './misc';
 import type {ColorState, HSLColor, RGBColor} from './models';
@@ -89,21 +103,25 @@ export function getForegroundColor(value: unknown): Color {
 	const original = getColor(value);
 	const {blue, green, red} = original.rgb;
 
-	const values = [blue / 255, green / 255, red / 255];
+	const values = [blue / MAX_HEX, green / MAX_HEX, red / MAX_HEX];
 
 	for (let color of values) {
-		if (color <= 0.03928) {
-			color /= 12.92;
+		if (color <= SRGB_LUMINANCE_MINIMUM) {
+			color /= SRGB_LUMINANCE_MULTIPLIER;
 		} else {
-			color = ((color + 0.055) / 1.055) ** 2.4;
+			color =
+				((color + SRGB_LUMINANCE_OFFSET) / SRGB_LUMINANCE_MODIFIER) **
+				SRGB_LUMINANCE_EXPONENT;
 		}
 	}
 
 	const luminance =
-		0.2126 * values[2] + 0.7152 * values[1] + 0.0722 * values[0];
+		SRGB_LUMINANCE_RED * values[2] +
+		SRGB_LUMINANCE_GREEN * values[1] +
+		SRGB_LUMINANCE_BLUE * values[0];
 
 	// Rudimentary and ureliable?; implement APCA for more reliable results?
-	return getColor(luminance > 0.625 ? '000000' : 'ffffff');
+	return getColor(luminance > SRGB_LUMINANCE_THRESHOLD ? HEX_BLACK : HEX_WHITE);
 }
 
 /**

@@ -55,15 +55,13 @@ export function unsmush<Value extends PlainObject>(
 		const key = keys[index].value;
 		const val = value[key];
 
-		setValue(
-			unsmushed,
-			key,
-			isArrayOrPlainObject(val)
-				? Array.isArray(val)
-					? [...val]
-					: {...val}
-				: val,
-		);
+		let next = val;
+
+		if (isArrayOrPlainObject(val)) {
+			next = Array.isArray(val) ? [...val] : {...val};
+		}
+
+		setValue(unsmushed, key, next);
 	}
 
 	return unsmushed as never;

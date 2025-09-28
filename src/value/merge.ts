@@ -22,12 +22,29 @@ export type MergeOptions = {
 	skipNullableInArrays: boolean;
 };
 
-type MergeValuesOptions = {
+type Options = {
 	replaceableObjects: ReplaceableObjectsCallback | undefined;
 	skipNullableInArrays: boolean;
 };
 
 type ReplaceableObjectsCallback = (name: string) => boolean;
+
+function getOptions(options?: Partial<MergeOptions>): Options {
+	const actual: Options = {
+		replaceableObjects: undefined,
+		skipNullableInArrays: false,
+	};
+
+	if (typeof options !== 'object' || options == null) {
+		return actual;
+	}
+
+	actual.replaceableObjects = getReplaceableObjects(options.replaceableObjects);
+
+	actual.skipNullableInArrays = options.skipNullableInArrays === true;
+
+	return actual;
+}
 
 function getReplaceableObjects(
 	value: unknown,
@@ -58,33 +75,20 @@ export function merge<Model extends ArrayOrPlainObject>(
 		return {} as Model;
 	}
 
-	return mergeValues(values, {
-		replaceableObjects: getReplaceableObjects(options?.replaceableObjects),
-		skipNullableInArrays: options?.skipNullableInArrays === true,
-	}) as Model;
+	return mergeValues(values, getOptions(options)) as Model;
 }
 
-function mergeValues(
+function mergeObjects(
 	values: ArrayOrPlainObject[],
-	options: MergeValuesOptions,
+	options: Options,
 	prefix?: string,
 ): ArrayOrPlainObject {
-	const actual = values.filter(isArrayOrPlainObject);
-
-	if (actual.length === 0) {
-		return {};
-	}
-
-	if (actual.length === 1) {
-		return actual[0];
-	}
-
-	const {length} = actual;
-	const isArray = actual.every(Array.isArray);
+	const {length} = values;
+	const isArray = values.every(Array.isArray);
 	const result = (isArray ? [] : {}) as PlainObject;
 
 	for (let outerIndex = 0; outerIndex < length; outerIndex += 1) {
-		const item = actual[outerIndex] as PlainObject;
+		const item = values[outerIndex] as PlainObject;
 		const keys = Object.keys(item);
 		const size = keys.length;
 
@@ -100,8 +104,7 @@ function mergeValues(
 			}
 
 			if (
-				!isArrayOrPlainObject(next) ||
-				!isArrayOrPlainObject(previous) ||
+				!(isArrayOrPlainObject(next) && isArrayOrPlainObject(previous)) ||
 				(options.replaceableObjects?.(full) ?? false)
 			) {
 				result[key] = next;
@@ -112,4 +115,16 @@ function mergeValues(
 	}
 
 	return result;
+}
+
+function mergeValues(
+	values: ArrayOrPlainObject[],
+	options: Options,
+	prefix?: string,
+): ArrayOrPlainObject {
+	const actual = values.filter(isArrayOrPlainObject);
+
+	return actual.length > 1
+		? mergeObjects(actual, options, prefix)
+		: actual[0] ?? {};
 }

@@ -74,16 +74,18 @@ function equalArray(
 	let offset = 0;
 
 	if (length >= ARRAY_THRESHOLD) {
-		offset = Math.round(length / 10);
+		offset = Math.round(length / ARRAY_PEEK_PERCENTAGE);
 		offset = offset > ARRAY_THRESHOLD ? ARRAY_THRESHOLD : offset;
 
 		for (let index = 0; index < offset; index += 1) {
 			if (
-				!equalValue(first[index], second[index], options) ||
-				!equalValue(
-					first[length - index - 1],
-					second[length - index - 1],
-					options,
+				!(
+					equalValue(first[index], second[index], options) &&
+					equalValue(
+						first[length - index - 1],
+						second[length - index - 1],
+						options,
+					)
 				)
 			) {
 				return false;
@@ -128,7 +130,7 @@ function equalArrayBuffer(
 				new Uint8Array(first) as never,
 				new Uint8Array(second) as never,
 				options,
-			)
+		  )
 		: false;
 }
 
@@ -142,7 +144,7 @@ function equalDataView(
 				first.buffer as ArrayBuffer,
 				second.buffer as ArrayBuffer,
 				options,
-			)
+		  )
 		: false;
 }
 
@@ -410,5 +412,7 @@ function getOptions(input?: boolean | EqualOptions): Options {
 }
 
 //
+
+const ARRAY_PEEK_PERCENTAGE = 10;
 
 const ARRAY_THRESHOLD = 100;
