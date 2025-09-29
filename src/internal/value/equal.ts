@@ -11,12 +11,17 @@ type EqualOptions = {
 	 * Keys _(or key expressions)_ to ignore when comparing objects
 	 */
 	ignoreKeys?: string | RegExp | Array<string | RegExp>;
+	/**
+	 * Should `null` and `undefined` be considered equal?
+	 */
+	relaxedNullish?: boolean;
 };
 
 type Options = {
 	ignoreCase: boolean;
 	ignoreExpressions: OptionsKeys<RegExp[]>;
 	ignoreKeys: OptionsKeys<Set<string>>;
+	relaxedNullish: boolean;
 };
 
 type OptionsKeys<Values> = {
@@ -28,10 +33,10 @@ type OptionsKeys<Values> = {
 
 /**
  * Are two strings equal?
- * @param first First string to compare
- * @param second Second string to compare
+ * @param first First string
+ * @param second Second string
  * @param ignoreCase If `true`, comparison will be case-insensitive
- * @returns `true` if the strings are equal, `false` otherwise
+ * @returns `true` if the strings are equal, otherwise `false`
  */
 export function equal(
 	first: string,
@@ -41,10 +46,10 @@ export function equal(
 
 /**
  * Are two values equal?
- * @param first First value to compare
- * @param second Second value to compare
+ * @param first First value
+ * @param second Second value
  * @param options Comparison options
- * @returns `true` if the values are equal, `false` otherwise
+ * @returns `true` if the values are equal, otherwise `false`
  */
 export function equal(
 	first: unknown,
@@ -60,6 +65,7 @@ export function equal(
 	return equalValue(first, second, getOptions(options));
 }
 
+// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: Extracting to smaller functions had unintended results for return-early statements, so leaving as-is for now
 function equalArray(
 	first: unknown[],
 	second: unknown[],
@@ -291,6 +297,10 @@ function equalValue(
 	second: unknown,
 	options: Options,
 ): boolean {
+	if (options.relaxedNullish === true && first == null && second == null) {
+		return true;
+	}
+
 	switch (true) {
 		case Object.is(first, second):
 			return true;
@@ -307,12 +317,7 @@ function equalValue(
 				(second as string).toLocaleLowerCase(),
 			);
 
-		default:
-			break;
-	}
-
-	switch (true) {
-		case first instanceof ArrayBuffer && second instanceof ArrayBuffer:
+			case first instanceof ArrayBuffer && second instanceof ArrayBuffer:
 			return equalArrayBuffer(first, second, options);
 
 		case first instanceof Date && second instanceof Date:
@@ -377,6 +382,7 @@ function getOptions(input?: boolean | EqualOptions): Options {
 			enabled: false,
 			values: new Set(),
 		},
+		relaxedNullish: false,
 	};
 
 	if (typeof input === 'boolean') {
@@ -407,6 +413,8 @@ function getOptions(input?: boolean | EqualOptions): Options {
 		options.ignoreExpressions.values.length > 0;
 
 	options.ignoreKeys.enabled = options.ignoreKeys.values.size > 0;
+
+	options.relaxedNullish = input.relaxedNullish === true;
 
 	return options;
 }

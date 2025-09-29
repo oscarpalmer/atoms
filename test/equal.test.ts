@@ -1,3 +1,5 @@
+/** biome-ignore-all lint/style/noMagicNumbers: Testing */
+/** biome-ignore-all lint/style/useNamingConvention: Testing */
 import {expect, test} from 'vitest';
 import {equal} from '../src/value';
 
@@ -32,6 +34,10 @@ test('any', () => {
 			const inner = values[innerIndex];
 
 			expect(equal(outer, inner)).toBe(outerIndex === innerIndex);
+
+			expect(equal(outer, inner, {
+				relaxedNullish: true,
+			})).toBe((outerIndex < 2 && innerIndex < 2) || (outerIndex === innerIndex));
 		}
 	}
 });

@@ -15,9 +15,9 @@ export type TemplateOptions = {
 
 /**
  * Render a string from a template with variables
- * @param value Template string with variables
- * @param variables Variables to use in the template
- * @param options Options for the template rendering
+ * @param value Template string
+ * @param variables Variables to use
+ * @param options Templating options
  * @returns Templated string
  */
 export function template(
@@ -33,10 +33,13 @@ export function template(
 		return value;
 	}
 
-	const ignoreCase = options?.ignoreCase === true;
+	const hasOptions = typeof options === 'object' && options != null;
+	const ignoreCase = hasOptions && options?.ignoreCase === true;
 
 	const pattern =
-		options?.pattern instanceof RegExp ? options.pattern : variablePattern;
+		hasOptions && options?.pattern instanceof RegExp
+			? options.pattern
+			: EXPRESSION_VARIABLE;
 
 	const values: Record<string, string> = {};
 
@@ -56,4 +59,4 @@ export function template(
 
 //
 
-const variablePattern = /{{([\s\S]+?)}}/g;
+const EXPRESSION_VARIABLE = /{{([\s\S]+?)}}/g;

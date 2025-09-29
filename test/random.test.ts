@@ -1,3 +1,5 @@
+/** biome-ignore-all lint/style/noMagicNumbers: Testing */
+/** biome-ignore-all lint/nursery/useExplicitType: Testing */
 import {expect, test} from 'vitest';
 import {
 	getRandomBoolean,
@@ -12,25 +14,32 @@ import {
 
 const size = 100_000;
 
+// biome-ignore lint/suspicious/useAwait: Testing
+// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: Testing
 async function getRandomNumber(
 	callback: (min?: number, max?: number) => number,
 	flipped: boolean,
 	min?: number,
 	max?: number,
 ): Promise<void> {
-	const maxActual =
-		typeof max === 'number'
-			? max
-			: flipped
-				? Number.MIN_SAFE_INTEGER
-				: Number.MAX_SAFE_INTEGER;
+	let maxActual: number;
+	let minActual: number;
 
-	const minActual =
-		typeof min === 'number'
-			? min
-			: flipped
-				? Number.MAX_SAFE_INTEGER
-				: Number.MIN_SAFE_INTEGER;
+	if (typeof max === 'number') {
+		maxActual = max;
+	} else {
+		maxActual = flipped
+			? Number.MIN_SAFE_INTEGER
+			: Number.MAX_SAFE_INTEGER;
+	}
+
+	if (typeof min === 'number') {
+		minActual = min;
+	} else {
+		minActual = flipped
+			? Number.MAX_SAFE_INTEGER
+			: Number.MIN_SAFE_INTEGER;
+	}
 
 	let index = 0;
 	let invalid = 0;
@@ -107,15 +116,14 @@ test('getRandomCharacters', () =>
 	}));
 
 test('getRandomColor', () => {
-	const pattern = /^#[0-9A-F]{6}$/;
+	const prefixed = /^#[0-9A-F]{6}$/;
+	const unprefixed = /^[0-9A-F]{6}$/;
 
-	let index = 0;
 	let invalid = 0;
 
-	for (; index < size; index += 1) {
-		if (!pattern.test(getRandomColor())) {
-			invalid += 1;
-		}
+	for (let index = 0; index < size; index += 1) {
+		invalid += unprefixed.test(getRandomColor()) ? 0 : 1;
+		invalid += prefixed.test(getRandomColor(true)) ? 0 : 1;
 	}
 
 	expect(invalid).toBe(0);

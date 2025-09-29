@@ -1,3 +1,6 @@
+/** biome-ignore-all lint/style/noMagicNumbers: Testing */
+/** biome-ignore-all lint/nursery/useExplicitType: Testing */
+/** biome-ignore-all lint/style/useNamingConvention: Testing */
 import {expect, test} from 'vitest';
 import {
 	camelCase,
@@ -16,11 +19,19 @@ import {
 } from '../src/string';
 
 class ItemWithoutToString {
-	constructor(public value: string) {}
+	value: string;
+
+	constructor(value: string) {
+		this.value = value;
+	}
 }
 
 class ItemWithToString {
-	constructor(public value: string) {}
+	value: string;
+
+	constructor(value: string) {
+		this.value = value;
+	}
 
 	toString() {
 		return this.value;

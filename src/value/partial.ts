@@ -2,8 +2,8 @@ import type {PlainObject} from '../models';
 
 /**
  * Create a new object with only the specified keys
- * @param value Object to create a partial object from
- * @param keys Keys to include in the partial object
+ * @param value Original object
+ * @param keys Keys to use
  * @returns Partial object with only the specified keys
  */
 export function partial<Value extends PlainObject, Key extends keyof Value>(

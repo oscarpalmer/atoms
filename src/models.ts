@@ -50,6 +50,8 @@ export type PlainObject = Record<PropertyKey, unknown>;
 
 /**
  * Get the value's type as a string
+ * 
+ * _(Thanks, type-fest!)_
  */
 export type ToString<Value> = Value extends string | number
 	? `${Value}`

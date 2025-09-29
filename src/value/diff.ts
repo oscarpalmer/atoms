@@ -61,10 +61,10 @@ type Parameters = {
 
 /**
  * Find the differences between two values
- * @param first First value to compare
- * @param second Second value to compare
+ * @param first First value
+ * @param second Second value
  * @param options Comparison options
- * @returns The differences between the two values
+ * @returns Difference result
  */
 export function diff<First, Second = First>(
 	first: First,
@@ -192,7 +192,7 @@ function setChanges(parameters: Parameters): void {
 	const from = values.first?.[key as never];
 	const to = values.second?.[key as never];
 
-	if ((relaxedNullish && from == null && to == null) || equal(from, to)) {
+	if (equal(from, to, {relaxedNullish})) {
 		return;
 	}
 

@@ -4,18 +4,18 @@ import {insertValues} from '../internal/array/insert';
 
 /**
  * Removes and returns all items from an array starting from a specific index
- * @param array Array to splice
+ * @param array Original array
  * @param start Index to start splicing from
- * @returns Array of removed items
+ * @returns Removed items
  */
 export function splice<Item>(array: Item[], start: number): Item[];
 
 /**
  * Removes and returns _(up to)_ a specific amount of items from an array, starting from a specific index
- * @param array Array to splice
+ * @param array Original array
  * @param start Index to start splicing from
- * @param amount Number of items to remove from the array
- * @returns Array of removed items
+ * @param amount Number of items to remove
+ * @returns Removed items
  */
 export function splice<Item>(
 	array: Item[],
@@ -24,11 +24,11 @@ export function splice<Item>(
 ): Item[];
 
 /**
- * Adds values into an array at a specific index and removes no items
- * @param array Array to splice
+ * Adds items into an array at a specific index
+ * @param array Original array
  * @param start Index to start splicing from
- * @param added Values to add to the array
- * @returns Array of removed items
+ * @param added Added items
+ * @returns Removed items
  */
 export function splice<Item>(
 	array: Item[],
@@ -37,12 +37,12 @@ export function splice<Item>(
 ): Item[];
 
 /**
- * Adds values into an array at a specific index and removes a specific amount of items
- * @param array Array to splice
+ * Adds items into an array at a specific index and removes a specific amount of items
+ * @param array Original array
  * @param start Index to start splicing from
- * @param amount Number of items to remove from the array
- * @param added Values to add to the array
- * @returns Array of removed items
+ * @param amount Number of items to remove
+ * @param added Added items
+ * @returns Removed items
  */
 export function splice<Item>(
 	array: Item[],

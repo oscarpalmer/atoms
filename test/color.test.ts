@@ -1,3 +1,5 @@
+/** biome-ignore-all lint/style/noMagicNumbers: Testing */
+/** biome-ignore-all lint/nursery/useExplicitType: Testing */
 import {expect, test} from 'vitest';
 import {
 	getColor,

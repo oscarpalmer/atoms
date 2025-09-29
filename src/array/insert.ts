@@ -3,19 +3,19 @@ import {insertValues} from '../internal/array/insert';
 // Uses chunking to avoid call stack size being exceeded
 
 /**
- * Insert values into an array at the end
- * @param array Array to insert values into
- * @param items Values to insert into the array
- * @returns Original array with the values inserted
+ * Insert items into an array _(at the end)_
+ * @param array Original array
+ * @param items Inserted items
+ * @returns Updated array
  */
 export function insert<Item>(array: Item[], items: Item[]): Item[];
 
 /**
- * Insert values into an array at a specified index
- * @param array Array to insert values into
- * @param index Index to insert the values at
- * @param items Values to insert into the array
- * @returns Original array with the values inserted
+ * Insert items into an array at a specified index
+ * @param array Original array
+ * @param index Index to insert at
+ * @param items Inserted items
+ * @returns Updated array
  */
 export function insert<Item>(
 	array: Item[],

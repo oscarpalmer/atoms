@@ -2,8 +2,8 @@ import {getRandomInteger} from '../random';
 
 /**
  * Shuffle items in array
- * @param array Array to shuffle
- * @returns New array with shuffled values
+ * @param array Original array
+ * @returns Shuffled array
  */
 export function shuffle<Item>(array: Item[]): Item[] {
 	if (!Array.isArray(array)) {

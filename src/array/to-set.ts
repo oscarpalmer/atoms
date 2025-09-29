@@ -4,15 +4,15 @@ import type {PlainObject} from '../models';
 /**
  * Create a Set from an array of items
  * @param array Array to convert
- * @returns Set with items as values
+ * @returns Set of items
  */
 export function toSet<Item>(array: Item[]): Set<Item>;
 
 /**
  * Create a Set from an array of items using a key
  * @param array Array to convert
- * @param key Key to use
- * @returns Set with keyed values
+ * @param key Key to use for value
+ * @returns Set of values
  */
 export function toSet<Item extends PlainObject, Key extends keyof Item>(
 	array: Item[],
@@ -22,8 +22,8 @@ export function toSet<Item extends PlainObject, Key extends keyof Item>(
 /**
  * Create a Set from an array of items using a callback
  * @param array Array to convert
- * @param callback Function to get a value from each item
- * @returns Set with values
+ * @param callback Callback to get an item's value
+ * @returns Set of values
  */
 export function toSet<
 	Item,

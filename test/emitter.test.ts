@@ -1,3 +1,5 @@
+/** biome-ignore-all lint/style/noMagicNumbers: Testing */
+/** biome-ignore-all lint/nursery/useExplicitType: Testing */
 import {expect, test} from 'vitest';
 import {emitter} from '../src/emitter';
 
@@ -15,7 +17,7 @@ test('emitter', () =>
 			expect(value.active).toBe(false);
 
 			try {
-				const {observable} = value;
+				value.observable;
 			} catch (error: unknown) {
 				expect(error).toBeInstanceOf(Error);
 				expect((error as Error)?.message).toBe(

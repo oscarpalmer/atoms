@@ -2,17 +2,17 @@ import {findValue} from '../internal/array/find';
 import type {PlainObject} from '../models';
 
 /**
- * Get the index for the first item matching the given item
+ * Get the index of the first item matching the given item
  * @param array Array to search in
- * @param value Item to search for
+ * @param item Item to match against
  * @returns Index of the first matching item, or `-1` if no match is found
  */
-export function indexOf<Item>(array: Item[], value: Item): number;
+export function indexOf<Item>(array: Item[], item: Item): number;
 
 /**
- * Get the index for the first item matching the filter
+ * Get the index of the first item matching the filter
  * @param array Array to search in
- * @param filter Function to match items
+ * @param filter Filter callback to match items
  * @returns Index of the first matching item, or `-1` if no match is found
  */
 export function indexOf<Item>(
@@ -21,10 +21,10 @@ export function indexOf<Item>(
 ): number;
 
 /**
- * Get the index for the first matching item by key
+ * Get the index of the first matching item by key
  * @param array Array to search in
  * @param key Key to match items by
- * @param value Value to search for
+ * @param value Value to match against
  * @returns Index of the first matching item, or `-1` if no match is found
  */
 export function indexOf<Item extends PlainObject>(
@@ -34,10 +34,10 @@ export function indexOf<Item extends PlainObject>(
 ): number;
 
 /**
- * Get the index for the first matching item by callback
+ * Get the index of the first matching item by callback
  * @param array Array to search in
- * @param callback Function to get a value from each item
- * @param value Value to search for
+ * @param callback Callback to get an item's value
+ * @param value Value to match against
  * @returns Index of the first matching item, or `-1` if no match is found
  */
 export function indexOf<Item extends PlainObject>(

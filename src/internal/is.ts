@@ -3,7 +3,7 @@ import type {ArrayOrPlainObject, Key, PlainObject, TypedArray} from '../models';
 /**
  * Is the value an array or a record?
  * @param value Value to check
- * @returns `true` if the value is an array or a record, `false` otherwise
+ * @returns `true` if the value is an array or a record, otherwise `false`
  */
 export function isArrayOrPlainObject(
 	value: unknown,
@@ -14,7 +14,7 @@ export function isArrayOrPlainObject(
 /**
  * Is the value a key?
  * @param value Value to check
- * @returns `true` if the value is a `Key` _(`number` or `string`)_, `false` otherwise
+ * @returns `true` if the value is a `Key` _(`number` or `string`)_, otherwise `false`
  */
 export function isKey(value: unknown): value is Key {
 	return typeof value === 'number' || typeof value === 'string';
@@ -23,7 +23,7 @@ export function isKey(value: unknown): value is Key {
 /**
  * Is the value a number?
  * @param value Value to check
- * @returns `true` if the value is a `number`, `false` otherwise
+ * @returns `true` if the value is a `number`, otherwise `false`
  */
 export function isNumber(value: unknown): value is number {
 	return typeof value === 'number' && !Number.isNaN(value);
@@ -32,7 +32,7 @@ export function isNumber(value: unknown): value is number {
 /**
  * Is the value a plain object?
  * @param value Value to check
- * @returns `true` if the value is a plain object, `false` otherwise
+ * @returns `true` if the value is a plain object, otherwise `false`
  */
 export function isPlainObject(value: unknown): value is PlainObject {
 	if (value === null || typeof value !== 'object') {
@@ -55,15 +55,15 @@ export function isPlainObject(value: unknown): value is PlainObject {
 /**
  * Is the value a typed array?
  * @param value Value to check
- * @returns `true` if the value is a typed array, `false` otherwise
+ * @returns `true` if the value is a typed array, otherwise `false`
  */
 export function isTypedArray(value: unknown): value is TypedArray {
-	return typeArrays.has((value as TypedArray)?.constructor);
+	return TYPED_ARRAYS.has((value as TypedArray)?.constructor);
 }
 
 //
 
-const typeArrays: Set<unknown> = new Set([
+const TYPED_ARRAYS: Set<unknown> = new Set([
 	Int8Array,
 	Uint8Array,
 	Uint8ClampedArray,

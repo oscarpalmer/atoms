@@ -3,7 +3,7 @@ import {join, words} from '../internal/string';
 /**
  * Convert a string to camel case _(thisIsCamelCase)_
  * @param value String to convert to camel case
- * @returns Camel cased string
+ * @returns Camel-cased string
  */
 export function camelCase(value: string): string {
 	return toCase(value, '', true, false);
@@ -27,7 +27,7 @@ export function capitalize(value: string): string {
 /**
  * Convert a string to kebab case _(this-is-kebab-case)_
  * @param value String to convert to kebab case
- * @returns Kebab cased string
+ * @returns Kebab-cased string
  */
 export function kebabCase(value: string): string {
 	return toCase(value, '-', false, false);
@@ -36,7 +36,7 @@ export function kebabCase(value: string): string {
 /**
  * Convert a string to pascal case _(ThisIsPascalCase)_
  * @param value String to convert to pascal case
- * @returns Pascal cased string
+ * @returns Pascal-cased string
  */
 export function pascalCase(value: string): string {
 	return toCase(value, '', true, true);
@@ -45,7 +45,7 @@ export function pascalCase(value: string): string {
 /**
  * Convert a string to snake case _(this_is_snake_case)_
  * @param value String to convert to snake case
- * @returns Snake cased string
+ * @returns Snake-cased string
  */
 export function snakeCase(value: string): string {
 	return toCase(value, '_', false, false);
@@ -54,7 +54,7 @@ export function snakeCase(value: string): string {
 /**
  * Convert a string to title case _(Capitalizing Every Word)_
  * @param value String to convert to title case
- * @returns Title cased string
+ * @returns Title-cased string
  */
 export function titleCase(value: string): string {
 	if (typeof value !== 'string') {
@@ -89,12 +89,12 @@ function toCase(
 		const part = parts[partIndex];
 
 		const acronymParts = part.replace(
-			acronymExpression,
+			EXPRESSION_ACRONYM,
 			(full, one, two, three) =>
 				three === 's' ? full : `${one}-${two}${three}`,
 		);
 
-		const camelCaseParts = acronymParts.replace(camelCaseExpression, '$1-$2');
+		const camelCaseParts = acronymParts.replace(EXPRESSION_CAMEL_CASE, '$1-$2');
 
 		const items = camelCaseParts.split('-');
 		const itemsLength = items.length;
@@ -130,6 +130,6 @@ function toCase(
 
 //
 
-const camelCaseExpression = /(\p{Ll})(\p{Lu})/gu;
+const EXPRESSION_CAMEL_CASE = /(\p{Ll})(\p{Lu})/gu;
 
-const acronymExpression = /(\p{Lu}*)(\p{Lu})(\p{Ll}+)/gu;
+const EXPRESSION_ACRONYM = /(\p{Lu}*)(\p{Lu})(\p{Ll}+)/gu;

@@ -1,3 +1,4 @@
+/** biome-ignore-all lint/style/noMagicNumbers: Testing */
 import {expect, test} from 'vitest';
 import {logger} from '../src/logger';
 

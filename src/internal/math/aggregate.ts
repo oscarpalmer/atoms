@@ -64,30 +64,30 @@ export function aggregate(
 
 /**
  * Get the maximum value from a list of numbers
- * @param values List of numbers to get the maximum from
+ * @param values List of numbers
  * @returns Maximum value, or `NaN` if no maximum can be found
  */
 export function max(values: number[]): number;
 
 /**
- * Get the maximum value from a list of objects
- * @param array List of objects to get the maximum from
- * @param key key for a value in object to get the maximum from
+ * Get the maximum value from a list of items
+ * @param items List of items
+ * @param key Key to use for value
  * @returns Maximum value, or `NaN` if no maximum can be found
  */
 export function max<Item extends PlainObject>(
-	array: Item[],
+	items: Item[],
 	key: keyof OnlyNumericalKeys<Item>,
 ): number;
 
 /**
- * Get the maximum value from a list of objects
- * @param array List of objects to get the maximum from
- * @param callback Function to get a value in object to get the maximum from
+ * Get the maximum value from a list of items
+ * @param items List of items
+ * @param callback Callback to get an item's value
  * @returns Maximum value, or `NaN` if no maximum can be found
  */
 export function max<Item extends PlainObject>(
-	array: Item[],
+	items: Item[],
 	callback: (item: Item, index: number, array: Item[]) => number,
 ): number;
 

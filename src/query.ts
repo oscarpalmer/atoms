@@ -21,7 +21,7 @@ export function fromQuery(query: string): PlainObject {
 
 	for (let index = 0; index < length; index += 1) {
 		const decoded = parts[index].split('=').map(tryDecode);
-		const key = decoded[0].replace(arraySuffixPattern, '');
+		const key = decoded[0].replace(EXPRESSION_ARRAY_SUFFIX, '');
 
 		if (!ignoreKey(key)) {
 			setQueryValue(parameters, key, decoded[1]);
@@ -62,7 +62,7 @@ function getParts(
 }
 
 function getValue(value: string): unknown {
-	if (booleanPattern.test(value)) {
+	if (EXPRESSION_BOOLEAN.test(value)) {
 		return value === 'true';
 	}
 
@@ -84,7 +84,7 @@ function getValue(value: string): unknown {
 }
 
 function isDecodable(value: unknown): value is boolean | number | string {
-	return types.has(typeof value);
+	return TYPES.has(typeof value);
 }
 
 function setQueryValue(
@@ -123,11 +123,11 @@ export function toQuery(parameters: PlainObject): string {
 
 //
 
-const arraySuffixPattern = /\[\]$/;
+const EXPRESSION_ARRAY_SUFFIX = /\[\]$/;
 
-const booleanPattern = /^(false|true)$/;
+const EXPRESSION_BOOLEAN = /^(false|true)$/;
 
-const types: Set<string> = new Set(['boolean', 'number', 'string']);
+const TYPES: Set<string> = new Set(['boolean', 'number', 'string']);
 
 //
 

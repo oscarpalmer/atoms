@@ -4,7 +4,7 @@ import {join} from './internal/string';
 
 /**
  * Get a random boolean
- * @return Random boolean value
+ * @return Random boolean
  */
 export function getRandomBoolean(): boolean {
 	return Math.random() > BOOLEAN_MODIFIER;
@@ -12,7 +12,7 @@ export function getRandomBoolean(): boolean {
 
 /**
  * Get a random string of characters with a specified length
- * @param length Length of the string to return
+ * @param length Length of random string
  * @param selection String of characters to select from _(defaults to lowercase English alphabet)_
  * @returns Random string of characters
  */
@@ -40,10 +40,11 @@ export function getRandomCharacters(
 
 /**
  * Get a random hexadecimal color
- * @returns Random hexadecimal color string in the format `#RRGGBB`
+ * @param prefix Prefix the color with `#`? _(defaults to `false`)_
+ * @returns Random hexadecimal color string in the format `(#)RRGGBB`
  */
-export function getRandomColor(): string {
-	return `#${join(Array.from({length: 6}, getRandomHex))}`;
+export function getRandomColor(prefix?: boolean): string {
+	return `${prefix === true ? '#' : ''}${join(Array.from({length: 6}, getRandomHex))}`;
 }
 
 /**
@@ -57,7 +58,7 @@ export function getRandomHex(): string {
 /**
  * Get a random item from an array
  * @param array Array to get a random item from
- * @returns Random item from the array, or `undefined` if the array is empty
+ * @returns Random item from the array, or `undefined` if unable to retrieve one
  */
 export function getRandomItem<Value>(array: Value[]): Value | undefined {
 	if (!Array.isArray(array) || array.length === 0) {
@@ -80,7 +81,7 @@ export function getRandomItems<Value>(array: Value[]): Value[];
  * Get an amount of random items from an array
  * @param array Array to get random items from
  * @param amount Amount of items to return
- * @returns Array of random items from the original array
+ * @returns Array of random items
  */
 export function getRandomItems<Value>(array: Value[], amount: number): Value[];
 

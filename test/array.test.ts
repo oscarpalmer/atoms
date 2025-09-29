@@ -1,3 +1,6 @@
+/** biome-ignore-all lint/style/noMagicNumbers: Testing */
+/** biome-ignore-all lint/nursery/useExplicitType: Testing */
+/** biome-ignore-all lint/style/useNamingConvention: Testing */
 import {expect, test} from 'vitest';
 import {
 	chunk,
@@ -139,7 +142,7 @@ test('flatten', () => {
 });
 
 test('getArray', () => {
-	const values = [null, undefined, '', 123, true, Symbol('test'), () => {}];
+	const values = [null, undefined, '', 123, true, Symbol('test'), (): void => {}];
 
 	const {length} = values;
 

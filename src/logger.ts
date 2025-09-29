@@ -108,8 +108,9 @@ class Time {
 	}
 
 	/**
-	 * - Stop the timer and logs the total duration
-	 * - _(Will always log the total duration, even if logging is disabled)_
+	 * Stop the timer and logs the total duration
+	 *
+	 * _(Will always log the total duration, even if logging is disabled)_
 	 */
 	stop(): void {
 		if (this.#state.started && !this.#state.stopped) {

@@ -4,7 +4,7 @@ import type {PlainObject} from '../models';
 /**
  * Get the first item matching the given value
  * @param array Array to search in
- * @param value Value to search for
+ * @param value Value to match against
  * @returns First item that matches the value, or `undefined` if no match is found
  */
 export function find<Item>(array: Item[], value: Item): Item | undefined;
@@ -12,7 +12,7 @@ export function find<Item>(array: Item[], value: Item): Item | undefined;
 /**
  * Get the first item matching the filter
  * @param array Array to search in
- * @param filter Function to match items in the array
+ * @param filter Filter callback to match items
  * @returns First item that matches the filter, or `undefined` if no match is found
  */
 export function find<Item>(
@@ -23,8 +23,8 @@ export function find<Item>(
 /**
  * Get the first item matching the given value by key
  * @param array Array to search in
- * @param key Key to match items by
- * @param value Value to search for
+ * @param key Key to get an item's value for matching
+ * @param value Value to match against
  * @returns First item that matches the value, or `undefined` if no match is found
  */
 export function find<Item extends PlainObject>(
@@ -36,8 +36,8 @@ export function find<Item extends PlainObject>(
 /**
  * Get the first items matching the given value
  * @param array Array to search in
- * @param callback Function to get a value from each item
- * @param value Value to search for
+ * @param callback Callback to get an item's value for matching
+ * @param value Value to match against
  * @returns First item that matches the value, or `undefined` if no match is found
  */
 export function find<Item>(

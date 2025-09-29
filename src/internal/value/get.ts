@@ -3,9 +3,9 @@ import {getPaths, handleValue} from './misc';
 
 /**
  * Get the value from an object using a known path
- * @param data Object to retrieve the value from
- * @param path Path to the value, e.g., `foo.bar.baz`
- * @returns Value at the specified path, or `undefined` if not found
+ * @param data Object to get value from
+ * @param path Path for value, e.g., `foo.bar.baz`
+ * @returns Found value, or `undefined`
  */
 export function getValue<
 	Data extends ArrayOrPlainObject,
@@ -14,10 +14,10 @@ export function getValue<
 
 /**
  * Get the value from an object using an unknown path
- * @param data Object to retrieve the value from
- * @param path Path to the value, e.g., `foo.bar.baz`
+ * @param data Object to get value from
+ * @param path Path for value, e.g., `foo.bar.baz`
  * @param ignoreCase If `true`, the path matching is case-insensitive
- * @returns Value at the specified path, or `undefined` if not found
+ * @returns Found value, or `undefined`
  */
 export function getValue<Data extends ArrayOrPlainObject>(
 	data: Data,

@@ -12,19 +12,15 @@ function findKey(needle: string, haystack: ArrayOrPlainObject): string {
 export function getPaths(path: string, lowercase: boolean): string | string[] {
 	const normalized = lowercase ? path.toLowerCase() : path;
 
-	if (!nestedExpression.test(normalized)) {
+	if (!EXPRESSION_NESTED.test(normalized)) {
 		return normalized;
 	}
 
 	return normalized
-		.replace(bracketExpression, '.$1')
-		.replace(dotsExpression, '')
+		.replace(EXPRESSION_BRACKET, '.$1')
+		.replace(EXPRESSION_DOTS, '')
 		.split('.');
 }
-
-const bracketExpression = /\[(\w+)\]/g;
-const dotsExpression = /^\.|\.$/g;
-const nestedExpression = /\.|\[\w+\]/;
 
 export function handleValue(
 	data: ArrayOrPlainObject,
@@ -43,3 +39,11 @@ export function handleValue(
 		(data as PlainObject)[key] = value;
 	}
 }
+
+//
+
+const EXPRESSION_BRACKET = /\[(\w+)\]/g;
+
+const EXPRESSION_DOTS = /^\.|\.$/g;
+
+const EXPRESSION_NESTED = /\.|\[\w+\]/;

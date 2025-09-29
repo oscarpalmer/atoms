@@ -4,17 +4,19 @@ import type {Key, KeyedValue, PlainObject} from '../models';
 
 type ToRecord = {
 	/**
-	 * Create a record from an array of items, using their indices as keys
+	 * Create a record from an array of items _(using indices as keys)_
 	 * @param array Array to convert
-	 * @returns Record with indices as keys and items as values
+	 * @returns Record of indiced values
 	 */
 	<Item>(array: Item[]): Record<number, Item>;
 
 	/**
 	 * Create a record from an array of items using a key
+	 * 
+	 * If multiple items have the same key, the latest item will be used
 	 * @param array Array to convert
 	 * @param key Key to use for grouping
-	 * @returns Record with keys, holding the latest matching item
+	 * @returns Record of keyed values
 	 */
 	<Item extends PlainObject, ItemKey extends keyof Item>(
 		array: Item[],
@@ -23,9 +25,11 @@ type ToRecord = {
 
 	/**
 	 * Create a record from an array of items using a callback
+	 * 
+	 * If multiple items have the same key, the latest item will be used
 	 * @param array Array to convert
-	 * @param callback Function to get a key from each item
-	 * @returns Record with keys, holding the latest matching item
+	 * @param callback Callback to get an item's grouping key
+	 * @returns Record of keyed values
 	 */
 	<Item, Callback extends (item: Item, index: number, array: Item[]) => Key>(
 		array: Item[],
@@ -34,10 +38,12 @@ type ToRecord = {
 
 	/**
 	 * Create a record from an array of items using a key and value
+	 * 
+	 * If multiple items have the same key, the latest item will be used
 	 * @param array Array to convert
 	 * @param key Key to use for grouping
 	 * @param value Key to use for value
-	 * @returns Record with keys, holding the latest matching item's value
+	 * @returns Record of keyed values
 	 */
 	<
 		Item extends PlainObject,
@@ -51,10 +57,12 @@ type ToRecord = {
 
 	/**
 	 * Create a record from an array of items using a key and callback
+	 * 
+	 * If multiple items have the same key, the latest item will be used
 	 * @param array Array to convert
 	 * @param key Key to use for grouping
-	 * @param callback Function to get a value from each item
-	 * @returns Record with keys, holding the latest matching item's value
+	 * @param callback Callback to get an item's value
+	 * @returns Record with keys
 	 */
 	<
 		Item extends PlainObject,
@@ -68,10 +76,12 @@ type ToRecord = {
 
 	/**
 	 * Create a record from an array of items using a callback and value
+	 * 
+	 * If multiple items have the same key, the latest item will be used
 	 * @param array Array to convert
-	 * @param callback Function to get a key from each item
+	 * @param callback Callback to get an item's grouping key
 	 * @param value Key to use for value
-	 * @returns Record with keys, holding the latest matching item's value
+	 * @returns Record with keys
 	 */
 	<
 		Item extends PlainObject,
@@ -85,10 +95,12 @@ type ToRecord = {
 
 	/**
 	 * Create a record from an array of items using callbacks
+	 * 
+	 * If multiple items have the same key, the latest item will be used
 	 * @param array Array to convert
-	 * @param key Function to get a key from each item
-	 * @param value Function to get a value from each item
-	 * @returns Record with keys, holding the latest matching item's value
+	 * @param key Callback to get an item's grouping key
+	 * @param value Callback to get an item's value
+	 * @returns Record of keyed values
 	 */
 	<
 		Item,
@@ -101,10 +113,10 @@ type ToRecord = {
 	): Record<ReturnType<KeyCallback>, ReturnType<ValueCallback>>;
 
 	/**
-	 * Create a record from an array of items using a key, and grouping them into arrays
+	 * Create a record from an array of items using a key, grouping items into arrays
 	 * @param array Array to convert
 	 * @param key Key to use for grouping
-	 * @returns Record with keys, holding arrays of items
+	 * @returns Record of keyed arrays of items
 	 */
 	arrays<Item extends PlainObject, ItemKey extends keyof Item>(
 		array: Item[],
@@ -112,10 +124,10 @@ type ToRecord = {
 	): Simplify<Record<KeyedValue<Item, ItemKey>, Item[]>>;
 
 	/**
-	 * Create a record from an array of items using a callback, and grouping them into arrays
+	 * Create a record from an array of items using a callback, grouping items into arrays
 	 * @param array Array to convert
-	 * @param callback Function to get a key from each item
-	 * @returns Record with keys, holding arrays of items
+	 * @param callback Callback to get an item's grouping key
+	 * @returns Record of keyed arrays of items
 	 */
 	arrays<
 		Item,
@@ -123,11 +135,11 @@ type ToRecord = {
 	>(array: Item[], callback: Callback): Record<ReturnType<Callback>, Item[]>;
 
 	/**
-	 * Create a record from an array of items using a key and value, and grouping them into arrays
+	 * Create a record from an array of items using a key and value, grouping values into arrays
 	 * @param array Array to convert
 	 * @param key Key to use for grouping
 	 * @param value Key to use for value
-	 * @returns Record with keys, holding arrays of items' values
+	 * @returns Record of keyed arrays of values
 	 */
 	arrays<
 		Item extends PlainObject,
@@ -140,11 +152,11 @@ type ToRecord = {
 	): Simplify<Record<KeyedValue<Item, ItemKey>, Item[ItemValue][]>>;
 
 	/**
-	 * Create a record from an array of items using a key and callback, and grouping them into arrays
+	 * Create a record from an array of items using a key and callback, grouping values into arrays
 	 * @param array Array to convert
 	 * @param key Key to use for grouping
-	 * @param callback Function to get a value from each item
-	 * @returns Record with keys, holding arrays of items' values
+	 * @param callback Callback to get an item's value
+	 * @returns Record of keyed arrays of values
 	 */
 	arrays<
 		Item extends PlainObject,
@@ -157,11 +169,11 @@ type ToRecord = {
 	): Simplify<Record<KeyedValue<Item, ItemKey>, ReturnType<Callback>[]>>;
 
 	/**
-	 * Create a record from an array of items using a callback and value, and grouping them into arrays
+	 * Create a record from an array of items using a callback and value, grouping values into arrays
 	 * @param array Array to convert
-	 * @param callback Function to get a key from each item
+	 * @param callback Callback to get an item's grouping key
 	 * @param value Key to use for value
-	 * @returns Record with keys, holding arrays of items' values
+	 * @returns Record of keyed arrays of values
 	 */
 	arrays<
 		Item extends PlainObject,
@@ -174,11 +186,11 @@ type ToRecord = {
 	): Record<ReturnType<Callback>, Item[ItemValue][]>;
 
 	/**
-	 * Create a record from an array of items using callbacks, and grouping them into arrays
+	 * Create a record from an array of items using callbacks, grouping values into arrays
 	 * @param array Array to convert
-	 * @param key Function to get a key from each item
-	 * @param value Function to get a value from each item
-	 * @returns Record with keys, holding arrays of items' values
+	 * @param key Callback to get an item's grouping key
+	 * @param value Callback to get an item's value
+	 * @returns Record of keyed arrays of values
 	 */
 	arrays<
 		Item,

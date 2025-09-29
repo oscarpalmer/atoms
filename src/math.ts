@@ -3,30 +3,30 @@ import type {PlainObject} from './models';
 
 /**
  * Get the average value from a list of numbers
- * @param values List of numbers
+ * @param numbers List of numbers
  * @returns Average value, or `NaN` if no average can be calculated
  */
-export function average(values: number[]): number;
+export function average(numbers: number[]): number;
 
 /**
- * Get the average value from a list of objects
- * @param array List of objects to calculate the average for
- * @param key Key to get a numerical value from each object
+ * Get the average value from a list of items
+ * @param items List of items
+ * @param key Key to use for value
  * @returns Average value, or `NaN` if no average can be calculated
  */
 export function average<Item extends PlainObject>(
-	array: Item[],
+	items: Item[],
 	key: keyof OnlyNumericalKeys<Item>,
 ): number;
 
 /**
- * Get the average value from a list of values
- * @param array List of values to calculate the average for
- * @param callback Function to get a numerical value from each value
+ * Get the average value from a list of items
+ * @param items List of items
+ * @param callback Callback to get an item's value
  * @returns Average value, or `NaN` if no average can be calculated
  */
 export function average<Item extends PlainObject>(
-	array: Item[],
+	items: Item[],
 	callback: (item: Item, index: number, array: Item[]) => number,
 ): number;
 
@@ -46,10 +46,10 @@ export function average(array: unknown[], key?: unknown): number {
 export function count(values: unknown[]): number;
 
 /**
- * Count the number of items in an array that have a specific key value
+ * Count the number of items in an array that have a specific value
  * @param array Array to count for
- * @param key Key to get value from each item
- * @param value Value to count for each item
+ * @param key Key to use for value
+ * @param value Value to match and count
  * @returns Number of items with the specified key value, or `NaN` if no count can be calculated
  */
 export function count<Item extends PlainObject>(
@@ -59,10 +59,10 @@ export function count<Item extends PlainObject>(
 ): number;
 
 /**
- * Count the number of items in an array that match a specific condition value
+ * Count the number of items in an array that match a specific value
  * @param array Array to count for
- * @param callback Function to get value from each item
- * @param value Value to count for each item
+ * @param callback Callback to get an item's value
+ * @param value Value to match and count
  * @returns Number of items that match the condition, or `NaN` if no count can be calculated
  */
 export function count<Item extends PlainObject>(
@@ -114,24 +114,24 @@ export function count(
 export function min(values: number[]): number;
 
 /**
- * Get the minimum value from a list of objects
- * @param array List of objects
- * @param key Key to get a numerical value from each object
+ * Get the minimum value from a list of items
+ * @param items List of items
+ * @param key Key to use for value
  * @returns Minimum value, or `NaN` if no minimum can be found
  */
 export function min<Item extends PlainObject>(
-	array: Item[],
+	items: Item[],
 	key: keyof OnlyNumericalKeys<Item>,
 ): number;
 
 /**
- * Get the minimum value from a list of objects
- * @param array List of objects
- * @param callback Function to get a numerical value from each object
+ * Get the minimum value from a list of items
+ * @param items List of items
+ * @param callback Callback to get an item's value
  * @returns Minimum value, or `NaN` if no minimum can be found
  */
 export function min<Item extends PlainObject>(
-	array: Item[],
+	items: Item[],
 	callback: (item: Item, index: number, array: Item[]) => number,
 ): number;
 
@@ -169,24 +169,24 @@ export function round(value: number, decimals?: number): number {
 export function sum(values: number[]): number;
 
 /**
- * Get the sum of a list of objects
- * @param array List of objects
- * @param key Key to get a numerical value from each object
+ * Get the sum of a list of items
+ * @param items List of items
+ * @param key Key to use for value
  * @returns Sum of the values, or `NaN` if no sum can be calculated
  */
 export function sum<Item extends PlainObject>(
-	array: Item[],
+	items: Item[],
 	key: keyof OnlyNumericalKeys<Item>,
 ): number;
 
 /**
- * Get the sum of a list of objects
- * @param array List of objects
- * @param callback Function to get a numerical value from each object
+ * Get the sum of a list of items
+ * @param items List of items
+ * @param callback Callback to get an item's value
  * @returns Sum of the values, or `NaN` if no sum can be calculated
  */
 export function sum<Item extends PlainObject>(
-	array: Item[],
+	items: Item[],
 	callback: (item: Item, index: number, array: Item[]) => number,
 ): number;
 

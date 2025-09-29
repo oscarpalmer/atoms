@@ -21,7 +21,7 @@ export function getArray<Value extends PlainObject>(
 /**
  * Get an array from an object, where only values with numerical keys will be included
  * @param value Object to convert to an array
- * @returns Array holding the values of the object with numerical keys
+ * @returns Array holding the values of the object's numerical keys
  */
 export function getArray<Value extends PlainObject>(
 	value: Value,
@@ -47,26 +47,26 @@ export function getArray(value: unknown, indiced?: unknown): unknown[] {
 		return value;
 	}
 
-	if (isPlainObject(value)) {
-		if (indiced !== true) {
-			return Object.values(value);
-		}
-
-		const keys = Object.keys(value);
-		const {length} = keys;
-
-		const array: unknown[] = [];
-
-		for (let index = 0; index < length; index += 1) {
-			const key = keys[index];
-
-			if (!Number.isNaN(Number(key))) {
-				array.push(value[key]);
-			}
-		}
-
-		return array;
+	if (!isPlainObject(value)) {
+		return [value];
 	}
 
-	return [value];
+	if (indiced !== true) {
+		return Object.values(value);
+	}
+
+	const keys = Object.keys(value);
+	const {length} = keys;
+
+	const array: unknown[] = [];
+
+	for (let index = 0; index < length; index += 1) {
+		const key = keys[index];
+
+		if (!Number.isNaN(Number(key))) {
+			array.push(value[key]);
+		}
+	}
+
+	return array;
 }

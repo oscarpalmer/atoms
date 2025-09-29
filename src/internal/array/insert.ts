@@ -1,7 +1,13 @@
 import {chunk} from './chunk';
 
+//
+
+type InsertType = 'insert' | 'push' | 'splice';
+
+//
+
 function insertChunkedValues(
-	type: 'insert' | 'push' | 'splice',
+	type: InsertType,
 	array: unknown[],
 	items: unknown[],
 	start: number,
@@ -36,7 +42,7 @@ function insertChunkedValues(
 }
 
 export function insertValues(
-	type: 'insert' | 'push' | 'splice',
+	type: InsertType,
 	array: unknown,
 	items: unknown,
 	start: unknown,

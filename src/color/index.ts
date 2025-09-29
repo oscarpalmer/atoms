@@ -51,6 +51,9 @@ class Color {
 		return this.#state.hsl;
 	}
 
+	/**
+	 * Set colors from an HSL-color
+	 */
 	set hsl(value: HSLColor) {
 		if (isHSLColor(value)) {
 			const rgb = hslToRgb(value);
@@ -68,6 +71,9 @@ class Color {
 		return this.#state.rgb;
 	}
 
+	/**
+	 * Set colors from an RGB-color
+	 */
 	set rgb(value: RGBColor) {
 		if (isRGBColor(value)) {
 			this.#state.hex = rgbToHex(value);
@@ -87,7 +93,7 @@ class Color {
 
 /**
  * Get a color from any kind of value
- * @param value The value to get the color from
+ * @param value Original value
  * @returns Color instance
  */
 export function getColor(value: unknown): Color {
@@ -96,7 +102,7 @@ export function getColor(value: unknown): Color {
 
 /**
  * Get a foreground color _(usually text)_ based on a background color's luminance
- * @param value The value to get the foreground color from
+ * @param value Original value
  * @returns Color instance
  */
 export function getForegroundColor(value: unknown): Color {
@@ -126,7 +132,7 @@ export function getForegroundColor(value: unknown): Color {
 
 /**
  * Get the hex-color from any kind of value
- * @param value The value to get the hex-color from
+ * @param value Original value
  * @returns Hex-color string
  */
 export function getHexColor(value: unknown): string {
@@ -135,7 +141,7 @@ export function getHexColor(value: unknown): string {
 
 /**
  * Get the HSL-color from any kind of value
- * @param value The value to get the HSL-color from
+ * @param value Original value
  * @returns HSLColor object
  */
 export function getHSLColor(value: unknown): HSLColor {
@@ -144,7 +150,7 @@ export function getHSLColor(value: unknown): HSLColor {
 
 /**
  * Get the RGB-color from any kind of value
- * @param value The value to get the RGB-color from
+ * @param value Original value
  * @returns RGBColor object
  */
 export function getRGBColor(value: unknown): RGBColor {

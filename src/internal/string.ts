@@ -2,7 +2,7 @@ import {compact} from './array/compact';
 
 /**
  * Get the string value from any value
- * @param value Value to get the string from
+ * @param value Original value
  * @returns String representation of the value
  */
 export function getString(value: unknown): string {
@@ -24,12 +24,12 @@ export function getString(value: unknown): string {
 }
 
 export function ignoreKey(key: string): boolean {
-	return ignoreExpression.test(key);
+	return EXPRESSION_IGNORED.test(key);
 }
 
 /**
  * Join an array of values into a string
- * @param value Array of values to join
+ * @param value Array of values
  * @param delimiter Delimiter to use between values
  * @returns Joined string
  */
@@ -57,16 +57,16 @@ export function tryEncode(value: boolean | number | string): unknown {
 
 /**
  * Split a string into words _(and other readable parts)_
- * @param value String to split into words
+ * @param value Original string
  * @returns Array of words found in the string
  */
 export function words(value: string): string[] {
-	return typeof value === 'string' ? (value.match(wordsExpression) ?? []) : [];
+	return typeof value === 'string' ? (value.match(EXPRESSION_WORDS) ?? []) : [];
 }
 
 //
 
-const ignoreExpression = /(^|\.)(__proto__|constructor|prototype)(\.|$)/i;
+const EXPRESSION_IGNORED = /(^|\.)(__proto__|constructor|prototype)(\.|$)/i;
 
 // biome-ignore lint/suspicious/noControlCharactersInRegex: Lodash uses it, so it's fine ;-)
-const wordsExpression = /[^\x00-\x2f\x3a-\x40\x5b-\x60\x7b-\x7f]+/g;
+const EXPRESSION_WORDS = /[^\x00-\x2f\x3a-\x40\x5b-\x60\x7b-\x7f]+/g;

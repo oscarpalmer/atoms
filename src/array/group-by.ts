@@ -4,10 +4,19 @@ import type {Key, KeyedValue, PlainObject} from '../models';
 
 type GroupBy = {
 	/**
+	 * Create a record from an array of items _(using indices as keys)_
+	 * @param array Array to group
+	 * @returns Record of indiced items
+	 */
+	<Item>(array: Item[]): Record<number, Item>;
+
+	/**
 	 * Create a record from an array of items using a specific key
+	 *
+	 * If multiple items have the same key, the latest item will be used
 	 * @param array Array to group
 	 * @param key Key to use for grouping
-	 * @returns Record grouped by keyed values, holding the latest matching item
+	 * @returns Record of keyed items
 	 */
 	<Item extends PlainObject, ItemKey extends keyof Item>(
 		array: Item[],
@@ -16,9 +25,11 @@ type GroupBy = {
 
 	/**
 	 * Create a record from an array of items using a specific key
+	 *
+	 * If multiple items have the same key, the latest item will be used
 	 * @param array Array to group
-	 * @param callback Function to get a grouping value from each item
-	 * @returns Record grouped by keyed values, holding the latest matching item
+	 * @param callback Callback to get an item's grouping key
+	 * @returns Record of keyed items
 	 */
 	<Item, Callback extends (item: Item, index: number, array: Item[]) => Key>(
 		array: Item[],
@@ -27,10 +38,12 @@ type GroupBy = {
 
 	/**
 	 * Create a record from an array of items using a specific key and value
+	 *
+	 * If multiple items have the same key, the latest item's value will be used
 	 * @param array Array to group
 	 * @param key Key to use for grouping
 	 * @param value Key to use for value
-	 * @returns Record grouped by keyed values, holding the latest matching item's value
+	 * @returns Record of keyed values
 	 */
 	<
 		Item extends PlainObject,
@@ -44,10 +57,12 @@ type GroupBy = {
 
 	/**
 	 * Create a record from an array of items using a specific key and value
+	 *
+	 * If multiple items have the same key, the latest item's value will be used
 	 * @param array Array to group
 	 * @param key Key to use for grouping
-	 * @param value Function to get a value from each item
-	 * @returns Record grouped by keyed values, holding the latest matching item's value
+	 * @param value Callback to get an item's value
+	 * @returns Record of keyed values
 	 */
 	<
 		Item extends PlainObject,
@@ -61,10 +76,12 @@ type GroupBy = {
 
 	/**
 	 * Create a record from an array of items using a specific key and value
+	 *
+	 * If multiple items have the same key, the latest item's value will be used
 	 * @param array Array to group
-	 * @param key Function to get a grouping value from each item
+	 * @param key Callback to get an item's grouping key
 	 * @param value Key to use for value
-	 * @returns Record grouped by keyed values, holding the latest matching item's value
+	 * @returns Record of keyed values
 	 */
 	<
 		Item extends PlainObject,
@@ -78,10 +95,12 @@ type GroupBy = {
 
 	/**
 	 * Create a record from an array of items using a specific key and value
+	 *
+	 * If multiple items have the same key, the latest item's value will be used
 	 * @param array Array to group
-	 * @param key Function to get a grouping value from each item
-	 * @param value Function to get a value from each item
-	 * @returns Record grouped by keyed values, holding the latest matching item's value
+	 * @param key Callback to get an item's grouping key
+	 * @param value Callback to get an item's value
+	 * @returns Record of keyed values
 	 */
 	<
 		Item,
@@ -94,10 +113,10 @@ type GroupBy = {
 	): Simplify<Record<ReturnType<KeyCallback>, ReturnType<ValueCallback>>>;
 
 	/**
-	 * Create a record from an array of items using a specific key, and grouping them into arrays
+	 * Create a record from an array of items using a specific key, grouping items into arrays
 	 * @param array Array to group
 	 * @param key Key to use for grouping
-	 * @returns Record grouped by keyed values, holding arrays of items
+	 * @returns Record of keyed items
 	 */
 	arrays<Item extends PlainObject, ItemKey extends keyof Item>(
 		array: Item[],
@@ -105,25 +124,22 @@ type GroupBy = {
 	): Simplify<Record<KeyedValue<Item, ItemKey>, Item[]>>;
 
 	/**
-	 * Create a record from an array of items using a specific key, and grouping them into arrays
+	 * Create a record from an array of items using a specific key, grouping items into arrays
 	 * @param array Array to group
-	 * @param callback Function to get a grouping value from each item
-	 * @returns Record grouped by keyed values, holding arrays of items
+	 * @param callback Callback to get an item's grouping key
+	 * @returns Record of keyed items
 	 */
 	arrays<
 		Item,
 		Callback extends (item: Item, index: number, array: Item[]) => Key,
-	>(
-		array: Item[],
-		callback: Callback,
-	): Record<ReturnType<Callback>, Item[]>;
+	>(array: Item[], callback: Callback): Record<ReturnType<Callback>, Item[]>;
 
 	/**
-	 * Create a record from an array of items using a specific key and value, and grouping them into arrays
+	 * Create a record from an array of items using a specific key and value, grouping values into arrays
 	 * @param array Array to group
 	 * @param key Key to use for grouping
 	 * @param value Key to use for value
-	 * @returns Record grouped by keyed values, holding arrays of values
+	 * @returns Record of keyed values
 	 */
 	arrays<
 		Item extends PlainObject,
@@ -136,11 +152,11 @@ type GroupBy = {
 	): Simplify<Record<KeyedValue<Item, ItemKey>, Item[ItemValue][]>>;
 
 	/**
-	 * Create a record from an array of items using a specific key and value, and grouping them into arrays
+	 * Create a record from an array of items using a specific key and value, grouping values into arrays
 	 * @param array Array to group
 	 * @param key Key to use for grouping
-	 * @param value Function to get a value from each item
-	 * @returns Record grouped by keyed values, holding arrays of values
+	 * @param value Callback to get an item's value
+	 * @returns Record of keyed values
 	 */
 	arrays<
 		Item extends PlainObject,
@@ -153,11 +169,11 @@ type GroupBy = {
 	): Simplify<Record<KeyedValue<Item, ItemKey>, ReturnType<ValueCallback>[]>>;
 
 	/**
-	 * Create a record from an array of items using a specific key and value, and grouping them into arrays
+	 * Create a record from an array of items using a specific key and value, grouping values into arrays
 	 * @param array Array to group
-	 * @param key Function to get a grouping value from each item
+	 * @param key Callback to get an item's grouping key
 	 * @param value Key to use for value
-	 * @returns Record grouped by keyed values, holding arrays of values
+	 * @returns Record of keyed values
 	 */
 	arrays<
 		Item extends PlainObject,
@@ -170,11 +186,11 @@ type GroupBy = {
 	): Record<ReturnType<KeyCallback>, Item[ItemValue][]>;
 
 	/**
-	 * Create a record from an array of items using a specific key and value, and grouping them into arrays
+	 * Create a record from an array of items using a specific key and value, grouping values into arrays
 	 * @param array Array to group
-	 * @param key Function to get a grouping value from each item
-	 * @param value Function to get a value from each item
-	 * @returns Record grouped by keyed values, holding arrays of values
+	 * @param key Callback to get an item's grouping key
+	 * @param value Callback to get an item's value
+	 * @returns Record of keyed values
 	 */
 	arrays<
 		Item,

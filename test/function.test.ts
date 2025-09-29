@@ -1,3 +1,4 @@
+/** biome-ignore-all lint/style/noMagicNumbers: Testing */
 import {expect, test} from 'vitest';
 import {debounce, memoize, noop, throttle} from '../src/function';
 import {milliseconds} from '../src/internal/function';
@@ -111,7 +112,7 @@ test('memoize', () => {
 	expect(memoized.get(2)).toBeUndefined();
 	expect(memoized.delete(2)).toBe(false);
 
-	const keyed = memoize((key: string, value: number) => value * 3);
+	const keyed = memoize((_: string, value: number) => value * 3);
 
 	expect(keyed.run('a', 2)).toBe(6);
 	expect(keyed.run('b', 2)).toBe(6);

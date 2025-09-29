@@ -3,10 +3,10 @@ import {getPaths, handleValue} from './misc';
 
 /**
  * Set the value in an object using a known path
- * @param data Object to set the value in
- * @param path Path to the value, e.g., `foo.bar.baz`
- * @param value Value to set at the specified path
- * @returns Original object with the value set
+ * @param data Object to set value in
+ * @param path Path for value, e.g., `foo.bar.baz`
+ * @param value Value to set
+ * @returns Updated object
  */
 export function setValue<
 	Data extends ArrayOrPlainObject,
@@ -15,11 +15,11 @@ export function setValue<
 
 /**
  * Set the value in an object using an unknown path
- * @param data Object to set the value in
- * @param path Path to the value, e.g., `foo.bar.baz`
- * @param value Value to set at the specified path
+ * @param data Object to set value in
+ * @param path Path for value, e.g., `foo.bar.baz`
+ * @param value Value to set
  * @param ignoreCase If `true`, the path matching is case-insensitive
- * @returns Original object with the value set
+ * @returns Updated object
  */
 export function setValue<Data extends ArrayOrPlainObject>(
 	data: Data,
@@ -71,7 +71,7 @@ export function setValue<Data extends ArrayOrPlainObject>(
 		if (typeof next !== 'object' || next === null) {
 			const nextPath = paths[index + 1];
 
-			if (indexExpression.test(nextPath)) {
+			if (EXPRESSION_INDEX.test(nextPath)) {
 				const length = Number.parseInt(nextPath, 10) + 1;
 
 				next = Array.from({length}, () => undefined);
@@ -90,4 +90,4 @@ export function setValue<Data extends ArrayOrPlainObject>(
 
 //
 
-const indexExpression = /^\d+$/;
+const EXPRESSION_INDEX = /^\d+$/;

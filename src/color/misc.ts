@@ -4,8 +4,8 @@ import {isHexColor} from './is';
 
 /**
  * Try to get the normalized hex-color from a value
- * @param value The value to normalize
- * @returns The normalized hex-color string, or `#000000` if the value is unable to be parsed
+ * @param value Value to normalize
+ * @returns Normalized hex-color string, or `000000` if the value is unable to be normalized
  */
 export function getNormalizedHex(value: unknown): string {
 	if (!isHexColor(value)) {

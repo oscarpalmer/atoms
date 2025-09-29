@@ -64,7 +64,7 @@ function getReplaceableObjects(
 /**
  * Merge multiple arrays or objects into a single one
  * @param values Values to merge
- * @param options Options for merging
+ * @param options Merging options
  * @returns Merged value
  */
 export function merge<Model extends ArrayOrPlainObject>(

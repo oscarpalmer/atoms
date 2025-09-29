@@ -17,8 +17,10 @@ export function findValue(
 	array: unknown[],
 	parameters: unknown[],
 ): unknown {
+	const findIndex = type === 'index';
+
 	if (!Array.isArray(array) || array.length === 0) {
-		return type === 'index' ? -1 : undefined;
+		return findIndex ? -1 : undefined;
 	}
 
 	const {bool, key, value} = getParameters(parameters);
@@ -26,7 +28,7 @@ export function findValue(
 	const callbacks = getCallbacks(bool, key);
 
 	if (callbacks?.bool == null && callbacks?.keyed == null) {
-		return type === 'index'
+		return findIndex
 			? array.indexOf(value)
 			: array.find(item => item === value);
 	}
@@ -34,20 +36,29 @@ export function findValue(
 	if (callbacks.bool != null) {
 		const index = array.findIndex(callbacks.bool);
 
-		return type === 'index' ? index : array[index];
+		return findIndex ? index : array[index];
 	}
 
+	return findValueInArray(array, callbacks.keyed, value, findIndex);
+}
+
+function findValueInArray(
+	array: unknown[],
+	callback: ((item: unknown, index: number, array: unknown[]) => boolean) | undefined,
+	value: unknown,
+	findIndex: boolean,
+): unknown {
 	const {length} = array;
 
 	for (let index = 0; index < length; index += 1) {
 		const item = array[index];
 
-		if (callbacks.keyed?.(item, index, array) === value) {
-			return type === 'index' ? index : item;
+		if (callback?.(item, index, array) === value) {
+			return findIndex ? index : item;
 		}
 	}
 
-	return type === 'index' ? -1 : undefined;
+	return findIndex ? -1 : undefined;
 }
 
 export function findValues(

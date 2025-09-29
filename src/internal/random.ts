@@ -4,7 +4,7 @@ import {isNumber} from './is';
  * Get a random floating-point number
  * @param minimum Minimum value
  * @param maximum Maximum value
- * @returns A random floating-point number between `minimum` and `maximum`
+ * @returns Random floating-point number
  */
 export function getRandomFloat(minimum?: number, maximum?: number): number {
 	let max =
@@ -32,7 +32,7 @@ export function getRandomFloat(minimum?: number, maximum?: number): number {
  * Get a random integer
  * @param minimum Minimum value
  * @param maximum Maximum value
- * @returns A random integer between `minimum` and `maximum`
+ * @returns Random integer
  */
 export function getRandomInteger(minimum?: number, maximum?: number): number {
 	return Math.floor(getRandomFloat(minimum, maximum));

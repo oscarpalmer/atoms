@@ -3,15 +3,15 @@ import type {Key, PlainObject} from '../models';
 
 /**
  * Get an array of unique items
- * @param array Array to get unique items from
+ * @param array Original array
  * @returns Array of unique items
  */
 export function unique<Item>(array: Item[]): Item[];
 
 /**
  * Get an array of unique items
- * @param array Array to get unique items from
- * @param key Key to use for value
+ * @param array Original array
+ * @param key Key to use for unique value
  * @returns Array of unique items
  */
 export function unique<Item extends PlainObject, ItemKey extends keyof Item>(
@@ -21,8 +21,8 @@ export function unique<Item extends PlainObject, ItemKey extends keyof Item>(
 
 /**
  * Get an array of unique items
- * @param array Array to get unique items from
- * @param callback Function to get a value from each item
+ * @param array Original array
+ * @param callback Callback to get an item's value
  * @returns Array of unique items
  */
 export function unique<

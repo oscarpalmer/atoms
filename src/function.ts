@@ -62,7 +62,7 @@ class Memoized<Callback extends GenericCallback> {
 	/**
 	 * Delete a result from the cache
 	 * @param key Key to delete
-	 * @returns `true` if the key existed and was removed, `false` otherwise
+	 * @returns `true` if the key existed and was removed, otherwise `false`
 	 */
 	delete(key: unknown): boolean {
 		return this.#state.cache?.delete(key) ?? false;
@@ -90,7 +90,7 @@ class Memoized<Callback extends GenericCallback> {
 	/**
 	 * Does the result exist?
 	 * @param key Key to check
-	 * @returns `true` if the result exists, `false` otherwise
+	 * @returns `true` if the result exists, otherwise `false`
 	 */
 	has(key: unknown): boolean {
 		return this.#state.cache?.has(key) ?? false;
@@ -117,8 +117,9 @@ type MemoizedState<Callback extends GenericCallback> = {
 };
 
 /**
- * - Debounce a function, ensuring it is only called after `time` milliseconds have passed
- * - On subsequent calls, the timer is reset and will wait another `time` milliseconds _(and so on...)_
+ * Debounce a function, ensuring it is only called after `time` milliseconds have passed
+ *
+ * On subsequent calls, the timer is reset and will wait another `time` milliseconds _(and so on...)_
  * @param callback Callback to debounce
  * @param time Time in milliseconds to wait before calling the callback _(defaults to match frame rate)_
  * @returns Debounced callback with a `cancel` method

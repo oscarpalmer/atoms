@@ -1,9 +1,9 @@
 /**
- * Create a new UUID
- * @returns A new UUID string
+ * Create a new UUID-string
+ * @returns UUID string
  */
 export function createUuid(): string {
-	return uuidTemplate.replace(uuidPartExpression, (substring: string) => {
+	return TEMPLATE_UUID.replace(EXPRESSION_UUID_PART, (substring: string) => {
 		const digit = Number.parseInt(substring, 10);
 		const random = crypto.getRandomValues(new Uint8Array(1))[0];
 
@@ -56,6 +56,6 @@ export function truncate(
 
 //
 
-const uuidPartExpression = /[018]/g;
+const EXPRESSION_UUID_PART = /[018]/g;
 
-const uuidTemplate = '10000000-1000-4000-8000-100000000000';
+const TEMPLATE_UUID = '10000000-1000-4000-8000-100000000000';

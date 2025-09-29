@@ -12,7 +12,6 @@
 	},
 	"linter": {
 		"enabled": true,
-		"includes": ["./src/**/*"],
 		"rules": {
 			"recommended": true,
 			"complexity": {
@@ -51,7 +50,12 @@
 				"useDefaultParameterLast": "warn",
 				"useDefaultSwitchClause": "warn",
 				"useGroupedAccessorPairs": "warn",
-				"useNamingConvention": "warn",
+				"useNamingConvention": {
+					"level": "warn",
+					"options": {
+						"strictCase": false
+					}
+				},
 				"useObjectSpread": "warn",
 				"useReadonlyClassProperties": "warn"
 			},
