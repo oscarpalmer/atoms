@@ -1,5 +1,5 @@
 {
-	"$schema": "https://biomejs.dev/schemas/2.2.4/schema.json",
+	"$schema": "https://biomejs.dev/schemas/2.3.1/schema.json",
 	"files": {
 		"includes": ["./src/**/*", "./test/**/*"]
 	},
@@ -22,12 +22,6 @@
 				"useSimplifiedLogicExpression": "warn"
 			},
 			"nursery": {
-				"useConsistentTypeDefinitions": {
-					"level": "warn",
-					"options": {
-						"style": "type"
-					}
-				},
 				"useExplicitType": "warn",
 				"useMaxParams": {
 					"level": "warn",
@@ -47,6 +41,12 @@
 				"noParameterAssign": "warn",
 				"useConsistentArrayType": "warn",
 				"useConsistentMemberAccessibility": "warn",
+				"useConsistentTypeDefinitions": {
+					"level": "warn",
+					"options": {
+						"style": "type"
+					}
+				},
 				"useDefaultParameterLast": "warn",
 				"useDefaultSwitchClause": "warn",
 				"useGroupedAccessorPairs": "warn",

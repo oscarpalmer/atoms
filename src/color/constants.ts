@@ -1,4 +1,19 @@
-import type {ColorProperty, HSLColor, RGBColor} from './models';
+import type {Alpha, ColorProperty, HSLColor, RGBColor} from './models';
+
+export const ALPHA_FULL_HEX_SHORT = 'f';
+
+export const ALPHA_FULL_HEX_LONG = `${ALPHA_FULL_HEX_SHORT}${ALPHA_FULL_HEX_SHORT}`;
+
+export const ALPHA_FULL_VALUE = 1;
+
+export const ALPHA_NONE_HEX = '00';
+
+export const ALPHA_NONE_VALUE = 0;
+
+export const DEFAULT_ALPHA: Alpha = {
+	hex: ALPHA_FULL_HEX_LONG,
+	value: ALPHA_FULL_VALUE,
+};
 
 export const DEFAULT_HSL: HSLColor = {
 	hue: 0,
@@ -12,10 +27,10 @@ export const DEFAULT_RGB: RGBColor = {
 	red: 0,
 };
 
-export const EXPRESSION_ANY = /^#?([a-f0-9]{3}){1,2}$/i;
+export const EXPRESSION_HEX_LONG =
+	/^#?([a-f0-9]{2})([a-f0-9]{2})([a-f0-9]{2})([a-f0-9]{2})?$/i;
 
-export const EXPRESSION_GROUPED =
-	/^#?([a-f0-9]{2})([a-f0-9]{2})([a-f0-9]{2})$/i;
+export const EXPRESSION_HEX_SHORT = /^#?([a-f0-9]{3,4})$/i;
 
 export const EXPRESSION_PREFIX = /^#/;
 
@@ -23,13 +38,21 @@ export const HEX_BLACK = '000000';
 
 export const HEX_WHITE = 'ffffff';
 
+export const LENGTH_LONG = 6;
+
+export const LENGTH_SHORT = 3;
+
 export const KEYS_HSL: Set<ColorProperty> = new Set([
 	'hue',
 	'lightness',
 	'saturation',
 ]);
 
+export const KEYS_HSLA: Set<ColorProperty> = new Set([...KEYS_HSL, 'alpha']);
+
 export const KEYS_RGB: Set<ColorProperty> = new Set(['blue', 'green', 'red']);
+
+export const KEYS_RGBA: Set<ColorProperty> = new Set([...KEYS_RGB, 'alpha']);
 
 export const MAX_DEGREE = 360;
 

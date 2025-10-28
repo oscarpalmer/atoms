@@ -1,8 +1,21 @@
+export type Alpha = {
+	hex: string;
+	value: number;
+};
+
+type ColorWithAlpha = {
+	alpha: number;
+};
+
+export type HSLAColor = HSLColor & ColorWithAlpha;
+
 export type HSLColor = {
 	hue: number;
 	lightness: number;
 	saturation: number;
 };
+
+export type RGBAColor = RGBColor & ColorWithAlpha;
 
 export type RGBColor = {
 	blue: number;
@@ -11,6 +24,7 @@ export type RGBColor = {
 };
 
 export type ColorProperty =
+	| 'alpha'
 	| 'blue'
 	| 'green'
 	| 'hue'
@@ -19,6 +33,7 @@ export type ColorProperty =
 	| 'saturation';
 
 export type ColorState = {
+	alpha: Alpha;
 	hex: string;
 	hsl: HSLColor;
 	rgb: RGBColor;
