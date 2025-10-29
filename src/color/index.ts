@@ -2,11 +2,19 @@ import {Color} from './instance';
 import {isColor} from './misc/is';
 import type {HSLAColor, HSLColor, RGBAColor, RGBColor} from './models';
 
-export * from './misc/foreground';
+export {
+	getForegroundColor,
+	getHexaColor,
+	getHexColor,
+	getHslaColor,
+	getHslColor,
+	getRgbaColor,
+	getRgbColor,
+} from './misc/get';
+
 export * from './misc/is';
 
 export {
-	getHexColor,
 	getNormalizedHex,
 	hexToHsl,
 	hexToHsla,
@@ -15,16 +23,12 @@ export {
 } from './space/hex';
 
 export {
-	getHslaColor,
-	getHslColor,
 	hslToHex,
 	hslToRgb,
 	hslToRgba,
 } from './space/hsl';
 
 export {
-	getRgbaColor,
-	getRgbColor,
 	rgbToHex,
 	rgbToHsl,
 	rgbToHsla,
@@ -33,7 +37,7 @@ export {
 export type {Color, HSLAColor, HSLColor, RGBAColor, RGBColor};
 
 /**
- * Get a color from any kind of value
+ * Get a Color from any kind of value
  * @param value Original value
  * @returns Color instance
  */

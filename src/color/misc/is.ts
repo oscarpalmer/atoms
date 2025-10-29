@@ -111,7 +111,7 @@ export function isRgbColor(value: unknown): value is RGBColor {
 	return isObject(value, KEYS_RGBA) || isObject(value, KEYS_RGB);
 }
 
-function isObject(obj: unknown, properties: Set<ColorProperty>): boolean {
+function isObject(obj: unknown, properties: ColorProperty[]): boolean {
 	if (typeof obj !== 'object' || obj === null) {
 		return false;
 	}
@@ -119,7 +119,7 @@ function isObject(obj: unknown, properties: Set<ColorProperty>): boolean {
 	const keys = Object.keys(obj);
 	const {length} = keys;
 
-	if (length !== properties.size) {
+	if (length !== properties.length) {
 		return false;
 	}
 
@@ -128,7 +128,7 @@ function isObject(obj: unknown, properties: Set<ColorProperty>): boolean {
 
 		if (
 			!(
-				properties.has(key as never) &&
+				properties.includes(key as never) &&
 				validators[key as ColorProperty]((obj as PlainObject)[key])
 			)
 		) {

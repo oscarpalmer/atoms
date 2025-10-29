@@ -10,7 +10,6 @@ import {
 	MAX_HEX,
 } from '../constants';
 import {isHexColor} from '../misc/is';
-import {getState} from '../misc/state';
 import type {HSLAColor, HSLColor, RGBAColor, RGBColor} from '../models';
 import {convertRgbToHsla} from './rgb';
 
@@ -31,15 +30,6 @@ function convertHexToRgba(value: string): RGBAColor {
 		green: values[1],
 		red: values[0],
 	};
-}
-
-/**
- * Get the hex color from any kind of value
- * @param value Original value
- * @returns Hex color
- */
-export function getHexColor(value: unknown): string {
-	return getState(value).hex;
 }
 
 /**

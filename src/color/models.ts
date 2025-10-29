@@ -32,6 +32,8 @@ export type ColorProperty =
 	| 'red'
 	| 'saturation';
 
+export type ColorSpace = 'hsl' | 'rgb';
+
 export type ColorState = {
 	alpha: Alpha;
 	hex: string;

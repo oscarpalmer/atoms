@@ -4,6 +4,7 @@ import {expect, test} from 'vitest';
 import {
 	getColor,
 	getForegroundColor,
+	getHexaColor,
 	getHexColor,
 	getHslaColor,
 	getHslColor,
@@ -28,6 +29,7 @@ import {
 	rgbToHsla,
 } from '../src/color';
 import {DEFAULT_HSL, DEFAULT_RGB} from '../src/color/constants';
+import {getAlphaHexadecimal} from '../src/color/misc/alpha';
 import {getRandomItem} from '../src/random';
 
 const alphas = [0, 1, 0.125, 0.25, 0.375, 0.5, 0.625, 0.75, 0.875, 1];
@@ -198,6 +200,39 @@ test('color', () => {
 	expect(color.alpha).toEqual(0.25);
 });
 
+test('formatting', () => {
+	for (let index = 0; index < length; index += 1) {
+		const hex = hexes[index];
+		const hsl = hsls[index];
+		const rgb = rgbs[index];
+
+		const color = getColor(hslas[index]);
+
+		expect(String(color)).toBe(`#${hex}`);
+
+		expect(color.toHexString()).toBe(`#${hex}`);
+		expect(color.toHexString(true)).toBe(
+			`#${hex}${getAlphaHexadecimal(alphas[index])}`,
+		);
+
+		expect(color.toHslString()).toBe(
+			`hsl(${hsl.hue} ${hsl.saturation} ${hsl.lightness})`,
+		);
+
+		expect(color.toHslString(true)).toBe(
+			`hsl(${hsl.hue} ${hsl.saturation} ${hsl.lightness} / ${alphas[index]})`,
+		);
+
+		expect(color.toRgbString()).toBe(
+			`rgb(${rgb.red} ${rgb.green} ${rgb.blue})`,
+		);
+
+		expect(color.toRgbString(true)).toBe(
+			`rgb(${rgb.red} ${rgb.green} ${rgb.blue} / ${alphas[index]})`,
+		);
+	}
+});
+
 test('getColor + isColor', () => {
 	const indices = Array.from({length}).map((_, index) => index);
 
@@ -275,9 +310,12 @@ test('getForegroundColor', () => {
 	}
 });
 
-test('getHexColor', () => {
+test('getHex(a)Color', () => {
 	for (let index = 0; index < length; index += 1) {
-		expect(getHexColor(hexes[index])).toEqual(hexes[index]);
+		const hex = hexes[index];
+
+		expect(getHexColor(hex)).toEqual(hex);
+		expect(getHexaColor(hex)).toEqual(`${hex}ff`);
 	}
 
 	const short = hexes.map(
@@ -292,10 +330,15 @@ test('getHexColor', () => {
 	);
 
 	for (let index = 0; index < length; index += 1) {
-		expect(getHexColor(short[index])).toEqual(long[index]);
+		const longHex = long[index];
+		const shortHex = short[index];
+
+		expect(getHexColor(shortHex)).toEqual(longHex);
+		expect(getHexaColor(shortHex)).toEqual(`${longHex}ff`);
 	}
 
 	expect(getHexColor('invalid')).toBe('000000');
+	expect(getHexaColor('invalid')).toBe('000000ff');
 });
 
 test('getHslaColor', () => {

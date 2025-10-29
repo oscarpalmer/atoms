@@ -8,7 +8,6 @@ import {
 } from '../constants';
 import {getAlphaValue} from '../misc/alpha';
 import {isHslColor} from '../misc/is';
-import {getState} from '../misc/state';
 import type {HSLAColor, HSLColor, RGBAColor, RGBColor} from '../models';
 import {convertRgbToHex} from './rgb';
 
@@ -56,29 +55,6 @@ function getHexyValue(
 	return (
 		(lightness - mod * Math.max(-1, Math.min(part - 3, 9 - part, 1))) * MAX_HEX
 	);
-}
-
-/**
- * Get the HSLA color from any kind of value
- * @param value Original value
- * @returns HSLA color
- */
-export function getHslaColor(value: unknown): HSLAColor {
-	const {alpha, hsl} = getState(value);
-
-	return {
-		...hsl,
-		alpha: alpha.value,
-	};
-}
-
-/**
- * Get the HSL color from any kind of value
- * @param value Original value
- * @returns HSL color
- */
-export function getHslColor(value: unknown): HSLColor {
-	return getState(value).hsl;
 }
 
 export function hslToHex(hsl: HSLAColor | HSLColor, alpha?: boolean): string {

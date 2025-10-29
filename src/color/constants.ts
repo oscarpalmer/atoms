@@ -1,4 +1,10 @@
-import type {Alpha, ColorProperty, HSLColor, RGBColor} from './models';
+import type {
+	Alpha,
+	ColorProperty,
+	ColorSpace,
+	HSLColor,
+	RGBColor,
+} from './models';
 
 export const ALPHA_FULL_HEX_SHORT = 'f';
 
@@ -42,23 +48,25 @@ export const LENGTH_LONG = 6;
 
 export const LENGTH_SHORT = 3;
 
-export const KEYS_HSL: Set<ColorProperty> = new Set([
-	'hue',
-	'lightness',
-	'saturation',
-]);
+export const KEYS_HSL: ColorProperty[] = ['hue', 'saturation', 'lightness'];
 
-export const KEYS_HSLA: Set<ColorProperty> = new Set([...KEYS_HSL, 'alpha']);
+export const KEYS_HSLA: ColorProperty[] = [...KEYS_HSL, 'alpha'];
 
-export const KEYS_RGB: Set<ColorProperty> = new Set(['blue', 'green', 'red']);
+export const KEYS_RGB: ColorProperty[] = ['red', 'green', 'blue'];
 
-export const KEYS_RGBA: Set<ColorProperty> = new Set([...KEYS_RGB, 'alpha']);
+export const KEYS_RGBA: ColorProperty[] = [...KEYS_RGB, 'alpha'];
 
 export const MAX_DEGREE = 360;
 
 export const MAX_HEX = 255;
 
 export const MAX_PERCENT = 100;
+
+export const SPACE_HSL: ColorSpace = 'hsl';
+
+export const SPACE_RGB: ColorSpace = 'rgb';
+
+//
 
 // https://www.w3.org/TR/WCAG20/#relativeluminancedef
 

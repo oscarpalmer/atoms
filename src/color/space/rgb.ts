@@ -8,7 +8,6 @@ import {
 } from '../constants';
 import {getAlpha, getAlphaValue} from '../misc/alpha';
 import {isRgbColor} from '../misc/is';
-import {getState} from '../misc/state';
 import type {HSLAColor, HSLColor, RGBAColor, RGBColor} from '../models';
 
 export function convertRgbToHex(
@@ -90,29 +89,6 @@ export function convertRgbToHsla(rgb: RGBAColor | RGBColor): HSLAColor {
 		lightness: +(lightness * MAX_PERCENT).toFixed(2),
 		saturation: +(saturation * MAX_PERCENT).toFixed(2),
 	};
-}
-
-/**
- * Get the RGBA color from any kind of value
- * @param value Original value
- * @returns RGBA color
- */
-export function getRgbaColor(value: unknown): RGBAColor {
-	const {alpha, rgb} = getState(value);
-
-	return {
-		...rgb,
-		alpha: alpha.value,
-	};
-}
-
-/**
- * Get the RGB color from any kind of value
- * @param value Original value
- * @returns RGB color
- */
-export function getRgbColor(value: unknown): RGBColor {
-	return getState(value).rgb;
 }
 
 /**

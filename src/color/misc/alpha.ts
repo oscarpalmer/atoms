@@ -24,7 +24,7 @@ export function getAlpha(value: unknown): Alpha {
 	return {...DEFAULT_ALPHA};
 }
 
-function getAlphaHexadecimal(value: number): string {
+export function getAlphaHexadecimal(value: number): string {
 	if (value === ALPHA_NONE_VALUE) {
 		return ALPHA_NONE_HEX;
 	}

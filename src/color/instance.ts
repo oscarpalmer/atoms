@@ -1,3 +1,5 @@
+import {SPACE_HSL, SPACE_RGB} from './constants';
+import {formatColor} from './misc';
 import {getAlpha} from './misc/alpha';
 import {getState, setHexColor, setHSLColor, setRGBColor} from './misc/state';
 import type {
@@ -13,10 +15,16 @@ export class Color {
 
 	readonly #state: ColorState;
 
+	/**
+	 * Get the alpha channel
+	 */
 	get alpha(): number {
 		return this.#state.alpha.value;
 	}
 
+	/**
+	 * Set the alpha channel
+	 */
 	set alpha(value: number) {
 		if (typeof value === 'number' && !Number.isNaN(value)) {
 			this.#state.alpha = getAlpha(value);
@@ -119,5 +127,21 @@ export class Color {
 		Object.defineProperty(this, '$color', {
 			value: true,
 		});
+	}
+
+	toHexString(alpha?: boolean): string {
+		return `#${alpha === true ? this.hexa : this.hex}`;
+	}
+
+	toHslString(alpha?: boolean): string {
+		return formatColor('hsl', this, alpha === true);
+	}
+
+	toRgbString(alpha?: boolean): string {
+		return formatColor('rgb', this, alpha === true);
+	}
+
+	toString(): string {
+		return this.toHexString();
 	}
 }
