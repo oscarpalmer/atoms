@@ -3,98 +3,8 @@ import type {Key, PlainObject} from '../models';
 
 type ToMap = {
 	/**
-	 * Create a Map from an array of items _(using indices as keys)_
-	 * @param array Array to convert
-	 * @returns Map of indiced items
-	 */
-	<Item>(array: Item[]): Map<number, Item>;
-
-	/**
-	 * Create a Map from an array of items using a key
-	 * 
-	 * If multiple items have the same key, the latest item will be used
-	 * @param array Array to convert
-	 * @param key Key to use for grouping
-	 * @returns Map of keyed items
-	 */
-	<Item extends PlainObject, ItemKey extends keyof Item>(
-		array: Item[],
-		key: ItemKey,
-	): Map<Item[ItemKey], Item>;
-
-	/**
-	 * Create a Map from an array of items using a callback
-	 * 
-	 * If multiple items have the same key, the latest item will be used
-	 * @param array Array to convert
-	 * @param callback Callback to get an item's grouping key
-	 * @returns Map of keyed items
-	 */
-	<Item, Callback extends (item: Item, index: number, array: Item[]) => Key>(
-		array: Item[],
-		callback: Callback,
-	): Map<ReturnType<Callback>, Item>;
-
-	/**
-	 * Create a Map from an array of items using a key and value
-	 * 
-	 * If multiple items have the same key, the latest item's value will be used
-	 * @param array Array to convert
-	 * @param key Key to use for grouping
-	 * @param value Key to use for value
-	 * @returns Map of keyed values
-	 */
-	<
-		Item extends PlainObject,
-		ItemKey extends keyof Item,
-		ItemValue extends keyof Item,
-	>(
-		array: Item[],
-		key: ItemKey,
-		value: ItemValue,
-	): Map<Item[ItemKey], Item[ItemValue]>;
-
-	/**
-	 * Create a Map from an array of items using a key and callback
-	 * 
-	 * If multiple items have the same key, the latest item's value will be used
-	 * @param array Array to convert
-	 * @param key Key to use for grouping
-	 * @param value Callback to get an item's value
-	 * @returns Map of keyed values
-	 */
-	<
-		Item extends PlainObject,
-		ItemKey extends keyof Item,
-		ValueCallback extends (item: Item, index: number, array: Item[]) => unknown,
-	>(
-		array: Item[],
-		key: ItemKey,
-		value: ValueCallback,
-	): Map<Item[ItemKey], ReturnType<ValueCallback>>;
-
-	/**
-	 * Create a Map from an array of items using a callback and value
-	 * 
-	 * If multiple items have the same key, the latest item's value will be used
-	 * @param array Array to convert
-	 * @param key Callback to get an item's grouping key
-	 * @param value Key to use for value
-	 * @returns Map of keyed values
-	 */
-	<
-		Item extends PlainObject,
-		KeyCallback extends (item: Item, index: number, array: Item[]) => Key,
-		ItemValue extends keyof Item,
-	>(
-		array: Item[],
-		key: KeyCallback,
-		value: ItemValue,
-	): Map<ReturnType<KeyCallback>, Item[ItemValue]>;
-
-	/**
 	 * Create a Map from an array of items using callbacks
-	 * 
+	 *
 	 * If multiple items have the same key, the latest item's value will be used
 	 * @param array Array to convert
 	 * @param key Callback to get an item's grouping key
@@ -112,52 +22,34 @@ type ToMap = {
 	): Map<ReturnType<KeyCallback>, ReturnType<ValueCallback>>;
 
 	/**
-	 * Create a Map from an array of items using a key, grouping items into arrays
+	 * Create a Map from an array of items using a callback and value
+	 *
+	 * If multiple items have the same key, the latest item's value will be used
 	 * @param array Array to convert
-	 * @param key Key to use for grouping
-	 * @returns Map of keyed arrays of items
-	 */
-	arrays<Item extends PlainObject, ItemKey extends keyof Item>(
-		array: Item[],
-		key: ItemKey,
-	): Map<Item[ItemKey], Item[]>;
-
-	/**
-	 * Create a Map from an array of items using a callback, grouping items into arrays
-	 * @param array Array to convert
-	 * @param callback Callback to get an item's grouping key
-	 * @returns Map of keyed arrays of items
-	 */
-	arrays<
-		Item,
-		Callback extends (item: Item, index: number, array: Item[]) => Key,
-	>(array: Item[], callback: Callback): Map<ReturnType<Callback>, Item[]>;
-
-	/**
-	 * Create a Map from an array of items using a key and value, grouping values into arrays
-	 * @param array Array to convert
-	 * @param key Key to use for grouping
+	 * @param key Callback to get an item's grouping key
 	 * @param value Key to use for value
-	 * @returns Map of keyed arrays of values
+	 * @returns Map of keyed values
 	 */
-	arrays<
+	<
 		Item extends PlainObject,
-		ItemKey extends keyof Item,
+		KeyCallback extends (item: Item, index: number, array: Item[]) => Key,
 		ItemValue extends keyof Item,
 	>(
 		array: Item[],
-		key: ItemKey,
+		key: KeyCallback,
 		value: ItemValue,
-	): Map<Item[ItemKey], Item[ItemValue][]>;
+	): Map<ReturnType<KeyCallback>, Item[ItemValue]>;
 
 	/**
-	 * Create a Map from an array of items using a key and callback, grouping values into arrays
+	 * Create a Map from an array of items using a key and callback
+	 *
+	 * If multiple items have the same key, the latest item's value will be used
 	 * @param array Array to convert
 	 * @param key Key to use for grouping
 	 * @param value Callback to get an item's value
-	 * @returns Map of keyed arrays of values
+	 * @returns Map of keyed values
 	 */
-	arrays<
+	<
 		Item extends PlainObject,
 		ItemKey extends keyof Item,
 		ValueCallback extends (item: Item, index: number, array: Item[]) => unknown,
@@ -165,7 +57,76 @@ type ToMap = {
 		array: Item[],
 		key: ItemKey,
 		value: ValueCallback,
-	): Map<Item[ItemKey], ReturnType<ValueCallback>[]>;
+	): Map<Item[ItemKey], ReturnType<ValueCallback>>;
+
+	/**
+	 * Create a Map from an array of items using a key and value
+	 *
+	 * If multiple items have the same key, the latest item's value will be used
+	 * @param array Array to convert
+	 * @param key Key to use for grouping
+	 * @param value Key to use for value
+	 * @returns Map of keyed values
+	 */
+	<
+		Item extends PlainObject,
+		ItemKey extends keyof Item,
+		ItemValue extends keyof Item,
+	>(
+		array: Item[],
+		key: ItemKey,
+		value: ItemValue,
+	): Map<Item[ItemKey], Item[ItemValue]>;
+
+	/**
+	 * Create a Map from an array of items using a callback
+	 *
+	 * If multiple items have the same key, the latest item will be used
+	 * @param array Array to convert
+	 * @param callback Callback to get an item's grouping key
+	 * @returns Map of keyed items
+	 */
+	<Item, Callback extends (item: Item, index: number, array: Item[]) => Key>(
+		array: Item[],
+		callback: Callback,
+	): Map<ReturnType<Callback>, Item>;
+
+	/**
+	 * Create a Map from an array of items using a key
+	 *
+	 * If multiple items have the same key, the latest item will be used
+	 * @param array Array to convert
+	 * @param key Key to use for grouping
+	 * @returns Map of keyed items
+	 */
+	<Item extends PlainObject, ItemKey extends keyof Item>(
+		array: Item[],
+		key: ItemKey,
+	): Map<Item[ItemKey], Item>;
+
+	/**
+	 * Create a Map from an array of items _(using indices as keys)_
+	 * @param array Array to convert
+	 * @returns Map of indiced items
+	 */
+	<Item>(array: Item[]): Map<number, Item>;
+
+	/**
+	 * Create a Map from an array of items using callbacks, grouping values into arrays
+	 * @param array Array to convert
+	 * @param key Callback to get an item's grouping key
+	 * @param value Callback to get an item's value
+	 * @returns Map of keyed arrays of values
+	 */
+	arrays<
+		Item,
+		KeyCallback extends (item: Item, index: number, array: Item[]) => Key,
+		ValueCallback extends (item: Item, index: number, array: Item[]) => unknown,
+	>(
+		array: Item[],
+		key: KeyCallback,
+		value: ValueCallback,
+	): Map<ReturnType<KeyCallback>, ReturnType<ValueCallback>[]>;
 
 	/**
 	 * Create a Map from an array of items using a callback and value, grouping values into arrays
@@ -185,21 +146,60 @@ type ToMap = {
 	): Map<ReturnType<KeyCallback>, Item[ItemValue][]>;
 
 	/**
-	 * Create a Map from an array of items using callbacks, grouping values into arrays
+	 * Create a Map from an array of items using a key and callback, grouping values into arrays
 	 * @param array Array to convert
-	 * @param key Callback to get an item's grouping key
+	 * @param key Key to use for grouping
 	 * @param value Callback to get an item's value
 	 * @returns Map of keyed arrays of values
 	 */
 	arrays<
-		Item,
-		KeyCallback extends (item: Item, index: number, array: Item[]) => Key,
+		Item extends PlainObject,
+		ItemKey extends keyof Item,
 		ValueCallback extends (item: Item, index: number, array: Item[]) => unknown,
 	>(
 		array: Item[],
-		key: KeyCallback,
+		key: ItemKey,
 		value: ValueCallback,
-	): Map<ReturnType<KeyCallback>, ReturnType<ValueCallback>[]>;
+	): Map<Item[ItemKey], ReturnType<ValueCallback>[]>;
+
+	/**
+	 * Create a Map from an array of items using a key and value, grouping values into arrays
+	 * @param array Array to convert
+	 * @param key Key to use for grouping
+	 * @param value Key to use for value
+	 * @returns Map of keyed arrays of values
+	 */
+	arrays<
+		Item extends PlainObject,
+		ItemKey extends keyof Item,
+		ItemValue extends keyof Item,
+	>(
+		array: Item[],
+		key: ItemKey,
+		value: ItemValue,
+	): Map<Item[ItemKey], Item[ItemValue][]>;
+
+	/**
+	 * Create a Map from an array of items using a callback, grouping items into arrays
+	 * @param array Array to convert
+	 * @param callback Callback to get an item's grouping key
+	 * @returns Map of keyed arrays of items
+	 */
+	arrays<
+		Item,
+		Callback extends (item: Item, index: number, array: Item[]) => Key,
+	>(array: Item[], callback: Callback): Map<ReturnType<Callback>, Item[]>;
+
+	/**
+	 * Create a Map from an array of items using a key, grouping items into arrays
+	 * @param array Array to convert
+	 * @param key Key to use for grouping
+	 * @returns Map of keyed arrays of items
+	 */
+	arrays<Item extends PlainObject, ItemKey extends keyof Item>(
+		array: Item[],
+		key: ItemKey,
+	): Map<Item[ItemKey], Item[]>;
 };
 
 function getMapValues(

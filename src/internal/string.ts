@@ -14,6 +14,10 @@ export function getString(value: unknown): string {
 		return '';
 	}
 
+	if (typeof value === 'function') {
+		return getString(value());
+	}
+
 	if (typeof value !== 'object') {
 		return String(value);
 	}

@@ -18,6 +18,8 @@ import {
 const values = [
 	undefined,
 	null,
+	[],
+	() => {},
 	'',
 	' ',
 	'123',
@@ -30,8 +32,8 @@ const values = [
 	false,
 	Symbol('test'),
 	{},
-	[],
-	() => {},
+	[1, 2, 3],
+	() => 'hello, world',
 	new Map(),
 	new Set(),
 ];
@@ -39,7 +41,9 @@ const values = [
 const {length} = values;
 
 test('isArrayOrPlainObject', () => {
-	const expected = Array.from({length}, (_, index) => [13, 14].includes(index));
+	const expected = Array.from({length}, (_, index) =>
+		[2, 15, 16].includes(index),
+	);
 
 	let index = 0;
 
@@ -61,7 +65,7 @@ test('isEmpty', () => {
 });
 
 test('isKey', () => {
-	const indices = [2, 3, 4, 5, 6, 7, 8, 9];
+	const indices = [4, 5, 6, 7, 8, 9, 10, 11];
 
 	for (let index = 0; index < length; index += 1) {
 		expect(isKey(values[index])).toBe(indices.includes(index));
@@ -80,7 +84,7 @@ test('isNullable', () => {
 
 test('isNullableOrEmpty', () => {
 	const expected = Array.from({length}, (_, index) =>
-		[0, 1, 2, length - 4].includes(index),
+		[0, 1, 2, 3, 4].includes(index),
 	);
 
 	let index = 0;
@@ -92,7 +96,7 @@ test('isNullableOrEmpty', () => {
 
 test('isNullableOrWhitespace', () => {
 	const expected = Array.from({length}, (_, index) =>
-		[0, 1, 2, 3, length - 4].includes(index),
+		[0, 1, 2, 3, 4, 5].includes(index),
 	);
 
 	let index = 0;
@@ -104,7 +108,7 @@ test('isNullableOrWhitespace', () => {
 
 test('isNumber', () => {
 	const expected = Array.from({length}, (_, index) =>
-		[7, 8, 9].includes(index),
+		[9, 10, 11].includes(index),
 	);
 
 	let index = 0;
@@ -116,7 +120,7 @@ test('isNumber', () => {
 
 test('isNumerical', () => {
 	const expected = Array.from({length}, (_, index) =>
-		[4, 5, 7, 8, 9].includes(index),
+		[6, 7, 9, 10, 11].includes(index),
 	);
 
 	let index = 0;
@@ -127,7 +131,10 @@ test('isNumerical', () => {
 });
 
 test('isObject', () => {
-	const expected = Array.from({length}, (_, index) => index > 12);
+	const expected = Array.from(
+		{length},
+		(_, index) => index === 2 || index === 3 || index === 17 || index > 14,
+	);
 
 	let index = 0;
 
@@ -137,7 +144,7 @@ test('isObject', () => {
 });
 
 test('isPlainObject', () => {
-	const expected = Array.from({length}, (_, index) => index === 13);
+	const expected = Array.from({length}, (_, index) => index === 15);
 
 	let index = 0;
 
@@ -147,7 +154,10 @@ test('isPlainObject', () => {
 });
 
 test('isPrimitive', () => {
-	const expected = Array.from({length}, (_, index) => index < 13);
+	const expected = Array.from(
+		{length},
+		(_, index) => index !== 2 && index !== 3 && index < 15,
+	);
 
 	let index = 0;
 

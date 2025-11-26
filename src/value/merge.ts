@@ -126,5 +126,5 @@ function mergeValues(
 
 	return actual.length > 1
 		? mergeObjects(actual, options, prefix)
-		: actual[0] ?? {};
+		: (actual[0] ?? {});
 }

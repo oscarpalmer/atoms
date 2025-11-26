@@ -2,11 +2,15 @@ import {aggregate, type OnlyNumericalKeys} from './internal/math/aggregate';
 import type {PlainObject} from './models';
 
 /**
- * Get the average value from a list of numbers
- * @param numbers List of numbers
+ * Get the average value from a list of items
+ * @param items List of items
+ * @param callback Callback to get an item's value
  * @returns Average value, or `NaN` if no average can be calculated
  */
-export function average(numbers: number[]): number;
+export function average<Item extends PlainObject>(
+	items: Item[],
+	callback: (item: Item, index: number, array: Item[]) => number,
+): number;
 
 /**
  * Get the average value from a list of items
@@ -20,15 +24,11 @@ export function average<Item extends PlainObject>(
 ): number;
 
 /**
- * Get the average value from a list of items
- * @param items List of items
- * @param callback Callback to get an item's value
+ * Get the average value from a list of numbers
+ * @param numbers List of numbers
  * @returns Average value, or `NaN` if no average can be calculated
  */
-export function average<Item extends PlainObject>(
-	items: Item[],
-	callback: (item: Item, index: number, array: Item[]) => number,
-): number;
+export function average(numbers: number[]): number;
 
 export function average(array: unknown[], key?: unknown): number {
 	const aggregated = aggregate('average', array, key);
@@ -39,11 +39,17 @@ export function average(array: unknown[], key?: unknown): number {
 }
 
 /**
- * Count the number of items in an array
- * @param values Array to count for
- * @return Number of items, or `NaN` if no count can be calculated
+ * Count the number of items in an array that match a specific value
+ * @param array Array to count for
+ * @param callback Callback to get an item's value
+ * @param value Value to match and count
+ * @returns Number of items that match the condition, or `NaN` if no count can be calculated
  */
-export function count(values: unknown[]): number;
+export function count<Item extends PlainObject>(
+	array: Item[],
+	callback: (item: Item, index: number, array: Item[]) => unknown,
+	value: unknown,
+): number;
 
 /**
  * Count the number of items in an array that have a specific value
@@ -59,17 +65,11 @@ export function count<Item extends PlainObject>(
 ): number;
 
 /**
- * Count the number of items in an array that match a specific value
- * @param array Array to count for
- * @param callback Callback to get an item's value
- * @param value Value to match and count
- * @returns Number of items that match the condition, or `NaN` if no count can be calculated
+ * Count the number of items in an array
+ * @param values Array to count for
+ * @return Number of items, or `NaN` if no count can be calculated
  */
-export function count<Item extends PlainObject>(
-	array: Item[],
-	callback: (item: Item, index: number, array: Item[]) => unknown,
-	value: unknown,
-): number;
+export function count(values: unknown[]): number;
 
 export function count(
 	array: unknown[],
@@ -91,7 +91,9 @@ export function count(
 	}
 
 	const callback =
-		typeof key === 'function' ? key : (item: PlainObject): unknown => item[key as never];
+		typeof key === 'function'
+			? key
+			: (item: PlainObject): unknown => item[key as never];
 
 	let count = 0;
 
@@ -107,11 +109,15 @@ export function count(
 }
 
 /**
- * Get the minimum value from a list of numbers
- * @param values List of numbers
+ * Get the minimum value from a list of items
+ * @param items List of items
+ * @param callback Callback to get an item's value
  * @returns Minimum value, or `NaN` if no minimum can be found
  */
-export function min(values: number[]): number;
+export function min<Item extends PlainObject>(
+	items: Item[],
+	callback: (item: Item, index: number, array: Item[]) => number,
+): number;
 
 /**
  * Get the minimum value from a list of items
@@ -125,15 +131,11 @@ export function min<Item extends PlainObject>(
 ): number;
 
 /**
- * Get the minimum value from a list of items
- * @param items List of items
- * @param callback Callback to get an item's value
+ * Get the minimum value from a list of numbers
+ * @param values List of numbers
  * @returns Minimum value, or `NaN` if no minimum can be found
  */
-export function min<Item extends PlainObject>(
-	items: Item[],
-	callback: (item: Item, index: number, array: Item[]) => number,
-): number;
+export function min(values: number[]): number;
 
 export function min(array: unknown[], key?: unknown): number {
 	const aggregated = aggregate('min', array, key);
@@ -162,11 +164,15 @@ export function round(value: number, decimals?: number): number {
 }
 
 /**
- * Get the sum of a list of numbers
- * @param values List of numbers
- * @returns Sum of the numbers, or `NaN` if no sum can be calculated
+ * Get the sum of a list of items
+ * @param items List of items
+ * @param callback Callback to get an item's value
+ * @returns Sum of the values, or `NaN` if no sum can be calculated
  */
-export function sum(values: number[]): number;
+export function sum<Item extends PlainObject>(
+	items: Item[],
+	callback: (item: Item, index: number, array: Item[]) => number,
+): number;
 
 /**
  * Get the sum of a list of items
@@ -180,15 +186,11 @@ export function sum<Item extends PlainObject>(
 ): number;
 
 /**
- * Get the sum of a list of items
- * @param items List of items
- * @param callback Callback to get an item's value
- * @returns Sum of the values, or `NaN` if no sum can be calculated
+ * Get the sum of a list of numbers
+ * @param values List of numbers
+ * @returns Sum of the numbers, or `NaN` if no sum can be calculated
  */
-export function sum<Item extends PlainObject>(
-	items: Item[],
-	callback: (item: Item, index: number, array: Item[]) => number,
-): number;
+export function sum(values: number[]): number;
 
 export function sum(array: unknown[], key?: unknown): number {
 	const aggregated = aggregate('sum', array, key);

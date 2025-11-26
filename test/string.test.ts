@@ -107,6 +107,8 @@ test('getString', () => {
 	expect(getString({})).toBe('{}');
 	expect(getString([])).toBe('');
 	expect(getString([1, 2, 3])).toBe('1,2,3');
+	expect(getString(() => {})).toBe('');
+	expect(getString(() => 'test')).toBe('test');
 	expect(getString(new ItemWithoutToString('test'))).toBe('{"value":"test"}');
 	expect(getString(new ItemWithToString('test'))).toBe('test');
 

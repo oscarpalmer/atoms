@@ -28,17 +28,13 @@ async function getRandomNumber(
 	if (typeof max === 'number') {
 		maxActual = max;
 	} else {
-		maxActual = flipped
-			? Number.MIN_SAFE_INTEGER
-			: Number.MAX_SAFE_INTEGER;
+		maxActual = flipped ? Number.MIN_SAFE_INTEGER : Number.MAX_SAFE_INTEGER;
 	}
 
 	if (typeof min === 'number') {
 		minActual = min;
 	} else {
-		minActual = flipped
-			? Number.MAX_SAFE_INTEGER
-			: Number.MIN_SAFE_INTEGER;
+		minActual = flipped ? Number.MAX_SAFE_INTEGER : Number.MIN_SAFE_INTEGER;
 	}
 
 	let index = 0;

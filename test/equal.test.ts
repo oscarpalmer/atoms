@@ -35,9 +35,11 @@ test('any', () => {
 
 			expect(equal(outer, inner)).toBe(outerIndex === innerIndex);
 
-			expect(equal(outer, inner, {
-				relaxedNullish: true,
-			})).toBe((outerIndex < 2 && innerIndex < 2) || (outerIndex === innerIndex));
+			expect(
+				equal(outer, inner, {
+					relaxedNullish: true,
+				}),
+			).toBe((outerIndex < 2 && innerIndex < 2) || outerIndex === innerIndex);
 		}
 	}
 });

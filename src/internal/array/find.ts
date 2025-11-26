@@ -44,7 +44,9 @@ export function findValue(
 
 function findValueInArray(
 	array: unknown[],
-	callback: ((item: unknown, index: number, array: unknown[]) => boolean) | undefined,
+	callback:
+		| ((item: unknown, index: number, array: unknown[]) => boolean)
+		| undefined,
 	value: unknown,
 	findIndex: boolean,
 ): unknown {

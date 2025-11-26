@@ -142,7 +142,15 @@ test('flatten', () => {
 });
 
 test('getArray', () => {
-	const values = [null, undefined, '', 123, true, Symbol('test'), (): void => {}];
+	const values = [
+		null,
+		undefined,
+		'',
+		123,
+		true,
+		Symbol('test'),
+		(): void => {},
+	];
 
 	const {length} = values;
 

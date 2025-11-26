@@ -136,7 +136,7 @@ function equalArrayBuffer(
 				new Uint8Array(first) as never,
 				new Uint8Array(second) as never,
 				options,
-		  )
+			)
 		: false;
 }
 
@@ -150,7 +150,7 @@ function equalDataView(
 				first.buffer as ArrayBuffer,
 				second.buffer as ArrayBuffer,
 				options,
-		  )
+			)
 		: false;
 }
 
@@ -317,7 +317,7 @@ function equalValue(
 				(second as string).toLocaleLowerCase(),
 			);
 
-			case first instanceof ArrayBuffer && second instanceof ArrayBuffer:
+		case first instanceof ArrayBuffer && second instanceof ArrayBuffer:
 			return equalArrayBuffer(first, second, options);
 
 		case first instanceof Date && second instanceof Date:

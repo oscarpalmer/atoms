@@ -90,23 +90,20 @@ function getSorter(value: unknown, modifier: number): Sorter | undefined {
 }
 
 /**
- * Sort an array of items
+ * Sort an array of items, using multiple sorters to sort by specific values
  * @param array Array to sort
- * @param descending Sort in descending order? _(defaults to `false`)_
+ * @param sorters Sorters to use for sorting
+ * @param descending Sort in descending order? _(defaults to `false`; overridden by individual sorters)_
  * @returns Sorted array
  */
-export function sort<Item>(array: Item[], descending?: boolean): Item[];
-
-/**
- * Sort an array of items, using a sorter to sort by a specific value
- * @param array Array to sort
- * @param sorter Sorter to use for sorting
- * @param descending Sort in descending order? _(defaults to `false`; overridden by the sorter)_
- * @returns Sorted array
- */
-export function sort<Item extends Primitive>(
+export function sort<Item extends PlainObject>(
 	array: Item[],
-	sorter: (item: Item) => unknown,
+	sorters: Array<
+		| keyof Item
+		| ((item: Item) => unknown)
+		| CallbackSorter<Item>
+		| KeySorter<Item>
+	>,
 	descending?: boolean,
 ): Item[];
 
@@ -141,22 +138,25 @@ export function sort<Item extends Primitive>(
 ): Item[];
 
 /**
- * Sort an array of items, using multiple sorters to sort by specific values
+ * Sort an array of items, using a sorter to sort by a specific value
  * @param array Array to sort
- * @param sorters Sorters to use for sorting
- * @param descending Sort in descending order? _(defaults to `false`; overridden by individual sorters)_
+ * @param sorter Sorter to use for sorting
+ * @param descending Sort in descending order? _(defaults to `false`; overridden by the sorter)_
  * @returns Sorted array
  */
-export function sort<Item extends PlainObject>(
+export function sort<Item extends Primitive>(
 	array: Item[],
-	sorters: Array<
-		| keyof Item
-		| ((item: Item) => unknown)
-		| CallbackSorter<Item>
-		| KeySorter<Item>
-	>,
+	sorter: (item: Item) => unknown,
 	descending?: boolean,
 ): Item[];
+
+/**
+ * Sort an array of items
+ * @param array Array to sort
+ * @param descending Sort in descending order? _(defaults to `false`)_
+ * @returns Sorted array
+ */
+export function sort<Item>(array: Item[], descending?: boolean): Item[];
 
 export function sort(
 	array: unknown[],

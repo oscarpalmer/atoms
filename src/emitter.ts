@@ -118,13 +118,6 @@ class Observable<Value> {
 
 	/**
 	 * Subscribe to value changes
-	 * @param observer Observer for changes
-	 * @returns Subscription to the observable
-	 */
-	subscribe(observer: Observer<Value>): Subscription<Value>;
-
-	/**
-	 * Subscribe to value changes
 	 * @param onNext Callback for when the observable receives a new value
 	 * @param onError Callback for when the observable receives an error
 	 * @param onComplete Callback for when the observable is completed
@@ -135,6 +128,13 @@ class Observable<Value> {
 		onError?: (error: Error) => void,
 		onComplete?: () => void,
 	): Subscription<Value>;
+
+	/**
+	 * Subscribe to value changes
+	 * @param observer Observer for changes
+	 * @returns Subscription to the observable
+	 */
+	subscribe(observer: Observer<Value>): Subscription<Value>;
 
 	subscribe(
 		first: Observer<Value> | ((value: Value) => void),

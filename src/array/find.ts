@@ -2,22 +2,16 @@ import {findValue} from '../internal/array/find';
 import type {PlainObject} from '../models';
 
 /**
- * Get the first item matching the given value
+ * Get the first items matching the given value
  * @param array Array to search in
+ * @param callback Callback to get an item's value for matching
  * @param value Value to match against
  * @returns First item that matches the value, or `undefined` if no match is found
  */
-export function find<Item>(array: Item[], value: Item): Item | undefined;
-
-/**
- * Get the first item matching the filter
- * @param array Array to search in
- * @param filter Filter callback to match items
- * @returns First item that matches the filter, or `undefined` if no match is found
- */
 export function find<Item>(
 	array: Item[],
-	filter: (item: Item, index: number, array: Item[]) => boolean,
+	callback: (item: Item, index: number, array: Item[]) => unknown,
+	value: unknown,
 ): Item | undefined;
 
 /**
@@ -34,17 +28,23 @@ export function find<Item extends PlainObject>(
 ): Item | undefined;
 
 /**
- * Get the first items matching the given value
+ * Get the first item matching the filter
  * @param array Array to search in
- * @param callback Callback to get an item's value for matching
- * @param value Value to match against
- * @returns First item that matches the value, or `undefined` if no match is found
+ * @param filter Filter callback to match items
+ * @returns First item that matches the filter, or `undefined` if no match is found
  */
 export function find<Item>(
 	array: Item[],
-	callback: (item: Item, index: number, array: Item[]) => unknown,
-	value: unknown,
+	filter: (item: Item, index: number, array: Item[]) => boolean,
 ): Item | undefined;
+
+/**
+ * Get the first item matching the given value
+ * @param array Array to search in
+ * @param value Value to match against
+ * @returns First item that matches the value, or `undefined` if no match is found
+ */
+export function find<Item>(array: Item[], value: Item): Item | undefined;
 
 export function find<Item>(
 	array: unknown[],

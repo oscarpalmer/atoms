@@ -200,19 +200,22 @@ test('diff', () => {
 		'4': {from: 5, to: undefined},
 	});
 
-	let nullish = diff({
-		a: {
-			b: {
-				c: 123,
+	let nullish = diff(
+		{
+			a: {
+				b: {
+					c: 123,
+				},
 			},
+			nullish: null,
 		},
-		nullish: null,
-	}, {
-		a: {
-			x: 'y',
+		{
+			a: {
+				x: 'y',
+			},
+			nullish: undefined,
 		},
-		nullish: undefined,
-	});
+	);
 
 	expect(nullish.type).toBe('partial');
 
@@ -220,21 +223,25 @@ test('diff', () => {
 	expect(nullish.values['a.x']).toEqual({from: undefined, to: 'y'});
 	expect(nullish.values.nullish).toEqual({from: null, to: undefined});
 
-	nullish = diff({
-		a: {
-			b: {
-				c: 123,
+	nullish = diff(
+		{
+			a: {
+				b: {
+					c: 123,
+				},
 			},
+			nullish: null,
 		},
-		nullish: null,
-	}, {
-		a: {
-			x: 'y',
+		{
+			a: {
+				x: 'y',
+			},
+			nullish: undefined,
 		},
-		nullish: undefined,
-	}, {
-		relaxedNullish: true,
-	});
+		{
+			relaxedNullish: true,
+		},
+	);
 
 	expect(nullish.type).toBe('partial');
 	expect(nullish.values.relaxedNull).toBeUndefined();

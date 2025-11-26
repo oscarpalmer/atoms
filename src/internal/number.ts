@@ -48,7 +48,9 @@ export function clamp(
 		return loop === true ? maximum : minimum;
 	}
 
-	return value > maximum ? (loop === true ? minimum : maximum) : value;
+	const next = loop === true ? minimum : maximum;
+
+	return value > maximum ? next : value;
 }
 
 /**
@@ -67,6 +69,10 @@ export function getNumber(value: unknown): number {
 
 	if (value == null || typeof value === 'symbol') {
 		return Number.NaN;
+	}
+
+	if (typeof value === 'function') {
+		return getNumber(value());
 	}
 
 	let parsed = value.valueOf();

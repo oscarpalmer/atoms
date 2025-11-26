@@ -1,7 +1,7 @@
 /// <reference types="vitest" />
 import {extname, relative} from 'node:path';
 import {fileURLToPath} from 'node:url';
-import {globSync} from 'glob';
+import {globSync} from 'tinyglobby';
 import {defineConfig} from 'vite';
 
 const files = globSync('./src/**/*.ts').map(file => [

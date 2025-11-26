@@ -61,7 +61,10 @@ test('getNumber', () => {
 	expect(getNumber('0o10')).toBe(8);
 	expect(getNumber('0x10')).toBe(16);
 	expect(getNumber(Symbol())).toBeNaN();
+	expect(getNumber([])).toBeNaN();
 	expect(getNumber({})).toBeNaN();
+	expect(getNumber(() => {})).toBeNaN();
+	expect(getNumber(() => 123)).toBe(123);
 	expect(getNumber(a)).toBe(123);
 	expect(getNumber(b)).toBe(123);
 	expect(getNumber(c)).toBeNaN();

@@ -4,9 +4,13 @@ import type {Key, PlainObject} from '../models';
 /**
  * Get an array of unique items
  * @param array Original array
+ * @param callback Callback to get an item's value
  * @returns Array of unique items
  */
-export function unique<Item>(array: Item[]): Item[];
+export function unique<
+	Item,
+	ItemCallback extends (item: Item, index: number, array: Item[]) => Key,
+>(array: Item[], callback: ItemCallback): Item[];
 
 /**
  * Get an array of unique items
@@ -22,13 +26,9 @@ export function unique<Item extends PlainObject, ItemKey extends keyof Item>(
 /**
  * Get an array of unique items
  * @param array Original array
- * @param callback Callback to get an item's value
  * @returns Array of unique items
  */
-export function unique<
-	Item,
-	ItemCallback extends (item: Item, index: number, array: Item[]) => Key,
->(array: Item[], callback: ItemCallback): Item[];
+export function unique<Item>(array: Item[]): Item[];
 
 export function unique(array: unknown[], key?: unknown): unknown[] {
 	if (!Array.isArray(array)) {

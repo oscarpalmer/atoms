@@ -71,19 +71,19 @@ export function getRandomItem<Value>(array: Value[]): Value | undefined {
 }
 
 /**
- * Get an shuffled array
- * @param array Array to get random items from
- * @returns A shuffled version of the original array
- */
-export function getRandomItems<Value>(array: Value[]): Value[];
-
-/**
  * Get an amount of random items from an array
  * @param array Array to get random items from
  * @param amount Amount of items to return
  * @returns Array of random items
  */
 export function getRandomItems<Value>(array: Value[], amount: number): Value[];
+
+/**
+ * Get an shuffled array
+ * @param array Array to get random items from
+ * @returns A shuffled version of the original array
+ */
+export function getRandomItems<Value>(array: Value[]): Value[];
 
 export function getRandomItems<Value>(
 	array: Value[],

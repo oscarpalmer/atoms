@@ -46,7 +46,7 @@ export function aggregate(
 
 		const value = isCallback
 			? (key as GenericCallback)(item, index, array)
-			: (item as PlainObject)[key as never] ?? item;
+			: ((item as PlainObject)[key as never] ?? item);
 
 		if (typeof value === 'number' && !Number.isNaN(value)) {
 			aggregated = aggregator(aggregated, value, notNumber);
@@ -63,11 +63,15 @@ export function aggregate(
 }
 
 /**
- * Get the maximum value from a list of numbers
- * @param values List of numbers
+ * Get the maximum value from a list of items
+ * @param items List of items
+ * @param callback Callback to get an item's value
  * @returns Maximum value, or `NaN` if no maximum can be found
  */
-export function max(values: number[]): number;
+export function max<Item extends PlainObject>(
+	items: Item[],
+	callback: (item: Item, index: number, array: Item[]) => number,
+): number;
 
 /**
  * Get the maximum value from a list of items
@@ -81,15 +85,11 @@ export function max<Item extends PlainObject>(
 ): number;
 
 /**
- * Get the maximum value from a list of items
- * @param items List of items
- * @param callback Callback to get an item's value
+ * Get the maximum value from a list of numbers
+ * @param values List of numbers
  * @returns Maximum value, or `NaN` if no maximum can be found
  */
-export function max<Item extends PlainObject>(
-	items: Item[],
-	callback: (item: Item, index: number, array: Item[]) => number,
-): number;
+export function max(values: number[]): number;
 
 export function max(array: unknown[], key?: unknown): number {
 	return aggregate('max', array, key).value;
