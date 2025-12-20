@@ -61,9 +61,7 @@ export function titleCase(value: string): string {
 		return '';
 	}
 
-	return value.length < 1
-		? capitalize(value)
-		: join(words(value).map(capitalize), ' ');
+	return value.length < 1 ? capitalize(value) : join(words(value).map(capitalize), ' ');
 }
 
 function toCase(
@@ -88,10 +86,8 @@ function toCase(
 	for (let partIndex = 0; partIndex < partsLength; partIndex += 1) {
 		const part = parts[partIndex];
 
-		const acronymParts = part.replace(
-			EXPRESSION_ACRONYM,
-			(full, one, two, three) =>
-				three === 's' ? full : `${one}-${two}${three}`,
+		const acronymParts = part.replace(EXPRESSION_ACRONYM, (full, one, two, three) =>
+			three === 's' ? full : `${one}-${two}${three}`,
 		);
 
 		const camelCaseParts = acronymParts.replace(EXPRESSION_CAMEL_CASE, '$1-$2');
@@ -110,10 +106,7 @@ function toCase(
 				continue;
 			}
 
-			if (
-				!capitalizeAny ||
-				(itemCount === 0 && partIndex === 0 && !capitalizeFirst)
-			) {
+			if (!capitalizeAny || (itemCount === 0 && partIndex === 0 && !capitalizeFirst)) {
 				partResult.push(item.toLocaleLowerCase());
 			} else {
 				partResult.push(capitalize(item));

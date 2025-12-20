@@ -37,9 +37,7 @@ export function template(
 	const ignoreCase = hasOptions && options?.ignoreCase === true;
 
 	const pattern =
-		hasOptions && options?.pattern instanceof RegExp
-			? options.pattern
-			: EXPRESSION_VARIABLE;
+		hasOptions && options?.pattern instanceof RegExp ? options.pattern : EXPRESSION_VARIABLE;
 
 	const values: Record<string, string> = {};
 

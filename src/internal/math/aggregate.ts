@@ -5,11 +5,7 @@ type Aggregation = {
 	value: number;
 };
 
-type AggregationCallback = (
-	current: number,
-	value: number,
-	notNumber: boolean,
-) => number;
+type AggregationCallback = (current: number, value: number, notNumber: boolean) => number;
 
 type AggregationType = 'average' | 'max' | 'min' | 'sum';
 
@@ -20,11 +16,7 @@ export type OnlyNumericalKeys<Item> = {
 	[Key in keyof Item as Item[Key] extends number ? Key : never]: Item[Key];
 };
 
-export function aggregate(
-	type: AggregationType,
-	array: unknown[],
-	key: unknown,
-): Aggregation {
+export function aggregate(type: AggregationType, array: unknown[], key: unknown): Aggregation {
 	const length = Array.isArray(array) ? array.length : 0;
 
 	if (length === 0) {

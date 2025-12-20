@@ -1,7 +1,10 @@
+import {clamp} from '../../number';
 import {
 	HEX_BLACK,
 	HEX_WHITE,
+	MAX_DEGREE,
 	MAX_HEX,
+	MAX_PERCENT,
 	SRGB_LUMINANCE_BLUE,
 	SRGB_LUMINANCE_EXPONENT,
 	SRGB_LUMINANCE_GREEN,
@@ -32,8 +35,7 @@ export function getForegroundColor(value: unknown): Color {
 			color /= SRGB_LUMINANCE_MULTIPLIER;
 		} else {
 			color =
-				((color + SRGB_LUMINANCE_OFFSET) / SRGB_LUMINANCE_MODIFIER) **
-				SRGB_LUMINANCE_EXPONENT;
+				((color + SRGB_LUMINANCE_OFFSET) / SRGB_LUMINANCE_MODIFIER) ** SRGB_LUMINANCE_EXPONENT;
 		}
 	}
 
@@ -43,9 +45,7 @@ export function getForegroundColor(value: unknown): Color {
 		SRGB_LUMINANCE_BLUE * values[0];
 
 	// Rudimentary and ureliable?; implement APCA for more reliable results?
-	return new Color(
-		luminance > SRGB_LUMINANCE_THRESHOLD ? HEX_BLACK : HEX_WHITE,
-	);
+	return new Color(luminance > SRGB_LUMINANCE_THRESHOLD ? HEX_BLACK : HEX_WHITE);
 }
 
 /**
@@ -66,6 +66,14 @@ export function getHexaColor(value: unknown): string {
  */
 export function getHexColor(value: unknown): string {
 	return getState(value).hex;
+}
+
+export function getHexValue(value: unknown): number {
+	return getValue(value, 0, MAX_HEX);
+}
+
+export function getDegrees(value: unknown): number {
+	return getValue(value, 0, MAX_DEGREE);
 }
 
 /**
@@ -91,6 +99,10 @@ export function getHslColor(value: unknown): HSLColor {
 	return getState(value).hsl;
 }
 
+export function getPercentage(value: unknown): number {
+	return getValue(value, 0, MAX_PERCENT);
+}
+
 /**
  * Get the RGBA color from any kind of value
  * @param value Original value
@@ -112,4 +124,8 @@ export function getRgbaColor(value: unknown): RGBAColor {
  */
 export function getRgbColor(value: unknown): RGBColor {
 	return getState(value).rgb;
+}
+
+function getValue(value: unknown, minimum: number, maximum: number): number {
+	return typeof value === 'number' ? clamp(value, minimum, maximum) : minimum;
 }

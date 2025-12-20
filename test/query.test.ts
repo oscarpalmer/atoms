@@ -1,5 +1,3 @@
-/** biome-ignore-all lint/style/noMagicNumbers: Testing */
-/** biome-ignore-all lint/nursery/useExplicitType: Testing */
 import {expect, test} from 'vitest';
 import {tryDecode, tryEncode} from '../src/internal/string';
 import {fromQuery, toQuery} from '../src/query';
@@ -43,13 +41,9 @@ const parameters = {
 };
 
 test('fromQuery', () => {
-	expect(fromQuery(`${query.simple}&${query.ignored}`)).toEqual(
-		parameters.simple,
-	);
+	expect(fromQuery(`${query.simple}&${query.ignored}`)).toEqual(parameters.simple);
 
-	expect(fromQuery(`${query.complex.basic}&${query.ignored}`)).toEqual(
-		parameters.complex,
-	);
+	expect(fromQuery(`${query.complex.basic}&${query.ignored}`)).toEqual(parameters.complex);
 
 	expect(fromQuery(`${query.complex.basic}&${query.ignored}`)).toEqual(
 		fromQuery(`${query.complex.bracketed}&${query.ignored}`),

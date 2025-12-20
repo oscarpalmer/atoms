@@ -46,18 +46,14 @@ function getOptions(options?: Partial<MergeOptions>): Options {
 	return actual;
 }
 
-function getReplaceableObjects(
-	value: unknown,
-): ReplaceableObjectsCallback | undefined {
+function getReplaceableObjects(value: unknown): ReplaceableObjectsCallback | undefined {
 	const items = (Array.isArray(value) ? value : [value]).filter(
 		item => typeof item === 'string' || item instanceof RegExp,
 	);
 
 	if (items.length > 0) {
 		return (name: string) =>
-			items.some(item =>
-				typeof item === 'string' ? item === name : item.test(name),
-			);
+			items.some(item => (typeof item === 'string' ? item === name : item.test(name)));
 	}
 }
 
@@ -75,7 +71,7 @@ export function merge<Model extends ArrayOrPlainObject>(
 		return {} as Model;
 	}
 
-	return mergeValues(values, getOptions(options)) as Model;
+	return mergeValues(values, getOptions(options), true) as Model;
 }
 
 function mergeObjects(
@@ -104,12 +100,13 @@ function mergeObjects(
 			}
 
 			if (
-				!(isArrayOrPlainObject(next) && isArrayOrPlainObject(previous)) ||
-				(options.replaceableObjects?.(full) ?? false)
+				isArrayOrPlainObject(next) &&
+				isArrayOrPlainObject(previous) &&
+				!(options.replaceableObjects?.(full) ?? false)
 			) {
-				result[key] = next;
+				result[key] = mergeValues([previous, next], options, false, full);
 			} else {
-				result[key] = mergeValues([previous, next], options, full);
+				result[key] = next;
 			}
 		}
 	}
@@ -120,11 +117,10 @@ function mergeObjects(
 function mergeValues(
 	values: ArrayOrPlainObject[],
 	options: Options,
+	validate: boolean,
 	prefix?: string,
 ): ArrayOrPlainObject {
-	const actual = values.filter(isArrayOrPlainObject);
+	const actual = validate ? values.filter(isArrayOrPlainObject) : values;
 
-	return actual.length > 1
-		? mergeObjects(actual, options, prefix)
-		: (actual[0] ?? {});
+	return actual.length > 1 ? mergeObjects(actual, options, prefix) : (actual[0] ?? {});
 }

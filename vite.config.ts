@@ -4,7 +4,9 @@ import {fileURLToPath} from 'node:url';
 import {globSync} from 'tinyglobby';
 import {defineConfig} from 'vite';
 
-const files = globSync('./src/**/*.ts').map(file => [
+const watch = process.argv.includes('--watch');
+
+const files = globSync(watch ? './src/index.ts' : './src/**/*.ts').map(file => [
 	relative('./src', file.slice(0, file.length - extname(file).length)),
 	fileURLToPath(new URL(file, import.meta.url)),
 ]);
@@ -24,7 +26,6 @@ export default defineConfig({
 				preserveModules: true,
 			},
 		},
-		target: 'esnext',
 	},
 	logLevel: 'silent',
 	test: {

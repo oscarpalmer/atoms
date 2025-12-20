@@ -68,11 +68,7 @@ type ToMap = {
 	 * @param value Key to use for value
 	 * @returns Map of keyed values
 	 */
-	<
-		Item extends PlainObject,
-		ItemKey extends keyof Item,
-		ItemValue extends keyof Item,
-	>(
+	<Item extends PlainObject, ItemKey extends keyof Item, ItemValue extends keyof Item>(
 		array: Item[],
 		key: ItemKey,
 		value: ItemValue,
@@ -169,11 +165,7 @@ type ToMap = {
 	 * @param value Key to use for value
 	 * @returns Map of keyed arrays of values
 	 */
-	arrays<
-		Item extends PlainObject,
-		ItemKey extends keyof Item,
-		ItemValue extends keyof Item,
-	>(
+	arrays<Item extends PlainObject, ItemKey extends keyof Item, ItemValue extends keyof Item>(
 		array: Item[],
 		key: ItemKey,
 		value: ItemValue,
@@ -185,10 +177,10 @@ type ToMap = {
 	 * @param callback Callback to get an item's grouping key
 	 * @returns Map of keyed arrays of items
 	 */
-	arrays<
-		Item,
-		Callback extends (item: Item, index: number, array: Item[]) => Key,
-	>(array: Item[], callback: Callback): Map<ReturnType<Callback>, Item[]>;
+	arrays<Item, Callback extends (item: Item, index: number, array: Item[]) => Key>(
+		array: Item[],
+		callback: Callback,
+	): Map<ReturnType<Callback>, Item[]>;
 
 	/**
 	 * Create a Map from an array of items using a key, grouping items into arrays

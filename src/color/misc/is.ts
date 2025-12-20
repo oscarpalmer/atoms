@@ -16,19 +16,14 @@ import {
 	MAX_PERCENT,
 } from '../constants';
 import type {Color} from '../index';
-import type {
-	ColorProperty,
-	HSLAColor,
-	HSLColor,
-	RGBAColor,
-	RGBColor,
-} from '../models';
+import type {ColorProperty, HSLAColor, HSLColor, RGBAColor, RGBColor} from '../models';
+
+function hasKeys(value: unknown, keys: ColorProperty[]): boolean {
+	return typeof value === 'object' && value !== null && keys.every(key => key in value);
+}
 
 function isAlpha(value: unknown): value is number {
-	return (
-		typeof value === 'number' &&
-		between(value, ALPHA_NONE_VALUE, ALPHA_FULL_VALUE)
-	);
+	return typeof value === 'number' && between(value, ALPHA_NONE_VALUE, ALPHA_FULL_VALUE);
 }
 
 function isBytey(value: unknown): value is number {
@@ -41,12 +36,7 @@ function isBytey(value: unknown): value is number {
  * @returns `true` if the value is a Color, otherwise `false`
  */
 export function isColor(value: unknown): value is Color {
-	return (
-		typeof value === 'object' &&
-		value !== null &&
-		'$color' in value &&
-		value.$color === true
-	);
+	return typeof value === 'object' && value !== null && '$color' in value && value.$color === true;
 }
 
 function isDegree(value: unknown): value is number {
@@ -93,6 +83,10 @@ export function isHslColor(value: unknown): value is HSLColor {
 	return isObject(value, KEYS_HSLA) || isObject(value, KEYS_HSL);
 }
 
+export function isHslLike(value: unknown): value is Record<keyof HSLColor, unknown> {
+	return hasKeys(value, KEYS_HSL);
+}
+
 /**
  * Is the value an RGBA color?
  * @param value The value to check
@@ -109,6 +103,10 @@ export function isRgbaColor(value: unknown): value is RGBAColor {
  */
 export function isRgbColor(value: unknown): value is RGBColor {
 	return isObject(value, KEYS_RGBA) || isObject(value, KEYS_RGB);
+}
+
+export function isRgbLike(value: unknown): value is Record<keyof RGBColor, unknown> {
+	return hasKeys(value, KEYS_RGB);
 }
 
 function isObject(obj: unknown, properties: ColorProperty[]): boolean {

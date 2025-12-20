@@ -23,14 +23,7 @@ export type RGBColor = {
 	red: number;
 };
 
-export type ColorProperty =
-	| 'alpha'
-	| 'blue'
-	| 'green'
-	| 'hue'
-	| 'lightness'
-	| 'red'
-	| 'saturation';
+export type ColorProperty = 'alpha' | 'blue' | 'green' | 'hue' | 'lightness' | 'red' | 'saturation';
 
 export type ColorSpace = 'hsl' | 'rgb';
 

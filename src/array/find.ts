@@ -46,9 +46,6 @@ export function find<Item>(
  */
 export function find<Item>(array: Item[], value: Item): Item | undefined;
 
-export function find<Item>(
-	array: unknown[],
-	...parameters: unknown[]
-): Item | undefined {
+export function find<Item>(array: unknown[], ...parameters: unknown[]): Item | undefined {
 	return findValue('value', array, parameters) as Item | undefined;
 }

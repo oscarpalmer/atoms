@@ -12,11 +12,7 @@ type Parameters = {
 
 //
 
-export function findValue(
-	type: FindValueType,
-	array: unknown[],
-	parameters: unknown[],
-): unknown {
+export function findValue(type: FindValueType, array: unknown[], parameters: unknown[]): unknown {
 	const findIndex = type === 'index';
 
 	if (!Array.isArray(array) || array.length === 0) {
@@ -28,9 +24,7 @@ export function findValue(
 	const callbacks = getCallbacks(bool, key);
 
 	if (callbacks?.bool == null && callbacks?.keyed == null) {
-		return findIndex
-			? array.indexOf(value)
-			: array.find(item => item === value);
+		return findIndex ? array.indexOf(value) : array.find(item => item === value);
 	}
 
 	if (callbacks.bool != null) {
@@ -44,9 +38,7 @@ export function findValue(
 
 function findValueInArray(
 	array: unknown[],
-	callback:
-		| ((item: unknown, index: number, array: unknown[]) => boolean)
-		| undefined,
+	callback: ((item: unknown, index: number, array: unknown[]) => boolean) | undefined,
 	value: unknown,
 	findIndex: boolean,
 ): unknown {
@@ -92,11 +84,7 @@ export function findValues(
 	const {bool, key, value} = getParameters(parameters);
 	const callbacks = getCallbacks(bool, key);
 
-	if (
-		type === 'unique' &&
-		callbacks?.keyed == null &&
-		length >= UNIQUE_THRESHOLD
-	) {
+	if (type === 'unique' && callbacks?.keyed == null && length >= UNIQUE_THRESHOLD) {
 		return [...new Set(array)];
 	}
 
@@ -115,10 +103,7 @@ export function findValues(
 		const item = array[index];
 		const keyed = callbacks?.keyed?.(item, index, array) ?? item;
 
-		if (
-			(type === 'all' && Object.is(keyed, value)) ||
-			(type === 'unique' && !keys.has(keyed))
-		) {
+		if ((type === 'all' && Object.is(keyed, value)) || (type === 'unique' && !keys.has(keyed))) {
 			keys.add(keyed);
 			result.push(item);
 		}
@@ -133,15 +118,9 @@ function getParameters(original: unknown[]): Parameters {
 	const {length} = original;
 
 	return {
-		bool:
-			length === 1 && typeof original[0] === 'function'
-				? original[0]
-				: undefined,
+		bool: length === 1 && typeof original[0] === 'function' ? original[0] : undefined,
 		key: length === 2 ? original[0] : undefined,
-		value:
-			length === 1 && typeof original[0] !== 'function'
-				? original[0]
-				: original[1],
+		value: length === 1 && typeof original[0] !== 'function' ? original[0] : original[1],
 	};
 }
 

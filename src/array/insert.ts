@@ -9,11 +9,7 @@ import {insertValues} from '../internal/array/insert';
  * @param items Inserted items
  * @returns Updated array
  */
-export function insert<Item>(
-	array: Item[],
-	index: number,
-	items: Item[],
-): Item[];
+export function insert<Item>(array: Item[], index: number, items: Item[]): Item[];
 
 /**
  * Insert items into an array _(at the end)_

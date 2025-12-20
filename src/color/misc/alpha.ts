@@ -46,11 +46,7 @@ function getAlphaFromValue(value: number): Alpha {
 }
 
 export function getAlphaValue(original: number): number {
-	if (
-		Number.isNaN(original) ||
-		original >= MAX_PERCENT ||
-		original === ALPHA_FULL_VALUE
-	) {
+	if (Number.isNaN(original) || original >= MAX_PERCENT || original === ALPHA_FULL_VALUE) {
 		return ALPHA_FULL_VALUE;
 	}
 

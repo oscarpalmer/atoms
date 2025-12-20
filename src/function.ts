@@ -1,4 +1,4 @@
-import {milliseconds} from './internal/function';
+import FRAME_RATE_MS from './internal/frame-rate';
 import {getString, join} from './internal/string';
 import type {GenericCallback} from './models';
 import {SizedMap} from './sized';
@@ -30,13 +30,8 @@ class Memoized<Callback extends GenericCallback> {
 	constructor(callback: Callback, size: number) {
 		const cache = new SizedMap<unknown, ReturnType<Callback>>(size);
 
-		const getter = (
-			...parameters: Parameters<Callback>
-		): ReturnType<Callback> => {
-			const key =
-				parameters.length === 1
-					? parameters[0]
-					: join(parameters.map(getString), '_');
+		const getter = (...parameters: Parameters<Callback>): ReturnType<Callback> => {
+			const key = parameters.length === 1 ? parameters[0] : join(parameters.map(getString), '_');
 
 			if (cache.has(key)) {
 				return cache.get(key) as ReturnType<Callback>;
@@ -103,7 +98,6 @@ class Memoized<Callback extends GenericCallback> {
 	 */
 	run(...parameters: Parameters<Callback>): ReturnType<Callback> {
 		if (this.#state.cache == null || this.#state.getter == null) {
-			/* istanbul ignore next */
 			throw new Error('The Memoized instance has been destroyed');
 		}
 
@@ -128,14 +122,10 @@ export function debounce<Callback extends GenericCallback>(
 	callback: Callback,
 	time?: number,
 ): CancellableCallback<Callback> {
-	const interval =
-		typeof time === 'number' && time >= milliseconds ? time : milliseconds;
+	const interval = typeof time === 'number' && time >= FRAME_RATE_MS ? time : FRAME_RATE_MS;
 
-	function step(
-		now: DOMHighResTimeStamp,
-		parameters: Parameters<Callback>,
-	): void {
-		if (interval === milliseconds || now - start >= interval) {
+	function step(now: DOMHighResTimeStamp, parameters: Parameters<Callback>): void {
+		if (interval === FRAME_RATE_MS || now - start >= interval) {
 			callback(...parameters);
 		} else {
 			frame = requestAnimationFrame(next => {
@@ -151,7 +141,7 @@ export function debounce<Callback extends GenericCallback>(
 		debounced.cancel();
 
 		frame = requestAnimationFrame(now => {
-			start = now - milliseconds;
+			start = now - FRAME_RATE_MS;
 
 			step(now, parameters);
 		});
@@ -180,9 +170,7 @@ export function memoize<Callback extends GenericCallback>(
 ): Memoized<Callback> {
 	return new Memoized(
 		callback,
-		typeof cacheSize === 'number' && cacheSize > 0
-			? cacheSize
-			: DEFAULT_CACHE_SIZE,
+		typeof cacheSize === 'number' && cacheSize > 0 ? cacheSize : DEFAULT_CACHE_SIZE,
 	);
 }
 
@@ -196,14 +184,10 @@ export function throttle<Callback extends GenericCallback>(
 	callback: Callback,
 	time?: number,
 ): CancellableCallback<Callback> {
-	const interval =
-		typeof time === 'number' && time >= milliseconds ? time : milliseconds;
+	const interval = typeof time === 'number' && time >= FRAME_RATE_MS ? time : FRAME_RATE_MS;
 
-	function step(
-		now: DOMHighResTimeStamp,
-		parameters: Parameters<Callback>,
-	): void {
-		if (interval === milliseconds || now - last >= interval) {
+	function step(now: DOMHighResTimeStamp, parameters: Parameters<Callback>): void {
+		if (interval === FRAME_RATE_MS || now - last >= interval) {
 			last = now;
 
 			callback(...parameters);
@@ -222,7 +206,7 @@ export function throttle<Callback extends GenericCallback>(
 		throttler.cancel();
 
 		frame = requestAnimationFrame(now => {
-			last ??= now - milliseconds;
+			last ??= now - FRAME_RATE_MS;
 
 			step(now, parameters);
 		});

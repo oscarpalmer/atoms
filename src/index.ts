@@ -1,3 +1,5 @@
+import FRAME_RATE_MS from './internal/frame-rate';
+
 export * from './array/index';
 export * from './color/index';
 export * from './emitter';
@@ -12,3 +14,5 @@ export * from './random';
 export * from './sized';
 export * from './string/index';
 export * from './value/index';
+
+export {FRAME_RATE_MS};

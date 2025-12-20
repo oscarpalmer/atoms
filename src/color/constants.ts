@@ -1,10 +1,4 @@
-import type {
-	Alpha,
-	ColorProperty,
-	ColorSpace,
-	HSLColor,
-	RGBColor,
-} from './models';
+import type {Alpha, ColorProperty, ColorSpace, HSLColor, RGBColor} from './models';
 
 export const ALPHA_FULL_HEX_SHORT = 'f';
 
@@ -33,8 +27,7 @@ export const DEFAULT_RGB: RGBColor = {
 	red: 0,
 };
 
-export const EXPRESSION_HEX_LONG =
-	/^#?([a-f0-9]{2})([a-f0-9]{2})([a-f0-9]{2})([a-f0-9]{2})?$/i;
+export const EXPRESSION_HEX_LONG = /^#?([a-f0-9]{2})([a-f0-9]{2})([a-f0-9]{2})([a-f0-9]{2})?$/i;
 
 export const EXPRESSION_HEX_SHORT = /^#?([a-f0-9]{3,4})$/i;
 

@@ -1,6 +1,3 @@
-/** biome-ignore-all lint/style/noMagicNumbers: Testing */
-/** biome-ignore-all lint/nursery/useExplicitType: Testing */
-/** biome-ignore-all lint/style/useNamingConvention: Testing */
 import {expect, test} from 'vitest';
 import {
 	chunk,
@@ -56,19 +53,9 @@ test('chunk', () => {
 test('compact', () => {
 	expect(compact([1, 2, 3, 4])).toEqual([1, 2, 3, 4]);
 
-	expect(compact([0, 1, null, 2, undefined, 3, false, 4, ''])).toEqual([
-		0,
-		1,
-		2,
-		3,
-		false,
-		4,
-		'',
-	]);
+	expect(compact([0, 1, null, 2, undefined, 3, false, 4, ''])).toEqual([0, 1, 2, 3, false, 4, '']);
 
-	expect(compact([0, 1, null, 2, undefined, 3, false, 4, ''], true)).toEqual([
-		1, 2, 3, 4,
-	]);
+	expect(compact([0, 1, null, 2, undefined, 3, false, 4, ''], true)).toEqual([1, 2, 3, 4]);
 
 	expect(compact('blah' as never)).toEqual([]);
 });
@@ -142,15 +129,7 @@ test('flatten', () => {
 });
 
 test('getArray', () => {
-	const values = [
-		null,
-		undefined,
-		'',
-		123,
-		true,
-		Symbol('test'),
-		(): void => {},
-	];
+	const values = [null, undefined, '', 123, true, Symbol('test'), (): void => {}];
 
 	const {length} = values;
 
@@ -168,12 +147,7 @@ test('getArray', () => {
 		value: {hello: 'world'},
 	};
 
-	expect(getArray(object)).toEqual([
-		'one two three',
-		'nine nine nine',
-		'omega',
-		{hello: 'world'},
-	]);
+	expect(getArray(object)).toEqual(['one two three', 'nine nine nine', 'omega', {hello: 'world'}]);
 
 	expect(getArray(object, true)).toEqual(['one two three', 'nine nine nine']);
 });
@@ -409,17 +383,9 @@ test('sort: basic', () => {
 
 	expect(sort([2, 1, 3], [{} as never])).toEqual([1, 2, 3]);
 
-	expect(sort([{id: 2}, {id: 1}, {id: 3}], 'id')).toEqual([
-		{id: 1},
-		{id: 2},
-		{id: 3},
-	]);
+	expect(sort([{id: 2}, {id: 1}, {id: 3}], 'id')).toEqual([{id: 1}, {id: 2}, {id: 3}]);
 
-	expect(sort([{id: 2}, {id: 1}, {id: 3}], 'id', true)).toEqual([
-		{id: 3},
-		{id: 2},
-		{id: 1},
-	]);
+	expect(sort([{id: 2}, {id: 1}, {id: 3}], 'id', true)).toEqual([{id: 3}, {id: 2}, {id: 1}]);
 
 	expect(
 		sort(
@@ -861,9 +827,7 @@ test('toSet', () => {
 
 	expect(keyed).toEqual(new Set([1, 2, 3, 4, 5]));
 
-	expect(callbacked).toEqual(
-		new Set(['Alice', 'Bob', 'Charlie', 'Alice', 'David']),
-	);
+	expect(callbacked).toEqual(new Set(['Alice', 'Bob', 'Charlie', 'Alice', 'David']));
 
 	expect(toSet(complex, [] as never)).toEqual(new Set(complex));
 	expect(toSet('blah' as never)).toEqual(new Set());

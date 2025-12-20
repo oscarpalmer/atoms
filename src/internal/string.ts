@@ -72,5 +72,5 @@ export function words(value: string): string[] {
 
 const EXPRESSION_IGNORED = /(^|\.)(__proto__|constructor|prototype)(\.|$)/i;
 
-// biome-ignore lint/suspicious/noControlCharactersInRegex: Lodash uses it, so it's fine ;-)
+// oxlint-disable-next-line no-control-regex: Lodash uses it, so it's fine ;-)
 const EXPRESSION_WORDS = /[^\x00-\x2f\x3a-\x40\x5b-\x60\x7b-\x7f]+/g;

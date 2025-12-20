@@ -8,14 +8,10 @@ import {isNumber} from './is';
  */
 export function getRandomFloat(minimum?: number, maximum?: number): number {
 	let max =
-		isNumber(maximum) && maximum <= Number.MAX_SAFE_INTEGER
-			? maximum
-			: Number.MAX_SAFE_INTEGER;
+		isNumber(maximum) && maximum <= Number.MAX_SAFE_INTEGER ? maximum : Number.MAX_SAFE_INTEGER;
 
 	let min =
-		isNumber(minimum) && minimum >= Number.MIN_SAFE_INTEGER
-			? minimum
-			: Number.MIN_SAFE_INTEGER;
+		isNumber(minimum) && minimum >= Number.MIN_SAFE_INTEGER ? minimum : Number.MIN_SAFE_INTEGER;
 
 	if (min === max) {
 		return min;

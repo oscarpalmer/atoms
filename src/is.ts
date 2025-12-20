@@ -34,9 +34,7 @@ export function isNullable(value: unknown): value is undefined | null {
  * @param value Value to check
  * @returns `true` if the value is nullable or an empty string, otherwise `false`
  */
-export function isNullableOrEmpty(
-	value: unknown,
-): value is undefined | null | '' {
+export function isNullableOrEmpty(value: unknown): value is undefined | null | '' {
 	return value == null || getString(value) === '';
 }
 
@@ -45,9 +43,7 @@ export function isNullableOrEmpty(
  * @param value Value to check
  * @returns `true` if the value is nullable or a whitespace-only string, otherwise `false`
  */
-export function isNullableOrWhitespace(
-	value: unknown,
-): value is undefined | null | '' {
+export function isNullableOrWhitespace(value: unknown): value is undefined | null | '' {
 	return value == null || EXPRESSION_WHITESPACE.test(getString(value));
 }
 
@@ -59,9 +55,7 @@ export function isNullableOrWhitespace(
 export function isNumerical(value: unknown): value is number | `${number}` {
 	return (
 		isNumber(value) ||
-		(typeof value === 'string' &&
-			value.trim().length > 0 &&
-			!Number.isNaN(+value))
+		(typeof value === 'string' && value.trim().length > 0 && !Number.isNaN(+value))
 	);
 }
 
@@ -71,9 +65,7 @@ export function isNumerical(value: unknown): value is number | `${number}` {
  * @returns `true` if the value matches, otherwise `false`
  */
 export function isObject(value: unknown): value is object {
-	return (
-		(typeof value === 'object' && value !== null) || typeof value === 'function'
-	);
+	return (typeof value === 'object' && value !== null) || typeof value === 'function';
 }
 
 /**
@@ -86,13 +78,7 @@ export function isPrimitive(value: unknown): value is Primitive {
 }
 
 export * from './internal/is';
-export type {
-	ArrayOrPlainObject,
-	Key,
-	PlainObject,
-	Primitive,
-	TypedArray,
-} from './models';
+export type {ArrayOrPlainObject, Key, PlainObject, Primitive, TypedArray} from './models';
 
 //
 

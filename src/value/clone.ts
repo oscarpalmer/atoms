@@ -80,11 +80,7 @@ function cloneMapOrSet<Value extends Map<unknown, unknown> | Set<unknown>>(
 	return cloned as Value;
 }
 
-function cloneNode(
-	node: Node,
-	depth: number,
-	references: WeakMap<WeakKey, unknown>,
-): Node {
+function cloneNode(node: Node, depth: number, references: WeakMap<WeakKey, unknown>): Node {
 	if (depth >= MAX_DEPTH) {
 		return node;
 	}
@@ -112,11 +108,7 @@ function cloneObject(
 	for (let index = 0; index < length; index += 1) {
 		const key = keys[index];
 
-		cloned[key] = cloneValue(
-			(value as PlainObject)[key],
-			depth + 1,
-			references,
-		);
+		cloned[key] = cloneValue((value as PlainObject)[key], depth + 1, references);
 	}
 
 	references.set(value, cloned);
@@ -151,22 +143,14 @@ function cloneTypedArray(
 		return value;
 	}
 
-	const cloned = new (
-		value.constructor as new (
-			...args: unknown[]
-		) => TypedArray
-	)(value);
+	const cloned = new (value.constructor as new (...args: unknown[]) => TypedArray)(value);
 
 	references.set(value, cloned);
 
 	return cloned as TypedArray;
 }
 
-function cloneValue(
-	value: unknown,
-	depth: number,
-	references: WeakMap<WeakKey, unknown>,
-): unknown {
+function cloneValue(value: unknown, depth: number, references: WeakMap<WeakKey, unknown>): unknown {
 	switch (true) {
 		case value == null:
 			return value;

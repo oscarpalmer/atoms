@@ -1,5 +1,3 @@
-/** biome-ignore-all lint/style/noMagicNumbers: Testing */
-/** biome-ignore-all lint/nursery/useExplicitType: Testing */
 import {expect, test} from 'vitest';
 import {emitter} from '../src/emitter';
 
@@ -17,6 +15,7 @@ test('emitter', () =>
 			expect(value.active).toBe(false);
 
 			try {
+				// oxlint-disable-next-line no-unused-expressions: Testing
 				value.observable;
 			} catch (error: unknown) {
 				expect(error).toBeInstanceOf(Error);
@@ -149,9 +148,7 @@ test('emitter: observable + subscription', () =>
 				thirdObservable.subscribe({});
 			} catch (error: unknown) {
 				expect(error).toBeInstanceOf(Error);
-				expect((error as Error)?.message).toBe(
-					'Cannot subscribe to a destroyed observable',
-				);
+				expect((error as Error)?.message).toBe('Cannot subscribe to a destroyed observable');
 			}
 
 			done();

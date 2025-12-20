@@ -1,19 +1,11 @@
 import {join} from '../../internal/string';
-import {
-	ALPHA_FULL_VALUE,
-	DEFAULT_RGB,
-	MAX_DEGREE,
-	MAX_HEX,
-	MAX_PERCENT,
-} from '../constants';
+import {ALPHA_FULL_VALUE, DEFAULT_RGB, MAX_HEX, MAX_PERCENT} from '../constants';
 import {getAlpha, getAlphaValue} from '../misc/alpha';
-import {isRgbColor} from '../misc/is';
+import {getHexValue} from '../misc/get';
+import {isRgbLike} from '../misc/is';
 import type {HSLAColor, HSLColor, RGBAColor, RGBColor} from '../models';
 
-export function convertRgbToHex(
-	rgb: RGBAColor | RGBColor,
-	alpha: boolean,
-): string {
+export function convertRgbToHex(rgb: RGBAColor | RGBColor, alpha: boolean): string {
 	const hex = `${join(
 		[rgb.red, rgb.green, rgb.blue].map(color => {
 			const hex = color.toString(16);
@@ -31,12 +23,12 @@ export function convertRgbToHex(
 	return `${hex}${a}`;
 }
 
-export function convertRgbToHsla(rgb: RGBAColor | RGBColor): HSLAColor {
-	const actual = isRgbColor(rgb) ? rgb : {...DEFAULT_RGB};
+export function convertRgbToHsla(value: unknown): HSLAColor {
+	const rgb = isRgbLike(value) ? getRgbValue(value) : {...DEFAULT_RGB};
 
-	const blue = actual.blue / MAX_HEX;
-	const green = actual.green / MAX_HEX;
-	const red = actual.red / MAX_HEX;
+	const blue = rgb.blue / MAX_HEX;
+	const green = rgb.green / MAX_HEX;
+	const red = rgb.red / MAX_HEX;
 
 	const max = Math.max(blue, green, red);
 	const min = Math.min(blue, green, red);
@@ -48,10 +40,7 @@ export function convertRgbToHsla(rgb: RGBAColor | RGBColor): HSLAColor {
 	let saturation = 0;
 
 	if (delta !== 0) {
-		saturation =
-			lightness === 0 || lightness === 1
-				? 0
-				: (max - lightness) / Math.min(lightness, 1 - lightness);
+		saturation = (max - lightness) / Math.min(lightness, 1 - lightness);
 
 		switch (max) {
 			case blue:
@@ -65,29 +54,24 @@ export function convertRgbToHsla(rgb: RGBAColor | RGBColor): HSLAColor {
 			case red:
 				hue = (green - blue) / delta + (green < blue ? 6 : 0);
 				break;
-
-			default:
-				/* istanbul ignore next */
-				break;
 		}
 
 		hue *= 60;
 	}
 
-	if (saturation < 0) {
-		hue += MAX_DEGREE / 2;
-		saturation = Math.abs(saturation);
-	}
-
-	if (hue >= MAX_DEGREE) {
-		hue -= MAX_DEGREE;
-	}
-
 	return {
-		alpha: getAlphaValue((rgb as RGBAColor).alpha ?? ALPHA_FULL_VALUE),
+		alpha: getAlphaValue((value as RGBAColor).alpha ?? ALPHA_FULL_VALUE),
 		hue: +hue.toFixed(2),
 		lightness: +(lightness * MAX_PERCENT).toFixed(2),
 		saturation: +(saturation * MAX_PERCENT).toFixed(2),
+	};
+}
+
+export function getRgbValue(value: Record<keyof RGBColor, unknown>): RGBColor {
+	return {
+		blue: getHexValue((value as RGBColor).blue),
+		green: getHexValue((value as RGBColor).green),
+		red: getHexValue((value as RGBColor).red),
 	};
 }
 
@@ -98,10 +82,7 @@ export function convertRgbToHsla(rgb: RGBAColor | RGBColor): HSLAColor {
  * @returns Hex color
  */
 export function rgbToHex(rgb: RGBAColor | RGBColor, alpha?: boolean): string {
-	return convertRgbToHex(
-		isRgbColor(rgb) ? rgb : {...DEFAULT_RGB},
-		alpha ?? false,
-	);
+	return convertRgbToHex(isRgbLike(rgb) ? getRgbValue(rgb) : {...DEFAULT_RGB}, alpha ?? false);
 }
 
 /**

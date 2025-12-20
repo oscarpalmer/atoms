@@ -5,12 +5,7 @@ export type CallbackSorter<Item> = {
 	/**
 	 * Comparator to use when comparing items and values
 	 */
-	compare?: (
-		first: Item,
-		firstValue: unknown,
-		second: Item,
-		secondValue: unknown,
-	) => number;
+	compare?: (first: Item, firstValue: unknown, second: Item, secondValue: unknown) => number;
 	/**
 	 * Direction to sort by
 	 */
@@ -28,12 +23,7 @@ export type KeySorter<Item> = {
 	/**
 	 * Comparator to use when comparing items and values
 	 */
-	compare?: (
-		first: Item,
-		firstValue: unknown,
-		second: Item,
-		secondValue: unknown,
-	) => number;
+	compare?: (first: Item, firstValue: unknown, second: Item, secondValue: unknown) => number;
 	/**
 	 * Direction to sort by
 	 */
@@ -48,11 +38,7 @@ export type KeySorter<Item> = {
  * The numerical keys of an object
  */
 export type NumericalKeys<Value> = {
-	[Key in keyof Value]: Key extends number
-		? Key
-		: Key extends `${number}`
-			? Key
-			: never;
+	[Key in keyof Value]: Key extends number ? Key : Key extends `${number}` ? Key : never;
 }[keyof Value];
 
 export type {Key, KeyedValue, NestedArray, PlainObject} from '../models';

@@ -17,9 +17,7 @@ export function getArray<Value extends PlainObject>(
  * @param value Object to convert to an array
  * @returns Array holding the values of the object
  */
-export function getArray<Value extends PlainObject>(
-	value: Value,
-): Value[keyof Value][];
+export function getArray<Value extends PlainObject>(value: Value): Value[keyof Value][];
 
 /**
  * Get an array

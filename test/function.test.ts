@@ -1,7 +1,6 @@
-/** biome-ignore-all lint/style/noMagicNumbers: Testing */
 import {expect, test} from 'vitest';
 import {debounce, memoize, noop, throttle} from '../src/function';
-import {milliseconds} from '../src/internal/function';
+import FRAME_RATE_MS from '../src/internal/frame-rate';
 
 test('debounce', () =>
 	new Promise<void>(done => {
@@ -42,8 +41,8 @@ test('debounce', () =>
 			expect(defaulted.invalid).toBeGreaterThan(0);
 			expect(defaulted.zero).toBeGreaterThan(0);
 
-			expect(defaulted.invalid).toBeLessThanOrEqual(Math.ceil(milliseconds));
-			expect(defaulted.zero).toBeLessThanOrEqual(Math.ceil(milliseconds));
+			expect(defaulted.invalid).toBeLessThanOrEqual(Math.ceil(FRAME_RATE_MS));
+			expect(defaulted.zero).toBeLessThanOrEqual(Math.ceil(FRAME_RATE_MS));
 
 			expect(value).toBe(1);
 
@@ -53,8 +52,8 @@ test('debounce', () =>
 
 			setTimeout(() => {
 				setTimeout(() => {
-					expect(diff).toBeGreaterThanOrEqual(Math.floor(9 * milliseconds));
-					expect(diff).toBeLessThanOrEqual(Math.ceil(11 * milliseconds));
+					expect(diff).toBeGreaterThanOrEqual(Math.floor(9 * FRAME_RATE_MS));
+					expect(diff).toBeLessThanOrEqual(Math.ceil(11 * FRAME_RATE_MS));
 					expect(value).toBe(1);
 
 					done();
@@ -157,12 +156,12 @@ test('memoize', () => {
 	expect(memoize(noop, 'blah' as never).maximum).toBe(2 ** 16);
 	expect(memoize(noop, {} as never).maximum).toBe(2 ** 16);
 
-	/* try {
+	try {
 		memoized.run(2);
 	} catch (error) {
 		expect(error).toBeInstanceOf(Error);
-		expect(error.message).toBe('The Memoized instance has been destroyed');
-	} */
+		expect((error as Error).message).toBe('The Memoized instance has been destroyed');
+	}
 });
 
 test('noop', () => {

@@ -35,7 +35,5 @@ export function unique(array: unknown[], key?: unknown): unknown[] {
 		return [];
 	}
 
-	return array.length > 1
-		? findValues('unique', array, [key, undefined])
-		: array;
+	return array.length > 1 ? findValues('unique', array, [key, undefined]) : array;
 }

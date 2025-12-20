@@ -1,9 +1,14 @@
-import type {Get, Paths, Primitive} from 'type-fest';
-
 /**
  * A generic array or object
  */
 export type ArrayOrPlainObject = unknown[] | Record<PropertyKey, unknown>;
+
+/**
+ * For mathicng any `void`, `Date`, primitive, or `RegExp` values
+ *
+ * (Thanks, type-fest!)
+ */
+export type BuiltIns = void | Date | Primitive | RegExp;
 
 /**
  * Position of an event
@@ -16,7 +21,6 @@ export type EventPosition = {
 /**
  * A generic callback function
  */
-// biome-ignore lint/suspicious/noExplicitAny: It's meant to be generic and permissive, so `any`is fine
 export type GenericCallback = (...args: any[]) => any;
 
 /**
@@ -24,17 +28,45 @@ export type GenericCallback = (...args: any[]) => any;
  */
 export type Key = number | string;
 
-export type KeyedValue<
-	Item,
-	Key extends keyof Item,
-> = Item[Key] extends PropertyKey ? Item[Key] : never;
+export type KeyedValue<Item, Key extends keyof Item> = Item[Key] extends PropertyKey
+	? Item[Key]
+	: never;
 
 /**
  * A nested array
  */
-export type NestedArray<Value> = Value extends Array<infer NestedValue>
-	? NestedArray<NestedValue>
-	: Value;
+export type NestedArray<Value> =
+	Value extends Array<infer NestedValue> ? NestedArray<NestedValue> : Value;
+
+export type NestedKeys<Value extends PlainObject> = _NestedKeys<Value>;
+
+type _NestedKeys<Value, Depth extends number = 5> = Depth extends 0
+	? never
+	: Value extends readonly any[]
+		? Value extends readonly [any, ...any]
+			? // Tuple: extract actual indices
+				{
+					[Key in keyof Value]-?: Key extends `${number}`
+						? Value[Key] extends readonly any[]
+							? `${Key}` | `${Key}.${_NestedKeys<Value[Key], SubtractDepth<Depth>>}`
+							: Value[Key] extends PlainObject
+								? `${Key}` | `${Key}.${_NestedKeys<Value[Key], SubtractDepth<Depth>>}`
+								: `${Key}`
+						: never;
+				}[number]
+			: // Array: use no indices
+				never
+		: Value extends PlainObject
+			? {
+					[Key in keyof Value]-?: Key extends number | string
+						? Value[Key] extends readonly any[]
+							? `${Key}` | `${Key}.${_NestedKeys<Value[Key], SubtractDepth<Depth>>}`
+							: Value[Key] extends PlainObject
+								? `${Key}` | `${Key}.${_NestedKeys<Value[Key], SubtractDepth<Depth>>}`
+								: `${Key}`
+						: never;
+				}[keyof Value]
+			: never;
 
 /**
  * An extended version of `Partial` that allows for nested properties to be optional
@@ -43,19 +75,67 @@ export type NestedPartial<T> = {
 	[K in keyof T]?: T[K] extends object ? NestedPartial<T[K]> : T[K];
 };
 
+export type NestedValue<Value extends PlainObject, Path extends string> = Simplify<
+	_NestedValue<Value, Path>
+>;
+
+export type _NestedValue<Value, Path extends string> = Path extends keyof Value
+	? Value[Path]
+	: Path extends `${infer Key}.${infer Rest}`
+		? Key extends keyof Value
+			? _NestedValue<Value[Key], Rest>
+			: Key extends `${number}`
+				? Value extends readonly any[]
+					? _NestedValue<Value[number], Rest>
+					: never
+				: never
+		: Path extends `${number}`
+			? Value extends readonly any[]
+				? Value[number]
+				: never
+			: never;
+
+export type NestedValues<Value extends PlainObject> = {
+	[Path in NestedKeys<Value>]: NestedValue<Value, Path>;
+};
+
 /**
  * A generic object
  */
 export type PlainObject = Record<PropertyKey, unknown>;
 
 /**
+ * A primitive value
+ *
+ * _(Thanks, type-fest!)_
+ */
+export type Primitive = null | undefined | string | number | boolean | symbol | bigint;
+
+/**
+ * Flattens the type to improve type hints in IDEs
+ *
+ * _(Thanks, type-fest!)_
+ */
+export type Simplify<Value> = {[Key in keyof Value]: Value[Key]} & {};
+
+type SubtractDepth<Value extends number> = Value extends 5
+	? 4
+	: Value extends 4
+		? 3
+		: Value extends 3
+			? 2
+			: Value extends 2
+				? 1
+				: Value extends 1
+					? 0
+					: never;
+
+/**
  * Get the value's type as a string
  *
  * _(Thanks, type-fest!)_
  */
-export type ToString<Value> = Value extends string | number
-	? `${Value}`
-	: never;
+export type ToString<Value> = Value extends string | number ? `${Value}` : never;
 
 /**
  * A union type of all typed arrays
@@ -72,5 +152,3 @@ export type TypedArray =
 	| Float64Array
 	| BigInt64Array
 	| BigUint64Array;
-
-export type {Get, Paths, Primitive};

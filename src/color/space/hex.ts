@@ -49,18 +49,14 @@ export function getNormalizedHex(value: unknown, alpha?: boolean): string {
 
 	if (normalized.length < LENGTH_LONG) {
 		const hex = normalized.slice(0, LENGTH_SHORT);
-		const a = includeAlpha
-			? (normalized[LENGTH_SHORT] ?? ALPHA_FULL_HEX_SHORT)
-			: '';
+		const a = includeAlpha ? (normalized[LENGTH_SHORT] ?? ALPHA_FULL_HEX_SHORT) : '';
 
 		return join(`${hex}${a}`.split('').map(character => character.repeat(2)));
 	}
 
 	const hex = normalized.slice(0, LENGTH_LONG);
 
-	const a = includeAlpha
-		? normalized.slice(LENGTH_LONG) || ALPHA_FULL_HEX_LONG
-		: '';
+	const a = includeAlpha ? normalized.slice(LENGTH_LONG) || ALPHA_FULL_HEX_LONG : '';
 
 	return `${hex}${a}`;
 }

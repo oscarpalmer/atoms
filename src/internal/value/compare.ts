@@ -80,10 +80,7 @@ function compareValue(
 	const secondType = typeof second;
 
 	if (firstType === secondType && firstType in comparators) {
-		return comparators[firstType as keyof typeof comparators](
-			first as never,
-			second as never,
-		);
+		return comparators[firstType as keyof typeof comparators](first as never, second as never);
 	}
 
 	if (first instanceof Date && second instanceof Date) {
@@ -105,10 +102,7 @@ function getParts(value: unknown): unknown[] {
 
 //
 
-const comparators: Record<
-	string,
-	(first: never, second: never) => number | undefined
-> = {
+const comparators: Record<string, (first: never, second: never) => number | undefined> = {
 	bigint: compareNumbers,
 	boolean: compareNumbers,
 	number: compareNumbers,

@@ -7,10 +7,10 @@ import type {PlainObject} from '../models';
  * @param callback Callback to get an item's value
  * @returns Set of values
  */
-export function toSet<
-	Item,
-	Callback extends (item: Item, index: number, array: Item[]) => unknown,
->(array: Item[], callback: Callback): Set<ReturnType<Callback>>;
+export function toSet<Item, Callback extends (item: Item, index: number, array: Item[]) => unknown>(
+	array: Item[],
+	callback: Callback,
+): Set<ReturnType<Callback>>;
 
 /**
  * Create a Set from an array of items using a key

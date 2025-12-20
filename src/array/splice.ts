@@ -10,12 +10,7 @@ import {insertValues} from '../internal/array/insert';
  * @param added Added items
  * @returns Removed items
  */
-export function splice<Item>(
-	array: Item[],
-	start: number,
-	amount: number,
-	added: Item[],
-): Item[];
+export function splice<Item>(array: Item[], start: number, amount: number, added: Item[]): Item[];
 
 /**
  * Adds items into an array at a specific index
@@ -24,11 +19,7 @@ export function splice<Item>(
  * @param added Added items
  * @returns Removed items
  */
-export function splice<Item>(
-	array: Item[],
-	start: number,
-	added: Item[],
-): Item[];
+export function splice<Item>(array: Item[], start: number, added: Item[]): Item[];
 
 /**
  * Removes and returns _(up to)_ a specific amount of items from an array, starting from a specific index
@@ -37,11 +28,7 @@ export function splice<Item>(
  * @param amount Number of items to remove
  * @returns Removed items
  */
-export function splice<Item>(
-	array: Item[],
-	start: number,
-	amount: number,
-): Item[];
+export function splice<Item>(array: Item[], start: number, amount: number): Item[];
 
 /**
  * Removes and returns all items from an array starting from a specific index

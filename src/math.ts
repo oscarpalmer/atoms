@@ -33,9 +33,7 @@ export function average(numbers: number[]): number;
 export function average(array: unknown[], key?: unknown): number {
 	const aggregated = aggregate('average', array, key);
 
-	return aggregated.count > 0
-		? aggregated.value / aggregated.count
-		: Number.NaN;
+	return aggregated.count > 0 ? aggregated.value / aggregated.count : Number.NaN;
 }
 
 /**
@@ -71,11 +69,7 @@ export function count<Item extends PlainObject>(
  */
 export function count(values: unknown[]): number;
 
-export function count(
-	array: unknown[],
-	key?: unknown,
-	value?: unknown,
-): number {
+export function count(array: unknown[], key?: unknown, value?: unknown): number {
 	if (!Array.isArray(array)) {
 		return Number.NaN;
 	}
@@ -91,9 +85,7 @@ export function count(
 	}
 
 	const callback =
-		typeof key === 'function'
-			? key
-			: (item: PlainObject): unknown => item[key as never];
+		typeof key === 'function' ? key : (item: PlainObject): unknown => item[key as never];
 
 	let count = 0;
 

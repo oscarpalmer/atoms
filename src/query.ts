@@ -31,11 +31,7 @@ export function fromQuery(query: string): PlainObject {
 	return parameters;
 }
 
-function getParts(
-	value: ArrayOrPlainObject,
-	fromArray: boolean,
-	prefix?: string,
-): string[] {
+function getParts(value: ArrayOrPlainObject, fromArray: boolean, prefix?: string): string[] {
 	const keys = Object.keys(value);
 	const {length} = keys;
 
@@ -87,11 +83,7 @@ function isDecodable(value: unknown): value is boolean | number | string {
 	return TYPES.has(typeof value);
 }
 
-function setQueryValue(
-	parameters: PlainObject,
-	key: string,
-	value: string,
-): void {
+function setQueryValue(parameters: PlainObject, key: string, value: string): void {
 	if (key.includes('.')) {
 		setValue(parameters, key, getValue(value));
 	} else {

@@ -1,6 +1,5 @@
-import type {Simplify} from 'type-fest';
 import {groupValues} from '../internal/array/group';
-import type {Key, KeyedValue, PlainObject} from '../models';
+import type {Key, KeyedValue, PlainObject, Simplify} from '../models';
 
 type ToRecord = {
 	/**
@@ -69,11 +68,7 @@ type ToRecord = {
 	 * @param value Key to use for value
 	 * @returns Record of keyed values
 	 */
-	<
-		Item extends PlainObject,
-		ItemKey extends keyof Item,
-		ItemValue extends keyof Item,
-	>(
+	<Item extends PlainObject, ItemKey extends keyof Item, ItemValue extends keyof Item>(
 		array: Item[],
 		key: ItemKey,
 		value: ItemValue,
@@ -170,11 +165,7 @@ type ToRecord = {
 	 * @param value Key to use for value
 	 * @returns Record of keyed arrays of values
 	 */
-	arrays<
-		Item extends PlainObject,
-		ItemKey extends keyof Item,
-		ItemValue extends keyof Item,
-	>(
+	arrays<Item extends PlainObject, ItemKey extends keyof Item, ItemValue extends keyof Item>(
 		array: Item[],
 		key: ItemKey,
 		value: ItemValue,
@@ -186,10 +177,10 @@ type ToRecord = {
 	 * @param callback Callback to get an item's grouping key
 	 * @returns Record of keyed arrays of items
 	 */
-	arrays<
-		Item,
-		Callback extends (item: Item, index: number, array: Item[]) => Key,
-	>(array: Item[], callback: Callback): Record<ReturnType<Callback>, Item[]>;
+	arrays<Item, Callback extends (item: Item, index: number, array: Item[]) => Key>(
+		array: Item[],
+		callback: Callback,
+	): Record<ReturnType<Callback>, Item[]>;
 
 	/**
 	 * Create a record from an array of items using a key, grouping items into arrays
@@ -203,11 +194,8 @@ type ToRecord = {
 	): Simplify<Record<KeyedValue<Item, ItemKey>, Item[]>>;
 };
 
-const toRecord: ToRecord = ((
-	array: unknown[],
-	first: unknown,
-	second: unknown,
-) => groupValues(array, first, second, false)) as ToRecord;
+const toRecord: ToRecord = ((array: unknown[], first: unknown, second: unknown) =>
+	groupValues(array, first, second, false)) as ToRecord;
 
 toRecord.arrays = ((array: unknown[], first: unknown, second: unknown) =>
 	groupValues(array, first, second, true)) as ToRecord['arrays'];

@@ -1,12 +1,27 @@
-import type {KeysOfUnion, Simplify} from 'type-fest';
 import {isArrayOrPlainObject} from '../internal/is';
 import {setValue} from '../internal/value/set';
-import type {PlainObject} from '../models';
+import type {PlainObject, Simplify} from '../models';
+
+/**
+ * Thanks, type-fest!
+ */
+type KeysOfUnion<ObjectType> = keyof UnionToIntersection<
+	ObjectType extends unknown ? Record<keyof ObjectType, never> : never
+>;
 
 type OrderedKey = {
 	order: number;
 	value: string;
 };
+
+/**
+ * Thanks, type-fest!
+ */
+type UnionToIntersection<Union> = (
+	Union extends unknown ? (distributedUnion: Union) => void : never
+) extends (mergedIntersection: infer Intersection) => void
+	? Intersection & Union
+	: never;
 
 type Unsmushed<Value extends PlainObject> = Simplify<
 	Omit<
@@ -40,9 +55,7 @@ function getKeys(value: PlainObject): OrderedKey[] {
  * @param value Object to unsmush
  * @returns Unsmushed object with nested keys
  */
-export function unsmush<Value extends PlainObject>(
-	value: Value,
-): Unsmushed<Value> {
+export function unsmush<Value extends PlainObject>(value: Value): Unsmushed<Value> {
 	if (typeof value !== 'object' || value === null) {
 		return {} as never;
 	}

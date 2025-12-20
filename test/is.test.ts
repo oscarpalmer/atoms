@@ -1,5 +1,3 @@
-/** biome-ignore-all lint/style/noMagicNumbers: Testing */
-/** biome-ignore-all lint/nursery/useExplicitType: Testing */
 import {expect, test} from 'vitest';
 import {
 	isArrayOrPlainObject,
@@ -41,9 +39,7 @@ const values = [
 const {length} = values;
 
 test('isArrayOrPlainObject', () => {
-	const expected = Array.from({length}, (_, index) =>
-		[2, 15, 16].includes(index),
-	);
+	const expected = Array.from({length}, (_, index) => [2, 15, 16].includes(index));
 
 	let index = 0;
 
@@ -83,9 +79,7 @@ test('isNullable', () => {
 });
 
 test('isNullableOrEmpty', () => {
-	const expected = Array.from({length}, (_, index) =>
-		[0, 1, 2, 3, 4].includes(index),
-	);
+	const expected = Array.from({length}, (_, index) => [0, 1, 2, 3, 4].includes(index));
 
 	let index = 0;
 
@@ -95,9 +89,7 @@ test('isNullableOrEmpty', () => {
 });
 
 test('isNullableOrWhitespace', () => {
-	const expected = Array.from({length}, (_, index) =>
-		[0, 1, 2, 3, 4, 5].includes(index),
-	);
+	const expected = Array.from({length}, (_, index) => [0, 1, 2, 3, 4, 5].includes(index));
 
 	let index = 0;
 
@@ -107,9 +99,7 @@ test('isNullableOrWhitespace', () => {
 });
 
 test('isNumber', () => {
-	const expected = Array.from({length}, (_, index) =>
-		[9, 10, 11].includes(index),
-	);
+	const expected = Array.from({length}, (_, index) => [9, 10, 11].includes(index));
 
 	let index = 0;
 
@@ -119,9 +109,7 @@ test('isNumber', () => {
 });
 
 test('isNumerical', () => {
-	const expected = Array.from({length}, (_, index) =>
-		[6, 7, 9, 10, 11].includes(index),
-	);
+	const expected = Array.from({length}, (_, index) => [6, 7, 9, 10, 11].includes(index));
 
 	let index = 0;
 
@@ -154,10 +142,7 @@ test('isPlainObject', () => {
 });
 
 test('isPrimitive', () => {
-	const expected = Array.from(
-		{length},
-		(_, index) => index !== 2 && index !== 3 && index < 15,
-	);
+	const expected = Array.from({length}, (_, index) => index !== 2 && index !== 3 && index < 15);
 
 	let index = 0;
 

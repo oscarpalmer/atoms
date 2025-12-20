@@ -1,6 +1,3 @@
-/** biome-ignore-all lint/style/noMagicNumbers: Testing */
-/** biome-ignore-all lint/nursery/useExplicitType: Testing */
-/** biome-ignore-all lint/style/useNamingConvention: Testing */
 import {expect, test} from 'vitest';
 import {
 	camelCase,
@@ -120,13 +117,9 @@ test('getString', () => {
 });
 
 test('join', () => {
-	expect(join([null, undefined, 'a', new ItemWithToString('b'), 'c'])).toBe(
-		'abc',
-	);
+	expect(join([null, undefined, 'a', new ItemWithToString('b'), 'c'])).toBe('abc');
 
-	expect(
-		join([null, undefined, 'a', new ItemWithToString('b'), 'c'], '.'),
-	).toBe('a.b.c');
+	expect(join([null, undefined, 'a', new ItemWithToString('b'), 'c'], '.')).toBe('a.b.c');
 });
 
 test('kebabCase', () => {
@@ -251,20 +244,14 @@ test('truncate', () => {
 		'One morning, when Gregor Samsa woke from troubled dreams, he found himself transformed in his bed into a horrible vermin.',
 	];
 
-	const expected = [
-		'Hello, world!',
-		'The quick brown fox jum…',
-		'One morning, when Gre!!!',
-	];
+	const expected = ['Hello, world!', 'The quick brown fox jum…', 'One morning, when Gre!!!'];
 
 	const suffixes = [undefined, '…', '!!!'];
 
 	const {length} = original;
 
 	for (let index = 0; index < length; index += 1) {
-		expect(truncate(original[index], 24, suffixes[index])).toBe(
-			expected[index],
-		);
+		expect(truncate(original[index], 24, suffixes[index])).toBe(expected[index]);
 	}
 
 	expect(truncate('Hello, world!', -99)).toBe('');
@@ -308,18 +295,7 @@ test('words', () => {
 	const expected = [
 		['Hello', 'world'],
 		['The', 'quick', 'brown', 'fox', 'jumps', 'over', 'the', 'lazy', 'dog'],
-		[
-			'Η',
-			'γρήγορη',
-			'καφέ',
-			'αλεπού',
-			'πηδάει',
-			'πάνω',
-			'από',
-			'το',
-			'τεμπέλικο',
-			'σκυλί',
-		],
+		['Η', 'γρήγορη', 'καφέ', 'αλεπού', 'πηδάει', 'πάνω', 'από', 'το', 'τεμπέλικο', 'σκυλί'],
 		['Быстрая', 'коричневая', 'лиса', 'прыгает', 'через', 'ленивую', 'собаку'],
 	];
 

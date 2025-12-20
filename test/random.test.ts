@@ -1,5 +1,3 @@
-/** biome-ignore-all lint/style/noMagicNumbers: Testing */
-/** biome-ignore-all lint/nursery/useExplicitType: Testing */
 import {expect, test} from 'vitest';
 import {
 	getRandomBoolean,
@@ -14,8 +12,6 @@ import {
 
 const size = 100_000;
 
-// biome-ignore lint/suspicious/useAwait: Testing
-// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: Testing
 async function getRandomNumber(
 	callback: (min?: number, max?: number) => number,
 	flipped: boolean,
@@ -79,10 +75,7 @@ test('getRandomCharacters', () =>
 		for (let index = 0; index < size; index += 1) {
 			const random = getRandomCharacters(5);
 
-			if (
-				random.length !== 5 ||
-				!random.split('').every(character => alphabet.has(character))
-			) {
+			if (random.length !== 5 || !random.split('').every(character => alphabet.has(character))) {
 				defaultFailed = true;
 			}
 		}
@@ -132,12 +125,7 @@ test('getRandomFloat', () =>
 			await getRandomNumber(getRandomFloat, false, -123.456, 456.789);
 			await getRandomNumber(getRandomFloat, true, 456.789, -123.456);
 
-			await getRandomNumber(
-				getRandomFloat,
-				false,
-				'blah' as never,
-				'blah' as never,
-			);
+			await getRandomNumber(getRandomFloat, false, 'blah' as never, 'blah' as never);
 
 			done();
 		}
@@ -169,12 +157,7 @@ test('getRandomInteger', () =>
 			await getRandomNumber(getRandomInteger, false, 0, 100);
 			await getRandomNumber(getRandomInteger, true, 100, 0);
 
-			await getRandomNumber(
-				getRandomInteger,
-				false,
-				'blah' as never,
-				'blah' as never,
-			);
+			await getRandomNumber(getRandomInteger, false, 'blah' as never, 'blah' as never);
 
 			done();
 		}

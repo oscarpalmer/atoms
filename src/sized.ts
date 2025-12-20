@@ -72,7 +72,7 @@ export class SizedMap<Key = unknown, Value = unknown> extends Map<Key, Value> {
 	/**
 	 * @inheritdoc
 	 */
-	get(key: Key): Value | undefined {
+	override get(key: Key): Value | undefined {
 		const value = super.get(key);
 
 		if (value !== undefined || this.has(key)) {
@@ -85,7 +85,7 @@ export class SizedMap<Key = unknown, Value = unknown> extends Map<Key, Value> {
 	/**
 	 * @inheritdoc
 	 */
-	set(key: Key, value: Value): this {
+	override set(key: Key, value: Value): this {
 		if (this.has(key)) {
 			this.delete(key);
 		} else if (this.size >= this.#maximumSize) {
@@ -164,7 +164,7 @@ export class SizedSet<Value = unknown> extends Set<Value> {
 	/**
 	 * @inheritdoc
 	 */
-	add(value: Value): this {
+	override add(value: Value): this {
 		if (this.has(value)) {
 			this.delete(value);
 		} else if (this.size >= this.#maximumSize) {

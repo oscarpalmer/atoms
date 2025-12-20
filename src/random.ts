@@ -16,18 +16,12 @@ export function getRandomBoolean(): boolean {
  * @param selection String of characters to select from _(defaults to lowercase English alphabet)_
  * @returns Random string of characters
  */
-export function getRandomCharacters(
-	length: number,
-	selection?: string,
-): string {
+export function getRandomCharacters(length: number, selection?: string): string {
 	if (typeof length !== 'number' || length <= 0) {
 		return '';
 	}
 
-	const actual =
-		typeof selection === 'string' && selection.length > 0
-			? selection
-			: ALPHABET;
+	const actual = typeof selection === 'string' && selection.length > 0 ? selection : ALPHABET;
 
 	let result = '';
 
@@ -65,9 +59,7 @@ export function getRandomItem<Value>(array: Value[]): Value | undefined {
 		return;
 	}
 
-	return array.length === 1
-		? array[0]
-		: array[getRandomInteger(0, array.length - 1)];
+	return array.length === 1 ? array[0] : array[getRandomInteger(0, array.length - 1)];
 }
 
 /**
@@ -85,10 +77,7 @@ export function getRandomItems<Value>(array: Value[], amount: number): Value[];
  */
 export function getRandomItems<Value>(array: Value[]): Value[];
 
-export function getRandomItems<Value>(
-	array: Value[],
-	amount?: number,
-): Value[] {
+export function getRandomItems<Value>(array: Value[], amount?: number): Value[] {
 	if (!Array.isArray(array) || array.length === 0 || amount === 0) {
 		return [];
 	}

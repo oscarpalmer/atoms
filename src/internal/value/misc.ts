@@ -16,10 +16,7 @@ export function getPaths(path: string, lowercase: boolean): string | string[] {
 		return normalized;
 	}
 
-	return normalized
-		.replace(EXPRESSION_BRACKET, '.$1')
-		.replace(EXPRESSION_DOTS, '')
-		.split('.');
+	return normalized.replace(EXPRESSION_BRACKET, '.$1').replace(EXPRESSION_DOTS, '').split('.');
 }
 
 export function handleValue(

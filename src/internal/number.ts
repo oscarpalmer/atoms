@@ -7,11 +7,7 @@ import {isNumber} from './is';
  * @param maximum Maximum value
  * @returns `true` if the value is between the minimum and maximum, otherwise `false`
  */
-export function between(
-	value: number,
-	minimum: number,
-	maximum: number,
-): boolean {
+export function between(value: number, minimum: number, maximum: number): boolean {
 	if (![value, minimum, maximum].every(isNumber)) {
 		return false;
 	}
@@ -34,12 +30,7 @@ export function between(
  * @param loop If `true`, the value will loop around when smaller than the minimum or larger than the maximum _(defaults to `false`)_
  * @returns Clamped value
  */
-export function clamp(
-	value: number,
-	minimum: number,
-	maximum: number,
-	loop?: boolean,
-): number {
+export function clamp(value: number, minimum: number, maximum: number, loop?: boolean): number {
 	if (![value, minimum, maximum].every(isNumber)) {
 		return Number.NaN;
 	}
@@ -102,9 +93,7 @@ export function getNumber(value: unknown): number {
 	}
 
 	return Number(
-		EXPRESSION_HEX.test(trimmed)
-			? trimmed
-			: trimmed.replace(EXPRESSION_UNDERSCORE, ''),
+		EXPRESSION_HEX.test(trimmed) ? trimmed : trimmed.replace(EXPRESSION_UNDERSCORE, ''),
 	);
 }
 

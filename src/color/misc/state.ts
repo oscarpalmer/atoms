@@ -1,26 +1,19 @@
-import {clamp} from '../../internal/number';
 import {
 	ALPHA_FULL_VALUE,
 	DEFAULT_HSL,
 	DEFAULT_RGB,
 	HEX_BLACK,
+	KEYS_HSL,
+	KEYS_RGB,
 	LENGTH_LONG,
-	MAX_DEGREE,
-	MAX_HEX,
-	MAX_PERCENT,
 } from '../constants';
-import type {
-	ColorState,
-	HSLAColor,
-	HSLColor,
-	RGBAColor,
-	RGBColor,
-} from '../models';
+import type {ColorState, HSLAColor, HSLColor, RGBAColor, RGBColor} from '../models';
 import {getNormalizedHex, hexToRgb} from '../space/hex';
-import {hslToRgb} from '../space/hsl';
-import {rgbToHex, rgbToHsl} from '../space/rgb';
+import {getHslValue, hslToRgb} from '../space/hsl';
+import {getRgbValue, rgbToHex, rgbToHsl} from '../space/rgb';
 import {getAlpha} from './alpha';
-import {isColor, isHexColor, isHslColor, isRgbColor} from './is';
+import {getHexValue, getDegrees, getPercentage} from './get';
+import {isColor, isHexColor, isHslLike, isRgbLike} from './is';
 
 export function getState(value: unknown): ColorState {
 	if (typeof value === 'string') {
@@ -50,26 +43,16 @@ export function getState(value: unknown): ColorState {
 	if (typeof value === 'object' && value !== null) {
 		state.alpha = getAlpha((value as HSLAColor).alpha);
 
-		if (isHslColor(value)) {
-			state.hsl = {
-				hue: clamp(value.hue, 0, MAX_DEGREE),
-				lightness: clamp(value.lightness, 0, MAX_PERCENT),
-				saturation: clamp(value.saturation, 0, MAX_PERCENT),
-			};
-
+		if (KEYS_HSL.every(key => key in value)) {
+			state.hsl = getHslValue(value as Record<keyof HSLColor, unknown>);
 			state.rgb = hslToRgb(state.hsl as HSLColor);
 			state.hex = rgbToHex(state.rgb as RGBColor);
 
 			return state as ColorState;
 		}
 
-		if (isRgbColor(value)) {
-			state.rgb = {
-				blue: clamp(value.blue, 0, MAX_HEX),
-				green: clamp(value.green, 0, MAX_HEX),
-				red: clamp(value.red, 0, MAX_HEX),
-			};
-
+		if (KEYS_RGB.every(key => key in value)) {
+			state.rgb = getRgbValue(value as Record<keyof RGBColor, unknown>);
 			state.hex = rgbToHex(state.rgb as RGBColor);
 			state.hsl = rgbToHsl(state.rgb as RGBColor);
 
@@ -85,11 +68,7 @@ export function getState(value: unknown): ColorState {
 	return state as ColorState;
 }
 
-export function setHexColor(
-	state: ColorState,
-	value: string,
-	alpha: boolean,
-): void {
+export function setHexColor(state: ColorState, value: string, alpha: boolean): void {
 	if (!isHexColor(value) || (!alpha && value === state.hex)) {
 		return;
 	}
@@ -107,19 +86,21 @@ export function setHexColor(
 	}
 }
 
-export function setHSLColor(
-	state: ColorState,
-	value: unknown,
-	alpha: boolean,
-): void {
-	if (!isHslColor(value)) {
+export function setHSLColor(state: ColorState, value: unknown, alpha: boolean): void {
+	if (!isHslLike(value)) {
 		return;
 	}
 
-	const rgb = hslToRgb(value);
+	const hsl = {
+		hue: getDegrees((value as HSLColor).hue),
+		lightness: getPercentage((value as HSLColor).lightness),
+		saturation: getPercentage((value as HSLColor).saturation),
+	};
+
+	const rgb = hslToRgb(hsl);
 
 	state.hex = rgbToHex(rgb);
-	state.hsl = value;
+	state.hsl = hsl;
 	state.rgb = rgb;
 
 	if (alpha) {
@@ -127,18 +108,20 @@ export function setHSLColor(
 	}
 }
 
-export function setRGBColor(
-	state: ColorState,
-	value: unknown,
-	alpha: boolean,
-): void {
-	if (!isRgbColor(value)) {
+export function setRGBColor(state: ColorState, value: unknown, alpha: boolean): void {
+	if (!isRgbLike(value)) {
 		return;
 	}
 
-	state.hex = rgbToHex(value);
-	state.hsl = rgbToHsl(value);
-	state.rgb = value;
+	const rgb = {
+		blue: getHexValue((value as RGBColor).blue),
+		green: getHexValue((value as RGBColor).green),
+		red: getHexValue((value as RGBColor).red),
+	};
+
+	state.hex = rgbToHex(rgb);
+	state.hsl = rgbToHsl(rgb);
+	state.rgb = rgb;
 
 	if (alpha) {
 		state.alpha = getAlpha((value as RGBAColor).alpha);

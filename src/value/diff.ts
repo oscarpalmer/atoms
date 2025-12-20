@@ -71,8 +71,7 @@ export function diff<First, Second = First>(
 	second: Second,
 	options?: DiffOptions,
 ): DiffResult<First, Second> {
-	const relaxedNullish =
-		typeof options === 'object' && options?.relaxedNullish === true;
+	const relaxedNullish = typeof options === 'object' && options?.relaxedNullish === true;
 
 	const result: DiffResult<First, Second> = {
 		original: {
@@ -83,9 +82,7 @@ export function diff<First, Second = First>(
 		values: {},
 	};
 
-	const same =
-		(relaxedNullish && first == null && second == null) ||
-		Object.is(first, second);
+	const same = (relaxedNullish && first == null && second == null) || Object.is(first, second);
 
 	const firstIsArrayOrObject = isArrayOrPlainObject(first);
 	const secondIsArrayOrObject = isArrayOrPlainObject(second);
@@ -131,10 +128,7 @@ function getChanges(
 	for (let outerIndex = 0; outerIndex < 2; outerIndex += 1) {
 		const value = (outerIndex === 0 ? first : second) ?? {};
 
-		const keys = [
-			...Object.keys(value),
-			...Object.getOwnPropertySymbols(value),
-		];
+		const keys = [...Object.keys(value), ...Object.getOwnPropertySymbols(value)];
 
 		const {length} = keys;
 
@@ -208,9 +202,7 @@ function setChanges(parameters: Parameters): void {
 
 	const diffs = nested ? getDiffs(from, to, relaxedNullish, prefixed) : [];
 
-	if (!nested || (nested && diffs.length > 0)) {
-		changes.push(change);
-	}
+	changes.push(change);
 
 	const diffsLength = diffs.length;
 

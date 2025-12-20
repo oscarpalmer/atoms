@@ -5,9 +5,7 @@ import type {ArrayOrPlainObject, Key, PlainObject, TypedArray} from '../models';
  * @param value Value to check
  * @returns `true` if the value is an array or a record, otherwise `false`
  */
-export function isArrayOrPlainObject(
-	value: unknown,
-): value is ArrayOrPlainObject {
+export function isArrayOrPlainObject(value: unknown): value is ArrayOrPlainObject {
 	return Array.isArray(value) || isPlainObject(value);
 }
 

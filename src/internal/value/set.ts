@@ -1,4 +1,4 @@
-import type {ArrayOrPlainObject, Paths, PlainObject} from '../../models';
+import type {NestedKeys, PlainObject} from '../../models';
 import {getPaths, handleValue} from './misc';
 
 /**
@@ -8,10 +8,11 @@ import {getPaths, handleValue} from './misc';
  * @param value Value to set
  * @returns Updated object
  */
-export function setValue<
-	Data extends ArrayOrPlainObject,
-	Path extends Paths<Data>,
->(data: Data, path: Path, value: unknown): Data;
+export function setValue<Data extends PlainObject, Path extends NestedKeys<Data>>(
+	data: Data,
+	path: Path,
+	value: unknown,
+): Data;
 
 /**
  * Set the value in an object using an unknown path
@@ -21,14 +22,14 @@ export function setValue<
  * @param ignoreCase If `true`, the path matching is case-insensitive
  * @returns Updated object
  */
-export function setValue<Data extends ArrayOrPlainObject>(
+export function setValue<Data extends PlainObject>(
 	data: Data,
 	path: string,
 	value: unknown,
 	ignoreCase?: boolean,
 ): Data;
 
-export function setValue<Data extends ArrayOrPlainObject>(
+export function setValue<Data extends PlainObject>(
 	data: Data,
 	path: string,
 	value: unknown,
@@ -55,7 +56,7 @@ export function setValue<Data extends ArrayOrPlainObject>(
 	const {length} = paths;
 	const lastIndex = length - 1;
 
-	let target: ArrayOrPlainObject = data;
+	let target: PlainObject = data;
 
 	for (let index = 0; index < length; index += 1) {
 		const path = paths[index];
@@ -82,7 +83,7 @@ export function setValue<Data extends ArrayOrPlainObject>(
 			(target as PlainObject)[path] = next;
 		}
 
-		target = next as ArrayOrPlainObject;
+		target = next as PlainObject;
 	}
 
 	return data;

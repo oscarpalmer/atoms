@@ -35,11 +35,7 @@ export function parse(
  * @param suffix Suffix to append to the truncated string
  * @returns Truncated string
  */
-export function truncate(
-	value: string,
-	length: number,
-	suffix?: string,
-): string {
+export function truncate(value: string, length: number, suffix?: string): string {
 	if (typeof value !== 'string' || typeof length !== 'number' || length <= 0) {
 		return '';
 	}

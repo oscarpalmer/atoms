@@ -1,5 +1,3 @@
-/** biome-ignore-all lint/style/noMagicNumbers: Testing */
-/** biome-ignore-all lint/nursery/useExplicitType: Testing */
 import {expect, test} from 'vitest';
 import {
 	getColor,
@@ -28,7 +26,7 @@ import {
 	rgbToHsl,
 	rgbToHsla,
 } from '../src/color';
-import {DEFAULT_HSL, DEFAULT_RGB} from '../src/color/constants';
+import {DEFAULT_HSL, DEFAULT_RGB, HEX_BLACK} from '../src/color/constants';
 import {getAlphaHexadecimal} from '../src/color/misc/alpha';
 import {getRandomItem} from '../src/random';
 
@@ -92,18 +90,7 @@ const rgbs = [
 
 const rgbas = rgbs.map((rgb, index) => ({...rgb, alpha: alphas[index]}));
 
-const shorts = [
-	'fff',
-	'3ac',
-	'960',
-	'069',
-	'9bf',
-	'f93',
-	'12a',
-	'568',
-	'685',
-	'432',
-];
+const shorts = ['fff', '3ac', '960', '069', '9bf', 'f93', '12a', '568', '685', '432'];
 
 const {length} = hexes;
 
@@ -142,34 +129,34 @@ test('color', () => {
 	expect(color.hex).toEqual('ffffff');
 	expect(color.alpha).toEqual(1);
 
-	color.hsl = {hue: 0, lightness: 0, saturation: 0};
+	color.hsl = {hue: 0, lightness: 'blah' as never, saturation: 0};
 
 	expect(color.hsl).toEqual({hue: 0, lightness: 0, saturation: 0});
 	expect(color.alpha).toEqual(1);
 
-	color.hsl = {hue: 0, lightness: 0, saturation: 0};
+	color.hsl = 123 as never;
 
 	expect(color.hsl).toEqual({hue: 0, lightness: 0, saturation: 0});
 	expect(color.alpha).toEqual(1);
 
 	color.hsl = {hue: 900, lightness: 0, saturation: 0};
 
-	expect(color.hsl).toEqual({hue: 0, lightness: 0, saturation: 0});
+	expect(color.hsl).toEqual({hue: 360, lightness: 0, saturation: 0});
 	expect(color.alpha).toEqual(1);
 
-	color.rgb = {red: 0, green: 0, blue: 0};
+	color.rgb = {red: 0, green: 'blah' as never, blue: 0};
 
 	expect(color.rgb).toEqual({red: 0, green: 0, blue: 0});
 	expect(color.alpha).toEqual(1);
 
-	color.rgb = {red: 0, green: 0, blue: 0};
+	color.rgb = 123 as never;
 
 	expect(color.rgb).toEqual({red: 0, green: 0, blue: 0});
 	expect(color.alpha).toEqual(1);
 
 	color.rgb = {red: 552, green: 0, blue: 0};
 
-	expect(color.rgb).toEqual({red: 0, green: 0, blue: 0});
+	expect(color.rgb).toEqual({red: 255, green: 0, blue: 0});
 	expect(color.alpha).toEqual(1);
 
 	color.alpha = -99;
@@ -177,6 +164,10 @@ test('color', () => {
 	expect(color.alpha).toEqual(0);
 
 	color.alpha = 500;
+
+	expect(color.alpha).toEqual(1);
+
+	color.alpha = Number.NaN;
 
 	expect(color.alpha).toEqual(1);
 
@@ -211,21 +202,15 @@ test('formatting', () => {
 		expect(String(color)).toBe(`#${hex}`);
 
 		expect(color.toHexString()).toBe(`#${hex}`);
-		expect(color.toHexString(true)).toBe(
-			`#${hex}${getAlphaHexadecimal(alphas[index])}`,
-		);
+		expect(color.toHexString(true)).toBe(`#${hex}${getAlphaHexadecimal(alphas[index])}`);
 
-		expect(color.toHslString()).toBe(
-			`hsl(${hsl.hue} ${hsl.saturation} ${hsl.lightness})`,
-		);
+		expect(color.toHslString()).toBe(`hsl(${hsl.hue} ${hsl.saturation} ${hsl.lightness})`);
 
 		expect(color.toHslString(true)).toBe(
 			`hsl(${hsl.hue} ${hsl.saturation} ${hsl.lightness} / ${alphas[index]})`,
 		);
 
-		expect(color.toRgbString()).toBe(
-			`rgb(${rgb.red} ${rgb.green} ${rgb.blue})`,
-		);
+		expect(color.toRgbString()).toBe(`rgb(${rgb.red} ${rgb.green} ${rgb.blue})`);
 
 		expect(color.toRgbString(true)).toBe(
 			`rgb(${rgb.red} ${rgb.green} ${rgb.blue} / ${alphas[index]})`,
@@ -276,17 +261,7 @@ test('getColor + isColor', () => {
 		}
 	}
 
-	const values = [
-		...hexes,
-		...hsls,
-		...rgbs,
-		true,
-		123,
-		BigInt(123),
-		{},
-		[],
-		() => {},
-	];
+	const values = [...hexes, ...hsls, ...rgbs, true, 123, BigInt(123), {}, [], () => {}];
 
 	const valuesLength = values.length;
 
@@ -318,15 +293,10 @@ test('getHex(a)Color', () => {
 		expect(getHexaColor(hex)).toEqual(`${hex}ff`);
 	}
 
-	const short = hexes.map(
-		hex => `${hex.slice(0, 1)}${hex.slice(2, 3)}${hex.slice(4, 5)}`,
-	);
+	const short = hexes.map(hex => `${hex.slice(0, 1)}${hex.slice(2, 3)}${hex.slice(4, 5)}`);
 
 	const long = short.map(
-		hex =>
-			`${hex.slice(0, 1).repeat(2)}${hex.slice(1, 2).repeat(2)}${hex
-				.slice(2, 3)
-				.repeat(2)}`,
+		hex => `${hex.slice(0, 1).repeat(2)}${hex.slice(1, 2).repeat(2)}${hex.slice(2, 3).repeat(2)}`,
 	);
 
 	for (let index = 0; index < length; index += 1) {
@@ -462,6 +432,8 @@ test('hslToRgb(a)', () => {
 		expect(hslToRgb(hsl)).toEqual(rgb);
 		expect(hslToRgba(hsl)).toEqual({...rgb, alpha: 1});
 	}
+
+	expect(hslToRgb(123 as never)).toEqual(DEFAULT_RGB);
 });
 
 test('is', () => {
@@ -532,6 +504,8 @@ test('rgbToHex(a)', () => {
 		expect(rgbToHex(rgb)).toEqual(hex);
 		expect(rgbToHex(rgb, true)).toEqual(`${hex}ff`);
 	}
+
+	expect(rgbToHex(123 as never)).toEqual(HEX_BLACK);
 });
 
 test('rgbToHsl(a)', () => {
@@ -542,4 +516,30 @@ test('rgbToHsl(a)', () => {
 		expect(rgbToHsl(rgb)).toEqual(hsl);
 		expect(rgbToHsla(rgb)).toEqual({...hsl, alpha: 1});
 	}
+
+	expect(
+		rgbToHsl({
+			red: 192,
+			green: 128,
+			blue: 64,
+		}),
+	).toEqual({
+		hue: 30,
+		lightness: 50.2,
+		saturation: 50.39,
+	});
+
+	expect(
+		rgbToHsl({
+			red: 192,
+			green: 64,
+			blue: 128,
+		}),
+	).toEqual({
+		hue: 330,
+		lightness: 50.2,
+		saturation: 50.39,
+	});
+
+	expect(rgbToHsl(123 as never)).toEqual(DEFAULT_HSL);
 });

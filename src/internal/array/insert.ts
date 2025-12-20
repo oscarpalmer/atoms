@@ -59,11 +59,5 @@ export function insertValues(
 		return splice ? [] : 0;
 	}
 
-	return insertChunkedValues(
-		type,
-		array,
-		items,
-		start,
-		splice ? deleteCount : 0,
-	);
+	return insertChunkedValues(type, array, items, start, splice ? deleteCount : 0);
 }

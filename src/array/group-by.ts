@@ -1,6 +1,5 @@
-import type {Simplify} from 'type-fest';
 import {groupValues} from '../internal/array/group';
-import type {Key, KeyedValue, PlainObject} from '../models';
+import type {Key, KeyedValue, PlainObject, Simplify} from '../models';
 
 type GroupBy = {
 	/**
@@ -69,11 +68,7 @@ type GroupBy = {
 	 * @param value Key to use for value
 	 * @returns Record of keyed values
 	 */
-	<
-		Item extends PlainObject,
-		ItemKey extends keyof Item,
-		ItemValue extends keyof Item,
-	>(
+	<Item extends PlainObject, ItemKey extends keyof Item, ItemValue extends keyof Item>(
 		array: Item[],
 		key: ItemKey,
 		value: ItemValue,
@@ -170,11 +165,7 @@ type GroupBy = {
 	 * @param value Key to use for value
 	 * @returns Record of keyed values
 	 */
-	arrays<
-		Item extends PlainObject,
-		ItemKey extends keyof Item,
-		ItemValue extends keyof Item,
-	>(
+	arrays<Item extends PlainObject, ItemKey extends keyof Item, ItemValue extends keyof Item>(
 		array: Item[],
 		key: ItemKey,
 		value: ItemValue,
@@ -186,10 +177,10 @@ type GroupBy = {
 	 * @param callback Callback to get an item's grouping key
 	 * @returns Record of keyed items
 	 */
-	arrays<
-		Item,
-		Callback extends (item: Item, index: number, array: Item[]) => Key,
-	>(array: Item[], callback: Callback): Record<ReturnType<Callback>, Item[]>;
+	arrays<Item, Callback extends (item: Item, index: number, array: Item[]) => Key>(
+		array: Item[],
+		callback: Callback,
+	): Record<ReturnType<Callback>, Item[]>;
 
 	/**
 	 * Create a record from an array of items using a specific key, grouping items into arrays
@@ -206,11 +197,7 @@ type GroupBy = {
 const groupBy = ((array: unknown[], first: unknown, second: unknown) =>
 	groupValues(array, first, second, false)) as GroupBy;
 
-groupBy.arrays = ((
-	array: unknown[],
-	first: unknown,
-	second: unknown,
-): unknown =>
+groupBy.arrays = ((array: unknown[], first: unknown, second: unknown): unknown =>
 	groupValues(array, first, second, true) as never) as GroupBy['arrays'];
 
 export {groupBy};

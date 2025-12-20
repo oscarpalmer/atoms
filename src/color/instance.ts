@@ -1,16 +1,10 @@
 import {formatColor} from './misc';
 import {getAlpha} from './misc/alpha';
 import {getState, setHexColor, setHSLColor, setRGBColor} from './misc/state';
-import type {
-	ColorState,
-	HSLAColor,
-	HSLColor,
-	RGBAColor,
-	RGBColor,
-} from './models';
+import type {ColorState, HSLAColor, HSLColor, RGBAColor, RGBColor} from './models';
 
 export class Color {
-	private declare readonly $color: boolean;
+	declare private readonly $color: boolean;
 
 	readonly #state: ColorState;
 

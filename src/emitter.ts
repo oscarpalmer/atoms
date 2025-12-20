@@ -67,11 +67,7 @@ class Emitter<Value> {
 		finishEmitter(this.#state, true);
 	}
 
-	#on(
-		type: keyof Observer<never>,
-		finish: boolean,
-		value: Error | Value,
-	): void {
+	#on(type: keyof Observer<never>, finish: boolean, value: Error | Value): void {
 		if (this.#state.active) {
 			if (type === 'next') {
 				this.#state.value = value as Value;
@@ -98,10 +94,7 @@ type EmitterState<Value> = {
 class Observable<Value> {
 	readonly #state: ObservableState<Value>;
 
-	constructor(
-		emitter: Emitter<Value>,
-		observers: Map<Subscription<Value>, Observer<Value>>,
-	) {
+	constructor(emitter: Emitter<Value>, observers: Map<Subscription<Value>, Observer<Value>>) {
 		this.#state = {
 			emitter,
 			observers,
@@ -253,10 +246,7 @@ function finishEmitter<Value>(state: EmitterState<Value>, emit: boolean): void {
 	}
 }
 
-function getFunction<Callback>(
-	value: Callback,
-	defaultValue: Callback,
-): Callback {
+function getFunction<Callback>(value: Callback, defaultValue: Callback): Callback {
 	return typeof value === 'function' ? value : defaultValue;
 }
 

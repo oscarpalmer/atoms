@@ -1,13 +1,19 @@
-import type {Get, Paths, Simplify} from 'type-fest';
 import {isArrayOrPlainObject} from '../internal/is';
 import {join} from '../internal/string';
-import type {ArrayOrPlainObject, PlainObject, ToString} from '../models';
+import type {
+	ArrayOrPlainObject,
+	NestedKeys,
+	NestedValue,
+	PlainObject,
+	Simplify,
+	ToString,
+} from '../models';
 
-type Smushed<Value> = Simplify<{
-	[Key in Paths<Value>]: Get<Value, ToString<Key>>;
+type Smushed<Value extends PlainObject> = Simplify<{
+	[Key in NestedKeys<Value>]: NestedValue<Value, ToString<Key>>;
 }>;
 
-function flatten(
+function flattenObject(
 	value: ArrayOrPlainObject,
 	depth: number,
 	smushed: WeakMap<WeakKey, PlainObject>,
@@ -32,7 +38,7 @@ function flatten(
 		if (isArrayOrPlainObject(val)) {
 			Object.assign(flattened, {
 				[join([prefix, key], '.')]: Array.isArray(val) ? [...val] : {...val},
-				...flatten(val, depth + 1, smushed, join([prefix, key], '.')),
+				...flattenObject(val, depth + 1, smushed, join([prefix, key], '.')),
 			});
 		} else {
 			flattened[join([prefix, key], '.')] = val;
@@ -51,7 +57,7 @@ function flatten(
  */
 export function smush<Value extends PlainObject>(value: Value): Smushed<Value> {
 	return typeof value === 'object' && value !== null
-		? (flatten(value, 0, new WeakMap()) as never)
+		? (flattenObject(value, 0, new WeakMap()) as never)
 		: ({} as never);
 }
 

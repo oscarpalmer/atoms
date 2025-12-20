@@ -1,16 +1,6 @@
-/** biome-ignore-all lint/style/noMagicNumbers: Testing */
 import {expect, test} from 'vitest';
 import type {NestedPartial} from '../src/models';
-import {
-	compare,
-	diff,
-	getValue,
-	merge,
-	partial,
-	setValue,
-	smush,
-	unsmush,
-} from '../src/value';
+import {compare, diff, getValue, merge, partial, setValue, smush, unsmush} from '../src/value';
 
 type Diffable = {
 	numbers: number[];
@@ -141,9 +131,7 @@ test('diff', () => {
 				c: 1,
 			},
 		},
-		strings: Array.from({length: 10}).map((_, i) =>
-			String(i % 3 === 0 ? -1 : i),
-		),
+		strings: Array.from({length: 10}).map((_, i) => String(i % 3 === 0 ? -1 : i)),
 		value: 456,
 	};
 
@@ -314,6 +302,24 @@ test('merge', () => {
 	expect(merge([{hello: 'world'}])).toEqual({hello: 'world'});
 
 	expect(
+		merge([
+			{hello: {w: 'w'}},
+			{hello: {o: 'o'}} as never,
+			{hello: {r: 'r'}} as never,
+			{hello: {l: 'l'}} as never,
+			{hello: {d: 'd'}} as never,
+		]),
+	).toEqual({
+		hello: {
+			w: 'w',
+			o: 'o',
+			r: 'r',
+			l: 'l',
+			d: 'd',
+		},
+	});
+
+	expect(
 		merge([[1, 2, 3, 4, 5], [null, null, 99] as never], {
 			skipNullableInArrays: true,
 		}),
@@ -347,7 +353,7 @@ test('merge', () => {
 	};
 
 	const replaceableMerged = merge([replaceableFirst, replaceableSecond], {
-		replaceableObjects: ['d', /c9x/, /\w\d$/],
+		replaceableObjects: [/c9x/, /\w\d$/],
 	});
 
 	expect(replaceableMerged).toEqual({
