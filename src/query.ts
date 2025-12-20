@@ -57,7 +57,7 @@ function getParts(value: ArrayOrPlainObject, fromArray: boolean, prefix?: string
 	return parts;
 }
 
-function getValue(value: string): unknown {
+function getQueryValue(value: string): unknown {
 	if (EXPRESSION_BOOLEAN.test(value)) {
 		return value === 'true';
 	}
@@ -85,16 +85,16 @@ function isDecodable(value: unknown): value is boolean | number | string {
 
 function setQueryValue(parameters: PlainObject, key: string, value: string): void {
 	if (key.includes('.')) {
-		setValue(parameters, key, getValue(value));
+		setValue(parameters, key, getQueryValue(value));
 	} else {
 		if (key in parameters) {
 			if (!Array.isArray(parameters[key])) {
 				parameters[key] = [parameters[key]];
 			}
 
-			(parameters[key] as unknown[]).push(getValue(value) as never);
+			(parameters[key] as unknown[]).push(getQueryValue(value) as never);
 		} else {
-			parameters[key] = getValue(value) as never;
+			parameters[key] = getQueryValue(value) as never;
 		}
 	}
 }

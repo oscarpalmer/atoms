@@ -46,10 +46,10 @@ export function template(
 			return values[key];
 		}
 
-		const value = getValue(variables, key, ignoreCase);
-		const nullish = value == null;
+		const templateValue = getValue(variables, key, ignoreCase);
+		const nullish = templateValue == null;
 
-		values[key] = nullish ? '' : getString(value);
+		values[key] = nullish ? '' : getString(templateValue);
 
 		return values[key];
 	});

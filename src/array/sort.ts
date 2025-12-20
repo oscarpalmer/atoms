@@ -17,29 +17,29 @@ type Sorter = {
 function getCallback(
 	value: unknown,
 	key: string | undefined,
-	isObject: boolean,
+	forObject: boolean,
 ): GenericCallback | undefined {
 	if (key != null) {
 		return;
 	}
 
-	if (isObject && typeof (value as PlainObject).value === 'function') {
+	if (forObject && typeof (value as PlainObject).value === 'function') {
 		return (value as PlainObject).value as never;
 	}
 
 	return typeof value === 'function' ? (value as never) : undefined;
 }
 
-function getKey(value: unknown, isObject: boolean): string | undefined {
-	if (isObject && typeof (value as PlainObject).key === 'string') {
+function getKey(value: unknown, forObject: boolean): string | undefined {
+	if (forObject && typeof (value as PlainObject).key === 'string') {
 		return (value as PlainObject).key as string;
 	}
 
 	return typeof value === 'string' ? value : undefined;
 }
 
-function getModifier(value: unknown, modifier: number, isObject: boolean): number {
-	if (!isObject || typeof (value as PlainObject).direction !== 'string') {
+function getModifier(value: unknown, modifier: number, forObject: boolean): number {
+	if (!forObject || typeof (value as PlainObject).direction !== 'string') {
 		return modifier;
 	}
 
@@ -51,7 +51,7 @@ function getModifier(value: unknown, modifier: number, isObject: boolean): numbe
 }
 
 function getSorter(value: unknown, modifier: number): Sorter | undefined {
-	const isObject = isPlainObject(value);
+	const forObject = isPlainObject(value);
 
 	const sorter: Sorter = {
 		identifier: '',
@@ -59,12 +59,11 @@ function getSorter(value: unknown, modifier: number): Sorter | undefined {
 	};
 
 	sorter.compare =
-		isObject && typeof value.compare === 'function' ? (value.compare as never) : undefined;
+		forObject && typeof value.compare === 'function' ? (value.compare as never) : undefined;
 
-	sorter.key = getKey(value, isObject);
-	sorter.modifier = getModifier(value, modifier, isObject);
-
-	sorter.callback = getCallback(value, sorter.key, isObject);
+	sorter.key = getKey(value, forObject);
+	sorter.modifier = getModifier(value, modifier, forObject);
+	sorter.callback = getCallback(value, sorter.key, forObject);
 
 	if (sorter.key != null || sorter.callback != null) {
 		sorter.identifier = `${sorter.key ?? sorter.callback}`;
@@ -149,44 +148,44 @@ export function sort(array: unknown[], first?: unknown, second?: unknown): unkno
 		.map(item => getSorter(item, modifier))
 		.filter(sorter => sorter != null)
 		.filter(
-			(current, index, sorters) =>
-				sorters.findIndex(next => next.identifier === current.identifier) === index,
+			(current, index, filtered) =>
+				filtered.findIndex(next => next.identifier === current.identifier) === index,
 		);
 
 	const {length} = sorters;
 
 	if (length === 0) {
-		return array.sort((first, second) => compare(first as never, second as never) * modifier);
+		return array.sort(
+			(firstItem, secondItem) => compare(firstItem as never, secondItem as never) * modifier,
+		);
 	}
 
 	if (length === 1) {
 		const sorter = sorters[0];
-		const {callback, key, modifier} = sorter;
+		const {callback, key} = sorter;
 
-		return array.sort((first, second) => {
-			const firstValue = key == null ? callback?.(first) : (first as PlainObject)[key];
-
-			const secondValue = key == null ? callback?.(second) : (second as PlainObject)[key];
+		return array.sort((firstItem, secondItem) => {
+			const firstValue = key == null ? callback?.(firstItem) : (firstItem as PlainObject)[key];
+			const secondValue = key == null ? callback?.(secondItem) : (secondItem as PlainObject)[key];
 
 			return (
-				(sorter.compare?.(first, firstValue, second, secondValue) ??
-					compare(firstValue, secondValue)) * modifier
+				(sorter.compare?.(firstItem, firstValue, secondItem, secondValue) ??
+					compare(firstValue, secondValue)) * sorter.modifier
 			);
 		});
 	}
 
-	return array.sort((first, second) => {
+	return array.sort((firstItem, secondItem) => {
 		for (let index = 0; index < length; index += 1) {
 			const sorter = sorters[index];
-			const {callback, key, modifier} = sorter;
+			const {callback, key} = sorter;
 
-			const firstValue = key == null ? callback?.(first) : (first as PlainObject)[key];
-
-			const secondValue = key == null ? callback?.(second) : (second as PlainObject)[key];
+			const firstValue = key == null ? callback?.(firstItem) : (firstItem as PlainObject)[key];
+			const secondValue = key == null ? callback?.(secondItem) : (secondItem as PlainObject)[key];
 
 			const compared =
-				(sorter.compare?.(first, firstValue, second, secondValue) ??
-					compare(firstValue, secondValue)) * modifier;
+				(sorter.compare?.(firstItem, firstValue, secondItem, secondValue) ??
+					compare(firstValue, secondValue)) * sorter.modifier;
 
 			if (compared !== 0) {
 				return compared;

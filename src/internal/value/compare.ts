@@ -20,14 +20,14 @@ export function compare(first: unknown, second: unknown): number {
 		return 1;
 	}
 
-	const comparison = compareValue(first, second, false);
+	let comparison = compareValue(first, second, false);
 
 	if (comparison != null) {
 		return comparison;
 	}
 
-	const firstParts = getParts(first);
-	const secondParts = getParts(second);
+	const firstParts = getComparisonParts(first);
+	const secondParts = getComparisonParts(second);
 	const length = max([firstParts.length, secondParts.length]);
 	const lastIndex = length - 1;
 
@@ -35,7 +35,7 @@ export function compare(first: unknown, second: unknown): number {
 		const firstPart = firstParts[index];
 		const secondPart = secondParts[index];
 
-		const comparison = compareValue(firstPart, secondPart, true);
+		comparison = compareValue(firstPart, secondPart, true);
 
 		if (comparison === 0) {
 			if (index === lastIndex) {
@@ -92,7 +92,7 @@ function compareValue(
 	}
 }
 
-function getParts(value: unknown): unknown[] {
+function getComparisonParts(value: unknown): unknown[] {
 	if (Array.isArray(value)) {
 		return value;
 	}

@@ -59,28 +59,26 @@ export function setValue<Data extends PlainObject>(
 	let target: PlainObject = data;
 
 	for (let index = 0; index < length; index += 1) {
-		const path = paths[index];
+		const currentPath = paths[index];
 
 		if (index === lastIndex) {
-			handleValue(target, path, value, false, shouldIgnoreCase);
+			handleValue(target, currentPath, value, false, shouldIgnoreCase);
 
 			break;
 		}
 
-		let next = handleValue(target, path, null, true, shouldIgnoreCase);
+		let next = handleValue(target, currentPath, null, true, shouldIgnoreCase);
 
 		if (typeof next !== 'object' || next === null) {
 			const nextPath = paths[index + 1];
 
 			if (EXPRESSION_INDEX.test(nextPath)) {
-				const length = Number.parseInt(nextPath, 10) + 1;
-
-				next = Array.from({length}, () => undefined);
+				next = Array.from({length: Number.parseInt(nextPath, 10) + 1}, () => undefined);
 			} else {
 				next = {};
 			}
 
-			(target as PlainObject)[path] = next;
+			(target as PlainObject)[currentPath] = next;
 		}
 
 		target = next as PlainObject;

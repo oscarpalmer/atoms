@@ -19,7 +19,7 @@ import {
 	toSet,
 	unique,
 } from '../src/array';
-import {getCallbacks} from '../src/internal/array/callbacks';
+import {getArrayCallbacks} from '../src/internal/array/callbacks';
 import {getRandomInteger} from '../src/random';
 import {diff, equal} from '../src/value';
 
@@ -153,28 +153,28 @@ test('getArray', () => {
 });
 
 test('getCallbacks', () => {
-	const withBoolean = getCallbacks(null, true);
+	const withBoolean = getArrayCallbacks(null, true);
 	expect(withBoolean?.keyed).toBeUndefined();
 
-	const withDotNotation = getCallbacks(null, 'prop.nested');
+	const withDotNotation = getArrayCallbacks(null, 'prop.nested');
 	expect(withDotNotation?.keyed).toBeUndefined();
 
-	const withFunction = getCallbacks(() => true);
+	const withFunction = getArrayCallbacks(() => true);
 	expect(typeof withFunction?.bool).toBe('function');
 
-	const withNumber = getCallbacks(null, 123);
+	const withNumber = getArrayCallbacks(null, 123);
 	expect(typeof withNumber?.keyed).toBe('function');
 
-	const withObject = getCallbacks(null, {});
+	const withObject = getArrayCallbacks(null, {});
 	expect(withObject?.keyed).toBeUndefined();
 
-	const withNull = getCallbacks(null, null);
+	const withNull = getArrayCallbacks(null, null);
 	expect(withNull?.keyed).toBeUndefined();
 
-	const withString = getCallbacks(null, 'id');
+	const withString = getArrayCallbacks(null, 'id');
 	expect(typeof withString?.keyed).toBe('function');
 
-	const withUndefined = getCallbacks(null, undefined);
+	const withUndefined = getArrayCallbacks(null, undefined);
 	expect(withUndefined?.keyed).toBeUndefined();
 });
 

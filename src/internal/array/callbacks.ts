@@ -6,7 +6,7 @@ export type Callbacks = {
 	value?: GenericCallback;
 };
 
-function getCallback(value: unknown): GenericCallback | undefined {
+function getArrayCallback(value: unknown): GenericCallback | undefined {
 	switch (typeof value) {
 		case 'function':
 			return value as GenericCallback;
@@ -22,7 +22,7 @@ function getCallback(value: unknown): GenericCallback | undefined {
 	}
 }
 
-export function getCallbacks(
+export function getArrayCallbacks(
 	bool?: unknown,
 	key?: unknown,
 	value?: unknown,
@@ -32,7 +32,7 @@ export function getCallbacks(
 	}
 
 	return {
-		keyed: getCallback(key),
-		value: getCallback(value),
+		keyed: getArrayCallback(key),
+		value: getArrayCallback(value),
 	};
 }

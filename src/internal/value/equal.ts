@@ -50,7 +50,7 @@ export function equal(first: string, second: string, ignoreCase?: boolean): bool
 export function equal(first: unknown, second: unknown, options?: EqualOptions): boolean;
 
 export function equal(first: unknown, second: unknown, options?: boolean | EqualOptions): boolean {
-	return equalValue(first, second, getOptions(options));
+	return equalValue(first, second, getEqualOptions(options));
 }
 
 function equalArray(first: unknown[], second: unknown[], options: Options): boolean {
@@ -302,7 +302,7 @@ function filterKey(key: string | symbol, options: Options): boolean {
 	return true;
 }
 
-function getOptions(input?: boolean | EqualOptions): Options {
+function getEqualOptions(input?: boolean | EqualOptions): Options {
 	const options: Options = {
 		ignoreCase: false,
 		ignoreExpressions: {

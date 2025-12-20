@@ -1,8 +1,8 @@
 import FRAME_RATE_MS from './internal/frame-rate';
 
 export * from './array/index';
+export * from './beacon';
 export * from './color/index';
-export * from './emitter';
 export * from './function';
 export * from './is';
 export * from './logger';

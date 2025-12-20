@@ -1,4 +1,4 @@
-import {getCallbacks} from '../internal/array/callbacks';
+import {getArrayCallbacks} from '../internal/array/callbacks';
 import type {Key, PlainObject} from '../models';
 
 type ToMap = {
@@ -205,7 +205,7 @@ function getMapValues(
 	}
 
 	const {length} = array;
-	const callbacks = getCallbacks(undefined, first, second);
+	const callbacks = getArrayCallbacks(undefined, first, second);
 	const map = new Map<Key, unknown>();
 
 	for (let index = 0; index < length; index += 1) {

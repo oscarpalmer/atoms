@@ -87,17 +87,17 @@ export function count(array: unknown[], key?: unknown, value?: unknown): number 
 	const callback =
 		typeof key === 'function' ? key : (item: PlainObject): unknown => item[key as never];
 
-	let count = 0;
+	let counted = 0;
 
 	for (let index = 0; index < length; index += 1) {
 		const item = array[index];
 
 		if (Object.is(callback(item as never, index, array), value)) {
-			count += 1;
+			counted += 1;
 		}
 	}
 
-	return count;
+	return counted;
 }
 
 /**

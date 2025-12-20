@@ -49,15 +49,15 @@ export function insertValues(
 	start: unknown,
 	deleteCount: number,
 ): unknown {
-	const splice = type === 'insert' || type === 'splice';
+	const spliceArray = type === 'insert' || type === 'splice';
 
 	if (!Array.isArray(array) || typeof start !== 'number') {
-		return splice ? [] : 0;
+		return spliceArray ? [] : 0;
 	}
 
 	if (!Array.isArray(items) || items.length === 0) {
-		return splice ? [] : 0;
+		return spliceArray ? [] : 0;
 	}
 
-	return insertChunkedValues(type, array, items, start, splice ? deleteCount : 0);
+	return insertChunkedValues(type, array, items, start, spliceArray ? deleteCount : 0);
 }

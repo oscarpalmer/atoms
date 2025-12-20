@@ -1,5 +1,5 @@
 import type {Key} from '../../models';
-import {getCallbacks} from './callbacks';
+import {getArrayCallbacks} from './callbacks';
 
 export function groupValues(
 	array: unknown[],
@@ -12,7 +12,7 @@ export function groupValues(
 	}
 
 	const {length} = array;
-	const callbacks = getCallbacks(undefined, key, value);
+	const callbacks = getArrayCallbacks(undefined, key, value);
 	const record: Record<Key, unknown> = {};
 
 	for (let index = 0; index < length; index += 1) {

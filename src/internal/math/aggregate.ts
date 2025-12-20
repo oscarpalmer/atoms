@@ -29,7 +29,7 @@ export function aggregate(type: AggregationType, array: unknown[], key: unknown)
 	const aggregator = aggregators[type];
 	const isCallback = typeof key === 'function';
 
-	let count = 0;
+	let counted = 0;
 	let aggregated = Number.NaN;
 	let notNumber = true;
 
@@ -43,13 +43,13 @@ export function aggregate(type: AggregationType, array: unknown[], key: unknown)
 		if (typeof value === 'number' && !Number.isNaN(value)) {
 			aggregated = aggregator(aggregated, value, notNumber);
 
-			count += 1;
+			counted += 1;
 			notNumber = false;
 		}
 	}
 
 	return {
-		count,
+		count: counted,
 		value: aggregated,
 	};
 }
@@ -87,17 +87,17 @@ export function max(array: unknown[], key?: unknown): number {
 	return aggregate('max', array, key).value;
 }
 
-function sum(current: number, value: number, notNumber: boolean): number {
+function calculateSum(current: number, value: number, notNumber: boolean): number {
 	return notNumber ? value : current + value;
 }
 
 //
 
 const aggregators: Record<AggregationType, AggregationCallback> = {
-	sum,
-	average: sum,
+	average: calculateSum,
 	max: (current: number, value: number, notNumber: boolean) =>
 		notNumber || value > current ? value : current,
 	min: (current: number, value: number, notNumber: boolean) =>
 		notNumber || value < current ? value : current,
+	sum: calculateSum,
 };

@@ -26,13 +26,13 @@
 				"types": "./types/array/index.d.ts",
 				"default": "./dist/array/index.js"
 		},
+		"./beacon": {
+				"types": "./types/beacon.d.ts",
+				"default": "./dist/beacon.js"
+		},
 		"./color": {
 				"types": "./types/color/index.d.ts",
 				"default": "./dist/color/index.js"
-		},
-		"./emitter": {
-				"types": "./types/emitter.d.ts",
-				"default": "./dist/emitter.js"
 		},
 		"./frame-rate": {
 			"types": "./types/internal/frame-rate.d.ts",
@@ -101,5 +101,5 @@
 	},
 	"type": "module",
 	"types": "./types/index.d.ts",
-	"version": "0.116.0"
+	"version": "0.117.0"
 }

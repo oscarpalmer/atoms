@@ -108,9 +108,9 @@ export function diff<First, Second = First>(
 	}
 
 	for (let index = 0; index < length; index += 1) {
-		const diff = diffs[index];
+		const differences = diffs[index];
 
-		result.values[diff.key] = {from: diff.from, to: diff.to};
+		result.values[differences.key] = {from: differences.from, to: differences.to};
 	}
 
 	return result;

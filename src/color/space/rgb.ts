@@ -8,9 +8,9 @@ import type {HSLAColor, HSLColor, RGBAColor, RGBColor} from '../models';
 export function convertRgbToHex(rgb: RGBAColor | RGBColor, alpha: boolean): string {
 	const hex = `${join(
 		[rgb.red, rgb.green, rgb.blue].map(color => {
-			const hex = color.toString(16);
+			const hexString = color.toString(16);
 
-			return hex.length === 1 ? `0${hex}` : hex;
+			return hexString.length === 1 ? `0${hexString}` : hexString;
 		}),
 	)}`;
 
@@ -30,19 +30,18 @@ export function convertRgbToHsla(value: unknown): HSLAColor {
 	const green = rgb.green / MAX_HEX;
 	const red = rgb.red / MAX_HEX;
 
-	const max = Math.max(blue, green, red);
-	const min = Math.min(blue, green, red);
+	const maxHex = Math.max(blue, green, red);
+	const minHex = Math.min(blue, green, red);
 
-	const delta = max - min;
-	const lightness = (min + max) / 2;
-
+	const delta = maxHex - minHex;
+	const lightness = (minHex + maxHex) / 2;
 	let hue = 0;
 	let saturation = 0;
 
 	if (delta !== 0) {
-		saturation = (max - lightness) / Math.min(lightness, 1 - lightness);
+		saturation = (maxHex - lightness) / Math.min(lightness, 1 - lightness);
 
-		switch (max) {
+		switch (maxHex) {
 			case blue:
 				hue = (red - green) / delta + 4;
 				break;

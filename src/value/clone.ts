@@ -17,7 +17,7 @@ function cloneArrayBuffer(
 	depth?: number,
 	references?: WeakMap<WeakKey, unknown>,
 ): ArrayBuffer {
-	if (typeof depth === 'number' && depth >= MAX_DEPTH) {
+	if (typeof depth === 'number' && depth >= MAX_CLONE_DEPTH) {
 		return value;
 	}
 
@@ -35,7 +35,7 @@ function cloneDataView(
 	depth: number,
 	references: WeakMap<WeakKey, unknown>,
 ): DataView {
-	if (depth >= MAX_DEPTH) {
+	if (depth >= MAX_CLONE_DEPTH) {
 		return value;
 	}
 
@@ -53,7 +53,7 @@ function cloneMapOrSet<Value extends Map<unknown, unknown> | Set<unknown>>(
 	depth: number,
 	references: WeakMap<WeakKey, unknown>,
 ): Value {
-	if (depth >= MAX_DEPTH) {
+	if (depth >= MAX_CLONE_DEPTH) {
 		return value;
 	}
 
@@ -81,7 +81,7 @@ function cloneMapOrSet<Value extends Map<unknown, unknown> | Set<unknown>>(
 }
 
 function cloneNode(node: Node, depth: number, references: WeakMap<WeakKey, unknown>): Node {
-	if (depth >= MAX_DEPTH) {
+	if (depth >= MAX_CLONE_DEPTH) {
 		return node;
 	}
 
@@ -97,7 +97,7 @@ function cloneObject(
 	depth: number,
 	references: WeakMap<WeakKey, unknown>,
 ): ArrayOrPlainObject {
-	if (depth >= MAX_DEPTH) {
+	if (depth >= MAX_CLONE_DEPTH) {
 		return Array.isArray(value) ? [...value] : {...value};
 	}
 
@@ -121,7 +121,7 @@ function cloneRegularExpression(
 	depth: number,
 	references: WeakMap<WeakKey, unknown>,
 ): RegExp {
-	if (depth >= MAX_DEPTH) {
+	if (depth >= MAX_CLONE_DEPTH) {
 		return value;
 	}
 
@@ -139,7 +139,7 @@ function cloneTypedArray(
 	depth: number,
 	references: WeakMap<WeakKey, unknown>,
 ): TypedArray {
-	if (depth >= MAX_DEPTH) {
+	if (depth >= MAX_CLONE_DEPTH) {
 		return value;
 	}
 
@@ -208,7 +208,7 @@ function tryStructuredClone(
 	depth: number,
 	references: WeakMap<WeakKey, unknown>,
 ): unknown {
-	if (depth >= MAX_DEPTH) {
+	if (depth >= MAX_CLONE_DEPTH) {
 		return value;
 	}
 
@@ -227,4 +227,4 @@ function tryStructuredClone(
 
 //
 
-const MAX_DEPTH = 100;
+const MAX_CLONE_DEPTH = 100;

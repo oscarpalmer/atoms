@@ -1,9 +1,9 @@
 import {expect, test} from 'vitest';
-import {emitter} from '../src/emitter';
+import {beacon} from '../src/beacon';
 
 test('emitter', () =>
 	new Promise<void>(done => {
-		const value = emitter(0);
+		const value = beacon(0);
 
 		expect(value.active).toBe(true);
 		expect(value.observable).toBeDefined();
@@ -30,9 +30,9 @@ test('emitter', () =>
 
 test('emitter: observable + subscription', () =>
 	new Promise<void>(done => {
-		const first = emitter(0);
-		const second = emitter(0);
-		const third = emitter(0);
+		const first = beacon(0);
+		const second = beacon(0);
+		const third = beacon(0);
 
 		const results = {
 			first: {

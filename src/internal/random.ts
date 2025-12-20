@@ -7,21 +7,21 @@ import {isNumber} from './is';
  * @returns Random floating-point number
  */
 export function getRandomFloat(minimum?: number, maximum?: number): number {
-	let max =
+	let maxFloat =
 		isNumber(maximum) && maximum <= Number.MAX_SAFE_INTEGER ? maximum : Number.MAX_SAFE_INTEGER;
 
-	let min =
+	let minFloat =
 		isNumber(minimum) && minimum >= Number.MIN_SAFE_INTEGER ? minimum : Number.MIN_SAFE_INTEGER;
 
-	if (min === max) {
-		return min;
+	if (minFloat === maxFloat) {
+		return minFloat;
 	}
 
-	if (min > max) {
-		[min, max] = [max, min];
+	if (minFloat > maxFloat) {
+		[minFloat, maxFloat] = [maxFloat, minFloat];
 	}
 
-	return Math.random() * (max + 1 - min) + min;
+	return Math.random() * (maxFloat + 1 - minFloat) + minFloat;
 }
 
 /**

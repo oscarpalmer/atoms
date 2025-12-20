@@ -1,4 +1,4 @@
-import {getCallbacks} from './callbacks';
+import {getArrayCallbacks} from './callbacks';
 
 type FindValueType = 'index' | 'value';
 
@@ -21,7 +21,7 @@ export function findValue(type: FindValueType, array: unknown[], parameters: unk
 
 	const {bool, key, value} = getParameters(parameters);
 
-	const callbacks = getCallbacks(bool, key);
+	const callbacks = getArrayCallbacks(bool, key);
 
 	if (callbacks?.bool == null && callbacks?.keyed == null) {
 		return findIndex ? array.indexOf(value) : array.find(item => item === value);
@@ -82,7 +82,7 @@ export function findValues(
 
 	const {length} = array;
 	const {bool, key, value} = getParameters(parameters);
-	const callbacks = getCallbacks(bool, key);
+	const callbacks = getArrayCallbacks(bool, key);
 
 	if (type === 'unique' && callbacks?.keyed == null && length >= UNIQUE_THRESHOLD) {
 		return [...new Set(array)];

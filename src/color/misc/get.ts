@@ -19,6 +19,10 @@ import {Color} from '../instance';
 import type {HSLAColor, HSLColor, RGBAColor, RGBColor} from '../models';
 import {getState} from './state';
 
+function getClampedValue(value: unknown, minimum: number, maximum: number): number {
+	return typeof value === 'number' ? clamp(value, minimum, maximum) : minimum;
+}
+
 /**
  * Get a foreground color _(usually text)_ based on a background color's luminance
  * @param value Original value
@@ -69,11 +73,11 @@ export function getHexColor(value: unknown): string {
 }
 
 export function getHexValue(value: unknown): number {
-	return getValue(value, 0, MAX_HEX);
+	return getClampedValue(value, 0, MAX_HEX);
 }
 
 export function getDegrees(value: unknown): number {
-	return getValue(value, 0, MAX_DEGREE);
+	return getClampedValue(value, 0, MAX_DEGREE);
 }
 
 /**
@@ -100,7 +104,7 @@ export function getHslColor(value: unknown): HSLColor {
 }
 
 export function getPercentage(value: unknown): number {
-	return getValue(value, 0, MAX_PERCENT);
+	return getClampedValue(value, 0, MAX_PERCENT);
 }
 
 /**
@@ -124,8 +128,4 @@ export function getRgbaColor(value: unknown): RGBAColor {
  */
 export function getRgbColor(value: unknown): RGBColor {
 	return getState(value).rgb;
-}
-
-function getValue(value: unknown, minimum: number, maximum: number): number {
-	return typeof value === 'number' ? clamp(value, minimum, maximum) : minimum;
 }

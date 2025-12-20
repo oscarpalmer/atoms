@@ -1,4 +1,4 @@
-import {getCallbacks} from '../internal/array/callbacks';
+import {getArrayCallbacks} from '../internal/array/callbacks';
 import type {PlainObject} from '../models';
 
 /**
@@ -35,7 +35,7 @@ export function toSet(array: unknown[], value?: unknown): Set<unknown> {
 		return new Set();
 	}
 
-	const callbacks = getCallbacks(undefined, undefined, value);
+	const callbacks = getArrayCallbacks(undefined, undefined, value);
 
 	if (callbacks?.value == null) {
 		return new Set(array);

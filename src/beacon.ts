@@ -1,10 +1,10 @@
 import {noop} from './internal/function';
 
-class Emitter<Value> {
-	readonly #state: EmitterState<Value>;
+class Beacon<Value> {
+	readonly #state: BeaconState<Value>;
 
 	/**
-	 * Is the emitter active?
+	 * Is the beacon active?
 	 */
 	get active(): boolean {
 		return this.#state.active;
@@ -36,16 +36,16 @@ class Emitter<Value> {
 	}
 
 	/**
-	 * Destroy the emitter
+	 * Destroy the beacon
 	 */
 	destroy(): void {
-		finishEmitter(this.#state, false);
+		finishBeacon(this.#state, false);
 	}
 
 	/**
 	 * Emit a new value
 	 * @param value Value to set and emit
-	 * @param finish Finish the emitter after emitting? _(defaults to `false`)_
+	 * @param finish Finish the beacon after emitting? _(defaults to `false`)_
 	 */
 	emit(value: Value, finish?: boolean): void {
 		this.#on('next', finish ?? false, value);
@@ -54,17 +54,17 @@ class Emitter<Value> {
 	/**
 	 * Emit an error
 	 * @param error Error to emit
-	 * @param finish Finish the emitter after emitting? _(defaults to `false`)_
+	 * @param finish Finish the beacon after emitting? _(defaults to `false`)_
 	 */
 	error(error: Error, finish?: boolean): void {
 		this.#on('error', finish ?? false, error);
 	}
 
 	/**
-	 * Finish the emitter
+	 * Finish the beacon
 	 */
 	finish(): void {
-		finishEmitter(this.#state, true);
+		finishBeacon(this.#state, true);
 	}
 
 	#on(type: keyof Observer<never>, finish: boolean, value: Error | Value): void {
@@ -78,13 +78,13 @@ class Emitter<Value> {
 			}
 
 			if (finish === true) {
-				finishEmitter(this.#state, true);
+				finishBeacon(this.#state, true);
 			}
 		}
 	}
 }
 
-type EmitterState<Value> = {
+type BeaconState<Value> = {
 	active: boolean;
 	observable: Observable<Value>;
 	observers: Map<Subscription<Value>, Observer<Value>>;
@@ -94,10 +94,10 @@ type EmitterState<Value> = {
 class Observable<Value> {
 	readonly #state: ObservableState<Value>;
 
-	constructor(emitter: Emitter<Value>, observers: Map<Subscription<Value>, Observer<Value>>) {
+	constructor(emitter: Beacon<Value>, observers: Map<Subscription<Value>, Observer<Value>>) {
 		this.#state = {
-			emitter,
 			observers,
+			beacon: emitter,
 			closed: false,
 		};
 	}
@@ -143,15 +143,15 @@ class Observable<Value> {
 
 		this.#state.observers.set(instance, observer);
 
-		observer.next?.(this.#state.emitter.value);
+		observer.next?.(this.#state.beacon.value);
 
 		return instance;
 	}
 }
 
 type ObservableState<Value> = {
+	beacon: Beacon<Value>;
 	closed: boolean;
-	emitter: Emitter<Value>;
 	observers: Map<Subscription<Value>, Observer<Value>>;
 };
 
@@ -184,7 +184,7 @@ class Subscription<Value> {
 	 * Is the subscription closed?
 	 */
 	get closed(): boolean {
-		return this.#state.closed || !this.#state.emitter.active;
+		return this.#state.closed || !this.#state.beacon.active;
 	}
 
 	/**
@@ -210,20 +210,20 @@ class Subscription<Value> {
 
 type SubscriptionState<Value> = {
 	closed: boolean;
-	emitter: Emitter<Value>;
+	beacon: Beacon<Value>;
 	observers: Map<Subscription<Value>, Observer<Value>>;
 };
 
 /**
- * Create a new emitter
+ * Create a new beacon
  * @param value Initial value
- * @returns Emitter instance
+ * @returns Beacon instance
  */
-export function emitter<Value>(value: Value): Emitter<Value> {
-	return new Emitter(value);
+export function beacon<Value>(value: Value): Beacon<Value> {
+	return new Beacon(value);
 }
 
-function finishEmitter<Value>(state: EmitterState<Value>, emit: boolean): void {
+function finishBeacon<Value>(state: BeaconState<Value>, emit: boolean): void {
 	if (state.active) {
 		state.active = false;
 
@@ -274,4 +274,4 @@ function getObserver<Value>(
 	return observer;
 }
 
-export type {Emitter, Observable, Observer, Subscription};
+export type {Beacon, Observable, Observer, Subscription};
