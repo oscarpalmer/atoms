@@ -1,14 +1,23 @@
+import {getArray} from './array/get';
 import {isNumber} from './internal/is';
 import {getString} from './internal/string';
-import type {ArrayOrPlainObject, Primitive} from './models';
+import type {Primitive} from './models';
 
 /**
- * Is the array or object completely empty, or only containing `null` or `undefined` values?
- * @param value Array or object to check
- * @returns `true` if the value is considered empty, otherwise `false`
+ * Is the value empty, or only containing `null` or `undefined` values?
+ * @param value Object to check
+ * @returns `true` if the object is considered empty, otherwise `false`
  */
-export function isEmpty(value: ArrayOrPlainObject): boolean {
-	const values = Object.values(value);
+export function isEmpty(value: unknown): boolean {
+	if (value == null) {
+		return true;
+	}
+
+	if (typeof value === 'string') {
+		return value.length === 0;
+	}
+
+	const values = getArray(value);
 	const {length} = values;
 
 	for (let index = 0; index < length; index += 1) {

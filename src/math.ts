@@ -1,5 +1,5 @@
-import {aggregate, type OnlyNumericalKeys} from './internal/math/aggregate';
-import type {PlainObject} from './models';
+import {aggregate} from './internal/math/aggregate';
+import type {NumericalValues, PlainObject} from './models';
 
 /**
  * Get the average value from a list of items
@@ -20,7 +20,7 @@ export function average<Item extends PlainObject>(
  */
 export function average<Item extends PlainObject>(
 	items: Item[],
-	key: keyof OnlyNumericalKeys<Item>,
+	key: keyof NumericalValues<Item>,
 ): number;
 
 /**
@@ -119,7 +119,7 @@ export function min<Item extends PlainObject>(
  */
 export function min<Item extends PlainObject>(
 	items: Item[],
-	key: keyof OnlyNumericalKeys<Item>,
+	key: keyof NumericalValues<Item>,
 ): number;
 
 /**
@@ -174,7 +174,7 @@ export function sum<Item extends PlainObject>(
  */
 export function sum<Item extends PlainObject>(
 	items: Item[],
-	key: keyof OnlyNumericalKeys<Item>,
+	key: keyof NumericalValues<Item>,
 ): number;
 
 /**
@@ -190,4 +190,5 @@ export function sum(array: unknown[], key?: unknown): number {
 	return aggregated.count > 0 ? aggregated.value : Number.NaN;
 }
 
-export {max, type OnlyNumericalKeys} from './internal/math/aggregate';
+export {max} from './internal/math/aggregate';
+export type {NumericalValues}

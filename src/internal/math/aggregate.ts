@@ -1,4 +1,4 @@
-import type {GenericCallback, PlainObject} from '../../models';
+import type {GenericCallback, NumericalValues, PlainObject} from '../../models';
 
 type Aggregation = {
 	count: number;
@@ -8,13 +8,6 @@ type Aggregation = {
 type AggregationCallback = (current: number, value: number, notNumber: boolean) => number;
 
 type AggregationType = 'average' | 'max' | 'min' | 'sum';
-
-/**
- * The numerical values of an object
- */
-export type OnlyNumericalKeys<Item> = {
-	[Key in keyof Item as Item[Key] extends number ? Key : never]: Item[Key];
-};
 
 export function aggregate(type: AggregationType, array: unknown[], key: unknown): Aggregation {
 	const length = Array.isArray(array) ? array.length : 0;
@@ -73,7 +66,7 @@ export function max<Item extends PlainObject>(
  */
 export function max<Item extends PlainObject>(
 	items: Item[],
-	key: keyof OnlyNumericalKeys<Item>,
+	key: keyof NumericalValues<Item>,
 ): number;
 
 /**

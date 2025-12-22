@@ -49,6 +49,10 @@ test('isArrayOrPlainObject', () => {
 });
 
 test('isEmpty', () => {
+	for (let index = 0; index < length; index += 1) {
+		expect(isEmpty(values[index])).toBe(index < 3 || index === 4 || index === 15 || index > 17);
+	}
+
 	expect(isEmpty([])).toBe(true);
 	expect(isEmpty([null])).toBe(true);
 	expect(isEmpty([undefined])).toBe(true);
@@ -58,6 +62,13 @@ test('isEmpty', () => {
 	expect(isEmpty({key: null})).toBe(true);
 	expect(isEmpty({key: undefined})).toBe(true);
 	expect(isEmpty({key: 123})).toBe(false);
+
+	expect(isEmpty(new Map())).toBe(true);
+	expect(isEmpty(new Set())).toBe(true);
+	expect(isEmpty(new Map([['key', null]]))).toBe(true);
+	expect(isEmpty(new Set([undefined]))).toBe(true);
+	expect(isEmpty(new Map([['key', 123]]))).toBe(false);
+	expect(isEmpty(new Set([123]))).toBe(false);
 });
 
 test('isKey', () => {

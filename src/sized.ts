@@ -206,6 +206,6 @@ function getMaximum(first?: unknown, second?: unknown): number {
 
 //
 
-const MAXIMUM_ABSOLUTE = 16_777_216;
+const MAXIMUM_ABSOLUTE = 16_777_216; // 2^24
 
-const MAXIMUM_DEFAULT = 1_048_576;
+const MAXIMUM_DEFAULT = 1_048_576; // 2^20

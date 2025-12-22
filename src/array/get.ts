@@ -45,6 +45,10 @@ export function getArray(value: unknown, indiced?: unknown): unknown[] {
 		return value;
 	}
 
+	if (value instanceof Map || value instanceof Set) {
+		return [...value.values()];
+	}
+
 	if (!isPlainObject(value)) {
 		return [value];
 	}

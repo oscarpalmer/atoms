@@ -1,6 +1,9 @@
 import {noop} from './internal/function';
+import {isPlainObject} from './internal/is';
+import type {PlainObject} from './models';
 
 class Beacon<Value> {
+	readonly #options: Options;
 	readonly #state: BeaconState<Value>;
 
 	/**
@@ -14,6 +17,10 @@ class Beacon<Value> {
 	 * The observable that can be subscribed to
 	 */
 	get observable(): Observable<Value> {
+		if (!this.#state.active) {
+			throw new Error(DESTROYED_BEACON);
+		}
+
 		return this.#state.observable;
 	}
 
@@ -24,8 +31,10 @@ class Beacon<Value> {
 		return this.#state.value;
 	}
 
-	constructor(value: Value) {
+	constructor(value: Value, options?: BeaconOptions<Value>) {
 		const observers = new Map<Subscription<Value>, Observer<Value>>();
+
+		this.#options = getBeaconOptions(options);
 
 		this.#state = {
 			observers,
@@ -48,7 +57,7 @@ class Beacon<Value> {
 	 * @param finish Finish the beacon after emitting? _(defaults to `false`)_
 	 */
 	emit(value: Value, finish?: boolean): void {
-		this.#on('next', finish ?? false, value);
+		this.#on('next', value, finish);
 	}
 
 	/**
@@ -57,7 +66,7 @@ class Beacon<Value> {
 	 * @param finish Finish the beacon after emitting? _(defaults to `false`)_
 	 */
 	error(error: Error, finish?: boolean): void {
-		this.#on('error', finish ?? false, error);
+		this.#on('error', error, finish);
 	}
 
 	/**
@@ -67,22 +76,39 @@ class Beacon<Value> {
 		finishBeacon(this.#state, true);
 	}
 
-	#on(type: keyof Observer<never>, finish: boolean, value: Error | Value): void {
-		if (this.#state.active) {
-			if (type === 'next') {
-				this.#state.value = value as Value;
+	#on(type: keyof Observer<never>, value: Error | Value, finish?: boolean): void {
+		if (!this.#state.active) {
+			return;
+		}
+
+		if (type === 'next') {
+			if (this.#options.equal(this.#state.value, value as Value)) {
+				return;
 			}
 
-			for (const [, observer] of this.#state.observers) {
-				observer[type]?.(value as never);
-			}
+			this.#state.value = value as Value;
+		}
 
-			if (finish === true) {
-				finishBeacon(this.#state, true);
-			}
+		for (const [, observer] of this.#state.observers) {
+			observer[type]?.(value as never);
+		}
+
+		if (finish === true) {
+			finishBeacon(this.#state, true);
 		}
 	}
 }
+
+type BeaconOptions<Value> = {
+	/**
+	 * Method for comparing values for equality
+	 * @param first First value
+	 * @param second Second value
+	 * @returns `true` if the values are equal, otherwise `false`
+	 * @default Object.is
+	 */
+	equal?: (first: Value, second: Value) => boolean;
+};
 
 type BeaconState<Value> = {
 	active: boolean;
@@ -94,10 +120,10 @@ type BeaconState<Value> = {
 class Observable<Value> {
 	readonly #state: ObservableState<Value>;
 
-	constructor(emitter: Beacon<Value>, observers: Map<Subscription<Value>, Observer<Value>>) {
+	constructor(instance: Beacon<Value>, observers: Map<Subscription<Value>, Observer<Value>>) {
 		this.#state = {
 			observers,
-			beacon: emitter,
+			beacon: instance,
 			closed: false,
 		};
 	}
@@ -135,7 +161,7 @@ class Observable<Value> {
 		third?: () => void,
 	): Subscription<Value> {
 		if (this.#state.closed) {
-			throw new Error('Cannot subscribe to a destroyed observable');
+			throw new Error(DESTROYED_OBSERVABLE);
 		}
 
 		const observer = getObserver(first, second, third);
@@ -169,6 +195,8 @@ type Observer<Value> = {
 	 */
 	next?: (value: Value) => void;
 };
+
+type Options = Required<BeaconOptions<unknown>>;
 
 class Subscription<Value> {
 	readonly #state: SubscriptionState<Value>;
@@ -214,40 +242,53 @@ type SubscriptionState<Value> = {
 	observers: Map<Subscription<Value>, Observer<Value>>;
 };
 
+//
+
 /**
  * Create a new beacon
  * @param value Initial value
+ * @param options Beacon options
  * @returns Beacon instance
  */
-export function beacon<Value>(value: Value): Beacon<Value> {
-	return new Beacon(value);
+export function beacon<Value>(value: Value, options?: BeaconOptions<Value>): Beacon<Value> {
+	return new Beacon(value, options);
 }
 
 function finishBeacon<Value>(state: BeaconState<Value>, emit: boolean): void {
-	if (state.active) {
-		state.active = false;
+	if (!state.active) {
+		return;
+	}
 
-		const entries = [...state.observers.entries()];
-		const {length} = entries;
+	state.active = false;
 
-		for (let index = 0; index < length; index += 1) {
-			const [subscription, observer] = entries[index];
+	const entries = [...state.observers.entries()];
+	const {length} = entries;
 
-			if (emit) {
-				observer.complete?.();
-			}
+	for (let index = 0; index < length; index += 1) {
+		const [subscription, observer] = entries[index];
 
-			subscription.destroy();
+		if (emit) {
+			observer.complete?.();
 		}
 
-		state.observable?.destroy();
-
-		state.observers.clear();
+		subscription.destroy();
 	}
+
+	state.observable?.destroy();
+
+	state.observers.clear();
 }
 
-function getFunction<Callback>(value: Callback, defaultValue: Callback): Callback {
-	return typeof value === 'function' ? value : defaultValue;
+function getBeaconOptions(input?: BeaconOptions<never>): Options {
+	const options: Partial<Options> = isPlainObject(input) ? (input as PlainObject) : {};
+
+	options.equal = typeof options.equal === 'function' ? options.equal : Object.is;
+
+	return options as Options;
+}
+
+function getObservableCallback<Callback>(value: Callback): Callback {
+	return typeof value === 'function' ? value : (noop as Callback);
 }
 
 function getObserver<Value>(
@@ -261,17 +302,23 @@ function getObserver<Value>(
 
 	if (typeof first === 'function') {
 		observer = {
-			error: getFunction(second, noop),
-			next: getFunction(first, noop),
-			complete: getFunction(third, noop),
+			error: getObservableCallback(second),
+			next: getObservableCallback(first),
+			complete: getObservableCallback(third),
 		};
 	} else if (typeof first === 'object') {
-		observer.complete = getFunction(first?.complete, noop);
-		observer.error = getFunction(first?.error, noop);
-		observer.next = getFunction(first?.next, noop);
+		observer.complete = getObservableCallback(first?.complete);
+		observer.error = getObservableCallback(first?.error);
+		observer.next = getObservableCallback(first?.next);
 	}
 
 	return observer;
 }
+
+//
+
+const DESTROYED_BEACON = 'Cannot retrieve observable from a destroyed beacon';
+
+const DESTROYED_OBSERVABLE = 'Cannot subscribe to a destroyed observable';
 
 export type {Beacon, Observable, Observer, Subscription};

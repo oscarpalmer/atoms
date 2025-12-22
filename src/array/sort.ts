@@ -1,5 +1,5 @@
 import {compare} from '../internal/value/compare';
-import {isPlainObject} from '../is';
+import {isPlainObject} from '../internal/is';
 import type {GenericCallback, PlainObject, Primitive} from '../models';
 import type {CallbackSorter, KeySorter} from './models';
 

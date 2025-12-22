@@ -1,7 +1,8 @@
 import {expect, test} from 'vitest';
 import {beacon} from '../src/beacon';
+import {equal} from '../src/internal/value/equal';
 
-test('emitter', () =>
+test('beacon', () =>
 	new Promise<void>(done => {
 		const value = beacon(0);
 
@@ -14,21 +15,15 @@ test('emitter', () =>
 		setTimeout(() => {
 			expect(value.active).toBe(false);
 
-			try {
-				// oxlint-disable-next-line no-unused-expressions: Testing
-				value.observable;
-			} catch (error: unknown) {
-				expect(error).toBeInstanceOf(Error);
-				expect((error as Error)?.message).toBe(
-					'Cannot retrieve observable from a destroyed emitter',
-				);
-			}
+			expect(() => value.observable).toThrowError(
+				'Cannot retrieve observable from a destroyed beacon',
+			);
 
-			done();
+			setTimeout(done);
 		});
 	}));
 
-test('emitter: observable + subscription', () =>
+test('observable + subscription', () =>
 	new Promise<void>(done => {
 		const first = beacon(0);
 		const second = beacon(0);
@@ -71,7 +66,9 @@ test('emitter: observable + subscription', () =>
 			},
 		);
 
-		let three = third.observable.subscribe({});
+		const thirdObservable = third.observable;
+
+		let three = thirdObservable.subscribe({});
 
 		first.observable.subscribe('blah' as never);
 
@@ -129,7 +126,7 @@ test('emitter: observable + subscription', () =>
 		}, 50);
 
 		setTimeout(() => {
-			three = third.observable.subscribe({});
+			three = thirdObservable.subscribe({});
 
 			third.destroy();
 		}, 75);
@@ -142,15 +139,49 @@ test('emitter: observable + subscription', () =>
 			third.error(new Error('test'));
 			third.finish();
 
-			const thirdObservable = third.observable;
+			expect(() => thirdObservable.subscribe({})).toThrowError(
+				'Cannot subscribe to a destroyed observable',
+			);
 
-			try {
-				thirdObservable.subscribe({});
-			} catch (error: unknown) {
-				expect(error).toBeInstanceOf(Error);
-				expect((error as Error)?.message).toBe('Cannot subscribe to a destroyed observable');
-			}
-
-			done();
+			setTimeout(done, 25);
 		}, 100);
 	}));
+
+test('options', () => {
+	const counts = {
+		first: 0,
+		second: 0,
+	};
+
+	const beacons = {
+		first: beacon<number[]>([], {
+			equal: 'blah' as never,
+		}),
+		second: beacon<number[]>([], {
+			equal,
+		}),
+	};
+
+	beacons.first.observable.subscribe(() => {
+		counts.first += 1;
+	});
+
+	beacons.second.observable.subscribe(() => {
+		counts.second += 1;
+	});
+
+	expect(counts.first).toBe(1);
+	expect(counts.second).toBe(1);
+
+	beacons.first.emit([1, 2, 3]);
+	beacons.second.emit([1, 2, 3]);
+
+	expect(counts.first).toBe(2);
+	expect(counts.second).toBe(2);
+
+	beacons.first.emit([1, 2, 3]);
+	beacons.second.emit([1, 2, 3]);
+
+	expect(counts.first).toBe(3);
+	expect(counts.second).toBe(2);
+});
