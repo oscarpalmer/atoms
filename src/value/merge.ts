@@ -2,10 +2,30 @@ import {isArrayOrPlainObject} from '../internal/is';
 import {join} from '../internal/string';
 import type {ArrayOrPlainObject, NestedPartial, PlainObject} from '../models';
 
+type Merge = {
+	/**
+	 * Merge multiple arrays or objects into a single one
+	 * @param values Values to merge
+	 * @param options Merging options
+	 * @returns Merged value
+	 */
+	<Model extends ArrayOrPlainObject>(
+		values: NestedPartial<Model>[],
+		options?: Partial<MergeOptions>,
+	): Model;
+
+	/**
+	 * Create a merger with predefined options
+	 * @param options Merging options
+	 * @returns Merger function
+	 */
+	initialize(options?: Partial<MergeOptions>): Merger;
+};
+
 /**
  * Options for merging values
  */
-export type MergeOptions = {
+type MergeOptions = {
 	/**
 	 * Key _(or key epxressions)_ for values that should be replaced
 	 * ```ts
@@ -22,6 +42,15 @@ export type MergeOptions = {
 	skipNullableInArrays: boolean;
 };
 
+/**
+ * Merge multiple arrays or objects into a single one
+ * @param values Values to merge
+ * @returns Merged value
+ */
+type Merger<Model extends ArrayOrPlainObject = ArrayOrPlainObject> = (
+	values: NestedPartial<Model>[],
+) => Model;
+
 type Options = {
 	replaceableObjects: ReplaceableObjectsCallback | undefined;
 	skipNullableInArrays: boolean;
@@ -29,7 +58,7 @@ type Options = {
 
 type ReplaceableObjectsCallback = (name: string) => boolean;
 
-function getOptions(options?: Partial<MergeOptions>): Options {
+function getMergeOptions(options?: Partial<MergeOptions>): Options {
 	const actual: Options = {
 		replaceableObjects: undefined,
 		skipNullableInArrays: false,
@@ -57,22 +86,23 @@ function getReplaceableObjects(value: unknown): ReplaceableObjectsCallback | und
 	}
 }
 
-/**
- * Merge multiple arrays or objects into a single one
- * @param values Values to merge
- * @param options Merging options
- * @returns Merged value
- */
-export function merge<Model extends ArrayOrPlainObject>(
+function handleMerge(values: ArrayOrPlainObject[], options: Options): ArrayOrPlainObject {
+	return !Array.isArray(values) || values.length === 0 ? {} : mergeValues(values, options, true);
+}
+
+const merge = (<Model extends ArrayOrPlainObject>(
 	values: NestedPartial<Model>[],
 	options?: Partial<MergeOptions>,
-): Model {
-	if (!Array.isArray(values) || values.length === 0) {
-		return {} as Model;
-	}
+): Model => {
+	return handleMerge(values, getMergeOptions(options)) as Model;
+}) as Merge;
 
-	return mergeValues(values, getOptions(options), true) as Model;
-}
+merge.initialize = (options?: Partial<MergeOptions>): Merger => {
+	const actual = getMergeOptions(options);
+
+	return <Model extends ArrayOrPlainObject>(values: NestedPartial<Model>[]): Model =>
+		handleMerge(values, actual) as Model;
+};
 
 function mergeObjects(
 	values: ArrayOrPlainObject[],
@@ -124,3 +154,5 @@ function mergeValues(
 
 	return actual.length > 1 ? mergeObjects(actual, options, prefix) : (actual[0] ?? {});
 }
+
+export {merge};

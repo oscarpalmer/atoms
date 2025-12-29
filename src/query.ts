@@ -119,7 +119,7 @@ const EXPRESSION_ARRAY_SUFFIX = /\[\]$/;
 
 const EXPRESSION_BOOLEAN = /^(false|true)$/;
 
-const TYPES: Set<string> = new Set(['boolean', 'number', 'string']);
+const TYPES = new Set(['boolean', 'number', 'string']);
 
 //
 

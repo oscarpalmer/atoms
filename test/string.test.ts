@@ -4,6 +4,7 @@ import {
 	capitalize,
 	createUuid,
 	getString,
+	getUuid,
 	join,
 	kebabCase,
 	parse,
@@ -82,7 +83,7 @@ test(
 			let index = 0;
 
 			for (; index < length; index += 1) {
-				ids.add(createUuid());
+				ids.add(index % 2 === 0 ? createUuid() : getUuid());
 			}
 
 			expect(ids.size).toBe(length);
@@ -201,6 +202,8 @@ test('template', () => {
 	const basic = '{{a.0.b.1.c}}, {{a.0.b.1.c}}!';
 	const custom = '<a.0.b.1.c>, <a.0.b.1.c>!';
 
+	const templater = template.initialize();
+
 	const variables = {
 		a: [
 			{
@@ -215,7 +218,7 @@ test('template', () => {
 	};
 
 	expect(template(basic, variables)).toBe(', !');
-	expect(template(custom, variables)).toBe('<a.0.b.1.c>, <a.0.b.1.c>!');
+	expect(templater(custom, variables)).toBe('<a.0.b.1.c>, <a.0.b.1.c>!');
 
 	expect(
 		template(basic, variables, {
@@ -257,6 +260,9 @@ test('truncate', () => {
 	expect(truncate('Hello, world!', -99)).toBe('');
 	expect(truncate('Hello, world!', 'blah' as never)).toBe('');
 	expect(truncate('Hello, world!', 5, 123 as never)).toBe('Hello');
+
+	expect(truncate('blah', 10)).toBe('blah');
+	expect(truncate('blah', 1, '…')).toBe('…');
 });
 
 test('titleCase', () => {

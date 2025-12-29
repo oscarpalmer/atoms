@@ -1,12 +1,6 @@
 import {isNumber} from './is';
 
-/**
- * Get a random floating-point number
- * @param minimum Minimum value
- * @param maximum Maximum value
- * @returns Random floating-point number
- */
-export function getRandomFloat(minimum?: number, maximum?: number): number {
+function _getRandomFloat(inclusive: boolean, minimum?: number, maximum?: number): number {
 	let maxFloat =
 		isNumber(maximum) && maximum <= Number.MAX_SAFE_INTEGER ? maximum : Number.MAX_SAFE_INTEGER;
 
@@ -21,7 +15,17 @@ export function getRandomFloat(minimum?: number, maximum?: number): number {
 		[minFloat, maxFloat] = [maxFloat, minFloat];
 	}
 
-	return Math.random() * (maxFloat + 1 - minFloat) + minFloat;
+	return Math.random() * (maxFloat + (inclusive ? 1 : 0) - minFloat) + minFloat;
+}
+
+/**
+ * Get a random floating-point number
+ * @param minimum Minimum value
+ * @param maximum Maximum value
+ * @returns Random floating-point number
+ */
+export function getRandomFloat(minimum?: number, maximum?: number): number {
+	return _getRandomFloat(false, minimum, maximum);
 }
 
 /**
@@ -31,5 +35,5 @@ export function getRandomFloat(minimum?: number, maximum?: number): number {
  * @returns Random integer
  */
 export function getRandomInteger(minimum?: number, maximum?: number): number {
-	return Math.floor(getRandomFloat(minimum, maximum));
+	return Math.floor(_getRandomFloat(true, minimum, maximum));
 }

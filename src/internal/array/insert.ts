@@ -21,7 +21,9 @@ function insertChunkedValues(
 	let index = Number(chunked.length);
 	let returned: unknown[] | undefined;
 
-	while (--index >= 0) {
+	while (index > 0) {
+		index -= 1;
+
 		const result = array.splice(
 			actualStart,
 			index === lastIndex ? actualDeleteCount : 0,
@@ -51,11 +53,12 @@ export function insertValues(
 ): unknown {
 	const spliceArray = type === 'insert' || type === 'splice';
 
-	if (!Array.isArray(array) || typeof start !== 'number') {
-		return spliceArray ? [] : 0;
-	}
-
-	if (!Array.isArray(items) || items.length === 0) {
+	if (
+		!Array.isArray(array) ||
+		typeof start !== 'number' ||
+		!Array.isArray(items) ||
+		items.length === 0
+	) {
 		return spliceArray ? [] : 0;
 	}
 

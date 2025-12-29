@@ -11,13 +11,13 @@ function calculate(): Promise<number> {
 
 			last = now;
 
-			if (values.length >= CALCULATION_TOTAL) {
+			if (values.length >= TOTAL) {
 				const median =
 					values
 						.sort()
-						.slice(CALCULATION_TRIM_PART, -CALCULATION_TRIM_PART)
+						.slice(TRIM_PART, -TRIM_PART)
 						.reduce((first, second) => first + second, 0) /
-					(values.length - CALCULATION_TRIM_TOTAL);
+					(values.length - TRIM_TOTAL);
 
 				resolve(median);
 			} else {
@@ -31,23 +31,19 @@ function calculate(): Promise<number> {
 
 //
 
-const CALCULATION_TOTAL = 10;
+const TOTAL = 10;
 
-const CALCULATION_TRIM_PART = 2;
+const TRIM_PART = 2;
 
-const CALCULATION_TRIM_TOTAL = 4;
-
-const DEFAULT_FPS = 60;
-
-const MILLISECONDS_IN_SECOND = 1000;
+const TRIM_TOTAL = 4;
 
 /**
  * A calculated average of the refresh rate of the display _(in milliseconds)_
  */
-let FRAME_RATE_MS = MILLISECONDS_IN_SECOND / DEFAULT_FPS;
+const FRAME_RATE_MS = await calculate();
 
-calculate().then(value => {
+/* calculate().then(value => {
 	FRAME_RATE_MS = value;
-});
+}); */
 
 export default FRAME_RATE_MS;

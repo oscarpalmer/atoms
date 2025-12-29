@@ -36,10 +36,19 @@ function flattenObject(
 		const val = value[key as never];
 
 		if (isArrayOrPlainObject(val)) {
-			Object.assign(flattened, {
-				[join([prefix, key], '.')]: Array.isArray(val) ? [...val] : {...val},
-				...flattenObject(val, depth + 1, smushed, join([prefix, key], '.')),
-			});
+			const prefixedKey = join([prefix, key], '.');
+
+			flattened[prefixedKey] = Array.isArray(val) ? [...val] : {...val};
+
+			const nested = flattenObject(val, depth + 1, smushed, prefixedKey);
+			const nestedKeys = Object.keys(nested);
+			const nestedLength = nestedKeys.length;
+
+			for (let nestedIndex = 0; nestedIndex < nestedLength; nestedIndex += 1) {
+				const nestedKey = nestedKeys[nestedIndex];
+
+				flattened[nestedKey] = nested[nestedKey];
+			}
 		} else {
 			flattened[join([prefix, key], '.')] = val;
 		}

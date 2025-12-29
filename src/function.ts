@@ -1,5 +1,6 @@
 import FRAME_RATE_MS from './internal/frame-rate';
 import {getString, join} from './internal/string';
+import {isPlainObject} from './is';
 import type {GenericCallback} from './models';
 import {SizedMap} from './sized';
 
@@ -27,11 +28,13 @@ class Memoized<Callback extends GenericCallback> {
 		return this.#state.cache?.size ?? Number.NaN;
 	}
 
-	constructor(callback: Callback, size: number) {
-		const cache = new SizedMap<unknown, ReturnType<Callback>>(size);
+	constructor(callback: Callback, options: Options) {
+		const cache = new SizedMap<unknown, ReturnType<Callback>>(options.cacheSize);
 
 		const getter = (...parameters: Parameters<Callback>): ReturnType<Callback> => {
-			const key = parameters.length === 1 ? parameters[0] : join(parameters.map(getString), '_');
+			const key =
+				options.cacheKey?.(...parameters) ??
+				(parameters.length === 1 ? parameters[0] : join(parameters.map(getString), '_'));
 
 			if (cache.has(key)) {
 				return cache.get(key) as ReturnType<Callback>;
@@ -105,10 +108,28 @@ class Memoized<Callback extends GenericCallback> {
 	}
 }
 
+type MemoizedOptions<Callback extends GenericCallback> = {
+	/**
+	 * Callback for getting a cache key for the provided parameters
+	 */
+	cacheKey?: (...parameters: Parameters<Callback>) => unknown;
+	/**
+	 * Size of the cache
+	 */
+	cacheSize?: number;
+};
+
 type MemoizedState<Callback extends GenericCallback> = {
 	cache?: SizedMap<unknown, ReturnType<Callback>>;
 	getter?: (...parameters: Parameters<Callback>) => ReturnType<Callback>;
 };
+
+type Options = {
+	cacheKey?: GenericCallback;
+	cacheSize: number;
+};
+
+//
 
 /**
  * Debounce a function, ensuring it is only called after `time` milliseconds have passed
@@ -122,10 +143,22 @@ export function debounce<Callback extends GenericCallback>(
 	callback: Callback,
 	time?: number,
 ): CancellableCallback<Callback> {
+	return getLimiter(callback, false, time);
+}
+
+function getLimiter<Callback extends GenericCallback>(
+	callback: Callback,
+	throttler: boolean,
+	time?: number,
+): CancellableCallback<Callback> {
 	const interval = typeof time === 'number' && time >= FRAME_RATE_MS ? time : FRAME_RATE_MS;
 
 	function step(now: DOMHighResTimeStamp, parameters: Parameters<Callback>): void {
-		if (interval === FRAME_RATE_MS || now - start >= interval) {
+		if (interval === FRAME_RATE_MS || now - timestamp >= interval) {
+			if (throttler) {
+				timestamp = now;
+			}
+
 			callback(...parameters);
 		} else {
 			frame = requestAnimationFrame(next => {
@@ -135,19 +168,19 @@ export function debounce<Callback extends GenericCallback>(
 	}
 
 	let frame: DOMHighResTimeStamp | undefined;
-	let start: DOMHighResTimeStamp;
+	let timestamp: DOMHighResTimeStamp;
 
-	const debounced = (...parameters: Parameters<Callback>): void => {
-		debounced.cancel();
+	const limiter = (...parameters: Parameters<Callback>): void => {
+		limiter.cancel();
 
 		frame = requestAnimationFrame(now => {
-			start = now - FRAME_RATE_MS;
+			timestamp ??= now - FRAME_RATE_MS;
 
 			step(now, parameters);
 		});
 	};
 
-	debounced.cancel = (): void => {
+	limiter.cancel = (): void => {
 		if (frame != null) {
 			cancelAnimationFrame(frame);
 
@@ -155,23 +188,31 @@ export function debounce<Callback extends GenericCallback>(
 		}
 	};
 
-	return debounced as CancellableCallback<Callback>;
+	return limiter as CancellableCallback<Callback>;
+}
+
+function getMemoizationOptions<Callback extends GenericCallback>(
+	input?: MemoizedOptions<Callback>,
+): Options {
+	const {cacheKey, cacheSize} = isPlainObject(input) ? (input as MemoizedOptions<Callback>) : {};
+
+	return {
+		cacheKey: typeof cacheKey === 'function' ? cacheKey : undefined,
+		cacheSize: typeof cacheSize === 'number' && cacheSize > 0 ? cacheSize : DEFAULT_CACHE_SIZE,
+	};
 }
 
 /**
  * Memoize a function, caching and retrieving results based on the first parameter
  * @param callback Callback to memoize
- * @param cacheSize Size of the cache
+ * @param options Memoization options
  * @returns Memoized instance
  */
 export function memoize<Callback extends GenericCallback>(
 	callback: Callback,
-	cacheSize?: number,
+	options?: MemoizedOptions<Callback>,
 ): Memoized<Callback> {
-	return new Memoized(
-		callback,
-		typeof cacheSize === 'number' && cacheSize > 0 ? cacheSize : DEFAULT_CACHE_SIZE,
-	);
+	return new Memoized(callback, getMemoizationOptions(options));
 }
 
 /**
@@ -184,43 +225,7 @@ export function throttle<Callback extends GenericCallback>(
 	callback: Callback,
 	time?: number,
 ): CancellableCallback<Callback> {
-	const interval = typeof time === 'number' && time >= FRAME_RATE_MS ? time : FRAME_RATE_MS;
-
-	function step(now: DOMHighResTimeStamp, parameters: Parameters<Callback>): void {
-		if (interval === FRAME_RATE_MS || now - last >= interval) {
-			last = now;
-
-			callback(...parameters);
-		} else {
-			frame = requestAnimationFrame(next => {
-				step(next, parameters);
-			});
-		}
-	}
-
-	let last: number;
-
-	let frame: DOMHighResTimeStamp | undefined;
-
-	const throttler = (...parameters: Parameters<Callback>): void => {
-		throttler.cancel();
-
-		frame = requestAnimationFrame(now => {
-			last ??= now - FRAME_RATE_MS;
-
-			step(now, parameters);
-		});
-	};
-
-	throttler.cancel = (): void => {
-		if (frame != null) {
-			cancelAnimationFrame(frame);
-
-			frame = undefined;
-		}
-	};
-
-	return throttler as CancellableCallback<Callback>;
+	return getLimiter(callback, true, time);
 }
 
 export type {CancellableCallback, GenericCallback, Memoized};
@@ -228,4 +233,4 @@ export {noop} from './internal/function';
 
 //
 
-const DEFAULT_CACHE_SIZE = 65_536;
+const DEFAULT_CACHE_SIZE = 1024;

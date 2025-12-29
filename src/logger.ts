@@ -84,9 +84,35 @@ class Logger {
 }
 
 class Time {
+	#logger: typeof console.timeLog | undefined;
+	#stopper: typeof console.timeEnd | undefined;
+
 	readonly #state: TimeState;
 
+	get active(): boolean {
+		return this.#state.started && !this.#state.stopped && enabled;
+	}
+
+	/**
+	 * Log the current duration of the timer _(ignored if logging is disabled)_
+	 */
+	get log(): () => void {
+		return this.active ? this.#logger! : noop;
+	}
+
+	/**
+	 * Stop the timer and logs the total duration
+	 *
+	 * _(Will always log the total duration, even if logging is disabled)_
+	 */
+	get stop(): () => void {
+		return this.active ? this.#stopTimer() : noop;
+	}
+
 	constructor(label: string) {
+		this.#logger = console.timeLog.bind(console, label);
+		this.#stopper = console.timeEnd.bind(console, label);
+
 		this.#state = {
 			label,
 			started: enabled,
@@ -98,26 +124,15 @@ class Time {
 		}
 	}
 
-	/**
-	 * Log the current duration of the timer _(ignored if logging is disabled)_
-	 */
-	log(): void {
-		if (this.#state.started && !this.#state.stopped && enabled) {
-			console.timeLog(this.#state.label);
-		}
-	}
+	#stopTimer(): () => void {
+		const stopper = this.#stopper!;
 
-	/**
-	 * Stop the timer and logs the total duration
-	 *
-	 * _(Will always log the total duration, even if logging is disabled)_
-	 */
-	stop(): void {
-		if (this.#state.started && !this.#state.stopped) {
-			this.#state.stopped = true;
+		this.#state.stopped = true;
 
-			console.timeEnd(this.#state.label);
-		}
+		this.#logger = undefined;
+		this.#stopper = undefined;
+
+		return stopper;
 	}
 }
 
@@ -127,6 +142,10 @@ type TimeState = {
 	stopped: boolean;
 };
 
-const logger: Logger = new Logger();
+//
+
+const logger = new Logger();
+
+//
 
 export {logger, type Logger, type Time};

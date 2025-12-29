@@ -1,14 +1,34 @@
 /**
  * Create a new UUID-string
+ * @deprecated Use {@link getUuid} instead
  * @returns UUID string
  */
 export function createUuid(): string {
-	return TEMPLATE_UUID.replace(EXPRESSION_UUID_PART, (substring: string) => {
-		const digit = Number.parseInt(substring, 10);
-		const random = crypto.getRandomValues(new Uint8Array(1))[0];
+	return getUuid();
+}
 
-		return (digit ^ (random & (15 >> (digit / 4)))).toString(16);
-	});
+/**
+ * Get a new UUID-string _(version 4)_
+ * @returns UUID string
+ */
+export function getUuid(): string {
+	const bytes = new Uint8Array(16);
+
+	crypto.getRandomValues(bytes);
+
+	bytes[6] = (bytes[6] & 0x0f) | 0x40;
+
+	bytes[8] = (bytes[8] & 0x3f) | 0x80;
+
+	const hex = Array.from(bytes, byte => byte.toString(16).padStart(2, '0')).join('');
+
+	return [
+		hex.substring(0, 8),
+		hex.substring(8, 12),
+		hex.substring(12, 16),
+		hex.substring(16, 20),
+		hex.substring(20, 32),
+	].join('-');
 }
 
 /**
@@ -36,7 +56,7 @@ export function parse(
  * @returns Truncated string
  */
 export function truncate(value: string, length: number, suffix?: string): string {
-	if (typeof value !== 'string' || typeof length !== 'number' || length <= 0) {
+	if (typeof value !== 'string' || typeof length !== 'number' || length === 0) {
 		return '';
 	}
 
@@ -45,13 +65,13 @@ export function truncate(value: string, length: number, suffix?: string): string
 	}
 
 	const actualSuffix = typeof suffix === 'string' ? suffix : '';
-	const truncatedLength = length - actualSuffix.length;
+	const actualSuffixLength = actualSuffix.length;
+
+	if (length <= actualSuffixLength) {
+		return actualSuffix;
+	}
+
+	const truncatedLength = length - actualSuffixLength;
 
 	return `${value.slice(0, truncatedLength)}${actualSuffix}`;
 }
-
-//
-
-const EXPRESSION_UUID_PART = /[018]/g;
-
-const TEMPLATE_UUID = '10000000-1000-4000-8000-100000000000';

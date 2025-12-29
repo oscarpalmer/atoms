@@ -16,19 +16,22 @@ export function compact<Item>(
  */
 export function compact<Item>(array: Item[]): Exclude<Item, null | undefined>[];
 
-export function compact<Item>(array: Item[], strict?: boolean): Item[] {
+export function compact<Item>(array: Item[], strict?: unknown): Item[] {
 	if (!Array.isArray(array)) {
 		return [];
 	}
 
+	if (strict === true) {
+		return array.filter(Boolean);
+	}
+
 	const {length} = array;
-	const isStrict = strict ?? false;
 	const compacted: Item[] = [];
 
 	for (let index = 0; index < length; index += 1) {
 		const item = array[index];
 
-		if ((isStrict && !!item) || (!isStrict && item != null)) {
+		if (item != null) {
 			compacted.push(item);
 		}
 	}

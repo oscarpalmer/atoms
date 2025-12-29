@@ -38,7 +38,7 @@ const foregrounds = [
 	'ffffff',
 	'ffffff',
 	'000000',
-	'000000',
+	'ffffff',
 	'ffffff',
 	'ffffff',
 	'ffffff',

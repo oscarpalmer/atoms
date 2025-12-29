@@ -63,7 +63,7 @@ test('debounce', () =>
 test('memoize', () => {
 	const memoized = memoize((value: number) => value * 2);
 
-	expect(memoized.maximum).toBe(2 ** 16);
+	expect(memoized.maximum).toBe(1024);
 	expect(memoized.size).toBe(0);
 
 	expect(memoized.has(2)).toBe(false);
@@ -145,14 +145,42 @@ test('memoize', () => {
 	expect(keyed.get('a_3')).toBeUndefined();
 	expect(keyed.get('b_3')).toBeUndefined();
 
+	const callbacked = memoize(value => value ** 2, {
+		cacheKey: value => value % 2 === 0,
+	});
+
+	expect(callbacked.run(2)).toBe(4);
+	expect(callbacked.run(4)).toBe(4);
+	expect(callbacked.run(3)).toBe(9);
+	expect(callbacked.run(5)).toBe(9);
+
+	expect(callbacked.size).toBe(2);
+
+	expect(callbacked.has(true)).toBe(true);
+	expect(callbacked.has(false)).toBe(true);
+
+	expect(callbacked.get(true)).toBe(4);
+	expect(callbacked.get(false)).toBe(9);
+
+	callbacked.delete(true);
+	callbacked.delete(false);
+
+	expect(callbacked.size).toBe(0);
+
+	expect(callbacked.has(true)).toBe(false);
+	expect(callbacked.has(false)).toBe(false);
+
+	expect(callbacked.get(true)).toBeUndefined();
+	expect(callbacked.get(false)).toBeUndefined();
+
 	// Defaults
 
-	expect(memoize(noop).maximum).toBe(2 ** 16);
-	expect(memoize(noop, 128).maximum).toBe(128);
-	expect(memoize(noop, 0).maximum).toBe(2 ** 16);
-	expect(memoize(noop, -1).maximum).toBe(2 ** 16);
-	expect(memoize(noop, 'blah' as never).maximum).toBe(2 ** 16);
-	expect(memoize(noop, {} as never).maximum).toBe(2 ** 16);
+	expect(memoize(noop).maximum).toBe(1024);
+	expect(memoize(noop, {cacheSize: 128}).maximum).toBe(128);
+	expect(memoize(noop, 0 as never).maximum).toBe(1024);
+	expect(memoize(noop, {cacheSize: -1}).maximum).toBe(1024);
+	expect(memoize(noop, {cacheSize: 'blah' as never}).maximum).toBe(1024);
+	expect(memoize(noop, {}).maximum).toBe(1024);
 
 	try {
 		memoized.run(2);

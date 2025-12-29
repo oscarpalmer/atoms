@@ -283,9 +283,11 @@ test('merge', () => {
 		hobbies: ['Wrestling'],
 	};
 
-	const merged = merge([first, second, third, fourth], {
+	const merger = merge.initialize({
 		replaceableObjects: 'cars',
 	});
+
+	const merged = merger([first, second, third, fourth]);
 
 	expect(merged).toEqual({
 		age: 99,
@@ -382,7 +384,7 @@ test('partial', () => {
 				b: true,
 				c: 'abc',
 			},
-			['b'],
+			['b', 'd' as never],
 		),
 	).toEqual({
 		b: true,

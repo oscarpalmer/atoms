@@ -1,4 +1,17 @@
+import {memoize, type Memoized} from '../function';
 import {join, words} from '../internal/string';
+
+//
+
+type Case = 'camel' | 'kebab' | 'pascal' | 'snake';
+
+type Options = {
+	capitalizeAny: boolean;
+	capitalizeFirst: boolean;
+	type: Case;
+};
+
+//
 
 /**
  * Convert a string to camel case _(thisIsCamelCase)_
@@ -6,7 +19,7 @@ import {join, words} from '../internal/string';
  * @returns Camel-cased string
  */
 export function camelCase(value: string): string {
-	return toCase(value, '', true, false);
+	return toCase(TYPE_CAMEL, value, true, false);
 }
 
 /**
@@ -19,9 +32,13 @@ export function capitalize(value: string): string {
 		return '';
 	}
 
-	return value.length === 1
-		? value.toLocaleUpperCase()
-		: `${value.charAt(0).toLocaleUpperCase()}${value.slice(1).toLocaleLowerCase()}`;
+	memoizedCapitalize ??= memoize(v =>
+		v.length === 1
+			? v.toLocaleUpperCase()
+			: `${v.charAt(0).toLocaleUpperCase()}${v.slice(1).toLocaleLowerCase()}`,
+	);
+
+	return memoizedCapitalize.run(value);
 }
 
 /**
@@ -30,7 +47,7 @@ export function capitalize(value: string): string {
  * @returns Kebab-cased string
  */
 export function kebabCase(value: string): string {
-	return toCase(value, '-', false, false);
+	return toCase(TYPE_KEBAB, value, false, false);
 }
 
 /**
@@ -39,7 +56,7 @@ export function kebabCase(value: string): string {
  * @returns Pascal-cased string
  */
 export function pascalCase(value: string): string {
-	return toCase(value, '', true, true);
+	return toCase(TYPE_PASCAL, value, true, true);
 }
 
 /**
@@ -48,7 +65,7 @@ export function pascalCase(value: string): string {
  * @returns Snake-cased string
  */
 export function snakeCase(value: string): string {
-	return toCase(value, '_', false, false);
+	return toCase(TYPE_SNAKE, value, false, false);
 }
 
 /**
@@ -61,15 +78,25 @@ export function titleCase(value: string): string {
 		return '';
 	}
 
-	return value.length < 1 ? capitalize(value) : join(words(value).map(capitalize), ' ');
+	memoizedTitleCase ??= memoize(v =>
+		v.length < 1 ? capitalize(v) : join(words(v).map(capitalize), ' '),
+	);
+
+	return memoizedTitleCase.run(value);
 }
 
 function toCase(
+	type: Case,
 	value: string,
-	delimiter: string,
 	capitalizeAny: boolean,
 	capitalizeFirst: boolean,
 ): string {
+	memoizers[type] ??= memoize(toCaseCallback.bind({type, capitalizeAny, capitalizeFirst}));
+
+	return memoizers[type].run(value);
+}
+
+function toCaseCallback(this: Options, value: string): string {
 	if (typeof value !== 'string') {
 		return '';
 	}
@@ -77,6 +104,8 @@ function toCase(
 	if (value.length < 1) {
 		return value;
 	}
+
+	const {capitalizeAny, capitalizeFirst, type} = this;
 
 	const parts = words(value);
 	const partsLength = parts.length;
@@ -90,7 +119,7 @@ function toCase(
 			three === 's' ? full : `${one}-${two}${three}`,
 		);
 
-		const camelCaseParts = acronymParts.replace(EXPRESSION_CAMEL_CASE, '$1-$2');
+		const camelCaseParts = acronymParts.replace(EXPRESSION_CAMEL_CASE, REPLACEMENT_CAMEL_CASE);
 
 		const items = camelCaseParts.split('-');
 		const itemsLength = items.length;
@@ -115,10 +144,10 @@ function toCase(
 			itemCount += 1;
 		}
 
-		result.push(join(partResult, delimiter));
+		result.push(join(partResult, delimiters[type]));
 	}
 
-	return join(result, delimiter);
+	return join(result, delimiters[type]);
 }
 
 //
@@ -126,3 +155,28 @@ function toCase(
 const EXPRESSION_CAMEL_CASE = /(\p{Ll})(\p{Lu})/gu;
 
 const EXPRESSION_ACRONYM = /(\p{Lu}*)(\p{Lu})(\p{Ll}+)/gu;
+
+const REPLACEMENT_CAMEL_CASE = '$1-$2';
+
+const TYPE_CAMEL = 'camel';
+
+const TYPE_KEBAB = 'kebab';
+
+const TYPE_PASCAL = 'pascal';
+
+const TYPE_SNAKE = 'snake';
+
+//
+
+const delimiters: Record<Case, string> = {
+	[TYPE_CAMEL]: '',
+	[TYPE_KEBAB]: '-',
+	[TYPE_PASCAL]: '',
+	[TYPE_SNAKE]: '_',
+};
+
+const memoizers: Partial<Record<Case, Memoized<typeof toCaseCallback>>> = {};
+
+let memoizedCapitalize: Memoized<(value: string) => string>;
+
+let memoizedTitleCase: Memoized<(value: string) => string>;

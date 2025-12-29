@@ -7,7 +7,7 @@ type Aggregation = {
 
 type AggregationCallback = (current: number, value: number, notNumber: boolean) => number;
 
-type AggregationType = 'average' | 'max' | 'min' | 'sum';
+export type AggregationType = 'average' | 'max' | 'min' | 'sum';
 
 export function aggregate(type: AggregationType, array: unknown[], key: unknown): Aggregation {
 	const length = Array.isArray(array) ? array.length : 0;
@@ -77,11 +77,21 @@ export function max<Item extends PlainObject>(
 export function max(values: number[]): number;
 
 export function max(array: unknown[], key?: unknown): number {
-	return aggregate('max', array, key).value;
+	return getAggregated('max', array, key);
 }
 
 function calculateSum(current: number, value: number, notNumber: boolean): number {
 	return notNumber ? value : current + value;
+}
+
+export function getAggregated(
+	type: Exclude<AggregationType, 'average'>,
+	array: unknown[],
+	key?: unknown,
+): number {
+	const aggregated = aggregate(type, array, key);
+
+	return aggregated.count > 0 ? aggregated.value : Number.NaN;
 }
 
 //

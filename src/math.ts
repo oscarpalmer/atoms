@@ -1,4 +1,4 @@
-import {aggregate} from './internal/math/aggregate';
+import {aggregate, getAggregated} from './internal/math/aggregate';
 import type {NumericalValues, PlainObject} from './models';
 
 /**
@@ -130,9 +130,7 @@ export function min<Item extends PlainObject>(
 export function min(values: number[]): number;
 
 export function min(array: unknown[], key?: unknown): number {
-	const aggregated = aggregate('min', array, key);
-
-	return aggregated.count > 0 ? aggregated.value : Number.NaN;
+	return getAggregated('min', array, key);
 }
 
 /**
@@ -185,10 +183,8 @@ export function sum<Item extends PlainObject>(
 export function sum(values: number[]): number;
 
 export function sum(array: unknown[], key?: unknown): number {
-	const aggregated = aggregate('sum', array, key);
-
-	return aggregated.count > 0 ? aggregated.value : Number.NaN;
+	return getAggregated('sum', array, key);
 }
 
 export {max} from './internal/math/aggregate';
-export type {NumericalValues}
+export type {NumericalValues};

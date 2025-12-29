@@ -2,6 +2,10 @@ import {expect, test} from 'vitest';
 import {equal} from '../src/value';
 
 test('any', () => {
+	const eq = equal.initialize({
+		relaxedNullish: true,
+	});
+
 	const values = [
 		null,
 		undefined,
@@ -33,11 +37,9 @@ test('any', () => {
 
 			expect(equal(outer, inner)).toBe(outerIndex === innerIndex);
 
-			expect(
-				equal(outer, inner, {
-					relaxedNullish: true,
-				}),
-			).toBe((outerIndex < 2 && innerIndex < 2) || outerIndex === innerIndex);
+			expect(eq(outer, inner)).toBe(
+				(outerIndex < 2 && innerIndex < 2) || outerIndex === innerIndex,
+			);
 		}
 	}
 });

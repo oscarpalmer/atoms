@@ -1,7 +1,7 @@
 /**
  * Chunk an array into smaller arrays
  * @param array Array to chunk
- * @param size Size of each chunk _(defaults to 5000)_
+ * @param size Size of each chunk _(minimum is `1`, maximum is `5000`; defaults to `5000`)_
  * @returns Array of arrays
  */
 export function chunk<Item>(array: Item[], size?: number): Item[][] {
@@ -15,8 +15,7 @@ export function chunk<Item>(array: Item[], size?: number): Item[][] {
 
 	const {length} = array;
 
-	const actualSize =
-		typeof size === 'number' && size > 0 && size <= DEFAULT_SIZE ? size : DEFAULT_SIZE;
+	const actualSize = typeof size === 'number' && size > 0 && size <= MAX_SIZE ? size : MAX_SIZE;
 
 	if (length <= actualSize) {
 		return [array];
@@ -37,4 +36,4 @@ export function chunk<Item>(array: Item[], size?: number): Item[][] {
 
 //
 
-const DEFAULT_SIZE = 5_000;
+const MAX_SIZE = 5_000;

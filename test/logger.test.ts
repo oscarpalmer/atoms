@@ -1,5 +1,6 @@
 import {expect, test} from 'vitest';
 import {logger} from '../src/logger';
+import { noop } from '../src/internal/function';
 
 test('log', () => {
 	logger.log('test');
@@ -44,23 +45,64 @@ test('log', () => {
 test('log.time', () => {
 	logger.enabled = true;
 
-	let time = logger.time('test');
+	const one = logger.time('test');
 
-	expect(time).toBeTypeOf('object');
-	expect(time.log).toBeTypeOf('function');
-	expect(time.stop).toBeTypeOf('function');
+	expect(one).toBeTypeOf('object');
+	expect(one.active).toBe(true);
+	expect(one.log).not.toBe(noop);
 
-	time.log();
-	time.stop();
+	one.log();
+
+	const stopper_1 = one.stop;
+	const stopper_2 = one.stop;
+
+	expect(stopper_1).not.toBe(noop);
+	expect(stopper_2).toBe(noop);
+
+	stopper_1();
+
+	expect(one.active).toBe(false);
+	expect(one.log).toBe(noop);
+
+	const two = logger.time('test');
+
+	expect(two).toBeTypeOf('object');
+	expect(two.active).toBe(true);
+	expect(two.log).not.toBe(noop);
 
 	logger.enabled = false;
 
-	time = logger.time('test');
+	expect(two.active).toBe(false);
+	expect(two.log).toBe(noop);
+	expect(two.stop).toBe(noop);
 
-	expect(time).toBeTypeOf('object');
-	expect(time.log).toBeTypeOf('function');
-	expect(time.stop).toBeTypeOf('function');
+	logger.enabled = true;
 
-	time.log();
-	time.stop();
+	expect(two.active).toBe(true);
+	expect(two.log).not.toBe(noop);
+
+	const stopper_3 = two.stop;
+	const stopper_4 = two.stop;
+
+	expect(stopper_3).not.toBe(noop);
+	expect(stopper_4).toBe(noop);
+
+	stopper_3();
+
+	expect(two.active).toBe(false);
+	expect(two.log).toBe(noop);
+
+	logger.enabled = false;
+
+	const three = logger.time('test');
+
+	expect(three.active).toBe(false);
+	expect(three.log).toBe(noop);
+	expect(three.stop).toBe(noop);
+
+	logger.enabled = true;
+
+	expect(three.active).toBe(false);
+	expect(three.log).toBe(noop);
+	expect(three.stop).toBe(noop);
 });

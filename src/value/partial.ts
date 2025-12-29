@@ -26,7 +26,9 @@ export function partial<Value extends PlainObject, Key extends keyof Value>(
 	for (let index = 0; index < length; index += 1) {
 		const key = keys[index];
 
-		result[key] = value[key];
+		if (key in value) {
+			result[key] = value[key];
+		}
 	}
 
 	return result;

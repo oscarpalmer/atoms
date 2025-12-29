@@ -61,7 +61,7 @@ export function isTypedArray(value: unknown): value is TypedArray {
 
 //
 
-const TYPED_ARRAYS: Set<unknown> = new Set([
+const TYPED_ARRAYS = new Set<unknown>([
 	Int8Array,
 	Uint8Array,
 	Uint8ClampedArray,

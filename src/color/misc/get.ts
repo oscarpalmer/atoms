@@ -33,12 +33,15 @@ export function getForegroundColor(value: unknown): Color {
 	const {blue, green, red} = state.rgb;
 
 	const values = [blue / MAX_HEX, green / MAX_HEX, red / MAX_HEX];
+	const {length} = values;
 
-	for (let color of values) {
+	for (let index = 0; index < length; index += 1) {
+		const color = values[index];
+
 		if (color <= SRGB_LUMINANCE_MINIMUM) {
-			color /= SRGB_LUMINANCE_MULTIPLIER;
+			values[index] /= SRGB_LUMINANCE_MULTIPLIER;
 		} else {
-			color =
+			values[index] =
 				((color + SRGB_LUMINANCE_OFFSET) / SRGB_LUMINANCE_MODIFIER) ** SRGB_LUMINANCE_EXPONENT;
 		}
 	}
