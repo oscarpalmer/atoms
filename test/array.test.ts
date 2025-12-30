@@ -7,22 +7,24 @@ import {
 	find,
 	flatten,
 	getArray,
+	groupBy,
+	groupByArrays,
 	indexOf,
 	insert,
 	push,
 	shuffle,
 	sort,
 	splice,
+	toMap,
+	toMapArrays,
+	toRecord,
+	toRecordArrays,
 	toSet,
 	unique,
 } from '../src/array';
-import {groupBy} from '../src/array/group-by';
-import {toMap} from '../src/array/to-map';
-import {toRecord} from '../src/array/to-record';
 import {getArrayCallbacks} from '../src/internal/array/callbacks';
-import {equal} from '../src/internal/value/equal';
 import {getRandomInteger} from '../src/random';
-import {diff} from '../src/value/diff';
+import {diff, equal} from '../src/value';
 
 type Item = {
 	age: number;
@@ -225,8 +227,8 @@ test('groupBy', () => {
 	expect(keyToValue).toEqual(valueToKey);
 	expect(valueToValue).toEqual(valueToKey);
 
-	const keyeds = groupBy.arrays(complex, 'id');
-	const callbackeds = groupBy.arrays(complex, item => item.name);
+	const keyeds = groupByArrays(complex, 'id');
+	const callbackeds = groupByArrays(complex, item => item.name);
 
 	expect(keyeds).toEqual({
 		1: [{id: 1, age: 25, name: 'Alice'}],
@@ -246,10 +248,10 @@ test('groupBy', () => {
 		David: [{id: 5, age: 35, name: 'David'}],
 	});
 
-	const keyToKeys = groupBy.arrays(complex, 'id', 'name');
-	const valueToKeys = groupBy.arrays(complex, item => item.name, 'age');
-	const keyToValues = groupBy.arrays(complex, 'name', item => item.age);
-	const valueToValues = groupBy.arrays(
+	const keyToKeys = groupByArrays(complex, 'id', 'name');
+	const valueToKeys = groupByArrays(complex, item => item.name, 'age');
+	const keyToValues = groupByArrays(complex, 'name', item => item.age);
+	const valueToValues = groupByArrays(
 		complex,
 		item => item.name,
 		item => item.age,
@@ -653,8 +655,8 @@ test('toMap', () => {
 	expect(keyToValue).toEqual(valueToKey);
 	expect(valueToValue).toEqual(valueToKey);
 
-	const keyeds = toMap.arrays(complex, 'id');
-	const callbackeds = toMap.arrays(complex, item => item.name);
+	const keyeds = toMapArrays(complex, 'id');
+	const callbackeds = toMapArrays(complex, item => item.name);
 
 	expect(keyeds).toEqual(
 		new Map([
@@ -681,10 +683,10 @@ test('toMap', () => {
 		]),
 	);
 
-	const keyToKeys = toMap.arrays(complex, 'id', 'name');
-	const valueToKeys = toMap.arrays(complex, item => item.name, 'age');
-	const keyToValues = toMap.arrays(complex, 'name', item => item.age);
-	const valueToValues = toMap.arrays(
+	const keyToKeys = toMapArrays(complex, 'id', 'name');
+	const valueToKeys = toMapArrays(complex, item => item.name, 'age');
+	const keyToValues = toMapArrays(complex, 'name', item => item.age);
+	const valueToValues = toMapArrays(
 		complex,
 		item => item.name,
 		item => item.age,
@@ -770,8 +772,8 @@ test('toRecord', () => {
 	expect(keyToValue).toEqual(valueToKey);
 	expect(valueToValue).toEqual(valueToKey);
 
-	const keyeds = toRecord.arrays(complex, 'id');
-	const callbackeds = toRecord.arrays(complex, item => item.name);
+	const keyeds = toRecordArrays(complex, 'id');
+	const callbackeds = toRecordArrays(complex, item => item.name);
 
 	expect(keyeds).toEqual({
 		1: [{id: 1, age: 25, name: 'Alice'}],
@@ -791,10 +793,10 @@ test('toRecord', () => {
 		David: [{id: 5, age: 35, name: 'David'}],
 	});
 
-	const keyToKeys = toRecord.arrays(complex, 'id', 'name');
-	const valueToKeys = toRecord.arrays(complex, item => item.name, 'age');
-	const keyToValues = toRecord.arrays(complex, 'name', item => item.age);
-	const valueToValues = toRecord.arrays(
+	const keyToKeys = toRecordArrays(complex, 'id', 'name');
+	const valueToKeys = toRecordArrays(complex, item => item.name, 'age');
+	const keyToValues = toRecordArrays(complex, 'name', item => item.age);
+	const valueToValues = toRecordArrays(
 		complex,
 		item => item.name,
 		item => item.age,

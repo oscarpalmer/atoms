@@ -76,25 +76,23 @@ function handleMerge(values: ArrayOrPlainObject[], options: Options): ArrayOrPla
  * @param options Merging options
  * @returns Merged value
  */
-function merge<Model extends ArrayOrPlainObject>(
+export function merge<Model extends ArrayOrPlainObject>(
 	values: NestedPartial<Model>[],
 	options?: Partial<MergeOptions>,
 ): Model {
 	return handleMerge(values, getMergeOptions(options)) as Model;
 }
 
-namespace merge {
-	/**
-	 * Create a merger with predefined options
-	 * @param options Merging options
-	 * @returns Merger function
-	 */
-	export function initialize(options?: Partial<MergeOptions>): Merger {
-		const actual = getMergeOptions(options);
+/**
+ * Create a merger with predefined options
+ * @param options Merging options
+ * @returns Merger function
+ */
+export function merger(options?: Partial<MergeOptions>): Merger {
+	const actual = getMergeOptions(options);
 
-		return <Model extends ArrayOrPlainObject>(values: NestedPartial<Model>[]): Model =>
-			handleMerge(values, actual) as Model;
-	}
+	return <Model extends ArrayOrPlainObject>(values: NestedPartial<Model>[]): Model =>
+		handleMerge(values, actual) as Model;
 }
 
 function mergeObjects(
@@ -147,5 +145,3 @@ function mergeValues(
 
 	return actual.length > 1 ? mergeObjects(actual, options, prefix) : (actual[0] ?? {});
 }
-
-export {merge};

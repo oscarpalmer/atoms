@@ -12,7 +12,16 @@ export {
 	getRgbColor,
 } from './misc/get';
 
-export * from './misc/is';
+export {
+	isColor,
+	isHexColor,
+	isHslColor,
+	isHslLike,
+	isHslaColor,
+	isRgbColor,
+	isRgbLike,
+	isRgbaColor,
+} from './misc/is';
 
 export {getNormalizedHex, hexToHsl, hexToHsla, hexToRgb, hexToRgba} from './space/hex';
 

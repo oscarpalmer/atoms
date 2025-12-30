@@ -1,8 +1,16 @@
 import {expect, test} from 'vitest';
 import type {NestedPartial} from '../src/models';
-import {compare, getValue, partial, setValue, smush, unsmush} from '../src/value';
-import {diff} from '../src/value/diff';
-import {merge} from '../src/value/merge';
+import {
+	compare,
+	diff,
+	getValue,
+	merge,
+	merger,
+	partial,
+	setValue,
+	smush,
+	unsmush,
+} from '../src/value';
 
 type Diffable = {
 	numbers: number[];
@@ -285,11 +293,11 @@ test('merge', () => {
 		hobbies: ['Wrestling'],
 	};
 
-	const merger = merge.initialize({
+	const mrgr = merger({
 		replaceableObjects: 'cars',
 	});
 
-	const merged = merger([first, second, third, fourth]);
+	const merged = mrgr([first, second, third, fourth]);
 
 	expect(merged).toEqual({
 		age: 99,

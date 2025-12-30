@@ -46,7 +46,7 @@ function getMapValues(
  * @param value Callback to get an item's value
  * @returns Map of keyed values
  */
-function toMap<
+export function toMap<
 	Item,
 	KeyCallback extends (item: Item, index: number, array: Item[]) => Key,
 	ValueCallback extends (item: Item, index: number, array: Item[]) => unknown,
@@ -65,7 +65,7 @@ function toMap<
  * @param value Key to use for value
  * @returns Map of keyed values
  */
-function toMap<
+export function toMap<
 	Item extends PlainObject,
 	KeyCallback extends (item: Item, index: number, array: Item[]) => Key,
 	ItemValue extends keyof Item,
@@ -80,7 +80,7 @@ function toMap<
  * @param value Callback to get an item's value
  * @returns Map of keyed values
  */
-function toMap<
+export function toMap<
 	Item extends PlainObject,
 	ItemKey extends keyof Item,
 	ValueCallback extends (item: Item, index: number, array: Item[]) => unknown,
@@ -95,11 +95,11 @@ function toMap<
  * @param value Key to use for value
  * @returns Map of keyed values
  */
-function toMap<Item extends PlainObject, ItemKey extends keyof Item, ItemValue extends keyof Item>(
-	array: Item[],
-	key: ItemKey,
-	value: ItemValue,
-): Map<Item[ItemKey], Item[ItemValue]>;
+export function toMap<
+	Item extends PlainObject,
+	ItemKey extends keyof Item,
+	ItemValue extends keyof Item,
+>(array: Item[], key: ItemKey, value: ItemValue): Map<Item[ItemKey], Item[ItemValue]>;
 
 /**
  * Create a Map from an array of items using a callback
@@ -109,7 +109,7 @@ function toMap<Item extends PlainObject, ItemKey extends keyof Item, ItemValue e
  * @param callback Callback to get an item's grouping key
  * @returns Map of keyed items
  */
-function toMap<Item, Callback extends (item: Item, index: number, array: Item[]) => Key>(
+export function toMap<Item, Callback extends (item: Item, index: number, array: Item[]) => Key>(
 	array: Item[],
 	callback: Callback,
 ): Map<ReturnType<Callback>, Item>;
@@ -122,7 +122,7 @@ function toMap<Item, Callback extends (item: Item, index: number, array: Item[])
  * @param key Key to use for grouping
  * @returns Map of keyed items
  */
-function toMap<Item extends PlainObject, ItemKey extends keyof Item>(
+export function toMap<Item extends PlainObject, ItemKey extends keyof Item>(
 	array: Item[],
 	key: ItemKey,
 ): Map<Item[ItemKey], Item>;
@@ -132,102 +132,98 @@ function toMap<Item extends PlainObject, ItemKey extends keyof Item>(
  * @param array Array to convert
  * @returns Map of indiced items
  */
-function toMap<Item>(array: Item[]): Map<number, Item>;
+export function toMap<Item>(array: Item[]): Map<number, Item>;
 
-function toMap(array: unknown[], first?: unknown, second?: unknown): unknown {
+export function toMap(array: unknown[], first?: unknown, second?: unknown): unknown {
 	return getMapValues(array, first, second, false);
 }
 
-namespace toMap {
-	/**
-	 * Create a Map from an array of items using callbacks, grouping values into arrays
-	 * @param array Array to convert
-	 * @param key Callback to get an item's grouping key
-	 * @param value Callback to get an item's value
-	 * @returns Map of keyed arrays of values
-	 */
-	export function arrays<
-		Item,
-		KeyCallback extends (item: Item, index: number, array: Item[]) => Key,
-		ValueCallback extends (item: Item, index: number, array: Item[]) => unknown,
-	>(
-		array: Item[],
-		key: KeyCallback,
-		value: ValueCallback,
-	): Map<ReturnType<KeyCallback>, ReturnType<ValueCallback>[]>;
+/**
+ * Create a Map from an array of items using callbacks, grouping values into arrays
+ * @param array Array to convert
+ * @param key Callback to get an item's grouping key
+ * @param value Callback to get an item's value
+ * @returns Map of keyed arrays of values
+ */
+export function toMapArrays<
+	Item,
+	KeyCallback extends (item: Item, index: number, array: Item[]) => Key,
+	ValueCallback extends (item: Item, index: number, array: Item[]) => unknown,
+>(
+	array: Item[],
+	key: KeyCallback,
+	value: ValueCallback,
+): Map<ReturnType<KeyCallback>, ReturnType<ValueCallback>[]>;
 
-	/**
-	 * Create a Map from an array of items using a callback and value, grouping values into arrays
-	 * @param array Array to convert
-	 * @param key Callback to get an item's grouping key
-	 * @param value Key to use for value
-	 * @returns Map of keyed arrays of values
-	 */
-	export function arrays<
-		Item extends PlainObject,
-		KeyCallback extends (item: Item, index: number, array: Item[]) => Key,
-		ItemValue extends keyof Item,
-	>(
-		array: Item[],
-		key: KeyCallback,
-		value: ItemValue,
-	): Map<ReturnType<KeyCallback>, Item[ItemValue][]>;
+/**
+ * Create a Map from an array of items using a callback and value, grouping values into arrays
+ * @param array Array to convert
+ * @param key Callback to get an item's grouping key
+ * @param value Key to use for value
+ * @returns Map of keyed arrays of values
+ */
+export function toMapArrays<
+	Item extends PlainObject,
+	KeyCallback extends (item: Item, index: number, array: Item[]) => Key,
+	ItemValue extends keyof Item,
+>(
+	array: Item[],
+	key: KeyCallback,
+	value: ItemValue,
+): Map<ReturnType<KeyCallback>, Item[ItemValue][]>;
 
-	/**
-	 * Create a Map from an array of items using a key and callback, grouping values into arrays
-	 * @param array Array to convert
-	 * @param key Key to use for grouping
-	 * @param value Callback to get an item's value
-	 * @returns Map of keyed arrays of values
-	 */
-	export function arrays<
-		Item extends PlainObject,
-		ItemKey extends keyof Item,
-		ValueCallback extends (item: Item, index: number, array: Item[]) => unknown,
-	>(
-		array: Item[],
-		key: ItemKey,
-		value: ValueCallback,
-	): Map<Item[ItemKey], ReturnType<ValueCallback>[]>;
+/**
+ * Create a Map from an array of items using a key and callback, grouping values into arrays
+ * @param array Array to convert
+ * @param key Key to use for grouping
+ * @param value Callback to get an item's value
+ * @returns Map of keyed arrays of values
+ */
+export function toMapArrays<
+	Item extends PlainObject,
+	ItemKey extends keyof Item,
+	ValueCallback extends (item: Item, index: number, array: Item[]) => unknown,
+>(
+	array: Item[],
+	key: ItemKey,
+	value: ValueCallback,
+): Map<Item[ItemKey], ReturnType<ValueCallback>[]>;
 
-	/**
-	 * Create a Map from an array of items using a key and value, grouping values into arrays
-	 * @param array Array to convert
-	 * @param key Key to use for grouping
-	 * @param value Key to use for value
-	 * @returns Map of keyed arrays of values
-	 */
-	export function arrays<
-		Item extends PlainObject,
-		ItemKey extends keyof Item,
-		ItemValue extends keyof Item,
-	>(array: Item[], key: ItemKey, value: ItemValue): Map<Item[ItemKey], Item[ItemValue][]>;
+/**
+ * Create a Map from an array of items using a key and value, grouping values into arrays
+ * @param array Array to convert
+ * @param key Key to use for grouping
+ * @param value Key to use for value
+ * @returns Map of keyed arrays of values
+ */
+export function toMapArrays<
+	Item extends PlainObject,
+	ItemKey extends keyof Item,
+	ItemValue extends keyof Item,
+>(array: Item[], key: ItemKey, value: ItemValue): Map<Item[ItemKey], Item[ItemValue][]>;
 
-	/**
-	 * Create a Map from an array of items using a callback, grouping items into arrays
-	 * @param array Array to convert
-	 * @param callback Callback to get an item's grouping key
-	 * @returns Map of keyed arrays of items
-	 */
-	export function arrays<Item, Callback extends (item: Item, index: number, array: Item[]) => Key>(
-		array: Item[],
-		callback: Callback,
-	): Map<ReturnType<Callback>, Item[]>;
+/**
+ * Create a Map from an array of items using a callback, grouping items into arrays
+ * @param array Array to convert
+ * @param callback Callback to get an item's grouping key
+ * @returns Map of keyed arrays of items
+ */
+export function toMapArrays<
+	Item,
+	Callback extends (item: Item, index: number, array: Item[]) => Key,
+>(array: Item[], callback: Callback): Map<ReturnType<Callback>, Item[]>;
 
-	/**
-	 * Create a Map from an array of items using a key, grouping items into arrays
-	 * @param array Array to convert
-	 * @param key Key to use for grouping
-	 * @returns Map of keyed arrays of items
-	 */
-	export function arrays<Item extends PlainObject, ItemKey extends keyof Item>(
-		array: Item[],
-		key: ItemKey,
-	): Map<Item[ItemKey], Item[]>;
+/**
+ * Create a Map from an array of items using a key, grouping items into arrays
+ * @param array Array to convert
+ * @param key Key to use for grouping
+ * @returns Map of keyed arrays of items
+ */
+export function toMapArrays<Item extends PlainObject, ItemKey extends keyof Item>(
+	array: Item[],
+	key: ItemKey,
+): Map<Item[ItemKey], Item[]>;
 
-	export function arrays(array: unknown[], first?: unknown, second?: unknown): unknown {
-		return getMapValues(array, first, second, true);
-	}
+export function toMapArrays(array: unknown[], first?: unknown, second?: unknown): unknown {
+	return getMapValues(array, first, second, true);
 }
-
-export {toMap};

@@ -86,7 +86,7 @@ export function isPrimitive(value: unknown): value is Primitive {
 	return value == null || EXPRESSION_PRIMITIVE.test(typeof value);
 }
 
-export * from './internal/is';
+export {isArrayOrPlainObject, isKey, isNumber, isPlainObject, isTypedArray} from './internal/is';
 export type {ArrayOrPlainObject, Key, PlainObject, Primitive, TypedArray} from './models';
 
 //

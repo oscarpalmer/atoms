@@ -26,18 +26,6 @@
 				"types": "./types/array/index.d.ts",
 				"default": "./dist/array/index.js"
 		},
-		"./array/group-by": {
-				"types": "./types/array/group-by.d.ts",
-				"default": "./dist/array/group-by.js"
-		},
-		"./array/to-map": {
-				"types": "./types/array/to-map.d.ts",
-				"default": "./dist/array/to-map.js"
-		},
-		"./array/to-record": {
-				"types": "./types/array/to-record.d.ts",
-				"default": "./dist/array/to-record.js"
-		},
 		"./beacon": {
 				"types": "./types/beacon.d.ts",
 				"default": "./dist/beacon.js"
@@ -89,25 +77,9 @@
 				"types": "./types/string/index.d.ts",
 				"default": "./dist/string/index.js"
 		},
-		"./string/template": {
-				"types": "./types/string/template.d.ts",
-				"default": "./dist/string/template.js"
-		},
 		"./value": {
 				"types": "./types/value/index.d.ts",
 				"default": "./dist/value/index.js"
-		},
-		"./value/diff": {
-				"types": "./types/value/diff.d.ts",
-				"default": "./dist/value/diff.js"
-		},
-		"./value/equal": {
-				"types": "./types/internal/value/equal.d.ts",
-				"default": "./dist/internal/value/equal.js"
-		},
-		"./value/merge": {
-				"types": "./types/value/merge.d.ts",
-				"default": "./dist/value/merge.js"
 		}
 	},
 	"files": ["dist", "src", "types"],
@@ -129,5 +101,5 @@
 	},
 	"type": "module",
 	"types": "./types/index.d.ts",
-	"version": "0.122.0"
+	"version": "0.123.0"
 }

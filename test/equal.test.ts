@@ -1,8 +1,8 @@
 import {expect, test} from 'vitest';
-import {equal} from '../src/internal/value/equal';
+import {equal, equalizer} from '../src/value';
 
 test('any', () => {
-	const eq = equal.initialize({
+	const eq = equalizer({
 		relaxedNullish: true,
 	});
 

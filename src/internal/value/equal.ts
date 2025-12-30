@@ -46,7 +46,7 @@ type OptionsKeys<Values> = {
  * @param ignoreCase If `true`, comparison will be case-insensitive
  * @returns `true` if the strings are equal, otherwise `false`
  */
-function equal(first: string, second: string, ignoreCase?: boolean): boolean;
+export function equal(first: string, second: string, ignoreCase?: boolean): boolean;
 
 /**
  * Are two values equal?
@@ -55,23 +55,10 @@ function equal(first: string, second: string, ignoreCase?: boolean): boolean;
  * @param options Comparison options
  * @returns `true` if the values are equal, otherwise `false`
  */
-function equal(first: unknown, second: unknown, options?: EqualOptions): boolean;
+export function equal(first: unknown, second: unknown, options?: EqualOptions): boolean;
 
-function equal(first: unknown, second: unknown, options?: boolean | EqualOptions): boolean {
+export function equal(first: unknown, second: unknown, options?: boolean | EqualOptions): boolean {
 	return equalValue(first, second, getEqualOptions(options));
-}
-
-namespace equal {
-	/**
-	 * Create an equalizer with predefined options
-	 * @param options Comparison options
-	 * @returns Equalizer function
-	 */
-	export function initialize(options?: EqualOptions): Equalizer {
-		const actual = getEqualOptions(options);
-
-		return (first: unknown, second: unknown): boolean => equalValue(first, second, actual);
-	}
 }
 
 function equalArray(first: unknown[], second: unknown[], options: Options): boolean {
@@ -304,6 +291,17 @@ function equalValue(first: unknown, second: unknown, options: Options): boolean 
 	}
 }
 
+/**
+ * Create an equalizer with predefined options
+ * @param options Comparison options
+ * @returns Equalizer function
+ */
+export function equalizer(options?: EqualOptions): Equalizer {
+	const actual = getEqualOptions(options);
+
+	return (first: unknown, second: unknown): boolean => equalValue(first, second, actual);
+}
+
 function filterKey(key: string | symbol, options: Options): boolean {
 	if (typeof key !== 'string') {
 		return true;
@@ -373,7 +371,3 @@ function getEqualOptions(input?: boolean | EqualOptions): Options {
 const ARRAY_PEEK_PERCENTAGE = 10;
 
 const ARRAY_THRESHOLD = 100;
-
-//
-
-export {equal};

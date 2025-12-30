@@ -1,16 +1,27 @@
-export * from '../internal/array/chunk';
-export * from '../internal/array/compact';
-export * from '../internal/array/shuffle';
-export * from './exists';
-export * from './filter';
-export * from './find';
-export * from './flatten';
-export * from './get';
-export * from './index-of';
-export * from './insert';
-export * from './models';
-export * from './push';
-export * from './sort';
-export * from './splice';
-export * from './to-set';
-export * from './unique';
+export {chunk} from '../internal/array/chunk';
+export {compact} from '../internal/array/compact';
+export {shuffle} from '../internal/array/shuffle';
+export {exists} from './exists';
+export {filter} from './filter';
+export {find} from './find';
+export {flatten} from './flatten';
+export {getArray} from './get';
+export {groupBy, groupByArrays} from './group-by';
+export {indexOf} from './index-of';
+export {insert} from './insert';
+export type {
+	CallbackSorter,
+	Key,
+	KeySorter,
+	KeyedValue,
+	NestedArray,
+	NumericalKeys,
+	PlainObject,
+} from './models';
+export {push} from './push';
+export {sort} from './sort';
+export {splice} from './splice';
+export {toMap, toMapArrays} from './to-map';
+export {toRecord, toRecordArrays} from './to-record';
+export {toSet} from './to-set';
+export {unique} from './unique';

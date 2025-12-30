@@ -67,7 +67,7 @@ function handleTemplate(
  * @param options Templating options
  * @returns Templated string
  */
-function template(
+export function template(
 	value: string,
 	variables: PlainObject,
 	options?: Partial<TemplateOptions>,
@@ -77,25 +77,19 @@ function template(
 	return handleTemplate(value, pattern, ignoreCase, variables);
 }
 
-namespace template {
-	/**
-	 * Create a templater with predefined options
-	 * @param options Templating options
-	 * @returns Templater function
-	 */
-	export function initialize(options?: Partial<TemplateOptions>): Templater {
-		const {ignoreCase, pattern} = getTemplateOptions(options);
+/**
+ * Create a templater with predefined options
+ * @param options Templating options
+ * @returns Templater function
+ */
+export function templater(options?: Partial<TemplateOptions>): Templater {
+	const {ignoreCase, pattern} = getTemplateOptions(options);
 
-		return (value: string, variables?: PlainObject): string => {
-			return handleTemplate(value, pattern, ignoreCase, variables);
-		};
-	}
+	return (value: string, variables?: PlainObject): string => {
+		return handleTemplate(value, pattern, ignoreCase, variables);
+	};
 }
 
 //
 
 const EXPRESSION_VARIABLE = /{{([\s\S]+?)}}/g;
-
-//
-
-export {template};
