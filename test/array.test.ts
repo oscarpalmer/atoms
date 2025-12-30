@@ -7,21 +7,22 @@ import {
 	find,
 	flatten,
 	getArray,
-	groupBy,
 	indexOf,
 	insert,
 	push,
 	shuffle,
 	sort,
 	splice,
-	toMap,
-	toRecord,
 	toSet,
 	unique,
 } from '../src/array';
+import {groupBy} from '../src/array/group-by';
+import {toMap} from '../src/array/to-map';
+import {toRecord} from '../src/array/to-record';
 import {getArrayCallbacks} from '../src/internal/array/callbacks';
+import {equal} from '../src/internal/value/equal';
 import {getRandomInteger} from '../src/random';
-import {diff, equal} from '../src/value';
+import {diff} from '../src/value';
 
 type Item = {
 	age: number;

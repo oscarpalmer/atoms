@@ -10,11 +10,11 @@ import {
 	parse,
 	pascalCase,
 	snakeCase,
-	template,
 	titleCase,
 	truncate,
 	words,
 } from '../src/string';
+import {template} from '../src/string/template';
 
 class ItemWithoutToString {
 	value: string;

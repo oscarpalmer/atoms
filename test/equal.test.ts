@@ -1,5 +1,5 @@
 import {expect, test} from 'vitest';
-import {equal} from '../src/value';
+import {equal} from '../src/internal/value/equal';
 
 test('any', () => {
 	const eq = equal.initialize({
