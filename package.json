@@ -97,6 +97,10 @@
 				"types": "./types/value/index.d.ts",
 				"default": "./dist/value/index.js"
 		},
+		"./value/diff": {
+				"types": "./types/value/diff.d.ts",
+				"default": "./dist/value/diff.js"
+		},
 		"./value/equal": {
 				"types": "./types/internal/value/equal.d.ts",
 				"default": "./dist/internal/value/equal.js"
@@ -125,5 +129,5 @@
 	},
 	"type": "module",
 	"types": "./types/index.d.ts",
-	"version": "0.121.0"
+	"version": "0.122.0"
 }

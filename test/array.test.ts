@@ -22,7 +22,7 @@ import {toRecord} from '../src/array/to-record';
 import {getArrayCallbacks} from '../src/internal/array/callbacks';
 import {equal} from '../src/internal/value/equal';
 import {getRandomInteger} from '../src/random';
-import {diff} from '../src/value';
+import {diff} from '../src/value/diff';
 
 type Item = {
 	age: number;

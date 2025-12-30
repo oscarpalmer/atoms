@@ -19,6 +19,7 @@ export * from './sized';
 export * from './string/index';
 export * from './string/template';
 export * from './value/index';
+export * from './value/diff';
 export * from './value/merge';
 
 export {FRAME_RATE_MS};
