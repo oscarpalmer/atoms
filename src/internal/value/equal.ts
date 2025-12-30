@@ -2,33 +2,6 @@ import type {ArrayOrPlainObject, PlainObject, TypedArray} from '../../models';
 import {chunk} from '../array/chunk';
 import {isPlainObject, isTypedArray} from '../is';
 
-type Equal = {
-	/**
-	 * Are two strings equal?
-	 * @param first First string
-	 * @param second Second string
-	 * @param ignoreCase If `true`, comparison will be case-insensitive
-	 * @returns `true` if the strings are equal, otherwise `false`
-	 */
-	(first: string, second: string, ignoreCase?: boolean): boolean;
-
-	/**
-	 * Are two values equal?
-	 * @param first First value
-	 * @param second Second value
-	 * @param options Comparison options
-	 * @returns `true` if the values are equal, otherwise `false`
-	 */
-	(first: unknown, second: unknown, options?: EqualOptions): boolean;
-
-	/**
-	 * Create an equalizer with predefined options
-	 * @param options Comparison options
-	 * @returns Equalizer function
-	 */
-	initialize(options?: EqualOptions): Equalizer;
-};
-
 type EqualOptions = {
 	/**
 	 * When `true`, strings are compared case-insensitively
@@ -66,15 +39,40 @@ type OptionsKeys<Values> = {
 
 //
 
-const equal = ((first: unknown, second: unknown, options?: boolean | EqualOptions): boolean => {
+/**
+ * Are two strings equal?
+ * @param first First string
+ * @param second Second string
+ * @param ignoreCase If `true`, comparison will be case-insensitive
+ * @returns `true` if the strings are equal, otherwise `false`
+ */
+function equal(first: string, second: string, ignoreCase?: boolean): boolean;
+
+/**
+ * Are two values equal?
+ * @param first First value
+ * @param second Second value
+ * @param options Comparison options
+ * @returns `true` if the values are equal, otherwise `false`
+ */
+function equal(first: unknown, second: unknown, options?: EqualOptions): boolean;
+
+function equal(first: unknown, second: unknown, options?: boolean | EqualOptions): boolean {
 	return equalValue(first, second, getEqualOptions(options));
-}) as Equal;
+}
 
-equal.initialize = (options?: EqualOptions): Equalizer => {
-	const actual = getEqualOptions(options);
+namespace equal {
+	/**
+	 * Create an equalizer with predefined options
+	 * @param options Comparison options
+	 * @returns Equalizer function
+	 */
+	export function initialize(options?: EqualOptions): Equalizer {
+		const actual = getEqualOptions(options);
 
-	return (first: unknown, second: unknown): boolean => equalValue(first, second, actual);
-};
+		return (first: unknown, second: unknown): boolean => equalValue(first, second, actual);
+	}
+}
 
 function equalArray(first: unknown[], second: unknown[], options: Options): boolean {
 	const {length} = first;

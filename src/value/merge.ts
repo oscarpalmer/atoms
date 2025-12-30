@@ -2,26 +2,6 @@ import {isArrayOrPlainObject} from '../internal/is';
 import {join} from '../internal/string';
 import type {ArrayOrPlainObject, NestedPartial, PlainObject} from '../models';
 
-type Merge = {
-	/**
-	 * Merge multiple arrays or objects into a single one
-	 * @param values Values to merge
-	 * @param options Merging options
-	 * @returns Merged value
-	 */
-	<Model extends ArrayOrPlainObject>(
-		values: NestedPartial<Model>[],
-		options?: Partial<MergeOptions>,
-	): Model;
-
-	/**
-	 * Create a merger with predefined options
-	 * @param options Merging options
-	 * @returns Merger function
-	 */
-	initialize(options?: Partial<MergeOptions>): Merger;
-};
-
 /**
  * Options for merging values
  */
@@ -90,19 +70,32 @@ function handleMerge(values: ArrayOrPlainObject[], options: Options): ArrayOrPla
 	return !Array.isArray(values) || values.length === 0 ? {} : mergeValues(values, options, true);
 }
 
-const merge = (<Model extends ArrayOrPlainObject>(
+/**
+ * Merge multiple arrays or objects into a single one
+ * @param values Values to merge
+ * @param options Merging options
+ * @returns Merged value
+ */
+function merge<Model extends ArrayOrPlainObject>(
 	values: NestedPartial<Model>[],
 	options?: Partial<MergeOptions>,
-): Model => {
+): Model {
 	return handleMerge(values, getMergeOptions(options)) as Model;
-}) as Merge;
+}
 
-merge.initialize = (options?: Partial<MergeOptions>): Merger => {
-	const actual = getMergeOptions(options);
+namespace merge {
+	/**
+	 * Create a merger with predefined options
+	 * @param options Merging options
+	 * @returns Merger function
+	 */
+	export function initialize(options?: Partial<MergeOptions>): Merger {
+		const actual = getMergeOptions(options);
 
-	return <Model extends ArrayOrPlainObject>(values: NestedPartial<Model>[]): Model =>
-		handleMerge(values, actual) as Model;
-};
+		return <Model extends ArrayOrPlainObject>(values: NestedPartial<Model>[]): Model =>
+			handleMerge(values, actual) as Model;
+	}
+}
 
 function mergeObjects(
 	values: ArrayOrPlainObject[],

@@ -14,24 +14,6 @@ type TemplateOptions = {
 	pattern?: RegExp;
 };
 
-type Template = {
-	/**
-	 * Render a string from a template with variables
-	 * @param value Template string
-	 * @param variables Variables to use
-	 * @param options Templating options
-	 * @returns Templated string
-	 */
-	(value: string, variables: PlainObject, options?: Partial<TemplateOptions>): string;
-
-	/**
-	 * Create a templater with predefined options
-	 * @param options Templating options
-	 * @returns Templater function
-	 */
-	initialize(options?: Partial<TemplateOptions>): Templater;
-};
-
 /**
  * Render a string from a template with variables
  * @param value Template string
@@ -78,19 +60,37 @@ function handleTemplate(
 	});
 }
 
-const template = ((value: string, variables: PlainObject, options?: Partial<TemplateOptions>) => {
+/**
+ * Render a string from a template with variables
+ * @param value Template string
+ * @param variables Variables to use
+ * @param options Templating options
+ * @returns Templated string
+ */
+function template(
+	value: string,
+	variables: PlainObject,
+	options?: Partial<TemplateOptions>,
+): string {
 	const {ignoreCase, pattern} = getTemplateOptions(options);
 
 	return handleTemplate(value, pattern, ignoreCase, variables);
-}) as Template;
+}
 
-template.initialize = (options?: Partial<TemplateOptions>): Templater => {
-	const {ignoreCase, pattern} = getTemplateOptions(options);
+namespace template {
+	/**
+	 * Create a templater with predefined options
+	 * @param options Templating options
+	 * @returns Templater function
+	 */
+	export function initialize(options?: Partial<TemplateOptions>): Templater {
+		const {ignoreCase, pattern} = getTemplateOptions(options);
 
-	return (value: string, variables?: PlainObject): string => {
-		return handleTemplate(value, pattern, ignoreCase, variables);
-	};
-};
+		return (value: string, variables?: PlainObject): string => {
+			return handleTemplate(value, pattern, ignoreCase, variables);
+		};
+	}
+}
 
 //
 
