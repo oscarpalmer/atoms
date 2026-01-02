@@ -19,7 +19,7 @@ type Options = {
  * @returns Camel-cased string
  */
 export function camelCase(value: string): string {
-	return toCase(TYPE_CAMEL, value, true, false);
+	return toCase('camel', value, true, false);
 }
 
 /**
@@ -47,7 +47,7 @@ export function capitalize(value: string): string {
  * @returns Kebab-cased string
  */
 export function kebabCase(value: string): string {
-	return toCase(TYPE_KEBAB, value, false, false);
+	return toCase('kebab', value, false, false);
 }
 
 /**
@@ -56,7 +56,7 @@ export function kebabCase(value: string): string {
  * @returns Pascal-cased string
  */
 export function pascalCase(value: string): string {
-	return toCase(TYPE_PASCAL, value, true, true);
+	return toCase('pascal', value, true, true);
 }
 
 /**
@@ -65,7 +65,7 @@ export function pascalCase(value: string): string {
  * @returns Snake-cased string
  */
 export function snakeCase(value: string): string {
-	return toCase(TYPE_SNAKE, value, false, false);
+	return toCase('snake', value, false, false);
 }
 
 /**
@@ -158,24 +158,16 @@ const EXPRESSION_ACRONYM = /(\p{Lu}*)(\p{Lu})(\p{Ll}+)/gu;
 
 const REPLACEMENT_CAMEL_CASE = '$1-$2';
 
-const TYPE_CAMEL = 'camel';
-
-const TYPE_KEBAB = 'kebab';
-
-const TYPE_PASCAL = 'pascal';
-
-const TYPE_SNAKE = 'snake';
-
 //
 
 const delimiters: Record<Case, string> = {
-	[TYPE_CAMEL]: '',
-	[TYPE_KEBAB]: '-',
-	[TYPE_PASCAL]: '',
-	[TYPE_SNAKE]: '_',
+	camel: '',
+	kebab: '-',
+	pascal: '',
+	snake: '_',
 };
 
-const memoizers: Partial<Record<Case, Memoized<typeof toCaseCallback>>> = {};
+const memoizers: Partial<Record<string, Memoized<typeof toCaseCallback>>> = {};
 
 let memoizedCapitalize: Memoized<(value: string) => string>;
 

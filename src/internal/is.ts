@@ -56,21 +56,23 @@ export function isPlainObject(value: unknown): value is PlainObject {
  * @returns `true` if the value is a typed array, otherwise `false`
  */
 export function isTypedArray(value: unknown): value is TypedArray {
+	TYPED_ARRAYS ??= new Set<unknown>([
+		Int8Array,
+		Uint8Array,
+		Uint8ClampedArray,
+		Int16Array,
+		Uint16Array,
+		Int32Array,
+		Uint32Array,
+		Float32Array,
+		Float64Array,
+		BigInt64Array,
+		BigUint64Array,
+	]);
+
 	return TYPED_ARRAYS.has((value as TypedArray)?.constructor);
 }
 
 //
 
-const TYPED_ARRAYS = new Set<unknown>([
-	Int8Array,
-	Uint8Array,
-	Uint8ClampedArray,
-	Int16Array,
-	Uint16Array,
-	Int32Array,
-	Uint32Array,
-	Float32Array,
-	Float64Array,
-	BigInt64Array,
-	BigUint64Array,
-]);
+let TYPED_ARRAYS: Set<unknown>;

@@ -11,6 +11,7 @@ import {
 	isObject,
 	isPlainObject,
 	isPrimitive,
+	isTypedArray,
 } from '../src/is';
 
 const values = [
@@ -159,5 +160,29 @@ test('isPrimitive', () => {
 
 	for (; index < length; index += 1) {
 		expect(isPrimitive(values[index])).toBe(expected[index]);
+	}
+});
+
+test('isTypedArray', () => {
+	for (let index = 0; index < length; index += 1) {
+		expect(isTypedArray(values[index])).toBe(false);
+	}
+
+	const arrays = [
+		new Uint8Array([1, 2, 3]),
+		new Uint8ClampedArray([1, 2, 3]),
+		new Uint16Array([1, 2, 3]),
+		new Uint32Array([1, 2, 3]),
+		new Int8Array([1, 2, 3]),
+		new Int16Array([1, 2, 3]),
+		new Int32Array([1, 2, 3]),
+		new Float32Array([1, 2, 3]),
+		new Float64Array([1, 2, 3]),
+		new BigUint64Array([1n, 2n, 3n]),
+		new BigInt64Array([1n, 2n, 3n]),
+	];
+
+	for (const array of arrays) {
+		expect(isTypedArray(array)).toBe(true);
 	}
 });
