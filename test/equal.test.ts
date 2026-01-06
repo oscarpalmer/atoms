@@ -1,8 +1,8 @@
 import {expect, test} from 'vitest';
-import {equal, equalizer} from '../src/value';
+import {equal} from '../src/value';
 
 test('any', () => {
-	const eq = equalizer({
+	const equalizer = equal.initialize({
 		relaxedNullish: true,
 	});
 
@@ -37,7 +37,7 @@ test('any', () => {
 
 			expect(equal(outer, inner)).toBe(outerIndex === innerIndex);
 
-			expect(eq(outer, inner)).toBe(
+			expect(equalizer(outer, inner)).toBe(
 				(outerIndex < 2 && innerIndex < 2) || outerIndex === innerIndex,
 			);
 		}

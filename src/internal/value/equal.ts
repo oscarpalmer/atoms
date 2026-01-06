@@ -296,11 +296,11 @@ function equalValue(first: unknown, second: unknown, options: Options): boolean 
  * @param options Comparison options
  * @returns Equalizer function
  */
-export function equalizer(options?: EqualOptions): Equalizer {
+equal.initialize = function (options?: EqualOptions): Equalizer {
 	const actual = getEqualOptions(options);
 
 	return (first: unknown, second: unknown): boolean => equalValue(first, second, actual);
-}
+};
 
 function filterKey(key: string | symbol, options: Options): boolean {
 	if (typeof key !== 'string') {

@@ -11,7 +11,6 @@ import {
 	pascalCase,
 	snakeCase,
 	template,
-	templater,
 	titleCase,
 	truncate,
 	words,
@@ -203,7 +202,7 @@ test('template', () => {
 	const basic = '{{a.0.b.1.c}}, {{a.0.b.1.c}}!';
 	const custom = '<a.0.b.1.c>, <a.0.b.1.c>!';
 
-	const tplr = templater();
+	const templater = template.initialize();
 
 	const variables = {
 		a: [
@@ -219,7 +218,7 @@ test('template', () => {
 	};
 
 	expect(template(basic, variables)).toBe(', !');
-	expect(tplr(custom, variables)).toBe('<a.0.b.1.c>, <a.0.b.1.c>!');
+	expect(templater(custom, variables)).toBe('<a.0.b.1.c>, <a.0.b.1.c>!');
 
 	expect(
 		template(basic, variables, {

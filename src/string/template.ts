@@ -82,13 +82,13 @@ export function template(
  * @param options Templating options
  * @returns Templater function
  */
-export function templater(options?: Partial<TemplateOptions>): Templater {
+template.initialize = function (options?: Partial<TemplateOptions>): Templater {
 	const {ignoreCase, pattern} = getTemplateOptions(options);
 
 	return (value: string, variables?: PlainObject): string => {
 		return handleTemplate(value, pattern, ignoreCase, variables);
 	};
-}
+};
 
 //
 

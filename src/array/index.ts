@@ -6,7 +6,7 @@ export {filter} from './filter';
 export {find} from './find';
 export {flatten} from './flatten';
 export {getArray} from './get';
-export {groupBy, groupByArrays} from './group-by';
+export {groupBy} from './group-by';
 export {indexOf} from './index-of';
 export {insert} from './insert';
 export type {
@@ -21,7 +21,7 @@ export type {
 export {push} from './push';
 export {sort} from './sort';
 export {splice} from './splice';
-export {toMap, toMapArrays} from './to-map';
-export {toRecord, toRecordArrays} from './to-record';
+export {toMap} from './to-map';
+export {toRecord} from './to-record';
 export {toSet} from './to-set';
 export {unique} from './unique';

@@ -1,6 +1,6 @@
 import {expect, test} from 'vitest';
 import {logger} from '../src/logger';
-import { noop } from '../src/internal/function';
+import {noop} from '../src/internal/function';
 
 test('log', () => {
 	logger.log('test');
