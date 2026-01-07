@@ -108,6 +108,9 @@ class Memoized<Callback extends GenericCallback> {
 	}
 }
 
+/**
+ * Options for memoized functions
+ */
 type MemoizedOptions<Callback extends GenericCallback> = {
 	/**
 	 * Callback for getting a cache key for the provided parameters
@@ -228,7 +231,7 @@ export function throttle<Callback extends GenericCallback>(
 	return getLimiter(callback, true, time);
 }
 
-export type {CancellableCallback, GenericCallback, Memoized};
+export type {CancellableCallback, GenericCallback, Memoized, MemoizedOptions};
 export {noop} from './internal/function';
 
 //

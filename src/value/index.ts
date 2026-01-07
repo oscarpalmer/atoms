@@ -1,11 +1,11 @@
 export {compare} from '../internal/value/compare';
-export {diff} from './diff';
-export {equal} from '../internal/value/equal';
+export {equal, type EqualOptions} from '../internal/value/equal';
 export {getValue} from '../internal/value/get';
 export {setValue} from '../internal/value/set';
 export type {ArrayOrPlainObject, NestedPartial, PlainObject} from '../models';
 export {clone} from './clone';
-export {merge} from './merge';
+export {diff, type DiffOptions, type DiffResult, type DiffValue} from './diff';
+export {merge, type MergeOptions} from './merge';
 export {partial} from './partial';
 export {smush} from './smush';
 export {unsmush} from './unsmush';

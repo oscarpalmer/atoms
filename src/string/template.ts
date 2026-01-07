@@ -3,7 +3,10 @@ import {getValue} from '../internal/value/get';
 import {isPlainObject} from '../is';
 import type {PlainObject} from '../models';
 
-type TemplateOptions = {
+/**
+ * Options for templating strings
+ */
+export type TemplateOptions = {
 	/**
 	 * Ignore case when searching for variables?
 	 */

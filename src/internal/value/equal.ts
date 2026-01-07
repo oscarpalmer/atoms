@@ -2,7 +2,10 @@ import type {ArrayOrPlainObject, PlainObject, TypedArray} from '../../models';
 import {chunk} from '../array/chunk';
 import {isPlainObject, isTypedArray} from '../is';
 
-type EqualOptions = {
+/**
+ * Options for value equality comparison
+ */
+export type EqualOptions = {
 	/**
 	 * When `true`, strings are compared case-insensitively
 	 */

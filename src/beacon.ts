@@ -99,6 +99,9 @@ class Beacon<Value> {
 	}
 }
 
+/**
+ * Options for Beacon
+ */
 type BeaconOptions<Value> = {
 	/**
 	 * Method for comparing values for equality
@@ -321,4 +324,4 @@ const DESTROYED_BEACON = 'Cannot retrieve observable from a destroyed beacon';
 
 const DESTROYED_OBSERVABLE = 'Cannot subscribe to a destroyed observable';
 
-export type {Beacon, Observable, Observer, Subscription};
+export type {Beacon, BeaconOptions, Observable, Observer, Subscription};

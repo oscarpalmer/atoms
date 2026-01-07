@@ -2,7 +2,10 @@ import {isArrayOrPlainObject} from '../internal/is';
 import {join} from '../internal/string';
 import {equal} from '../internal/value/equal';
 
-type DiffOptions = {
+/**
+ * Options for value comparison
+ */
+export type DiffOptions = {
 	/**
 	 * Should `null` and `undefined` be considered equal and ignored in results?
 	 */
@@ -29,7 +32,7 @@ export type DiffResult<First, Second = First> = {
 	values: Record<string, DiffValue>;
 };
 
-export type DiffType = 'full' | 'none' | 'partial';
+type DiffType = 'full' | 'none' | 'partial';
 
 /**
  * The difference between two values

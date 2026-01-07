@@ -5,7 +5,7 @@ import type {ArrayOrPlainObject, NestedPartial, PlainObject} from '../models';
 /**
  * Options for merging values
  */
-type MergeOptions = {
+export type MergeOptions = {
 	/**
 	 * Key _(or key epxressions)_ for values that should be replaced
 	 * ```ts
