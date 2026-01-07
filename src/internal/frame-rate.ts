@@ -37,13 +37,15 @@ const TRIM_PART = 2;
 
 const TRIM_TOTAL = 4;
 
+let FRAME_RATE_MS = 1000 / 60;
+
+//
+
 /**
  * A calculated average of the refresh rate of the display _(in milliseconds)_
  */
-const FRAME_RATE_MS = await calculate();
-
-/* calculate().then(value => {
+calculate().then(value => {
 	FRAME_RATE_MS = value;
-}); */
+});
 
 export default FRAME_RATE_MS;
