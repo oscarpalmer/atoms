@@ -23,13 +23,13 @@ export function getRandomCharacters(length: number, selection?: string): string 
 
 	const actual = typeof selection === 'string' && selection.length > 0 ? selection : ALPHABET;
 
-	let result = '';
+	let characters = '';
 
 	for (let index = 0; index < length; index += 1) {
-		result += actual.charAt(getRandomInteger(0, actual.length - 1));
+		characters += actual.charAt(getRandomInteger(0, actual.length - 1));
 	}
 
-	return result;
+	return characters;
 }
 
 /**

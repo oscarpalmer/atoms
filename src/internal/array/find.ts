@@ -97,7 +97,7 @@ export function findValues(
 	}
 
 	const keys = new Set();
-	const result: unknown[] = [];
+	const values: unknown[] = [];
 
 	for (let index = 0; index < length; index += 1) {
 		const item = array[index];
@@ -105,13 +105,13 @@ export function findValues(
 
 		if ((type === 'all' && Object.is(keyed, value)) || (type === 'unique' && !keys.has(keyed))) {
 			keys.add(keyed);
-			result.push(item);
+			values.push(item);
 		}
 	}
 
 	keys.clear();
 
-	return result;
+	return values;
 }
 
 function getParameters(original: unknown[]): Parameters {

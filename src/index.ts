@@ -11,6 +11,7 @@ export * from './models';
 export * from './number';
 export * from './query';
 export * from './random';
+export * from './result';
 export * from './sized';
 export * from './string/index';
 export * from './value/index';

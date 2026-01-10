@@ -24,16 +24,16 @@ function insertChunkedValues(
 	while (index > 0) {
 		index -= 1;
 
-		const result = array.splice(
+		const spliced = array.splice(
 			actualStart,
 			index === lastIndex ? actualDeleteCount : 0,
 			...chunked[index],
 		);
 
 		if (returned == null) {
-			returned = result;
+			returned = spliced;
 		} else {
-			returned.push(...result);
+			returned.push(...spliced);
 		}
 	}
 

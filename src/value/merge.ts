@@ -102,7 +102,7 @@ function mergeObjects(
 ): ArrayOrPlainObject {
 	const {length} = values;
 	const isArray = values.every(Array.isArray);
-	const result = (isArray ? [] : {}) as PlainObject;
+	const merged = (isArray ? [] : {}) as PlainObject;
 
 	for (let outerIndex = 0; outerIndex < length; outerIndex += 1) {
 		const item = values[outerIndex] as PlainObject;
@@ -114,7 +114,7 @@ function mergeObjects(
 			const full = join([prefix, key], '.');
 
 			const next = item[key];
-			const previous = result[key];
+			const previous = merged[key];
 
 			if (isArray && options.skipNullableInArrays && next == null) {
 				continue;
@@ -125,14 +125,14 @@ function mergeObjects(
 				isArrayOrPlainObject(previous) &&
 				!(options.replaceableObjects?.(full) ?? false)
 			) {
-				result[key] = mergeValues([previous, next], options, false, full);
+				merged[key] = mergeValues([previous, next], options, false, full);
 			} else {
-				result[key] = next;
+				merged[key] = next;
 			}
 		}
 	}
 
-	return result;
+	return merged;
 }
 
 function mergeValues(

@@ -1,3 +1,11 @@
+//
+
+import {memoize, type Memoized} from '../function';
+
+type Match = 'endsWith' | 'includes' | 'startsWith';
+
+//
+
 /**
  * Create a new UUID-string
  * @deprecated Use {@link getUuid} instead
@@ -5,6 +13,17 @@
  */
 export function createUuid(): string {
 	return getUuid();
+}
+
+/**
+ * Check if a string ends with a specified substring
+ * @param haystack String to look in
+ * @param needle String to look for
+ * @param ignoreCase Ignore case when matching? _(defaults to `false`)_
+ * @returns `true` if the string ends with the given substring, otherwise `false`
+ */
+export function endsWith(haystack: string, needle: string, ignoreCase?: boolean): boolean {
+	return match('endsWith', haystack, needle, ignoreCase === true);
 }
 
 /**
@@ -32,6 +51,38 @@ export function getUuid(): string {
 }
 
 /**
+ * Check if a string includes a specified substring
+ * @param haystack String to look in
+ * @param needle String to look for
+ * @param ignoreCase Ignore case when matching? _(defaults to `false`)_
+ * @returns `true` if the string includes the given substring, otherwise `false`
+ */
+export function includes(haystack: string, needle: string, ignoreCase?: boolean): boolean {
+	return match('includes', haystack, needle, ignoreCase === true);
+}
+
+function match(type: Match, haystack: string, needle: string, ignoreCase: boolean): boolean {
+	if (typeof haystack !== 'string' || typeof needle !== 'string') {
+		return false;
+	}
+
+	memoizers[type] ??= memoize(matchCallback.bind(type));
+
+	return memoizers[type].run(haystack, needle, ignoreCase);
+}
+
+function matchCallback(
+	this: Match,
+	haystack: string,
+	needle: string,
+	ignoreCase: boolean,
+): boolean {
+	return (ignoreCase ? haystack.toLocaleLowerCase() : haystack)[this](
+		ignoreCase ? needle.toLocaleLowerCase() : needle,
+	);
+}
+
+/**
  * Parse a JSON string into its proper value _(or `undefined` if it fails)_
  * @param value JSON string to parse
  * @param reviver Reviver function to transform the parsed values
@@ -46,6 +97,26 @@ export function parse(
 	} catch {
 		return undefined;
 	}
+}
+
+/**
+ * Check if a string starts with a specified substring
+ * @param haystack String to look in
+ * @param needle String to look for
+ * @param ignoreCase Ignore case when matching? _(defaults to `false`)_
+ * @returns `true` if the string starts with the given substring, otherwise `false`
+ */
+export function startsWith(haystack: string, needle: string, ignoreCase?: boolean): boolean {
+	return match('startsWith', haystack, needle, ignoreCase === true);
+}
+
+/**
+ * Trim a string _(removing whitespace from both ends)_
+ * @param value String to trim
+ * @returns Trimmed string
+ */
+export function trim(value: string): string {
+	return typeof value === 'string' ? value.trim() : '';
 }
 
 /**
@@ -75,3 +146,7 @@ export function truncate(value: string, length: number, suffix?: string): string
 
 	return `${value.slice(0, truncatedLength)}${actualSuffix}`;
 }
+
+//
+
+const memoizers: Partial<Record<Match, Memoized<typeof matchCallback>>> = {};

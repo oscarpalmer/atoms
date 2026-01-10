@@ -1,5 +1,18 @@
-import type {NestedKeys, PlainObject} from '../../models';
+import type {NestedKeys, NestedValue, PlainObject} from '../../models';
 import {getPaths, handleValue} from './misc';
+
+/**
+ * Update the value in an object using a known path
+ * @param data Object to set value in
+ * @param path Path for value, e.g., `foo.bar.baz`
+ * @param updater Function to update the current value
+ * @returns Updated object
+ */
+export function setValue<Data extends PlainObject, Path extends NestedKeys<Data>>(
+	data: Data,
+	path: Path,
+	updater: (current: NestedValue<Data, Path>) => NestedValue<Data, Path>,
+): Data;
 
 /**
  * Set the value in an object using a known path
@@ -11,7 +24,7 @@ import {getPaths, handleValue} from './misc';
 export function setValue<Data extends PlainObject, Path extends NestedKeys<Data>>(
 	data: Data,
 	path: Path,
-	value: unknown,
+	value: NestedValue<Data, Path>,
 ): Data;
 
 /**

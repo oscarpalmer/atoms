@@ -7,14 +7,18 @@ import {
 	getUuid,
 	join,
 	kebabCase,
+	lowerCase,
 	parse,
 	pascalCase,
 	snakeCase,
 	template,
 	titleCase,
+	trim,
 	truncate,
+	upperCase,
 	words,
 } from '../src/string';
+import {endsWith, includes, startsWith} from '../src/string/misc';
 
 class ItemWithoutToString {
 	value: string;
@@ -35,6 +39,13 @@ class ItemWithToString {
 		return this.value;
 	}
 }
+
+const strings = [
+	'Hello, world!',
+	'The quick brown fox jumps over the lazy dog',
+	'Η γρήγορη καφέ αλεπού πηδάει πάνω από το τεμπέλικο σκυλί',
+	'Быстрая коричневая лиса прыгает через ленивую собаку',
+];
 
 test('camelCase', () => {
 	expect(camelCase('12 feet')).toBe('12Feet');
@@ -72,26 +83,24 @@ test('capitalize', () => {
 	expect(capitalize('')).toBe('');
 });
 
-test(
-	'createUuid',
-	() =>
-		new Promise<void>(done => {
-			const ids = new Set<string>();
+test('endsWith', () => {
+	const values = [
+		['Hello, world', 'world', false, true],
+		['Hello, world', 'World', false, false],
+		['Hello, world', 'World', true, true],
+	];
 
-			const length = 100_000;
+	const {length} = values;
 
-			let index = 0;
+	for (let index = 0; index < length; index += 1) {
+		const [haystack, needle, ignoreCase, expected] = values[index];
 
-			for (; index < length; index += 1) {
-				ids.add(index % 2 === 0 ? createUuid() : getUuid());
-			}
+		expect(endsWith(haystack as string, needle as string, ignoreCase as boolean)).toBe(expected);
+	}
 
-			expect(ids.size).toBe(length);
-
-			done();
-		}),
-	60_000,
-);
+	expect(endsWith(123 as never, 'test')).toBe(false);
+	expect(endsWith('Hello, world', 456 as never)).toBe(false);
+});
 
 test('getString', () => {
 	expect(getString(undefined)).toBe('');
@@ -115,6 +124,46 @@ test('getString', () => {
 	obj.valueOf = undefined as never;
 
 	expect(getString(obj)).toBe('{}');
+});
+
+test(
+	'getUuid',
+	() =>
+		new Promise<void>(done => {
+			const ids = new Set<string>();
+
+			const length = 100_000;
+
+			let index = 0;
+
+			for (; index < length; index += 1) {
+				ids.add(index % 2 === 0 ? createUuid() : getUuid());
+			}
+
+			expect(ids.size).toBe(length);
+
+			done();
+		}),
+	60_000,
+);
+
+test('includes', () => {
+	const values = [
+		['Hello, world', 'world', false, true],
+		['Hello, world', 'World', false, false],
+		['Hello, world', 'World', true, true],
+	];
+
+	const {length} = values;
+
+	for (let index = 0; index < length; index += 1) {
+		const [haystack, needle, ignoreCase, expected] = values[index];
+
+		expect(includes(haystack as string, needle as string, ignoreCase as boolean)).toBe(expected);
+	}
+
+	expect(includes(123 as never, 'test')).toBe(false);
+	expect(includes('Hello, world', 456 as never)).toBe(false);
 });
 
 test('join', () => {
@@ -141,6 +190,21 @@ test('kebabCase', () => {
 
 	expect(kebabCase(123 as never)).toBe('');
 	expect(kebabCase('')).toBe('');
+});
+
+test('lowercase', () => {
+	const expected = [
+		'hello, world!',
+		'the quick brown fox jumps over the lazy dog',
+		'η γρήγορη καφέ αλεπού πηδάει πάνω από το τεμπέλικο σκυλί',
+		'быстрая коричневая лиса прыгает через ленивую собаку',
+	];
+
+	for (let index = 0; index < strings.length; index += 1) {
+		expect(lowerCase(strings[index])).toBe(expected[index]);
+	}
+
+	expect(lowerCase(123 as never)).toBe('');
 });
 
 test('parse', () => {
@@ -196,6 +260,25 @@ test('snakeCase', () => {
 
 	expect(snakeCase(123 as never)).toBe('');
 	expect(snakeCase('')).toBe('');
+});
+
+test('startsWith', () => {
+	const values = [
+		['Hello, world', 'Hello', false, true],
+		['Hello, world', 'hello', false, false],
+		['Hello, world', 'hello', true, true],
+	];
+
+	const {length} = values;
+
+	for (let index = 0; index < length; index += 1) {
+		const [haystack, needle, ignoreCase, expected] = values[index];
+
+		expect(startsWith(haystack as string, needle as string, ignoreCase as boolean)).toBe(expected);
+	}
+
+	expect(startsWith(123 as never, 'test')).toBe(false);
+	expect(startsWith('Hello, world', 456 as never)).toBe(false);
 });
 
 test('template', () => {
@@ -266,28 +349,40 @@ test('truncate', () => {
 });
 
 test('titleCase', () => {
-	const original = [
-		'the quick brown fox jumps over the lazy dog',
-		'η γρήγορη καφέ αλεπού πηδάει πάνω από το τεμπέλικο σκυλί',
-		'быстрая коричневая лиса прыгает через ленивую собаку',
-	];
-
 	const expected = [
+		'Hello World',
 		'The Quick Brown Fox Jumps Over The Lazy Dog',
 		'Η Γρήγορη Καφέ Αλεπού Πηδάει Πάνω Από Το Τεμπέλικο Σκυλί',
 		'Быстрая Коричневая Лиса Прыгает Через Ленивую Собаку',
 	];
 
-	const {length} = original;
-
-	let index = 0;
-
-	for (; index < length; index += 1) {
-		expect(titleCase(original[index])).toBe(expected[index]);
+	for (let index = 0; index < strings.length; index += 1) {
+		expect(titleCase(strings[index])).toBe(expected[index]);
 	}
 
 	expect(titleCase(123 as never)).toBe('');
 	expect(titleCase('')).toBe('');
+});
+
+test('upperCase', () => {
+	const expected = [
+		'HELLO, WORLD!',
+		'THE QUICK BROWN FOX JUMPS OVER THE LAZY DOG',
+		'Η ΓΡΉΓΟΡΗ ΚΑΦΈ ΑΛΕΠΟΎ ΠΗΔΆΕΙ ΠΆΝΩ ΑΠΌ ΤΟ ΤΕΜΠΈΛΙΚΟ ΣΚΥΛΊ',
+		'БЫСТРАЯ КОРИЧНЕВАЯ ЛИСА ПРЫГАЕТ ЧЕРЕЗ ЛЕНИВУЮ СОБАКУ',
+	];
+
+	for (let index = 0; index < strings.length; index += 1) {
+		expect(upperCase(strings[index])).toBe(expected[index]);
+	}
+
+	expect(upperCase(123 as never)).toBe('');
+});
+
+test('trim', () => {
+	expect(trim('  Hello, world!  ')).toBe('Hello, world!');
+	expect(trim('\n\tHello, world!\n\t')).toBe('Hello, world!');
+	expect(trim(123 as never)).toBe('');
 });
 
 test('words', () => {

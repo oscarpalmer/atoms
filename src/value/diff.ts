@@ -76,7 +76,7 @@ export function diff<First, Second = First>(
 ): DiffResult<First, Second> {
 	const relaxedNullish = typeof options === 'object' && options?.relaxedNullish === true;
 
-	const result: DiffResult<First, Second> = {
+	const diffResult: DiffResult<First, Second> = {
 		original: {
 			from: first,
 			to: second,
@@ -91,15 +91,15 @@ export function diff<First, Second = First>(
 	const secondIsArrayOrObject = isArrayOrPlainObject(second);
 
 	if (same || !(firstIsArrayOrObject || secondIsArrayOrObject)) {
-		result.type = same ? 'none' : 'full';
+		diffResult.type = same ? 'none' : 'full';
 
-		return result;
+		return diffResult;
 	}
 
 	if (firstIsArrayOrObject !== secondIsArrayOrObject) {
-		result.type = 'full';
+		diffResult.type = 'full';
 
-		return result;
+		return diffResult;
 	}
 
 	const diffs = getDiffs(first, second, relaxedNullish);
@@ -107,16 +107,16 @@ export function diff<First, Second = First>(
 	const {length} = diffs;
 
 	if (length === 0) {
-		result.type = 'none';
+		diffResult.type = 'none';
 	}
 
 	for (let index = 0; index < length; index += 1) {
 		const differences = diffs[index];
 
-		result.values[differences.key] = {from: differences.from, to: differences.to};
+		diffResult.values[differences.key] = {from: differences.from, to: differences.to};
 	}
 
-	return result;
+	return diffResult;
 }
 
 function getChanges(

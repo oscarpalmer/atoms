@@ -62,11 +62,11 @@ class Beacon<Value> {
 
 	/**
 	 * Emit an error
-	 * @param error Error to emit
+	 * @param value Error to emit
 	 * @param finish Finish the beacon after emitting? _(defaults to `false`)_
 	 */
-	error(error: Error, finish?: boolean): void {
-		this.#on('error', error, finish);
+	error(value: Error, finish?: boolean): void {
+		this.#on('error', value, finish);
 	}
 
 	/**

@@ -36,18 +36,18 @@ function getKeys(value: PlainObject): OrderedKey[] {
 	const keys = Object.keys(value);
 	const {length} = keys;
 
-	const result: OrderedKey[] = [];
+	const orderedKeys: OrderedKey[] = [];
 
 	for (let index = 0; index < length; index += 1) {
 		const key = keys[index];
 
-		result.push({
+		orderedKeys.push({
 			order: key.split('.').length,
 			value: key,
 		});
 	}
 
-	return result.sort((first, second) => first.order - second.order);
+	return orderedKeys.sort((first, second) => first.order - second.order);
 }
 
 /**

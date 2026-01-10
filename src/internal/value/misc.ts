@@ -33,7 +33,7 @@ export function handleValue(
 			return data[key as never];
 		}
 
-		(data as PlainObject)[key] = value;
+		(data as PlainObject)[key] = typeof value === 'function' ? value(data[key as never]) : value;
 	}
 }
 

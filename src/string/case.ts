@@ -15,7 +15,7 @@ type Options = {
 
 /**
  * Convert a string to camel case _(thisIsCamelCase)_
- * @param value String to convert to camel case
+ * @param value String to convert
  * @returns Camel-cased string
  */
 export function camelCase(value: string): string {
@@ -43,7 +43,7 @@ export function capitalize(value: string): string {
 
 /**
  * Convert a string to kebab case _(this-is-kebab-case)_
- * @param value String to convert to kebab case
+ * @param value String to convert
  * @returns Kebab-cased string
  */
 export function kebabCase(value: string): string {
@@ -51,8 +51,17 @@ export function kebabCase(value: string): string {
 }
 
 /**
+ * Convert a string to lower case
+ * @param value String to convert
+ * @returns Lower-cased string
+ */
+export function lowerCase(value: string): string {
+	return typeof value === 'string' ? value.toLocaleLowerCase() : '';
+}
+
+/**
  * Convert a string to pascal case _(ThisIsPascalCase)_
- * @param value String to convert to pascal case
+ * @param value String to convert
  * @returns Pascal-cased string
  */
 export function pascalCase(value: string): string {
@@ -61,7 +70,7 @@ export function pascalCase(value: string): string {
 
 /**
  * Convert a string to snake case _(this_is_snake_case)_
- * @param value String to convert to snake case
+ * @param value String to convert
  * @returns Snake-cased string
  */
 export function snakeCase(value: string): string {
@@ -70,7 +79,7 @@ export function snakeCase(value: string): string {
 
 /**
  * Convert a string to title case _(Capitalizing Every Word)_
- * @param value String to convert to title case
+ * @param value String to convert
  * @returns Title-cased string
  */
 export function titleCase(value: string): string {
@@ -110,7 +119,7 @@ function toCaseCallback(this: Options, value: string): string {
 	const parts = words(value);
 	const partsLength = parts.length;
 
-	const result: string[] = [];
+	const cased: string[] = [];
 
 	for (let partIndex = 0; partIndex < partsLength; partIndex += 1) {
 		const part = parts[partIndex];
@@ -144,10 +153,19 @@ function toCaseCallback(this: Options, value: string): string {
 			itemCount += 1;
 		}
 
-		result.push(join(partResult, delimiters[type]));
+		cased.push(join(partResult, delimiters[type]));
 	}
 
-	return join(result, delimiters[type]);
+	return join(cased, delimiters[type]);
+}
+
+/**
+ * Convert a string to upper case
+ * @param value String to convert
+ * @returns Upper-cased string
+ */
+export function upperCase(value: string): string {
+	return typeof value === 'string' ? value.toLocaleUpperCase() : '';
 }
 
 //
