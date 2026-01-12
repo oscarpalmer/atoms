@@ -10,5 +10,5 @@ export {
 	titleCase,
 	upperCase,
 } from './case';
-export {createUuid, getUuid, parse, trim, truncate} from './misc';
+export {createUuid, endsWith, getUuid, includes, parse, startsWith, trim, truncate} from './misc';
 export {template, type TemplateOptions} from './template';
