@@ -1,6 +1,8 @@
 import {getArrayCallbacks} from '../internal/array/callbacks';
 import type {PlainObject} from '../models';
 
+// #region Functions
+
 /**
  * Create a Set from an array of items using a callback
  * @param array Array to convert
@@ -50,3 +52,5 @@ export function toSet(array: unknown[], value?: unknown): Set<unknown> {
 
 	return set;
 }
+
+// #endregion

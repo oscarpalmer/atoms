@@ -1,6 +1,8 @@
 import {groupValues} from '../internal/array/group';
 import type {Key, KeyedValue, PlainObject, Simplify} from '../models';
 
+// #region Functions
+
 /**
  * Create a record from an array of items using callbacks
  *
@@ -209,3 +211,5 @@ function toRecordArrays<Item extends PlainObject, ItemKey extends keyof Item>(
 function toRecordArrays(array: unknown[], first?: unknown, second?: unknown): unknown {
 	return groupValues(array, first, second, true);
 }
+
+// #endregion

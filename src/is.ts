@@ -3,6 +3,8 @@ import {isNumber} from './internal/is';
 import {getString} from './internal/string';
 import type {Primitive} from './models';
 
+// #region Functions
+
 /**
  * Is the value empty, or only containing `null` or `undefined` values?
  * @param value Object to check
@@ -86,11 +88,19 @@ export function isPrimitive(value: unknown): value is Primitive {
 	return value == null || EXPRESSION_PRIMITIVE.test(typeof value);
 }
 
-export {isArrayOrPlainObject, isKey, isNumber, isPlainObject, isTypedArray} from './internal/is';
-export type {ArrayOrPlainObject, Key, PlainObject, Primitive, TypedArray} from './models';
+// #endregion
 
-//
+// #region Constants
 
 const EXPRESSION_PRIMITIVE = /^(bigint|boolean|number|string|symbol)$/;
 
 const EXPRESSION_WHITESPACE = /^\s*$/;
+
+// #endregion
+
+// #region Exports
+
+export {isArrayOrPlainObject, isKey, isNumber, isPlainObject, isTypedArray} from './internal/is';
+export type {ArrayOrPlainObject, Key, PlainObject, Primitive, TypedArray} from './models';
+
+// #endregion

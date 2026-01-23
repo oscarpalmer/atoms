@@ -1,5 +1,7 @@
 import {getArrayCallbacks} from './callbacks';
 
+// #region Types
+
 type FindValueType = 'index' | 'value';
 
 type FindValuesType = 'all' | 'unique';
@@ -10,7 +12,9 @@ type Parameters = {
 	value?: unknown;
 };
 
-//
+// #endregion
+
+// #region Functions
 
 export function findValue(type: FindValueType, array: unknown[], parameters: unknown[]): unknown {
 	const findIndex = type === 'index';
@@ -124,6 +128,10 @@ function getParameters(original: unknown[]): Parameters {
 	};
 }
 
-//
+// #endregion
+
+// #region Constants
 
 const UNIQUE_THRESHOLD = 100;
+
+// #endregion

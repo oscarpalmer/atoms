@@ -1,6 +1,8 @@
 import {findValue} from '../internal/array/find';
 import type {PlainObject} from '../models';
 
+// #region Functions
+
 /**
  * Does an item with a specific value exist in the array?
  * @param array Array to search in
@@ -53,3 +55,5 @@ export function exists(array: unknown[], ...parameters: unknown[]): boolean {
 
 	return (findValue('index', array, parameters) as number) > -1;
 }
+
+// #endregion

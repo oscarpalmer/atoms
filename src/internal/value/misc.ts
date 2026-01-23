@@ -1,6 +1,8 @@
 import type {ArrayOrPlainObject, PlainObject} from '../../models';
 import {ignoreKey} from '../string';
 
+// #region Functions
+
 function findKey(needle: string, haystack: ArrayOrPlainObject): string {
 	const keys = Object.keys(haystack);
 	const normalized = keys.map(key => key.toLowerCase());
@@ -37,10 +39,14 @@ export function handleValue(
 	}
 }
 
-//
+// #endregion
+
+// #region Constants
 
 const EXPRESSION_BRACKET = /\[(\w+)\]/g;
 
 const EXPRESSION_DOTS = /^\.|\.$/g;
 
 const EXPRESSION_NESTED = /\.|\[\w+\]/;
+
+// #endregion

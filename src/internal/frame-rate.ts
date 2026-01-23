@@ -1,3 +1,5 @@
+// #region Functions
+
 function calculate(): Promise<number> {
 	return new Promise(resolve => {
 		const values: number[] = [];
@@ -29,7 +31,9 @@ function calculate(): Promise<number> {
 	});
 }
 
-//
+// #endregion
+
+// #region Constants & variables
 
 const TOTAL = 10;
 
@@ -39,7 +43,9 @@ const TRIM_TOTAL = 4;
 
 let FRAME_RATE_MS = 1000 / 60;
 
-//
+// #endregion
+
+// #region Initialization
 
 /**
  * A calculated average of the refresh rate of the display _(in milliseconds)_
@@ -48,4 +54,10 @@ calculate().then(value => {
 	FRAME_RATE_MS = value;
 });
 
+// #endregion
+
+// #region Exports
+
 export default FRAME_RATE_MS;
+
+// #endregion

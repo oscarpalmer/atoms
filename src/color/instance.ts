@@ -3,6 +3,8 @@ import {getAlpha} from './misc/alpha';
 import {getState, setHexColor, setHSLColor, setRGBColor} from './misc/state';
 import type {ColorState, HSLAColor, HSLColor, RGBAColor, RGBColor} from './models';
 
+// #region Classes
+
 export class Color {
 	declare private readonly $color: boolean;
 
@@ -138,3 +140,5 @@ export class Color {
 		return this.toHexString();
 	}
 }
+
+// #endregion

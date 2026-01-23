@@ -1,3 +1,5 @@
+// #region Types
+
 /**
  * Sorting information for arrays _(using a callback)_
  */
@@ -41,4 +43,10 @@ export type NumericalKeys<Value> = {
 	[Key in keyof Value]: Key extends number ? Key : Key extends `${number}` ? Key : never;
 }[keyof Value];
 
+// #endregion
+
+// #region Exports
+
 export type {Key, KeyedValue, NestedArray, PlainObject} from '../models';
+
+// #endregion

@@ -1,5 +1,7 @@
 import type {PlainObject} from '../models';
 
+// #region Functions
+
 /**
  * Create a new object with only the specified keys
  * @param value Original object
@@ -33,3 +35,5 @@ export function partial<Value extends PlainObject, Key extends keyof Value>(
 
 	return partials;
 }
+
+// #endregion

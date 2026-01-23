@@ -18,6 +18,8 @@ import {
 import type {Color} from '../index';
 import type {ColorProperty, HSLAColor, HSLColor, RGBAColor, RGBColor} from '../models';
 
+// ##region Functions
+
 function hasKeys(value: unknown, keys: ColorProperty[]): boolean {
 	return typeof value === 'object' && value !== null && keys.every(key => key in value);
 }
@@ -141,7 +143,9 @@ function isPercentage(value: unknown): value is number {
 	return typeof value === 'number' && between(value, 0, MAX_PERCENT);
 }
 
-//
+// #endregion
+
+// #region Constants
 
 const validators: Record<ColorProperty, (value: unknown) => value is number> = {
 	alpha: isAlpha,
@@ -152,3 +156,5 @@ const validators: Record<ColorProperty, (value: unknown) => value is number> = {
 	saturation: isPercentage,
 	red: isBytey,
 };
+
+// #endregion

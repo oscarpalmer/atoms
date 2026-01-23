@@ -1,6 +1,8 @@
 import {findValues} from '../internal/array/find';
 import type {Key, PlainObject} from '../models';
 
+// #region Functions
+
 /**
  * Get an array of unique items
  * @param array Original array
@@ -37,3 +39,5 @@ export function unique(array: unknown[], key?: unknown): unknown[] {
 
 	return array.length > 1 ? findValues('unique', array, [key, undefined]) : array;
 }
+
+// #endregion

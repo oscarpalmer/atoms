@@ -2,6 +2,8 @@ import {noop} from './internal/function';
 import {isPlainObject} from './internal/is';
 import type {PlainObject} from './models';
 
+// #region Types and classes
+
 class Beacon<Value> {
 	readonly #options: Options;
 	readonly #state: BeaconState<Value>;
@@ -245,7 +247,9 @@ type SubscriptionState<Value> = {
 	observers: Map<Subscription<Value>, Observer<Value>>;
 };
 
-//
+// #endregion
+
+// #region Functions
 
 /**
  * Create a new beacon
@@ -318,10 +322,18 @@ function getObserver<Value>(
 	return observer;
 }
 
-//
+// #endregion
+
+// #region Constants
 
 const DESTROYED_BEACON = 'Cannot retrieve observable from a destroyed beacon';
 
 const DESTROYED_OBSERVABLE = 'Cannot subscribe to a destroyed observable';
 
+// #endregion
+
+// #region Exports
+
 export type {Beacon, BeaconOptions, Observable, Observer, Subscription};
+
+// #endregion

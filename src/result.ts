@@ -1,5 +1,7 @@
 import {isPlainObject} from './internal/is';
 
+// #region Types
+
 /**
  * An error result
  */
@@ -28,7 +30,9 @@ export type Ok<Value> = {
  */
 export type Result<Value, E = Error> = Err<E> | Ok<Value>;
 
-//
+// #endregion
+
+// #region Functions
 
 function _isResult(value: unknown, okValue: boolean): value is Result<unknown, unknown> {
 	if (!isPlainObject(value)) {
@@ -228,3 +232,5 @@ export function unwrap(value: unknown, defaultValue: unknown): unknown;
 export function unwrap(value: unknown, defaultValue: unknown): unknown {
 	return isOk(value) ? value.value : defaultValue;
 }
+
+// #endregion

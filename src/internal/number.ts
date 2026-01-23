@@ -1,5 +1,7 @@
 import {isNumber} from './is';
 
+// #region Functions
+
 /**
  * Is the number between a minimum and maximum value?
  * @param value Value to check
@@ -97,7 +99,9 @@ export function getNumber(value: unknown): number {
 	);
 }
 
-//
+// #endregion
+
+// #region Constants
 
 const EXPRESSION_BINARY = /^0b[01]+$/i;
 
@@ -110,3 +114,5 @@ const EXPRESSION_UNDERSCORE = /_/g;
 const EXPRESSION_ZEROISH = /^\s*0+\s*$/;
 
 const OCTAL_VALUE = 8;
+
+// #endregion

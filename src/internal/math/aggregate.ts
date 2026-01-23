@@ -1,5 +1,7 @@
 import type {GenericCallback, NumericalValues, PlainObject} from '../../models';
 
+// #region Types
+
 type Aggregation = {
 	count: number;
 	value: number;
@@ -8,6 +10,10 @@ type Aggregation = {
 type AggregationCallback = (current: number, value: number, notNumber: boolean) => number;
 
 export type AggregationType = 'average' | 'max' | 'min' | 'sum';
+
+// #endregion
+
+// #region Functions
 
 export function aggregate(type: AggregationType, array: unknown[], key: unknown): Aggregation {
 	const length = Array.isArray(array) ? array.length : 0;
@@ -94,7 +100,9 @@ export function getAggregated(
 	return aggregated.count > 0 ? aggregated.value : Number.NaN;
 }
 
-//
+// #endregion
+
+// #region Constants
 
 const aggregators: Record<AggregationType, AggregationCallback> = {
 	average: calculateSum,
@@ -104,3 +112,5 @@ const aggregators: Record<AggregationType, AggregationCallback> = {
 		notNumber || value < current ? value : current,
 	sum: calculateSum,
 };
+
+// #endregion

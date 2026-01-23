@@ -1,6 +1,6 @@
 import {noop} from './internal/function';
 
-let enabled = true;
+// #region Types & classes
 
 class Logger {
 	/**
@@ -142,10 +142,18 @@ type TimeState = {
 	stopped: boolean;
 };
 
-//
+// #endregion
+
+// #region Constants & variables
 
 const logger = new Logger();
 
-//
+let enabled = true;
+
+// #endregion
+
+// #region Exports
 
 export {logger, type Logger, type Time};
+
+// #endregion

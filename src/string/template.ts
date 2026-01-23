@@ -3,6 +3,8 @@ import {getValue} from '../internal/value/get';
 import {isPlainObject} from '../is';
 import type {PlainObject} from '../models';
 
+// #region Types
+
 /**
  * Options for templating strings
  */
@@ -25,7 +27,9 @@ export type TemplateOptions = {
  */
 type Templater = (value: string, variables?: PlainObject) => string;
 
-//
+// #endregion
+
+// #region Functions
 
 function getTemplateOptions(input?: Partial<TemplateOptions>): Required<TemplateOptions> {
 	const options = isPlainObject(input) ? (input as TemplateOptions) : {};
@@ -93,6 +97,10 @@ template.initialize = function (options?: Partial<TemplateOptions>): Templater {
 	};
 };
 
-//
+// #endregion
+
+// #region Constants
 
 const EXPRESSION_VARIABLE = /{{([\s\S]+?)}}/g;
+
+// #endregion

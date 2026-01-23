@@ -1,6 +1,8 @@
 import {getArrayCallbacks} from '../internal/array/callbacks';
 import type {Key, PlainObject} from '../models';
 
+// #region Functions
+
 function getMapValues(
 	array: unknown[],
 	first: unknown,
@@ -229,3 +231,5 @@ function toMapArrays<Item extends PlainObject, ItemKey extends keyof Item>(
 function toMapArrays(array: unknown[], first?: unknown, second?: unknown): unknown {
 	return getMapValues(array, first, second, true);
 }
+
+// #endregion

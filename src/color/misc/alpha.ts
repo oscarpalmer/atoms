@@ -9,6 +9,8 @@ import {
 } from '../constants';
 import type {Alpha} from '../models';
 
+// #region Functions
+
 export function getAlpha(value: unknown): Alpha {
 	if (typeof value === 'number') {
 		return getAlphaFromValue(value);
@@ -56,3 +58,5 @@ export function getAlphaValue(original: number): number {
 
 	return original <= ALPHA_FULL_VALUE ? original : original / MAX_PERCENT;
 }
+
+// #endregion

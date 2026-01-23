@@ -1,5 +1,7 @@
 import {clamp} from './internal/number';
 
+// #region Classes
+
 /**
  * A Map with a maximum size
  *
@@ -192,6 +194,10 @@ export class SizedSet<Value = unknown> extends Set<Value> {
 	}
 }
 
+// #endregion
+
+// #region Functions
+
 function getMaximum(first?: unknown, second?: unknown): number {
 	let actual: number;
 
@@ -204,8 +210,12 @@ function getMaximum(first?: unknown, second?: unknown): number {
 	return clamp(actual, 1, MAXIMUM_ABSOLUTE);
 }
 
-//
+// #endregion
+
+// #region Constants
 
 const MAXIMUM_ABSOLUTE = 16_777_216; // 2^24
 
 const MAXIMUM_DEFAULT = 1_048_576; // 2^20
+
+// #endregion

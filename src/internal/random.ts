@@ -1,5 +1,7 @@
 import {isNumber} from './is';
 
+// #region Functions
+
 function _getRandomFloat(inclusive: boolean, minimum?: number, maximum?: number): number {
 	let maxFloat =
 		isNumber(maximum) && maximum <= Number.MAX_SAFE_INTEGER ? maximum : Number.MAX_SAFE_INTEGER;
@@ -37,3 +39,5 @@ export function getRandomFloat(minimum?: number, maximum?: number): number {
 export function getRandomInteger(minimum?: number, maximum?: number): number {
 	return Math.floor(_getRandomFloat(true, minimum, maximum));
 }
+
+// #endregion

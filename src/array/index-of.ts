@@ -1,6 +1,8 @@
 import {findValue} from '../internal/array/find';
 import type {PlainObject} from '../models';
 
+// #region Functions
+
 /**
  * Get the index of the first matching item by callback
  * @param array Array to search in
@@ -49,3 +51,5 @@ export function indexOf<Item>(array: Item[], item: Item): number;
 export function indexOf(array: unknown[], ...parameters: unknown[]): number {
 	return findValue('index', array, parameters) as number;
 }
+
+// #endregion

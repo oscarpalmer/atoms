@@ -9,9 +9,15 @@ import type {
 	ToString,
 } from '../models';
 
+// #region Types
+
 type Smushed<Value extends PlainObject> = Simplify<{
 	[Key in NestedKeys<Value>]: NestedValue<Value, ToString<Key>>;
 }>;
+
+// #endregion
+
+// #region Functions
 
 function flattenObject(
 	value: ArrayOrPlainObject,
@@ -70,6 +76,10 @@ export function smush<Value extends PlainObject>(value: Value): Smushed<Value> {
 		: ({} as never);
 }
 
-//
+// #endregion
+
+// #region Constants
 
 const MAX_DEPTH = 100;
+
+// #endregion

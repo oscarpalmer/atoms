@@ -1,5 +1,7 @@
 import type {ArrayOrPlainObject, Key, PlainObject, TypedArray} from '../models';
 
+// #region Functions
+
 /**
  * Is the value an array or a record?
  * @param value Value to check
@@ -73,6 +75,10 @@ export function isTypedArray(value: unknown): value is TypedArray {
 	return TYPED_ARRAYS.has((value as TypedArray)?.constructor);
 }
 
-//
+// #endregion
+
+// #region Variables
 
 let TYPED_ARRAYS: Set<unknown>;
+
+// #endregion

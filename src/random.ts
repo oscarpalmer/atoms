@@ -2,6 +2,8 @@ import {shuffle} from './internal/array/shuffle';
 import {getRandomInteger} from './internal/random';
 import {join} from './internal/string';
 
+// #region Functions
+
 /**
  * Get a random boolean
  * @return Random boolean
@@ -95,7 +97,9 @@ export function getRandomItems<Value>(array: Value[], amount?: number): Value[] 
 		: shuffle(array).slice(0, amount);
 }
 
-//
+// #endregion
+
+// #region Constants
 
 const ALPHABET = 'abcdefghijklmnopqrstuvwxyz';
 
@@ -105,6 +109,10 @@ const HEX_CHARACTERS = '0123456789ABCDEF';
 
 const HEX_MAXIMUM = 15;
 
-//
+// #endregion
+
+// #region Exports
 
 export {getRandomFloat, getRandomInteger} from './internal/random';
+
+// #endregion

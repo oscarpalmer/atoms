@@ -1,6 +1,8 @@
 import {isArrayOrPlainObject, isTypedArray} from '../internal/is';
 import type {ArrayOrPlainObject, PlainObject, TypedArray} from '../models';
 
+// #region Functions
+
 /**
  * Clone any kind of value _(deeply, if needed)_
  * @param value Value to clone
@@ -225,6 +227,10 @@ function tryStructuredClone(
 	}
 }
 
-//
+// #endregion
+
+// #region Constants
 
 const MAX_CLONE_DEPTH = 100;
+
+// #endregion

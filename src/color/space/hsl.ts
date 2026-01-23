@@ -5,6 +5,8 @@ import {isHslLike} from '../misc/is';
 import type {HSLAColor, HSLColor, RGBAColor, RGBColor} from '../models';
 import {convertRgbToHex} from './rgb';
 
+// #region Functions
+
 function convertHslToRgba(value: unknown): RGBAColor {
 	const hsl = isHslLike(value) ? getHslValue(value) : {...DEFAULT_HSL};
 
@@ -66,3 +68,5 @@ export function hslToRgb(hsl: HSLAColor | HSLColor): RGBColor {
 export function hslToRgba(hsl: HSLAColor | HSLColor): RGBAColor {
 	return convertHslToRgba(hsl);
 }
+
+// #endregion

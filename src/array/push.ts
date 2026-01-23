@@ -1,5 +1,7 @@
 import {insertValues} from '../internal/array/insert';
 
+// #region Functions
+
 // Uses chunking to avoid call stack size being exceeded
 
 /**
@@ -11,3 +13,5 @@ import {insertValues} from '../internal/array/insert';
 export function push<Item>(array: Item[], pushed: Item[]): number {
 	return insertValues('push', array, pushed, array.length, 0) as number;
 }
+
+// #endregion

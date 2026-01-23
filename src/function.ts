@@ -4,6 +4,8 @@ import {isPlainObject} from './is';
 import type {GenericCallback} from './models';
 import {SizedMap} from './sized';
 
+// #region Types & classes
+
 type CancellableCallback<Callback extends GenericCallback> = Callback & {
 	/**
 	 * Cancel the callback
@@ -132,7 +134,9 @@ type Options = {
 	cacheSize: number;
 };
 
-//
+// #endregion
+
+// #region Functions
 
 /**
  * Debounce a function, ensuring it is only called after `time` milliseconds have passed
@@ -234,6 +238,10 @@ export function throttle<Callback extends GenericCallback>(
 export type {CancellableCallback, GenericCallback, Memoized, MemoizedOptions};
 export {noop} from './internal/function';
 
-//
+// #endregion
+
+// #region Constants
 
 const DEFAULT_CACHE_SIZE = 1024;
+
+// #endregion

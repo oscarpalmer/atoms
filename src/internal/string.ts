@@ -1,5 +1,7 @@
 import {compact} from './array/compact';
 
+// #region Functions
+
 /**
  * Get the string value from any value
  * @param value Original value
@@ -68,9 +70,13 @@ export function words(value: string): string[] {
 	return typeof value === 'string' ? (value.match(EXPRESSION_WORDS) ?? []) : [];
 }
 
-//
+// #endregion
+
+// #region Constants
 
 const EXPRESSION_IGNORED = /(^|\.)(__proto__|constructor|prototype)(\.|$)/i;
 
 // oxlint-disable-next-line no-control-regex: Lodash uses it, so it's fine ;-)
 const EXPRESSION_WORDS = /[^\x00-\x2f\x3a-\x40\x5b-\x60\x7b-\x7f]+/g;
+
+// #endregion

@@ -1,6 +1,8 @@
 import {aggregate, getAggregated} from './internal/math/aggregate';
 import type {NumericalValues, PlainObject} from './models';
 
+// #region Functions
+
 /**
  * Get the average value from a list of items
  * @param items List of items
@@ -186,5 +188,11 @@ export function sum(array: unknown[], key?: unknown): number {
 	return getAggregated('sum', array, key);
 }
 
+// #endregion
+
+// #region Exports
+
 export {max} from './internal/math/aggregate';
 export type {NumericalValues};
+
+// #endregion

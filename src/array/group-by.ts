@@ -1,6 +1,8 @@
 import {groupValues} from '../internal/array/group';
 import type {Key, KeyedValue, PlainObject, Simplify} from '../models';
 
+// #region Functions
+
 /**
  * Create a record from an array of items using a specific key and value
  *
@@ -209,3 +211,5 @@ function groupArraysBy<Item extends PlainObject, ItemKey extends keyof Item>(
 function groupArraysBy(array: unknown[], first?: unknown, second?: unknown): unknown {
 	return groupValues(array, first, second, true);
 }
+
+// #endregion

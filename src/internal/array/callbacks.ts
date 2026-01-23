@@ -1,10 +1,16 @@
 import type {GenericCallback, PlainObject} from '../../models';
 
+// #region Types
+
 export type Callbacks = {
 	bool?: GenericCallback;
 	keyed?: GenericCallback;
 	value?: GenericCallback;
 };
+
+// #endregion
+
+// #region Functions
 
 function getArrayCallback(value: unknown): GenericCallback | undefined {
 	switch (typeof value) {
@@ -36,3 +42,5 @@ export function getArrayCallbacks(
 		value: getArrayCallback(value),
 	};
 }
+
+// #endregion

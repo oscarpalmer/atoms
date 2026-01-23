@@ -2,6 +2,8 @@ import type {ArrayOrPlainObject, PlainObject, TypedArray} from '../../models';
 import {chunk} from '../array/chunk';
 import {isPlainObject, isTypedArray} from '../is';
 
+// #region Types
+
 /**
  * Options for value equality comparison
  */
@@ -40,7 +42,9 @@ type OptionsKeys<Values> = {
 	values: Values;
 };
 
-//
+// #endregion
+
+// #region Functions
 
 /**
  * Are two strings equal?
@@ -369,8 +373,12 @@ function getEqualOptions(input?: boolean | EqualOptions): Options {
 	return options;
 }
 
-//
+// #endregion
+
+// #region Constants
 
 const ARRAY_PEEK_PERCENTAGE = 10;
 
 const ARRAY_THRESHOLD = 100;
+
+// #endregion

@@ -1,3 +1,5 @@
+// #region Functions
+
 /**
  * Chunk an array into smaller arrays
  * @param array Array to chunk
@@ -34,6 +36,10 @@ export function chunk<Item>(array: Item[], size?: number): Item[][] {
 	return chunks;
 }
 
-//
+// #endregion
+
+// #region Constants
 
 const MAX_SIZE = 5_000;
+
+// #endregion

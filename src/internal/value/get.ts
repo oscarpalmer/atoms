@@ -1,6 +1,8 @@
 import type {NestedKeys, NestedValue, PlainObject, ToString} from '../../models';
 import {getPaths, handleValue} from './misc';
 
+// #region Functions
+
 /**
  * Get the value from an object using a known path
  * @param data Object to get value from
@@ -53,3 +55,5 @@ export function getValue(data: PlainObject, path: string, ignoreCase?: boolean):
 
 	return value as never;
 }
+
+// #endregion

@@ -1,3 +1,5 @@
+// #region Functions
+
 /**
  * Compact an array _(removing all false-y values)_
  * @param array Array to compact
@@ -38,3 +40,5 @@ export function compact<Item>(array: Item[], strict?: unknown): Item[] {
 
 	return compacted;
 }
+
+// #endregion

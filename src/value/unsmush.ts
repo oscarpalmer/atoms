@@ -2,6 +2,8 @@ import {isArrayOrPlainObject} from '../internal/is';
 import {setValue} from '../internal/value/set';
 import type {PlainObject, Simplify} from '../models';
 
+// #region Types
+
 /**
  * Thanks, type-fest!
  */
@@ -31,6 +33,10 @@ type Unsmushed<Value extends PlainObject> = Simplify<
 		`${string}.${string}`
 	>
 >;
+
+// #endregion
+
+// #region Functions
 
 function getKeys(value: PlainObject): OrderedKey[] {
 	const keys = Object.keys(value);
@@ -79,3 +85,5 @@ export function unsmush<Value extends PlainObject>(value: Value): Unsmushed<Valu
 
 	return unsmushed as never;
 }
+
+// #endregion

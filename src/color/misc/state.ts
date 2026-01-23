@@ -15,6 +15,8 @@ import {getAlpha} from './alpha';
 import {getHexValue, getDegrees, getPercentage} from './get';
 import {isColor, isHexColor, isHslLike, isRgbLike} from './is';
 
+// #region Functions
+
 export function getState(value: unknown): ColorState {
 	if (typeof value === 'string') {
 		const normalized = getNormalizedHex(value, true);
@@ -127,3 +129,5 @@ export function setRGBColor(state: ColorState, value: unknown, alpha: boolean): 
 		state.alpha = getAlpha((value as RGBAColor).alpha);
 	}
 }
+
+// #endregion

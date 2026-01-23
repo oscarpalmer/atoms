@@ -1,3 +1,5 @@
+// #region Types
+
 export type Alpha = {
 	hex: string;
 	value: number;
@@ -33,3 +35,5 @@ export type ColorState = {
 	hsl: HSLColor;
 	rgb: RGBColor;
 };
+
+// #endregion

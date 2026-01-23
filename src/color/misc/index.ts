@@ -3,6 +3,8 @@ import {KEYS_HSL, KEYS_RGB} from '../constants';
 import type {Color} from '../instance';
 import type {ColorProperty, ColorSpace} from '../models';
 
+// #region Functions
+
 export function formatColor(space: ColorSpace, color: Color, alpha: boolean): string {
 	const suffix = alpha ? ` / ${color.alpha}` : '';
 	const value = color[space];
@@ -13,9 +15,13 @@ export function formatColor(space: ColorSpace, color: Color, alpha: boolean): st
 	)}${suffix})`;
 }
 
-//
+// #endregion
+
+// #region Constants
 
 const formattingKeys: Record<ColorSpace, ColorProperty[]> = {
 	hsl: KEYS_HSL,
 	rgb: KEYS_RGB,
 };
+
+// #endregion

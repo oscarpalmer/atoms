@@ -1,5 +1,7 @@
 import type {Alpha, ColorProperty, ColorSpace, HSLColor, RGBColor} from './models';
 
+// #region Constants
+
 export const ALPHA_FULL_HEX_SHORT = 'f';
 
 export const ALPHA_FULL_HEX_LONG = `${ALPHA_FULL_HEX_SHORT}${ALPHA_FULL_HEX_SHORT}`;
@@ -59,8 +61,6 @@ export const SPACE_HSL: ColorSpace = 'hsl';
 
 export const SPACE_RGB: ColorSpace = 'rgb';
 
-//
-
 // https://www.w3.org/TR/WCAG20/#relativeluminancedef
 
 export const SRGB_LUMINANCE_BLUE = 0.0722;
@@ -80,3 +80,5 @@ export const SRGB_LUMINANCE_OFFSET = 0.055;
 export const SRGB_LUMINANCE_RED = 0.2126;
 
 export const SRGB_LUMINANCE_THRESHOLD = 0.625;
+
+// #endregion

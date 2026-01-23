@@ -1,5 +1,7 @@
 import {insertValues} from '../internal/array/insert';
 
+// #region Functions
+
 // Uses chunking to avoid call stack size being exceeded
 
 /**
@@ -52,3 +54,5 @@ export function splice(
 		typeof deleteCountOrItems === 'number' ? deleteCountOrItems : 0,
 	) as unknown[];
 }
+
+// #endregion

@@ -3,6 +3,8 @@ import {isPlainObject} from '../internal/is';
 import type {GenericCallback, PlainObject, Primitive} from '../models';
 import type {CallbackSorter, KeySorter} from './models';
 
+// #region Types
+
 type Sorter = {
 	callback?: (item: unknown) => unknown;
 	compare?: (first: unknown, firstValue: unknown, second: unknown, secondValue: unknown) => number;
@@ -12,7 +14,9 @@ type Sorter = {
 	sorter?: (first: unknown, firstValue: unknown, second: unknown, secondValue: unknown) => number;
 };
 
-//
+// #endregion
+
+// #region Functions
 
 function getCallback(
 	value: unknown,
@@ -195,3 +199,5 @@ export function sort(array: unknown[], first?: unknown, second?: unknown): unkno
 		return 0;
 	});
 }
+
+// #endregion

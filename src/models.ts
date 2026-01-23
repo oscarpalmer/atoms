@@ -1,3 +1,5 @@
+// #region Types
+
 /**
  * A generic array or object
  */
@@ -164,3 +166,5 @@ export type TypedArray =
 	| Float64Array
 	| BigInt64Array
 	| BigUint64Array;
+
+// #endregion

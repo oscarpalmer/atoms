@@ -4,6 +4,8 @@ import {ignoreKey, join, tryDecode, tryEncode} from './internal/string';
 import {setValue} from './internal/value/set';
 import type {ArrayOrPlainObject, PlainObject} from './models';
 
+// #region Functions
+
 /**
  * Convert a query string to a plain _(nested)_ object
  * @param query Query string to convert
@@ -113,7 +115,9 @@ export function toQuery(parameters: PlainObject): string {
 		: '';
 }
 
-//
+// #endregion
+
+// #region Constants
 
 const EXPRESSION_ARRAY_SUFFIX = /\[\]$/;
 
@@ -121,6 +125,10 @@ const EXPRESSION_BOOLEAN = /^(false|true)$/;
 
 const TYPES = new Set(['boolean', 'number', 'string']);
 
-//
+// #endregion
+
+// #region Exports
 
 export type {PlainObject} from './models';
+
+// #endregion

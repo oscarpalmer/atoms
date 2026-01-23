@@ -2,6 +2,8 @@ import {isPlainObject} from '../internal/is';
 import type {PlainObject} from '../models';
 import type {NumericalKeys} from './models';
 
+// #region Functions
+
 /**
  * Get an array from an object, where only values with numerical keys will be included
  * @param value Object to convert to an array
@@ -72,3 +74,5 @@ export function getArray(value: unknown, indiced?: unknown): unknown[] {
 
 	return array;
 }
+
+// #endregion

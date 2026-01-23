@@ -5,6 +5,8 @@ import {getHexValue} from '../misc/get';
 import {isRgbLike} from '../misc/is';
 import type {HSLAColor, HSLColor, RGBAColor, RGBColor} from '../models';
 
+// #region Functions
+
 export function convertRgbToHex(rgb: RGBAColor | RGBColor, alpha: boolean): string {
 	const hex = `${join(
 		[rgb.red, rgb.green, rgb.blue].map(color => {
@@ -111,3 +113,5 @@ export function rgbToHsl(rgb: RGBAColor | RGBColor): HSLColor {
 export function rgbToHsla(rgb: RGBAColor | RGBColor): HSLAColor {
 	return convertRgbToHsla(rgb);
 }
+
+// #endregion

@@ -1,6 +1,8 @@
 import {max} from '../math/aggregate';
 import {getString, words} from '../string';
 
+// #region Functions
+
 /**
  * Compare two values _(for sorting purposes)_
  * @param first First value
@@ -100,7 +102,9 @@ function getComparisonParts(value: unknown): unknown[] {
 	return typeof value === 'object' ? [value] : words(getString(value));
 }
 
-//
+// #endregion
+
+// #region Constants
 
 const comparators: Record<string, (first: never, second: never) => number | undefined> = {
 	bigint: compareNumbers,
@@ -108,3 +112,5 @@ const comparators: Record<string, (first: never, second: never) => number | unde
 	number: compareNumbers,
 	symbol: compareSymbols,
 };
+
+// #endregion

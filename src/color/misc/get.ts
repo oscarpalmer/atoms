@@ -19,6 +19,8 @@ import {Color} from '../instance';
 import type {HSLAColor, HSLColor, RGBAColor, RGBColor} from '../models';
 import {getState} from './state';
 
+// #region Functions
+
 function getClampedValue(value: unknown, minimum: number, maximum: number): number {
 	return typeof value === 'number' ? clamp(value, minimum, maximum) : minimum;
 }
@@ -132,3 +134,5 @@ export function getRgbaColor(value: unknown): RGBAColor {
 export function getRgbColor(value: unknown): RGBColor {
 	return getState(value).rgb;
 }
+
+// #endregion

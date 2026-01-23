@@ -1,7 +1,7 @@
 import {memoize, type Memoized} from '../function';
 import {join, words} from '../internal/string';
 
-//
+// #region Types
 
 type Case = 'camel' | 'kebab' | 'pascal' | 'snake';
 
@@ -11,7 +11,9 @@ type Options = {
 	type: Case;
 };
 
-//
+// #endregion
+
+// #region Functions
 
 /**
  * Convert a string to camel case _(thisIsCamelCase)_
@@ -168,15 +170,9 @@ export function upperCase(value: string): string {
 	return typeof value === 'string' ? value.toLocaleUpperCase() : '';
 }
 
-//
+// #endregion
 
-const EXPRESSION_CAMEL_CASE = /(\p{Ll})(\p{Lu})/gu;
-
-const EXPRESSION_ACRONYM = /(\p{Lu}*)(\p{Lu})(\p{Ll}+)/gu;
-
-const REPLACEMENT_CAMEL_CASE = '$1-$2';
-
-//
+// #region Constants & variables
 
 const delimiters: Record<Case, string> = {
 	camel: '',
@@ -185,8 +181,16 @@ const delimiters: Record<Case, string> = {
 	snake: '_',
 };
 
+const EXPRESSION_CAMEL_CASE = /(\p{Ll})(\p{Lu})/gu;
+
+const EXPRESSION_ACRONYM = /(\p{Lu}*)(\p{Lu})(\p{Ll}+)/gu;
+
 const memoizers: Partial<Record<string, Memoized<typeof toCaseCallback>>> = {};
+
+const REPLACEMENT_CAMEL_CASE = '$1-$2';
 
 let memoizedCapitalize: Memoized<(value: string) => string>;
 
 let memoizedTitleCase: Memoized<(value: string) => string>;
+
+// #endregion

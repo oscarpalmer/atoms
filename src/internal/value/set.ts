@@ -1,6 +1,8 @@
 import type {NestedKeys, NestedValue, PlainObject} from '../../models';
 import {getPaths, handleValue} from './misc';
 
+// #region Functions
+
 /**
  * Update the value in an object using a known path
  * @param data Object to set value in
@@ -100,6 +102,10 @@ export function setValue<Data extends PlainObject>(
 	return data;
 }
 
-//
+// #endregion
+
+// #region Constants
 
 const EXPRESSION_INDEX = /^\d+$/;
+
+// #endregion

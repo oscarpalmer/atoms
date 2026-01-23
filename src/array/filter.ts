@@ -1,6 +1,8 @@
 import {findValues} from '../internal/array/find';
 import type {PlainObject} from '../models';
 
+// #region Functions
+
 /**
  * Get a filtered array of items
  * @param array Array to search in
@@ -49,3 +51,5 @@ export function filter<Item>(array: Item[], item: Item): Item[];
 export function filter(array: unknown[], ...parameters: unknown[]): unknown[] {
 	return findValues('all', array, parameters);
 }
+
+// #endregion

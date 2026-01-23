@@ -1,6 +1,8 @@
 import {findValue} from '../internal/array/find';
 import type {PlainObject} from '../models';
 
+// #region Functions
+
 /**
  * Get the first items matching the given value
  * @param array Array to search in
@@ -49,3 +51,5 @@ export function find<Item>(array: Item[], value: Item): Item | undefined;
 export function find<Item>(array: unknown[], ...parameters: unknown[]): Item | undefined {
 	return findValue('value', array, parameters) as Item | undefined;
 }
+
+// #endregion

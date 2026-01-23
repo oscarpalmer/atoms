@@ -13,6 +13,8 @@ import {isHexColor} from '../misc/is';
 import type {HSLAColor, HSLColor, RGBAColor, RGBColor} from '../models';
 import {convertRgbToHsla} from './rgb';
 
+// #region Functions
+
 function convertHexToRgba(value: string): RGBAColor {
 	const normalized = getNormalizedHex(value, true);
 	const pairs = EXPRESSION_HEX_LONG.exec(normalized) as RegExpExecArray;
@@ -94,3 +96,5 @@ export function hexToRgb(value: string): RGBColor {
 export function hexToRgba(value: string): RGBAColor {
 	return convertHexToRgba(value);
 }
+
+// #endregion

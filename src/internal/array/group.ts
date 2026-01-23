@@ -1,6 +1,8 @@
 import type {Key} from '../../models';
 import {getArrayCallbacks} from './callbacks';
 
+// #region Functions
+
 export function groupValues(
 	array: unknown[],
 	key: unknown,
@@ -36,3 +38,5 @@ export function groupValues(
 
 	return record;
 }
+
+// #endregion

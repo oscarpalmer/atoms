@@ -1,10 +1,12 @@
 import {chunk} from './chunk';
 
-//
+// #region Types
 
 type InsertType = 'insert' | 'push' | 'splice';
 
-//
+// #endregion
+
+// #region Functions
 
 function insertChunkedValues(
 	type: InsertType,
@@ -64,3 +66,5 @@ export function insertValues(
 
 	return insertChunkedValues(type, array, items, start, spliceArray ? deleteCount : 0);
 }
+
+// #endregion

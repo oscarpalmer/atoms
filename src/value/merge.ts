@@ -2,6 +2,8 @@ import {isArrayOrPlainObject} from '../internal/is';
 import {join} from '../internal/string';
 import type {ArrayOrPlainObject, NestedPartial, PlainObject} from '../models';
 
+// #region Types
+
 /**
  * Options for merging values
  */
@@ -37,6 +39,10 @@ type Options = {
 };
 
 type ReplaceableObjectsCallback = (name: string) => boolean;
+
+// #endregion
+
+// #region Functions
 
 function getMergeOptions(options?: Partial<MergeOptions>): Options {
 	const actual: Options = {
@@ -145,3 +151,5 @@ function mergeValues(
 
 	return actual.length > 1 ? mergeObjects(actual, options, prefix) : (actual[0] ?? {});
 }
+
+// #endregion

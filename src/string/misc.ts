@@ -1,10 +1,12 @@
-//
-
 import {memoize, type Memoized} from '../function';
+
+// #region Types
 
 type Match = 'endsWith' | 'includes' | 'startsWith';
 
-//
+// #endregion
+
+// #region Functions
 
 /**
  * Create a new UUID-string
@@ -147,6 +149,10 @@ export function truncate(value: string, length: number, suffix?: string): string
 	return `${value.slice(0, truncatedLength)}${actualSuffix}`;
 }
 
-//
+// #endregion
+
+// #region Constants
 
 const memoizers: Partial<Record<Match, Memoized<typeof matchCallback>>> = {};
+
+// #endregion

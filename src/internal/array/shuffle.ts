@@ -1,5 +1,7 @@
 import {getRandomInteger} from '../random';
 
+// #region Functions
+
 /**
  * Shuffle items in array
  * @param array Original array
@@ -26,3 +28,5 @@ export function shuffle<Item>(array: Item[]): Item[] {
 
 	return shuffled;
 }
+
+// #endregion

@@ -2,6 +2,8 @@ import {isArrayOrPlainObject} from '../internal/is';
 import {join} from '../internal/string';
 import {equal} from '../internal/value/equal';
 
+// #region Types
+
 /**
  * Options for value comparison
  */
@@ -60,7 +62,9 @@ type Parameters = {
 	prefix?: string;
 };
 
-//
+// #endregion
+
+// #region Functions
 
 /**
  * Find the differences between two values
@@ -213,3 +217,5 @@ function setChanges(parameters: Parameters): void {
 		changes.push(diffs[diffIndex]);
 	}
 }
+
+// #endregion
