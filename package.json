@@ -100,10 +100,10 @@
 		"clean": "rm -rf ./dist && rm -rf ./types && rm -f ./tsconfig.tsbuildinfo",
 		"rolldown:build": "npx rolldown -c",
 		"rolldown:watch": "npx rolldown -c ./rolldown.config.js --watch",
-		"test": "npx vitest --coverage --silent",
+		"test": "npx vitest --coverage",
 		"watch": "npx vite build --watch"
 	},
 	"type": "module",
 	"types": "./types/index.d.ts",
-	"version": "0.128.1"
+	"version": "0.129.0"
 }

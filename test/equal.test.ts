@@ -119,6 +119,36 @@ test('error', () => {
 	expect(equal(first, third)).toBe(false);
 });
 
+test('instance', () => {
+	class Test {
+		constructor(readonly value: number) {}
+	}
+
+	function compare(first: Test, second: Test): boolean {
+		return first.value === second.value;
+	}
+
+	expect(equal(new Test(123), new Test(123))).toBe(false);
+
+	equal.register(Test, compare);
+
+	expect(equal(new Test(123), new Test(123))).toBe(true);
+	expect(equal(new Test(123), new Test(456))).toBe(false);
+
+	equal.unregister(Test);
+
+	expect(equal(new Test(123), new Test(123))).toBe(false);
+
+	equal.register(compare as never, compare);
+	equal.register('blah' as never, compare);
+	equal.register(Test, 'blah' as never);
+
+	expect(equal(new Test(123), new Test(123))).toBe(false);
+
+	equal.unregister(compare as never);
+	equal.unregister('blah' as never);
+});
+
 test('map', () => {
 	const first = new Map([
 		['a', 1],

@@ -1,8 +1,10 @@
-import type {ArrayOrPlainObject, PlainObject, TypedArray} from '../../models';
+import type {ArrayOrPlainObject, Constructor, PlainObject, TypedArray} from '../../models';
 import {chunk} from '../array/chunk';
-import {isPlainObject, isTypedArray} from '../is';
+import {isConstructor, isPlainObject, isTypedArray} from '../is';
 
 // #region Types
+
+type Comparison<Instance> = (first: Instance, second: Instance) => boolean;
 
 /**
  * Options for value equality comparison
@@ -22,13 +24,25 @@ export type EqualOptions = {
 	relaxedNullish?: boolean;
 };
 
-/**
- * Are two values equal?
- * @param first First value
- * @param second Second value
- * @returns `true` if the values are equal, otherwise `false`
- */
-type Equalizer = (first: unknown, second: unknown) => boolean;
+type Equalizer = {
+	/**
+	 * Are two values equal?
+	 * @param first First value
+	 * @param second Second value
+	 * @returns `true` if the values are equal, otherwise `false`
+	 */
+	(first: unknown, second: unknown): boolean;
+
+	/**
+	 * @inheritdoc equal.register
+	 */
+	register: typeof equal.register;
+
+	/**
+	 * @inheritdoc equal.unregister
+	 */
+	unregister: typeof equal.unregister;
+};
 
 type Options = {
 	ignoreCase: boolean;
@@ -155,18 +169,28 @@ function equalMap(
 	return true;
 }
 
-function equalObject(
+function equalObject(first: object, second: object): boolean {
+	const comparison = comparisons.get(first.constructor as Constructor);
+
+	if (comparison == null) {
+		return Object.is(first, second);
+	}
+
+	return second instanceof first.constructor && comparison(first, second);
+}
+
+function equalPlainObject(
 	first: ArrayOrPlainObject,
 	second: ArrayOrPlainObject,
 	options: Options,
 ): boolean {
-	const firstKeys = [...Object.keys(first), ...Object.getOwnPropertySymbols(first)].filter(key =>
-		filterKey(key, options),
-	);
+	let firstKeys = [...Object.keys(first), ...Object.getOwnPropertySymbols(first)];
+	let secondKeys = [...Object.keys(second), ...Object.getOwnPropertySymbols(second)];
 
-	const secondKeys = [...Object.keys(second), ...Object.getOwnPropertySymbols(second)].filter(key =>
-		filterKey(key, options),
-	);
+	if (options.ignoreKeys.enabled || options.ignoreExpressions.enabled) {
+		firstKeys = firstKeys.filter(key => filterKey(key, options));
+		secondKeys = secondKeys.filter(key => filterKey(key, options));
+	}
 
 	const {length} = firstKeys;
 
@@ -246,7 +270,7 @@ function equalTypedArray(first: TypedArray, second: TypedArray): boolean {
 }
 
 function equalValue(first: unknown, second: unknown, options: Options): boolean {
-	if (options.relaxedNullish === true && first == null && second == null) {
+	if (options.relaxedNullish && first == null && second == null) {
 		return true;
 	}
 
@@ -288,10 +312,13 @@ function equalValue(first: unknown, second: unknown, options: Options): boolean 
 			return equalArray(first, second, options);
 
 		case isPlainObject(first) && isPlainObject(second):
-			return equalObject(first, second, options);
+			return equalPlainObject(first, second, options);
 
 		case isTypedArray(first) && isTypedArray(second):
 			return equalTypedArray(first as TypedArray, second as TypedArray);
+
+		case typeof first === 'object':
+			return equalObject(first, second);
 
 		default:
 			return Object.is(first, second);
@@ -306,7 +333,36 @@ function equalValue(first: unknown, second: unknown, options: Options): boolean 
 equal.initialize = function (options?: EqualOptions): Equalizer {
 	const actual = getEqualOptions(options);
 
-	return (first: unknown, second: unknown): boolean => equalValue(first, second, actual);
+	const equalizer = (first: unknown, second: unknown): boolean => equalValue(first, second, actual);
+
+	equalizer.register = equal.register;
+	equalizer.unregister = equal.unregister;
+
+	return equalizer;
+};
+
+/**
+ * Register a custom comparison for a specific class
+ * @param constructor Class constructor
+ * @param comparison Comparison function
+ */
+equal.register = function <Instance>(
+	constructor: Constructor<Instance>,
+	comparison: Comparison<Instance>,
+): void {
+	if (isConstructor(constructor) && typeof comparison === 'function') {
+		comparisons.set(constructor, comparison as Comparison<unknown>);
+	}
+};
+
+/**
+ * Unregister a custom comparison for a specific class
+ * @param constructor Class constructor
+ */
+equal.unregister = function <Instance>(constructor: Constructor<Instance>): void {
+	if (isConstructor(constructor)) {
+		comparisons.delete(constructor);
+	}
 };
 
 function filterKey(key: string | symbol, options: Options): boolean {
@@ -380,5 +436,7 @@ function getEqualOptions(input?: boolean | EqualOptions): Options {
 const ARRAY_PEEK_PERCENTAGE = 10;
 
 const ARRAY_THRESHOLD = 100;
+
+const comparisons = new WeakMap<Constructor, Comparison<unknown>>();
 
 // #endregion

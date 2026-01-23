@@ -1,4 +1,5 @@
 import {expect, test} from 'vitest';
+import {isPlainObject} from '../src/internal/is';
 import type {PlainObject} from '../src/models';
 import {clone, getValue} from '../src/value';
 
@@ -10,6 +11,14 @@ class Test {
 		name: string,
 	) {
 		this.name = name;
+	}
+
+	clone(): Test {
+		return new Test(this.id, 'clone');
+	}
+
+	custom(): Test {
+		return new Test(this.id, 'custom');
 	}
 }
 
@@ -60,14 +69,78 @@ test('function', () => {
 });
 
 test('instance', () => {
-	const data = new Test(1, 'Hello');
-	const cloned = clone(data);
+	const original = new Test(1, 'Hello');
 
-	expect(cloned).not.toBe(data);
+	let cloned = clone(original);
 
-	cloned.name = 'Hi';
+	expect(cloned).not.toBe(original);
+	expect(isPlainObject(cloned)).toBe(true);
 
-	expect(data.name).not.toBe(cloned.name);
+	clone.register(Test);
+
+	cloned = clone(original);
+
+	expect(cloned).not.toBe(original);
+	expect(cloned).toBeInstanceOf(Test);
+	expect(cloned.id).toBe(original.id);
+	expect(cloned.name).toBe('clone');
+
+	clone.register(Test, 'custom');
+
+	cloned = clone(original);
+
+	expect(cloned).not.toBe(original);
+	expect(cloned).toBeInstanceOf(Test);
+	expect(cloned.id).toBe(original.id);
+	expect(cloned.name).toBe('custom');
+
+	clone.register(Test, value => new Test(value.id, 'callback'));
+
+	cloned = clone(original);
+
+	expect(cloned).not.toBe(original);
+	expect(cloned).toBeInstanceOf(Test);
+	expect(cloned.id).toBe(original.id);
+	expect(cloned.name).toBe('callback');
+
+	clone.unregister(Test);
+
+	cloned = clone(original);
+
+	expect(cloned).not.toBe(original);
+	expect(isPlainObject(cloned)).toBe(true);
+
+	clone.register(Test, 'nonExistentMethod');
+
+	cloned = clone(original);
+
+	expect(cloned).not.toBe(original);
+	expect(isPlainObject(cloned)).toBe(true);
+
+	clone.unregister(Test);
+
+	clone.register(Test, clone);
+
+	cloned = clone(original);
+
+	expect(cloned).not.toBe(original);
+	expect(isPlainObject(cloned)).toBe(true);
+
+	clone.register(Test, 123 as never);
+
+	cloned = clone(original);
+
+	expect(cloned).not.toBe(original);
+	expect(isPlainObject(cloned)).toBe(true);
+
+	clone.register(123 as never, 'custom');
+
+	cloned = clone(original);
+
+	expect(cloned).not.toBe(original);
+	expect(isPlainObject(cloned)).toBe(true);
+
+	clone.unregister(123 as never);
 });
 
 test('map', () => {

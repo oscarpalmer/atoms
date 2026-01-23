@@ -13,6 +13,11 @@ export type ArrayOrPlainObject = unknown[] | Record<PropertyKey, unknown>;
 export type BuiltIns = void | Date | Primitive | RegExp;
 
 /**
+ * A generic class constructor
+ */
+export type Constructor<Instance = unknown> = new (...args: any[]) => Instance;
+
+/**
  * Position of an event
  */
 export type EventPosition = {
