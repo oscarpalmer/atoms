@@ -102,9 +102,9 @@ function toCase(
 	capitalizeAny: boolean,
 	capitalizeFirst: boolean,
 ): string {
-	memoizers[type] ??= memoize(toCaseCallback.bind({type, capitalizeAny, capitalizeFirst}));
+	caseMemoizers[type] ??= memoize(toCaseCallback.bind({type, capitalizeAny, capitalizeFirst}));
 
-	return memoizers[type].run(value);
+	return caseMemoizers[type].run(value);
 }
 
 function toCaseCallback(this: Options, value: string): string {
@@ -185,7 +185,7 @@ const EXPRESSION_CAMEL_CASE = /(\p{Ll})(\p{Lu})/gu;
 
 const EXPRESSION_ACRONYM = /(\p{Lu}*)(\p{Lu})(\p{Ll}+)/gu;
 
-const memoizers: Partial<Record<string, Memoized<typeof toCaseCallback>>> = {};
+const caseMemoizers: Partial<Record<string, Memoized<typeof toCaseCallback>>> = {};
 
 const REPLACEMENT_CAMEL_CASE = '$1-$2';
 

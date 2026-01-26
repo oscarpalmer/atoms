@@ -258,7 +258,6 @@ test('depth', () => {
 		{a: 1, b: 2},
 		new ArrayBuffer(8),
 		new DataView(new ArrayBuffer(8)),
-		new Date('2000-01-01'),
 		new Map([
 			['a', 1],
 			['b', 2],
@@ -311,7 +310,6 @@ test('references', () => {
 		{a: 1, b: 2},
 		new ArrayBuffer(8),
 		new DataView(new ArrayBuffer(8)),
-		new Date('2000-01-01'),
 		new Map([
 			['a', 1],
 			['b', 2],

@@ -1,11 +1,6 @@
-import {isArrayOrPlainObject, isConstructor, isTypedArray} from '../internal/is';
+import {isArrayOrPlainObject, isTypedArray} from '../internal/is';
+import {getSelfHandlers} from '../internal/value/handlers';
 import type {ArrayOrPlainObject, Constructor, PlainObject, TypedArray} from '../models';
-
-// #region Types
-
-type Cloner<Instance> = (original: Instance) => Instance;
-
-// #endregion
 
 // #region Functions
 
@@ -20,35 +15,28 @@ export function clone(value: unknown): unknown {
 	return cloneValue(value, 0, new WeakMap());
 }
 
+clone.handlers = getSelfHandlers(clone, {
+	callback: tryStructuredClone,
+	method: 'clone',
+});
+
 /**
- * Register a custom cloner for a specific class
+ * Register a clone handler for a specific class
  * @param constructor Class constructor
- * @param cloner Method name or cloning function _(defaults to `clone`)_
+ * @param handler Method name or clone function _(defaults to `clone`)_
  */
 clone.register = function <Instance>(
 	constructor: Constructor<Instance>,
-	cloner?: string | Cloner<Instance>,
+	handler?: string | ((value: Instance) => Instance),
 ): void {
-	if (!isConstructor(constructor) || cloner === clone) {
-		return;
-	}
-
-	const actual = cloner ?? 'clone';
-
-	if (typeof actual === 'function' || typeof constructor.prototype[actual] === 'function') {
-		cloners.set(constructor, actual as string | Cloner<unknown>);
-	}
+	clone.handlers.register(constructor, handler);
 };
 
 /**
- * Unregister a custom cloner for a specific class
+ * Unregister a clone handler for a specific class
  * @param constructor Class constructor
  */
-clone.unregister = function (constructor: Constructor): void {
-	if (isConstructor(constructor)) {
-		cloners.delete(constructor);
-	}
-};
+clone.unregister = clone.handlers.unregister;
 
 function cloneArrayBuffer(
 	value: ArrayBuffer,
@@ -128,20 +116,6 @@ function cloneNode(node: Node, depth: number, references: WeakMap<WeakKey, unkno
 	references.set(node, cloned);
 
 	return cloned;
-}
-
-function cloneObject(value: object, depth: number, references: WeakMap<WeakKey, unknown>): unknown {
-	const cloner = cloners.get(value.constructor as Constructor);
-
-	if (typeof cloner === 'function') {
-		return cloner(value);
-	}
-
-	if (cloner == null) {
-		return tryStructuredClone(value, depth, references);
-	}
-
-	return ((value as unknown as PlainObject)[cloner] as Function)();
 }
 
 function clonePlainObject(
@@ -234,6 +208,9 @@ function cloneValue(value: unknown, depth: number, references: WeakMap<WeakKey, 
 		case value instanceof DataView:
 			return cloneDataView(value, depth, references);
 
+		case value instanceof Date:
+			return new Date(value.getTime());
+
 		case value instanceof RegExp:
 			return cloneRegularExpression(value, depth, references);
 
@@ -251,7 +228,7 @@ function cloneValue(value: unknown, depth: number, references: WeakMap<WeakKey, 
 			return cloneTypedArray(value, depth, references);
 
 		default:
-			return cloneObject(value, depth, references);
+			return clone.handlers.handle(value, depth, references);
 	}
 }
 
@@ -280,8 +257,6 @@ function tryStructuredClone(
 // #endregion
 
 // #region Constants
-
-const cloners = new WeakMap<Constructor, string | Cloner<unknown>>();
 
 const MAX_CLONE_DEPTH = 100;
 

@@ -68,9 +68,9 @@ function match(type: Match, haystack: string, needle: string, ignoreCase: boolea
 		return false;
 	}
 
-	memoizers[type] ??= memoize(matchCallback.bind(type));
+	matchMemoizers[type] ??= memoize(matchCallback.bind(type));
 
-	return memoizers[type].run(haystack, needle, ignoreCase);
+	return matchMemoizers[type].run(haystack, needle, ignoreCase);
 }
 
 function matchCallback(
@@ -153,6 +153,6 @@ export function truncate(value: string, length: number, suffix?: string): string
 
 // #region Constants
 
-const memoizers: Partial<Record<Match, Memoized<typeof matchCallback>>> = {};
+const matchMemoizers: Partial<Record<Match, Memoized<typeof matchCallback>>> = {};
 
 // #endregion
