@@ -9,7 +9,7 @@ import type {NumericalValues, PlainObject} from './models';
  * @param callback Callback to get an item's value
  * @returns Average value, or `NaN` if no average can be calculated
  */
-export function average<Item extends PlainObject>(
+export function average<Item>(
 	items: Item[],
 	callback: (item: Item, index: number, array: Item[]) => number,
 ): number;
@@ -45,7 +45,7 @@ export function average(array: unknown[], key?: unknown): number {
  * @param value Value to match and count
  * @returns Number of items that match the condition, or `NaN` if no count can be calculated
  */
-export function count<Item extends PlainObject>(
+export function count<Item>(
 	array: Item[],
 	callback: (item: Item, index: number, array: Item[]) => unknown,
 	value: unknown,
@@ -108,7 +108,7 @@ export function count(array: unknown[], key?: unknown, value?: unknown): number 
  * @param callback Callback to get an item's value
  * @returns Minimum value, or `NaN` if no minimum can be found
  */
-export function min<Item extends PlainObject>(
+export function min<Item>(
 	items: Item[],
 	callback: (item: Item, index: number, array: Item[]) => number,
 ): number;
@@ -161,7 +161,7 @@ export function round(value: number, decimals?: number): number {
  * @param callback Callback to get an item's value
  * @returns Sum of the values, or `NaN` if no sum can be calculated
  */
-export function sum<Item extends PlainObject>(
+export function sum<Item>(
 	items: Item[],
 	callback: (item: Item, index: number, array: Item[]) => number,
 ): number;

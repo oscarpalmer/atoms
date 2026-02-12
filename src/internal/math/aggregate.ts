@@ -59,7 +59,7 @@ export function aggregate(type: AggregationType, array: unknown[], key: unknown)
  * @param callback Callback to get an item's value
  * @returns Maximum value, or `NaN` if no maximum can be found
  */
-export function max<Item extends PlainObject>(
+export function max<Item>(
 	items: Item[],
 	callback: (item: Item, index: number, array: Item[]) => number,
 ): number;

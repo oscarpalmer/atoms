@@ -10,7 +10,7 @@ import type {PlainObject} from '../models';
  * @param value Value to match against
  * @returns Index of the first matching item, or `-1` if no match is found
  */
-export function indexOf<Item extends PlainObject>(
+export function indexOf<Item>(
 	array: Item[],
 	callback: (item: Item, index: number, array: Item[]) => unknown,
 	value: unknown,

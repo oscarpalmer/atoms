@@ -41,8 +41,8 @@ test('debounce', () =>
 			expect(defaulted.invalid).toBeGreaterThan(0);
 			expect(defaulted.zero).toBeGreaterThan(0);
 
-			expect(defaulted.invalid).toBeLessThanOrEqual((FRAME_RATE_MS) + 1);
-			expect(defaulted.zero).toBeLessThanOrEqual((FRAME_RATE_MS) + 1);
+			expect(defaulted.invalid).toBeLessThanOrEqual(FRAME_RATE_MS + 1);
+			expect(defaulted.zero).toBeLessThanOrEqual(FRAME_RATE_MS + 1);
 
 			expect(value).toBe(1);
 

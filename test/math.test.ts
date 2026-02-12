@@ -1,6 +1,10 @@
 import {expect, test} from 'vitest';
 import {average, count, max, min, round, sum} from '../src/math';
 
+class Item {
+	constructor(readonly value: number) {}
+}
+
 type Person = {
 	age?: number;
 	name?: string;
@@ -17,6 +21,10 @@ const four: Person[] = [
 	{name: 'invalid'},
 ];
 
+const five = [new Item(123), new Item(456), new Item(789)];
+
+const six = ['abc', 'defg', 'hi'];
+
 test('average', () => {
 	expect(average([])).toBeNaN();
 	expect(average(['abc'] as never)).toBeNaN();
@@ -25,6 +33,8 @@ test('average', () => {
 	expect(average(three as never)).toBe(456);
 	expect(average(four, 'age' as never)).toBe(30);
 	expect(average(four, item => item.age as never)).toBe(30);
+	expect(average(five, item => item.value as never)).toBe(456);
+	expect(average(six, item => item.length as never)).toBe(3);
 	expect(average('blah' as never, 'age' as never)).toBeNaN();
 	expect(average({} as never, 'age' as never)).toBeNaN();
 });
@@ -36,6 +46,8 @@ test('count', () => {
 	expect(count(three)).toBe(5);
 	expect(count(four, 'age', 30)).toBe(1);
 	expect(count(four, item => item.age, 30)).toBe(1);
+	expect(count(five, item => item.value, 456)).toBe(1);
+	expect(count(six, item => item.length, 3)).toBe(1);
 	expect(count('blah' as never, 'age', 30)).toBeNaN();
 	expect(count({} as never, 'age', 30)).toBeNaN();
 	expect(count(four, 123 as never, 30 as never)).toBeNaN();
@@ -49,6 +61,8 @@ test('max', () => {
 	expect(max(three as never)).toBe(789);
 	expect(max(four, 'age' as never)).toBe(35);
 	expect(max(four, item => item.age as never)).toBe(35);
+	expect(max(five, item => item.value)).toBe(789);
+	expect(max(six, item => item.length)).toBe(4);
 	expect(max('blah' as never, 'age' as never)).toBeNaN();
 	expect(max({} as never, 'age' as never)).toBeNaN();
 });
@@ -60,6 +74,8 @@ test('min', () => {
 	expect(min(three as never)).toBe(123);
 	expect(min(four, 'age' as never)).toBe(25);
 	expect(min(four, item => item.age as never)).toBe(25);
+	expect(min(five, item => item.value)).toBe(123);
+	expect(min(six, item => item.length)).toBe(2);
 	expect(min('blah' as never, 'age' as never)).toBeNaN();
 	expect(min({} as never, 'age' as never)).toBeNaN();
 });
@@ -85,6 +101,8 @@ test('sum', () => {
 	expect(sum(three as number[])).toBe(1368);
 	expect(sum(four, 'age' as never)).toBe(90);
 	expect(sum(four, item => item.age as never)).toBe(90);
+	expect(sum(five, item => item.value)).toBe(1368);
+	expect(sum(six, item => item.length)).toBe(9);
 	expect(sum('blah' as never, 'age' as never)).toBeNaN();
 	expect(sum({} as never, 'age' as never)).toBeNaN();
 });

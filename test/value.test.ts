@@ -1,6 +1,6 @@
 import {expect, test} from 'vitest';
 import type {NestedPartial} from '../src/models';
-import {compare, diff, getValue, merge, partial, setValue, smush, unsmush} from '../src/value';
+import {diff, getValue, merge, partial, setValue, smush, unsmush} from '../src/value';
 
 type Diffable = {
 	numbers: number[];

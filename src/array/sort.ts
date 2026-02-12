@@ -83,6 +83,32 @@ function getSorter(value: unknown, modifier: number): Sorter | undefined {
  * @param descending Sort in descending order? _(defaults to `false`; overridden by individual sorters)_
  * @returns Sorted array
  */
+export function sort<Item>(
+	array: Item[],
+	sorters: Array<((item: Item) => unknown) | CallbackSorter<Item>>,
+	descending?: boolean,
+): Item[];
+
+/**
+ * Sort an array of items, using a sorter to sort by a specific value
+ * @param array Array to sort
+ * @param sorter Sorter to use for sorting
+ * @param descending Sort in descending order? _(defaults to `false`; overridden by the sorter)_
+ * @returns Sorted array
+ */
+export function sort<Item>(
+	array: Item[],
+	sorter: ((item: Item) => unknown) | CallbackSorter<Item>,
+	descending?: boolean,
+): Item[];
+
+/**
+ * Sort an array of items, using multiple sorters to sort by specific values
+ * @param array Array to sort
+ * @param sorters Sorters to use for sorting
+ * @param descending Sort in descending order? _(defaults to `false`; overridden by individual sorters)_
+ * @returns Sorted array
+ */
 export function sort<Item extends PlainObject>(
 	array: Item[],
 	sorters: Array<keyof Item | ((item: Item) => unknown) | CallbackSorter<Item> | KeySorter<Item>>,
