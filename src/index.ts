@@ -9,6 +9,7 @@ export * from './logger';
 export * from './math';
 export * from './models';
 export * from './number';
+export * from './promise';
 export * from './query';
 export * from './random';
 export * from './result';

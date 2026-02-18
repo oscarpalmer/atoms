@@ -7,9 +7,9 @@
 	"devDependencies": {
 		"@types/node": "^25.2",
 		"@vitest/coverage-istanbul": "^4",
-		"jsdom": "^28",
-		"oxfmt": "^0.31",
-		"oxlint": "^1.46",
+		"jsdom": "^28.1",
+		"oxfmt": "^0.33",
+		"oxlint": "^1.48",
 		"rolldown": "1.0.0-rc.4",
 		"tslib": "^2.8",
 		"typescript": "^5.9",
@@ -19,75 +19,86 @@
 	"exports": {
 		"./package.json": "./package.json",
 		".": {
-				"types": "./types/index.d.ts",
-				"default": "./dist/index.js"
+			"types": "./types/index.d.ts",
+			"default": "./dist/index.js"
 		},
 		"./array": {
-				"types": "./types/array/index.d.ts",
-				"default": "./dist/array/index.js"
+			"types": "./types/array/index.d.ts",
+			"default": "./dist/array/index.js"
 		},
 		"./beacon": {
-				"types": "./types/beacon.d.ts",
-				"default": "./dist/beacon.js"
+			"types": "./types/beacon.d.ts",
+			"default": "./dist/beacon.js"
 		},
 		"./color": {
-				"types": "./types/color/index.d.ts",
-				"default": "./dist/color/index.js"
+			"types": "./types/color/index.d.ts",
+			"default": "./dist/color/index.js"
 		},
 		"./frame-rate": {
 			"types": "./types/internal/frame-rate.d.ts",
 			"default": "./dist/internal/frame-rate.js"
 		},
 		"./function": {
-				"types": "./types/function.d.ts",
-				"default": "./dist/function.js"
+			"types": "./types/function.d.ts",
+			"default": "./dist/function.js"
 		},
 		"./is": {
-				"types": "./types/is.d.ts",
-				"default": "./dist/is.js"
+			"types": "./types/is.d.ts",
+			"default": "./dist/is.js"
 		},
 		"./logger": {
-				"types": "./types/logger.d.ts",
-				"default": "./dist/logger.js"
+			"types": "./types/logger.d.ts",
+			"default": "./dist/logger.js"
 		},
 		"./math": {
-				"types": "./types/math.d.ts",
-				"default": "./dist/math.js"
+			"types": "./types/math.d.ts",
+			"default": "./dist/math.js"
 		},
 		"./models": {
-				"types": "./types/models.d.ts"
+			"types": "./types/models.d.ts"
 		},
 		"./number": {
-				"types": "./types/number.d.ts",
-				"default": "./dist/number.js"
+			"types": "./types/number.d.ts",
+			"default": "./dist/number.js"
+		},
+		"./promise": {
+			"types": "./types/promise.d.ts",
+			"default": "./dist/promise.js"
 		},
 		"./query": {
-				"types": "./types/query.d.ts",
-				"default": "./dist/query.js"
+			"types": "./types/query.d.ts",
+			"default": "./dist/query.js"
 		},
 		"./random": {
-				"types": "./types/random.d.ts",
-				"default": "./dist/random.js"
+			"types": "./types/random.d.ts",
+			"default": "./dist/random.js"
 		},
 		"./result": {
-				"types": "./types/result.d.ts",
-				"default": "./dist/result.js"
+			"types": "./types/result.d.ts",
+			"default": "./dist/result.js"
 		},
 		"./sized": {
-				"types": "./types/sized.d.ts",
-				"default": "./dist/sized.js"
+			"types": "./types/sized.d.ts",
+			"default": "./dist/sized.js"
 		},
 		"./string": {
-				"types": "./types/string/index.d.ts",
-				"default": "./dist/string/index.js"
+			"types": "./types/string/index.d.ts",
+			"default": "./dist/string/index.js"
 		},
 		"./value": {
-				"types": "./types/value/index.d.ts",
-				"default": "./dist/value/index.js"
+			"types": "./types/value/index.d.ts",
+			"default": "./dist/value/index.js"
 		}
 	},
-	"files": ["dist", "src", "types"],
-	"keywords": ["helper", "utility"],
+	"files": [
+		"dist",
+		"src",
+		"types"
+	],
+	"keywords": [
+		"helper",
+		"utility"
+	],
 	"license": "MIT",
 	"module": "./dist/index.js",
 	"name": "@oscarpalmer/atoms",
@@ -105,5 +116,5 @@
 	},
 	"type": "module",
 	"types": "./types/index.d.ts",
-	"version": "0.131.0"
+	"version": "0.132.0"
 }
