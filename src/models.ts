@@ -26,6 +26,11 @@ export type EventPosition = {
 };
 
 /**
+ * A generic async callback function
+ */
+export type GenericAsyncCallback = (...args: any[]) => Promise<any>;
+
+/**
  * A generic callback function
  */
 export type GenericCallback = (...args: any[]) => any;

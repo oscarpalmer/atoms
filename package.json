@@ -65,6 +65,10 @@
 			"types": "./types/promise.d.ts",
 			"default": "./dist/promise.js"
 		},
+		"./queue": {
+			"types": "./types/queue.d.ts",
+			"default": "./dist/queue.js"
+		},
 		"./query": {
 			"types": "./types/query.d.ts",
 			"default": "./dist/query.js"
@@ -116,5 +120,5 @@
 	},
 	"type": "module",
 	"types": "./types/index.d.ts",
-	"version": "0.132.0"
+	"version": "0.133.0"
 }
