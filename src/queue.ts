@@ -62,29 +62,42 @@ class Queue<CallbackParameters extends Parameters<GenericAsyncCallback>, Callbac
 	/**
 	 * Add an item to the queue
 	 * @param parameters Parameters to use when item runs
+	 * @param signal Optional signal to abort the item
 	 * @returns Queued item
 	 */
-	add(...parameters: CallbackParameters): Queued<CallbackResult> {
+	add(parameters: CallbackParameters, signal?: AbortSignal): Queued<CallbackResult> {
 		if (this.full) {
 			throw new QueueError(MESSAGE_MAXIMUM);
 		}
 
-		let rejector: (reason?: unknown) => void;
-		let resolver: (value: CallbackResult) => void;
+		const abortSignal = signal instanceof AbortSignal ? signal : undefined;
+
+		if (abortSignal?.aborted ?? false) {
+			throw new Error(abortSignal!.reason);
+		}
 
 		const id = this.#identify();
+
+		let rejector: (reason?: unknown) => void;
+		let resolver: (value: CallbackResult) => void;
 
 		const promise = new Promise<CallbackResult>((resolve, reject) => {
 			rejector = reject;
 			resolver = resolve;
 		});
 
+		const aborter = abortSignal == null ? undefined : () => rejector(abortSignal.reason);
+
+		signal?.addEventListener(EVENT_NAME, aborter!, abortOptions);
+
 		this.#items.push({
 			id,
 			parameters,
 			promise,
+			abort: aborter,
 			reject: rejector!,
 			resolve: resolver!,
+			signal: abortSignal,
 		});
 
 		if (this.#options.autostart) {
@@ -102,7 +115,11 @@ class Queue<CallbackParameters extends Parameters<GenericAsyncCallback>, Callbac
 		const {length} = items;
 
 		for (let index = 0; index < length; index += 1) {
-			items[index].reject(new QueueError(MESSAGE_CLEAR));
+			const {abort, reject, signal} = items[index];
+
+			reject(new QueueError(MESSAGE_CLEAR));
+
+			signal?.removeEventListener(EVENT_NAME, abort!);
 		}
 	}
 
@@ -124,9 +141,11 @@ class Queue<CallbackParameters extends Parameters<GenericAsyncCallback>, Callbac
 		const index = this.#items.findIndex(item => item.id === id);
 
 		if (index > -1) {
-			const [item] = this.#items.splice(index, 1);
+			const {abort, reject, signal} = this.#items.splice(index, 1)[0];
 
-			item.reject(new QueueError(MESSAGE_REMOVE));
+			reject(new QueueError(MESSAGE_REMOVE));
+
+			signal?.removeEventListener(EVENT_NAME, abort!);
 		}
 	}
 
@@ -172,20 +191,34 @@ class Queue<CallbackParameters extends Parameters<GenericAsyncCallback>, Callbac
 			let result: unknown | CallbackResult;
 
 			try {
-				result = await this.#callback(...item.parameters);
-				handler = item.resolve;
+				if (!(item.signal?.aborted ?? false)) {
+					result = await this.#callback(...item.parameters);
+					handler = item.resolve;
+				}
 			} catch (thrown) {
 				result = thrown;
 				handler = item.reject;
 			}
 
 			if (this.#paused) {
-				this.#handled.push(() => handler(result));
+				const paused = item;
+
+				this.#handled.push(() => {
+					paused.signal?.removeEventListener(EVENT_NAME, paused.abort!);
+
+					if (!(paused.signal?.aborted ?? false)) {
+						handler(result);
+					}
+				});
 
 				break;
 			}
 
-			handler(result);
+			item.signal?.removeEventListener(EVENT_NAME, item.abort!);
+
+			if (!(item.signal?.aborted ?? false)) {
+				handler!(result as CallbackResult);
+			}
 
 			item = this.#items.shift();
 		}
@@ -223,11 +256,13 @@ type Queued<Value> = {
 };
 
 type QueuedItem<CallbackParameters extends Parameters<GenericAsyncCallback>, CallbackResult> = {
+	abort?: () => void;
 	id: number;
 	parameters: CallbackParameters;
 	promise: Promise<CallbackResult>;
 	reject: (reason?: unknown) => void;
 	resolve: (value: CallbackResult) => void;
+	signal?: AbortSignal;
 };
 
 // #endregion
@@ -289,7 +324,11 @@ function queue(
 
 // #region Variables
 
+const abortOptions = {once: true};
+
 const ERROR_NAME = 'QueueError';
+
+const EVENT_NAME = 'abort';
 
 const MESSAGE_CALLBACK = 'A Queue requires a callback function';
 

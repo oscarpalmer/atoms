@@ -136,6 +136,14 @@ export type PlainObject = Record<PropertyKey, unknown>;
 export type Primitive = null | undefined | string | number | boolean | symbol | bigint;
 
 /**
+ * Set required keys for a type
+ */
+export type RequiredKeys<Model extends object, Keys extends keyof Model> = Required<
+	Pick<Model, Keys>
+> &
+	Omit<Model, Keys>;
+
+/**
  * Flattens the type to improve type hints in IDEs
  *
  * _(Thanks, type-fest!)_

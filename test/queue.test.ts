@@ -8,6 +8,62 @@ const asyncCallback = async (value: number) =>
 
 const syncCallback = async (value: number) => value;
 
+test('abort', () => new Promise<void>(done => {
+	const queued = queue(asyncCallback);
+
+	const names = [
+		'First!',
+		'Second!',
+		'Third!',
+		'Fourth!',
+		'Fifth!',
+	];
+
+	const signals = Array.from({length: 5}, () => new AbortController());
+
+	const errors: unknown[] = [];
+	const values: number[] = [];
+
+	signals[0].abort(names[0]);
+
+	expect(() => queued.add([0], signals[0].signal)).toThrow(names[0]);
+
+	for (let index = 1; index < 5; index += 1) {
+		void queued
+			.add([index], signals[index].signal)
+			.promise.then(value => {
+				values.push(value ** 2);
+			})
+			.catch(error => {
+				errors.push(error);
+			});
+	}
+
+	setTimeout(() => {
+		signals[1].abort(names[1]);
+		signals[2].abort(names[2]);
+
+		queued.pause();
+	}, 50);
+
+	setTimeout(() => {
+		signals[3].abort(names[3]);
+
+		queued.resume();
+	}, 100);
+
+	setTimeout(() => {
+		signals[4].abort(names[4]);
+	}, 150);
+
+	setTimeout(() => {
+		expect(errors).toEqual(names.slice(1));
+		expect(values).toEqual([]);
+
+		done();
+	}, 600);
+}));
+
 test('basic: synchronous', () =>
 	new Promise<void>(done => {
 		const queued = queue(syncCallback);
@@ -18,7 +74,7 @@ test('basic: synchronous', () =>
 		let last: number;
 
 		for (let index = 0; index < 5; index += 1) {
-			void queued.add(index).promise.then(value => {
+			void queued.add([index]).promise.then(value => {
 				values.push(value);
 
 				last = Date.now();
@@ -46,7 +102,7 @@ test('basic: asynchronous', () =>
 		let last: number;
 
 		for (let index = 0; index < 5; index += 1) {
-			void queued.add(index).promise.then(value => {
+			void queued.add([index]).promise.then(value => {
 				values.push(value);
 
 				last = Date.now();
@@ -57,11 +113,11 @@ test('basic: asynchronous', () =>
 
 		setTimeout(() => {
 			expect(values).toEqual([0, 1, 2, 3, 4]);
-			expect(last - now).toBeGreaterThanOrEqual(100 * 5);
-			expect(last - now).toBeLessThan(100 * 6);
+			expect(last - now).toBeGreaterThanOrEqual(490);
+			expect(last - now).toBeLessThan(510);
 
 			done();
-		}, 1000);
+		}, 600);
 	}));
 
 test('callback', () => {
@@ -79,7 +135,7 @@ test('clear', () =>
 		let successes = 0;
 
 		for (let index = 0; index < 5; index += 1) {
-			void queued.add(index).promise.then(
+			void queued.add([index]).promise.then(
 				() => {
 					successes += 1;
 				},
@@ -116,7 +172,7 @@ test('error', () =>
 		let failed: boolean;
 		let successful: boolean;
 
-		void queued.add().promise.then(
+		void queued.add([]).promise.then(
 			() => {
 				failed = false;
 				successful = true;
@@ -148,7 +204,7 @@ test('option: autostart off', () =>
 		let last: number;
 
 		for (let index = 0; index < 5; index += 1) {
-			void queued.add(index).promise.then(value => {
+			void queued.add([index]).promise.then(value => {
 				values.push(value);
 
 				last = Date.now();
@@ -163,15 +219,15 @@ test('option: autostart off', () =>
 
 			queued.resume();
 			queued.resume();
-		}, 1000);
+		}, 500);
 
 		setTimeout(() => {
 			expect(values).toEqual([0, 1, 2, 3, 4]);
-			expect(last - now).toBeGreaterThanOrEqual(100 * 5 + 1000);
-			expect(last - now).toBeLessThan(100 * 6 + 1000);
+			expect(last - now).toBeGreaterThanOrEqual(490 + 500);
+			expect(last - now).toBeLessThan(510 + 500);
 
 			done();
-		}, 2000);
+		}, 1100);
 	}));
 
 test('option: concurrency', () =>
@@ -184,7 +240,7 @@ test('option: concurrency', () =>
 		let last: number;
 
 		for (let index = 0; index < 5; index += 1) {
-			void queued.add(index).promise.then(value => {
+			void queued.add([index]).promise.then(value => {
 				values.push(value);
 
 				last = Date.now();
@@ -195,11 +251,11 @@ test('option: concurrency', () =>
 
 		setTimeout(() => {
 			expect(values).toEqual([0, 1, 2, 3, 4]);
-			expect(last - now).toBeGreaterThanOrEqual(100);
-			expect(last - now).toBeLessThan(100 * 2);
+			expect(last - now).toBeGreaterThanOrEqual(90);
+			expect(last - now).toBeLessThan(110);
 
 			done();
-		}, 1000);
+		}, 150);
 	}));
 
 test('option: maximum size', () => {
@@ -208,10 +264,10 @@ test('option: maximum size', () => {
 		maximum: 2,
 	});
 
-	queued.add(0);
-	queued.add(1);
+	queued.add([0]);
+	queued.add([1]);
 
-	expect(() => queued.add(2)).toThrow('Queue has reached its maximum size');
+	expect(() => queued.add([2])).toThrow('Queue has reached its maximum size');
 });
 
 test('properties', () =>
@@ -227,7 +283,7 @@ test('properties', () =>
 		expect(queued.paused).toBe(true);
 		expect(queued.size).toBe(0);
 
-		queued.add(0);
+		queued.add([0]);
 
 		expect(queued.active).toBe(false);
 		expect(queued.empty).toBe(false);
@@ -235,7 +291,7 @@ test('properties', () =>
 		expect(queued.paused).toBe(true);
 		expect(queued.size).toBe(1);
 
-		queued.add(1);
+		queued.add([1]);
 
 		expect(queued.active).toBe(false);
 		expect(queued.empty).toBe(false);
@@ -293,7 +349,7 @@ test('remove', () =>
 		let failed: boolean;
 		let successful: boolean;
 
-		const {id, promise} = queued.add(0);
+		const {id, promise} = queued.add([0]);
 
 		promise.then(
 			() => {

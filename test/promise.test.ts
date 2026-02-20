@@ -1,14 +1,286 @@
 import {expect, test} from 'vitest';
-import {delay, promises, PromiseTimeoutError, timed} from '../src/promise';
+import {delay, isFulfilled, isRejected, promises, PromiseTimeoutError, timed} from '../src/promise';
 
 test('delay', () =>
 	new Promise<void>(done => {
 		const start = Date.now();
 
-		delay(1000).then(() => {
-			expect(Date.now() - start).toBeGreaterThanOrEqual(1000);
+		const errors: unknown[] = [undefined, undefined, undefined];
+		const values: number[][] = [undefined, undefined, undefined] as unknown as number[][];
+
+		void delay(500)
+			.then(() => {
+				values[0] = [Date.now() - start, 490, 510];
+			})
+			.catch(error => {
+				errors[0] = error;
+			});
+
+		void delay(-999)
+			.then(() => {
+				values[1] = [Date.now() - start, 0, 10];
+			})
+			.catch(error => {
+				errors[1] = error;
+			});
+
+		void delay('blah' as never)
+			.then(() => {
+				values[2] = [Date.now() - start, 0, 10];
+			})
+			.catch(error => {
+				errors[2] = error;
+			});
+
+		setTimeout(() => {
+			expect(errors.length).toBe(3);
+			expect(values.length).toBe(3);
+
+			expect(errors).toEqual([undefined, undefined, undefined]);
+
+			for (const value of values) {
+				expect(value[0]).toBeGreaterThanOrEqual(value[1]);
+				expect(value[0]).toBeLessThanOrEqual(value[2]);
+			}
+
 			done();
-		});
+		}, 1000);
+	}));
+
+test('delay: abort', () =>
+	new Promise<void>(done => {
+		const start = Date.now();
+
+		const errors: unknown[] = [undefined, undefined, undefined, undefined];
+
+		const values: number[][] = [
+			undefined,
+			undefined,
+			undefined,
+			undefined,
+		] as unknown as number[][];
+
+		void delay({
+			signal: AbortSignal.timeout(250),
+			time: 500,
+		})
+			.then(() => {
+				values[0] = [Date.now() - start, 240, 260];
+			})
+			.catch(error => {
+				errors[0] = error;
+			});
+
+		const first = new AbortController();
+		const second = new AbortController();
+
+		void delay({
+			signal: first.signal,
+			time: 500,
+		})
+			.then(() => {
+				values[1] = [Date.now() - start, 240, 260];
+			})
+			.catch(error => {
+				errors[1] = error;
+			});
+
+		second.abort('Already aborted!');
+
+		void delay({
+			signal: second.signal,
+			time: 500,
+		})
+			.then(() => {
+				values[2] = [Date.now() - start, 240, 260];
+			})
+			.catch(error => {
+				errors[2] = error;
+			});
+
+		void delay({
+			signal: 'blah' as never,
+			time: 500,
+		})
+			.then(() => {
+				values[3] = [Date.now() - start, 490, 510];
+			})
+			.catch(error => {
+				errors[3] = error;
+			});
+
+		setTimeout(() => {
+			first.abort('Aborted during!');
+		}, 250);
+
+		setTimeout(() => {
+			expect(errors.length).toBe(4);
+			expect(values.length).toBe(4);
+
+			expect(errors[0]).toBeInstanceOf(Error);
+			expect((errors[0] as Error).name).toBe('TimeoutError');
+
+			expect(errors[1]).toBe('Aborted during!');
+			expect(errors[2]).toBe('Already aborted!');
+			expect(errors[3]).toBeUndefined();
+
+			expect(values[0]).toBeUndefined();
+			expect(values[1]).toBeUndefined();
+			expect(values[2]).toBeUndefined();
+
+			expect(values[3][0]).toBeGreaterThanOrEqual(values[3][1]);
+			expect(values[3][0]).toBeLessThanOrEqual(values[3][2]);
+
+			done();
+		}, 1000);
+	}));
+
+test('is', () =>
+	new Promise<void>(done => {
+		const values = [undefined, null, 1, 'string', {}, [], new Map(), new Set(), () => {}];
+		const {length} = values;
+
+		for (let index = 0; index < length; index += 1) {
+			const value = values[index];
+
+			expect(isFulfilled(value)).toBe(false);
+			expect(isRejected(value)).toBe(false);
+		}
+
+		values.splice(0);
+
+		const errors: unknown[] = [];
+
+		void promises([Promise.resolve(1), Promise.reject(new Error('Nope!'))])
+			.then(value => {
+				values.push(...value);
+			})
+			.catch(() => {
+				errors.push('Error!');
+			});
+
+		setTimeout(() => {
+			expect(errors.length).toBe(0);
+			expect(values.length).toBe(2);
+
+			expect(isFulfilled(values[0])).toBe(true);
+			expect(isRejected(values[0])).toBe(false);
+
+			expect(isFulfilled(values[1])).toBe(false);
+			expect(isRejected(values[1])).toBe(true);
+
+			done();
+		}, 500);
+	}));
+
+test('promises: abort', () =>
+	new Promise<void>(done => {
+		const first = new AbortController();
+		const second = new AbortController();
+		const third = new AbortController();
+		const fourth = new AbortController();
+
+		const errors = {
+			first: undefined,
+			second: undefined,
+			third: undefined,
+			fourth: undefined,
+		} as Record<string, string | undefined>;
+
+		const values = {
+			first: undefined,
+			second: undefined,
+			third: undefined,
+			fourth: undefined,
+		} as Record<string, unknown>;
+
+		void promises(
+			[
+				new Promise<number>(resolve => setTimeout(() => resolve(1), 200)),
+				new Promise<number>(resolve => setTimeout(() => resolve(2), 200)),
+				new Promise<number>(resolve => setTimeout(() => resolve(3), 200)),
+			],
+			{
+				eager: true,
+				signal: first.signal,
+			},
+		)
+			.then(value => {
+				values.first = value;
+			})
+			.catch(error => {
+				errors.first = error;
+			});
+
+		second.abort('Already aborted second!');
+
+		void promises(
+			[
+				new Promise<number>(resolve => setTimeout(() => resolve(1), 200)),
+				new Promise<number>(resolve => setTimeout(() => resolve(2), 200)),
+				new Promise<number>(resolve => setTimeout(() => resolve(3), 200)),
+			],
+			{
+				signal: second.signal,
+			},
+		)
+			.then(value => {
+				values.second = value;
+			})
+			.catch(error => {
+				errors.second = error;
+			});
+
+		void promises(
+			[
+				new Promise<number>(resolve => setTimeout(() => resolve(1), 200)),
+				new Promise<number>(resolve => setTimeout(() => resolve(2), 200)),
+				new Promise<number>(resolve => setTimeout(() => resolve(3), 200)),
+			],
+			third.signal,
+		)
+			.then(value => {
+				values.third = value;
+			})
+			.catch(error => {
+				errors.third = error;
+			});
+
+		setTimeout(() => {
+			first.abort('Aborted first during!');
+			third.abort('Aborted third during!');
+		}, 100);
+
+		fourth.abort('Aborted fourth during!');
+
+		void promises(
+			[
+				new Promise<number>(resolve => setTimeout(() => resolve(1), 200)),
+				new Promise<number>(resolve => setTimeout(() => resolve(2), 200)),
+				new Promise<number>(resolve => setTimeout(() => resolve(3), 200)),
+			],
+			fourth.signal,
+		)
+			.then(value => {
+				values.fourth = value;
+			})
+			.catch(error => {
+				errors.fourth = error;
+			});
+
+		setTimeout(() => {
+			expect(errors.first).toBe('Aborted first during!');
+			expect(errors.second).toBe('Already aborted second!');
+			expect(errors.third).toBe('Aborted third during!');
+			expect(errors.fourth).toBe('Aborted fourth during!');
+
+			expect(values.first).toBeUndefined();
+			expect(values.second).toBeUndefined();
+			expect(values.third).toBeUndefined();
+			expect(values.fourth).toBeUndefined();
+
+			done();
+		}, 300);
 	}));
 
 test('promises: eager', () =>
@@ -206,4 +478,70 @@ test('timed', () =>
 
 			done();
 		}, 1000);
+	}));
+
+test('timed: abort', () =>
+	new Promise<void>(done => {
+		const first = new AbortController();
+		const second = new AbortController();
+
+		const start = Date.now();
+
+		const errors: unknown[] = [undefined, undefined, undefined];
+		const times: unknown[] = [undefined, undefined, undefined];
+
+		void timed(new Promise(resolve => setTimeout(resolve, 200)), {
+			signal: first.signal,
+			time: 300,
+		})
+			.then(() => {
+				times[0] = Date.now() - start;
+			})
+			.catch(error => {
+				errors[0] = error;
+			});
+
+		second.abort('Already aborted!');
+
+		void timed(new Promise(resolve => setTimeout(resolve, 200)), {
+			signal: second.signal,
+			time: 300,
+		})
+			.then(() => {
+				times[1] = Date.now() - start;
+			})
+			.catch(error => {
+				errors[1] = error;
+			});
+
+		void timed(new Promise(resolve => setTimeout(resolve, 200)), {
+			signal: 'blah' as never,
+			time: 300,
+		})
+			.then(() => {
+				times[2] = Date.now() - start;
+			})
+			.catch(error => {
+				errors[2] = error;
+			});
+
+		setTimeout(() => {
+			first.abort('Aborted during!');
+		}, 100);
+
+		setTimeout(() => {
+			expect(errors.length).toBe(3);
+			expect(times.length).toBe(3);
+
+			expect(errors[0]).toBe('Aborted during!');
+			expect(errors[1]).toBe('Already aborted!');
+			expect(errors[2]).toBeUndefined();
+
+			expect(times[0]).toBeUndefined();
+			expect(times[1]).toBeUndefined();
+			expect(times[2]).toBeGreaterThanOrEqual(190);
+			expect(times[2]).toBeLessThanOrEqual(210);
+
+			done();
+		}, 500);
 	}));
