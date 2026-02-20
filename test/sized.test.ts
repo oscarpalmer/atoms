@@ -1,28 +1,20 @@
 import {expect, test} from 'vitest';
-import * as Sized from '../src/sized';
+import {SizedMap, SizedSet} from '../src/sized';
+import {sizedFixture} from './.fixtures/sized.fixture';
 
-const actualMax = 2 ** 24;
-const niceMax = 2 ** 20;
-
-function joinMap(map: Map<unknown, unknown>): string {
-	return [...map.entries()].map(([key, value]) => `${key}:${value}`).join('; ');
-}
-
-function joinSet(set: Set<unknown>): string {
-	return [...set.values()].join('; ');
-}
+const {actualMax, joinMap, joinSet, niceMax} = sizedFixture;
 
 test('SizedMap', () =>
 	new Promise<void>(done => {
-		const entriesMap = new Sized.SizedMap([
+		const entriesMap = new SizedMap([
 			[0, 'a'],
 			[1, 'b'],
 			[2, 'c'],
 		]);
 
-		const maxMap = new Sized.SizedMap(2);
+		const maxMap = new SizedMap(2);
 
-		const shrunkMap = new Sized.SizedMap(
+		const shrunkMap = new SizedMap(
 			[
 				[0, 'a'],
 				[1, 'b'],
@@ -33,7 +25,7 @@ test('SizedMap', () =>
 			3,
 		);
 
-		const clampedMap = new Sized.SizedMap(actualMax + 1);
+		const clampedMap = new SizedMap(actualMax + 1);
 
 		expect(entriesMap.full).toBe(false);
 		expect(entriesMap.maximum).toBe(niceMax);
@@ -106,10 +98,10 @@ test('SizedMap', () =>
 
 test('SizedSet', () =>
 	new Promise<void>(done => {
-		const valuesSet = new Sized.SizedSet(['a', 'b', 'c']);
-		const maxSet = new Sized.SizedSet(2);
-		const shrunkSet = new Sized.SizedSet(['a', 'b', 'c', 'd', 'e'], 3);
-		const clampedSet = new Sized.SizedSet(actualMax + 1);
+		const valuesSet = new SizedSet(['a', 'b', 'c']);
+		const maxSet = new SizedSet(2);
+		const shrunkSet = new SizedSet(['a', 'b', 'c', 'd', 'e'], 3);
+		const clampedSet = new SizedSet(actualMax + 1);
 
 		expect(valuesSet.full).toBe(false);
 		expect(valuesSet.maximum).toBe(niceMax);

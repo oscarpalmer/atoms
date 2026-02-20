@@ -9,15 +9,6 @@ type Match = 'endsWith' | 'includes' | 'startsWith';
 // #region Functions
 
 /**
- * Create a new UUID-string
- * @deprecated Use {@link getUuid} instead
- * @returns UUID string
- */
-export function createUuid(): string {
-	return getUuid();
-}
-
-/**
  * Check if a string ends with a specified substring
  * @param haystack String to look in
  * @param needle String to look for

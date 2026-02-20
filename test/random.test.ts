@@ -9,45 +9,12 @@ import {
 	getRandomItem,
 	getRandomItems,
 } from '../src/random';
+import {randomFixture} from './.fixtures/random.fixture';
 
-const size = 100_000;
+const {getRandomNumber, size} = randomFixture;
 
-async function getRandomNumber(
-	callback: (min?: number, max?: number) => number,
-	flipped: boolean,
-	min?: number,
-	max?: number,
-): Promise<void> {
-	let maxActual: number;
-	let minActual: number;
-
-	if (typeof max === 'number') {
-		maxActual = max;
-	} else {
-		maxActual = flipped ? Number.MIN_SAFE_INTEGER : Number.MAX_SAFE_INTEGER;
-	}
-
-	if (typeof min === 'number') {
-		minActual = min;
-	} else {
-		minActual = flipped ? Number.MAX_SAFE_INTEGER : Number.MIN_SAFE_INTEGER;
-	}
-
-	let index = 0;
-	let invalid = 0;
-
-	for (; index < size; index += 1) {
-		const value = callback(min, max);
-
-		if (
-			value > (flipped ? minActual : maxActual) + 1 ||
-			value < (flipped ? maxActual : minActual)
-		) {
-			invalid += 1;
-		}
-	}
-
-	expect(invalid).toBe(0);
+function handler(value: unknown): void {
+	expect(value).toBe(0);
 }
 
 test('getRandomBoolean', () => {
@@ -121,11 +88,10 @@ test('getRandomColor', () => {
 test('getRandomFloat', () =>
 	new Promise<void>(done => {
 		async function run() {
-			await getRandomNumber(getRandomFloat, false);
-			await getRandomNumber(getRandomFloat, false, -123.456, 456.789);
-			await getRandomNumber(getRandomFloat, true, 456.789, -123.456);
-
-			await getRandomNumber(getRandomFloat, false, 'blah' as never, 'blah' as never);
+			await getRandomNumber(getRandomFloat, handler, false);
+			await getRandomNumber(getRandomFloat, handler, false, -123.456, 456.789);
+			await getRandomNumber(getRandomFloat, handler, true, 456.789, -123.456);
+			await getRandomNumber(getRandomFloat, handler, false, 'blah' as never, 'blah' as never);
 
 			done();
 		}
@@ -153,11 +119,10 @@ test('getRandomHex', () => {
 test('getRandomInteger', () =>
 	new Promise<void>(done => {
 		async function run() {
-			await getRandomNumber(getRandomInteger, false);
-			await getRandomNumber(getRandomInteger, false, 0, 100);
-			await getRandomNumber(getRandomInteger, true, 100, 0);
-
-			await getRandomNumber(getRandomInteger, false, 'blah' as never, 'blah' as never);
+			await getRandomNumber(getRandomInteger, handler, false);
+			await getRandomNumber(getRandomInteger, handler, false, 0, 100);
+			await getRandomNumber(getRandomInteger, handler, true, 100, 0);
+			await getRandomNumber(getRandomInteger, handler, false, 'blah' as never, 'blah' as never);
 
 			done();
 		}

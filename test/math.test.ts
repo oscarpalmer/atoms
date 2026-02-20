@@ -1,29 +1,8 @@
 import {expect, test} from 'vitest';
 import {average, count, max, min, round, sum} from '../src/math';
+import {mathFixture} from './.fixtures/math.fixture';
 
-class Item {
-	constructor(readonly value: number) {}
-}
-
-type Person = {
-	age?: number;
-	name?: string;
-};
-
-const one = [123, 'abc'];
-const two = [123, 'abc', 456];
-const three = [123, 'abc', 456, 'def', 789];
-
-const four: Person[] = [
-	{age: 25, name: 'John'},
-	{age: 30, name: 'Jane'},
-	{age: 35, name: 'Joe'},
-	{name: 'invalid'},
-];
-
-const five = [new Item(123), new Item(456), new Item(789)];
-
-const six = ['abc', 'defg', 'hi'];
+const {one, two, three, four, five, six} = mathFixture;
 
 test('average', () => {
 	expect(average([])).toBeNaN();

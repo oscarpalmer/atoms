@@ -1,29 +1,11 @@
 import {expect, test} from 'vitest';
 import type {NestedPartial} from '../src/models';
 import {diff, getValue, merge, partial, setValue, smush, unsmush} from '../src/value';
-
-type Diffable = {
-	numbers: number[];
-	object: {
-		nested: {
-			[key: string]: unknown;
-		};
-	};
-	strings: string[];
-	value: unknown;
-};
-
-type DiffableExtended = {
-	additional: unknown;
-} & Diffable;
-
-type Mergeable = {
-	age: number;
-	cars: string[];
-	hobbies: string[];
-	name: {first: string; last: string};
-	profession: string;
-};
+import {
+	TestValueDiffable,
+	TestValueDiffableExtended,
+	TestValueMergeable,
+} from './.fixtures/value.fixture';
 
 test('diff', () => {
 	expect(diff(null, null).type).toBe('none');
@@ -42,7 +24,7 @@ test('diff', () => {
 	expect(diff([1, 2, 3], [3, 2, 1]).type).toBe('partial');
 	expect(diff([1, 2, 3], [1, 2, 3]).type).toBe('none');
 
-	const first: Diffable = {
+	const first: TestValueDiffable = {
 		numbers: Array.from({length: 10}).map((_, i) => i),
 		object: {
 			nested: {
@@ -55,7 +37,7 @@ test('diff', () => {
 		value: 123,
 	};
 
-	const second: DiffableExtended = {
+	const second: TestValueDiffableExtended = {
 		additional: 'xyz',
 		numbers: Array.from({length: 10}).map((_, i) => (i % 3 === 0 ? -1 : i)),
 		object: {
@@ -191,7 +173,7 @@ test('getValue', () => {
 });
 
 test('merge', () => {
-	const first: NestedPartial<Mergeable> = {
+	const first: NestedPartial<TestValueMergeable> = {
 		age: 99,
 		cars: ['Alfa Romeo Spider', 'Lamborghini Miura'],
 		hobbies: ['Gaming', 'Reading'],
@@ -201,18 +183,18 @@ test('merge', () => {
 		profession: 'Developer?',
 	};
 
-	const second: NestedPartial<Mergeable> = {
+	const second: NestedPartial<TestValueMergeable> = {
 		cars: undefined,
 		name: {
 			last: 'Palmér',
 		},
 	};
 
-	const third: NestedPartial<Mergeable> = {
+	const third: NestedPartial<TestValueMergeable> = {
 		cars: ['Toyota 2000GT'],
 	};
 
-	const fourth: NestedPartial<Mergeable> = {
+	const fourth: NestedPartial<TestValueMergeable> = {
 		cars: ['Ferrari 250 GT California'],
 		hobbies: ['Wrestling'],
 	};

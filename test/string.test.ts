@@ -2,7 +2,6 @@ import {expect, test} from 'vitest';
 import {
 	camelCase,
 	capitalize,
-	createUuid,
 	getString,
 	getUuid,
 	join,
@@ -19,33 +18,13 @@ import {
 	words,
 } from '../src/string';
 import {endsWith, includes, startsWith} from '../src/string/misc';
+import {
+	TestStringItemWithToString,
+	TestStringItemWithoutToString,
+	stringFixture,
+} from './.fixtures/string.fixture';
 
-class ItemWithoutToString {
-	value: string;
-
-	constructor(value: string) {
-		this.value = value;
-	}
-}
-
-class ItemWithToString {
-	value: string;
-
-	constructor(value: string) {
-		this.value = value;
-	}
-
-	toString() {
-		return this.value;
-	}
-}
-
-const strings = [
-	'Hello, world!',
-	'The quick brown fox jumps over the lazy dog',
-	'Η γρήγορη καφέ αλεπού πηδάει πάνω από το τεμπέλικο σκυλί',
-	'Быстрая коричневая лиса прыгает через ленивую собаку',
-];
+const {strings} = stringFixture;
 
 test('camelCase', () => {
 	expect(camelCase('12 feet')).toBe('12Feet');
@@ -116,8 +95,8 @@ test('getString', () => {
 	expect(getString([1, 2, 3])).toBe('1,2,3');
 	expect(getString(() => {})).toBe('');
 	expect(getString(() => 'test')).toBe('test');
-	expect(getString(new ItemWithoutToString('test'))).toBe('{"value":"test"}');
-	expect(getString(new ItemWithToString('test'))).toBe('test');
+	expect(getString(new TestStringItemWithoutToString('test'))).toBe('{"value":"test"}');
+	expect(getString(new TestStringItemWithToString('test'))).toBe('test');
 
 	const obj = {};
 
@@ -137,7 +116,7 @@ test(
 			let index = 0;
 
 			for (; index < length; index += 1) {
-				ids.add(index % 2 === 0 ? createUuid() : getUuid());
+				ids.add(getUuid());
 			}
 
 			expect(ids.size).toBe(length);
@@ -167,9 +146,8 @@ test('includes', () => {
 });
 
 test('join', () => {
-	expect(join([null, undefined, 'a', new ItemWithToString('b'), 'c'])).toBe('abc');
-
-	expect(join([null, undefined, 'a', new ItemWithToString('b'), 'c'], '.')).toBe('a.b.c');
+	expect(join([null, undefined, 'a', new TestStringItemWithToString('b'), 'c'])).toBe('abc');
+	expect(join([null, undefined, 'a', new TestStringItemWithToString('b'), 'c'], '.')).toBe('a.b.c');
 });
 
 test('kebabCase', () => {

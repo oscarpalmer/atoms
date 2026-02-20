@@ -13,31 +13,9 @@ import {
 	isPrimitive,
 	isTypedArray,
 } from '../src/is';
+import {isFixture} from './.fixtures/is.fixture';
 
-const values = [
-	undefined,
-	null,
-	[],
-	() => {},
-	'',
-	' ',
-	'123',
-	'123.456',
-	'test',
-	0,
-	123,
-	123.456,
-	true,
-	false,
-	Symbol('test'),
-	{},
-	[1, 2, 3],
-	() => 'hello, world',
-	new Map(),
-	new Set(),
-];
-
-const {length} = values;
+const {values, length} = isFixture;
 
 test('isArrayOrPlainObject', () => {
 	const expected = Array.from({length}, (_, index) => [2, 15, 16].includes(index));
