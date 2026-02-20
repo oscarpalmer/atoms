@@ -25,6 +25,20 @@ class Queue<CallbackParameters extends Parameters<GenericAsyncCallback>, Callbac
 	}
 
 	/**
+	 * Does the queue automatically start when the first item is added?
+	 */
+	get autostart(): boolean {
+		return this.#options.autostart;
+	}
+
+	/**
+	 * Maximum number of runners to process the queue concurrently
+	 */
+	get concurrency(): number {
+		return this.#options.concurrency;
+	}
+
+	/**
 	 * Is the queue empty?
 	 */
 	get empty(): boolean {
@@ -36,6 +50,13 @@ class Queue<CallbackParameters extends Parameters<GenericAsyncCallback>, Callbac
 	 */
 	get full(): boolean {
 		return this.#options.maximum > 0 && this.#items.length >= this.#options.maximum;
+	}
+
+	/**
+	 * Maximum number of items allowed in the queue
+	 */
+	get maximum(): number {
+		return this.#options.maximum;
 	}
 
 	/**
