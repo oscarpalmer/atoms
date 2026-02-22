@@ -1,5 +1,5 @@
 import {expect, test} from 'vitest';
-import {clone} from '../../src/value';
+import {clone} from '../../src/value/clone';
 
 test('array', () => {
 	const data = [1, 'a', true];

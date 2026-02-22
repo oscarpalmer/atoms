@@ -11,4 +11,3 @@ export {
 	upperCase,
 } from './case';
 export {endsWith, getUuid, includes, parse, startsWith, trim, truncate} from './misc';
-export {initializeTemplater, template, type TemplateOptions} from './template';

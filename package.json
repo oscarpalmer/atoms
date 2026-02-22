@@ -89,9 +89,29 @@
 			"types": "./types/string/index.d.ts",
 			"default": "./dist/string/index.js"
 		},
+		"./string/template": {
+			"types": "./types/string/template.d.ts",
+			"default": "./dist/string/template.js"
+		},
 		"./value": {
 			"types": "./types/value/index.d.ts",
 			"default": "./dist/value/index.js"
+		},
+		"./value/clone": {
+			"types": "./types/value/clone.d.ts",
+			"default": "./dist/value/clone.js"
+		},
+		"./value/compare": {
+			"types": "./types/internal/value/compare.d.ts",
+			"default": "./dist/internal/value/compare.js"
+		},
+		"./value/equal": {
+			"types": "./types/internal/value/equal.d.ts",
+			"default": "./dist/internal/value/equal.js"
+		},
+		"./value/merge": {
+			"types": "./types/value/merge.d.ts",
+			"default": "./dist/value/merge.js"
 		}
 	},
 	"files": [
@@ -120,5 +140,5 @@
 	},
 	"type": "module",
 	"types": "./types/index.d.ts",
-	"version": "0.137.0"
+	"version": "0.138.0"
 }

@@ -1,5 +1,6 @@
 import {expect, test} from 'vitest';
-import {clone, getValue, type PlainObject} from '../../src/value';
+import {getValue, type PlainObject} from '../../src/value';
+import {clone} from '../../src/value/clone';
 
 test('array buffer', () => {
 	const data = new ArrayBuffer(8);

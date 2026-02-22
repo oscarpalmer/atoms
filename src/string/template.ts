@@ -1,6 +1,6 @@
+import {isPlainObject} from '../internal/is';
 import {getString} from '../internal/string';
 import {getValue} from '../internal/value/get';
-import {isPlainObject} from '../is';
 import type {PlainObject} from '../models';
 
 // #region Types

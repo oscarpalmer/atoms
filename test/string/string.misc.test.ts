@@ -1,5 +1,6 @@
 import {expect, test} from 'vitest';
-import {getString, getUuid, initializeTemplater, join, parse, template, trim, truncate, words} from '../../src/string';
+import {getString, getUuid, join, parse, trim, truncate, words} from '../../src/string';
+import {initializeTemplater, template} from '../../src/string/template';
 import {
 	TestStringItemWithToString,
 	TestStringItemWithoutToString,
