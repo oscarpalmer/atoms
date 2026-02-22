@@ -1,7 +1,7 @@
 import {expect, test} from 'vitest';
 import {shuffle, sort} from '../../src/array';
 import {getRandomInteger} from '../../src/internal/random';
-import {diff} from '../../src/value';
+import {diff} from '../../src/value/diff';
 
 test('basic', () => {
 	expect(sort([1])).toEqual([1]);

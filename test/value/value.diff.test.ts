@@ -1,5 +1,5 @@
 import {expect, test} from 'vitest';
-import {diff} from '../../src/value';
+import {diff} from '../../src/value/diff';
 import {TestValueDiffable, TestValueDiffableExtended} from '../.fixtures/value.fixture';
 
 test('diff', () => {
