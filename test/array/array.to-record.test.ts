@@ -1,5 +1,5 @@
 import {expect, test} from 'vitest';
-import {toRecord} from '../../src/array';
+import {toRecord, toRecordArrays} from '../../src/array';
 import {arrayFixture} from '../.fixtures/array.fixture';
 
 test('', () => {
@@ -60,8 +60,8 @@ test('', () => {
 	expect(keyToValue).toEqual(valueToKey);
 	expect(valueToValue).toEqual(valueToKey);
 
-	const keyeds = toRecord.arrays(complex, 'id');
-	const callbackeds = toRecord.arrays(complex, item => item.name);
+	const keyeds = toRecordArrays(complex, 'id');
+	const callbackeds = toRecordArrays(complex, item => item.name);
 
 	expect(keyeds).toEqual({
 		1: [{id: 1, age: 25, name: 'Alice'}],
@@ -81,11 +81,11 @@ test('', () => {
 		David: [{id: 5, age: 35, name: 'David'}],
 	});
 
-	const keyToKeys = toRecord.arrays(complex, 'id', 'name');
-	const valueToKeys = toRecord.arrays(complex, item => item.name, 'age');
-	const keyToValues = toRecord.arrays(complex, 'name', item => item.age);
+	const keyToKeys = toRecordArrays(complex, 'id', 'name');
+	const valueToKeys = toRecordArrays(complex, item => item.name, 'age');
+	const keyToValues = toRecordArrays(complex, 'name', item => item.age);
 
-	const valueToValues = toRecord.arrays(
+	const valueToValues = toRecordArrays(
 		complex,
 		item => item.name,
 		item => item.age,

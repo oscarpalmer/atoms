@@ -15,28 +15,25 @@ export function clone(value: unknown): unknown {
 	return cloneValue(value, 0, new WeakMap());
 }
 
-clone.handlers = getSelfHandlers(clone, {
-	callback: tryStructuredClone,
-	method: 'clone',
-});
-
 /**
  * Register a clone handler for a specific class
  * @param constructor Class constructor
  * @param handler Method name or clone function _(defaults to `clone`)_
  */
-clone.register = function <Instance>(
+export function registerCloner<Instance>(
 	constructor: Constructor<Instance>,
 	handler?: string | ((value: Instance) => Instance),
 ): void {
-	clone.handlers.register(constructor, handler);
-};
+	cloneHandlers.register(constructor, handler);
+}
 
 /**
  * Unregister a clone handler for a specific class
  * @param constructor Class constructor
  */
-clone.unregister = clone.handlers.unregister;
+export function unregisterCloner<Instance>(constructor: Constructor<Instance>): void {
+	cloneHandlers.unregister(constructor);
+}
 
 function cloneArrayBuffer(
 	value: ArrayBuffer,
@@ -228,7 +225,7 @@ function cloneValue(value: unknown, depth: number, references: WeakMap<WeakKey, 
 			return cloneTypedArray(value, depth, references);
 
 		default:
-			return clone.handlers.handle(value, depth, references);
+			return cloneHandlers.handle(value, depth, references);
 	}
 }
 
@@ -256,7 +253,12 @@ function tryStructuredClone(
 
 // #endregion
 
-// #region Constants
+// #region Variables
+
+const cloneHandlers = getSelfHandlers(clone, {
+	callback: tryStructuredClone,
+	method: 'clone',
+});
 
 const MAX_CLONE_DEPTH = 100;
 

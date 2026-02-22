@@ -1,6 +1,7 @@
 import {expect, test} from 'vitest';
 import {
 	isArrayOrPlainObject,
+	isConstructor,
 	isEmpty,
 	isKey,
 	isNullable,
@@ -24,6 +25,18 @@ test('isArrayOrPlainObject', () => {
 
 	for (; index < length; index += 1) {
 		expect(isArrayOrPlainObject(values[index])).toBe(expected[index]);
+	}
+});
+
+test('isConstructor', () => {
+	for (let index = 0; index < length; index += 1) {
+		expect(isConstructor(values[index])).toBe(false);
+	}
+
+	const constructors = [Array, Object, Map, Set, Date, RegExp, Promise, Error];
+
+	for (const constructor of constructors) {
+		expect(isConstructor(constructor)).toBe(true);
 	}
 });
 

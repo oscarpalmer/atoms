@@ -61,32 +61,25 @@ export function compare(first: unknown, second: unknown): number {
 	return 0;
 }
 
-compare.handlers = getCompareHandlers<number>(compare, {
-	callback: (first, second, compareStrings) => {
-		if (compareStrings) {
-			return getString(first).localeCompare(getString(second));
-		}
-	},
-	method: 'compare',
-});
-
 /**
  * Register a custom comparison handler for a class
  * @param constructor Class constructor
  * @param handler Method name or comparison function _(defaults to `compare`)_
  */
-compare.register = function <Instance>(
+export function registerComparator<Instance>(
 	constructor: Constructor<Instance>,
 	handler?: string | ((first: Instance, second: Instance) => number),
 ): void {
-	compare.handlers.register(constructor, handler);
-};
+	compareHandlers.register(constructor, handler);
+}
 
 /**
  * Unregister a custom comparison handler for a class
  * @param constructor Class constructor
  */
-compare.unregister = compare.handlers.unregister;
+export function unregisterComparator<Instance>(constructor: Constructor<Instance>): void {
+	compareHandlers.unregister(constructor);
+}
 
 function compareNumbers(
 	first: bigint | boolean | number,
@@ -124,7 +117,7 @@ function compareValue(
 		return compareNumbers(first.getTime(), second.getTime());
 	}
 
-	return compare.handlers.handle(first, second, compareStrings);
+	return compareHandlers.handle(first, second, compareStrings);
 }
 
 function getComparisonParts(value: unknown): unknown[] {
@@ -137,7 +130,7 @@ function getComparisonParts(value: unknown): unknown[] {
 
 // #endregion
 
-// #region Constants
+// #region Variables
 
 const comparators: Record<string, Comparator> = {
 	bigint: compareNumbers,
@@ -145,5 +138,14 @@ const comparators: Record<string, Comparator> = {
 	number: compareNumbers,
 	symbol: compareSymbols,
 };
+
+const compareHandlers = getCompareHandlers<number>(compare, {
+	callback: (first, second, compareStrings) => {
+		if (compareStrings) {
+			return getString(first).localeCompare(getString(second));
+		}
+	},
+	method: 'compare',
+});
 
 // #endregion

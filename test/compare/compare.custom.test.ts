@@ -1,5 +1,5 @@
 import {expect, test} from 'vitest';
-import {compare} from '../../src/internal/value/compare';
+import {compare, registerComparator, unregisterComparator} from '../../src/internal/value/compare';
 
 test('', () => {
 	class Test {
@@ -20,61 +20,61 @@ test('', () => {
 	expect(compare(alpha, omega)).toBe(-1);
 	expect(compare(omega, alpha)).toBe(1);
 
-	compare.register(Test);
+	registerComparator(Test);
 
 	expect(compare(alpha, omega)).toBe(-1);
 	expect(compare(omega, alpha)).toBe(1);
 
-	compare.unregister(Test);
+	unregisterComparator(Test);
 
 	expect(compare(alpha, omega)).toBe(-1);
 	expect(compare(omega, alpha)).toBe(1);
 
-	compare.register(Test, (first, second): number =>
+	registerComparator(Test, (first, second): number =>
 		compare(first.value.length, second.value.length),
 	);
 
 	expect(compare(alpha, omega)).toBe(1);
 	expect(compare(omega, alpha)).toBe(-1);
 
-	compare.unregister(Test);
+	unregisterComparator(Test);
 
 	expect(compare(alpha, omega)).toBe(-1);
 	expect(compare(omega, alpha)).toBe(1);
 
-	compare.register(Test, 'length');
+	registerComparator(Test, 'length');
 
 	expect(compare(alpha, omega)).toBe(1);
 	expect(compare(omega, alpha)).toBe(-1);
 
-	compare.unregister(Test);
+	unregisterComparator(Test);
 
 	expect(compare(alpha, omega)).toBe(-1);
 	expect(compare(omega, alpha)).toBe(1);
 
-	compare.register(Test, compare);
+	registerComparator(Test, compare);
 
 	expect(compare(alpha, omega)).toBe(-1);
 	expect(compare(omega, alpha)).toBe(1);
 
-	compare.unregister(Test);
+	unregisterComparator(Test);
 
 	expect(compare(alpha, omega)).toBe(-1);
 	expect(compare(omega, alpha)).toBe(1);
 
-	compare.register(Test, 'nonExistentMethod');
+	registerComparator(Test, 'nonExistentMethod');
 
 	expect(compare(alpha, omega)).toBe(-1);
 	expect(compare(omega, alpha)).toBe(1);
 
-	compare.unregister(Test);
+	unregisterComparator(Test);
 
-	compare.register('blah' as never, compare);
+	registerComparator('blah' as never, compare);
 
 	expect(compare(alpha, omega)).toBe(-1);
 	expect(compare(omega, alpha)).toBe(1);
 
-	compare.register(Test, [1, 2, 3] as never);
+	registerComparator(Test, [1, 2, 3] as never);
 
 	expect(compare(alpha, omega)).toBe(-1);
 	expect(compare(omega, alpha)).toBe(1);

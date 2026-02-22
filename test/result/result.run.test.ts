@@ -1,5 +1,5 @@
 import {expect, test} from 'vitest';
-import {isError, isOk, isResult, result} from '../../src/result';
+import {asyncResult, isError, isOk, isResult, result} from '../../src/result';
 
 test('synchronous', () => {
 	const failure = result(() => {
@@ -51,7 +51,7 @@ test('synchronous', () => {
 });
 
 test('asynchronous', async () => {
-	const rejected = await result.async(
+	const rejected = await asyncResult(
 		async () =>
 			new Promise<void>((_, reject) =>
 				setTimeout(() => {
@@ -60,7 +60,7 @@ test('asynchronous', async () => {
 			),
 	);
 
-	const rejectedCustom = await result.async(
+	const rejectedCustom = await asyncResult(
 		async () =>
 			new Promise<void>((_, reject) =>
 				setTimeout(() => {
@@ -70,7 +70,7 @@ test('asynchronous', async () => {
 		new Error('custom failure'),
 	);
 
-	const resolved = await result.async(
+	const resolved = await asyncResult(
 		async () =>
 			new Promise<string>(resolve =>
 				setTimeout(() => {

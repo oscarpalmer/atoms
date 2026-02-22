@@ -100,7 +100,22 @@ const EXPRESSION_WHITESPACE = /^\s*$/;
 
 // #region Exports
 
-export {isArrayOrPlainObject, isKey, isNumber, isPlainObject, isTypedArray} from './internal/is';
-export type {ArrayOrPlainObject, Key, PlainObject, Primitive, TypedArray} from './models';
+export {
+	isArrayOrPlainObject,
+	isConstructor,
+	isKey,
+	isNumber,
+	isPlainObject,
+	isTypedArray,
+} from './internal/is';
+
+export type {
+	ArrayOrPlainObject,
+	Constructor,
+	Key,
+	PlainObject,
+	Primitive,
+	TypedArray,
+} from './models';
 
 // #endregion

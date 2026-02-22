@@ -68,6 +68,19 @@ function handleTemplate(
 }
 
 /**
+ * Create a templater with predefined options
+ * @param options Templating options
+ * @returns Templater function
+ */
+export function initializeTemplater(options?: Partial<TemplateOptions>): Templater {
+	const {ignoreCase, pattern} = getTemplateOptions(options);
+
+	return (value: string, variables?: PlainObject): string => {
+		return handleTemplate(value, pattern, ignoreCase, variables);
+	};
+}
+
+/**
  * Render a string from a template with variables
  * @param value Template string
  * @param variables Variables to use
@@ -83,19 +96,6 @@ export function template(
 
 	return handleTemplate(value, pattern, ignoreCase, variables);
 }
-
-/**
- * Create a templater with predefined options
- * @param options Templating options
- * @returns Templater function
- */
-template.initialize = function (options?: Partial<TemplateOptions>): Templater {
-	const {ignoreCase, pattern} = getTemplateOptions(options);
-
-	return (value: string, variables?: PlainObject): string => {
-		return handleTemplate(value, pattern, ignoreCase, variables);
-	};
-};
 
 // #endregion
 

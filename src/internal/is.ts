@@ -12,12 +12,12 @@ export function isArrayOrPlainObject(value: unknown): value is ArrayOrPlainObjec
 }
 
 /**
- * Is the value a constructor?
+ * Is the value a constructor function?
  * @param value Value to check
- * @returns `true` if the value is a constructor, otherwise `false`
+ * @returns `true` if the value is a constructor function, otherwise `false`
  */
 export function isConstructor(value: unknown): value is Constructor {
-	return typeof value === 'function' && EXPRESSION_CONSTRUCTOR.test(value.name);
+	return typeof value === 'function' && value.prototype?.constructor === value;
 }
 
 /**
@@ -87,8 +87,6 @@ export function isTypedArray(value: unknown): value is TypedArray {
 // #endregion
 
 // #region Constants & variables
-
-const EXPRESSION_CONSTRUCTOR = /^[A-Z][A-Za-z0-9]*$/;
 
 let TYPED_ARRAYS: Set<unknown>;
 

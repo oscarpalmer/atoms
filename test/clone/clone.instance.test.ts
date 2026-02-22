@@ -1,6 +1,6 @@
 import {expect, test} from 'vitest';
 import {isPlainObject} from '../../src/internal/is';
-import {clone} from '../../src/value';
+import {clone, registerCloner, unregisterCloner} from '../../src/value/clone';
 import {TestCloneItem} from '../.fixtures/clone.fixture';
 
 test('instance', () => {
@@ -11,7 +11,7 @@ test('instance', () => {
 	expect(cloned).not.toBe(original);
 	expect(isPlainObject(cloned)).toBe(true);
 
-	clone.register(TestCloneItem);
+	registerCloner(TestCloneItem);
 
 	cloned = clone(original);
 
@@ -20,7 +20,7 @@ test('instance', () => {
 	expect(cloned.id).toBe(original.id);
 	expect(cloned.name).toBe('clone');
 
-	clone.register(TestCloneItem, 'custom');
+	registerCloner(TestCloneItem, 'custom');
 
 	cloned = clone(original);
 
@@ -29,7 +29,7 @@ test('instance', () => {
 	expect(cloned.id).toBe(original.id);
 	expect(cloned.name).toBe('custom');
 
-	clone.register(TestCloneItem, value => new TestCloneItem(value.id, 'callback'));
+	registerCloner(TestCloneItem, value => new TestCloneItem(value.id, 'callback'));
 
 	cloned = clone(original);
 
@@ -38,42 +38,42 @@ test('instance', () => {
 	expect(cloned.id).toBe(original.id);
 	expect(cloned.name).toBe('callback');
 
-	clone.unregister(TestCloneItem);
+	unregisterCloner(TestCloneItem);
 
 	cloned = clone(original);
 
 	expect(cloned).not.toBe(original);
 	expect(isPlainObject(cloned)).toBe(true);
 
-	clone.register(TestCloneItem, 'nonExistentMethod');
+	registerCloner(TestCloneItem, 'nonExistentMethod');
 
 	cloned = clone(original);
 
 	expect(cloned).not.toBe(original);
 	expect(isPlainObject(cloned)).toBe(true);
 
-	clone.unregister(TestCloneItem);
+	unregisterCloner(TestCloneItem);
 
-	clone.register(TestCloneItem, clone);
-
-	cloned = clone(original);
-
-	expect(cloned).not.toBe(original);
-	expect(isPlainObject(cloned)).toBe(true);
-
-	clone.register(TestCloneItem, 123 as never);
+	registerCloner(TestCloneItem, clone);
 
 	cloned = clone(original);
 
 	expect(cloned).not.toBe(original);
 	expect(isPlainObject(cloned)).toBe(true);
 
-	clone.register(123 as never, 'custom');
+	registerCloner(TestCloneItem, 123 as never);
 
 	cloned = clone(original);
 
 	expect(cloned).not.toBe(original);
 	expect(isPlainObject(cloned)).toBe(true);
 
-	clone.unregister(123 as never);
+	registerCloner(123 as never, 'custom');
+
+	cloned = clone(original);
+
+	expect(cloned).not.toBe(original);
+	expect(isPlainObject(cloned)).toBe(true);
+
+	unregisterCloner(123 as never);
 });

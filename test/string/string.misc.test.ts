@@ -1,5 +1,5 @@
 import {expect, test} from 'vitest';
-import {getString, getUuid, join, parse, template, trim, truncate, words} from '../../src/string';
+import {getString, getUuid, initializeTemplater, join, parse, template, trim, truncate, words} from '../../src/string';
 import {
 	TestStringItemWithToString,
 	TestStringItemWithoutToString,
@@ -74,7 +74,7 @@ test('template', () => {
 	const basic = '{{a.0.b.1.c}}, {{a.0.b.1.c}}!';
 	const custom = '<a.0.b.1.c>, <a.0.b.1.c>!';
 
-	const templater = template.initialize();
+	const templater = initializeTemplater();
 
 	const variables = {
 		a: [

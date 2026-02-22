@@ -1,6 +1,6 @@
 import {expect, test} from 'vitest';
 import type {NestedPartial} from '../../src/models';
-import {merge} from '../../src/value';
+import {initializeMerger, merge} from '../../src/value';
 import {TestValueMergeable} from '../.fixtures/value.fixture';
 
 test('merge', () => {
@@ -30,7 +30,7 @@ test('merge', () => {
 		hobbies: ['Wrestling'],
 	};
 
-	const merger = merge.initialize({
+	const merger = initializeMerger({
 		replaceableObjects: 'cars',
 	});
 

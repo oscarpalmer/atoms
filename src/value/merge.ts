@@ -94,7 +94,7 @@ export function merge<Model extends ArrayOrPlainObject>(
  * @param options Merging options
  * @returns Merger function
  */
-merge.initialize = function (options?: Partial<MergeOptions>): Merger {
+export function initializeMerger(options?: Partial<MergeOptions>): Merger {
 	const actual = getMergeOptions(options);
 
 	return <Model extends ArrayOrPlainObject>(values: NestedPartial<Model>[]): Model =>

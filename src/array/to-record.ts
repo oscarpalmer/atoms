@@ -116,8 +116,6 @@ export function toRecord(array: unknown[], first?: unknown, second?: unknown): u
 	return groupValues(array, first, second, false);
 }
 
-toRecord.arrays = toRecordArrays;
-
 /**
  * Create a record from an array of items using callbacks, grouping values into arrays
  * @param array Array to convert
@@ -125,7 +123,7 @@ toRecord.arrays = toRecordArrays;
  * @param value Callback to get an item's value
  * @returns Record of keyed arrays of values
  */
-function toRecordArrays<
+export function toRecordArrays<
 	Item,
 	KeyCallback extends (item: Item, index: number, array: Item[]) => Key,
 	ValueCallback extends (item: Item, index: number, array: Item[]) => unknown,
@@ -142,7 +140,7 @@ function toRecordArrays<
  * @param value Key to use for value
  * @returns Record of keyed arrays of values
  */
-function toRecordArrays<
+export function toRecordArrays<
 	Item extends PlainObject,
 	Callback extends (item: Item, index: number, array: Item[]) => Key,
 	ItemValue extends keyof Item,
@@ -159,7 +157,7 @@ function toRecordArrays<
  * @param callback Callback to get an item's value
  * @returns Record of keyed arrays of values
  */
-function toRecordArrays<
+export function toRecordArrays<
 	Item extends PlainObject,
 	ItemKey extends keyof Item,
 	Callback extends (item: Item, index: number, array: Item[]) => unknown,
@@ -176,7 +174,7 @@ function toRecordArrays<
  * @param value Key to use for value
  * @returns Record of keyed arrays of values
  */
-function toRecordArrays<
+export function toRecordArrays<
 	Item extends PlainObject,
 	ItemKey extends keyof Item,
 	ItemValue extends keyof Item,
@@ -192,7 +190,7 @@ function toRecordArrays<
  * @param callback Callback to get an item's grouping key
  * @returns Record of keyed arrays of items
  */
-function toRecordArrays<Item, Callback extends (item: Item, index: number, array: Item[]) => Key>(
+export function toRecordArrays<Item, Callback extends (item: Item, index: number, array: Item[]) => Key>(
 	array: Item[],
 	callback: Callback,
 ): Record<ReturnType<Callback>, Item[]>;
@@ -203,12 +201,12 @@ function toRecordArrays<Item, Callback extends (item: Item, index: number, array
  * @param key Key to use for grouping
  * @returns Record of keyed arrays of items
  */
-function toRecordArrays<Item extends PlainObject, ItemKey extends keyof Item>(
+export function toRecordArrays<Item extends PlainObject, ItemKey extends keyof Item>(
 	array: Item[],
 	key: ItemKey,
 ): Simplify<Record<KeyedValue<Item, ItemKey>, Item[]>>;
 
-function toRecordArrays(array: unknown[], first?: unknown, second?: unknown): unknown {
+export function toRecordArrays(array: unknown[], first?: unknown, second?: unknown): unknown {
 	return groupValues(array, first, second, true);
 }
 
