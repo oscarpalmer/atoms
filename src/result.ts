@@ -180,13 +180,15 @@ export function result<Value, E>(
 	}
 }
 
+result.async = asyncResult;
+
 /**
  * Executes a callback asynchronously, catching any errors, and returns a result
  * @param callback Callback to execute
  * @param error Error value
  * @returns Callback result
  */
-export async function asyncResult<Value, E>(
+async function asyncResult<Value, E>(
 	callback: () => Promise<Value>,
 	error: E,
 ): Promise<ExtendedErr<E> | Ok<Value>>;
@@ -196,9 +198,9 @@ export async function asyncResult<Value, E>(
  * @param callback Callback to execute
  * @returns Callback result
  */
-export async function asyncResult<Value>(callback: () => Promise<Value>): Promise<Result<Value>>;
+async function asyncResult<Value>(callback: () => Promise<Value>): Promise<Result<Value>>;
 
-export async function asyncResult<Value, E>(
+async function asyncResult<Value, E>(
 	callback: () => Promise<Value>,
 	err?: E,
 ): Promise<Result<Value, E>> {
