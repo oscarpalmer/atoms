@@ -201,6 +201,10 @@
 			"types": "./types/value/get-set.d.ts",
 			"default": "./dist/value/get-set.js"
 		},
+		"./value/merge": {
+			"types": "./types/value/merge.d.ts",
+			"default": "./dist/value/merge.js"
+		},
 		"./value/misc": {
 			"types": "./types/value/misc.d.ts",
 			"default": "./dist/value/misc.js"
@@ -232,5 +236,5 @@
 	},
 	"type": "module",
 	"types": "./types/index.d.ts",
-	"version": "0.140.0"
+	"version": "0.141.0"
 }

@@ -1,5 +1,5 @@
 import {expect, test} from 'vitest';
-import {equal, registerEqualizer, unregisterEqualizer} from '../../src';
+import {equal} from '../../src';
 import {TestEqualItem} from '../.fixtures/equal.fixture';
 
 test('instance', () => {
@@ -9,22 +9,22 @@ test('instance', () => {
 
 	expect(equal(new TestEqualItem(123), new TestEqualItem(123))).toBe(false);
 
-	registerEqualizer(TestEqualItem, compare);
+	equal.register(TestEqualItem, compare);
 
 	expect(equal(new TestEqualItem(123), new TestEqualItem(123))).toBe(true);
 	expect(equal(new TestEqualItem(123), new TestEqualItem(456))).toBe(false);
 
-	unregisterEqualizer(TestEqualItem);
+	equal.unregister(TestEqualItem);
 
 	expect(equal(new TestEqualItem(123), new TestEqualItem(123))).toBe(false);
 
-	registerEqualizer(compare as never, compare);
-	registerEqualizer('blah' as never, compare);
+	equal.register(compare as never, compare);
+	equal.register('blah' as never, compare);
 
-	registerEqualizer(TestEqualItem, 'blah' as never);
+	equal.register(TestEqualItem, 'blah' as never);
 
 	expect(equal(new TestEqualItem(123), new TestEqualItem(123))).toBe(false);
 
-	unregisterEqualizer(compare as never);
-	unregisterEqualizer('blah' as never);
+	equal.unregister(compare as never);
+	equal.unregister('blah' as never);
 });

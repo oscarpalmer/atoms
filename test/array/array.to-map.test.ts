@@ -1,5 +1,5 @@
 import {expect, test} from 'vitest';
-import {toMap, toMapArrays} from '../../src';
+import {toMap} from '../../src';
 import {arrayFixture} from '../.fixtures/array.fixture';
 
 test('', () => {
@@ -71,8 +71,8 @@ test('', () => {
 	expect(keyToValue).toEqual(valueToKey);
 	expect(valueToValue).toEqual(valueToKey);
 
-	const keyeds = toMapArrays(complex, 'id');
-	const callbackeds = toMapArrays(complex, item => item.name);
+	const keyeds = toMap.arrays(complex, 'id');
+	const callbackeds = toMap.arrays(complex, item => item.name);
 
 	expect(keyeds).toEqual(
 		new Map([
@@ -99,11 +99,11 @@ test('', () => {
 		]),
 	);
 
-	const keyToKeys = toMapArrays(complex, 'id', 'name');
-	const valueToKeys = toMapArrays(complex, item => item.name, 'age');
-	const keyToValues = toMapArrays(complex, 'name', item => item.age);
+	const keyToKeys = toMap.arrays(complex, 'id', 'name');
+	const valueToKeys = toMap.arrays(complex, item => item.name, 'age');
+	const keyToValues = toMap.arrays(complex, 'name', item => item.age);
 
-	const valueToValues = toMapArrays(
+	const valueToValues = toMap.arrays(
 		complex,
 		item => item.name,
 		item => item.age,

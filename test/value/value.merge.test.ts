@@ -1,5 +1,5 @@
 import {expect, test} from 'vitest';
-import {initializeMerger, merge, type NestedPartial} from '../../src';
+import {merge, type NestedPartial} from '../../src';
 import {TestValueMergeable} from '../.fixtures/value.fixture';
 
 test('merge', () => {
@@ -29,7 +29,7 @@ test('merge', () => {
 		hobbies: ['Wrestling'],
 	};
 
-	const merger = initializeMerger({
+	const merger = merge.initialize({
 		replaceableObjects: 'cars',
 	});
 

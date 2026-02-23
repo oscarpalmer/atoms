@@ -1,5 +1,5 @@
 import {expect, test} from 'vitest';
-import {groupArraysBy, groupBy} from '../../src';
+import {groupBy} from '../../src';
 import {arrayFixture} from '../.fixtures/array.fixture';
 
 test('', () => {
@@ -51,8 +51,8 @@ test('', () => {
 	expect(keyToValue).toEqual(valueToKey);
 	expect(valueToValue).toEqual(valueToKey);
 
-	const keyeds = groupArraysBy(complex, 'id');
-	const callbackeds = groupArraysBy(complex, item => item.name);
+	const keyeds = groupBy.arrays(complex, 'id');
+	const callbackeds = groupBy.arrays(complex, item => item.name);
 
 	expect(keyeds).toEqual({
 		1: [{id: 1, age: 25, name: 'Alice'}],
@@ -72,11 +72,11 @@ test('', () => {
 		David: [{id: 5, age: 35, name: 'David'}],
 	});
 
-	const keyToKeys = groupArraysBy(complex, 'id', 'name');
-	const valueToKeys = groupArraysBy(complex, item => item.name, 'age');
-	const keyToValues = groupArraysBy(complex, 'name', item => item.age);
+	const keyToKeys = groupBy.arrays(complex, 'id', 'name');
+	const valueToKeys = groupBy.arrays(complex, item => item.name, 'age');
+	const keyToValues = groupBy.arrays(complex, 'name', item => item.age);
 
-	const valueToValues = groupArraysBy(
+	const valueToValues = groupBy.arrays(
 		complex,
 		item => item.name,
 		item => item.age,

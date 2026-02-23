@@ -15,24 +15,33 @@ export function clone(value: unknown): unknown {
 	return cloneValue(value, 0, new WeakMap());
 }
 
+clone.handlers = getSelfHandlers(clone, {
+	callback: tryStructuredClone,
+	method: 'clone',
+});
+
+clone.register = registerCloner;
+
+clone.unregister = unregisterCloner;
+
 /**
  * Register a clone handler for a specific class
  * @param constructor Class constructor
  * @param handler Method name or clone function _(defaults to `clone`)_
  */
-export function registerCloner<Instance>(
+function registerCloner<Instance>(
 	constructor: Constructor<Instance>,
 	handler?: string | ((value: Instance) => Instance),
 ): void {
-	cloneHandlers.register(constructor, handler);
+	clone.handlers.register(constructor, handler);
 }
 
 /**
  * Unregister a clone handler for a specific class
  * @param constructor Class constructor
  */
-export function unregisterCloner<Instance>(constructor: Constructor<Instance>): void {
-	cloneHandlers.unregister(constructor);
+function unregisterCloner<Instance>(constructor: Constructor<Instance>): void {
+	clone.handlers.unregister(constructor);
 }
 
 function cloneArrayBuffer(
@@ -225,7 +234,7 @@ function cloneValue(value: unknown, depth: number, references: WeakMap<WeakKey, 
 			return cloneTypedArray(value, depth, references);
 
 		default:
-			return cloneHandlers.handle(value, depth, references);
+			return clone.handlers.handle(value, depth, references);
 	}
 }
 
@@ -254,11 +263,6 @@ function tryStructuredClone(
 // #endregion
 
 // #region Variables
-
-const cloneHandlers = getSelfHandlers(clone, {
-	callback: tryStructuredClone,
-	method: 'clone',
-});
 
 const MAX_CLONE_DEPTH = 100;
 

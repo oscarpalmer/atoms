@@ -61,24 +61,37 @@ export function compare(first: unknown, second: unknown): number {
 	return 0;
 }
 
+compare.handlers = getCompareHandlers<number>(compare, {
+	callback: (first, second, compareStrings) => {
+		if (compareStrings) {
+			return getString(first).localeCompare(getString(second));
+		}
+	},
+	method: 'compare',
+});
+
+compare.register = registerComparator;
+
+compare.unregister = unregisterComparator;
+
 /**
  * Register a custom comparison handler for a class
  * @param constructor Class constructor
  * @param handler Method name or comparison function _(defaults to `compare`)_
  */
-export function registerComparator<Instance>(
+function registerComparator<Instance>(
 	constructor: Constructor<Instance>,
 	handler?: string | ((first: Instance, second: Instance) => number),
 ): void {
-	compareHandlers.register(constructor, handler);
+	compare.handlers.register(constructor, handler);
 }
 
 /**
  * Unregister a custom comparison handler for a class
  * @param constructor Class constructor
  */
-export function unregisterComparator<Instance>(constructor: Constructor<Instance>): void {
-	compareHandlers.unregister(constructor);
+function unregisterComparator<Instance>(constructor: Constructor<Instance>): void {
+	compare.handlers.unregister(constructor);
 }
 
 function compareNumbers(
@@ -117,7 +130,7 @@ function compareValue(
 		return compareNumbers(first.getTime(), second.getTime());
 	}
 
-	return compareHandlers.handle(first, second, compareStrings);
+	return compare.handlers.handle(first, second, compareStrings);
 }
 
 function getComparisonParts(value: unknown): unknown[] {
@@ -138,14 +151,5 @@ const comparators: Record<string, Comparator> = {
 	number: compareNumbers,
 	symbol: compareSymbols,
 };
-
-const compareHandlers = getCompareHandlers<number>(compare, {
-	callback: (first, second, compareStrings) => {
-		if (compareStrings) {
-			return getString(first).localeCompare(getString(second));
-		}
-	},
-	method: 'compare',
-});
 
 // #endregion

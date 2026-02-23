@@ -72,7 +72,7 @@ function handleTemplate(
  * @param options Templating options
  * @returns Templater function
  */
-export function initializeTemplater(options?: Partial<TemplateOptions>): Templater {
+function initializeTemplater(options?: Partial<TemplateOptions>): Templater {
 	const {ignoreCase, pattern} = getTemplateOptions(options);
 
 	return (value: string, variables?: PlainObject): string => {
@@ -96,6 +96,8 @@ export function template(
 
 	return handleTemplate(value, pattern, ignoreCase, variables);
 }
+
+template.initialize = initializeTemplater;
 
 // #endregion
 

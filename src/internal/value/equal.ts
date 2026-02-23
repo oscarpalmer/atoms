@@ -23,13 +23,31 @@ export type EqualOptions = {
 	relaxedNullish?: boolean;
 };
 
-/**
+type Equalizer = {
+	/**
 	 * Are two values equal?
 	 * @param first First value
 	 * @param second Second value
 	 * @returns `true` if the values are equal, otherwise `false`
 	 */
-type Equalizer = (first: unknown, second: unknown) => boolean;
+	(first: unknown, second: unknown): boolean;
+
+	/**
+	 * Register a equality comparison function for a specific class
+	 * @param constructor Class constructor
+	 * @param fn Comparison function
+	 */
+	register: <Instance>(
+		constructor: Constructor<Instance>,
+		handler: (first: Instance, second: Instance) => boolean,
+	) => void;
+
+	/**
+	 * Unregister a equality comparison handler for a specific class
+	 * @param constructor Class constructor
+	 */
+	unregister: <Instance>(constructor: Constructor<Instance>) => void;
+};
 
 type Options = {
 	ignoreCase: boolean;
@@ -68,6 +86,16 @@ export function equal(first: unknown, second: unknown, options?: EqualOptions): 
 export function equal(first: unknown, second: unknown, options?: boolean | EqualOptions): boolean {
 	return equalValue(first, second, getEqualOptions(options));
 }
+
+equal.handlers = getCompareHandlers<boolean>(equal, {
+	callback: Object.is,
+});
+
+equal.initialize = initializeEqualizer;
+
+equal.register = registerEqualizer;
+
+equal.unregister = unregisterEqualizer;
 
 function equalArray(first: unknown[], second: unknown[], options: Options): boolean {
 	const {length} = first;
@@ -295,7 +323,7 @@ function equalValue(first: unknown, second: unknown, options: Options): boolean 
 			return equalTypedArray(first as TypedArray, second as TypedArray);
 
 		default:
-			return equalHandlers.handle(first, second, options);
+			return equal.handlers.handle(first, second, options);
 	}
 }
 
@@ -304,10 +332,15 @@ function equalValue(first: unknown, second: unknown, options: Options): boolean 
  * @param options Comparison options
  * @returns Equalizer function
  */
-export function initializeEqualizer(options?: EqualOptions): Equalizer {
+function initializeEqualizer(options?: EqualOptions): Equalizer {
 	const actual = getEqualOptions(options);
 
-	return (first: unknown, second: unknown): boolean => equalValue(first, second, actual);
+	const equalizer = (first: unknown, second: unknown): boolean => equalValue(first, second, actual);
+
+	equalizer.register = registerEqualizer;
+	equalizer.unregister = unregisterEqualizer;
+
+	return equalizer;
 }
 
 /**
@@ -315,19 +348,19 @@ export function initializeEqualizer(options?: EqualOptions): Equalizer {
  * @param constructor Class constructor
  * @param fn Comparison function
  */
-export function registerEqualizer<Instance>(
+function registerEqualizer<Instance>(
 	constructor: Constructor<Instance>,
-	fn: (first: Instance, second: Instance) => boolean,
+	handler: (first: Instance, second: Instance) => boolean,
 ): void {
-	equalHandlers.register(constructor, fn);
+	equal.handlers.register(constructor, handler);
 }
 
 /**
  * Unregister a equality comparison handler for a specific class
  * @param constructor Class constructor
  */
-export function unregisterEqualizer<Instance>(constructor: Constructor<Instance>): void {
-	equalHandlers.unregister(constructor);
+function unregisterEqualizer<Instance>(constructor: Constructor<Instance>): void {
+	equal.handlers.unregister(constructor);
 }
 
 function filterKey(key: string | symbol, options: Options): boolean {
@@ -397,10 +430,6 @@ function getEqualOptions(input?: boolean | EqualOptions): Options {
 // #endregion
 
 // #region Variables
-
-const equalHandlers = getCompareHandlers<boolean>(equal, {
-	callback: Object.is,
-});
 
 const ARRAY_PEEK_PERCENTAGE = 10;
 

@@ -2,7 +2,6 @@ import {expect, test} from 'vitest';
 import {
 	getString,
 	getUuid,
-	initializeTemplater,
 	join,
 	parse,
 	template,
@@ -84,7 +83,7 @@ test('template', () => {
 	const basic = '{{a.0.b.1.c}}, {{a.0.b.1.c}}!';
 	const custom = '<a.0.b.1.c>, <a.0.b.1.c>!';
 
-	const templater = initializeTemplater();
+	const templater = template.initialize();
 
 	const variables = {
 		a: [
