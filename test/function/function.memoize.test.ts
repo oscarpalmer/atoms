@@ -1,5 +1,5 @@
 import {expect, test} from 'vitest';
-import {memoize, noop} from '../../src/function';
+import {memoize, noop} from '../../src';
 
 test('', () => {
 	const memoized = memoize((value: number) => value * 2);

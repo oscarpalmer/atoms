@@ -1,5 +1,5 @@
 import {expect, test} from 'vitest';
-import {filter} from '../../src/array';
+import {filter} from '../../src';
 import {arrayFixture} from '../.fixtures/array.fixture';
 
 test('', () => {

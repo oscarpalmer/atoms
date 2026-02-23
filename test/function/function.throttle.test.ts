@@ -1,5 +1,5 @@
 import {expect, test} from 'vitest';
-import {throttle} from '../../src/function';
+import {throttle} from '../../src';
 
 test('', () =>
 	new Promise<void>(done => {

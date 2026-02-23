@@ -1,5 +1,5 @@
 import {expect, test} from 'vitest';
-import {queue} from '../../src/queue';
+import {queue} from '../../src';
 import {queueFixture} from '../.fixtures/queue.fixture';
 
 const {asynchronous} = queueFixture;

@@ -101,7 +101,7 @@ export function getNumber(value: unknown): number {
 
 // #endregion
 
-// #region Constants
+// #region Variables
 
 const EXPRESSION_BINARY = /^0b[01]+$/i;
 

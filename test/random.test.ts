@@ -8,7 +8,7 @@ import {
 	getRandomInteger,
 	getRandomItem,
 	getRandomItems,
-} from '../src/random';
+} from '../src';
 import {randomFixture} from './.fixtures/random.fixture';
 
 const {getRandomNumber, size} = randomFixture;

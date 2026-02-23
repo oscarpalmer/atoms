@@ -1,5 +1,5 @@
 import {expect, test} from 'vitest';
-import {promises} from '../../src/promise';
+import {promises} from '../../src';
 
 test('abort', () =>
 	new Promise<void>(done => {

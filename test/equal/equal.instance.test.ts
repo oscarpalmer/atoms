@@ -1,5 +1,5 @@
 import {expect, test} from 'vitest';
-import {equal, registerEqualizer, unregisterEqualizer} from '../../src/internal/value/equal';
+import {equal, registerEqualizer, unregisterEqualizer} from '../../src';
 import {TestEqualItem} from '../.fixtures/equal.fixture';
 
 test('instance', () => {

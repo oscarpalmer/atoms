@@ -1,5 +1,5 @@
 import {expect, test} from 'vitest';
-import {toRecord, toRecordArrays} from '../../src/array';
+import {toRecord, toRecordArrays} from '../../src';
 import {arrayFixture} from '../.fixtures/array.fixture';
 
 test('', () => {

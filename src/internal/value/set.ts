@@ -104,7 +104,7 @@ export function setValue<Data extends PlainObject>(
 
 // #endregion
 
-// #region Constants
+// #region Variables
 
 const EXPRESSION_INDEX = /^\d+$/;
 

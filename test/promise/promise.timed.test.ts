@@ -1,5 +1,5 @@
 import {expect, test} from 'vitest';
-import {PromiseTimeoutError, timed} from '../../src/promise';
+import {PromiseTimeoutError, timed} from '../../src';
 
 test('', () =>
 	new Promise<void>(done => {

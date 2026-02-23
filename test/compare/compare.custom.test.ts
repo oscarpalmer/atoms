@@ -1,5 +1,5 @@
 import {expect, test} from 'vitest';
-import {compare, registerComparator, unregisterComparator} from '../../src/internal/value/compare';
+import {compare, registerComparator, unregisterComparator} from '../../src';
 
 test('', () => {
 	class Test {

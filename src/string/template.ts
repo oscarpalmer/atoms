@@ -99,7 +99,7 @@ export function template(
 
 // #endregion
 
-// #region Constants
+// #region Variables
 
 const EXPRESSION_VARIABLE = /{{([\s\S]+?)}}/g;
 

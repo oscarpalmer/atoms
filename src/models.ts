@@ -13,6 +13,16 @@ export type ArrayOrPlainObject = unknown[] | Record<PropertyKey, unknown>;
 export type BuiltIns = void | Date | Primitive | RegExp;
 
 /**
+ * An extend callback that can be cancelled
+ */
+export type CancellableCallback<Callback extends GenericCallback> = Callback & {
+	/**
+	 * Cancel the callback
+	 */
+	cancel: () => void;
+};
+
+/**
  * A generic class constructor
  */
 export type Constructor<Instance = unknown> = new (...args: any[]) => Instance;
@@ -115,6 +125,13 @@ type _NestedValue<Value, Path extends string> = Path extends `${infer Key}.${inf
 export type NestedValues<Value extends PlainObject> = {
 	[Path in NestedKeys<Value>]: NestedValue<Value, Path>;
 };
+
+/**
+ * The numerical keys of an object
+ */
+export type NumericalKeys<Value> = {
+	[Key in keyof Value]: Key extends number ? Key : Key extends `${number}` ? Key : never;
+}[keyof Value];
 
 /**
  * The numerical values of an object

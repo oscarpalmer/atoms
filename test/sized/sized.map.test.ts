@@ -1,5 +1,5 @@
 import {expect, test} from 'vitest';
-import {SizedMap} from '../../src/sized';
+import {SizedMap} from '../../src';
 import {sizedFixture} from '../.fixtures/sized.fixture';
 
 const {actualMax, joinMap, niceMax} = sizedFixture;

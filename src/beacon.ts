@@ -1,8 +1,8 @@
-import {noop} from './internal/function';
+import {noop} from './internal/function/misc';
 import {isPlainObject} from './internal/is';
 import type {PlainObject} from './models';
 
-// #region Types and classes
+// #region Types
 
 class Beacon<Value> {
 	readonly #options: Options;
@@ -20,7 +20,7 @@ class Beacon<Value> {
 	 */
 	get observable(): Observable<Value> {
 		if (!this.#state.active) {
-			throw new Error(DESTROYED_BEACON);
+			throw new Error(MESSAGE_BEACON);
 		}
 
 		return this.#state.observable;
@@ -166,7 +166,7 @@ class Observable<Value> {
 		third?: () => void,
 	): Subscription<Value> {
 		if (this.#state.closed) {
-			throw new Error(DESTROYED_OBSERVABLE);
+			throw new Error(MESSAGE_OBSERVABLE);
 		}
 
 		const observer = getObserver(first, second, third);
@@ -324,11 +324,11 @@ function getObserver<Value>(
 
 // #endregion
 
-// #region Constants
+// #region Variables
 
-const DESTROYED_BEACON = 'Cannot retrieve observable from a destroyed beacon';
+const MESSAGE_BEACON = 'Cannot retrieve observable from a destroyed beacon';
 
-const DESTROYED_OBSERVABLE = 'Cannot subscribe to a destroyed observable';
+const MESSAGE_OBSERVABLE = 'Cannot subscribe to a destroyed observable';
 
 // #endregion
 

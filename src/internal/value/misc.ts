@@ -41,7 +41,7 @@ export function handleValue(
 
 // #endregion
 
-// #region Constants
+// #region Variables
 
 const EXPRESSION_BRACKET = /\[(\w+)\]/g;
 

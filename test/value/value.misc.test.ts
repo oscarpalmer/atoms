@@ -1,5 +1,5 @@
 import {expect, test} from 'vitest';
-import {partial, smush, unsmush} from '../../src/value';
+import {partial, smush, unsmush} from '../../src';
 
 test('partial', () => {
 	expect(

@@ -8,7 +8,7 @@ import {
 	snakeCase,
 	titleCase,
 	upperCase,
-} from '../../src/string';
+} from '../../src';
 import {stringFixture} from '../.fixtures/string.fixture';
 
 const {strings} = stringFixture;

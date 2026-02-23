@@ -1,5 +1,5 @@
 import {expect, test} from 'vitest';
-import {compact} from '../../src/array';
+import {compact} from '../../src';
 
 test('', () => {
 	expect(compact([1, 2, 3, 4])).toEqual([1, 2, 3, 4]);

@@ -1,6 +1,6 @@
 import type {GenericAsyncCallback, GenericCallback} from './models';
 
-// #region Types and classes
+// #region Types
 
 class Queue<CallbackParameters extends Parameters<GenericAsyncCallback>, CallbackResult> {
 	readonly #callback: GenericAsyncCallback;

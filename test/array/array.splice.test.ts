@@ -1,5 +1,5 @@
 import {expect, test} from 'vitest';
-import {splice} from '../../src/array';
+import {splice} from '../../src';
 
 test('', () => {
 	const length = 100_000;

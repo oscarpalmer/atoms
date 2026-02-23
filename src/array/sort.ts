@@ -1,9 +1,44 @@
-import {compare} from '../internal/value/compare';
 import {isPlainObject} from '../internal/is';
+import {compare} from '../internal/value/compare';
 import type {GenericCallback, PlainObject, Primitive} from '../models';
-import type {CallbackSorter, KeySorter} from './models';
 
 // #region Types
+
+/**
+ * Sorting information for arrays _(using a callback)_
+ */
+export type ArrayCallbackSorter<Item> = {
+	/**
+	 * Comparator to use when comparing items and values
+	 */
+	compare?: (first: Item, firstValue: unknown, second: Item, secondValue: unknown) => number;
+	/**
+	 * Direction to sort by
+	 */
+	direction?: 'ascending' | 'descending';
+	/**
+	 * Value to sort by
+	 */
+	value: (item: Item) => unknown;
+};
+
+/**
+ * Sorting information for arrays _(using a key)_
+ */
+export type ArrayKeySorter<Item> = {
+	/**
+	 * Comparator to use when comparing items and values
+	 */
+	compare?: (first: Item, firstValue: unknown, second: Item, secondValue: unknown) => number;
+	/**
+	 * Direction to sort by
+	 */
+	direction?: 'ascending' | 'descending';
+	/**
+	 * Key to sort by
+	 */
+	key: keyof Item;
+};
 
 type Sorter = {
 	callback?: (item: unknown) => unknown;
@@ -85,7 +120,7 @@ function getSorter(value: unknown, modifier: number): Sorter | undefined {
  */
 export function sort<Item>(
 	array: Item[],
-	sorters: Array<((item: Item) => unknown) | CallbackSorter<Item>>,
+	sorters: Array<((item: Item) => unknown) | ArrayCallbackSorter<Item>>,
 	descending?: boolean,
 ): Item[];
 
@@ -98,7 +133,7 @@ export function sort<Item>(
  */
 export function sort<Item>(
 	array: Item[],
-	sorter: ((item: Item) => unknown) | CallbackSorter<Item>,
+	sorter: ((item: Item) => unknown) | ArrayCallbackSorter<Item>,
 	descending?: boolean,
 ): Item[];
 
@@ -111,7 +146,9 @@ export function sort<Item>(
  */
 export function sort<Item extends PlainObject>(
 	array: Item[],
-	sorters: Array<keyof Item | ((item: Item) => unknown) | CallbackSorter<Item> | KeySorter<Item>>,
+	sorters: Array<
+		keyof Item | ((item: Item) => unknown) | ArrayCallbackSorter<Item> | ArrayKeySorter<Item>
+	>,
 	descending?: boolean,
 ): Item[];
 
@@ -124,7 +161,7 @@ export function sort<Item extends PlainObject>(
  */
 export function sort<Item extends PlainObject>(
 	array: Item[],
-	sorter: keyof Item | ((item: Item) => unknown) | CallbackSorter<Item> | KeySorter<Item>,
+	sorter: keyof Item | ((item: Item) => unknown) | ArrayCallbackSorter<Item> | ArrayKeySorter<Item>,
 	descending?: boolean,
 ): Item[];
 

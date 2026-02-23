@@ -90,7 +90,7 @@ export function isPrimitive(value: unknown): value is Primitive {
 
 // #endregion
 
-// #region Constants
+// #region Variables
 
 const EXPRESSION_PRIMITIVE = /^(bigint|boolean|number|string|symbol)$/;
 
@@ -108,14 +108,5 @@ export {
 	isPlainObject,
 	isTypedArray,
 } from './internal/is';
-
-export type {
-	ArrayOrPlainObject,
-	Constructor,
-	Key,
-	PlainObject,
-	Primitive,
-	TypedArray,
-} from './models';
 
 // #endregion

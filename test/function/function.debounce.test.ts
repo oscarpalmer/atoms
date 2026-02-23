@@ -1,5 +1,5 @@
 import {expect, test} from 'vitest';
-import {debounce} from '../../src/function';
+import {debounce} from '../../src';
 import FRAME_RATE_MS from '../../src/internal/frame-rate';
 
 test('', () =>

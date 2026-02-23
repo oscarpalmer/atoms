@@ -1,5 +1,5 @@
 import {expect, test} from 'vitest';
-import {insert} from '../../src/array';
+import {insert} from '../../src';
 
 test('', () => {
 	const length = 100_000;

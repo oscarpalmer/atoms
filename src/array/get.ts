@@ -1,6 +1,5 @@
 import {isPlainObject} from '../internal/is';
-import type {PlainObject} from '../models';
-import type {NumericalKeys} from './models';
+import type {NumericalKeys, PlainObject} from '../models';
 
 // #region Functions
 

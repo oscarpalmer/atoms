@@ -38,7 +38,7 @@ export function chunk<Item>(array: Item[], size?: number): Item[][] {
 
 // #endregion
 
-// #region Constants
+// #region Variables
 
 const MAX_SIZE = 5_000;
 

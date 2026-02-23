@@ -1,5 +1,5 @@
 import {expect, test} from 'vitest';
-import {average, count, max, min, round, sum} from '../src/math';
+import {average, count, max, min, round, sum} from '../src';
 import {mathFixture} from './.fixtures/math.fixture';
 
 const {one, two, three, four, five, six} = mathFixture;

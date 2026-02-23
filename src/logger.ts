@@ -1,6 +1,6 @@
-import {noop} from './internal/function';
+import {noop} from './internal/function/misc';
 
-// #region Types & classes
+// #region Types
 
 class Logger {
 	/**
@@ -144,7 +144,7 @@ type TimeState = {
 
 // #endregion
 
-// #region Constants & variables
+// #region Variables
 
 const logger = new Logger();
 

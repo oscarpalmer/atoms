@@ -1,6 +1,5 @@
 import {expect, test} from 'vitest';
-import type {NestedPartial} from '../../src/models';
-import {initializeMerger, merge} from '../../src/value/merge';
+import {initializeMerger, merge, type NestedPartial} from '../../src';
 import {TestValueMergeable} from '../.fixtures/value.fixture';
 
 test('merge', () => {

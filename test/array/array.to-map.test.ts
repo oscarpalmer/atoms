@@ -1,5 +1,5 @@
 import {expect, test} from 'vitest';
-import {toMap, toMapArrays} from '../../src/array';
+import {toMap, toMapArrays} from '../../src';
 import {arrayFixture} from '../.fixtures/array.fixture';
 
 test('', () => {

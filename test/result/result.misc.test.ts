@@ -1,5 +1,5 @@
 import {expect, test} from 'vitest';
-import {error, isError, isOk, isResult, ok, result, unwrap} from '../../src/result';
+import {error, isError, isOk, isResult, ok, result, unwrap} from '../../src';
 
 test('error', () => {
 	const basic = error('basic');

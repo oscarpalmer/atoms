@@ -72,7 +72,7 @@ export function words(value: string): string[] {
 
 // #endregion
 
-// #region Constants
+// #region Variables
 
 const EXPRESSION_IGNORED = /(^|\.)(__proto__|constructor|prototype)(\.|$)/i;
 

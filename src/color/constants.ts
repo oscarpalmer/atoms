@@ -1,6 +1,6 @@
 import type {Alpha, ColorProperty, ColorSpace, HSLColor, RGBColor} from './models';
 
-// #region Constants
+// #region Variables
 
 export const ALPHA_FULL_HEX_SHORT = 'f';
 

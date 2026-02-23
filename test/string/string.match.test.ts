@@ -1,5 +1,5 @@
 import {expect, test} from 'vitest';
-import {endsWith, includes, startsWith} from '../../src/string';
+import {endsWith, includes, startsWith} from '../../src';
 
 test('endsWith', () => {
 	const values = [

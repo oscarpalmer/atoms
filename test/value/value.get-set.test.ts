@@ -1,5 +1,5 @@
 import {expect, test} from 'vitest';
-import {getValue, setValue} from '../../src/value';
+import {getValue, setValue} from '../../src';
 
 test('getValue', () => {
 	const data = {

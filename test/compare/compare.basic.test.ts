@@ -1,5 +1,5 @@
 import {expect, test} from 'vitest';
-import {compare} from '../../src/internal/value/compare';
+import {compare} from '../../src';
 
 test('', () => {
 	expect(compare(null, null)).toBe(0);

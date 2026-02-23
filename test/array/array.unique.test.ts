@@ -1,5 +1,5 @@
 import {expect, test} from 'vitest';
-import {unique} from '../../src/array';
+import {unique} from '../../src';
 
 test('', () => {
 	const simple = [1, 2, 2, 3, 3, 3, 4, 4, 4, 4];

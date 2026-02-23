@@ -86,7 +86,7 @@ export function isTypedArray(value: unknown): value is TypedArray {
 
 // #endregion
 
-// #region Constants & variables
+// #region Variables
 
 let TYPED_ARRAYS: Set<unknown>;
 

@@ -1,5 +1,5 @@
 import {expect, test} from 'vitest';
-import {isFulfilled, isRejected, promises} from '../../src/promise';
+import {isFulfilled, isRejected, promises} from '../../src';
 
 test('is', () =>
 	new Promise<void>(done => {

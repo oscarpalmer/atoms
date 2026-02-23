@@ -130,7 +130,7 @@ function getParameters(original: unknown[]): Parameters {
 
 // #endregion
 
-// #region Constants
+// #region Variables
 
 const UNIQUE_THRESHOLD = 100;
 

@@ -33,7 +33,7 @@ function calculate(): Promise<number> {
 
 // #endregion
 
-// #region Constants & variables
+// #region Variables
 
 const TOTAL = 10;
 

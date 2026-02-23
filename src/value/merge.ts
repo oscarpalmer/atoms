@@ -29,7 +29,7 @@ export type MergeOptions = {
  * @param values Values to merge
  * @returns Merged value
  */
-type Merger<Model extends ArrayOrPlainObject = ArrayOrPlainObject> = (
+export type Merger<Model extends ArrayOrPlainObject = ArrayOrPlainObject> = (
 	values: NestedPartial<Model>[],
 ) => Model;
 

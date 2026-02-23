@@ -11,7 +11,7 @@ import type {
 
 // #region Types
 
-type Smushed<Value extends PlainObject> = Simplify<{
+export type Smushed<Value extends PlainObject> = Simplify<{
 	[Key in NestedKeys<Value>]: NestedValue<Value, ToString<Key>>;
 }>;
 
@@ -78,7 +78,7 @@ export function smush<Value extends PlainObject>(value: Value): Smushed<Value> {
 
 // #endregion
 
-// #region Constants
+// #region Variables
 
 const MAX_DEPTH = 100;
 

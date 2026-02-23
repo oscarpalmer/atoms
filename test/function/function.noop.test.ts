@@ -1,5 +1,5 @@
 import {expect, test} from 'vitest';
-import {noop} from '../../src/internal/function';
+import {noop} from '../../src';
 
 test('', () => {
 	expect(noop).toBeInstanceOf(Function);

@@ -99,7 +99,7 @@ export function getRandomItems<Value>(array: Value[], amount?: number): Value[] 
 
 // #endregion
 
-// #region Constants
+// #region Variables
 
 const ALPHABET = 'abcdefghijklmnopqrstuvwxyz';
 

@@ -1,5 +1,5 @@
 import {expect, test} from 'vitest';
-import {flatten} from '../../src/array';
+import {flatten} from '../../src';
 
 test('', () => {
 	expect(flatten([1, [2, [3, [4, [5, [6, [7, [8, [9, [10]]]]]]]]]])).toEqual([

@@ -102,7 +102,7 @@ export function getAggregated(
 
 // #endregion
 
-// #region Constants
+// #region Variables
 
 const aggregators: Record<AggregationType, AggregationCallback> = {
 	average: calculateSum,

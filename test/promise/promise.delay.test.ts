@@ -1,5 +1,5 @@
 import {expect, test} from 'vitest';
-import {delay} from '../../src/promise';
+import {delay} from '../../src';
 
 test('', () =>
 	new Promise<void>(done => {

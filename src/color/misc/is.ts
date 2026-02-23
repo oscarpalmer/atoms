@@ -145,7 +145,7 @@ function isPercentage(value: unknown): value is number {
 
 // #endregion
 
-// #region Constants
+// #region Variables
 
 const validators: Record<ColorProperty, (value: unknown) => value is number> = {
 	alpha: isAlpha,

@@ -1,5 +1,5 @@
 import {expect, test} from 'vitest';
-import {groupArraysBy, groupBy} from '../../src/array';
+import {groupArraysBy, groupBy} from '../../src';
 import {arrayFixture} from '../.fixtures/array.fixture';
 
 test('', () => {

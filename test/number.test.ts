@@ -1,5 +1,5 @@
 import {expect, test} from 'vitest';
-import {between, clamp, getNumber} from '../src/number';
+import {between, clamp, getNumber} from '../src';
 
 test('between', () => {
 	const max = 20;

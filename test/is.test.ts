@@ -13,7 +13,7 @@ import {
 	isPlainObject,
 	isPrimitive,
 	isTypedArray,
-} from '../src/is';
+} from '../src';
 import {isFixture} from './.fixtures/is.fixture';
 
 const {values, length} = isFixture;

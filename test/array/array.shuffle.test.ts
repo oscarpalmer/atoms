@@ -1,6 +1,5 @@
 import {expect, test} from 'vitest';
-import {shuffle} from '../../src/array';
-import {equal} from '../../src/internal/value/equal';
+import {equal, shuffle} from '../../src';
 import {TestArrayItem, arrayFixture} from '../.fixtures/array.fixture';
 
 test('', () => {

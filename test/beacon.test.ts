@@ -1,6 +1,5 @@
 import {expect, test} from 'vitest';
-import {beacon} from '../src/beacon';
-import {equal} from '../src/internal/value/equal';
+import {beacon, equal} from '../src';
 
 test('beacon', () =>
 	new Promise<void>(done => {

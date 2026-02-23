@@ -17,7 +17,7 @@ export function formatColor(space: ColorSpace, color: Color, alpha: boolean): st
 
 // #endregion
 
-// #region Constants
+// #region Variables
 
 const formattingKeys: Record<ColorSpace, ColorProperty[]> = {
 	hsl: KEYS_HSL,

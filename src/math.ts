@@ -193,6 +193,5 @@ export function sum(array: unknown[], key?: unknown): number {
 // #region Exports
 
 export {max} from './internal/math/aggregate';
-export type {NumericalValues};
 
 // #endregion

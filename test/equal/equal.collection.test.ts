@@ -1,5 +1,5 @@
 import {expect, test} from 'vitest';
-import {equal} from '../../src/internal/value/equal';
+import {equal} from '../../src';
 import {equalFixture} from '../.fixtures/equal.fixture';
 
 const {maps, sets, typedArrays} = equalFixture;

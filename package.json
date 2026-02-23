@@ -22,9 +22,73 @@
 			"types": "./types/index.d.ts",
 			"default": "./dist/index.js"
 		},
-		"./array": {
-			"types": "./types/array/index.d.ts",
-			"default": "./dist/array/index.js"
+		"./array/chunk": {
+			"types": "./types/internal/array/chunk.d.ts",
+			"default": "./dist/internal/array/chunk.js"
+		},
+		"./array/compact": {
+			"types": "./types/internal/array/compact.d.ts",
+			"default": "./dist/internal/array/compact.js"
+		},
+		"./array/exists": {
+			"types": "./types/array/exists.d.ts",
+			"default": "./dist/array/exists.js"
+		},
+		"./array/filter": {
+			"types": "./types/array/filter.d.ts",
+			"default": "./dist/array/filter.js"
+		},
+		"./array/find": {
+			"types": "./types/array/find.d.ts",
+			"default": "./dist/array/find.js"
+		},
+		"./array/flatten": {
+			"types": "./types/array/flatten.d.ts",
+			"default": "./dist/array/flatten.js"
+		},
+		"./array/get": {
+			"types": "./types/array/get.d.ts",
+			"default": "./dist/array/get.js"
+		},
+		"./array/group-by": {
+			"types": "./types/array/group-by.d.ts",
+			"default": "./dist/array/group-by.js"
+		},
+		"./array/index-of": {
+			"types": "./types/array/index-of.d.ts",
+			"default": "./dist/array/index-of.js"
+		},
+		"./array/insert": {
+			"types": "./types/array/insert.d.ts",
+			"default": "./dist/array/insert.js"
+		},
+		"./array/push": {
+			"types": "./types/array/push.d.ts",
+			"default": "./dist/array/push.js"
+		},
+		"./array/sort": {
+			"types": "./types/array/sort.d.ts",
+			"default": "./dist/array/sort.js"
+		},
+		"./array/splice": {
+			"types": "./types/array/splice.d.ts",
+			"default": "./dist/array/splice.js"
+		},
+		"./array/to-map": {
+			"types": "./types/array/to-map.d.ts",
+			"default": "./dist/array/to-map.js"
+		},
+		"./array/to-record": {
+			"types": "./types/array/to-record.d.ts",
+			"default": "./dist/array/to-record.js"
+		},
+		"./array/to-set": {
+			"types": "./types/array/to-set.d.ts",
+			"default": "./dist/array/to-set.js"
+		},
+		"./array/unique": {
+			"types": "./types/array/unique.d.ts",
+			"default": "./dist/array/unique.js"
 		},
 		"./beacon": {
 			"types": "./types/beacon.d.ts",
@@ -38,9 +102,21 @@
 			"types": "./types/internal/frame-rate.d.ts",
 			"default": "./dist/internal/frame-rate.js"
 		},
-		"./function": {
-			"types": "./types/function.d.ts",
-			"default": "./dist/function.js"
+		"./function/debounce": {
+			"types": "./types/function/debounce.d.ts",
+			"default": "./dist/function/debounce.js"
+		},
+		"./function/memoize": {
+			"types": "./types/function/memoize.d.ts",
+			"default": "./dist/function/memoize.js"
+		},
+		"./function/misc": {
+			"types": "./types/function/misc.d.ts",
+			"default": "./dist/function/misc.js"
+		},
+		"./function/throttle": {
+			"types": "./types/function/throttle.d.ts",
+			"default": "./dist/function/throttle.js"
 		},
 		"./is": {
 			"types": "./types/is.d.ts",
@@ -65,13 +141,13 @@
 			"types": "./types/promise.d.ts",
 			"default": "./dist/promise.js"
 		},
-		"./queue": {
-			"types": "./types/queue.d.ts",
-			"default": "./dist/queue.js"
-		},
 		"./query": {
 			"types": "./types/query.d.ts",
 			"default": "./dist/query.js"
+		},
+		"./queue": {
+			"types": "./types/queue.d.ts",
+			"default": "./dist/queue.js"
 		},
 		"./random": {
 			"types": "./types/random.d.ts",
@@ -81,21 +157,29 @@
 			"types": "./types/result.d.ts",
 			"default": "./dist/result.js"
 		},
-		"./sized": {
-			"types": "./types/sized.d.ts",
-			"default": "./dist/sized.js"
+		"./sized/map": {
+			"types": "./types/sized/map.d.ts",
+			"default": "./dist/sized/map.js"
 		},
-		"./string": {
-			"types": "./types/string/index.d.ts",
-			"default": "./dist/string/index.js"
+		"./sized/set": {
+			"types": "./types/sized/set.d.ts",
+			"default": "./dist/sized/set.js"
+		},
+		"./string/case": {
+			"types": "./types/string/case.d.ts",
+			"default": "./dist/string/case.js"
+		},
+		"./string/match": {
+			"types": "./types/string/match.d.ts",
+			"default": "./dist/string/match.js"
+		},
+		"./string/misc": {
+			"types": "./types/string/misc.d.ts",
+			"default": "./dist/string/misc.js"
 		},
 		"./string/template": {
 			"types": "./types/string/template.d.ts",
 			"default": "./dist/string/template.js"
-		},
-		"./value": {
-			"types": "./types/value/index.d.ts",
-			"default": "./dist/value/index.js"
 		},
 		"./value/clone": {
 			"types": "./types/value/clone.d.ts",
@@ -113,9 +197,13 @@
 			"types": "./types/internal/value/equal.d.ts",
 			"default": "./dist/internal/value/equal.js"
 		},
-		"./value/merge": {
-			"types": "./types/value/merge.d.ts",
-			"default": "./dist/value/merge.js"
+		"./value/get-set": {
+			"types": "./types/value/get-set.d.ts",
+			"default": "./dist/value/get-set.js"
+		},
+		"./value/misc": {
+			"types": "./types/value/misc.d.ts",
+			"default": "./dist/value/misc.js"
 		}
 	},
 	"files": [
@@ -144,5 +232,5 @@
 	},
 	"type": "module",
 	"types": "./types/index.d.ts",
-	"version": "0.139.0"
+	"version": "0.140.0"
 }

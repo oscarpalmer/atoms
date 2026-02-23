@@ -1,6 +1,5 @@
 import {expect, test} from 'vitest';
-import {shuffle, sort} from '../../src/array';
-import {getRandomInteger} from '../../src/internal/random';
+import {getRandomInteger, shuffle, sort} from '../../src';
 import {diff} from '../../src/value/diff';
 
 test('basic', () => {

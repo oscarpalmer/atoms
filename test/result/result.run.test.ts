@@ -1,5 +1,5 @@
 import {expect, test} from 'vitest';
-import {asyncResult, isError, isOk, isResult, result} from '../../src/result';
+import {asyncResult, isError, isOk, isResult, result} from '../../src';
 
 test('synchronous', () => {
 	const failure = result(() => {

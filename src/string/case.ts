@@ -1,4 +1,4 @@
-import {memoize, type Memoized} from '../function';
+import {memoize, type Memoized} from '../function/memoize';
 import {join, words} from '../internal/string';
 
 // #region Types
@@ -172,7 +172,9 @@ export function upperCase(value: string): string {
 
 // #endregion
 
-// #region Constants & variables
+// #region Variables
+
+const caseMemoizers: Partial<Record<string, Memoized<typeof toCaseCallback>>> = {};
 
 const delimiters: Record<Case, string> = {
 	camel: '',
@@ -184,8 +186,6 @@ const delimiters: Record<Case, string> = {
 const EXPRESSION_CAMEL_CASE = /(\p{Ll})(\p{Lu})/gu;
 
 const EXPRESSION_ACRONYM = /(\p{Lu}*)(\p{Lu})(\p{Ll}+)/gu;
-
-const caseMemoizers: Partial<Record<string, Memoized<typeof toCaseCallback>>> = {};
 
 const REPLACEMENT_CAMEL_CASE = '$1-$2';
 

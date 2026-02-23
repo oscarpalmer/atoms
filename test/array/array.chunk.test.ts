@@ -1,5 +1,5 @@
 import {expect, test} from 'vitest';
-import {chunk} from '../../src/array';
+import {chunk} from '../../src';
 
 test('', () => {
 	const array = Array.from({length: 10_000}, (_, i) => i + 1);

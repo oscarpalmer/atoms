@@ -1,6 +1,5 @@
 import {expect, test} from 'vitest';
-import {tryDecode, tryEncode} from '../src/internal/string';
-import {fromQuery, toQuery} from '../src/query';
+import {fromQuery, toQuery, tryDecode, tryEncode} from '../src';
 import {queryFixture} from './.fixtures/query.fixture';
 
 const {query, parameters} = queryFixture;

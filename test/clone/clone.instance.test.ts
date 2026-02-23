@@ -1,6 +1,5 @@
 import {expect, test} from 'vitest';
-import {isPlainObject} from '../../src/internal/is';
-import {clone, registerCloner, unregisterCloner} from '../../src/value/clone';
+import {clone, isPlainObject, registerCloner, unregisterCloner} from '../../src';
 import {TestCloneItem} from '../.fixtures/clone.fixture';
 
 test('instance', () => {

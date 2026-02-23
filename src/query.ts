@@ -117,18 +117,12 @@ export function toQuery(parameters: PlainObject): string {
 
 // #endregion
 
-// #region Constants
+// #region Variables
 
 const EXPRESSION_ARRAY_SUFFIX = /\[\]$/;
 
 const EXPRESSION_BOOLEAN = /^(false|true)$/;
 
 const TYPES = new Set(['boolean', 'number', 'string']);
-
-// #endregion
-
-// #region Exports
-
-export type {PlainObject} from './models';
 
 // #endregion

@@ -1,17 +1,9 @@
-import FRAME_RATE_MS from './internal/frame-rate';
-import {getString, join} from './internal/string';
-import {isPlainObject} from './is';
-import type {GenericCallback} from './models';
-import {SizedMap} from './sized';
+import {isPlainObject} from '../internal/is';
+import {getString, join} from '../internal/string';
+import type {GenericCallback} from '../models';
+import {SizedMap} from '../sized/map';
 
-// #region Types & classes
-
-type CancellableCallback<Callback extends GenericCallback> = Callback & {
-	/**
-	 * Cancel the callback
-	 */
-	cancel: () => void;
-};
+// #region Types
 
 class Memoized<Callback extends GenericCallback> {
 	readonly #state: MemoizedState<Callback>;
@@ -138,66 +130,6 @@ type Options = {
 
 // #region Functions
 
-/**
- * Debounce a function, ensuring it is only called after `time` milliseconds have passed
- *
- * On subsequent calls, the timer is reset and will wait another `time` milliseconds _(and so on...)_
- * @param callback Callback to debounce
- * @param time Time in milliseconds to wait before calling the callback _(defaults to match frame rate)_
- * @returns Debounced callback with a `cancel` method
- */
-export function debounce<Callback extends GenericCallback>(
-	callback: Callback,
-	time?: number,
-): CancellableCallback<Callback> {
-	return getLimiter(callback, false, time);
-}
-
-function getLimiter<Callback extends GenericCallback>(
-	callback: Callback,
-	throttler: boolean,
-	time?: number,
-): CancellableCallback<Callback> {
-	const interval = typeof time === 'number' && time >= FRAME_RATE_MS ? time : FRAME_RATE_MS;
-
-	function step(now: DOMHighResTimeStamp, parameters: Parameters<Callback>): void {
-		if (interval === FRAME_RATE_MS || now - timestamp >= interval) {
-			if (throttler) {
-				timestamp = now;
-			}
-
-			callback(...parameters);
-		} else {
-			frame = requestAnimationFrame(next => {
-				step(next, parameters);
-			});
-		}
-	}
-
-	let frame: DOMHighResTimeStamp | undefined;
-	let timestamp: DOMHighResTimeStamp;
-
-	const limiter = (...parameters: Parameters<Callback>): void => {
-		limiter.cancel();
-
-		frame = requestAnimationFrame(now => {
-			timestamp ??= now - FRAME_RATE_MS;
-
-			step(now, parameters);
-		});
-	};
-
-	limiter.cancel = (): void => {
-		if (frame != null) {
-			cancelAnimationFrame(frame);
-
-			frame = undefined;
-		}
-	};
-
-	return limiter as CancellableCallback<Callback>;
-}
-
 function getMemoizationOptions<Callback extends GenericCallback>(
 	input?: MemoizedOptions<Callback>,
 ): Options {
@@ -222,26 +154,16 @@ export function memoize<Callback extends GenericCallback>(
 	return new Memoized(callback, getMemoizationOptions(options));
 }
 
-/**
- * Throttle a function, ensuring it is only called once every `time` milliseconds
- * @param callback Callback to throttle
- * @param time Time in milliseconds to wait before calling the callback again _(defaults to match frame rate)_
- * @returns Throttled callback with a `cancel` method
- */
-export function throttle<Callback extends GenericCallback>(
-	callback: Callback,
-	time?: number,
-): CancellableCallback<Callback> {
-	return getLimiter(callback, true, time);
-}
+// #endregion
 
-export type {CancellableCallback, GenericCallback, Memoized, MemoizedOptions};
-export {noop} from './internal/function';
+// #region Variables
+
+const DEFAULT_CACHE_SIZE = 1024;
 
 // #endregion
 
-// #region Constants
+// #region Exports
 
-const DEFAULT_CACHE_SIZE = 1024;
+export type {Memoized, MemoizedOptions};
 
 // #endregion

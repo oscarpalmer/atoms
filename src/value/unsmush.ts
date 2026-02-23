@@ -25,7 +25,7 @@ type UnionToIntersection<Union> = (
 	? Intersection & Union
 	: never;
 
-type Unsmushed<Value extends PlainObject> = Simplify<
+export type Unsmushed<Value extends PlainObject> = Simplify<
 	Omit<
 		{
 			[Key in KeysOfUnion<Value>]: Value[Key];
