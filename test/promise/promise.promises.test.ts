@@ -111,14 +111,27 @@ test('abort', () =>
 		}, 300);
 	}));
 
-test('eager', () =>
+test('error', () => {
+	const values = [undefined, null, true, 1, 'string', {}, () => {}, new Map(), new Set()];
+
+	const {length} = values;
+
+	for (let index = 0; index < length; index += 1) {
+		promises(values[index] as never).catch(error => {
+			expect(error).toBeInstanceOf(TypeError);
+			expect(error.message).toBe('Promises expected an array of promises');
+		});
+	}
+});
+
+test('first', () =>
 	new Promise<void>(done => {
 		const errors: unknown[] = [];
 		const values: unknown[] = [];
 
 		void promises(
 			[new Promise<number>(resolve => resolve(1)), new Promise<string>(resolve => resolve('2'))],
-			true,
+			'first',
 		)
 			.then(results => {
 				errors.push(undefined);
@@ -135,7 +148,7 @@ test('eager', () =>
 				new Promise<string>(resolve => resolve('2')),
 				new Promise<boolean>((_, reject) => reject(new Error('Nope!'))),
 			],
-			true,
+			'first',
 		)
 			.then(results => {
 				errors.push(undefined);

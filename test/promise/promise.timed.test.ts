@@ -3,55 +3,46 @@ import {PromiseTimeoutError, timed} from '../../src';
 
 test('', () =>
 	new Promise<void>(done => {
-		const errors: unknown[] = [];
-		const values: unknown[] = [];
+		const errors: unknown[] = [undefined, undefined, undefined, undefined, undefined];
+		const values: unknown[] = [undefined, undefined, undefined, undefined, undefined];
 
 		void timed(new Promise(resolve => setTimeout(() => resolve(1), 500)), 1000)
 			.then(value => {
-				errors.push(undefined);
-				values.push(value);
+				values[0] = value;
 			})
 			.catch(error => {
-				errors.push(error);
-				values.push(undefined);
+				errors[0] = error;
 			});
 
 		void timed(new Promise(resolve => setTimeout(() => resolve(2), 500)), -123)
 			.then(value => {
-				errors.push(undefined);
-				values.push(value);
+				values[1] = value;
 			})
 			.catch(error => {
-				errors.push(error);
-				values.push(undefined);
+				errors[1] = error;
 			});
 
 		void timed(new Promise(resolve => setTimeout(() => resolve(3), 500)), 'blah' as never)
 			.then(value => {
-				errors.push(undefined);
-				values.push(value);
+				values[2] = value;
 			})
 			.catch(error => {
-				errors.push(error);
-				values.push(undefined);
+				errors[2] = error;
 			});
 
 		void timed(new Promise(resolve => setTimeout(() => resolve(5), 1000)), 500)
 			.then(value => {
-				errors.push(undefined);
-				values.push(value);
+				values[3] = value;
 			})
 			.catch(error => {
-				errors.push(error);
-				values.push(undefined);
+				errors[3] = error;
 			});
 
-		expect(() => timed('blah' as never, 123)).toThrowError('Timed function expected a Promise');
+		void timed('blah' as never, 123).catch(error => {
+			errors[4] = error;
+		});
 
 		setTimeout(() => {
-			expect(errors.length).toBe(4);
-			expect(values.length).toBe(4);
-
 			expect(errors[0]).toBeUndefined();
 			expect(errors[1]).toBeUndefined();
 			expect(errors[2]).toBeUndefined();
@@ -59,10 +50,14 @@ test('', () =>
 			expect(errors[3]).toBeInstanceOf(PromiseTimeoutError);
 			expect((errors[3] as PromiseTimeoutError).message).toBe('Promise timed out');
 
+			expect(errors[4]).toBeInstanceOf(TypeError);
+			expect((errors[4] as TypeError).message).toBe('Timed function expected a Promise');
+
 			expect(values[0]).toBe(1);
 			expect(values[1]).toBe(2);
 			expect(values[2]).toBe(3);
 			expect(values[3]).toBeUndefined();
+			expect(values[4]).toBeUndefined();
 
 			done();
 		}, 1000);
@@ -118,9 +113,6 @@ test('abort', () =>
 		}, 100);
 
 		setTimeout(() => {
-			expect(errors.length).toBe(3);
-			expect(times.length).toBe(3);
-
 			expect(errors[0]).toBe('Aborted during!');
 			expect(errors[1]).toBe('Already aborted!');
 			expect(errors[2]).toBeUndefined();

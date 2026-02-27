@@ -18,8 +18,9 @@ type Handlers<Items extends unknown[]> = {
 };
 
 type Parameters<Items extends unknown[]> = {
+	abort: () => void;
+	complete: boolean;
 	data: Data<Items>;
-	eager: boolean;
 	handlers: Handlers<Items>;
 	index: number;
 	signal?: AbortSignal;
@@ -37,6 +38,11 @@ type PromiseOptions = {
 	time?: number;
 };
 
+/**
+ * Promise handling strategy
+ */
+export type PromiseStrategy = 'complete' | 'first';
+
 export class PromiseTimeoutError extends Error {
 	constructor() {
 		super(MESSAGE_TIMEOUT);
@@ -50,8 +56,8 @@ type Promises<Items extends unknown[]> = {
 };
 
 type PromisesOptions = {
-	eager?: boolean;
 	signal?: AbortSignal;
+	strategy?: PromiseStrategy;
 };
 
 type PromisesResult<Items extends unknown[]> = {
@@ -96,7 +102,7 @@ export function delay(options?: unknown): Promise<void> {
 		rejector(signal!.reason);
 	}
 
-	signal?.addEventListener('abort', abort, abortOptions);
+	signal?.addEventListener('abort', abort, ABORT_OPTIONS);
 
 	let rejector: (reason: unknown) => void;
 	let timeout: ReturnType<typeof setTimeout>;
@@ -105,15 +111,9 @@ export function delay(options?: unknown): Promise<void> {
 		rejector = reject;
 
 		timeout = setTimeout(() => {
-			signal?.removeEventListener('abort', abort);
-
-			resolve();
+			settlePromise(abort, resolve, undefined, signal);
 		}, time);
 	});
-}
-
-function getBooleanOrDefault(value: unknown, defaultValue: boolean): boolean {
-	return typeof value === 'boolean' ? value : defaultValue;
 }
 
 function getNumberOrDefault(value: unknown): number {
@@ -127,6 +127,10 @@ function getPromiseOptions(input: unknown): RequiredKeys<PromiseOptions, 'time'>
 		};
 	}
 
+	if (input instanceof AbortSignal) {
+		return {signal: input, time: 0};
+	}
+
 	const options = typeof input === 'object' && input !== null ? (input as PromiseOptions) : {};
 
 	return {
@@ -135,47 +139,87 @@ function getPromiseOptions(input: unknown): RequiredKeys<PromiseOptions, 'time'>
 	};
 }
 
-function getPromisesOptions(input: unknown): RequiredKeys<PromisesOptions, 'eager'> {
-	if (typeof input === 'boolean') {
-		return {eager: input};
+function getPromisesOptions(input: unknown): RequiredKeys<PromisesOptions, 'strategy'> {
+	if (typeof input === 'string') {
+		return {
+			strategy: getStrategyOrDefault(input),
+		};
 	}
 
 	if (input instanceof AbortSignal) {
-		return {eager: false, signal: input};
+		return {signal: input, strategy: DEFAULT_STRATEGY};
 	}
 
 	const options = typeof input === 'object' && input !== null ? (input as PromisesOptions) : {};
 
 	return {
-		eager: getBooleanOrDefault(options.eager, false),
 		signal: options.signal instanceof AbortSignal ? options.signal : undefined,
+		strategy: getStrategyOrDefault(options.strategy),
 	};
+}
+
+function getStrategyOrDefault(value: unknown): PromiseStrategy {
+	return strategies.has(value as PromiseStrategy) ? (value as PromiseStrategy) : DEFAULT_STRATEGY;
+}
+
+async function getTimed<Value>(
+	promise: Promise<Value>,
+	time: number,
+	signal?: AbortSignal,
+): Promise<Value> {
+	function abort(): void {
+		clearTimeout(timeout);
+
+		rejector(signal!.reason);
+	}
+
+	signal?.addEventListener(EVENT_NAME, abort, ABORT_OPTIONS);
+
+	let rejector: (reason: unknown) => void;
+	let timeout: ReturnType<typeof setTimeout>;
+
+	return Promise.race<Value>([
+		promise,
+		new Promise((_, reject) => {
+			rejector = reject;
+
+			timeout = setTimeout(() => {
+				settlePromise(abort, reject, new PromiseTimeoutError(), signal);
+			}, time);
+		}),
+	]).then(value => {
+		clearTimeout(timeout);
+
+		signal?.removeEventListener(EVENT_NAME, abort);
+
+		return value;
+	});
 }
 
 function handleResult<Items extends unknown[]>(
 	status: string,
 	parameters: Parameters<Items>,
 ): void {
-	const {data, eager, handlers, index, signal, value} = parameters;
+	const {abort, complete, data, handlers, index, signal, value} = parameters;
 
 	if (signal?.aborted ?? false) {
 		return;
 	}
 
-	if (eager && status === TYPE_REJECTED) {
-		handlers.reject(value);
+	if (!complete && status === TYPE_REJECTED) {
+		settlePromise(abort, handlers.reject, value, signal);
 
 		return;
 	}
 
-	(data.result as unknown[])[index] = eager
+	(data.result as unknown[])[index] = !complete
 		? value
 		: status === TYPE_FULFILLED
 			? {status, value}
 			: {status, reason: value};
 
 	if (index === data.last) {
-		handlers.resolve(data.result as Items | PromisesResult<Items>);
+		settlePromise(abort, handlers.resolve, data.result, signal);
 	}
 }
 
@@ -206,7 +250,9 @@ function isType(value: unknown, type: string): boolean {
 }
 
 /**
- * ---
+ * Handle a list of promises, returning their results in an ordered array.
+ *
+ * Depending on the strategy, the function will either reject on the first error encountered or return an array of rejected and resolved results
  * @param items List of promises
  * @param options Options for handling the promises
  * @return List of results
@@ -214,17 +260,19 @@ function isType(value: unknown, type: string): boolean {
 export async function promises<Items extends unknown[], Options extends PromisesOptions>(
 	items: Promises<Items>,
 	options?: Options,
-): Promise<Options['eager'] extends true ? Items : PromisesResult<Items>>;
+): Promise<Options['strategy'] extends 'first' ? Items : PromisesResult<Items>>;
 
 /**
- * Handle a list of promises, returning their results in an ordered array. If any promise in the list is rejected, the whole function will reject
+ * Handle a list of promises, returning their results in an ordered array.
+ *
+ * If any promise in the list is rejected, the whole function will reject
  * @param items List of promises
- * @param eager Reject immediately if any promise is rejected
+ * @param strategy Strategy for handling the promises; rejects on the first error encountered
  * @return List of results
  */
 export async function promises<Items extends unknown[]>(
 	items: Promises<Items>,
-	eager: true,
+	strategy: 'first',
 ): Promise<Items>;
 
 /**
@@ -242,24 +290,30 @@ export async function promises<Items extends unknown[]>(
 	items: Promises<Items>,
 	options?: unknown,
 ): Promise<Items | PromisesResult<Items>> {
-	const actual = items.filter(item => item instanceof Promise);
-	const {length} = actual;
-
-	const {eager, signal} = getPromisesOptions(options);
+	const {signal, strategy} = getPromisesOptions(options);
 
 	if (signal?.aborted ?? false) {
 		return Promise.reject(signal!.reason);
 	}
 
+	if (!Array.isArray(items)) {
+		return Promise.reject(new TypeError(MESSAGE_EXPECTATION_PROMISES));
+	}
+
+	const actual = items.filter(item => item instanceof Promise);
+	const {length} = actual;
+
 	if (length === 0) {
 		return actual as unknown as Items | PromisesResult<Items>;
 	}
+
+	const complete = strategy === DEFAULT_STRATEGY;
 
 	function abort(): void {
 		handlers.reject(signal!.reason);
 	}
 
-	signal?.addEventListener('abort', abort, abortOptions);
+	signal?.addEventListener('abort', abort, ABORT_OPTIONS);
 
 	const data: Data<Items> = {
 		last: length - 1,
@@ -273,21 +327,57 @@ export async function promises<Items extends unknown[]>(
 
 		for (let index = 0; index < length; index += 1) {
 			void actual[index]
-				.then(value => handleResult(TYPE_FULFILLED, {data, eager, handlers, index, signal, value}))
+				.then(value =>
+					handleResult(TYPE_FULFILLED, {abort, complete, data, handlers, index, signal, value}),
+				)
 				.catch(reason =>
-					handleResult(TYPE_REJECTED, {data, eager, handlers, index, signal, value: reason}),
+					handleResult(TYPE_REJECTED, {
+						abort,
+						complete,
+						data,
+						handlers,
+						index,
+						signal,
+						value: reason,
+					}),
 				);
 		}
 	});
 }
 
-export function timed(promise: Promise<unknown>, options: PromiseOptions): Promise<unknown>;
+function settlePromise(
+	aborter: () => void,
+	settler: (value: any) => void,
+	value: unknown,
+	signal?: AbortSignal,
+): void {
+	signal?.removeEventListener(EVENT_NAME, aborter);
 
-export function timed(promise: Promise<unknown>, time: number): Promise<unknown>;
+	settler(value);
+}
 
-export function timed(promise: Promise<unknown>, options: unknown): Promise<unknown> {
+/**
+ * Create a promise that should be settled within a certain amount of time
+ * @param promise Promise to settle
+ * @param options Timed options
+ * @returns A timed promise
+ */
+export async function timed<Value>(
+	promise: Promise<Value>,
+	options: RequiredKeys<PromiseOptions, 'time'>,
+): Promise<Value>;
+
+/**
+ * Create a promise that should be settled within a certain amount of time
+ * @param promise Promise to settle
+ * @param time How long to wait for _(in milliseconds; defaults to `0`)_
+ * @returns A timed promise
+ */
+export async function timed<Value>(promise: Promise<Value>, time: number): Promise<Value>;
+
+export async function timed<Value>(promise: Promise<Value>, options: unknown): Promise<Value> {
 	if (!(promise instanceof Promise)) {
-		throw new TypeError(MESSAGE_EXPECTATION);
+		return Promise.reject(new TypeError(MESSAGE_EXPECTATION_TIMED));
 	}
 
 	const {signal, time} = getPromiseOptions(options);
@@ -296,48 +386,113 @@ export function timed(promise: Promise<unknown>, options: unknown): Promise<unkn
 		return Promise.reject(signal!.reason);
 	}
 
-	if (time <= 0) {
-		return promise;
+	return time > 0 ? getTimed(promise, time, signal) : promise;
+}
+
+/**
+ * Wrap a promise with safety handlers, with optional abort capabilities and timeout
+ * @param promise Promise to wrap
+ * @param options Options for the promise
+ * @returns A wrapped promise
+ */
+export async function tryPromise<Value>(
+	promise: Promise<Value>,
+	options?: PromiseOptions | AbortSignal | number,
+): Promise<Value>;
+
+/**
+ * Wrap a promise-returning callback with safety handlers, with optional abort capabilities and timeout
+ * @param callback Callback to wrap
+ * @param options Options for the promise
+ * @returns A promise-wrapped callback
+ */
+export async function tryPromise<Value>(
+	callback: () => Promise<Value>,
+	options?: PromiseOptions | AbortSignal | number,
+): Promise<Value>;
+
+/**
+ * Wrap a callback with a promise and safety handlers, with optional abort capabilities and timeout
+ * @param callback Callback to wrap
+ * @param options Options for the promise
+ * @returns A promise-wrapped callback
+ */
+export async function tryPromise<Value>(
+	callback: () => Value,
+	options?: PromiseOptions | AbortSignal | number,
+): Promise<Value>;
+
+export async function tryPromise<Value>(
+	value: (() => Value) | Promise<Value>,
+	options?: PromiseOptions | AbortSignal | number,
+): Promise<Value> {
+	const isFunction = typeof value === 'function';
+
+	if (!isFunction && !(value instanceof Promise)) {
+		return Promise.reject(new TypeError(MESSAGE_EXPECTATION_TRY));
+	}
+
+	const {signal, time} = getPromiseOptions(options);
+
+	if (signal?.aborted ?? false) {
+		return Promise.reject(signal!.reason);
 	}
 
 	function abort(): void {
-		clearTimeout(timeout);
-
 		rejector(signal!.reason);
 	}
 
-	signal?.addEventListener(EVENT_NAME, abort, abortOptions);
+	async function handler(
+		resolve: (value: Value) => void,
+		reject: (reason: unknown) => void,
+	): Promise<void> {
+		try {
+			let result = isFunction ? value() : await value;
+
+			if (result instanceof Promise) {
+				result = await result;
+			}
+
+			settlePromise(abort, resolve, result, signal);
+		} catch (error) {
+			settlePromise(abort, reject, error, signal);
+		}
+	}
 
 	let rejector: (reason: unknown) => void;
-	let timeout: ReturnType<typeof setTimeout>;
 
-	return Promise.race([
-		promise,
-		new Promise((_, reject) => {
-			rejector = reject;
+	signal?.addEventListener(EVENT_NAME, abort, ABORT_OPTIONS);
 
-			timeout = setTimeout(() => {
-				signal?.removeEventListener(EVENT_NAME, abort);
+	const promise = new Promise<Value>((resolve, reject) => {
+		rejector = reject;
 
-				reject(new PromiseTimeoutError());
-			}, time);
-		}),
-	]);
+		handler(resolve, reject);
+	});
+
+	return time > 0 ? getTimed(promise, time, signal) : promise;
 }
 
 // #endregion
 
 // #region Variables
 
-const abortOptions = {once: true};
+const ABORT_OPTIONS = {once: true};
+
+const DEFAULT_STRATEGY: PromiseStrategy = 'complete';
 
 const ERROR_NAME = 'PromiseTimeoutError';
 
 const EVENT_NAME = 'abort';
 
-const MESSAGE_EXPECTATION = 'Timed function expected a Promise';
+const MESSAGE_EXPECTATION_PROMISES = 'Promises expected an array of promises';
+
+const MESSAGE_EXPECTATION_TIMED = 'Timed function expected a Promise';
+
+const MESSAGE_EXPECTATION_TRY = 'TryPromise expected a function or a promise';
 
 const MESSAGE_TIMEOUT = 'Promise timed out';
+
+const strategies = new Set<PromiseStrategy>(['complete', 'first']);
 
 const TYPE_FULFILLED = 'fulfilled';
 

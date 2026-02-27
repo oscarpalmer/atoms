@@ -1,14 +1,5 @@
 import {expect, test} from 'vitest';
-import {
-	getString,
-	getUuid,
-	join,
-	parse,
-	template,
-	trim,
-	truncate,
-	words,
-} from '../../src';
+import {getString, getUuid, join, parse, template, trim, truncate, words} from '../../src';
 import {
 	TestStringItemWithToString,
 	TestStringItemWithoutToString,

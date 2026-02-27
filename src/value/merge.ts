@@ -101,7 +101,7 @@ function initializeMerger(options?: Partial<MergeOptions>): Merger {
 
 	return <Model extends ArrayOrPlainObject>(values: NestedPartial<Model>[]): Model =>
 		handleMerge(values, actual) as Model;
-};
+}
 
 function mergeObjects(
 	values: ArrayOrPlainObject[],

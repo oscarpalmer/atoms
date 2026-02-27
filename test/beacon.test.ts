@@ -14,9 +14,7 @@ test('beacon', () =>
 		setTimeout(() => {
 			expect(value.active).toBe(false);
 
-			expect(() => value.observable).toThrowError(
-				'Cannot retrieve observable from a destroyed beacon',
-			);
+			expect(() => value.observable).toThrow('Cannot retrieve observable from a destroyed beacon');
 
 			setTimeout(done);
 		});
@@ -138,7 +136,7 @@ test('observable + subscription', () =>
 			third.error(new Error('test'));
 			third.finish();
 
-			expect(() => thirdObservable.subscribe({})).toThrowError(
+			expect(() => thirdObservable.subscribe({})).toThrow(
 				'Cannot subscribe to a destroyed observable',
 			);
 

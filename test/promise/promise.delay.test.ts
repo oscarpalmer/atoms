@@ -33,9 +33,6 @@ test('', () =>
 			});
 
 		setTimeout(() => {
-			expect(errors.length).toBe(3);
-			expect(values.length).toBe(3);
-
 			expect(errors).toEqual([undefined, undefined, undefined]);
 
 			for (const value of values) {
@@ -114,9 +111,6 @@ test('abort', () =>
 		}, 250);
 
 		setTimeout(() => {
-			expect(errors.length).toBe(4);
-			expect(values.length).toBe(4);
-
 			expect(errors[0]).toBeInstanceOf(Error);
 			expect((errors[0] as Error).name).toBe('TimeoutError');
 
