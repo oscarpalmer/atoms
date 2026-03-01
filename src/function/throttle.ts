@@ -1,5 +1,5 @@
 import {getLimiter} from '../internal/function/limiter';
-import type {CancellableCallback, GenericCallback} from '../models';
+import type {CancelableCallback, GenericCallback} from '../models';
 
 // #region Functions
 
@@ -12,7 +12,7 @@ import type {CancellableCallback, GenericCallback} from '../models';
 export function throttle<Callback extends GenericCallback>(
 	callback: Callback,
 	time?: number,
-): CancellableCallback<Callback> {
+): CancelableCallback<Callback> {
 	return getLimiter(callback, true, time);
 }
 

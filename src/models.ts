@@ -13,9 +13,9 @@ export type ArrayOrPlainObject = unknown[] | Record<PropertyKey, unknown>;
 export type BuiltIns = void | Date | Primitive | RegExp;
 
 /**
- * An extend callback that can be cancelled
+ * An extend callback that can be canceled
  */
-export type CancellableCallback<Callback extends GenericCallback> = Callback & {
+export type CancelableCallback<Callback extends GenericCallback> = Callback & {
 	/**
 	 * Cancel the callback
 	 */

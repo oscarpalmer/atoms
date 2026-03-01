@@ -2,6 +2,32 @@
 
 import type {RequiredKeys} from './models';
 
+export class CancelablePromise<Value = void> extends Promise<Value> {
+	#rejector!: (reason: unknown) => void;
+
+	constructor(
+		executor: (resolve: (value: Value) => void, reject: (reason: unknown) => void) => void,
+	) {
+		let rejector: (reason: unknown) => void;
+
+		super((resolve, reject) => {
+			rejector = reject;
+
+			executor(resolve, reject);
+		});
+
+		this.#rejector = rejector!;
+	}
+
+	/**
+	 * Cancel the promise, rejecting it with an optional reason
+	 * @param reason Optional reason for canceling the promise
+	 */
+	cancel(reason?: unknown): void {
+		this.#rejector(reason);
+	}
+}
+
 type Data<Items extends unknown[]> = {
 	last: number;
 	result: Items | PromisesResult<Items>;
@@ -61,7 +87,7 @@ type PromisesOptions = {
 };
 
 type PromisesResult<Items extends unknown[]> = {
-	[K in keyof Items]: PromisesResultItem<Items[K]>;
+	[K in keyof Items]: Items[K] extends Promise<infer Value> ? PromisesResultItem<Value> : never;
 };
 
 type PromisesResultItem<Value> = FulfilledPromiseResult<Value> | RejectedPromiseResult;
@@ -76,16 +102,27 @@ type RejectedPromiseResult = {
 // #region Functions
 
 /**
+ * Create a cancelable promise
+ * @param executor Executor function for the promise
+ * @returns Cancelable promise
+ */
+export function cancelable<Value>(
+	executor: (resolve: (value: Value) => void, reject: (reason: unknown) => void) => void,
+): CancelablePromise<Value> {
+	return new CancelablePromise(executor);
+}
+
+/**
  * Create a delayed promise that resolves after a certain amount of time, or rejects if aborted
  * @param options Options for the delay
- * @returns A delayed promise
+ * @returns Delayed promise
  */
 export function delay(options?: PromiseOptions): Promise<void>;
 
 /**
  * Create a delayed promise that resolves after a certain amount of time
  * @param time How long to wait for _(in milliseconds; defaults to `0`)_
- * @returns A delayed promise
+ * @returns Delayed promise
  */
 export function delay(time?: number): Promise<void>;
 
@@ -360,7 +397,7 @@ function settlePromise(
  * Create a promise that should be settled within a certain amount of time
  * @param promise Promise to settle
  * @param options Timed options
- * @returns A timed promise
+ * @returns Timed promise
  */
 export async function timed<Value>(
 	promise: Promise<Value>,
@@ -371,7 +408,7 @@ export async function timed<Value>(
  * Create a promise that should be settled within a certain amount of time
  * @param promise Promise to settle
  * @param time How long to wait for _(in milliseconds; defaults to `0`)_
- * @returns A timed promise
+ * @returns Timed promise
  */
 export async function timed<Value>(promise: Promise<Value>, time: number): Promise<Value>;
 
@@ -393,9 +430,9 @@ export async function timed<Value>(promise: Promise<Value>, options: unknown): P
  * Wrap a promise with safety handlers, with optional abort capabilities and timeout
  * @param promise Promise to wrap
  * @param options Options for the promise
- * @returns A wrapped promise
+ * @returns Wrapped promise
  */
-export async function tryPromise<Value>(
+export async function attemptPromise<Value>(
 	promise: Promise<Value>,
 	options?: PromiseOptions | AbortSignal | number,
 ): Promise<Value>;
@@ -404,9 +441,9 @@ export async function tryPromise<Value>(
  * Wrap a promise-returning callback with safety handlers, with optional abort capabilities and timeout
  * @param callback Callback to wrap
  * @param options Options for the promise
- * @returns A promise-wrapped callback
+ * @returns Promise-wrapped callback
  */
-export async function tryPromise<Value>(
+export async function attemptPromise<Value>(
 	callback: () => Promise<Value>,
 	options?: PromiseOptions | AbortSignal | number,
 ): Promise<Value>;
@@ -415,21 +452,21 @@ export async function tryPromise<Value>(
  * Wrap a callback with a promise and safety handlers, with optional abort capabilities and timeout
  * @param callback Callback to wrap
  * @param options Options for the promise
- * @returns A promise-wrapped callback
+ * @returns Promise-wrapped callback
  */
-export async function tryPromise<Value>(
+export async function attemptPromise<Value>(
 	callback: () => Value,
 	options?: PromiseOptions | AbortSignal | number,
 ): Promise<Value>;
 
-export async function tryPromise<Value>(
+export async function attemptPromise<Value>(
 	value: (() => Value) | Promise<Value>,
 	options?: PromiseOptions | AbortSignal | number,
 ): Promise<Value> {
 	const isFunction = typeof value === 'function';
 
 	if (!isFunction && !(value instanceof Promise)) {
-		return Promise.reject(new TypeError(MESSAGE_EXPECTATION_TRY));
+		return Promise.reject(new TypeError(MESSAGE_EXPECTATION_ATTEMPT));
 	}
 
 	const {signal, time} = getPromiseOptions(options);
@@ -484,11 +521,11 @@ const ERROR_NAME = 'PromiseTimeoutError';
 
 const EVENT_NAME = 'abort';
 
+const MESSAGE_EXPECTATION_ATTEMPT = 'Attempt expected a function or a promise';
+
 const MESSAGE_EXPECTATION_PROMISES = 'Promises expected an array of promises';
 
 const MESSAGE_EXPECTATION_TIMED = 'Timed function expected a Promise';
-
-const MESSAGE_EXPECTATION_TRY = 'TryPromise expected a function or a promise';
 
 const MESSAGE_TIMEOUT = 'Promise timed out';
 

@@ -1,5 +1,5 @@
 import {expect, test} from 'vitest';
-import {getColor} from '../../src/color';
+import {getColor} from '../../src';
 
 test('color', () => {
 	const color = getColor('hello, world!');

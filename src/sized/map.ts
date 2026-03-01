@@ -5,7 +5,7 @@ import {getSizedMaximum} from '../internal/sized';
 /**
  * A Map with a maximum size
  *
- * Behaviour is similar to a _LRU_-cache, where the least recently used entries are removed
+ * Behavior is similar to a _LRU_-cache, where the least recently used entries are removed
  */
 export class SizedMap<Key = unknown, Value = unknown> extends Map<Key, Value> {
 	/**

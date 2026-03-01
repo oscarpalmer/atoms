@@ -8,11 +8,11 @@ import {
 	getHslaColor,
 	getHslColor,
 	getNormalizedHex,
+	getRandomItem,
 	getRgbaColor,
 	getRgbColor,
 	isColor,
-} from '../../src/color';
-import {getRandomItem} from '../../src/random';
+} from '../../src';
 
 const {foregrounds, hexes, hsls, hslas, instances, rgbas, rgbs, shorts} = colorFixture;
 const {length} = hexes;

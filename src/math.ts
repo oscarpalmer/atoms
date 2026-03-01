@@ -1,4 +1,5 @@
-import {aggregate, getAggregated} from './internal/math/aggregate';
+import {isNumber} from './internal/is';
+import {aggregate, getAggregateCallback, getAggregated} from './internal/math/aggregate';
 import type {NumericalValues, PlainObject} from './models';
 
 // #region Functions
@@ -78,16 +79,11 @@ export function count(array: unknown[], key?: unknown, value?: unknown): number 
 
 	const {length} = array;
 
-	if (key == null) {
+	const callback = getAggregateCallback(key);
+
+	if (callback == null) {
 		return length;
 	}
-
-	if (typeof key !== 'string' && typeof key !== 'function') {
-		return Number.NaN;
-	}
-
-	const callback =
-		typeof key === 'function' ? key : (item: PlainObject): unknown => item[key as never];
 
 	let counted = 0;
 
@@ -100,6 +96,68 @@ export function count(array: unknown[], key?: unknown, value?: unknown): number 
 	}
 
 	return counted;
+}
+
+/**
+ * Get the median value from a list of items
+ * @param array List of items
+ * @param callback Callback to get an item's value
+ * @returns Median value, or `NaN` if no median can be calculated
+ */
+export function median<Item>(
+	array: Item[],
+	callback: (item: Item, index: number, array: Item[]) => number,
+): number;
+
+/**
+ * Get the median value from a list of items
+ * @param array List of items
+ * @param key Key to use for value
+ * @returns Median value, or `NaN` if no median can be calculated
+ */
+export function median<Item extends PlainObject>(
+	array: Item[],
+	key: keyof NumericalValues<Item>,
+): number;
+
+/**
+ * Get the median value from a list of numbers
+ * @param array List of numbers
+ * @returns Median value, or `NaN` if no median can be calculated
+ */
+export function median(array: number[]): number;
+
+export function median(array: unknown[], key?: unknown): number {
+	let length = Array.isArray(array) ? array.length : 0;
+
+	if (!Array.isArray(array) || length === 0) {
+		return Number.NaN;
+	}
+
+	if (length === 1) {
+		return isNumber(array[0]) ? array[0] : Number.NaN;
+	}
+
+	let values: unknown[] = array;
+
+	const callback = getAggregateCallback(key);
+
+	if (callback != null) {
+		values = array.map((item, index) => callback(item as never, index, array));
+	}
+
+	const numbers = values.filter(isNumber).sort((first, second) => first - second);
+
+	length = numbers.length;
+
+	if (length % 2 === 0) {
+		const first = length / 2 - 1;
+		const second = length / 2;
+
+		return (numbers[first] + numbers[second]) / 2;
+	}
+
+	return numbers[Math.floor(length / 2)];
 }
 
 /**

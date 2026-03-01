@@ -1,9 +1,30 @@
 import {expect, test} from 'vitest';
-import {partial, smush, unsmush} from '../../src';
+import {omit, pick, smush, unsmush} from '../../src';
 
-test('partial', () => {
+test('omit', () => {
 	expect(
-		partial(
+		omit(
+			{
+				a: 1,
+				b: true,
+				c: 'abc',
+			},
+			['b', 'd' as never],
+		),
+	).toEqual({
+		a: 1,
+		c: 'abc',
+	});
+
+	expect(omit('blah' as never, [])).toEqual({});
+	expect(omit({}, 'blah' as never)).toEqual({});
+	expect(omit({}, [])).toEqual({});
+	expect(omit({a: 1}, [])).toEqual({a: 1});
+});
+
+test('pick', () => {
+	expect(
+		pick(
 			{
 				a: 1,
 				b: true,
@@ -15,10 +36,10 @@ test('partial', () => {
 		b: true,
 	});
 
-	expect(partial('blah' as never, [])).toEqual({});
-	expect(partial({}, 'blah' as never)).toEqual({});
-	expect(partial({}, [])).toEqual({});
-	expect(partial({a: 1}, [])).toEqual({});
+	expect(pick('blah' as never, [])).toEqual({});
+	expect(pick({}, 'blah' as never)).toEqual({});
+	expect(pick({}, [])).toEqual({});
+	expect(pick({a: 1}, [])).toEqual({});
 });
 
 test('smush & unsmush', () => {

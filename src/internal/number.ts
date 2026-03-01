@@ -49,7 +49,7 @@ export function clamp(value: number, minimum: number, maximum: number, loop?: bo
 /**
  * Get the number value from an unknown value _(based on Lodash)_
  * @param value Original value
- * @returns The value as a number, or `NaN` if the value is unable to be parsed
+ * @returns Original value as a number, or `NaN` if the value is unable to be parsed
  */
 export function getNumber(value: unknown): number {
 	if (typeof value === 'number') {

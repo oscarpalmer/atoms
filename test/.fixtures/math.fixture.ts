@@ -3,30 +3,42 @@ export class TestMathItem {
 }
 
 export type TestMathPerson = {
-	age?: number;
-	name?: string;
+	age: number;
+	name: string;
 };
 
-const one = [123, 'abc'];
-const two = [123, 'abc', 456];
-const three = [123, 'abc', 456, 'def', 789];
+const invalid = {
+	empty: [],
+	values: {
+		items: [null, undefined, true, false, 'abc', {}, () => {}, new Map(), new Set()],
+		length: 9,
+	},
+};
 
-const four: TestMathPerson[] = [
-	{age: 25, name: 'John'},
-	{age: 30, name: 'Jane'},
-	{age: 35, name: 'Joe'},
-	{name: 'invalid'},
-];
-
-const five = [new TestMathItem(123), new TestMathItem(456), new TestMathItem(789)];
-
-const six = ['abc', 'defg', 'hi'];
+const valid = {
+	one: [123],
+	two: [123, 456],
+	three: [789, 123, 456],
+	four: [123, 1011, 789, 456],
+	five: [1011, 789, 456, 123, 1213],
+	people: [
+		{
+			age: 25,
+			name: 'Alice',
+		},
+		{
+			age: 35,
+			name: 'Bob',
+		},
+		{
+			age: 'blah',
+			name: 'Charlie',
+		},
+	] as TestMathPerson[],
+	items: [new TestMathItem(123), new TestMathItem('blah' as never), new TestMathItem(456)],
+};
 
 export const mathFixture = {
-	one,
-	two,
-	three,
-	four,
-	five,
-	six,
+	invalid,
+	valid,
 };

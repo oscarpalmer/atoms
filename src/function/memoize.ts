@@ -73,7 +73,7 @@ class Memoized<Callback extends GenericCallback> {
 	/**
 	 * Get a result from the cache
 	 * @param key Key to get
-	 * @returns The cached result or `undefined` if it does not exist
+	 * @returns Cached result or `undefined` if it does not exist
 	 */
 	get(key: unknown): ReturnType<Callback> | undefined {
 		return this.#state.cache?.get(key);

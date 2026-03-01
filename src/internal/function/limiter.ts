@@ -1,4 +1,4 @@
-import type {CancellableCallback} from '../../models';
+import type {CancelableCallback} from '../../models';
 import type {GenericCallback} from '../../models';
 import FRAME_RATE_MS from '../frame-rate';
 
@@ -8,7 +8,7 @@ export function getLimiter<Callback extends GenericCallback>(
 	callback: Callback,
 	throttler: boolean,
 	time?: number,
-): CancellableCallback<Callback> {
+): CancelableCallback<Callback> {
 	const interval = typeof time === 'number' && time >= FRAME_RATE_MS ? time : FRAME_RATE_MS;
 
 	function step(now: DOMHighResTimeStamp, parameters: Parameters<Callback>): void {
@@ -46,7 +46,7 @@ export function getLimiter<Callback extends GenericCallback>(
 		}
 	};
 
-	return limiter as CancellableCallback<Callback>;
+	return limiter as CancelableCallback<Callback>;
 }
 
 // #endregion

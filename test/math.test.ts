@@ -1,62 +1,101 @@
 import {expect, test} from 'vitest';
-import {average, count, max, min, round, sum} from '../src';
+import {average, count, max, median, min, round, sum} from '../src';
 import {mathFixture} from './.fixtures/math.fixture';
 
-const {one, two, three, four, five, six} = mathFixture;
+const {invalid, valid} = mathFixture;
 
 test('average', () => {
-	expect(average([])).toBeNaN();
-	expect(average(['abc'] as never)).toBeNaN();
-	expect(average(one as never)).toBe(123);
-	expect(average(two as never)).toBe(289.5);
-	expect(average(three as never)).toBe(456);
-	expect(average(four, 'age' as never)).toBe(30);
-	expect(average(four, item => item.age as never)).toBe(30);
-	expect(average(five, item => item.value as never)).toBe(456);
-	expect(average(six, item => item.length as never)).toBe(3);
-	expect(average('blah' as never, 'age' as never)).toBeNaN();
-	expect(average({} as never, 'age' as never)).toBeNaN();
+	expect(average(valid.one)).toBe(123);
+	expect(average(valid.two)).toBe(289.5);
+	expect(average(valid.three)).toBe(456);
+	expect(average(valid.four)).toBe(594.75);
+	expect(average(valid.five)).toBe(718.4);
+
+	expect(average(valid.people, 'age')).toBe(30);
+	expect(average(valid.items, item => item.value)).toBe(289.5);
+
+	expect(average(invalid.empty)).toBeNaN();
+
+	for (let index = 0; index < invalid.values.length; index += 1) {
+		expect(average(invalid.values.items[index] as never)).toBeNaN();
+	}
 });
 
 test('count', () => {
-	expect(count([])).toBe(0);
-	expect(count(one)).toBe(2);
-	expect(count(two)).toBe(3);
-	expect(count(three)).toBe(5);
-	expect(count(four, 'age', 30)).toBe(1);
-	expect(count(four, item => item.age, 30)).toBe(1);
-	expect(count(five, item => item.value, 456)).toBe(1);
-	expect(count(six, item => item.length, 3)).toBe(1);
-	expect(count('blah' as never, 'age', 30)).toBeNaN();
-	expect(count({} as never, 'age', 30)).toBeNaN();
-	expect(count(four, 123 as never, 30 as never)).toBeNaN();
-	expect(count(four, {} as never, '30' as never)).toBeNaN();
+	expect(count(valid.one)).toBe(1);
+	expect(count(valid.two)).toBe(2);
+	expect(count(valid.three)).toBe(3);
+	expect(count(valid.four)).toBe(4);
+	expect(count(valid.five)).toBe(5);
+
+	expect(count(valid.people, 'age', 25)).toBe(1);
+	expect(count(valid.people, 'age', 35)).toBe(1);
+	expect(count(valid.people, 'age', 'blah')).toBe(1);
+	expect(count(valid.people, 'age', 123)).toBe(0);
+
+	expect(count(valid.items, item => item.value, 123)).toBe(1);
+	expect(count(valid.items, item => item.value, 456)).toBe(1);
+	expect(count(valid.items, item => item.value, 789)).toBe(0);
+
+	expect(count(invalid.empty)).toBe(0);
+
+	for (let index = 0; index < invalid.values.length; index += 1) {
+		expect(count(invalid.values.items[index] as never)).toBeNaN();
+	}
 });
 
 test('max', () => {
-	expect(max([])).toBeNaN();
-	expect(max(one as never)).toBe(123);
-	expect(max(two as never)).toBe(456);
-	expect(max(three as never)).toBe(789);
-	expect(max(four, 'age' as never)).toBe(35);
-	expect(max(four, item => item.age as never)).toBe(35);
-	expect(max(five, item => item.value)).toBe(789);
-	expect(max(six, item => item.length)).toBe(4);
-	expect(max('blah' as never, 'age' as never)).toBeNaN();
-	expect(max({} as never, 'age' as never)).toBeNaN();
+	expect(max(valid.one)).toBe(123);
+	expect(max(valid.two)).toBe(456);
+	expect(max(valid.three)).toBe(789);
+	expect(max(valid.four)).toBe(1011);
+	expect(max(valid.five)).toBe(1213);
+
+	expect(max(valid.people, 'age')).toBe(35);
+	expect(max(valid.items, item => item.value)).toBe(456);
+
+	expect(max(invalid.empty)).toBeNaN();
+
+	for (let index = 0; index < invalid.values.length; index += 1) {
+		expect(max(invalid.values.items[index] as never)).toBeNaN();
+	}
+});
+
+test('median', () => {
+	expect(median(valid.one)).toBe(123);
+	expect(median(valid.two)).toBe(289.5);
+	expect(median(valid.three)).toBe(456);
+	expect(median(valid.four)).toBe(622.5);
+	expect(median(valid.five)).toBe(789);
+
+	expect(median(valid.people, 'age')).toBe(30);
+	expect(median(valid.items, item => item.value)).toBe(289.5);
+
+	expect(median(invalid.empty)).toBeNaN();
+
+	for (let index = 0; index < invalid.values.length; index += 1) {
+		const value = invalid.values.items[index];
+
+		expect(median(value as never)).toBeNaN();
+		expect(median([value] as never)).toBeNaN();
+	}
 });
 
 test('min', () => {
-	expect(min([])).toBeNaN();
-	expect(min(one as never)).toBe(123);
-	expect(min(two as never)).toBe(123);
-	expect(min(three as never)).toBe(123);
-	expect(min(four, 'age' as never)).toBe(25);
-	expect(min(four, item => item.age as never)).toBe(25);
-	expect(min(five, item => item.value)).toBe(123);
-	expect(min(six, item => item.length)).toBe(2);
-	expect(min('blah' as never, 'age' as never)).toBeNaN();
-	expect(min({} as never, 'age' as never)).toBeNaN();
+	expect(min(valid.one)).toBe(123);
+	expect(min(valid.two)).toBe(123);
+	expect(min(valid.three)).toBe(123);
+	expect(min(valid.four)).toBe(123);
+	expect(min(valid.five)).toBe(123);
+
+	expect(min(valid.people, 'age')).toBe(25);
+	expect(min(valid.items, item => item.value)).toBe(123);
+
+	expect(min(invalid.empty)).toBeNaN();
+
+	for (let index = 0; index < invalid.values.length; index += 1) {
+		expect(min(invalid.values.items[index] as never)).toBeNaN();
+	}
 });
 
 test('round', () => {
@@ -74,14 +113,18 @@ test('round', () => {
 });
 
 test('sum', () => {
-	expect(sum([])).toBeNaN();
-	expect(sum(one as number[])).toBe(123);
-	expect(sum(two as number[])).toBe(579);
-	expect(sum(three as number[])).toBe(1368);
-	expect(sum(four, 'age' as never)).toBe(90);
-	expect(sum(four, item => item.age as never)).toBe(90);
-	expect(sum(five, item => item.value)).toBe(1368);
-	expect(sum(six, item => item.length)).toBe(9);
-	expect(sum('blah' as never, 'age' as never)).toBeNaN();
-	expect(sum({} as never, 'age' as never)).toBeNaN();
+	expect(sum(valid.one)).toBe(123);
+	expect(sum(valid.two)).toBe(579);
+	expect(sum(valid.three)).toBe(1368);
+	expect(sum(valid.four)).toBe(2379);
+	expect(sum(valid.five)).toBe(3592);
+
+	expect(sum(valid.people, 'age')).toBe(60);
+	expect(sum(valid.items, item => item.value)).toBe(579);
+
+	expect(sum(invalid.empty)).toBeNaN();
+
+	for (let index = 0; index < invalid.values.length; index += 1) {
+		expect(sum(invalid.values.items[index] as never)).toBeNaN();
+	}
 });

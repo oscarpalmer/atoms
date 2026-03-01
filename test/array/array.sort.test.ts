@@ -1,6 +1,5 @@
 import {expect, test} from 'vitest';
-import {getRandomInteger, shuffle, sort} from '../../src';
-import {diff} from '../../src/value/diff';
+import {diff, getRandomInteger, shuffle, sort} from '../../src';
 
 test('basic', () => {
 	expect(sort([1])).toEqual([1]);

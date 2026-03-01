@@ -4,6 +4,7 @@ import {
 	isConstructor,
 	isEmpty,
 	isKey,
+	isNonNullable,
 	isNullable,
 	isNullableOrEmpty,
 	isNullableOrWhitespace,
@@ -71,12 +72,18 @@ test('isKey', () => {
 	}
 });
 
+test('isNonNullable', () => {
+	const expected = Array.from({length}, (_, index) => index > 1);
+
+	for (let index = 0; index < length; index += 1) {
+		expect(isNonNullable(values[index])).toBe(expected[index]);
+	}
+});
+
 test('isNullable', () => {
 	const expected = Array.from({length}, (_, index) => index < 2);
 
-	let index = 0;
-
-	for (; index < length; index += 1) {
+	for (let index = 0; index < length; index += 1) {
 		expect(isNullable(values[index])).toBe(expected[index]);
 	}
 });
@@ -84,9 +91,7 @@ test('isNullable', () => {
 test('isNullableOrEmpty', () => {
 	const expected = Array.from({length}, (_, index) => [0, 1, 2, 3, 4].includes(index));
 
-	let index = 0;
-
-	for (; index < length; index += 1) {
+	for (let index = 0; index < length; index += 1) {
 		expect(isNullableOrEmpty(values[index])).toBe(expected[index]);
 	}
 });
@@ -94,9 +99,7 @@ test('isNullableOrEmpty', () => {
 test('isNullableOrWhitespace', () => {
 	const expected = Array.from({length}, (_, index) => [0, 1, 2, 3, 4, 5].includes(index));
 
-	let index = 0;
-
-	for (; index < length; index += 1) {
+	for (let index = 0; index < length; index += 1) {
 		expect(isNullableOrWhitespace(values[index])).toBe(expected[index]);
 	}
 });
@@ -104,9 +107,7 @@ test('isNullableOrWhitespace', () => {
 test('isNumber', () => {
 	const expected = Array.from({length}, (_, index) => [9, 10, 11].includes(index));
 
-	let index = 0;
-
-	for (; index < length; index += 1) {
+	for (let index = 0; index < length; index += 1) {
 		expect(isNumber(values[index])).toBe(expected[index]);
 	}
 });
@@ -114,9 +115,7 @@ test('isNumber', () => {
 test('isNumerical', () => {
 	const expected = Array.from({length}, (_, index) => [6, 7, 9, 10, 11].includes(index));
 
-	let index = 0;
-
-	for (; index < length; index += 1) {
+	for (let index = 0; index < length; index += 1) {
 		expect(isNumerical(values[index])).toBe(expected[index]);
 	}
 });
@@ -127,9 +126,7 @@ test('isObject', () => {
 		(_, index) => index === 2 || index === 3 || index === 17 || index > 14,
 	);
 
-	let index = 0;
-
-	for (; index < length; index += 1) {
+	for (let index = 0; index < length; index += 1) {
 		expect(isObject(values[index])).toBe(expected[index]);
 	}
 });
@@ -137,9 +134,7 @@ test('isObject', () => {
 test('isPlainObject', () => {
 	const expected = Array.from({length}, (_, index) => index === 15);
 
-	let index = 0;
-
-	for (; index < length; index += 1) {
+	for (let index = 0; index < length; index += 1) {
 		expect(isPlainObject(values[index])).toBe(expected[index]);
 	}
 });
@@ -147,9 +142,7 @@ test('isPlainObject', () => {
 test('isPrimitive', () => {
 	const expected = Array.from({length}, (_, index) => index !== 2 && index !== 3 && index < 15);
 
-	let index = 0;
-
-	for (; index < length; index += 1) {
+	for (let index = 0; index < length; index += 1) {
 		expect(isPrimitive(values[index])).toBe(expected[index]);
 	}
 });

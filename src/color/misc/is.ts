@@ -34,7 +34,7 @@ function isBytey(value: unknown): value is number {
 
 /**
  * Is the value a Color?
- * @param value The value to check
+ * @param value Value to check
  * @returns `true` if the value is a Color, otherwise `false`
  */
 export function isColor(value: unknown): value is Color {
@@ -75,7 +75,7 @@ function isDegree(value: unknown): value is number {
 
 /**
  * Is the value a hex color?
- * @param value The value to check
+ * @param value Value to check
  * @param alpha Allow alpha channel? _(defaults to `true`)_
  * @returns `true` if the value is a hex color, otherwise `false`
  */
@@ -97,7 +97,7 @@ export function isHexColor(value: unknown, alpha?: boolean): value is string {
 
 /**
  * Is the value an HSLA color?
- * @param value The value to check
+ * @param value Value to check
  * @returns `true` if the value is an HSLA color, otherwise `false`
  */
 export function isHslaColor(value: unknown): value is HSLAColor {
@@ -106,7 +106,7 @@ export function isHslaColor(value: unknown): value is HSLAColor {
 
 /**
  * Is the value an HSL color?
- * @param value The value to check
+ * @param value Value to check
  * @returns `true` if the value is an HSL color, otherwise `false`
  */
 export function isHslColor(value: unknown): value is HSLColor {
@@ -119,7 +119,7 @@ export function isHslLike(value: unknown): value is Record<keyof HSLColor, unkno
 
 /**
  * Is the value an RGBA color?
- * @param value The value to check
+ * @param value Value to check
  * @returns `true` if the value is an RGBA color, otherwise `false`
  */
 export function isRgbaColor(value: unknown): value is RGBAColor {
@@ -128,7 +128,7 @@ export function isRgbaColor(value: unknown): value is RGBAColor {
 
 /**
  * Is the value an RGB color?
- * @param value The value to check
+ * @param value Value to check
  * @returns `true` if the value is an RGB color, otherwise `false`
  */
 export function isRgbColor(value: unknown): value is RGBColor {

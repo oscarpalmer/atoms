@@ -4,7 +4,7 @@ import {getSizedMaximum} from '../internal/sized';
 
 /**
  * - A Set with a maximum size
- * - Behaviour is similar to a _LRU_-cache, where the oldest values are removed
+ * - Behavior is similar to a _LRU_-cache, where the oldest values are removed
  */
 export class SizedSet<Value = unknown> extends Set<Value> {
 	/**
@@ -84,7 +84,7 @@ export class SizedSet<Value = unknown> extends Set<Value> {
 	 * Get a value from the SizedSet, if it exists _(and move it to the end)_
 	 * @param value Value to get from the SizedSet
 	 * @param update Update the value's position in the SizedSet? _(defaults to `false`)_
-	 * @returns The value if it exists, otherwise `undefined`
+	 * @returns Found value if it exists, otherwise `undefined`
 	 */
 	get(value: Value, update?: boolean): Value | undefined {
 		if (this.has(value)) {

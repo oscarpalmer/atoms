@@ -1,4 +1,5 @@
 import {isPlainObject} from './internal/is';
+import {attemptPromise} from './promise';
 
 // #region Types
 
@@ -158,16 +159,16 @@ export function ok<Value>(value: Value): Ok<Value> {
  * @param error Error value
  * @returns Callback result
  */
-export function result<Value, E>(callback: () => Value, error: E): ExtendedErr<E> | Ok<Value>;
+export function attempt<Value, E>(callback: () => Value, error: E): ExtendedErr<E> | Ok<Value>;
 
 /**
  * Executes a callback, catching any errors, and returns a result
  * @param callback Callback to execute
  * @returns Callback result
  */
-export function result<Value>(callback: () => Value): Result<Value, Error>;
+export function attempt<Value>(callback: () => Value): Result<Value, Error>;
 
-export function result<Value, E>(
+export function attempt<Value, E>(
 	callback: () => Value,
 	err?: E,
 ): ExtendedErr<E> | Result<Value, E> {
@@ -180,7 +181,19 @@ export function result<Value, E>(
 	}
 }
 
-result.async = asyncResult;
+attempt.async = asyncAttempt;
+attempt.promise = attemptPromise;
+
+/**
+ * Executes a promise, catching any errors, and returns a result
+ * @param promise Promise to execute
+ * @param error Error value
+ * @returns Callback result
+ */
+async function asyncAttempt<Value, E>(
+	promise: Promise<Value>,
+	error: E,
+): Promise<ExtendedErr<E> | Ok<Awaited<Value>>>;
 
 /**
  * Executes a callback asynchronously, catching any errors, and returns a result
@@ -188,26 +201,33 @@ result.async = asyncResult;
  * @param error Error value
  * @returns Callback result
  */
-async function asyncResult<Value, E>(
+async function asyncAttempt<Value, E>(
 	callback: () => Promise<Value>,
 	error: E,
 ): Promise<ExtendedErr<E> | Ok<Value>>;
+
+/**
+ * Executes a promise, catching any errors, and returns a result
+ * @param promise Promise to execute
+ * @returns Callback result
+ */
+async function asyncAttempt<Value>(promise: Promise<Value>): Promise<Awaited<Value>>;
 
 /**
  * Executes a callback asynchronously, catching any errors, and returns a result
  * @param callback Callback to execute
  * @returns Callback result
  */
-async function asyncResult<Value>(callback: () => Promise<Value>): Promise<Result<Value>>;
+async function asyncAttempt<Value>(callback: () => Promise<Value>): Promise<Result<Value>>;
 
-async function asyncResult<Value, E>(
-	callback: () => Promise<Value>,
+async function asyncAttempt<Value, E>(
+	value: Promise<Value> | (() => Promise<Value>),
 	err?: E,
-): Promise<Result<Value, E>> {
+): Promise<unknown> {
 	try {
-		const value = await callback();
+		const result = await (typeof value === 'function' ? value() : value);
 
-		return ok(value);
+		return ok(result);
 	} catch (thrown) {
 		return getError((err ?? thrown) as E, err == null ? undefined : (thrown as Error));
 	}

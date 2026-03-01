@@ -12,7 +12,7 @@ import {
 	isHslColor,
 	isRgbaColor,
 	isRgbColor,
-} from '../../src/color';
+} from '../../src';
 import {getAlphaHexadecimal} from '../../src/color/misc/alpha';
 import {colorFixture} from '../.fixtures/color.fixture';
 

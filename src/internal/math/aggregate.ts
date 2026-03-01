@@ -1,4 +1,5 @@
-import type {GenericCallback, NumericalValues, PlainObject} from '../../models';
+import type {NumericalValues, PlainObject} from '../../models';
+import {isNumber} from '../is';
 
 // #region Types
 
@@ -26,7 +27,7 @@ export function aggregate(type: AggregationType, array: unknown[], key: unknown)
 	}
 
 	const aggregator = aggregators[type];
-	const isCallback = typeof key === 'function';
+	const callback = getAggregateCallback(key);
 
 	let counted = 0;
 	let aggregated = Number.NaN;
@@ -35,22 +36,30 @@ export function aggregate(type: AggregationType, array: unknown[], key: unknown)
 	for (let index = 0; index < length; index += 1) {
 		const item = array[index];
 
-		const value = isCallback
-			? (key as GenericCallback)(item, index, array)
-			: ((item as PlainObject)[key as never] ?? item);
+		const value = callback == null ? item : callback(item as never, index, array);
 
-		if (typeof value === 'number' && !Number.isNaN(value)) {
-			aggregated = aggregator(aggregated, value, notNumber);
-
-			counted += 1;
-			notNumber = false;
+		if (!isNumber(value)) {
+			continue;
 		}
+
+		aggregated = aggregator(aggregated, value, notNumber);
+
+		counted += 1;
+		notNumber = false;
 	}
 
 	return {
 		count: counted,
 		value: aggregated,
 	};
+}
+
+export function getAggregateCallback(key: unknown): Function | undefined {
+	if (key == null) {
+		return;
+	}
+
+	return typeof key === 'function' ? key : (item: PlainObject): unknown => item[key as never];
 }
 
 /**

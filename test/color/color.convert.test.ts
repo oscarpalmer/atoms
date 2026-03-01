@@ -10,7 +10,7 @@ import {
 	rgbToHex,
 	rgbToHsl,
 	rgbToHsla,
-} from '../../src/color';
+} from '../../src';
 import {DEFAULT_HSL, DEFAULT_RGB, HEX_BLACK} from '../../src/color/constants';
 import {colorFixture} from '../.fixtures/color.fixture';
 

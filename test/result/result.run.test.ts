@@ -1,16 +1,16 @@
 import {expect, test} from 'vitest';
-import {isError, isOk, isResult, result} from '../../src';
+import {attempt, isError, isOk, isResult} from '../../src';
 
 test('synchronous', () => {
-	const failure = result(() => {
+	const failure = attempt(() => {
 		throw new Error('failure');
 	});
 
-	const failureCustom = result(() => {
+	const failureCustom = attempt(() => {
 		throw new Error('failure');
 	}, new Error('custom failure'));
 
-	const success = result(() => 'success');
+	const success = attempt(() => 'success');
 
 	expect(isResult(failure)).toBe(true);
 	expect(isResult(failureCustom)).toBe(true);
@@ -41,7 +41,7 @@ test('synchronous', () => {
 	expect((failure as any).value).toBeUndefined();
 	expect((success as any).value).toBe('success');
 
-	const invalid = result(123 as never);
+	const invalid = attempt(123 as never);
 
 	expect(isResult(invalid)).toBe(true);
 	expect(isOk(invalid)).toBe(false);
@@ -51,7 +51,7 @@ test('synchronous', () => {
 });
 
 test('asynchronous', async () => {
-	const rejected = await result.async(
+	const rejected = await attempt.async(
 		async () =>
 			new Promise<void>((_, reject) =>
 				setTimeout(() => {
@@ -60,17 +60,16 @@ test('asynchronous', async () => {
 			),
 	);
 
-	const rejectedCustom = await result.async(
-		async () =>
-			new Promise<void>((_, reject) =>
-				setTimeout(() => {
-					reject(new Error('failure'));
-				}, 50),
-			),
+	const rejectedCustom = await attempt.async(
+		new Promise<void>((_, reject) =>
+			setTimeout(() => {
+				reject(new Error('failure'));
+			}, 50),
+		),
 		new Error('custom failure'),
 	);
 
-	const resolved = await result.async(
+	const resolved = await attempt.async(
 		async () =>
 			new Promise<string>(resolve =>
 				setTimeout(() => {

@@ -38,7 +38,8 @@ export * from './string/template';
 export * from './value/clone';
 export * from './value/diff';
 export * from './value/merge';
-export * from './value/partial';
+export * from './value/omit';
+export * from './value/pick';
 export * from './value/smush';
 export * from './value/unsmush';
 

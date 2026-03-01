@@ -1,5 +1,5 @@
 import {expect, test} from 'vitest';
-import {error, isError, isOk, isResult, ok, result, unwrap} from '../../src';
+import {attempt, error, isError, isOk, isResult, ok, unwrap} from '../../src';
 
 test('error', () => {
 	const basic = error('basic');
@@ -66,11 +66,11 @@ test('ok', () => {
 });
 
 test('unwrap', () => {
-	const failure = result(() => {
+	const failure = attempt(() => {
 		throw new Error();
 	});
 
-	const success = result(() => 'Hello, world!');
+	const success = attempt(() => 'Hello, world!');
 
 	expect(unwrap(success, 'Oh no…')).toBe('Hello, world!');
 	expect(unwrap(failure, 'Oh no…')).toBe('Oh no…');

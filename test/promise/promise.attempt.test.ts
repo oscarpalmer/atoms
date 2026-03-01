@@ -1,12 +1,12 @@
 import {expect, test} from 'vitest';
-import {tryPromise} from '../../src/promise';
+import {attempt, attemptPromise} from '../../src';
 
 test('asynchronous', () =>
 	new Promise<void>(done => {
 		const errors: unknown[] = [];
 		const results: number[] = [];
 
-		void tryPromise(
+		void attemptPromise(
 			new Promise<number>(resolve => {
 				setTimeout(() => {
 					resolve(0);
@@ -16,7 +16,7 @@ test('asynchronous', () =>
 			results.push(result);
 		});
 
-		void tryPromise(
+		void attemptPromise(
 			new Promise<number>(resolve => {
 				setTimeout(() => {
 					resolve(1);
@@ -28,7 +28,7 @@ test('asynchronous', () =>
 			errors.push(error);
 		});
 
-		void tryPromise(
+		void attemptPromise(
 			() =>
 				new Promise<number>(resolve => {
 					setTimeout(() => {
@@ -42,21 +42,23 @@ test('asynchronous', () =>
 		const firstController = new AbortController();
 		const secondController = new AbortController();
 
-		void tryPromise(
-			new Promise<number>(resolve => {
-				setTimeout(() => {
-					resolve(3);
-				}, 250);
-			}),
-			firstController.signal,
-		).catch(error => {
-			errors.push(error);
-		});
+		void attempt
+			.promise(
+				new Promise<number>(resolve => {
+					setTimeout(() => {
+						resolve(3);
+					}, 250);
+				}),
+				firstController.signal,
+			)
+			.catch(error => {
+				errors.push(error);
+			});
 
 		firstController.abort('Aborted during');
 		secondController.abort('Aborted before');
 
-		void tryPromise(
+		void attemptPromise(
 			new Promise<number>(resolve => {
 				setTimeout(() => {
 					resolve(4);
@@ -98,9 +100,9 @@ test('error', () => {
 	const {length} = values;
 
 	for (let index = 0; index < length; index += 1) {
-		tryPromise(values[index] as never).catch(error => {
+		attemptPromise(values[index] as never).catch(error => {
 			expect(error).toBeInstanceOf(TypeError);
-			expect((error as Error).message).toBe('TryPromise expected a function or a promise');
+			expect((error as Error).message).toBe('Attempt expected a function or a promise');
 		});
 	}
 });
@@ -110,11 +112,11 @@ test('synchronous', () =>
 		const errors: unknown[] = [];
 		const results: unknown[] = [];
 
-		tryPromise(() => 0).then(result => {
+		attemptPromise(() => 0).then(result => {
 			results.push(result);
 		});
 
-		tryPromise(() => {
+		attemptPromise(() => {
 			throw new Error('Thrown');
 		}).catch(error => {
 			errors.push(error);
@@ -123,14 +125,14 @@ test('synchronous', () =>
 		const firstController = new AbortController();
 		const secondController = new AbortController();
 
-		tryPromise(() => 2, firstController.signal).then(result => {
+		attemptPromise(() => 2, firstController.signal).then(result => {
 			results.push(result);
 		});
 
 		firstController.abort('Aborted during');
 		secondController.abort('Aborted before');
 
-		tryPromise(() => 3, secondController.signal).catch(error => {
+		attemptPromise(() => 3, secondController.signal).catch(error => {
 			errors.push(error);
 		});
 
@@ -154,19 +156,19 @@ test('timed', () =>
 
 		const start = performance.now();
 
-		tryPromise(() => 0, 250).then(result => {
+		attemptPromise(() => 0, 250).then(result => {
 			results.push(result);
 			times.push(performance.now() - start);
 		});
 
-		tryPromise(() => {
+		attemptPromise(() => {
 			throw new Error('Thrown');
 		}, 250).catch(error => {
 			errors.push(error);
 			times.push(performance.now() - start);
 		});
 
-		void tryPromise(
+		void attemptPromise(
 			new Promise<number>(resolve => {
 				setTimeout(() => {
 					resolve(1);
@@ -178,7 +180,7 @@ test('timed', () =>
 			times.push(performance.now() - start);
 		});
 
-		void tryPromise(
+		void attemptPromise(
 			new Promise<number>(resolve => {
 				setTimeout(() => {
 					resolve(2);

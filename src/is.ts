@@ -7,8 +7,8 @@ import type {Primitive} from './models';
 
 /**
  * Is the value empty, or only containing `null` or `undefined` values?
- * @param value Object to check
- * @returns `true` if the object is considered empty, otherwise `false`
+ * @param value Value to check
+ * @returns `true` if the value is considered empty, otherwise `false`
  */
 export function isEmpty(value: unknown): boolean {
 	if (value == null) {
@@ -29,6 +29,15 @@ export function isEmpty(value: unknown): boolean {
 	}
 
 	return true;
+}
+
+/**
+ * Is the value not `undefined` or `null`?
+ * @param value Value to check
+ * @returns `true` if the value is not `undefined` or `null`, otherwise `false`
+ */
+export function isNonNullable(value: unknown): value is Exclude<unknown, undefined | null> {
+	return value != null;
 }
 
 /**
