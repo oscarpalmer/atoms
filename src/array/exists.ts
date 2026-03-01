@@ -10,11 +10,10 @@ import type {PlainObject} from '../models';
  * @param value Value to match against
  * @returns `true` if the item exists in the array, otherwise `false`
  */
-export function exists<Item>(
-	array: Item[],
-	callback: (item: Item, index: number, array: Item[]) => unknown,
-	value: unknown,
-): boolean;
+export function exists<
+	Item,
+	Callback extends (item: Item, index: number, array: Item[]) => unknown,
+>(array: Item[], callback: Callback, value: ReturnType<Callback>): boolean;
 
 /**
  * Does an item with a specific value exist in the array?
@@ -23,10 +22,10 @@ export function exists<Item>(
  * @param value Value to match against
  * @returns `true` if the item exists in the array, otherwise `false`
  */
-export function exists<Item extends PlainObject>(
+export function exists<Item extends PlainObject, Key extends keyof Item>(
 	array: Item[],
-	key: keyof Item,
-	value: unknown,
+	key: Key,
+	value: Item[Key],
 ): boolean;
 
 /**

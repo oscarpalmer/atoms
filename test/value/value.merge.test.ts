@@ -50,13 +50,37 @@ test('merge', () => {
 	expect(merge([{hello: 'world'}])).toEqual({hello: 'world'});
 
 	expect(
-		merge([
-			{hello: {w: 'w'}},
-			{hello: {o: 'o'}} as never,
-			{hello: {r: 'r'}} as never,
-			{hello: {l: 'l'}} as never,
-			{hello: {d: 'd'}} as never,
-		]),
+		merge(
+			[
+				{hello: {w: 'w'}},
+				{hello: {o: 'o'}} as never,
+				{hello: {r: 'r'}} as never,
+				{hello: {l: 'l'}} as never,
+				{hello: {d: 'd'}} as never,
+				{hello: null} as never,
+			],
+			{
+				skipNullableAny: false, // default
+			},
+		),
+	).toEqual({
+		hello: null,
+	});
+
+	expect(
+		merge(
+			[
+				{hello: {w: 'w'}},
+				{hello: {o: 'o'}} as never,
+				{hello: {r: 'r'}} as never,
+				{hello: {l: 'l'}} as never,
+				{hello: {d: 'd'}} as never,
+				{hello: null} as never,
+			],
+			{
+				skipNullableAny: true,
+			},
+		),
 	).toEqual({
 		hello: {
 			w: 'w',

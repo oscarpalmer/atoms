@@ -62,9 +62,21 @@
 			"types": "./types/array/insert.d.ts",
 			"default": "./dist/array/insert.js"
 		},
+		"./array/partition": {
+			"types": "./types/array/partition.d.ts",
+			"default": "./dist/array/partition.js"
+		},
 		"./array/push": {
 			"types": "./types/array/push.d.ts",
 			"default": "./dist/array/push.js"
+		},
+		"./array/range": {
+			"types": "./types/array/range.d.ts",
+			"default": "./dist/array/range.js"
+		},
+		"./array/select": {
+			"types": "./types/array/select.d.ts",
+			"default": "./dist/array/select.js"
 		},
 		"./array/sort": {
 			"types": "./types/array/sort.d.ts",
@@ -86,9 +98,17 @@
 			"types": "./types/array/to-set.d.ts",
 			"default": "./dist/array/to-set.js"
 		},
+		"./array/toggle": {
+			"types": "./types/array/toggle.d.ts",
+			"default": "./dist/array/toggle.js"
+		},
 		"./array/unique": {
 			"types": "./types/array/unique.d.ts",
 			"default": "./dist/array/unique.js"
+		},
+		"./array/update": {
+			"types": "./types/array/update.d.ts",
+			"default": "./dist/array/update.js"
 		},
 		"./beacon": {
 			"types": "./types/beacon.d.ts",
@@ -236,5 +256,5 @@
 	},
 	"type": "module",
 	"types": "./types/index.d.ts",
-	"version": "0.143.0"
+	"version": "0.144.0"
 }

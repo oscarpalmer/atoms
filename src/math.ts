@@ -40,6 +40,16 @@ export function average(array: unknown[], key?: unknown): number {
 }
 
 /**
+ * Round a number up
+ * @param value Number to round up
+ * @param decimals Number of decimal places to round to _(defaults to `0`)_
+ * @returns Rounded number, or `NaN` if the value if unable to be rounded
+ */
+export function ceil(value: number, decimals?: number): number {
+	return roundNumber(Math.ceil, value, decimals);
+}
+
+/**
  * Count the number of items in an array that match a specific value
  * @param array Array to count for
  * @param callback Callback to get an item's value
@@ -59,10 +69,10 @@ export function count<Item>(
  * @param value Value to match and count
  * @returns Number of items with the specified key value, or `NaN` if no count can be calculated
  */
-export function count<Item extends PlainObject>(
+export function count<Item extends PlainObject, Key extends keyof Item>(
 	array: Item[],
-	key: keyof Item,
-	value: unknown,
+	key: Key,
+	value: Item[Key],
 ): number;
 
 /**
@@ -96,6 +106,16 @@ export function count(array: unknown[], key?: unknown, value?: unknown): number 
 	}
 
 	return counted;
+}
+
+/**
+ * Round a number down
+ * @param value Number to round down
+ * @param decimals Number of decimal places to round to _(defaults to `0`)_
+ * @returns Rounded number, or `NaN` if the value if unable to be rounded
+ */
+export function floor(value: number, decimals?: number): number {
+	return roundNumber(Math.floor, value, decimals);
 }
 
 /**
@@ -200,17 +220,25 @@ export function min(array: unknown[], key?: unknown): number {
  * @returns Rounded number, or `NaN` if the value if unable to be rounded
  */
 export function round(value: number, decimals?: number): number {
+	return roundNumber(Math.round, value, decimals);
+}
+
+function roundNumber(
+	callback: (value: number) => number,
+	value: number,
+	decimals?: number,
+): number {
 	if (typeof value !== 'number') {
 		return Number.NaN;
 	}
 
 	if (typeof decimals !== 'number' || decimals < 1) {
-		return Math.round(value);
+		return callback(value);
 	}
 
 	const mod = 10 ** decimals;
 
-	return Math.round((value + Number.EPSILON) * mod) / mod;
+	return callback((value + Number.EPSILON) * mod) / mod;
 }
 
 /**

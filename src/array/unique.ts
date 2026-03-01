@@ -1,5 +1,5 @@
 import {findValues} from '../internal/array/find';
-import type {Key, PlainObject} from '../models';
+import type {PlainObject} from '../models';
 
 // #region Functions
 
@@ -9,10 +9,10 @@ import type {Key, PlainObject} from '../models';
  * @param callback Callback to get an item's value
  * @returns Array of unique items
  */
-export function unique<
-	Item,
-	ItemCallback extends (item: Item, index: number, array: Item[]) => Key,
->(array: Item[], callback: ItemCallback): Item[];
+export function unique<Item>(
+	array: Item[],
+	callback: (item: Item, index: number, array: Item[]) => unknown,
+): Item[];
 
 /**
  * Get an array of unique items
@@ -37,7 +37,7 @@ export function unique(array: unknown[], key?: unknown): unknown[] {
 		return [];
 	}
 
-	return array.length > 1 ? findValues('unique', array, [key, undefined]) : array;
+	return array.length > 1 ? findValues('unique', array, [key, undefined]).matched : array;
 }
 
 // #endregion

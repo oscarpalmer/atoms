@@ -10,11 +10,10 @@ import type {PlainObject} from '../models';
  * @param value Value to match against
  * @returns Index of the first matching item, or `-1` if no match is found
  */
-export function indexOf<Item>(
-	array: Item[],
-	callback: (item: Item, index: number, array: Item[]) => unknown,
-	value: unknown,
-): number;
+export function indexOf<
+	Item,
+	Callback extends (item: Item, index: number, array: Item[]) => unknown,
+>(array: Item[], callback: Callback, value: ReturnType<Callback>): number;
 
 /**
  * Get the index of the first matching item by key
@@ -23,10 +22,10 @@ export function indexOf<Item>(
  * @param value Value to match against
  * @returns Index of the first matching item, or `-1` if no match is found
  */
-export function indexOf<Item extends PlainObject>(
+export function indexOf<Item extends PlainObject, Key extends keyof Item>(
 	array: Item[],
-	key: keyof Item,
-	value: unknown,
+	key: Key,
+	value: Item[Key],
 ): number;
 
 /**

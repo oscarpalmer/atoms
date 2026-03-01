@@ -10,10 +10,10 @@ import type {PlainObject} from '../models';
  * @param value Value to match against
  * @returns First item that matches the value, or `undefined` if no match is found
  */
-export function find<Item>(
+export function find<Item, Callback extends (item: Item, index: number, array: Item[]) => unknown>(
 	array: Item[],
-	callback: (item: Item, index: number, array: Item[]) => unknown,
-	value: unknown,
+	callback: Callback,
+	value: ReturnType<Callback>,
 ): Item | undefined;
 
 /**
@@ -23,10 +23,10 @@ export function find<Item>(
  * @param value Value to match against
  * @returns First item that matches the value, or `undefined` if no match is found
  */
-export function find<Item extends PlainObject>(
+export function find<Item extends PlainObject, Key extends keyof Item>(
 	array: Item[],
-	key: keyof Item,
-	value: unknown,
+	key: Key,
+	value: Item[Key],
 ): Item | undefined;
 
 /**

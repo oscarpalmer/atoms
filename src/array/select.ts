@@ -1,0 +1,92 @@
+import {findValues} from '../internal/array/find';
+import type {PlainObject} from '../models';
+
+/**
+ * Get a filtered and mapped array of items
+ * @param array Array to search in
+ * @param filterCallback Callback to get an item's value for matching
+ * @param filterValue Value to match against
+ * @param mapCallback Callback to map the matched items
+ * @returns Filtered and mapped array of items
+ */
+export function select<
+	Item,
+	FilterCallback extends (item: Item, index: number, array: Item[]) => unknown,
+	MapCallback extends (item: Item, index: number, array: Item[]) => unknown,
+>(
+	array: Item[],
+	filterCallback: FilterCallback,
+	filterValue: ReturnType<FilterCallback>,
+	mapCallback: MapCallback,
+): Array<ReturnType<MapCallback>>;
+
+/**
+ * Get a filtered and mapped array of items
+ * @param array Array to search in
+ * @param filterKey Key to get an item's value for matching
+ * @param filterValue Value to match against
+ * @param mapCallback Callback to map the matched items
+ * @returns Filtered and mapped array of items
+ */
+export function select<
+	Item extends PlainObject,
+	Key extends keyof Item,
+	MapCallback extends (item: Item, index: number, array: Item[]) => unknown,
+>(
+	array: Item[],
+	filterKey: Key,
+	filterValue: Item[Key],
+	mapCallback: MapCallback,
+): Array<ReturnType<MapCallback>>;
+
+/**
+ * Get a filtered and mapped array of items
+ * @param array Array to search in
+ * @param filterCallback Filter callback to match items
+ * @param mapCallback Callback to map the matched items
+ * @returns Filtered and mapped array of items
+ */
+export function select<
+	Item,
+	FilterCallback extends (item: Item, index: number, array: Item[]) => unknown,
+	MapCallback extends (item: Item, index: number, array: Item[]) => unknown,
+>(
+	array: Item[],
+	filterCallback: FilterCallback,
+	filterValue: ReturnType<FilterCallback>,
+	mapCallback: MapCallback,
+): Array<ReturnType<MapCallback>>;
+
+/**
+ * Get a filtered and mapped array of items
+ * @param array Array to search in
+ * @param filter Filter callback to match items
+ * @param map Callback to map the matched items
+ * @returns Filtered and mapped array of items
+ */
+export function select<
+	Item,
+	MapCallback extends (item: Item, index: number, array: Item[]) => unknown,
+>(
+	array: Item[],
+	filter: (item: Item, index: number, array: Item[]) => boolean,
+	map: MapCallback,
+): Array<ReturnType<MapCallback>>;
+
+/**
+ * Get a filtered and mapped array of items
+ * @param array Array to search in
+ * @param item Item to match against
+ * @param map Callback to map the matched items
+ * @returns Filtered and mapped array of items
+ */
+export function select<
+	Item,
+	MapCallback extends (item: Item, index: number, array: Item[]) => unknown,
+>(array: Item[], filter: Item, map: MapCallback): Array<ReturnType<MapCallback>>;
+
+export function select(array: unknown[], ...parameters: unknown[]): unknown[] {
+	const mapper = parameters.pop();
+
+	return findValues('all', array, parameters, mapper).matched;
+}

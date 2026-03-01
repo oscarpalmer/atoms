@@ -10,11 +10,10 @@ import type {PlainObject} from '../models';
  * @param value Value to match against
  * @returns Filtered array of items
  */
-export function filter<Item>(
-	array: Item[],
-	callback: (item: Item, index: number, array: Item[]) => unknown,
-	value: unknown,
-): Item[];
+export function filter<
+	Item,
+	Callback extends (item: Item, index: number, array: Item[]) => unknown,
+>(array: Item[], callback: Callback, value: ReturnType<Callback>): Item[];
 
 /**
  * Get a filtered array of items
@@ -23,10 +22,10 @@ export function filter<Item>(
  * @param value Value to match against
  * @returns Filtered array of items
  */
-export function filter<Item extends PlainObject>(
+export function filter<Item extends PlainObject, Key extends keyof Item>(
 	array: Item[],
-	key: keyof Item,
-	value: unknown,
+	key: Key,
+	value: Item[Key],
 ): Item[];
 
 /**
@@ -49,7 +48,31 @@ export function filter<Item>(
 export function filter<Item>(array: Item[], item: Item): Item[];
 
 export function filter(array: unknown[], ...parameters: unknown[]): unknown[] {
-	return findValues('all', array, parameters);
+	return findValues('all', array, parameters).matched;
+}
+
+filter.remove = removeFiltered;
+
+function removeFiltered<
+	Item,
+	Callback extends (item: Item, index: number, array: Item[]) => unknown,
+>(array: Item[], callback: Callback, value: ReturnType<Callback>): unknown[];
+
+function removeFiltered<Item extends PlainObject, Key extends keyof Item>(
+	array: Item[],
+	key: Key,
+	value: Item[Key],
+): unknown[];
+
+function removeFiltered<Item>(
+	array: Item[],
+	filter: (item: Item, index: number, array: Item[]) => boolean,
+): unknown[];
+
+function removeFiltered<Item>(array: Item[], item: Item): unknown[];
+
+function removeFiltered(array: unknown[], ...parameters: unknown[]): unknown[] {
+	return findValues('all', array, parameters).notMatched;
 }
 
 // #endregion

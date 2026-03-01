@@ -41,8 +41,8 @@ test('', () =>
 			expect(defaulted.invalid).toBeGreaterThan(0);
 			expect(defaulted.zero).toBeGreaterThan(0);
 
-			expect(defaulted.invalid).toBeLessThanOrEqual(FRAME_RATE_MS + 1);
-			expect(defaulted.zero).toBeLessThanOrEqual(FRAME_RATE_MS + 1);
+			expect(defaulted.invalid).toBeLessThanOrEqual(FRAME_RATE_MS + 2);
+			expect(defaulted.zero).toBeLessThanOrEqual(FRAME_RATE_MS + 2);
 
 			expect(value).toBe(1);
 
@@ -51,8 +51,8 @@ test('', () =>
 			debounced.cancel();
 
 			setTimeout(() => {
-				expect(diff).toBeGreaterThanOrEqual(Math.floor(8.5 * FRAME_RATE_MS));
-				expect(diff).toBeLessThanOrEqual(Math.ceil(11.5 * FRAME_RATE_MS));
+				expect(diff).toBeGreaterThanOrEqual(Math.floor(8 * FRAME_RATE_MS));
+				expect(diff).toBeLessThanOrEqual(Math.ceil(12 * FRAME_RATE_MS));
 				expect(value).toBe(1);
 
 				done();

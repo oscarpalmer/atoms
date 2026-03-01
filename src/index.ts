@@ -8,13 +8,18 @@ export * from './array/get';
 export * from './array/group-by';
 export * from './array/index-of';
 export * from './array/insert';
+export * from './array/partition';
 export * from './array/push';
+export * from './array/range';
+export * from './array/select';
 export * from './array/sort';
 export * from './array/splice';
 export * from './array/to-map';
 export * from './array/to-record';
 export * from './array/to-set';
+export * from './array/toggle';
 export * from './array/unique';
+export * from './array/update';
 
 export * from './function/debounce';
 export * from './function/memoize';

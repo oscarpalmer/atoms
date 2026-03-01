@@ -4,6 +4,11 @@ import {getArrayCallbacks} from './callbacks';
 
 type FindValueType = 'index' | 'value';
 
+type FindValuesResult = {
+	matched: unknown[];
+	notMatched: unknown[];
+};
+
 type FindValuesType = 'all' | 'unique';
 
 type Parameters = {
@@ -63,25 +68,15 @@ export function findValues(
 	type: FindValuesType,
 	array: unknown[],
 	parameters: unknown[],
-): unknown[];
+	mapper?: unknown,
+): FindValuesResult {
+	const result: FindValuesResult = {
+		matched: [],
+		notMatched: [],
+	};
 
-export function findValues(
-	type: FindValuesType,
-	array: unknown[],
-	parameters: unknown[],
-): unknown[] | undefined;
-
-export function findValues(
-	type: FindValuesType,
-	array: unknown[],
-	parameters: unknown[],
-): unknown[] | undefined {
-	if (!Array.isArray(array)) {
-		return [];
-	}
-
-	if (array.length === 0) {
-		return [];
+	if (!Array.isArray(array) || array.length === 0) {
+		return result;
 	}
 
 	const {length} = array;
@@ -89,19 +84,30 @@ export function findValues(
 	const callbacks = getArrayCallbacks(bool, key);
 
 	if (type === 'unique' && callbacks?.keyed == null && length >= UNIQUE_THRESHOLD) {
-		return [...new Set(array)];
+		result.matched = [...new Set(array)];
+
+		return result;
 	}
 
-	if (callbacks?.bool != null) {
-		return array.filter(callbacks.bool);
-	}
+	const mapCallback = typeof mapper === 'function' ? mapper : undefined;
 
-	if (type === 'all' && key == null) {
-		return array.filter(item => item === value);
+	if (callbacks?.bool != null || (type === 'all' && key == null)) {
+		const callback = callbacks?.bool ?? (item => Object.is(item, value));
+
+		for (let index = 0; index < length; index += 1) {
+			const item = array[index];
+
+			if (callback(item, index, array)) {
+				result.matched.push(mapCallback?.(item, index, array) ?? item);
+			} else {
+				result.notMatched.push(item);
+			}
+		}
+
+		return result;
 	}
 
 	const keys = new Set();
-	const values: unknown[] = [];
 
 	for (let index = 0; index < length; index += 1) {
 		const item = array[index];
@@ -109,13 +115,13 @@ export function findValues(
 
 		if ((type === 'all' && Object.is(keyed, value)) || (type === 'unique' && !keys.has(keyed))) {
 			keys.add(keyed);
-			values.push(item);
+			result.matched.push(mapCallback?.(item, index, array) ?? item);
+		} else {
+			result.notMatched.push(item);
 		}
 	}
 
-	keys.clear();
-
-	return values;
+	return result;
 }
 
 function getParameters(original: unknown[]): Parameters {

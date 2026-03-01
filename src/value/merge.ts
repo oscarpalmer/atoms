@@ -14,14 +14,15 @@ export type MergeOptions = {
 	 * merge([{items: [1, 2, 3]}, {items: [99]}]); // {items: [99]}
 	 * ```
 	 */
-	replaceableObjects: string | RegExp | Array<string | RegExp>;
+	replaceableObjects?: string | RegExp | Array<string | RegExp>;
+	skipNullableAny?: boolean;
 	/**
 	 * Skip nullable values when merging arrays?
 	 * ```ts
 	 * merge([1, 2, 3], [null, null, 99]); // [1, 2, 99]
 	 * ```
 	 */
-	skipNullableInArrays: boolean;
+	skipNullableInArrays?: boolean;
 };
 
 /**
@@ -35,6 +36,7 @@ export type Merger<Model extends ArrayOrPlainObject = ArrayOrPlainObject> = (
 
 type Options = {
 	replaceableObjects: ReplaceableObjectsCallback | undefined;
+	skipNullableAny: boolean;
 	skipNullableInArrays: boolean;
 };
 
@@ -44,9 +46,10 @@ type ReplaceableObjectsCallback = (name: string) => boolean;
 
 // #region Functions
 
-function getMergeOptions(options?: Partial<MergeOptions>): Options {
+function getMergeOptions(options?: MergeOptions): Options {
 	const actual: Options = {
 		replaceableObjects: undefined,
+		skipNullableAny: false,
 		skipNullableInArrays: false,
 	};
 
@@ -56,6 +59,7 @@ function getMergeOptions(options?: Partial<MergeOptions>): Options {
 
 	actual.replaceableObjects = getReplaceableObjects(options.replaceableObjects);
 
+	actual.skipNullableAny = options.skipNullableAny === true;
 	actual.skipNullableInArrays = options.skipNullableInArrays === true;
 
 	return actual;
@@ -84,7 +88,7 @@ function handleMerge(values: ArrayOrPlainObject[], options: Options): ArrayOrPla
  */
 export function merge<Model extends ArrayOrPlainObject>(
 	values: NestedPartial<Model>[],
-	options?: Partial<MergeOptions>,
+	options?: MergeOptions,
 ): Model {
 	return handleMerge(values, getMergeOptions(options)) as Model;
 }
@@ -96,7 +100,7 @@ merge.initialize = initializeMerger;
  * @param options Merging options
  * @returns Merger function
  */
-function initializeMerger(options?: Partial<MergeOptions>): Merger {
+function initializeMerger(options?: MergeOptions): Merger {
 	const actual = getMergeOptions(options);
 
 	return <Model extends ArrayOrPlainObject>(values: NestedPartial<Model>[]): Model =>
@@ -124,7 +128,7 @@ function mergeObjects(
 			const next = item[key];
 			const previous = merged[key];
 
-			if (isArray && options.skipNullableInArrays && next == null) {
+			if (next == null && (options.skipNullableAny || (isArray && options.skipNullableInArrays))) {
 				continue;
 			}
 

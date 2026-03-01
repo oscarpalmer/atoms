@@ -12,7 +12,7 @@ export type Callbacks = {
 
 // #region Functions
 
-function getArrayCallback(value: unknown): GenericCallback | undefined {
+export function getArrayCallback(value: unknown): GenericCallback | undefined {
 	switch (typeof value) {
 		case 'function':
 			return value as GenericCallback;
