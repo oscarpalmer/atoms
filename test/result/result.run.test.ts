@@ -73,10 +73,24 @@ test('asynchronous', async () => {
 		async () =>
 			new Promise<string>(resolve =>
 				setTimeout(() => {
-					resolve('success');
+					resolve('success: basic');
 				}, 50),
 			),
 	);
+
+	const resolvedPromise = await attempt.async(new Promise<string>(resolve => {
+		setTimeout(() => {
+			resolve('success: promise');
+		}, 50);
+	}));
+
+	const resolvedReturn = await attempt.async(() => {
+		return new Promise<string>(resolve =>
+			setTimeout(() => {
+				resolve('success: return');
+			}, 50),
+		);
+	});
 
 	expect(isError(rejected)).toBe(true);
 	expect(isError(rejected, true)).toBe(false);
@@ -89,6 +103,10 @@ test('asynchronous', async () => {
 	expect(isError(resolved)).toBe(false);
 	expect(isError(resolved, true)).toBe(false);
 	expect(isOk(resolved)).toBe(true);
+
+	expect(isError(resolvedPromise)).toBe(false);
+	expect(isError(resolvedPromise, true)).toBe(false);
+	expect(isOk(resolvedPromise)).toBe(true);
 
 	expect((rejected as any).error).toBeInstanceOf(Error);
 	expect((rejected as any).error.message).toBe('failure');
@@ -103,5 +121,9 @@ test('asynchronous', async () => {
 
 	expect((resolved as any).error).toBeUndefined();
 	expect((resolved as any).original).toBeUndefined();
-	expect((resolved as any).value).toBe('success');
+	expect((resolved as any).value).toBe('success: basic');
+
+	expect((resolvedPromise as any).error).toBeUndefined();
+	expect((resolvedPromise as any).original).toBeUndefined();
+	expect((resolvedPromise as any).value).toBe('success: promise');
 });

@@ -19,6 +19,11 @@ export type ExtendedErr<E> = Err<E> & {
 };
 
 /**
+ * An extended, unknown result
+ */
+export type ExtendedResult<Value, E> = ExtendedErr<E> | Ok<Value>;
+
+/**
  * A successful result
  */
 export type Ok<Value> = {
@@ -41,6 +46,96 @@ function _isResult(value: unknown, okValue: boolean): value is Result<unknown, u
 	}
 
 	return value.ok === okValue && (okValue ? 'value' : 'error') in value;
+}
+
+/**
+ * Executes a callback, catching any errors, and returns a result
+ * @param callback Callback to execute
+ * @param error Error value
+ * @returns Callback result
+ */
+export function attempt<Value, E>(callback: () => Value, error: E): ExtendedErr<E> | Ok<Value>;
+
+/**
+ * Executes a callback, catching any errors, and returns a result
+ * @param callback Callback to execute
+ * @returns Callback result
+ */
+export function attempt<Value>(callback: () => Value): Result<Value, Error>;
+
+export function attempt<Value, E>(
+	callback: () => Value,
+	err?: E,
+): ExtendedErr<E> | Result<Value, E> {
+	try {
+		const value = callback();
+
+		return ok(value);
+	} catch (thrown) {
+		return getError((err ?? thrown) as E, err == null ? undefined : (thrown as Error));
+	}
+}
+
+attempt.async = asyncAttempt;
+attempt.promise = attemptPromise;
+
+/**
+ * Executes a promise, catching any errors, and returns a result
+ * @param promise Promise to execute
+ * @param error Error value
+ * @returns Callback result
+ */
+async function asyncAttempt<Value, E>(
+	promise: Promise<Value>,
+	error: E,
+): Promise<ExtendedResult<Awaited<Value>, E>>;
+
+/**
+ * Executes a callback asynchronously, catching any errors, and returns a result
+ * @param callback Callback to execute
+ * @param error Error value
+ * @returns Callback result
+ */
+async function asyncAttempt<Value, E>(
+	callback: () => Promise<Value>,
+	error: E,
+): Promise<ExtendedResult<Awaited<Value>, E>>;
+
+/**
+ * Executes a promise, catching any errors, and returns a result
+ * @param promise Promise to execute
+ * @returns Callback result
+ */
+async function asyncAttempt<Value>(promise: Promise<Value>): Promise<Result<Awaited<Value>>>;
+
+/**
+ * Executes a callback asynchronously, catching any errors, and returns a result
+ * @param callback Callback to execute
+ * @returns Callback result
+ */
+async function asyncAttempt<Value>(callback: () => Promise<Value>): Promise<Result<Awaited<Value>>>;
+
+async function asyncAttempt<Value, E>(
+	value: Promise<Value> | (() => Promise<Value>),
+	err?: E,
+): Promise<unknown> {
+	async function handler(resolve: (value: unknown) => void): Promise<void> {
+		try {
+			let result = typeof value === 'function' ? value() : await value;
+
+			if (result instanceof Promise) {
+				result = await result;
+			}
+
+			resolve(ok(result));
+		} catch (thrown) {
+			resolve(getError((err ?? thrown) as E, err == null ? undefined : (thrown as Error)));
+		}
+	}
+
+	return new Promise(resolve => {
+		handler(resolve);
+	});
 }
 
 /**
@@ -151,86 +246,6 @@ export function ok<Value>(value: Value): Ok<Value> {
 		ok: true,
 		value,
 	};
-}
-
-/**
- * Executes a callback, catching any errors, and returns a result
- * @param callback Callback to execute
- * @param error Error value
- * @returns Callback result
- */
-export function attempt<Value, E>(callback: () => Value, error: E): ExtendedErr<E> | Ok<Value>;
-
-/**
- * Executes a callback, catching any errors, and returns a result
- * @param callback Callback to execute
- * @returns Callback result
- */
-export function attempt<Value>(callback: () => Value): Result<Value, Error>;
-
-export function attempt<Value, E>(
-	callback: () => Value,
-	err?: E,
-): ExtendedErr<E> | Result<Value, E> {
-	try {
-		const value = callback();
-
-		return ok(value);
-	} catch (thrown) {
-		return getError((err ?? thrown) as E, err == null ? undefined : (thrown as Error));
-	}
-}
-
-attempt.async = asyncAttempt;
-attempt.promise = attemptPromise;
-
-/**
- * Executes a promise, catching any errors, and returns a result
- * @param promise Promise to execute
- * @param error Error value
- * @returns Callback result
- */
-async function asyncAttempt<Value, E>(
-	promise: Promise<Value>,
-	error: E,
-): Promise<ExtendedErr<E> | Ok<Awaited<Value>>>;
-
-/**
- * Executes a callback asynchronously, catching any errors, and returns a result
- * @param callback Callback to execute
- * @param error Error value
- * @returns Callback result
- */
-async function asyncAttempt<Value, E>(
-	callback: () => Promise<Value>,
-	error: E,
-): Promise<ExtendedErr<E> | Ok<Value>>;
-
-/**
- * Executes a promise, catching any errors, and returns a result
- * @param promise Promise to execute
- * @returns Callback result
- */
-async function asyncAttempt<Value>(promise: Promise<Value>): Promise<Awaited<Value>>;
-
-/**
- * Executes a callback asynchronously, catching any errors, and returns a result
- * @param callback Callback to execute
- * @returns Callback result
- */
-async function asyncAttempt<Value>(callback: () => Promise<Value>): Promise<Result<Value>>;
-
-async function asyncAttempt<Value, E>(
-	value: Promise<Value> | (() => Promise<Value>),
-	err?: E,
-): Promise<unknown> {
-	try {
-		const result = await (typeof value === 'function' ? value() : value);
-
-		return ok(result);
-	} catch (thrown) {
-		return getError((err ?? thrown) as E, err == null ? undefined : (thrown as Error));
-	}
 }
 
 /**

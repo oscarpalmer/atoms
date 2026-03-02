@@ -102,6 +102,89 @@ type RejectedPromiseResult = {
 // #region Functions
 
 /**
+ * Wrap a promise with safety handlers, with optional abort capabilities and timeout
+ * @param promise Promise to wrap
+ * @param options Options for the promise
+ * @returns Wrapped promise
+ */
+export async function attemptPromise<Value>(
+	promise: Promise<Value>,
+	options?: PromiseOptions | AbortSignal | number,
+): Promise<Value>;
+
+/**
+ * Wrap a promise-returning callback with safety handlers, with optional abort capabilities and timeout
+ * @param callback Callback to wrap
+ * @param options Options for the promise
+ * @returns Promise-wrapped callback
+ */
+export async function attemptPromise<Value>(
+	callback: () => Promise<Value>,
+	options?: PromiseOptions | AbortSignal | number,
+): Promise<Value>;
+
+/**
+ * Wrap a callback with a promise and safety handlers, with optional abort capabilities and timeout
+ * @param callback Callback to wrap
+ * @param options Options for the promise
+ * @returns Promise-wrapped callback
+ */
+export async function attemptPromise<Value>(
+	callback: () => Value,
+	options?: PromiseOptions | AbortSignal | number,
+): Promise<Value>;
+
+export async function attemptPromise<Value>(
+	value: (() => Value) | Promise<Value>,
+	options?: PromiseOptions | AbortSignal | number,
+): Promise<Value> {
+	const isFunction = typeof value === 'function';
+
+	if (!isFunction && !(value instanceof Promise)) {
+		return Promise.reject(new TypeError(MESSAGE_EXPECTATION_ATTEMPT));
+	}
+
+	const {signal, time} = getPromiseOptions(options);
+
+	if (signal?.aborted ?? false) {
+		return Promise.reject(signal!.reason);
+	}
+
+	function abort(): void {
+		rejector(signal!.reason);
+	}
+
+	async function handler(
+		resolve: (value: Value) => void,
+		reject: (reason: unknown) => void,
+	): Promise<void> {
+		try {
+			let result = isFunction ? value() : await value;
+
+			if (result instanceof Promise) {
+				result = await result;
+			}
+
+			settlePromise(abort, resolve, result, signal);
+		} catch (error) {
+			settlePromise(abort, reject, error, signal);
+		}
+	}
+
+	let rejector: (reason: unknown) => void;
+
+	signal?.addEventListener(EVENT_NAME, abort, ABORT_OPTIONS);
+
+	const promise = new Promise<Value>((resolve, reject) => {
+		rejector = reject;
+
+		handler(resolve, reject);
+	});
+
+	return time > 0 ? getTimed(promise, time, signal) : promise;
+}
+
+/**
  * Create a cancelable promise
  * @param executor Executor function for the promise
  * @returns Cancelable promise
@@ -422,89 +505,6 @@ export async function timed<Value>(promise: Promise<Value>, options: unknown): P
 	if (signal?.aborted ?? false) {
 		return Promise.reject(signal!.reason);
 	}
-
-	return time > 0 ? getTimed(promise, time, signal) : promise;
-}
-
-/**
- * Wrap a promise with safety handlers, with optional abort capabilities and timeout
- * @param promise Promise to wrap
- * @param options Options for the promise
- * @returns Wrapped promise
- */
-export async function attemptPromise<Value>(
-	promise: Promise<Value>,
-	options?: PromiseOptions | AbortSignal | number,
-): Promise<Value>;
-
-/**
- * Wrap a promise-returning callback with safety handlers, with optional abort capabilities and timeout
- * @param callback Callback to wrap
- * @param options Options for the promise
- * @returns Promise-wrapped callback
- */
-export async function attemptPromise<Value>(
-	callback: () => Promise<Value>,
-	options?: PromiseOptions | AbortSignal | number,
-): Promise<Value>;
-
-/**
- * Wrap a callback with a promise and safety handlers, with optional abort capabilities and timeout
- * @param callback Callback to wrap
- * @param options Options for the promise
- * @returns Promise-wrapped callback
- */
-export async function attemptPromise<Value>(
-	callback: () => Value,
-	options?: PromiseOptions | AbortSignal | number,
-): Promise<Value>;
-
-export async function attemptPromise<Value>(
-	value: (() => Value) | Promise<Value>,
-	options?: PromiseOptions | AbortSignal | number,
-): Promise<Value> {
-	const isFunction = typeof value === 'function';
-
-	if (!isFunction && !(value instanceof Promise)) {
-		return Promise.reject(new TypeError(MESSAGE_EXPECTATION_ATTEMPT));
-	}
-
-	const {signal, time} = getPromiseOptions(options);
-
-	if (signal?.aborted ?? false) {
-		return Promise.reject(signal!.reason);
-	}
-
-	function abort(): void {
-		rejector(signal!.reason);
-	}
-
-	async function handler(
-		resolve: (value: Value) => void,
-		reject: (reason: unknown) => void,
-	): Promise<void> {
-		try {
-			let result = isFunction ? value() : await value;
-
-			if (result instanceof Promise) {
-				result = await result;
-			}
-
-			settlePromise(abort, resolve, result, signal);
-		} catch (error) {
-			settlePromise(abort, reject, error, signal);
-		}
-	}
-
-	let rejector: (reason: unknown) => void;
-
-	signal?.addEventListener(EVENT_NAME, abort, ABORT_OPTIONS);
-
-	const promise = new Promise<Value>((resolve, reject) => {
-		rejector = reject;
-
-		handler(resolve, reject);
-	});
 
 	return time > 0 ? getTimed(promise, time, signal) : promise;
 }
