@@ -3,6 +3,7 @@ import {
 	isArrayOrPlainObject,
 	isConstructor,
 	isEmpty,
+	isInstanceOf,
 	isKey,
 	isNonNullable,
 	isNullable,
@@ -62,6 +63,21 @@ test('isEmpty', () => {
 	expect(isEmpty(new Set([undefined]))).toBe(true);
 	expect(isEmpty(new Map([['key', 123]]))).toBe(false);
 	expect(isEmpty(new Set([123]))).toBe(false);
+});
+
+test('isInstanceOf', () => {
+	for (let index = 0; index < length; index += 1) {
+		expect(isInstanceOf(Object, values[index])).toBe(index === 2 || index === 3 || index > 14);
+	}
+
+	expect(isInstanceOf(Array, [])).toBe(true);
+	expect(isInstanceOf(Object, {})).toBe(true);
+	expect(isInstanceOf(Map, new Map())).toBe(true);
+	expect(isInstanceOf(Set, new Set())).toBe(true);
+	expect(isInstanceOf(Date, new Date())).toBe(true);
+	expect(isInstanceOf(RegExp, /test/)).toBe(true);
+	expect(isInstanceOf(Promise, Promise.resolve())).toBe(true);
+	expect(isInstanceOf(Error, new Error())).toBe(true);
 });
 
 test('isKey', () => {

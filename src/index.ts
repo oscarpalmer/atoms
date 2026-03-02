@@ -24,6 +24,7 @@ export * from './array/update';
 export * from './function/debounce';
 export * from './function/memoize';
 export * from './function/throttle';
+export * from './function/work';
 
 export * from './internal/array/chunk';
 export * from './internal/array/compact';

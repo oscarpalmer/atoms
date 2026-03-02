@@ -78,19 +78,13 @@ test('asynchronous', async () => {
 			),
 	);
 
-	const resolvedPromise = await attempt.async(new Promise<string>(resolve => {
-		setTimeout(() => {
-			resolve('success: promise');
-		}, 50);
-	}));
-
-	const resolvedReturn = await attempt.async(() => {
-		return new Promise<string>(resolve =>
+	const resolvedPromise = await attempt.async(
+		new Promise<string>(resolve => {
 			setTimeout(() => {
-				resolve('success: return');
-			}, 50),
-		);
-	});
+				resolve('success: promise');
+			}, 50);
+		}),
+	);
 
 	expect(isError(rejected)).toBe(true);
 	expect(isError(rejected, true)).toBe(false);

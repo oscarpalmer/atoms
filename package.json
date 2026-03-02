@@ -138,6 +138,10 @@
 			"types": "./types/function/throttle.d.ts",
 			"default": "./dist/function/throttle.js"
 		},
+		"./function/work": {
+			"types": "./types/function/work.d.ts",
+			"default": "./dist/function/work.js"
+		},
 		"./is": {
 			"types": "./types/is.d.ts",
 			"default": "./dist/is.js"
@@ -256,5 +260,5 @@
 	},
 	"type": "module",
 	"types": "./types/index.d.ts",
-	"version": "0.144.0"
+	"version": "0.145.0"
 }
