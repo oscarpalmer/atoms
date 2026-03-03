@@ -6,7 +6,7 @@ import type {PlainObject} from '../models';
  * @param destination Array to toggle within
  * @param toggled Toggled items
  * @param callback Callback to find existing item
- * @return Original array
+ * @returns Original array
  */
 export function toggle<Item>(
 	destination: Item[],
@@ -19,7 +19,7 @@ export function toggle<Item>(
  * @param destination Array to toggle within
  * @param toggled Toggled items
  * @param key Key to find existing item
- * @return Original array
+ * @returns Original array
  */
 export function toggle<Item extends PlainObject, Key extends keyof Item>(
 	destination: Item[],

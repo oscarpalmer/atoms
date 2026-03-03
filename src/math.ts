@@ -78,7 +78,7 @@ export function count<Item extends PlainObject, Key extends keyof Item>(
 /**
  * Count the number of items in an array
  * @param values Array to count for
- * @return Number of items, or `NaN` if no count can be calculated
+ * @returns Number of items, or `NaN` if no count can be calculated
  */
 export function count(values: unknown[]): number;
 

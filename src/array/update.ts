@@ -6,7 +6,7 @@ import type {PlainObject} from '../models';
  * @param destination Array to update within
  * @param updated Updated items
  * @param callback Callback to find existing item
- * @return Original array
+ * @returns Original array
  */
 export function update<Item>(
 	destination: Item[],
@@ -19,7 +19,7 @@ export function update<Item>(
  * @param destination Array to update within
  * @param updated Updated items
  * @param key Key to find existing item
- * @return Original array
+ * @returns Original array
  */
 export function update<Item extends PlainObject, Key extends keyof Item>(
 	destination: Item[],

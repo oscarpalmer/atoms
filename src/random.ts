@@ -6,7 +6,7 @@ import {join} from './internal/string';
 
 /**
  * Get a random boolean
- * @return Random boolean
+ * @returns Random boolean
  */
 export function getRandomBoolean(): boolean {
 	return Math.random() > BOOLEAN_MODIFIER;

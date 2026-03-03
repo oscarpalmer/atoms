@@ -375,7 +375,7 @@ function isType(value: unknown, type: string): boolean {
  * Depending on the strategy, the function will either reject on the first error encountered or return an array of rejected and resolved results
  * @param items List of promises
  * @param options Options for handling the promises
- * @return List of results
+ * @returns List of results
  */
 export async function promises<Items extends unknown[], Options extends PromisesOptions>(
 	items: Promises<Items>,
@@ -388,7 +388,7 @@ export async function promises<Items extends unknown[], Options extends Promises
  * If any promise in the list is rejected, the whole function will reject
  * @param items List of promises
  * @param strategy Strategy for handling the promises; rejects on the first error encountered
- * @return List of results
+ * @returns List of results
  */
 export async function promises<Items extends unknown[]>(
 	items: Promises<Items>,
@@ -399,7 +399,7 @@ export async function promises<Items extends unknown[]>(
  * Handle a list of promises, returning their results in an ordered array of rejected and resolved results
  * @param items List of promises
  * @param signal AbortSignal for aborting the operation _(when aborted, the promise will reject with the reason of the signal)_
- * @return List of results
+ * @returns List of results
  */
 export async function promises<Items extends unknown[]>(
 	items: Promises<Items>,
