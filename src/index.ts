@@ -1,34 +1,16 @@
 import FRAME_RATE_MS from './internal/frame-rate';
 
-export * from './array/exists';
-export * from './array/filter';
-export * from './array/find';
-export * from './array/flatten';
-export * from './array/get';
 export * from './array/group-by';
-export * from './array/index-of';
-export * from './array/insert';
-export * from './array/partition';
-export * from './array/push';
-export * from './array/range';
-export * from './array/select';
-export * from './array/sort';
-export * from './array/splice';
+export * from './array/misc';
 export * from './array/to-map';
 export * from './array/to-record';
-export * from './array/to-set';
-export * from './array/toggle';
 export * from './array/unique';
-export * from './array/update';
 
 export * from './function/debounce';
 export * from './function/memoize';
 export * from './function/throttle';
 export * from './function/work';
 
-export * from './internal/array/chunk';
-export * from './internal/array/compact';
-export * from './internal/array/shuffle';
 export * from './internal/function/misc';
 export * from './internal/string';
 export * from './internal/value/compare';

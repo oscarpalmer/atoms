@@ -8,8 +8,8 @@
 		"@types/node": "^25.3",
 		"@vitest/coverage-istanbul": "^4",
 		"jsdom": "^28.1",
-		"oxfmt": "^0.35",
-		"oxlint": "^1.50",
+		"oxfmt": "^0.36",
+		"oxlint": "^1.51",
 		"rolldown": "1.0.0-rc.6",
 		"tslib": "^2.8",
 		"typescript": "^5.9",
@@ -22,69 +22,13 @@
 			"types": "./types/index.d.ts",
 			"default": "./dist/index.js"
 		},
-		"./array/chunk": {
-			"types": "./types/internal/array/chunk.d.ts",
-			"default": "./dist/internal/array/chunk.js"
-		},
-		"./array/compact": {
-			"types": "./types/internal/array/compact.d.ts",
-			"default": "./dist/internal/array/compact.js"
-		},
-		"./array/exists": {
-			"types": "./types/array/exists.d.ts",
-			"default": "./dist/array/exists.js"
-		},
-		"./array/filter": {
-			"types": "./types/array/filter.d.ts",
-			"default": "./dist/array/filter.js"
-		},
-		"./array/find": {
-			"types": "./types/array/find.d.ts",
-			"default": "./dist/array/find.js"
-		},
-		"./array/flatten": {
-			"types": "./types/array/flatten.d.ts",
-			"default": "./dist/array/flatten.js"
-		},
-		"./array/get": {
-			"types": "./types/array/get.d.ts",
-			"default": "./dist/array/get.js"
-		},
 		"./array/group-by": {
 			"types": "./types/array/group-by.d.ts",
 			"default": "./dist/array/group-by.js"
 		},
-		"./array/index-of": {
-			"types": "./types/array/index-of.d.ts",
-			"default": "./dist/array/index-of.js"
-		},
-		"./array/insert": {
-			"types": "./types/array/insert.d.ts",
-			"default": "./dist/array/insert.js"
-		},
-		"./array/partition": {
-			"types": "./types/array/partition.d.ts",
-			"default": "./dist/array/partition.js"
-		},
-		"./array/push": {
-			"types": "./types/array/push.d.ts",
-			"default": "./dist/array/push.js"
-		},
-		"./array/range": {
-			"types": "./types/array/range.d.ts",
-			"default": "./dist/array/range.js"
-		},
-		"./array/select": {
-			"types": "./types/array/select.d.ts",
-			"default": "./dist/array/select.js"
-		},
-		"./array/sort": {
-			"types": "./types/array/sort.d.ts",
-			"default": "./dist/array/sort.js"
-		},
-		"./array/splice": {
-			"types": "./types/array/splice.d.ts",
-			"default": "./dist/array/splice.js"
+		"./array/misc": {
+			"types": "./types/array/misc.d.ts",
+			"default": "./dist/array/misc.js"
 		},
 		"./array/to-map": {
 			"types": "./types/array/to-map.d.ts",
@@ -94,21 +38,9 @@
 			"types": "./types/array/to-record.d.ts",
 			"default": "./dist/array/to-record.js"
 		},
-		"./array/to-set": {
-			"types": "./types/array/to-set.d.ts",
-			"default": "./dist/array/to-set.js"
-		},
-		"./array/toggle": {
-			"types": "./types/array/toggle.d.ts",
-			"default": "./dist/array/toggle.js"
-		},
 		"./array/unique": {
 			"types": "./types/array/unique.d.ts",
 			"default": "./dist/array/unique.js"
-		},
-		"./array/update": {
-			"types": "./types/array/update.d.ts",
-			"default": "./dist/array/update.js"
 		},
 		"./beacon": {
 			"types": "./types/beacon.d.ts",
@@ -260,5 +192,5 @@
 	},
 	"type": "module",
 	"types": "./types/index.d.ts",
-	"version": "0.145.0"
+	"version": "0.146.0"
 }
