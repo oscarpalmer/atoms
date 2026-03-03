@@ -3,6 +3,11 @@ import type {GenericCallback} from '../models';
 // #region Types
 
 /**
+ * An unknown result
+ */
+export type AnyResult<Value, E> = Err<E> | ExtendedErr<E> | Ok<Value>;
+
+/**
  * An error result
  */
 export type Err<Error> = {
@@ -34,6 +39,25 @@ export type Ok<Value> = {
  * An unknown result
  */
 export type Result<Value, E = Error> = Err<E> | Ok<Value>;
+
+/**
+ * Match callbacks for a result
+ */
+export type ResultMatch<Value, Returned, E = Error> = {
+	/**
+	 * Callback for error result
+	 * @param error Error value
+	 * @param original Original error, if available
+	 * @returns Value to return
+	 */
+	error: (error: E, original?: Error) => Returned;
+	/**
+	 * Callback for ok result
+	 * @param value Ok value
+	 * @returns Value to return
+	 */
+	ok: (value: Value) => Returned;
+};
 
 /**
  * Unwrap a result value

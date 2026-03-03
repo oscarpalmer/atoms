@@ -1,5 +1,6 @@
 import {isOk} from '../internal/result';
 import {attemptPromise} from '../promise';
+import {matchResult} from './match';
 import type {Err, ExtendedErr, ExtendedResult, Ok, Result} from './models';
 import {attemptFlow} from './work/flow';
 import {attemptPipe} from './work/pipe';
@@ -65,7 +66,7 @@ async function asyncAttempt<Value, E>(
  * @param error Error value
  * @returns Callback result
  */
-export function attempt<Value, E>(callback: () => Value, error: E): ExtendedErr<E> | Ok<Value>;
+export function attempt<Value, E>(callback: () => Value, error: E): ExtendedResult<Value, E>;
 
 /**
  * Executes a callback, catching any errors, and returns a result
@@ -89,6 +90,7 @@ export function attempt<Value, E>(
 
 attempt.async = asyncAttempt;
 attempt.flow = attemptFlow;
+attempt.match = matchResult;
 attempt.pipe = attemptPipe;
 attempt.promise = attemptPromise;
 
