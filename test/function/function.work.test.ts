@@ -1,5 +1,5 @@
 import {expect, test} from 'vitest';
-import {flow, pipe} from '../../src';
+import {attempt, error, flow, ok, pipe} from '../../src';
 
 test('flow: asynchronous', async () => {
 	const nameTransformer = flow.async(
@@ -16,6 +16,19 @@ test('flow: asynchronous', async () => {
 	expect(() => flow.async(() => {}, 'not a function' as never)).toThrow(
 		'Flow expected to receive an array of functions',
 	);
+
+	const handleResult = flow.async(
+		(_: unknown) => {},
+		() => 'Test value!',
+	);
+
+	try {
+		await handleResult(error('Test error!'));
+	} catch (err) {
+		expect(err).toBe('Test error!');
+	}
+
+	await expect(handleResult(ok('Should pass'))).resolves.toBe('Test value!');
 });
 
 test('flow: synchronous', () => {
@@ -33,6 +46,14 @@ test('flow: synchronous', () => {
 	expect(() => flow(() => {}, 'not a function' as never)).toThrow(
 		'Flow expected to receive an array of functions',
 	);
+
+	const handleResult = flow(
+		(_: unknown) => {},
+		() => 'Test value!',
+	);
+
+	expect(() => handleResult(error('Test error!'))).toThrow('Test error!');
+	expect(handleResult(ok('Should pass'))).toBe('Test value!');
 });
 
 test('pipe: asynchronous', async () => {
@@ -81,4 +102,78 @@ test('pipe: synchronous', () => {
 	expect(() => pipe(123, (x: number) => x + 1, 'not a function' as never)).toThrow(
 		'Pipe expected to receive an array of functions',
 	);
+});
+
+test('return types', async () => {
+	expect(
+		flow(
+			() => 'Initial value!',
+			() => attempt(() => 'Returned value!'),
+		)(),
+	).toBe('Returned value!');
+
+	const x = flow(
+		() => 'Initial value!',
+		() => attempt(() => 'Returned value!'),
+	)();
+
+	const y = pipe(
+		() => 'Initial value!',
+		() => attempt(() => 'Returned value!'),
+	);
+
+	expect(
+		pipe(
+			() => {},
+			() => attempt(() => 'Test value!'),
+		),
+	).toBe('Test value!');
+
+	expect(() =>
+		flow(
+			() => {},
+			() =>
+				attempt(() => {
+					throw new Error('Test error!');
+				}),
+		)(),
+	).toThrow('Test error!');
+
+	expect(() =>
+		pipe(
+			() => {},
+			() =>
+				attempt(() => {
+					throw new Error('Test error!');
+				}),
+		),
+	).toThrow('Test error!');
+
+	expect(() =>
+		flow(
+			() => {},
+			() => new Promise(() => {}),
+		)(),
+	).toThrow('Synchronous Flow received a promise. Use `flow.async` instead.');
+
+	expect(() =>
+		pipe(
+			() => {},
+			() => new Promise(() => {}),
+		),
+	).toThrow('Synchronous Pipe received a promise. Use `pipe.async` instead.');
+
+	expect(() =>
+		flow(
+			() => {},
+			() => () => () => {},
+		)(),
+	).toThrow('Return values are too deeply nested.');
+
+	expect(() =>
+		pipe(
+			() => {},
+			() => () => () => {},
+		),
+	).toThrow('Return values are too deeply nested.');
 });

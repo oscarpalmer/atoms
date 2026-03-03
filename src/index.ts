@@ -42,7 +42,7 @@ export * from './promise';
 export * from './query';
 export * from './queue';
 export * from './random';
-export * from './result';
+export * from './result/index';
 export * from './sized/map';
 export * from './sized/set';
 

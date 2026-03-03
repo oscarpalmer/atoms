@@ -1,52 +1,10 @@
-import {isPlainObject} from './internal/is';
-import {attemptPromise} from './promise';
-
-// #region Types
-
-/**
- * An error result
- */
-export type Err<Error> = {
-	ok: false;
-	error: Error;
-};
-
-/**
- * An extended error result
- */
-export type ExtendedErr<E> = Err<E> & {
-	original: Error;
-};
-
-/**
- * An extended, unknown result
- */
-export type ExtendedResult<Value, E> = ExtendedErr<E> | Ok<Value>;
-
-/**
- * A successful result
- */
-export type Ok<Value> = {
-	ok: true;
-	value: Value;
-};
-
-/**
- * An unknown result
- */
-export type Result<Value, E = Error> = Err<E> | Ok<Value>;
-
-// #endregion
+import {isOk} from '../internal/result';
+import {attemptPromise} from '../promise';
+import type {Err, ExtendedErr, ExtendedResult, Ok, Result} from './models';
+import {attemptFlow} from './work/flow';
+import {attemptPipe} from './work/pipe';
 
 // #region Functions
-
-function _isResult(value: unknown, okValue: boolean): value is Result<unknown, unknown> {
-	if (!isPlainObject(value)) {
-		return false;
-	}
-
-	return value.ok === okValue && (okValue ? 'value' : 'error') in value;
-}
 
 /**
  * Executes a promise, catching any errors, and returns a result
@@ -130,6 +88,8 @@ export function attempt<Value, E>(
 }
 
 attempt.async = asyncAttempt;
+attempt.flow = attemptFlow;
+attempt.pipe = attemptPipe;
 attempt.promise = attemptPromise;
 
 /**
@@ -165,72 +125,6 @@ function getError<E>(value: E, original?: Error): Err<E> | ExtendedErr<E> {
 }
 
 /**
- * Is the result an extended error?
- * @param result Result to check
- * @returns `true` if the result is an extended error, `false` otherwise
- */
-export function isError<Value, E = Error>(
-	value: ExtendedErr<E> | Result<Value, E>,
-	extended: true,
-): value is ExtendedErr<E>;
-
-/**
- * Is the result an error?
- * @param result Result to check
- * @returns `true` if the result is an error, `false` otherwise
- */
-export function isError<Value, E = Error>(value: Result<Value, E>): value is Err<E>;
-
-/**
- * Is the value an error?
- * @param value Value to check
- * @returns `true` if the value is an error, `false` otherwise
- */
-export function isError(value: unknown): value is Err<unknown> | ExtendedErr<unknown>;
-
-export function isError(
-	value: unknown,
-	extended?: boolean,
-): value is Err<unknown> | ExtendedErr<unknown> {
-	return (
-		_isResult(value, false) &&
-		(extended === true ? (value as ExtendedErr<unknown>).original instanceof Error : true)
-	);
-}
-
-/**
- * Is the result ok?
- * @param value Result to check
- * @returns `true` if the result is ok, `false` otherwise
- */
-export function isOk<Value, E = Error>(value: Result<Value, E>): value is Ok<Value>;
-
-/**
- * Is the value ok?
- * @param value Value to check
- * @returns `true` if the value is ok, `false` otherwise
- */
-export function isOk(value: unknown): value is Ok<unknown>;
-
-/**
- * Is the result ok?
- * @param result Result to check
- * @returns `true` if the result is ok, `false` otherwise
- */
-export function isOk(value: unknown): value is Ok<unknown> {
-	return _isResult(value, true);
-}
-
-/**
- * Is the value a result?
- * @param value Value to check
- * @returns `true` if the value is a result, `false` otherwise
- */
-export function isResult(value: unknown): value is ExtendedErr<unknown> | Result<unknown, unknown> {
-	return _isResult(value, true) || _isResult(value, false);
-}
-
-/**
  * Creates an ok result
  * @param value Value
  * @returns Ok result
@@ -261,5 +155,12 @@ export function unwrap(value: unknown, defaultValue: unknown): unknown;
 export function unwrap(value: unknown, defaultValue: unknown): unknown {
 	return isOk(value) ? value.value : defaultValue;
 }
+
+// #endregion
+
+// #region Exports
+
+export {isError, isOk, isResult} from '../internal/result';
+export type {Err, ExtendedErr, ExtendedResult, Ok, Result} from './models';
 
 // #endregion

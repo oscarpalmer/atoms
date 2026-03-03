@@ -110,8 +110,8 @@
 			"default": "./dist/random.js"
 		},
 		"./result": {
-			"types": "./types/result.d.ts",
-			"default": "./dist/result.js"
+			"types": "./types/result/index.d.ts",
+			"default": "./dist/result/index.js"
 		},
 		"./sized/map": {
 			"types": "./types/sized/map.d.ts",
@@ -192,5 +192,5 @@
 	},
 	"type": "module",
 	"types": "./types/index.d.ts",
-	"version": "0.147.0"
+	"version": "0.148.0"
 }
