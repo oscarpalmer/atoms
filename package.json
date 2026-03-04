@@ -54,6 +54,10 @@
 			"types": "./types/function/index.d.ts",
 			"default": "./dist/function/index.js"
 		},
+		"./function/assert": {
+			"types": "./types/function/assert.d.ts",
+			"default": "./dist/function/assert.js"
+		},
 		"./function/retry": {
 			"types": "./types/function/retry.d.ts",
 			"default": "./dist/function/retry.js"
@@ -180,5 +184,5 @@
 	},
 	"type": "module",
 	"types": "./types/index.d.ts",
-	"version": "0.153.0"
+	"version": "0.154.0"
 }

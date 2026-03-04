@@ -154,10 +154,6 @@ export function median(array: unknown[], key?: unknown): number {
 		return Number.NaN;
 	}
 
-	if (length === 1) {
-		return isNumber(array[0]) ? array[0] : Number.NaN;
-	}
-
 	let values: unknown[] = array;
 
 	const callback = getAggregateCallback(key);
@@ -169,6 +165,10 @@ export function median(array: unknown[], key?: unknown): number {
 	const numbers = values.filter(isNumber).sort((first, second) => first - second);
 
 	length = numbers.length;
+
+	if (length === 1) {
+		return numbers[0];
+	}
 
 	if (length % 2 === 0) {
 		const first = length / 2 - 1;
