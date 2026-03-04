@@ -51,8 +51,8 @@
 			"default": "./dist/color/index.js"
 		},
 		"./function": {
-			"types": "./types/function/memoize.d.ts",
-			"default": "./dist/function/memoize.js"
+			"types": "./types/function/index.d.ts",
+			"default": "./dist/function/index.js"
 		},
 		"./function/work": {
 			"types": "./types/function/work.d.ts",
@@ -176,5 +176,5 @@
 	},
 	"type": "module",
 	"types": "./types/index.d.ts",
-	"version": "0.152.0"
+	"version": "0.152.1"
 }
