@@ -54,6 +54,10 @@
 			"types": "./types/function/index.d.ts",
 			"default": "./dist/function/index.js"
 		},
+		"./function/retry": {
+			"types": "./types/function/retry.d.ts",
+			"default": "./dist/function/retry.js"
+		},
 		"./function/work": {
 			"types": "./types/function/work.d.ts",
 			"default": "./dist/function/work.js"
@@ -176,5 +180,5 @@
 	},
 	"type": "module",
 	"types": "./types/index.d.ts",
-	"version": "0.152.1"
+	"version": "0.153.0"
 }

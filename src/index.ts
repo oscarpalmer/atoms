@@ -5,6 +5,7 @@ export * from './array/to-record';
 export * from './array/unique';
 
 export * from './function/index';
+export * from './function/retry';
 export * from './function/work';
 
 export * from './internal/function/misc';
