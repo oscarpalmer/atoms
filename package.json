@@ -50,25 +50,9 @@
 			"types": "./types/color/index.d.ts",
 			"default": "./dist/color/index.js"
 		},
-		"./frame-rate": {
-			"types": "./types/internal/frame-rate.d.ts",
-			"default": "./dist/internal/frame-rate.js"
-		},
-		"./function/debounce": {
-			"types": "./types/function/debounce.d.ts",
-			"default": "./dist/function/debounce.js"
-		},
-		"./function/memoize": {
+		"./function": {
 			"types": "./types/function/memoize.d.ts",
 			"default": "./dist/function/memoize.js"
-		},
-		"./function/misc": {
-			"types": "./types/function/misc.d.ts",
-			"default": "./dist/function/misc.js"
-		},
-		"./function/throttle": {
-			"types": "./types/function/throttle.d.ts",
-			"default": "./dist/function/throttle.js"
 		},
 		"./function/work": {
 			"types": "./types/function/work.d.ts",
@@ -192,5 +176,5 @@
 	},
 	"type": "module",
 	"types": "./types/index.d.ts",
-	"version": "0.151.0"
+	"version": "0.152.0"
 }

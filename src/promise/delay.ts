@@ -1,3 +1,4 @@
+import {getTimer, TIMER_WAIT} from '../internal/function/timer';
 import {getPromiseOptions} from './helpers';
 import {settlePromise} from './misc';
 import {PROMISE_ABORT_OPTIONS, type PromiseOptions} from './models';
@@ -26,27 +27,23 @@ export function delay(options?: unknown): Promise<void> {
 	}
 
 	function abort(): void {
-		cancelAnimationFrame(frame);
+		timer.cancel();
 
 		rejector(signal!.reason);
 	}
 
-	function run(now: DOMHighResTimeStamp): void {
-		start ??= now;
-
-		if (now - start >= time - 5) {
+	const timer = getTimer(
+		TIMER_WAIT,
+		() => {
 			settlePromise(abort, resolver, undefined, signal);
-		} else {
-			frame = requestAnimationFrame(run);
-		}
-	}
+		},
+		time,
+	);
 
 	signal?.addEventListener('abort', abort, PROMISE_ABORT_OPTIONS);
 
-	let frame: DOMHighResTimeStamp;
 	let rejector: (reason: unknown) => void;
 	let resolver: () => void;
-	let start: DOMHighResTimeStamp;
 
 	return new Promise((resolve, reject) => {
 		rejector = reject;
@@ -55,7 +52,7 @@ export function delay(options?: unknown): Promise<void> {
 		if (time === 0) {
 			settlePromise(abort, resolve, undefined, signal);
 		} else {
-			frame = requestAnimationFrame(run);
+			timer();
 		}
 	});
 }

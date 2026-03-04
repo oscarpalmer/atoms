@@ -1,3 +1,4 @@
+import {getTimer, TIMER_WAIT} from '../internal/function/timer';
 import type {RequiredKeys} from '../models';
 import {getPromiseOptions} from './helpers';
 import {settlePromise} from './misc';
@@ -17,36 +18,32 @@ export async function getTimedPromise<Value>(
 	signal?: AbortSignal,
 ): Promise<Value> {
 	function abort(): void {
-		cancelAnimationFrame(frame);
+		timer.cancel();
 
 		rejector(signal!.reason);
 	}
 
-	function run(now: DOMHighResTimeStamp): void {
-		start ??= now;
-
-		if (time === 0 || now - start >= time - 5) {
-			settlePromise(abort, rejector, new PromiseTimeoutError(), signal);
-		} else {
-			frame = requestAnimationFrame(run);
-		}
-	}
-
 	signal?.addEventListener(PROMISE_EVENT_NAME, abort, PROMISE_ABORT_OPTIONS);
 
-	let frame: DOMHighResTimeStamp;
+	const timer = getTimer(
+		TIMER_WAIT,
+		() => {
+			settlePromise(abort, rejector, new PromiseTimeoutError(), signal);
+		},
+		time,
+	);
+
 	let rejector: (reason: unknown) => void;
-	let start: DOMHighResTimeStamp;
 
 	return Promise.race<Value>([
 		promise,
 		new Promise((_, reject) => {
 			rejector = reject;
 
-			frame = requestAnimationFrame(run);
+			timer();
 		}),
 	]).then(value => {
-		cancelAnimationFrame(frame);
+		timer.cancel();
 
 		signal?.removeEventListener(PROMISE_EVENT_NAME, abort);
 

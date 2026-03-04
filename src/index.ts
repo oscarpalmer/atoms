@@ -4,9 +4,7 @@ export * from './array/to-map';
 export * from './array/to-record';
 export * from './array/unique';
 
-export * from './function/debounce';
-export * from './function/memoize';
-export * from './function/throttle';
+export * from './function/index';
 export * from './function/work';
 
 export * from './internal/function/misc';
