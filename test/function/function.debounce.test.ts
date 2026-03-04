@@ -1,6 +1,5 @@
 import {expect, test} from 'vitest';
 import {debounce} from '../../src';
-import FRAME_RATE_MS from '../../src/internal/frame-rate';
 
 test('', () =>
 	new Promise<void>(done => {
@@ -41,8 +40,8 @@ test('', () =>
 			expect(defaulted.invalid).toBeGreaterThan(0);
 			expect(defaulted.zero).toBeGreaterThan(0);
 
-			expect(defaulted.invalid).toBeLessThanOrEqual(FRAME_RATE_MS + 2);
-			expect(defaulted.zero).toBeLessThanOrEqual(FRAME_RATE_MS + 2);
+			expect(defaulted.invalid).toBeLessThanOrEqual(20);
+			expect(defaulted.zero).toBeLessThanOrEqual(20)
 
 			expect(value).toBe(1);
 
@@ -51,8 +50,9 @@ test('', () =>
 			debounced.cancel();
 
 			setTimeout(() => {
-				expect(diff).toBeGreaterThanOrEqual(Math.floor(8 * FRAME_RATE_MS));
-				expect(diff).toBeLessThanOrEqual(Math.ceil(12 * FRAME_RATE_MS));
+				expect(diff).toBeGreaterThanOrEqual(Math.floor(8 * 16));
+				expect(diff).toBeLessThanOrEqual(Math.ceil(12 * 16));
+
 				expect(value).toBe(1);
 
 				done();

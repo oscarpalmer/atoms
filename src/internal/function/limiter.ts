@@ -1,6 +1,5 @@
 import type {CancelableCallback} from '../../models';
 import type {GenericCallback} from '../../models';
-import FRAME_RATE_MS from '../frame-rate';
 
 // #region Functions
 
@@ -9,10 +8,10 @@ export function getLimiter<Callback extends GenericCallback>(
 	throttler: boolean,
 	time?: number,
 ): CancelableCallback<Callback> {
-	const interval = typeof time === 'number' && time >= FRAME_RATE_MS ? time : FRAME_RATE_MS;
+	const interval = typeof time === 'number' && time > 0 ? time : 0;;
 
 	function step(now: DOMHighResTimeStamp, parameters: Parameters<Callback>): void {
-		if (interval === FRAME_RATE_MS || now - timestamp >= interval) {
+		if (interval === 0 || now - timestamp >= interval) {
 			if (throttler) {
 				timestamp = now;
 			}
@@ -32,7 +31,7 @@ export function getLimiter<Callback extends GenericCallback>(
 		limiter.cancel();
 
 		frame = requestAnimationFrame(now => {
-			timestamp ??= now - FRAME_RATE_MS;
+			timestamp ??= now;
 
 			step(now, parameters);
 		});

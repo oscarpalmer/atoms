@@ -1,5 +1,3 @@
-import FRAME_RATE_MS from './internal/frame-rate';
-
 export * from './array/group-by';
 export * from './array/misc';
 export * from './array/to-map';
@@ -45,5 +43,3 @@ export * from './random';
 export * from './result/index';
 export * from './sized/map';
 export * from './sized/set';
-
-export {FRAME_RATE_MS};
