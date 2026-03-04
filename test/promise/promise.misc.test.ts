@@ -1,5 +1,5 @@
 import {expect, test} from 'vitest';
-import {isFulfilled, isRejected, promises} from '../../src';
+import {Err, isFulfilled, isRejected, Ok, promises, toResult} from '../../src';
 
 test('is', () =>
 	new Promise<void>(done => {
@@ -38,3 +38,18 @@ test('is', () =>
 			done();
 		}, 500);
 	}));
+
+test('toResult', async () => {
+	const fulfilled = await toResult(() => Promise.resolve('Success!'));
+	const rejected = await toResult(() => Promise.reject(new Error('Failure!')));
+
+	expect(fulfilled.ok).toBe(true);
+	expect((fulfilled as Ok<string>).value).toBe('Success!');
+
+	expect(rejected.ok).toBe(false);
+	expect((rejected as Err<Error>).error).toBeInstanceOf(Error);
+	expect((rejected as Err<Error>).error.message).toBe('Failure!');
+
+	await expect(toResult('blah' as never)).rejects.toThrow('toResult expected a Promise');
+	await expect(toResult(() => 'blah' as never)).rejects.toThrow('toResult expected a Promise');
+});

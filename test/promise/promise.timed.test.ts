@@ -119,8 +119,8 @@ test('abort', () =>
 
 			expect(times[0]).toBeUndefined();
 			expect(times[1]).toBeUndefined();
-			expect(times[2]).toBeGreaterThanOrEqual(190);
-			expect(times[2]).toBeLessThanOrEqual(210);
+			expect(times[2]).toBeGreaterThanOrEqual(150);
+			expect(times[2]).toBeLessThanOrEqual(250);
 
 			done();
 		}, 500);

@@ -38,7 +38,7 @@ export * from './logger';
 export * from './math';
 export * from './models';
 export * from './number';
-export * from './promise';
+export * from './promise/index';
 export * from './query';
 export * from './queue';
 export * from './random';

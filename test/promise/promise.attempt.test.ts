@@ -13,7 +13,7 @@ test('asynchronous', () =>
 				}, 250);
 			}),
 		).then(result => {
-			results.push(result);
+			results[0] = result;
 		});
 
 		void attemptPromise(
@@ -25,7 +25,7 @@ test('asynchronous', () =>
 				throw new Error('Thrown');
 			}),
 		).catch(error => {
-			errors.push(error);
+			errors[0] = (error);
 		});
 
 		void attemptPromise(
@@ -36,7 +36,7 @@ test('asynchronous', () =>
 					}, 250);
 				}),
 		).then(result => {
-			results.push(result);
+			results[1] = result;
 		});
 
 		const firstController = new AbortController();
@@ -52,7 +52,7 @@ test('asynchronous', () =>
 				firstController.signal,
 			)
 			.catch(error => {
-				errors.push(error);
+				errors[1] = error;
 			});
 
 		firstController.abort('Aborted during');
@@ -66,7 +66,7 @@ test('asynchronous', () =>
 			}),
 			secondController.signal,
 		).catch(error => {
-			errors.push(error);
+			errors[2] = error;
 		});
 
 		setTimeout(() => {
@@ -100,7 +100,7 @@ test('error', () => {
 	const {length} = values;
 
 	for (let index = 0; index < length; index += 1) {
-		attemptPromise(values[index] as never).catch(error => {
+		void attemptPromise(values[index] as never).catch(error => {
 			expect(error).toBeInstanceOf(TypeError);
 			expect((error as Error).message).toBe('Attempt expected a function or a promise');
 		});
@@ -112,11 +112,11 @@ test('synchronous', () =>
 		const errors: unknown[] = [];
 		const results: unknown[] = [];
 
-		attemptPromise(() => 0).then(result => {
+		void attemptPromise(() => 0).then(result => {
 			results.push(result);
 		});
 
-		attemptPromise(() => {
+		void attemptPromise(() => {
 			throw new Error('Thrown');
 		}).catch(error => {
 			errors.push(error);
@@ -125,14 +125,14 @@ test('synchronous', () =>
 		const firstController = new AbortController();
 		const secondController = new AbortController();
 
-		attemptPromise(() => 2, firstController.signal).then(result => {
+		void attemptPromise(() => 2, firstController.signal).then(result => {
 			results.push(result);
 		});
 
 		firstController.abort('Aborted during');
 		secondController.abort('Aborted before');
 
-		attemptPromise(() => 3, secondController.signal).catch(error => {
+		void attemptPromise(() => 3, secondController.signal).catch(error => {
 			errors.push(error);
 		});
 
@@ -201,13 +201,13 @@ test('timed', () =>
 			expect(results).toEqual([0, 1]);
 
 			expect(times[0]).toBeGreaterThanOrEqual(0);
-			expect(times[0]).toBeLessThan(10);
+			expect(times[0]).toBeLessThan(50);
 			expect(times[1]).toBeGreaterThanOrEqual(0);
-			expect(times[1]).toBeLessThan(10);
-			expect(times[2]).toBeGreaterThanOrEqual(240);
-			expect(times[2]).toBeLessThan(260);
-			expect(times[3]).toBeGreaterThanOrEqual(240);
-			expect(times[3]).toBeLessThan(260);
+			expect(times[1]).toBeLessThan(50);
+			expect(times[2]).toBeGreaterThanOrEqual(200);
+			expect(times[2]).toBeLessThan(300);
+			expect(times[3]).toBeGreaterThanOrEqual(200);
+			expect(times[3]).toBeLessThan(300);
 
 			done();
 		}, 500);

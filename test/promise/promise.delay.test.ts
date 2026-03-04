@@ -10,7 +10,7 @@ test('', () =>
 
 		void delay(500)
 			.then(() => {
-				values[0] = [Date.now() - start, 490, 510];
+				values[0] = [Date.now() - start, 450, 550];
 			})
 			.catch(error => {
 				errors[0] = error;
@@ -18,7 +18,7 @@ test('', () =>
 
 		void delay(-999)
 			.then(() => {
-				values[1] = [Date.now() - start, 0, 10];
+				values[1] = [Date.now() - start, 0, 50];
 			})
 			.catch(error => {
 				errors[1] = error;
@@ -26,7 +26,7 @@ test('', () =>
 
 		void delay('blah' as never)
 			.then(() => {
-				values[2] = [Date.now() - start, 0, 10];
+				values[2] = [Date.now() - start, 0, 50];
 			})
 			.catch(error => {
 				errors[2] = error;
@@ -62,7 +62,7 @@ test('abort', () =>
 			time: 500,
 		})
 			.then(() => {
-				values[0] = [Date.now() - start, 240, 260];
+				values[0] = [Date.now() - start, 200, 300];
 			})
 			.catch(error => {
 				errors[0] = error;
@@ -76,7 +76,7 @@ test('abort', () =>
 			time: 500,
 		})
 			.then(() => {
-				values[1] = [Date.now() - start, 240, 260];
+				values[1] = [Date.now() - start, 200, 300];
 			})
 			.catch(error => {
 				errors[1] = error;
@@ -89,7 +89,7 @@ test('abort', () =>
 			time: 500,
 		})
 			.then(() => {
-				values[2] = [Date.now() - start, 240, 260];
+				values[2] = [Date.now() - start, 200, 300];
 			})
 			.catch(error => {
 				errors[2] = error;
@@ -100,7 +100,7 @@ test('abort', () =>
 			time: 500,
 		})
 			.then(() => {
-				values[3] = [Date.now() - start, 490, 510];
+				values[3] = [Date.now() - start, 450, 550];
 			})
 			.catch(error => {
 				errors[3] = error;

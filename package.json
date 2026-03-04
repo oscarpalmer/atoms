@@ -94,8 +94,8 @@
 			"default": "./dist/number.js"
 		},
 		"./promise": {
-			"types": "./types/promise.d.ts",
-			"default": "./dist/promise.js"
+			"types": "./types/promise/index.d.ts",
+			"default": "./dist/promise/index.js"
 		},
 		"./query": {
 			"types": "./types/query.d.ts",
@@ -192,5 +192,5 @@
 	},
 	"type": "module",
 	"types": "./types/index.d.ts",
-	"version": "0.149.0"
+	"version": "0.150.0"
 }

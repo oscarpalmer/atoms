@@ -1,5 +1,5 @@
 import {expect, test} from 'vitest';
-import {attempt, error, isError, isOk, isResult, ok, unwrap} from '../../src';
+import {attempt, error, isError, isOk, isResult, ok, toPromise, unwrap} from '../../src';
 
 test('error', () => {
 	const basic = error('basic');
@@ -63,6 +63,25 @@ test('ok', () => {
 
 	expect(item.ok).toBe(true);
 	expect(item.value).toBe('success');
+});
+
+test('toPromise', async () => {
+	const success = ok('Hello, world!');
+	const failure = error('Something went wrong!');
+
+	await expect(toPromise(success)).resolves.toBe('Hello, world!');
+	await expect(toPromise(failure)).rejects.toBe('Something went wrong!');
+
+	await expect(toPromise(() => success)).resolves.toBe('Hello, world!');
+	await expect(toPromise(() => failure)).rejects.toBe('Something went wrong!');
+
+	await expect(toPromise('blah' as never)).rejects.toThrow(
+		'toPromise expected to receive a Result',
+	);
+
+	await expect(toPromise(() => 'blah' as never)).rejects.toThrow(
+		'toPromise expected to receive a Result',
+	);
 });
 
 test('unwrap', () => {
