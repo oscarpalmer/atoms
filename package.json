@@ -26,9 +26,9 @@
 			"types": "./types/array/group-by.d.ts",
 			"default": "./dist/array/group-by.js"
 		},
-		"./array/misc": {
-			"types": "./types/array/misc.d.ts",
-			"default": "./dist/array/misc.js"
+		"./array": {
+			"types": "./types/array/index.d.ts",
+			"default": "./dist/array/index.js"
 		},
 		"./array/to-map": {
 			"types": "./types/array/to-map.d.ts",
@@ -113,6 +113,10 @@
 			"types": "./types/sized/set.d.ts",
 			"default": "./dist/sized/set.js"
 		},
+		"./string": {
+			"types": "./types/string/index.d.ts",
+			"default": "./dist/string/index.js"
+		},
 		"./string/case": {
 			"types": "./types/string/case.d.ts",
 			"default": "./dist/string/case.js"
@@ -121,13 +125,13 @@
 			"types": "./types/string/match.d.ts",
 			"default": "./dist/string/match.js"
 		},
-		"./string/misc": {
-			"types": "./types/string/misc.d.ts",
-			"default": "./dist/string/misc.js"
-		},
 		"./string/template": {
 			"types": "./types/string/template.d.ts",
 			"default": "./dist/string/template.js"
+		},
+		"./value": {
+			"types": "./types/value/index.d.ts",
+			"default": "./dist/value/index.js"
 		},
 		"./value/clone": {
 			"types": "./types/value/clone.d.ts",
@@ -152,10 +156,6 @@
 		"./value/merge": {
 			"types": "./types/value/merge.d.ts",
 			"default": "./dist/value/merge.js"
-		},
-		"./value/misc": {
-			"types": "./types/value/misc.d.ts",
-			"default": "./dist/value/misc.js"
 		}
 	},
 	"files": [
@@ -184,5 +184,5 @@
 	},
 	"type": "module",
 	"types": "./types/index.d.ts",
-	"version": "0.155.0"
+	"version": "0.156.0"
 }

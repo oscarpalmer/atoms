@@ -12,9 +12,15 @@ const complex: TestArrayItem[] = [
 	{id: 5, age: 35, name: 'David'},
 ];
 
+const sets = {
+	complex: complex.filter((_, index) => index % 2 === 0),
+	simple: [1, 3],
+};
+
 const simple = [1, 2, 3, 4];
 
 export const arrayFixture = {
 	complex,
+	sets,
 	simple,
 };

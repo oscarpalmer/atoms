@@ -1,5 +1,5 @@
 export * from './array/group-by';
-export * from './array/misc';
+export * from './array/index';
 export * from './array/to-map';
 export * from './array/to-record';
 export * from './array/unique';
@@ -17,17 +17,14 @@ export * from './internal/value/has';
 export * from './internal/value/set';
 
 export * from './string/case';
+export * from './string/index';
 export * from './string/match';
-export * from './string/misc';
 export * from './string/template';
 
 export * from './value/clone';
 export * from './value/diff';
+export * from './value/index';
 export * from './value/merge';
-export * from './value/omit';
-export * from './value/pick';
-export * from './value/smush';
-export * from './value/unsmush';
 
 export * from './beacon';
 export * from './color';

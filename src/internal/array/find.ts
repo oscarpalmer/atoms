@@ -83,7 +83,7 @@ export function findValues(
 	const {bool, key, value} = getParameters(parameters);
 	const callbacks = getArrayCallbacks(bool, key);
 
-	if (type === 'unique' && callbacks?.keyed == null && length >= UNIQUE_THRESHOLD) {
+	if (type === FIND_VALUES_UNIQUE && callbacks?.keyed == null && length >= UNIQUE_THRESHOLD) {
 		result.matched = [...new Set(array)];
 
 		return result;
@@ -91,7 +91,7 @@ export function findValues(
 
 	const mapCallback = typeof mapper === 'function' ? mapper : undefined;
 
-	if (callbacks?.bool != null || (type === 'all' && key == null)) {
+	if (callbacks?.bool != null || (type === FIND_VALUES_ALL && key == null)) {
 		const callback = callbacks?.bool ?? (item => Object.is(item, value));
 
 		for (let index = 0; index < length; index += 1) {
@@ -113,7 +113,10 @@ export function findValues(
 		const item = array[index];
 		const keyed = callbacks?.keyed?.(item, index, array) ?? item;
 
-		if ((type === 'all' && Object.is(keyed, value)) || (type === 'unique' && !keys.has(keyed))) {
+		if (
+			(type === FIND_VALUES_ALL && Object.is(keyed, value)) ||
+			(type === FIND_VALUES_UNIQUE && !keys.has(keyed))
+		) {
 			keys.add(keyed);
 			result.matched.push(mapCallback?.(item, index, array) ?? item);
 		} else {
@@ -137,6 +140,14 @@ function getParameters(original: unknown[]): Parameters {
 // #endregion
 
 // #region Variables
+
+export const FIND_VALUE_INDEX: FindValueType = 'index';
+
+export const FIND_VALUE_VALUE: FindValueType = 'value';
+
+export const FIND_VALUES_ALL: FindValuesType = 'all';
+
+export const FIND_VALUES_UNIQUE: FindValuesType = 'unique';
 
 const UNIQUE_THRESHOLD = 100;
 

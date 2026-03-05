@@ -1,4 +1,4 @@
-import {findValues} from '../internal/array/find';
+import {FIND_VALUES_ALL, findValues} from '../internal/array/find';
 import type {PlainObject} from '../models';
 
 // #region Functions
@@ -48,7 +48,7 @@ export function partition<Item>(
 export function partition<Item>(array: Item[], item: Item): Item[][];
 
 export function partition(array: unknown[], ...parameters: unknown[]): unknown[][] {
-	const {matched, notMatched} = findValues('all', array, parameters);
+	const {matched, notMatched} = findValues(FIND_VALUES_ALL, array, parameters);
 
 	return [matched, notMatched];
 }

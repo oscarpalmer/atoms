@@ -89,8 +89,24 @@ function handleMerge(values: ArrayOrPlainObject[], options: Options): ArrayOrPla
 export function merge<Model extends ArrayOrPlainObject>(
 	values: NestedPartial<Model>[],
 	options?: MergeOptions,
-): Model {
-	return handleMerge(values, getMergeOptions(options)) as Model;
+): Model;
+
+/**
+ * Merge multiple arrays or objects into a single one
+ * @param values Values to merge
+ * @param options Merging options
+ * @returns Merged value
+ */
+export function merge(
+	values: NestedPartial<ArrayOrPlainObject>[],
+	options?: MergeOptions,
+): ArrayOrPlainObject;
+
+export function merge(
+	values: NestedPartial<ArrayOrPlainObject>[],
+	options?: MergeOptions,
+): ArrayOrPlainObject {
+	return handleMerge(values, getMergeOptions(options));
 }
 
 merge.initialize = initializeMerger;

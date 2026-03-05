@@ -53,11 +53,11 @@ test('merge', () => {
 		merge(
 			[
 				{hello: {w: 'w'}},
-				{hello: {o: 'o'}} as never,
-				{hello: {r: 'r'}} as never,
-				{hello: {l: 'l'}} as never,
-				{hello: {d: 'd'}} as never,
-				{hello: null} as never,
+				{hello: {o: 'o'}},
+				{hello: {r: 'r'}},
+				{hello: {l: 'l'}},
+				{hello: {d: 'd'}},
+				{hello: null},
 			],
 			{
 				skipNullableAny: false, // default
@@ -71,11 +71,11 @@ test('merge', () => {
 		merge(
 			[
 				{hello: {w: 'w'}},
-				{hello: {o: 'o'}} as never,
-				{hello: {r: 'r'}} as never,
-				{hello: {l: 'l'}} as never,
-				{hello: {d: 'd'}} as never,
-				{hello: null} as never,
+				{hello: {o: 'o'}},
+				{hello: {r: 'r'}},
+				{hello: {l: 'l'}},
+				{hello: {d: 'd'}},
+				{hello: null},
 			],
 			{
 				skipNullableAny: true,
@@ -92,7 +92,7 @@ test('merge', () => {
 	});
 
 	expect(
-		merge([[1, 2, 3, 4, 5], [null, null, 99] as never], {
+		merge([[1, 2, 3, 4, 5], [null, null, 99]], {
 			skipNullableInArrays: true,
 		}),
 	).toEqual([1, 2, 99, 4, 5]);

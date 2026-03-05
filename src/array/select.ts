@@ -1,4 +1,4 @@
-import {findValues} from '../internal/array/find';
+import {FIND_VALUES_ALL, findValues} from '../internal/array/find';
 import type {PlainObject} from '../models';
 
 /**
@@ -88,5 +88,5 @@ export function select<
 export function select(array: unknown[], ...parameters: unknown[]): unknown[] {
 	const mapper = parameters.pop();
 
-	return findValues('all', array, parameters, mapper).matched;
+	return findValues(FIND_VALUES_ALL, array, parameters, mapper).matched;
 }

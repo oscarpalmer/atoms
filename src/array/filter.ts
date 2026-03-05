@@ -1,4 +1,4 @@
-import {findValues} from '../internal/array/find';
+import {FIND_VALUES_ALL, findValues} from '../internal/array/find';
 import type {PlainObject} from '../models';
 
 // #region Functions
@@ -48,7 +48,7 @@ export function filter<Item>(
 export function filter<Item>(array: Item[], item: Item): Item[];
 
 export function filter(array: unknown[], ...parameters: unknown[]): unknown[] {
-	return findValues('all', array, parameters).matched;
+	return findValues(FIND_VALUES_ALL, array, parameters).matched;
 }
 
 filter.remove = removeFiltered;
@@ -72,7 +72,7 @@ function removeFiltered<Item>(
 function removeFiltered<Item>(array: Item[], item: Item): unknown[];
 
 function removeFiltered(array: unknown[], ...parameters: unknown[]): unknown[] {
-	return findValues('all', array, parameters).notMatched;
+	return findValues(FIND_VALUES_ALL, array, parameters).notMatched;
 }
 
 // #endregion

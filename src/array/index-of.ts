@@ -1,4 +1,4 @@
-import {findValue} from '../internal/array/find';
+import {FIND_VALUE_INDEX, findValue} from '../internal/array/find';
 import type {PlainObject} from '../models';
 
 // #region Functions
@@ -48,7 +48,7 @@ export function indexOf<Item>(
 export function indexOf<Item>(array: Item[], item: Item): number;
 
 export function indexOf(array: unknown[], ...parameters: unknown[]): number {
-	return findValue('index', array, parameters) as number;
+	return findValue(FIND_VALUE_INDEX, array, parameters) as number;
 }
 
 // #endregion

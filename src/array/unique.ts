@@ -1,4 +1,4 @@
-import {findValues} from '../internal/array/find';
+import {FIND_VALUES_UNIQUE, findValues} from '../internal/array/find';
 import type {PlainObject} from '../models';
 
 // #region Functions
@@ -37,7 +37,7 @@ export function unique(array: unknown[], key?: unknown): unknown[] {
 		return [];
 	}
 
-	return array.length > 1 ? findValues('unique', array, [key, undefined]).matched : array;
+	return array.length > 1 ? findValues(FIND_VALUES_UNIQUE, array, [key, undefined]).matched : array;
 }
 
 // #endregion
