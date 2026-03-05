@@ -21,6 +21,19 @@ export function isConstructor(value: unknown): value is Constructor {
 }
 
 /**
+ * Is the value an instance of the constructor?
+ * @param constructor Class constructor
+ * @param value Value to check
+ * @returns `true` if the value is an instance of the constructor, otherwise `false`
+ */
+export function isInstanceOf<Instance>(
+	constructor: Constructor<Instance>,
+	value: unknown,
+): value is Instance {
+	return isConstructor(constructor) && value instanceof constructor;
+}
+
+/**
  * Is the value a key?
  * @param value Value to check
  * @returns `true` if the value is a `Key` _(`number` or `string`)_, otherwise `false`

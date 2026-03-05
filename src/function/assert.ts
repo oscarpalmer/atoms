@@ -47,7 +47,7 @@ function assertCondition<Value>(
 }
 
 /**
- * Asserts that a value is defined _(not `null` or `undefined`)_, throwing an error if it is not
+ * Asserts that a value is defined throwing an error if it is not
  * @param value Value to assert
  * @param message Error message
  */
@@ -55,7 +55,7 @@ function assertDefined<Value>(
 	value: unknown,
 	message?: string,
 ): asserts value is Exclude<Value, null | undefined> {
-	assert(() => value != null, message ?? MESSAGE_DEFINED);
+	assert(() => value != null, message ?? MESSAGE_VALUE_DEFINED);
 }
 
 /**
@@ -96,6 +96,6 @@ function assertIs<Value>(
 
 // #region Variables
 
-const MESSAGE_DEFINED = 'Expected value to be defined';
+const MESSAGE_VALUE_DEFINED = 'Expected value to be defined';
 
 // #endregion

@@ -145,9 +145,9 @@
 			"types": "./types/internal/value/equal.d.ts",
 			"default": "./dist/internal/value/equal.js"
 		},
-		"./value/get-set": {
-			"types": "./types/value/get-set.d.ts",
-			"default": "./dist/value/get-set.js"
+		"./value/handle": {
+			"types": "./types/value/handle.d.ts",
+			"default": "./dist/value/handle.js"
 		},
 		"./value/merge": {
 			"types": "./types/value/merge.d.ts",
@@ -184,5 +184,5 @@
 	},
 	"type": "module",
 	"types": "./types/index.d.ts",
-	"version": "0.154.0"
+	"version": "0.155.0"
 }

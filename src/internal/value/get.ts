@@ -1,5 +1,5 @@
 import type {NestedKeys, NestedValue, PlainObject, ToString} from '../../models';
-import {getPaths, handleValue} from './misc';
+import {getNestedValue} from './misc';
 
 // #region Functions
 
@@ -28,32 +28,7 @@ export function getValue<Data extends PlainObject>(
 ): unknown;
 
 export function getValue(data: PlainObject, path: string, ignoreCase?: boolean): unknown {
-	if (
-		typeof data !== 'object' ||
-		data === null ||
-		typeof path !== 'string' ||
-		path.trim().length === 0
-	) {
-		return;
-	}
-
-	const shouldIgnoreCase = ignoreCase === true;
-	const paths = getPaths(path, shouldIgnoreCase);
-
-	if (typeof paths === 'string') {
-		return handleValue(data, paths, null, true, shouldIgnoreCase);
-	}
-
-	const {length} = paths;
-
-	let index = 0;
-	let value: PlainObject = data;
-
-	while (index < length && value != null) {
-		value = handleValue(value, paths[index++], null, true, shouldIgnoreCase) as PlainObject;
-	}
-
-	return value as never;
+	return getNestedValue(data, path, ignoreCase === true).value;
 }
 
 // #endregion

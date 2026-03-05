@@ -13,6 +13,7 @@ export * from './internal/string';
 export * from './internal/value/compare';
 export * from './internal/value/equal';
 export * from './internal/value/get';
+export * from './internal/value/has';
 export * from './internal/value/set';
 
 export * from './string/case';

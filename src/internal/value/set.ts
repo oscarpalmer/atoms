@@ -44,12 +44,12 @@ export function setValue<Data extends PlainObject>(
 	ignoreCase?: boolean,
 ): Data;
 
-export function setValue<Data extends PlainObject>(
-	data: Data,
+export function setValue(
+	data: object,
 	path: string,
 	value: unknown,
 	ignoreCase?: boolean,
-): Data {
+): object {
 	if (
 		typeof data !== 'object' ||
 		data === null ||
@@ -71,7 +71,7 @@ export function setValue<Data extends PlainObject>(
 	const {length} = paths;
 	const lastIndex = length - 1;
 
-	let target: PlainObject = data;
+	let target = data;
 
 	for (let index = 0; index < length; index += 1) {
 		const currentPath = paths[index];
@@ -82,7 +82,7 @@ export function setValue<Data extends PlainObject>(
 			break;
 		}
 
-		let next = handleValue(target, currentPath, null, true, shouldIgnoreCase);
+		let next = handleValue(target, currentPath, null, true, shouldIgnoreCase).value;
 
 		if (typeof next !== 'object' || next === null) {
 			const nextPath = paths[index + 1];
@@ -96,7 +96,7 @@ export function setValue<Data extends PlainObject>(
 			(target as PlainObject)[currentPath] = next;
 		}
 
-		target = next as PlainObject;
+		target = next as object;
 	}
 
 	return data;

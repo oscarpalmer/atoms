@@ -1,7 +1,7 @@
 import {getArray} from './array/get';
-import {isConstructor, isNumber} from './internal/is';
+import {isNumber} from './internal/is';
 import {getString} from './internal/string';
-import type {Constructor, Primitive} from './models';
+import type {Primitive} from './models';
 
 // #region Functions
 
@@ -29,19 +29,6 @@ export function isEmpty(value: unknown): boolean {
 	}
 
 	return true;
-}
-
-/**
- * Is the value an instance of the constructor?
- * @param constructor Class constructor
- * @param value Value to check
- * @returns `true` if the value is an instance of the constructor, otherwise `false`
- */
-export function isInstanceOf<Instance>(
-	constructor: Constructor<Instance>,
-	value: unknown,
-): value is Instance {
-	return isConstructor(constructor) && value instanceof constructor;
 }
 
 /**
@@ -125,6 +112,7 @@ const EXPRESSION_WHITESPACE = /^\s*$/;
 export {
 	isArrayOrPlainObject,
 	isConstructor,
+	isInstanceOf,
 	isKey,
 	isNumber,
 	isPlainObject,
