@@ -111,6 +111,30 @@ test('abort', () =>
 		}, 300);
 	}));
 
+test('abort: results', () =>
+	new Promise<void>(done => {
+		const controller = new AbortController();
+
+		void promises
+			.result(
+				[
+					new Promise<number>(resolve => setTimeout(() => resolve(1), 200)),
+					new Promise<number>(resolve => setTimeout(() => resolve(2), 200)),
+					new Promise<number>(resolve => setTimeout(() => resolve(3), 200)),
+				],
+				controller.signal,
+			)
+			.catch(error => {
+				expect(error).toBe('Aborted!');
+			});
+
+		setTimeout(() => {
+			controller.abort('Aborted!');
+		}, 100);
+
+		setTimeout(done, 300);
+	}));
+
 test('error', () => {
 	const values = [undefined, null, true, 1, 'string', {}, () => {}, new Map(), new Set()];
 
@@ -118,6 +142,11 @@ test('error', () => {
 
 	for (let index = 0; index < length; index += 1) {
 		promises(values[index] as never).catch(error => {
+			expect(error).toBeInstanceOf(TypeError);
+			expect(error.message).toBe('Promises expected an array of promises');
+		});
+
+		promises([values[index]] as never).catch(error => {
 			expect(error).toBeInstanceOf(TypeError);
 			expect(error.message).toBe('Promises expected an array of promises');
 		});
@@ -174,32 +203,6 @@ test('first', () =>
 		}, 500);
 	}));
 
-test('validation', () =>
-	new Promise<void>(done => {
-		const errors: unknown[] = [];
-		const values: unknown[] = [];
-
-		void promises([1, '2', true] as never)
-			.then(results => {
-				errors.push(undefined);
-				values.push(results);
-			})
-			.catch(error => {
-				errors.push(error);
-				values.push(undefined);
-			});
-
-		setTimeout(() => {
-			expect(errors.length).toBe(1);
-			expect(values.length).toBe(1);
-
-			expect(errors[0]).toBeUndefined();
-			expect(values[0]).toEqual([]);
-
-			done();
-		}, 500);
-	}));
-
 test('relaxed', () =>
 	new Promise<void>(done => {
 		const errors: unknown[] = [undefined, undefined];
@@ -248,6 +251,62 @@ test('relaxed', () =>
 				{status: 'fulfilled', value: '2'},
 				{status: 'rejected', reason: new Error('Nope!')},
 				{status: 'fulfilled', value: [1n, 2n]},
+			]);
+
+			done();
+		}, 500);
+	}));
+
+test('relaxed: results', () =>
+	new Promise<void>(done => {
+		const errors: unknown[] = [undefined, undefined];
+		const values: unknown[] = [undefined, undefined];
+
+		void promises
+			.result([
+				new Promise<number>(resolve => resolve(1)),
+				new Promise<string>(resolve => resolve('2')),
+				new Promise<boolean>((_, reject) => reject(new Error('Nope!'))),
+			])
+			.then(results => {
+				values[0] = results;
+			})
+			.catch(error => {
+				errors[0] = error;
+			});
+
+		void promises
+			.result([
+				new Promise<number>(resolve => resolve(1)),
+				new Promise<string>(resolve => resolve('2')),
+				new Promise<boolean>((_, reject) => reject(new Error('Nope!'))),
+				new Promise<bigint[]>(resolve => resolve([1n, 2n])),
+			])
+			.then(results => {
+				values[1] = results;
+			})
+			.catch(error => {
+				errors[1] = error;
+			});
+
+		setTimeout(() => {
+			expect(errors.length).toBe(2);
+			expect(values.length).toBe(2);
+
+			expect(errors[0]).toBeUndefined();
+			expect(errors[1]).toBeUndefined();
+
+			expect(values[0]).toEqual([
+				{ok: true, value: 1},
+				{ok: true, value: '2'},
+				{ok: false, error: new Error('Nope!')},
+			]);
+
+			expect(values[1]).toEqual([
+				{ok: true, value: 1},
+				{ok: true, value: '2'},
+				{ok: false, error: new Error('Nope!')},
+				{ok: true, value: [1n, 2n]},
 			]);
 
 			done();

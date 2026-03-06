@@ -184,5 +184,5 @@
 	},
 	"type": "module",
 	"types": "./types/index.d.ts",
-	"version": "0.158.0"
+	"version": "0.159.0"
 }

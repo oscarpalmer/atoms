@@ -22,10 +22,7 @@ export function cancelable<Value>(
 	return new CancelablePromise(executor);
 }
 
-export function handleResult<Items extends unknown[]>(
-	status: string,
-	parameters: PromiseParameters<Items>,
-): void {
+export function handleResult(status: string, parameters: PromiseParameters): void {
 	const {abort, complete, data, handlers, index, signal, value} = parameters;
 
 	if (signal?.aborted ?? false) {

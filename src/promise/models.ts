@@ -1,3 +1,5 @@
+import type {Result} from '../result/models';
+
 // #region Types
 
 export class CancelablePromise<Value = void> extends Promise<Value> {
@@ -28,16 +30,16 @@ export class CancelablePromise<Value = void> extends Promise<Value> {
 
 export type FulfilledPromise<Value> = {
 	status: typeof PROMISE_TYPE_FULFILLED;
-	value: Value;
+	value: Awaited<Value>;
 };
 
-export type PromiseData<Items extends unknown[]> = {
+export type PromiseData = {
 	last: number;
-	result: Items | PromisesResult<Items>;
+	result: unknown[];
 };
 
-export type PromiseHandlers<Items extends unknown[]> = {
-	resolve: (value: Items | PromisesResult<Items>) => void;
+export type PromiseHandlers = {
+	resolve: (value: unknown[]) => void;
 	reject: (reason: unknown) => void;
 };
 
@@ -52,11 +54,11 @@ export type PromiseOptions = {
 	time?: number;
 };
 
-export type PromiseParameters<Items extends unknown[]> = {
+export type PromiseParameters = {
 	abort: () => void;
 	complete: boolean;
-	data: PromiseData<Items>;
-	handlers: PromiseHandlers<Items>;
+	data: PromiseData;
+	handlers: PromiseHandlers;
 	index: number;
 	signal?: AbortSignal;
 	value?: unknown;
@@ -64,7 +66,7 @@ export type PromiseParameters<Items extends unknown[]> = {
 
 /**
  * Promise handling strategy
- * 
+ *
  * - `complete`: wait for all promises to settle, then return the results
  * 	- Returns an array of fulfilled and/or rejected results
  * - `first`: rejects on the first rejected promise
@@ -80,7 +82,7 @@ export class PromiseTimeoutError extends Error {
 	}
 }
 
-export type Promises<Items extends unknown[]> = {
+export type PromisesItems<Items extends unknown[]> = {
 	[K in keyof Items]: Promise<Items[K]>;
 };
 
@@ -90,10 +92,14 @@ export type PromisesOptions = {
 };
 
 export type PromisesResult<Items extends unknown[]> = {
-	[K in keyof Items]: Items[K] extends Promise<infer Value> ? PromisesResultItem<Value> : never;
+	[K in keyof Items]: Items[K] extends Promise<infer Value> ? Result<Awaited<Value>> : never;
 };
 
-export type PromisesResultItem<Value> = FulfilledPromise<Value> | RejectedPromise;
+export type PromisesValue<Value> = FulfilledPromise<Value> | RejectedPromise;
+
+export type PromisesValues<Items extends unknown[]> = {
+	[K in keyof Items]: Items[K] extends Promise<infer Value> ? PromisesValue<Awaited<Value>> : never;
+};
 
 export type RejectedPromise = {
 	status: typeof PROMISE_TYPE_REJECTED;

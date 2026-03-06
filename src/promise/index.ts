@@ -1,4 +1,5 @@
-import {getPromiseOptions, getPromisesOptions} from './helpers';
+import type {Result} from '../result/models';
+import {getPromiseOptions, getPromisesOptions, getResultsFromPromises} from './helpers';
 import {handleResult, settlePromise} from './misc';
 import {
 	PROMISE_ABORT_OPTIONS,
@@ -11,9 +12,11 @@ import {
 	type PromiseData,
 	type PromiseHandlers,
 	type PromiseOptions,
-	type Promises,
+	type PromisesItems,
 	type PromisesOptions,
 	type PromisesResult,
+	type PromisesValue,
+	type PromisesValues,
 } from './models';
 import {getTimedPromise} from './timed';
 
@@ -111,9 +114,22 @@ export async function attemptPromise<Value>(
  * @returns List of results
  */
 export async function promises<Items extends unknown[], Options extends PromisesOptions>(
-	items: Promises<Items>,
+	items: [...Items],
 	options?: Options,
-): Promise<Options['strategy'] extends 'first' ? Items : PromisesResult<Items>>;
+): Promise<Options['strategy'] extends 'first' ? Items : PromisesValues<PromisesItems<Items>>>;
+
+/**
+ * Handle a list of promises, returning their results in an ordered array.
+ *
+ * Depending on the strategy, the function will either reject on the first error encountered or return an array of rejected and resolved results
+ * @param items List of promises
+ * @param options Options for handling the promises
+ * @returns List of results
+ */
+export async function promises<Value, Options extends PromisesOptions>(
+	items: Promise<Value>[],
+	options?: Options,
+): Promise<Options['strategy'] extends 'first' ? Value[] : PromisesValue<Value>[]>;
 
 /**
  * Handle a list of promises, returning their results in an ordered array.
@@ -124,9 +140,19 @@ export async function promises<Items extends unknown[], Options extends Promises
  * @returns List of results
  */
 export async function promises<Items extends unknown[]>(
-	items: Promises<Items>,
+	items: [...Items],
 	strategy: 'first',
-): Promise<Items>;
+): Promise<PromisesItems<Items>>;
+
+/**
+ * Handle a list of promises, returning their results in an ordered array.
+ *
+ * If any promise in the list is rejected, the whole function will reject
+ * @param items List of promises
+ * @param strategy Strategy for handling the promises; rejects on the first error encountered
+ * @returns List of results
+ */
+export async function promises<Value>(items: Promise<Value>[], strategy: 'first'): Promise<Value[]>;
 
 /**
  * Handle a list of promises, returning their results in an ordered array of rejected and resolved results
@@ -135,14 +161,22 @@ export async function promises<Items extends unknown[]>(
  * @returns List of results
  */
 export async function promises<Items extends unknown[]>(
-	items: Promises<Items>,
+	items: [...Items],
 	signal?: AbortSignal,
-): Promise<PromisesResult<Items>>;
+): Promise<PromisesValues<PromisesItems<Items>>>;
 
-export async function promises<Items extends unknown[]>(
-	items: Promises<Items>,
-	options?: unknown,
-): Promise<Items | PromisesResult<Items>> {
+/**
+ * Handle a list of promises, returning their results in an ordered array of rejected and resolved results
+ * @param items List of promises
+ * @param signal AbortSignal for aborting the operation _(when aborted, the promise will reject with the reason of the signal)_
+ * @returns List of results
+ */
+export async function promises<Value>(
+	items: Promise<Value>[],
+	signal?: AbortSignal,
+): Promise<PromisesValue<Value>[]>;
+
+export async function promises(items: unknown[], options?: unknown): Promise<unknown[]> {
 	const {signal, strategy} = getPromisesOptions(options);
 
 	if (signal?.aborted ?? false) {
@@ -157,7 +191,7 @@ export async function promises<Items extends unknown[]>(
 	const {length} = actual;
 
 	if (length === 0) {
-		return actual as unknown as Items | PromisesResult<Items>;
+		return Promise.reject(new TypeError(PROMISE_MESSAGE_EXPECTATION_PROMISES));
 	}
 
 	const complete = strategy === PROMISE_STRATEGY_DEFAULT;
@@ -168,12 +202,12 @@ export async function promises<Items extends unknown[]>(
 
 	signal?.addEventListener('abort', abort, PROMISE_ABORT_OPTIONS);
 
-	const data: PromiseData<Items> = {
+	const data: PromiseData = {
 		last: length - 1,
-		result: [] as unknown as Items | PromisesResult<Items>,
+		result: [] as unknown[],
 	};
 
-	let handlers: PromiseHandlers<Items>;
+	let handlers: PromiseHandlers;
 
 	return new Promise((resolve, reject) => {
 		handlers = {reject, resolve};
@@ -206,6 +240,41 @@ export async function promises<Items extends unknown[]>(
 	});
 }
 
+promises.result = resultPromises;
+
+/**
+ * Handle a list of promises, returning their results in an ordered array of results _({@link Result})_.
+ *
+ * Depending on the strategy, the function will either reject on the first error encountered or return an array of rejected and resolved results
+ * @param items List of promises
+ * @param signal AbortSignal for aborting the operation _(when aborted, the promise will reject with the reason of the signal)_
+ * @returns List of results
+ */
+async function resultPromises<Items extends unknown[]>(
+	items: [...Items],
+	signal?: AbortSignal,
+): Promise<PromisesResult<PromisesItems<Items>>>;
+
+/**
+ * Handle a list of promises, returning their results in an ordered array of results _({@link Result})_.
+ *
+ * Depending on the strategy, the function will either reject on the first error encountered or return an array of rejected and resolved results
+ * @param items List of promises
+ * @param signal AbortSignal for aborting the operation _(when aborted, the promise will reject with the reason of the signal)_
+ * @returns List of results
+ */
+async function resultPromises<Value>(
+	items: Promise<Value>[],
+	signal?: AbortSignal,
+): Promise<Result<Awaited<Value>>[]>;
+
+async function resultPromises(
+	items: Promise<unknown>[],
+	signal?: AbortSignal,
+): Promise<Result<unknown>[]> {
+	return promises(items, signal).then(getResultsFromPromises);
+}
+
 // #endregion
 
 // #region Exports
@@ -218,12 +287,13 @@ export {
 	CancelablePromise,
 	PromiseTimeoutError,
 	type FulfilledPromise,
-	type RejectedPromise,
 	type PromiseOptions,
-	type PromiseStrategy,
 	type PromisesOptions,
 	type PromisesResult,
-	type PromisesResultItem,
+	type PromiseStrategy,
+	type PromisesValues as PromisesValue,
+	type PromisesValue as PromisesValueItem,
+	type RejectedPromise,
 } from './models';
 export {timed} from './timed';
 

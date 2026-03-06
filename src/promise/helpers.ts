@@ -1,14 +1,16 @@
 import type {RequiredKeys} from '../models';
+import {error, ok} from '../result';
+import type {Result} from '../result/models';
 import {
-	PROMISE_STRATEGY_DEFAULT,
 	PROMISE_STRATEGY_ALL,
+	PROMISE_STRATEGY_DEFAULT,
 	PROMISE_TYPE_FULFILLED,
 	PROMISE_TYPE_REJECTED,
 	type FulfilledPromise,
 	type PromiseOptions,
 	type PromisesOptions,
-	type PromisesResultItem,
 	type PromiseStrategy,
+	type PromisesValue,
 	type RejectedPromise,
 } from './models';
 
@@ -56,6 +58,14 @@ export function getPromisesOptions(input: unknown): RequiredKeys<PromisesOptions
 	};
 }
 
+export function getResultsFromPromises<Value>(
+	promised: PromisesValue<Value>[],
+): Result<Value>[] {
+	return promised.map(result =>
+		isFulfilled(result) ? ok(result.value) : error(result.reason),
+	) as Result<Value>[];
+}
+
 export function getStrategyOrDefault(value: unknown): PromiseStrategy {
 	return PROMISE_STRATEGY_ALL.has(value as PromiseStrategy)
 		? (value as PromiseStrategy)
@@ -84,7 +94,7 @@ function isType(value: unknown, type: string): boolean {
 	return (
 		typeof value === 'object' &&
 		value !== null &&
-		(value as PromisesResultItem<unknown>).status === type
+		(value as PromisesValue<unknown>).status === type
 	);
 }
 
