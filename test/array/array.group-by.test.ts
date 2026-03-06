@@ -9,18 +9,18 @@ test('', () => {
 	const callbacked = groupBy(complex, item => item.name);
 
 	expect(keyed).toEqual({
-		1: {id: 1, age: 25, name: 'Alice'},
-		2: {id: 2, age: 30, name: 'Bob'},
-		3: {id: 3, age: 25, name: 'Charlie'},
-		4: {id: 4, age: 30, name: 'Alice'},
-		5: {id: 5, age: 35, name: 'David'},
+		1: complex[0],
+		2: complex[1],
+		3: complex[2],
+		4: complex[3],
+		5: complex[4],
 	});
 
 	expect(callbacked).toEqual({
-		Alice: {id: 4, age: 30, name: 'Alice'},
-		Bob: {id: 2, age: 30, name: 'Bob'},
-		Charlie: {id: 3, age: 25, name: 'Charlie'},
-		David: {id: 5, age: 35, name: 'David'},
+		Alice: complex[3],
+		Bob: complex[1],
+		Charlie: complex[2],
+		David: complex[4],
 	});
 
 	const keyToKey = groupBy(complex, 'id', 'name');
@@ -44,7 +44,7 @@ test('', () => {
 	expect(valueToKey).toEqual({
 		Alice: 30,
 		Bob: 30,
-		Charlie: 25,
+		Charlie: 35,
 		David: 35,
 	});
 
@@ -55,21 +55,21 @@ test('', () => {
 	const callbackeds = groupBy.arrays(complex, item => item.name);
 
 	expect(keyeds).toEqual({
-		1: [{id: 1, age: 25, name: 'Alice'}],
-		2: [{id: 2, age: 30, name: 'Bob'}],
-		3: [{id: 3, age: 25, name: 'Charlie'}],
-		4: [{id: 4, age: 30, name: 'Alice'}],
-		5: [{id: 5, age: 35, name: 'David'}],
+		1: [complex[0]],
+		2: [complex[1]],
+		3: [complex[2]],
+		4: [complex[3]],
+		5: [complex[4]],
 	});
 
 	expect(callbackeds).toEqual({
 		Alice: [
-			{id: 1, age: 25, name: 'Alice'},
-			{id: 4, age: 30, name: 'Alice'},
+			complex[0],
+			complex[3],
 		],
-		Bob: [{id: 2, age: 30, name: 'Bob'}],
-		Charlie: [{id: 3, age: 25, name: 'Charlie'}],
-		David: [{id: 5, age: 35, name: 'David'}],
+		Bob: [complex[1]],
+		Charlie: [complex[2]],
+		David: [complex[4]],
 	});
 
 	const keyToKeys = groupBy.arrays(complex, 'id', 'name');
@@ -83,17 +83,17 @@ test('', () => {
 	);
 
 	expect(keyToKeys).toEqual({
-		1: ['Alice'],
-		2: ['Bob'],
-		3: ['Charlie'],
-		4: ['Alice'],
-		5: ['David'],
+		1: [complex[0].name],
+		2: [complex[1].name],
+		3: [complex[2].name],
+		4: [complex[3].name],
+		5: [complex[4].name],
 	});
 
 	expect(valueToKeys).toEqual({
 		Alice: [25, 30],
 		Bob: [30],
-		Charlie: [25],
+		Charlie: [35],
 		David: [35],
 	});
 

@@ -6,7 +6,7 @@ test('', () => {
 	const {complex, simple} = arrayFixture;
 
 	expect(exists(simple, 2)).toBe(true);
-	expect(exists(simple, 5)).toBe(false);
+	expect(exists(simple, 10)).toBe(false);
 
 	const existsByKeyCallback = exists(complex, item => item.id, 3);
 	const existsByKeyValue = exists(complex, 'id', 3);

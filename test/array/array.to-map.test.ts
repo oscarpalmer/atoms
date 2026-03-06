@@ -11,31 +11,31 @@ test('', () => {
 
 	expect(indiced).toEqual(
 		new Map([
-			[0, {id: 1, age: 25, name: 'Alice'}],
-			[1, {id: 2, age: 30, name: 'Bob'}],
-			[2, {id: 3, age: 25, name: 'Charlie'}],
-			[3, {id: 4, age: 30, name: 'Alice'}],
-			[4, {id: 5, age: 35, name: 'David'}],
+			[0, complex[0]],
+			[1, complex[1]],
+			[2, complex[2]],
+			[3, complex[3]],
+			[4, complex[4]],
 		]),
 	);
 
 	expect(keyed).toEqual(
 		new Map([
-			[1, {id: 1, age: 25, name: 'Alice'}],
-			[2, {id: 2, age: 30, name: 'Bob'}],
-			[3, {id: 3, age: 25, name: 'Charlie'}],
-			[4, {id: 4, age: 30, name: 'Alice'}],
-			[5, {id: 5, age: 35, name: 'David'}],
+			[1, complex[0]],
+			[2, complex[1]],
+			[3, complex[2]],
+			[4, complex[3]],
+			[5, complex[4]],
 		]),
 	);
 
 	expect(callbacked).toEqual(
 		new Map([
-			['Alice', {id: 1, age: 25, name: 'Alice'}],
-			['Bob', {id: 2, age: 30, name: 'Bob'}],
-			['Charlie', {id: 3, age: 25, name: 'Charlie'}],
-			['Alice', {id: 4, age: 30, name: 'Alice'}],
-			['David', {id: 5, age: 35, name: 'David'}],
+			[complex[0].name, complex[0]],
+			[complex[1].name, complex[1]],
+			[complex[2].name, complex[2]],
+			[complex[3].name, complex[3]],
+			[complex[4].name, complex[4]],
 		]),
 	);
 
@@ -51,20 +51,21 @@ test('', () => {
 
 	expect(keyToKey).toEqual(
 		new Map([
-			[1, 'Alice'],
-			[2, 'Bob'],
-			[3, 'Charlie'],
-			[4, 'Alice'],
-			[5, 'David'],
+			[1, complex[0].name],
+			[2, complex[1].name],
+			[3, complex[2].name],
+			[4, complex[3].name],
+			[5, complex[4].name],
 		]),
 	);
 
 	expect(valueToKey).toEqual(
 		new Map([
-			['Alice', 30],
-			['Bob', 30],
-			['Charlie', 25],
-			['David', 35],
+			[complex[0].name, complex[0].age],
+			[complex[1].name, complex[1].age],
+			[complex[2].name, complex[2].age],
+			[complex[3].name, complex[3].age],
+			[complex[4].name, complex[4].age],
 		]),
 	);
 
@@ -76,26 +77,26 @@ test('', () => {
 
 	expect(keyeds).toEqual(
 		new Map([
-			[1, [{id: 1, age: 25, name: 'Alice'}]],
-			[2, [{id: 2, age: 30, name: 'Bob'}]],
-			[3, [{id: 3, age: 25, name: 'Charlie'}]],
-			[4, [{id: 4, age: 30, name: 'Alice'}]],
-			[5, [{id: 5, age: 35, name: 'David'}]],
+			[1, [complex[0]]],
+			[2, [complex[1]]],
+			[3, [complex[2]]],
+			[4, [complex[3]]],
+			[5, [complex[4]]],
 		]),
 	);
 
 	expect(callbackeds).toEqual(
 		new Map([
 			[
-				'Alice',
+				complex[0].name,
 				[
-					{id: 1, age: 25, name: 'Alice'},
-					{id: 4, age: 30, name: 'Alice'},
+					complex[0],
+					complex[3],
 				],
 			],
-			['Bob', [{id: 2, age: 30, name: 'Bob'}]],
-			['Charlie', [{id: 3, age: 25, name: 'Charlie'}]],
-			['David', [{id: 5, age: 35, name: 'David'}]],
+			[complex[1].name, [complex[1]]],
+			[complex[2].name, [complex[2]]],
+			[complex[4].name, [complex[4]]],
 		]),
 	);
 
@@ -111,20 +112,20 @@ test('', () => {
 
 	expect(keyToKeys).toEqual(
 		new Map([
-			[1, ['Alice']],
-			[2, ['Bob']],
-			[3, ['Charlie']],
-			[4, ['Alice']],
-			[5, ['David']],
+			[complex[0].id, [complex[0].name]],
+			[complex[1].id, [complex[1].name]],
+			[complex[2].id, [complex[2].name]],
+			[complex[3].id, [complex[3].name]],
+			[complex[4].id, [complex[4].name]],
 		]),
 	);
 
 	expect(valueToKeys).toEqual(
 		new Map([
-			['Alice', [25, 30]],
-			['Bob', [30]],
-			['Charlie', [25]],
-			['David', [35]],
+			[complex[0].name, [complex[0].age, complex[3].age]],
+			[complex[1].name, [complex[1].age]],
+			[complex[2].name, [complex[2].age]],
+			[complex[4].name, [complex[4].age]],
 		]),
 	);
 

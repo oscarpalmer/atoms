@@ -11,37 +11,37 @@ test('', () => {
 	const complex = arrayFixture.complex.map(item => ({...item}));
 
 	expect(update(complex, [{id: 3, age: 25, name: 'Charlie (updated)'}], item => item.id)).toEqual([
-		{id: 1, age: 25, name: 'Alice'},
-		{id: 2, age: 30, name: 'Bob'},
+		complex[0],
+		complex[1],
 		{id: 3, age: 25, name: 'Charlie (updated)'},
-		{id: 4, age: 30, name: 'Alice'},
-		{id: 5, age: 35, name: 'David'},
+		complex[3],
+		complex[4],
 	]);
 
 	expect(update(complex, [{id: 6, age: 40, name: 'Eve'}], item => item.id)).toEqual([
-		{id: 1, age: 25, name: 'Alice'},
-		{id: 2, age: 30, name: 'Bob'},
+		complex[0],
+		complex[1],
 		{id: 3, age: 25, name: 'Charlie (updated)'},
-		{id: 4, age: 30, name: 'Alice'},
-		{id: 5, age: 35, name: 'David'},
+		complex[3],
+		complex[4],
 		{id: 6, age: 40, name: 'Eve'},
 	]);
 
 	expect(update(complex, [{id: 4, age: 30, name: 'Alice (updated)'}], 'id')).toEqual([
-		{id: 1, age: 25, name: 'Alice'},
-		{id: 2, age: 30, name: 'Bob'},
+		complex[0],
+		complex[1],
 		{id: 3, age: 25, name: 'Charlie (updated)'},
 		{id: 4, age: 30, name: 'Alice (updated)'},
-		{id: 5, age: 35, name: 'David'},
+		complex[4],
 		{id: 6, age: 40, name: 'Eve'},
 	]);
 
 	expect(update(complex, [{id: 4, age: 30, name: 'Alice (updated again)'}], 'id')).toEqual([
-		{id: 1, age: 25, name: 'Alice'},
-		{id: 2, age: 30, name: 'Bob'},
+		complex[0],
+		complex[1],
 		{id: 3, age: 25, name: 'Charlie (updated)'},
 		{id: 4, age: 30, name: 'Alice (updated again)'},
-		{id: 5, age: 35, name: 'David'},
+		complex[4],
 		{id: 6, age: 40, name: 'Eve'},
 	]);
 

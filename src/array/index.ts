@@ -15,6 +15,7 @@ export * from './intersection';
 export * from './partition';
 export * from './push';
 export * from './select';
+export * from './slice';
 export * from './sort';
 export * from './splice';
 export * from './to-set';

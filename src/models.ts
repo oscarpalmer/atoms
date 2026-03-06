@@ -141,6 +141,41 @@ export type NumericalValues<Item extends PlainObject> = {
 };
 
 /**
+ * An asynchronous function that can only be called once, returning the same value on subsequent calls
+ */
+export type OnceAsyncCallback<Callback extends GenericAsyncCallback> = {
+	/**
+	 * Did the callback's promise reject?
+	 */
+	readonly error: boolean;
+	/**
+	 * Has the callback finished?
+	 */
+	readonly finished: boolean;
+} & Callback &
+	OnceCallbackProperties;
+
+/**
+ * A callback function that can only be called once, returning the same value on subsequent calls
+ */
+export type OnceCallback<Callback extends GenericCallback> = Callback & OnceCallbackProperties;
+
+type OnceCallbackProperties = {
+	/**
+	 * Has the callback been called?
+	 */
+	readonly called: boolean;
+	/**
+	 * Has the callback's value been cleared?
+	 */
+	readonly cleared: boolean;
+	/**
+	 * Clear the callback's cached value
+	 */
+	clear: () => void;
+};
+
+/**
  * A generic object
  */
 export type PlainObject = Record<PropertyKey, unknown>;

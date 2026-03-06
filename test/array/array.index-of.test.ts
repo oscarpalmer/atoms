@@ -6,7 +6,7 @@ test('', () => {
 	const {complex, simple} = arrayFixture;
 
 	expect(indexOf(simple, 2)).toBe(1);
-	expect(indexOf(simple, 5)).toBe(-1);
+	expect(indexOf(simple, 10)).toBe(-1);
 
 	const indexOfByKeyCallback = indexOf(complex, item => item.id, 3);
 	const indexOfByKeyValue = indexOf(complex, 'id', 3);

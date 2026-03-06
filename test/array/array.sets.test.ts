@@ -29,23 +29,23 @@ test('difference', () => {
 });
 
 test('intersection', () => {
-	expect(intersection(arrayFixture.simple, arrayFixture.sets.simple)).toEqual([1, 3]);
+	expect(intersection(arrayFixture.simple, arrayFixture.sets.simple)).toEqual([1, 3, 5]);
 
 	expect(intersection(arrayFixture.complex, arrayFixture.sets.complex)).toEqual([
 		{id: 1, age: 25, name: 'Alice'},
-		{id: 3, age: 25, name: 'Charlie'},
+		{id: 3, age: 35, name: 'Charlie'},
 		{id: 5, age: 35, name: 'David'},
 	]);
 
 	expect(intersection(arrayFixture.complex, arrayFixture.sets.complex, item => item.id)).toEqual([
 		{id: 1, age: 25, name: 'Alice'},
-		{id: 3, age: 25, name: 'Charlie'},
+		{id: 3, age: 35, name: 'Charlie'},
 		{id: 5, age: 35, name: 'David'},
 	]);
 
 	expect(intersection(arrayFixture.complex, arrayFixture.sets.complex, 'id')).toEqual([
 		{id: 1, age: 25, name: 'Alice'},
-		{id: 3, age: 25, name: 'Charlie'},
+		{id: 3, age: 35, name: 'Charlie'},
 		{id: 5, age: 35, name: 'David'},
 	]);
 
@@ -59,31 +59,17 @@ test('intersection', () => {
 });
 
 test('union', () => {
-	expect(union(arrayFixture.simple, arrayFixture.sets.simple)).toEqual([1, 2, 3, 4]);
+	expect(union(arrayFixture.simple, arrayFixture.sets.simple)).toEqual([1, 2, 3, 4, 5]);
 
-	expect(union(arrayFixture.complex, arrayFixture.sets.complex)).toEqual([
-		{id: 1, age: 25, name: 'Alice'},
-		{id: 2, age: 30, name: 'Bob'},
-		{id: 3, age: 25, name: 'Charlie'},
-		{id: 4, age: 30, name: 'Alice'},
-		{id: 5, age: 35, name: 'David'},
-	]);
+	expect(union(arrayFixture.complex, arrayFixture.sets.complex)).toEqual(arrayFixture.complex);
 
-	expect(union(arrayFixture.complex, arrayFixture.sets.complex, item => item.id)).toEqual([
-		{id: 1, age: 25, name: 'Alice'},
-		{id: 2, age: 30, name: 'Bob'},
-		{id: 3, age: 25, name: 'Charlie'},
-		{id: 4, age: 30, name: 'Alice'},
-		{id: 5, age: 35, name: 'David'},
-	]);
+	expect(union(arrayFixture.complex, arrayFixture.sets.complex, item => item.id)).toEqual(
+		arrayFixture.complex,
+	);
 
-	expect(union(arrayFixture.complex, arrayFixture.sets.complex, 'id')).toEqual([
-		{id: 1, age: 25, name: 'Alice'},
-		{id: 2, age: 30, name: 'Bob'},
-		{id: 3, age: 25, name: 'Charlie'},
-		{id: 4, age: 30, name: 'Alice'},
-		{id: 5, age: 35, name: 'David'},
-	]);
+	expect(union(arrayFixture.complex, arrayFixture.sets.complex, 'id')).toEqual(
+		arrayFixture.complex,
+	);
 
 	expect(union(arrayFixture.simple, arrayFixture.simple)).toEqual(arrayFixture.simple);
 
