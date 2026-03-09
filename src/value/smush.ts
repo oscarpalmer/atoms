@@ -44,7 +44,7 @@ function flattenObject(
 		if (isArrayOrPlainObject(val)) {
 			const prefixedKey = join([prefix, key], '.');
 
-			flattened[prefixedKey] = Array.isArray(val) ? [...val] : {...val};
+			flattened[prefixedKey] = Array.isArray(val) ? val.slice() : {...val};
 
 			const nested = flattenObject(val, depth + 1, smushed, prefixedKey);
 			const nestedKeys = Object.keys(nested);

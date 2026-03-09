@@ -23,11 +23,11 @@ export function compareSets(
 	const isUnion = type === COMPARE_SETS_UNION;
 
 	if (first.length === 0) {
-		return isDifference ? [...first] : isIntersection ? [] : [...second];
+		return isDifference ? first.slice() : isIntersection ? [] : second.slice();
 	}
 
 	if (!Array.isArray(second) || second.length === 0) {
-		return isIntersection ? [] : [...first];
+		return isIntersection ? [] : first.slice();
 	}
 
 	const callback = getArrayCallback(key);
@@ -47,7 +47,7 @@ export function compareSets(
 
 	length = source.length;
 
-	const result: unknown[] = isUnion ? [...first] : [];
+	const result: unknown[] = isUnion ? first.slice() : [];
 
 	for (let index = 0; index < length; index += 1) {
 		const item = source[index];

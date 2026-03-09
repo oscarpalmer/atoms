@@ -13,6 +13,7 @@ export * from './index-of';
 export * from './insert';
 export * from './intersection';
 export * from './partition';
+export * from './position';
 export * from './push';
 export * from './select';
 export * from './slice';

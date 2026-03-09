@@ -130,7 +130,7 @@ function clonePlainObject(
 	references: WeakMap<WeakKey, unknown>,
 ): ArrayOrPlainObject {
 	if (depth >= MAX_CLONE_DEPTH) {
-		return Array.isArray(value) ? [...value] : {...value};
+		return Array.isArray(value) ? value.slice() : {...value};
 	}
 
 	const cloned = (Array.isArray(value) ? [] : {}) as PlainObject;

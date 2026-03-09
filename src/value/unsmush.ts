@@ -77,7 +77,7 @@ export function unsmush<Value extends PlainObject>(value: Value): Unsmushed<Valu
 		let next = val;
 
 		if (isArrayOrPlainObject(val)) {
-			next = Array.isArray(val) ? [...val] : {...val};
+			next = Array.isArray(val) ? val.slice() : {...val};
 		}
 
 		setValue(unsmushed, key, next);

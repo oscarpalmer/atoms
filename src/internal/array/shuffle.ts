@@ -12,7 +12,7 @@ export function shuffle<Item>(array: Item[]): Item[] {
 		return [];
 	}
 
-	const shuffled = [...array];
+	const shuffled = array.slice();
 
 	if (shuffled.length < 2) {
 		return shuffled;

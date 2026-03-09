@@ -10,10 +10,10 @@
 		"jsdom": "^28.1",
 		"oxfmt": "^0.36",
 		"oxlint": "^1.51",
-		"rolldown": "1.0.0-rc.7",
+		"rolldown": "1.0.0-rc.8",
 		"tslib": "^2.8",
 		"typescript": "^5.9",
-		"vite": "8.0.0-beta.16",
+		"vite": "8.0.0-beta.17",
 		"vitest": "^4"
 	},
 	"exports": {
@@ -184,5 +184,5 @@
 	},
 	"type": "module",
 	"types": "./types/index.d.ts",
-	"version": "0.159.0"
+	"version": "0.160.0"
 }
