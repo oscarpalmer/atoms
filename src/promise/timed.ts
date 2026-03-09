@@ -4,7 +4,7 @@ import {getPromiseOptions} from './helpers';
 import {settlePromise} from './misc';
 import {
 	PROMISE_ABORT_OPTIONS,
-	PROMISE_EVENT_NAME,
+	PROMISE_ABORT_EVENT,
 	PROMISE_MESSAGE_EXPECTATION_TIMED,
 	PromiseTimeoutError,
 	type PromiseOptions,
@@ -23,7 +23,7 @@ export async function getTimedPromise<Value>(
 		rejector(signal!.reason);
 	}
 
-	signal?.addEventListener(PROMISE_EVENT_NAME, abort, PROMISE_ABORT_OPTIONS);
+	signal?.addEventListener(PROMISE_ABORT_EVENT, abort, PROMISE_ABORT_OPTIONS);
 
 	const timer = getTimer(
 		TIMER_WAIT,
@@ -45,7 +45,7 @@ export async function getTimedPromise<Value>(
 	]).then(value => {
 		timer.cancel();
 
-		signal?.removeEventListener(PROMISE_EVENT_NAME, abort);
+		signal?.removeEventListener(PROMISE_ABORT_EVENT, abort);
 
 		return value;
 	});

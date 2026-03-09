@@ -3,7 +3,7 @@ import {getPromiseOptions, getPromisesOptions, getResultsFromPromises} from './h
 import {handleResult, settlePromise} from './misc';
 import {
 	PROMISE_ABORT_OPTIONS,
-	PROMISE_EVENT_NAME,
+	PROMISE_ABORT_EVENT,
 	PROMISE_MESSAGE_EXPECTATION_ATTEMPT,
 	PROMISE_MESSAGE_EXPECTATION_PROMISES,
 	PROMISE_STRATEGY_DEFAULT,
@@ -94,7 +94,7 @@ export async function attemptPromise<Value>(
 
 	let rejector: (reason: unknown) => void;
 
-	signal?.addEventListener(PROMISE_EVENT_NAME, abort, PROMISE_ABORT_OPTIONS);
+	signal?.addEventListener(PROMISE_ABORT_EVENT, abort, PROMISE_ABORT_OPTIONS);
 
 	const promise = new Promise<Value>((resolve, reject) => {
 		rejector = reject;
@@ -200,7 +200,7 @@ export async function promises(items: unknown[], options?: unknown): Promise<unk
 		handlers.reject(signal!.reason);
 	}
 
-	signal?.addEventListener('abort', abort, PROMISE_ABORT_OPTIONS);
+	signal?.addEventListener(PROMISE_ABORT_EVENT, abort, PROMISE_ABORT_OPTIONS);
 
 	const data: PromiseData = {
 		last: length - 1,

@@ -22,7 +22,7 @@ type Parameters = {
 // #region Functions
 
 export function findValue(type: FindValueType, array: unknown[], parameters: unknown[]): unknown {
-	const findIndex = type === 'index';
+	const findIndex = type === FIND_VALUE_INDEX;
 
 	if (!Array.isArray(array) || array.length === 0) {
 		return findIndex ? -1 : undefined;
@@ -33,7 +33,7 @@ export function findValue(type: FindValueType, array: unknown[], parameters: unk
 	const callbacks = getArrayCallbacks(bool, key);
 
 	if (callbacks?.bool == null && callbacks?.keyed == null) {
-		return findIndex ? array.indexOf(value) : array.find(item => item === value);
+		return findIndex ? array.indexOf(value) : array.find(item => Object.is(item, value));
 	}
 
 	if (callbacks.bool != null) {
@@ -56,7 +56,7 @@ function findValueInArray(
 	for (let index = 0; index < length; index += 1) {
 		const item = array[index];
 
-		if (callback?.(item, index, array) === value) {
+		if (Object.is(callback?.(item, index, array), value)) {
 			return findIndex ? index : item;
 		}
 	}

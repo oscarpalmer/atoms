@@ -39,11 +39,11 @@ function insertChunkedValues(
 		}
 	}
 
-	if (type === 'insert') {
+	if (type === INSERT_TYPE_INSERT) {
 		return array;
 	}
 
-	return type === 'splice' ? returned : array.length;
+	return type === INSERT_TYPE_SPLICE ? returned : array.length;
 }
 
 export function insertValues(
@@ -53,7 +53,7 @@ export function insertValues(
 	start: unknown,
 	deleteCount: number,
 ): unknown {
-	const spliceArray = type === 'insert' || type === 'splice';
+	const spliceArray = type === INSERT_TYPE_INSERT || type === INSERT_TYPE_SPLICE;
 
 	if (
 		!Array.isArray(array) ||
@@ -66,5 +66,15 @@ export function insertValues(
 
 	return insertChunkedValues(type, array, items, start, spliceArray ? deleteCount : 0);
 }
+
+// #endregion
+
+// #region Variables
+
+export const INSERT_TYPE_INSERT: InsertType = 'insert';
+
+export const INSERT_TYPE_PUSH: InsertType = 'push';
+
+export const INSERT_TYPE_SPLICE: InsertType = 'splice';
 
 // #endregion

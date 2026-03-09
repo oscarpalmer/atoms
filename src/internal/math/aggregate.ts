@@ -12,6 +12,8 @@ type AggregationCallback = (current: number, value: number, notNumber: boolean) 
 
 export type AggregationType = 'average' | 'max' | 'min' | 'sum';
 
+type NonAverageAggregationType = 'max' | 'min' | 'sum';
+
 // #endregion
 
 // #region Functions
@@ -92,7 +94,7 @@ export function max<Item extends PlainObject, Key extends keyof NumericalValues<
 export function max(values: number[]): number;
 
 export function max(array: unknown[], key?: unknown): number {
-	return getAggregated('max', array, key);
+	return getAggregated(AGGREGATION_MAX as NonAverageAggregationType, array, key);
 }
 
 function calculateSum(current: number, value: number, notNumber: boolean): number {
@@ -100,7 +102,7 @@ function calculateSum(current: number, value: number, notNumber: boolean): numbe
 }
 
 export function getAggregated(
-	type: Exclude<AggregationType, 'average'>,
+	type: NonAverageAggregationType,
 	array: unknown[],
 	key?: unknown,
 ): number {
@@ -112,6 +114,14 @@ export function getAggregated(
 // #endregion
 
 // #region Variables
+
+export const AGGREGATION_AVERAGE: AggregationType = 'average';
+
+export const AGGREGATION_MAX = 'max';
+
+export const AGGREGATION_MIN = 'min';
+
+export const AGGREGATION_SUM = 'sum';
 
 const aggregators: Record<AggregationType, AggregationCallback> = {
 	average: calculateSum,

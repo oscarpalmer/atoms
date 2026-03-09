@@ -2,6 +2,12 @@ import {isArrayOrPlainObject, isTypedArray} from '../internal/is';
 import {getSelfHandlers} from '../internal/value/handlers';
 import type {ArrayOrPlainObject, Constructor, PlainObject, TypedArray} from '../models';
 
+// #region Special variables
+
+const CLONE_NAME = 'clone';
+
+// #endregion
+
 // #region Functions
 
 /**
@@ -17,7 +23,7 @@ export function clone(value: unknown): unknown {
 
 clone.handlers = getSelfHandlers(clone, {
 	callback: tryStructuredClone,
-	method: 'clone',
+	method: CLONE_NAME,
 });
 
 clone.register = registerCloner;

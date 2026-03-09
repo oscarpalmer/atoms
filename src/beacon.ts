@@ -59,7 +59,7 @@ class Beacon<Value> {
 	 * @param finish Finish the beacon after emitting? _(defaults to `false`)_
 	 */
 	emit(value: Value, finish?: boolean): void {
-		this.#on('next', value, finish);
+		this.#on(TYPE_NEXT, value, finish);
 	}
 
 	/**
@@ -68,7 +68,7 @@ class Beacon<Value> {
 	 * @param finish Finish the beacon after emitting? _(defaults to `false`)_
 	 */
 	error(value: Error, finish?: boolean): void {
-		this.#on('error', value, finish);
+		this.#on(TYPE_ERROR, value, finish);
 	}
 
 	/**
@@ -83,7 +83,7 @@ class Beacon<Value> {
 			return;
 		}
 
-		if (type === 'next') {
+		if (type === TYPE_NEXT) {
 			if (this.#options.equal(this.#state.value, value as Value)) {
 				return;
 			}
@@ -329,6 +329,10 @@ function getObserver<Value>(
 const MESSAGE_BEACON = 'Cannot retrieve observable from a destroyed beacon';
 
 const MESSAGE_OBSERVABLE = 'Cannot subscribe to a destroyed observable';
+
+const TYPE_ERROR = 'error';
+
+const TYPE_NEXT = 'next';
 
 // #endregion
 

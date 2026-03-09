@@ -9,6 +9,12 @@ type Comparator<Value = any> = (first: Value, second: Value) => number;
 
 // #endregion
 
+// #region Special variables
+
+const COMPARE_NAME: string = 'compare';
+
+// #endregion
+
 // #region Functions
 
 /**
@@ -67,7 +73,7 @@ compare.handlers = getCompareHandlers<number>(compare, {
 			return getString(first).localeCompare(getString(second));
 		}
 	},
-	method: 'compare',
+	method: COMPARE_NAME,
 });
 
 compare.register = registerComparator;
@@ -101,7 +107,7 @@ function compareNumbers(
 	const firstNumber = Number(first);
 	const secondNumber = Number(second);
 
-	if (firstNumber === secondNumber) {
+	if (Object.is(firstNumber, secondNumber)) {
 		return 0;
 	}
 

@@ -17,7 +17,7 @@ export * from './position';
 export * from './push';
 export * from './select';
 export * from './slice';
-export * from './sort';
+export {sort} from './sort';
 export * from './splice';
 export * from './to-set';
 export * from './toggle';

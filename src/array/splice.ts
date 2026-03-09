@@ -1,4 +1,4 @@
-import {insertValues} from '../internal/array/insert';
+import {INSERT_TYPE_SPLICE, insertValues} from '../internal/array/insert';
 
 // #region Functions
 
@@ -47,7 +47,7 @@ export function splice(
 	items?: unknown,
 ): unknown[] {
 	return insertValues(
-		'splice',
+		INSERT_TYPE_SPLICE,
 		array,
 		typeof deleteCountOrItems === 'number' ? items : deleteCountOrItems,
 		start,

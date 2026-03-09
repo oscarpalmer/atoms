@@ -1,3 +1,4 @@
+import { SPACE_HSL, SPACE_RGB } from './constants';
 import {formatColor} from './misc';
 import {getAlpha} from './misc/alpha';
 import {getState, setHexColor, setHSLColor, setRGBColor} from './misc/state';
@@ -129,11 +130,11 @@ export class Color {
 	}
 
 	toHslString(alpha?: boolean): string {
-		return formatColor('hsl', this, alpha === true);
+		return formatColor(SPACE_HSL, this, alpha === true);
 	}
 
 	toRgbString(alpha?: boolean): string {
-		return formatColor('rgb', this, alpha === true);
+		return formatColor(SPACE_RGB, this, alpha === true);
 	}
 
 	toString(): string {

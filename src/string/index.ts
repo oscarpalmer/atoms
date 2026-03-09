@@ -13,7 +13,7 @@ export function getUuid(): string {
 
 	bytes[8] = (bytes[8] & 0x3f) | 0x80;
 
-	const hex = Array.from(bytes, byte => byte.toString(16).padStart(2, '0')).join('');
+	const hex = Array.from(bytes, byte => byte.toString(16).padStart(2, ZERO)).join('');
 
 	return [
 		hex.substring(0, 8),
@@ -77,6 +77,12 @@ export function truncate(value: string, length: number, suffix?: string): string
 
 	return `${value.slice(0, truncatedLength)}${actualSuffix}`;
 }
+
+// #region Variables
+
+const ZERO = '0';
+
+// #endregion
 
 // #endregion
 

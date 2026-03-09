@@ -10,8 +10,8 @@ export function formatColor(space: ColorSpace, color: Color, alpha: boolean): st
 	const value = color[space];
 
 	return `${space}(${join(
-		formattingKeys[space].map(key => value[key as never]),
-		' ',
+		keys[space].map(key => value[key as never]),
+		SPACE,
 	)}${suffix})`;
 }
 
@@ -19,7 +19,9 @@ export function formatColor(space: ColorSpace, color: Color, alpha: boolean): st
 
 // #region Variables
 
-const formattingKeys: Record<ColorSpace, ColorProperty[]> = {
+const SPACE = ' ';
+
+const keys: Record<ColorSpace, ColorProperty[]> = {
 	hsl: KEYS_HSL,
 	rgb: KEYS_RGB,
 };

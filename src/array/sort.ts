@@ -15,7 +15,7 @@ export type ArrayCallbackSorter<Item> = {
 	/**
 	 * Direction to sort by
 	 */
-	direction?: 'ascending' | 'descending';
+	direction?: SortDirection;
 	/**
 	 * Value to sort by
 	 */
@@ -33,12 +33,14 @@ export type ArrayKeySorter<Item> = {
 	/**
 	 * Direction to sort by
 	 */
-	direction?: 'ascending' | 'descending';
+	direction?: SortDirection;
 	/**
 	 * Key to sort by
 	 */
 	key: keyof Item;
 };
+
+export type SortDirection = 'ascending' | 'descending';
 
 type Sorter = {
 	callback?: (item: unknown) => unknown;
@@ -82,11 +84,11 @@ function getModifier(value: unknown, modifier: number, forObject: boolean): numb
 		return modifier;
 	}
 
-	if ((value as PlainObject).direction === 'ascending') {
+	if ((value as PlainObject).direction === SORT_DIRECTION_ASCENDING) {
 		return 1;
 	}
 
-	return (value as PlainObject).direction === 'descending' ? -1 : modifier;
+	return (value as PlainObject).direction === SORT_DIRECTION_DESCENDING ? -1 : modifier;
 }
 
 function getSorter(value: unknown, modifier: number): Sorter | undefined {
@@ -208,8 +210,10 @@ export function sort(array: unknown[], first?: unknown, second?: unknown): unkno
 		return array;
 	}
 
-	const direction = first === true || second === true ? 'desc' : 'asc';
-	const modifier = direction === 'asc' ? 1 : -1;
+	const direction =
+		first === true || second === true ? SORT_DIRECTION_DESCENDING : SORT_DIRECTION_ASCENDING;
+
+		const modifier = direction === SORT_DIRECTION_ASCENDING ? 1 : -1;
 
 	const sorters = (Array.isArray(first) ? first : [first])
 		.map(item => getSorter(item, modifier))
@@ -262,5 +266,13 @@ export function sort(array: unknown[], first?: unknown, second?: unknown): unkno
 		return 0;
 	});
 }
+
+// #endregion
+
+// #region Variables
+
+export const SORT_DIRECTION_ASCENDING: SortDirection = 'ascending';
+
+export const SORT_DIRECTION_DESCENDING: SortDirection = 'descending';
 
 // #endregion

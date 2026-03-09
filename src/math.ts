@@ -1,5 +1,12 @@
 import {isNumber} from './internal/is';
-import {aggregate, getAggregateCallback, getAggregated} from './internal/math/aggregate';
+import {
+	aggregate,
+	AGGREGATION_AVERAGE,
+	AGGREGATION_MIN,
+	AGGREGATION_SUM,
+	getAggregateCallback,
+	getAggregated,
+} from './internal/math/aggregate';
 import type {NumericalValues, PlainObject} from './models';
 
 // #region Functions
@@ -34,7 +41,7 @@ export function average<Item extends PlainObject>(
 export function average(numbers: number[]): number;
 
 export function average(array: unknown[], key?: unknown): number {
-	const aggregated = aggregate('average', array, key);
+	const aggregated = aggregate(AGGREGATION_AVERAGE, array, key);
 
 	return aggregated.count > 0 ? aggregated.value / aggregated.count : Number.NaN;
 }
@@ -210,7 +217,7 @@ export function min<Item extends PlainObject>(
 export function min(values: number[]): number;
 
 export function min(array: unknown[], key?: unknown): number {
-	return getAggregated('min', array, key);
+	return getAggregated(AGGREGATION_MIN, array, key);
 }
 
 /**
@@ -271,7 +278,7 @@ export function sum<Item extends PlainObject>(
 export function sum(values: number[]): number;
 
 export function sum(array: unknown[], key?: unknown): number {
-	return getAggregated('sum', array, key);
+	return getAggregated(AGGREGATION_SUM, array, key);
 }
 
 // #endregion

@@ -8,7 +8,7 @@ function _isResult(value: unknown, okValue: boolean): value is Result<unknown, u
 		return false;
 	}
 
-	return value.ok === okValue && (okValue ? 'value' : 'error') in value;
+	return value.ok === okValue && (okValue ? PROPERTY_VALUE : PROPERTY_ERROR) in value;
 }
 
 /**
@@ -76,5 +76,13 @@ export function isOk(value: unknown): value is Ok<unknown> {
 export function isResult(value: unknown): value is ExtendedErr<unknown> | Result<unknown, unknown> {
 	return _isResult(value, true) || _isResult(value, false);
 }
+
+// #endregion
+
+// #region Variable
+
+const PROPERTY_ERROR = 'error';
+
+const PROPERTY_VALUE = 'value';
 
 // #endregion

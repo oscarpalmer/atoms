@@ -85,7 +85,7 @@ export function diff<First, Second = First>(
 			from: first,
 			to: second,
 		},
-		type: 'partial',
+		type: DIFF_PARTIAL,
 		values: {},
 	};
 
@@ -95,13 +95,13 @@ export function diff<First, Second = First>(
 	const secondIsArrayOrObject = isArrayOrPlainObject(second);
 
 	if (same || !(firstIsArrayOrObject || secondIsArrayOrObject)) {
-		diffResult.type = same ? 'none' : 'full';
+		diffResult.type = same ? DIFF_NONE : DIFF_FULL;
 
 		return diffResult;
 	}
 
 	if (firstIsArrayOrObject !== secondIsArrayOrObject) {
-		diffResult.type = 'full';
+		diffResult.type = DIFF_FULL;
 
 		return diffResult;
 	}
@@ -111,7 +111,7 @@ export function diff<First, Second = First>(
 	const {length} = diffs;
 
 	if (length === 0) {
-		diffResult.type = 'none';
+		diffResult.type = DIFF_NONE;
 	}
 
 	for (let index = 0; index < length; index += 1) {
@@ -217,5 +217,15 @@ function setChanges(parameters: Parameters): void {
 		changes.push(diffs[diffIndex]);
 	}
 }
+
+// #endregion
+
+// #region Variables
+
+const DIFF_FULL: DiffType = 'full';
+
+const DIFF_NONE: DiffType = 'none';
+
+const DIFF_PARTIAL: DiffType = 'partial';
 
 // #endregion

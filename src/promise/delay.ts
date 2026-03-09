@@ -1,7 +1,7 @@
 import {getTimer, TIMER_WAIT} from '../internal/function/timer';
 import {getPromiseOptions} from './helpers';
 import {settlePromise} from './misc';
-import {PROMISE_ABORT_OPTIONS, type PromiseOptions} from './models';
+import {PROMISE_ABORT_OPTIONS, PROMISE_ABORT_EVENT, type PromiseOptions} from './models';
 
 // #region Functions
 
@@ -40,7 +40,7 @@ export function delay(options?: unknown): Promise<void> {
 		time,
 	);
 
-	signal?.addEventListener('abort', abort, PROMISE_ABORT_OPTIONS);
+	signal?.addEventListener(PROMISE_ABORT_EVENT, abort, PROMISE_ABORT_OPTIONS);
 
 	let rejector: (reason: unknown) => void;
 	let resolver: () => void;

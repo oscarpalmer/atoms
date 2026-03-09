@@ -109,7 +109,7 @@ class Queue<CallbackParameters extends Parameters<GenericAsyncCallback>, Callbac
 
 		const aborter = abortSignal == null ? undefined : () => rejector(abortSignal.reason);
 
-		signal?.addEventListener(EVENT_NAME, aborter!, abortOptions);
+		signal?.addEventListener(EVENT_NAME, aborter!, EVENT_OPTIONS);
 
 		this.#items.push({
 			id,
@@ -345,11 +345,11 @@ function queue(
 
 // #region Variables
 
-const abortOptions = {once: true};
-
 const ERROR_NAME = 'QueueError';
 
 const EVENT_NAME = 'abort';
+
+const EVENT_OPTIONS = {once: true};
 
 const MESSAGE_CALLBACK = 'A Queue requires a callback function';
 

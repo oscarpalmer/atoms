@@ -110,11 +110,11 @@ export type RejectedPromise = {
 
 // #region Variables
 
+export const PROMISE_ABORT_EVENT = 'abort';
+
 export const PROMISE_ABORT_OPTIONS = {once: true};
 
 export const PROMISE_ERROR_NAME = 'PromiseTimeoutError';
-
-export const PROMISE_EVENT_NAME = 'abort';
 
 export const PROMISE_MESSAGE_EXPECTATION_ATTEMPT = 'Attempt expected a function or a promise';
 

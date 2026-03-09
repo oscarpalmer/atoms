@@ -28,7 +28,7 @@ class Memoized<Callback extends GenericCallback> {
 		const getter = (...parameters: Parameters<Callback>): ReturnType<Callback> => {
 			const key =
 				options.cacheKey?.(...parameters) ??
-				(parameters.length === 1 ? parameters[0] : join(parameters.map(getString), '_'));
+				(parameters.length === 1 ? parameters[0] : join(parameters.map(getString), SEPARATOR));
 
 			if (cache.has(key)) {
 				return cache.get(key) as ReturnType<Callback>;
@@ -159,6 +159,8 @@ export function memoize<Callback extends GenericCallback>(
 // #region Variables
 
 const DEFAULT_CACHE_SIZE = 1024;
+
+const SEPARATOR = '_';
 
 // #endregion
 

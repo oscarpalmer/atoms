@@ -2,7 +2,7 @@ import {error, ok} from '../result/misc';
 import type {Result} from '../result/models';
 import {
 	CancelablePromise,
-	PROMISE_EVENT_NAME,
+	PROMISE_ABORT_EVENT,
 	PROMISE_MESSAGE_EXPECTATION_RESULT,
 	PROMISE_TYPE_FULFILLED,
 	PROMISE_TYPE_REJECTED,
@@ -52,7 +52,7 @@ export function settlePromise(
 	value: unknown,
 	signal?: AbortSignal,
 ): void {
-	signal?.removeEventListener(PROMISE_EVENT_NAME, aborter);
+	signal?.removeEventListener(PROMISE_ABORT_EVENT, aborter);
 
 	settler(value);
 }

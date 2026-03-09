@@ -14,8 +14,8 @@ export function between(value: number, minimum: number, maximum: number): boolea
 		return false;
 	}
 
-	if (minimum === maximum) {
-		return value === minimum;
+	if (Object.is(minimum, maximum)) {
+		return Object.is(value, minimum);
 	}
 
 	const max = maximum > minimum ? maximum : minimum;

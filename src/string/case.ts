@@ -21,7 +21,7 @@ type Options = {
  * @returns Camel-cased string
  */
 export function camelCase(value: string): string {
-	return toCase('camel', value, true, false);
+	return toCase(CASE_CAMEL, value, true, false);
 }
 
 /**
@@ -49,7 +49,7 @@ export function capitalize(value: string): string {
  * @returns Kebab-cased string
  */
 export function kebabCase(value: string): string {
-	return toCase('kebab', value, false, false);
+	return toCase(CASE_KEBAB, value, false, false);
 }
 
 /**
@@ -67,7 +67,7 @@ export function lowerCase(value: string): string {
  * @returns Pascal-cased string
  */
 export function pascalCase(value: string): string {
-	return toCase('pascal', value, true, true);
+	return toCase(CASE_PASCAL, value, true, true);
 }
 
 /**
@@ -76,7 +76,7 @@ export function pascalCase(value: string): string {
  * @returns Snake-cased string
  */
 export function snakeCase(value: string): string {
-	return toCase('snake', value, false, false);
+	return toCase(CASE_SNAKE, value, false, false);
 }
 
 /**
@@ -127,7 +127,7 @@ function toCaseCallback(this: Options, value: string): string {
 		const part = parts[partIndex];
 
 		const acronymParts = part.replace(EXPRESSION_ACRONYM, (full, one, two, three) =>
-			three === 's' ? full : `${one}-${two}${three}`,
+			three === S ? full : `${one}-${two}${three}`,
 		);
 
 		const camelCaseParts = acronymParts.replace(EXPRESSION_CAMEL_CASE, REPLACEMENT_CAMEL_CASE);
@@ -174,20 +174,36 @@ export function upperCase(value: string): string {
 
 // #region Variables
 
-const caseMemoizers: Partial<Record<string, Memoized<typeof toCaseCallback>>> = {};
+const CASE_CAMEL: Case = 'camel';
 
-const delimiters: Record<Case, string> = {
-	camel: '',
-	kebab: '-',
-	pascal: '',
-	snake: '_',
-};
+const CASE_KEBAB: Case = 'kebab';
+
+const CASE_PASCAL: Case = 'pascal';
+
+const CASE_SNAKE: Case = 'snake';
+
+const DELIMTER_EMPTY = '';
+
+const DELIMITER_HYPHEN = '-';
+
+const DELIMITER_UNDERSCORE = '_';
 
 const EXPRESSION_CAMEL_CASE = /(\p{Ll})(\p{Lu})/gu;
 
 const EXPRESSION_ACRONYM = /(\p{Lu}*)(\p{Lu})(\p{Ll}+)/gu;
 
 const REPLACEMENT_CAMEL_CASE = '$1-$2';
+
+const S = 's';
+
+const caseMemoizers: Partial<Record<string, Memoized<typeof toCaseCallback>>> = {};
+
+const delimiters: Record<Case, string> = {
+	[CASE_CAMEL]: DELIMTER_EMPTY,
+	[CASE_KEBAB]: DELIMITER_HYPHEN,
+	[CASE_PASCAL]: DELIMTER_EMPTY,
+	[CASE_SNAKE]: DELIMITER_UNDERSCORE,
+};
 
 let memoizedCapitalize: Memoized<(value: string) => string>;
 

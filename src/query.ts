@@ -61,7 +61,7 @@ function getParts(value: ArrayOrPlainObject, fromArray: boolean, prefix?: string
 
 function getQueryValue(value: string): unknown {
 	if (EXPRESSION_BOOLEAN.test(value)) {
-		return value === 'true';
+		return value === TRUE;
 	}
 
 	const asNumber = getNumber(value);
@@ -122,6 +122,8 @@ export function toQuery(parameters: PlainObject): string {
 const EXPRESSION_ARRAY_SUFFIX = /\[\]$/;
 
 const EXPRESSION_BOOLEAN = /^(false|true)$/;
+
+const TRUE = 'true';
 
 const TYPES = new Set(['boolean', 'number', 'string']);
 
