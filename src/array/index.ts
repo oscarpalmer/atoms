@@ -1,5 +1,6 @@
 export * from '../internal/array/chunk';
 export * from '../internal/array/compact';
+export * from '../internal/array/index-of';
 export * from '../internal/array/shuffle';
 
 export * from './difference';
@@ -9,7 +10,6 @@ export * from './find';
 export * from './flatten';
 export * from './from';
 export * from './get';
-export * from './index-of';
 export * from './insert';
 export * from './intersection';
 export * from './partition';
@@ -19,6 +19,7 @@ export * from './select';
 export * from './slice';
 export {sort} from './sort';
 export * from './splice';
+export * from './swap';
 export * from './to-set';
 export * from './toggle';
 export * from './union';

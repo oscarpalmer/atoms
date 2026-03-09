@@ -42,8 +42,8 @@ test('simple', () => {
 test('complex', () => {
 	const {keys} = position;
 
-	for (let index = 0; index < position.complex.length; index += 1) {
-		const {items, result} = position.complex[index];
+	for (let index = 0; index < position.complex.cases.length; index += 1) {
+		const {items, result} = position.complex.cases[index];
 
 		for (const key of keys) {
 			const endsWith = endsWithArray(haystack, items, key);

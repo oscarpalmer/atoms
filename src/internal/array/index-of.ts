@@ -1,5 +1,5 @@
-import {FIND_VALUE_INDEX, findValue} from '../internal/array/find';
-import type {PlainObject} from '../models';
+import {FIND_VALUE_INDEX, findValue} from './find';
+import type {PlainObject} from '../../models';
 
 // #region Functions
 
