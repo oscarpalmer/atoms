@@ -41,7 +41,7 @@ test('', () =>
 			expect(defaulted.zero).toBeGreaterThan(0);
 
 			expect(defaulted.invalid).toBeLessThanOrEqual(20);
-			expect(defaulted.zero).toBeLessThanOrEqual(20)
+			expect(defaulted.zero).toBeLessThanOrEqual(20);
 
 			expect(value).toBe(1);
 

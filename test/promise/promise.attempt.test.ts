@@ -25,7 +25,7 @@ test('asynchronous', () =>
 				throw new Error('Thrown');
 			}),
 		).catch(error => {
-			errors[0] = (error);
+			errors[0] = error;
 		});
 
 		void attemptPromise(

@@ -1,4 +1,4 @@
-import { SPACE_HSL, SPACE_RGB } from './constants';
+import {SPACE_HSL, SPACE_RGB} from './constants';
 import {formatColor} from './misc';
 import {getAlpha} from './misc/alpha';
 import {getState, setHexColor, setHSLColor, setRGBColor} from './misc/state';

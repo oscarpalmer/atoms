@@ -87,13 +87,7 @@ test('', () => {
 
 	expect(callbackeds).toEqual(
 		new Map([
-			[
-				complex[0].name,
-				[
-					complex[0],
-					complex[3],
-				],
-			],
+			[complex[0].name, [complex[0], complex[3]]],
 			[complex[1].name, [complex[1]]],
 			[complex[2].name, [complex[2]]],
 			[complex[4].name, [complex[4]]],

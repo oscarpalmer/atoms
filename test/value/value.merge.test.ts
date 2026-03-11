@@ -92,9 +92,15 @@ test('merge', () => {
 	});
 
 	expect(
-		merge([[1, 2, 3, 4, 5], [null, null, 99]], {
-			skipNullableInArrays: true,
-		}),
+		merge(
+			[
+				[1, 2, 3, 4, 5],
+				[null, null, 99],
+			],
+			{
+				skipNullableInArrays: true,
+			},
+		),
 	).toEqual([1, 2, 99, 4, 5]);
 
 	const replaceableFirst = {

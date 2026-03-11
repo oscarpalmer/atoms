@@ -1,5 +1,6 @@
 import {getArrayCallback} from '../internal/array/callbacks';
 import {indexOf} from '../internal/array/index-of';
+import {arraysOverlap} from '../internal/array/overlap';
 import type {PlainObject} from '../models';
 import {indexOfArray} from './position';
 
@@ -130,23 +131,30 @@ function swapArrays(array: unknown[], from: unknown[], to: unknown[], key: unkno
 		return array;
 	}
 
-	const first = fromIndex < toIndex ? from : to;
-	const second = fromIndex < toIndex ? to : from;
+	const {first, second, overlap} = arraysOverlap(
+		{
+			array: from,
+			index: fromIndex,
+		},
+		{
+			array: to,
+			index: toIndex,
+		},
+	);
 
-	const firstIndex = first === from ? fromIndex : toIndex;
-	const secondIndex = first === from ? toIndex : fromIndex;
-
-	const firstEnd = firstIndex + first.length - 1;
-	const secondEnd = secondIndex + second.length - 1;
-
-	if (firstIndex <= secondEnd && firstEnd >= secondIndex) {
+	if (overlap) {
 		// The arrays overlap, so we can't swap them without losing data
 
 		return array;
 	}
 
-	array.splice(firstIndex, first.length, ...second);
-	array.splice(secondIndex, second.length, ...first);
+	array.splice(first.index, first.array.length, ...second.array);
+
+	array.splice(
+		second.index + (second.array.length - first.array.length),
+		second.array.length,
+		...first.array,
+	);
 
 	return array;
 }

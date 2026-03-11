@@ -44,12 +44,7 @@ export function setValue<Data extends PlainObject>(
 	ignoreCase?: boolean,
 ): Data;
 
-export function setValue(
-	data: object,
-	path: string,
-	value: unknown,
-	ignoreCase?: boolean,
-): object {
+export function setValue(data: object, path: string, value: unknown, ignoreCase?: boolean): object {
 	if (
 		typeof data !== 'object' ||
 		data === null ||

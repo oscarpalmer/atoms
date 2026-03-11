@@ -58,9 +58,7 @@ export function getPromisesOptions(input: unknown): RequiredKeys<PromisesOptions
 	};
 }
 
-export function getResultsFromPromises<Value>(
-	promised: PromisesValue<Value>[],
-): Result<Value>[] {
+export function getResultsFromPromises<Value>(promised: PromisesValue<Value>[]): Result<Value>[] {
 	return promised.map(result =>
 		isFulfilled(result) ? ok(result.value) : error(result.reason),
 	) as Result<Value>[];
@@ -92,9 +90,7 @@ export function isRejected(value: unknown): value is RejectedPromise {
 
 function isType(value: unknown, type: string): boolean {
 	return (
-		typeof value === 'object' &&
-		value !== null &&
-		(value as PromisesValue<unknown>).status === type
+		typeof value === 'object' && value !== null && (value as PromisesValue<unknown>).status === type
 	);
 }
 

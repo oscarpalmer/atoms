@@ -213,7 +213,7 @@ export function sort(array: unknown[], first?: unknown, second?: unknown): unkno
 	const direction =
 		first === true || second === true ? SORT_DIRECTION_DESCENDING : SORT_DIRECTION_ASCENDING;
 
-		const modifier = direction === SORT_DIRECTION_ASCENDING ? 1 : -1;
+	const modifier = direction === SORT_DIRECTION_ASCENDING ? 1 : -1;
 
 	const sorters = (Array.isArray(first) ? first : [first])
 		.map(item => getSorter(item, modifier))

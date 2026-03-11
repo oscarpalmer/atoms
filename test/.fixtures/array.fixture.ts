@@ -46,6 +46,370 @@ const sets = {
 
 const simple = [1, 2, 3, 4, 5];
 
+const move = {
+	keys,
+	complex: {
+		cases: [
+			// Earlier -> later
+
+			{
+				key: -1,
+				parameters: {first: complex[0], second: complex[4]},
+				result: [complex[0], complex[1], complex[2], complex[3], complex[4]],
+			},
+			{
+				key: 0,
+				parameters: {first: complex[0], second: complex[4]},
+				result: [complex[1], complex[2], complex[3], complex[4], complex[0]],
+			},
+			{
+				key: 1,
+				parameters: {first: complex[1], second: complex[3]},
+				result: [complex[0], complex[2], complex[3], complex[1], complex[4]],
+			},
+
+			// Earlier -> later, array of items
+
+			{
+				key: -1,
+				parameters: {first: [complex[0]], second: [complex[4]]},
+				result: [complex[0], complex[1], complex[2], complex[3], complex[4]],
+			},
+			{
+				key: 0,
+				parameters: {first: [complex[0], complex[1]], second: [complex[4]]},
+				result: [complex[2], complex[3], complex[4], complex[0], complex[1]],
+			},
+			{
+				key: 1,
+				parameters: {first: [complex[1]], second: [complex[3], complex[4]]},
+				result: [complex[0], complex[2], complex[3], complex[4], complex[1]],
+			},
+
+			// Later -> earlier
+
+			{
+				key: -1,
+				parameters: {first: complex[4], second: complex[0]},
+				result: [complex[0], complex[1], complex[2], complex[3], complex[4]],
+			},
+			{
+				key: 0,
+				parameters: {first: complex[4], second: complex[0]},
+				result: [complex[4], complex[0], complex[1], complex[2], complex[3]],
+			},
+			{
+				key: 1,
+				parameters: {first: complex[3], second: complex[1]},
+				result: [complex[0], complex[3], complex[1], complex[2], complex[4]],
+			},
+
+			// Later -> earlier, array of items
+
+			{
+				key: -1,
+				parameters: {first: [complex[4]], second: [complex[0]]},
+				result: [complex[0], complex[1], complex[2], complex[3], complex[4]],
+			},
+			{
+				key: 0,
+				parameters: {first: [complex[3], complex[4]], second: [complex[0]]},
+				result: [complex[3], complex[4], complex[0], complex[1], complex[2]],
+			},
+			{
+				key: 1,
+				parameters: {first: [complex[3], complex[4]], second: [complex[1]]},
+				result: [complex[0], complex[3], complex[4], complex[1], complex[2]],
+			},
+
+			// Same
+
+			{
+				key: -1,
+				parameters: {first: complex[0], second: complex[0]},
+				result: complex,
+			},
+
+			// Invalid
+
+			{
+				array: [],
+				key: -1,
+				parameters: {first: complex[0], second: complex[3]},
+				result: [],
+			},
+			{
+				array: 'blah' as never,
+				key: -1,
+				parameters: {first: complex[0], second: complex[3]},
+				result: [],
+			},
+			{
+				key: -1,
+				parameters: {first: [], second: complex[4]},
+				result: complex,
+			},
+			{
+				key: -1,
+				parameters: {first: complex[0], second: []},
+				result: complex,
+			},
+
+			// Overlap
+
+			{
+				key: -1,
+				parameters: {first: [complex[1], complex[2], complex[3]], second: [complex[2], complex[3]]},
+				result: complex,
+			},
+		] as TestArrayMove<TestArrayItem>[],
+		values: complex.map(item => ({...item})),
+	},
+	indices: {
+		cases: [
+			// Earlier -> later
+
+			{
+				key: -1,
+				parameters: {first: 0, second: 4},
+				result: [2, 3, 4, 5, 1],
+			},
+			{
+				key: -1,
+				parameters: {first: 0, second: -1},
+				result: [2, 3, 4, 5, 1],
+			},
+
+			// Later -> earlier
+			{
+				key: -1,
+				parameters: {first: 4, second: 0},
+				result: [5, 1, 2, 3, 4],
+			},
+			{
+				key: -1,
+				parameters: {first: -1, second: 0},
+				result: [5, 1, 2, 3, 4],
+			},
+
+			// Same
+			{
+				key: -1,
+				parameters: {first: 0, second: 0},
+				result: simple,
+			},
+
+			// Invalid
+
+			{
+				key: -1,
+				parameters: {first: 0, second: 5},
+				result: [1, 2, 3, 4, 5],
+			},
+			{
+				array: [],
+				key: -1,
+				parameters: {first: 0, second: 0},
+				result: [],
+			},
+			{
+				array: 'blah' as never,
+				key: -1,
+				parameters: {first: 0, second: 0},
+				result: [],
+			},
+			{
+				key: -1,
+				parameters: {first: 'blah' as never, second: 0},
+				result: [1, 2, 3, 4, 5],
+			},
+			{
+				key: -1,
+				parameters: {first: 0, second: 'blah' as never},
+				result: [1, 2, 3, 4, 5],
+			},
+		] as TestArrayMove<number>[],
+		values: [...simple],
+	},
+	simple: {
+		cases: [
+			// Single item
+
+			{
+				key: -1,
+				parameters: {first: 1, second: 5},
+				result: [2, 3, 4, 5, 1],
+			},
+			{
+				key: -1,
+				parameters: {first: 5, second: 1},
+				result: [5, 1, 2, 3, 4],
+			},
+
+			// Array of items
+
+			{
+				key: -1,
+				parameters: {first: [1], second: [4, 5]},
+				result: [2, 3, 4, 5, 1],
+			},
+			{
+				key: -1,
+				parameters: {first: [4, 5], second: [1]},
+				result: [4, 5, 1, 2, 3],
+			},
+			{
+				key: -1,
+				parameters: {first: [4, 5], second: [1, 2, 3]},
+				result: [4, 5, 1, 2, 3],
+			},
+
+			// Invalid
+
+			{
+				key: -1,
+				parameters: {first: [], second: []},
+				result: simple,
+			},
+			{
+				key: -1,
+				parameters: {first: 1, second: 10},
+				result: simple,
+			},
+			{
+				array: [],
+				key: -1,
+				parameters: {first: 0, second: 0},
+				result: [],
+			},
+			{
+				array: 'blah' as never,
+				key: -1,
+				parameters: {first: 0, second: 0},
+				result: [],
+			},
+			{
+				key: -1,
+				parameters: {first: 'blah' as never, second: 0},
+				result: simple,
+			},
+			{
+				key: -1,
+				parameters: {first: 0, second: 'blah' as never},
+				result: simple,
+			},
+			{
+				key: -1,
+				parameters: {first: [1, 2], second: [10, 11]},
+				result: simple,
+			},
+
+			// Overlap
+
+			{
+				key: -1,
+				parameters: {first: [1, 2, 3], second: [2, 3]},
+				result: simple,
+			},
+		] as TestArrayMove<number>[],
+		values: [...simple],
+	},
+	toIndex: {
+		cases: [
+			// Earlier -> later
+
+			{
+				key: -1,
+				parameters: {first: 1, second: 4},
+				result: [2, 3, 4, 5, 1],
+			},
+			{
+				key: -1,
+				parameters: {first: 1, second: -1},
+				result: [2, 3, 4, 5, 1],
+			},
+
+			// Earlier -> later, array of items
+
+			{
+				key: -1,
+				parameters: {first: [1], second: 4},
+				result: [2, 3, 4, 5, 1],
+			},
+			{
+				key: -1,
+				parameters: {first: [1], second: -1},
+				result: [2, 3, 4, 5, 1],
+			},
+
+			// Later -> earlier
+
+			{
+				key: -1,
+				parameters: {first: 5, second: 0},
+				result: [5, 1, 2, 3, 4],
+			},
+			{
+				key: -1,
+				parameters: {first: 5, second: -5},
+				result: [5, 1, 2, 3, 4],
+			},
+
+			// Later -> earlier, array of items
+
+			{
+				key: -1,
+				parameters: {first: [5], second: 0},
+				result: [5, 1, 2, 3, 4],
+			},
+			{
+				key: -1,
+				parameters: {first: [5], second: -5},
+				result: [5, 1, 2, 3, 4],
+			},
+
+			// Same
+
+			{
+				key: -1,
+				parameters: {first: 1, second: 0},
+				result: simple,
+			},
+
+			// Invalid
+
+			{
+				key: -1,
+				parameters: {first: 1, second: 10},
+				result: [1, 2, 3, 4, 5],
+			},
+			{
+				array: [],
+				key: -1,
+				parameters: {first: 0, second: 0},
+				result: [],
+			},
+			{
+				array: 'blah' as never,
+				key: -1,
+				parameters: {first: 0, second: 0},
+				result: [],
+			},
+			{
+				key: -1,
+				parameters: {first: 'blah' as never, second: 0},
+				result: [1, 2, 3, 4, 5],
+			},
+			{
+				key: -1,
+				parameters: {first: 0, second: 'blah' as never},
+				result: [1, 2, 3, 4, 5],
+			},
+		] as TestArrayMove<number>[],
+		values: [...simple],
+	},
+};
+
 const swap = {
 	keys,
 	complex: {
@@ -185,6 +549,12 @@ const swap = {
 				result: [],
 			},
 			{
+				array: 'blah' as never,
+				key: -1,
+				parameters: {first: [complex[0]], second: [complex[3]]},
+				result: [],
+			},
+			{
 				key: -1,
 				parameters: {first: [], second: [complex[4]]},
 				result: complex,
@@ -194,7 +564,7 @@ const swap = {
 				parameters: {first: [complex[0]], second: []},
 				result: complex,
 			},
-		] satisfies TestArrayMove<TestArrayItem>[],
+		] as TestArrayMove<TestArrayItem>[],
 		values: complex.map(item => ({...item})),
 	},
 	indices: {
@@ -239,6 +609,18 @@ const swap = {
 				result: simple,
 			},
 			{
+				array: [],
+				key: -1,
+				parameters: {first: 0, second: 0},
+				result: [],
+			},
+			{
+				array: 'blah' as never,
+				key: -1,
+				parameters: {first: 0, second: 0},
+				result: [],
+			},
+			{
 				key: -1,
 				parameters: {first: 'blah' as never, second: 0},
 				result: simple,
@@ -248,7 +630,7 @@ const swap = {
 				parameters: {first: 0, second: 'blah' as never},
 				result: simple,
 			},
-		] satisfies TestArrayMove<number>[],
+		] as TestArrayMove<number>[],
 		values: [...simple],
 	},
 	simple: {
@@ -327,6 +709,18 @@ const swap = {
 				result: simple,
 			},
 			{
+				array: [],
+				key: -1,
+				parameters: {first: 0, second: 0},
+				result: [],
+			},
+			{
+				array: 'blah' as never,
+				key: -1,
+				parameters: {first: 0, second: 0},
+				result: [],
+			},
+			{
 				key: -1,
 				parameters: {first: 'blah' as never, second: 0},
 				result: simple,
@@ -341,7 +735,7 @@ const swap = {
 				parameters: {first: [1, 2], second: [10, 11]},
 				result: simple,
 			},
-		] satisfies TestArrayMove<number>[],
+		] as TestArrayMove<number>[],
 		values: [...simple],
 	},
 };
@@ -446,7 +840,7 @@ const position = {
 				items: complex.slice(0),
 				result: {endsWith: true, includes: true, indexOf: 0, position: 'same', startsWith: true},
 			},
-		] satisfies TestArrayPosition<TestArrayItem>[],
+		] as TestArrayPosition<TestArrayItem>[],
 		values: complex.map(item => ({...item})),
 	},
 	simple: {
@@ -557,13 +951,14 @@ const position = {
 					startsWith: false,
 				},
 			},
-		] satisfies TestArrayPosition<string>[],
+		] as TestArrayPosition<string>[],
 		values: ['a', 'b', 'c', 'd', 'e'],
 	},
 };
 
 export const arrayFixture = {
 	complex,
+	move,
 	position,
 	sets,
 	simple,

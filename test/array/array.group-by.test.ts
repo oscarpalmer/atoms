@@ -63,10 +63,7 @@ test('', () => {
 	});
 
 	expect(callbackeds).toEqual({
-		Alice: [
-			complex[0],
-			complex[3],
-		],
+		Alice: [complex[0], complex[3]],
 		Bob: [complex[1]],
 		Charlie: [complex[2]],
 		David: [complex[4]],

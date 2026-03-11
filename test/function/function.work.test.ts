@@ -112,16 +112,6 @@ test('return types', async () => {
 		)(),
 	).toBe('Returned value!');
 
-	const x = flow(
-		() => 'Initial value!',
-		() => attempt(() => 'Returned value!'),
-	)();
-
-	const y = pipe(
-		() => 'Initial value!',
-		() => attempt(() => 'Returned value!'),
-	);
-
 	expect(
 		pipe(
 			() => {},

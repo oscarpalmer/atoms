@@ -31,29 +31,14 @@ test('remove', () => {
 	const removeByKeyValue = filter.remove(complex, 'id', 3);
 	const removeByKeyCallback = filter.remove(complex, item => item.id, 3);
 
-	expect(removeByKeyValue).toEqual([
-		complex[0],
-		complex[1],
-		complex[3],
-		complex[4],
-	]);
+	expect(removeByKeyValue).toEqual([complex[0], complex[1], complex[3], complex[4]]);
 
-	expect(removeByKeyCallback).toEqual([
-		complex[0],
-		complex[1],
-		complex[3],
-		complex[4],
-	]);
+	expect(removeByKeyCallback).toEqual([complex[0], complex[1], complex[3], complex[4]]);
 
 	const removeByValueCallback = filter.remove(complex, item => item.id === 3);
 	const removeByInvalidKey = filter.remove(complex, 'name.length' as never);
 
-	expect(removeByValueCallback).toEqual([
-		complex[0],
-		complex[1],
-		complex[3],
-		complex[4],
-	]);
+	expect(removeByValueCallback).toEqual([complex[0], complex[1], complex[3], complex[4]]);
 
 	expect(removeByInvalidKey).toEqual(complex);
 
