@@ -1,189 +1,186 @@
 {
-	"author": {
-		"name": "Oscar Palmér",
-		"url": "https://oscarpalmer.se"
-	},
+	"name": "@oscarpalmer/atoms",
+	"version": "0.163.0",
 	"description": "Atomic utilities for making your JavaScript better.",
-	"devDependencies": {
-		"@types/node": "^25.4",
-		"@vitest/coverage-istanbul": "^4.1",
-		"jsdom": "^28.1",
-		"oxfmt": "^0.40",
-		"oxlint": "^1.55",
-		"rolldown": "1.0.0-rc.9",
-		"tslib": "^2.8",
-		"typescript": "^5.9",
-		"vite": "8.0.0",
-		"vitest": "^4.1"
-	},
-	"exports": {
-		"./package.json": "./package.json",
-		".": {
-			"types": "./types/index.d.ts",
-			"default": "./dist/index.js"
-		},
-		"./array/group-by": {
-			"types": "./types/array/group-by.d.ts",
-			"default": "./dist/array/group-by.js"
-		},
-		"./array": {
-			"types": "./types/array/index.d.ts",
-			"default": "./dist/array/index.js"
-		},
-		"./array/to-map": {
-			"types": "./types/array/to-map.d.ts",
-			"default": "./dist/array/to-map.js"
-		},
-		"./array/to-record": {
-			"types": "./types/array/to-record.d.ts",
-			"default": "./dist/array/to-record.js"
-		},
-		"./array/unique": {
-			"types": "./types/array/unique.d.ts",
-			"default": "./dist/array/unique.js"
-		},
-		"./beacon": {
-			"types": "./types/beacon.d.ts",
-			"default": "./dist/beacon.js"
-		},
-		"./color": {
-			"types": "./types/color/index.d.ts",
-			"default": "./dist/color/index.js"
-		},
-		"./function": {
-			"types": "./types/function/index.d.ts",
-			"default": "./dist/function/index.js"
-		},
-		"./function/assert": {
-			"types": "./types/function/assert.d.ts",
-			"default": "./dist/function/assert.js"
-		},
-		"./function/retry": {
-			"types": "./types/function/retry.d.ts",
-			"default": "./dist/function/retry.js"
-		},
-		"./function/work": {
-			"types": "./types/function/work.d.ts",
-			"default": "./dist/function/work.js"
-		},
-		"./is": {
-			"types": "./types/is.d.ts",
-			"default": "./dist/is.js"
-		},
-		"./logger": {
-			"types": "./types/logger.d.ts",
-			"default": "./dist/logger.js"
-		},
-		"./math": {
-			"types": "./types/math.d.ts",
-			"default": "./dist/math.js"
-		},
-		"./models": {
-			"types": "./types/models.d.ts"
-		},
-		"./number": {
-			"types": "./types/number.d.ts",
-			"default": "./dist/number.js"
-		},
-		"./promise": {
-			"types": "./types/promise/index.d.ts",
-			"default": "./dist/promise/index.js"
-		},
-		"./query": {
-			"types": "./types/query.d.ts",
-			"default": "./dist/query.js"
-		},
-		"./queue": {
-			"types": "./types/queue.d.ts",
-			"default": "./dist/queue.js"
-		},
-		"./random": {
-			"types": "./types/random.d.ts",
-			"default": "./dist/random.js"
-		},
-		"./result": {
-			"types": "./types/result/index.d.ts",
-			"default": "./dist/result/index.js"
-		},
-		"./sized/map": {
-			"types": "./types/sized/map.d.ts",
-			"default": "./dist/sized/map.js"
-		},
-		"./sized/set": {
-			"types": "./types/sized/set.d.ts",
-			"default": "./dist/sized/set.js"
-		},
-		"./string": {
-			"types": "./types/string/index.d.ts",
-			"default": "./dist/string/index.js"
-		},
-		"./string/case": {
-			"types": "./types/string/case.d.ts",
-			"default": "./dist/string/case.js"
-		},
-		"./string/match": {
-			"types": "./types/string/match.d.ts",
-			"default": "./dist/string/match.js"
-		},
-		"./string/template": {
-			"types": "./types/string/template.d.ts",
-			"default": "./dist/string/template.js"
-		},
-		"./value": {
-			"types": "./types/value/index.d.ts",
-			"default": "./dist/value/index.js"
-		},
-		"./value/clone": {
-			"types": "./types/value/clone.d.ts",
-			"default": "./dist/value/clone.js"
-		},
-		"./value/compare": {
-			"types": "./types/internal/value/compare.d.ts",
-			"default": "./dist/internal/value/compare.js"
-		},
-		"./value/diff": {
-			"types": "./types/value/diff.d.ts",
-			"default": "./dist/value/diff.js"
-		},
-		"./value/equal": {
-			"types": "./types/internal/value/equal.d.ts",
-			"default": "./dist/internal/value/equal.js"
-		},
-		"./value/handle": {
-			"types": "./types/value/handle.d.ts",
-			"default": "./dist/value/handle.js"
-		},
-		"./value/merge": {
-			"types": "./types/value/merge.d.ts",
-			"default": "./dist/value/merge.js"
-		}
-	},
-	"files": [
-		"dist",
-		"src",
-		"types"
-	],
 	"keywords": [
 		"helper",
 		"utility"
 	],
 	"license": "MIT",
-	"module": "./dist/index.js",
-	"name": "@oscarpalmer/atoms",
+	"author": {
+		"name": "Oscar Palmér",
+		"url": "https://oscarpalmer.se"
+	},
 	"repository": {
 		"type": "git",
 		"url": "git+https://github.com/oscarpalmer/atoms.git"
 	},
+	"files": [
+		"dist",
+		"src"
+	],
+	"type": "module",
+	"module": "./dist/index.mjs",
+	"types": "./dist/index.d.mts",
+	"exports": {
+		"./package.json": "./package.json",
+		".": {
+			"types": "./dist/index.d.mts",
+			"default": "./dist/index.mjs"
+		},
+		"./array/group-by": {
+			"types": "./dist/array/group-by.d.mts",
+			"default": "./dist/array/group-by.mjs"
+		},
+		"./array": {
+			"types": "./dist/array/index.d.mts",
+			"default": "./dist/array/index.mjs"
+		},
+		"./array/to-map": {
+			"types": "./dist/array/to-map.d.mts",
+			"default": "./dist/array/to-map.mjs"
+		},
+		"./array/to-record": {
+			"types": "./dist/array/to-record.d.mts",
+			"default": "./dist/array/to-record.mjs"
+		},
+		"./array/unique": {
+			"types": "./dist/array/unique.d.mts",
+			"default": "./dist/array/unique.mjs"
+		},
+		"./beacon": {
+			"types": "./dist/beacon.d.mts",
+			"default": "./dist/beacon.mjs"
+		},
+		"./color": {
+			"types": "./dist/color/index.d.mts",
+			"default": "./dist/color/index.mjs"
+		},
+		"./function": {
+			"types": "./dist/function/index.d.mts",
+			"default": "./dist/function/index.mjs"
+		},
+		"./function/assert": {
+			"types": "./dist/function/assert.d.mts",
+			"default": "./dist/function/assert.mjs"
+		},
+		"./function/retry": {
+			"types": "./dist/function/retry.d.mts",
+			"default": "./dist/function/retry.mjs"
+		},
+		"./function/work": {
+			"types": "./dist/function/work.d.mts",
+			"default": "./dist/function/work.mjs"
+		},
+		"./is": {
+			"types": "./dist/is.d.mts",
+			"default": "./dist/is.mjs"
+		},
+		"./logger": {
+			"types": "./dist/logger.d.mts",
+			"default": "./dist/logger.mjs"
+		},
+		"./math": {
+			"types": "./dist/math.d.mts",
+			"default": "./dist/math.mjs"
+		},
+		"./models": {
+			"types": "./dist/models.d.mts"
+		},
+		"./number": {
+			"types": "./dist/number.d.mts",
+			"default": "./dist/number.mjs"
+		},
+		"./promise": {
+			"types": "./dist/promise/index.d.mts",
+			"default": "./dist/promise/index.mjs"
+		},
+		"./query": {
+			"types": "./dist/query.d.mts",
+			"default": "./dist/query.mjs"
+		},
+		"./queue": {
+			"types": "./dist/queue.d.mts",
+			"default": "./dist/queue.mjs"
+		},
+		"./random": {
+			"types": "./dist/random.d.mts",
+			"default": "./dist/random.mjs"
+		},
+		"./result": {
+			"types": "./dist/result/index.d.mts",
+			"default": "./dist/result/index.mjs"
+		},
+		"./sized/map": {
+			"types": "./dist/sized/map.d.mts",
+			"default": "./dist/sized/map.mjs"
+		},
+		"./sized/set": {
+			"types": "./dist/sized/set.d.mts",
+			"default": "./dist/sized/set.mjs"
+		},
+		"./string": {
+			"types": "./dist/string/index.d.mts",
+			"default": "./dist/string/index.mjs"
+		},
+		"./string/case": {
+			"types": "./dist/string/case.d.mts",
+			"default": "./dist/string/case.mjs"
+		},
+		"./string/match": {
+			"types": "./dist/string/match.d.mts",
+			"default": "./dist/string/match.mjs"
+		},
+		"./string/template": {
+			"types": "./dist/string/template.d.mts",
+			"default": "./dist/string/template.mjs"
+		},
+		"./value": {
+			"types": "./dist/value/index.d.mts",
+			"default": "./dist/value/index.mjs"
+		},
+		"./value/clone": {
+			"types": "./dist/value/clone.d.mts",
+			"default": "./dist/value/clone.mjs"
+		},
+		"./value/compare": {
+			"types": "./dist/internal/value/compare.d.mts",
+			"default": "./dist/internal/value/compare.mjs"
+		},
+		"./value/diff": {
+			"types": "./dist/value/diff.d.mts",
+			"default": "./dist/value/diff.mjs"
+		},
+		"./value/equal": {
+			"types": "./dist/internal/value/equal.d.mts",
+			"default": "./dist/internal/value/equal.mjs"
+		},
+		"./value/handle": {
+			"types": "./dist/value/handle.d.mts",
+			"default": "./dist/value/handle.mjs"
+		},
+		"./value/merge": {
+			"types": "./dist/value/merge.d.mts",
+			"default": "./dist/value/merge.mjs"
+		}
+	},
 	"scripts": {
-		"build": "npm run clean && npx vite build && npm run rolldown:build && npx tsc",
-		"clean": "rm -rf ./dist && rm -rf ./types && rm -f ./tsconfig.tsbuildinfo",
-		"rolldown:build": "npx rolldown -c",
-		"rolldown:watch": "npx rolldown -c ./rolldown.config.js --watch",
-		"test": "npx vitest --coverage",
-		"test:leak": "npx vitest --detect-async-leaks --coverage",
+		"build": "npx vp pack && npm run tsdown:build",
+		"tsdown:build": "npx tsdown -c ./tsdown.config.ts",
+		"tsdown:watch": "npx tsdown -c ./tsdown.config.ts --watch",
+		"test": "npx vp test run --coverage",
+		"test:leak": "npx vp test run --detect-async-leaks --coverage",
 		"watch": "npx vite build --watch"
 	},
-	"type": "module",
-	"types": "./types/index.d.ts",
-	"version": "0.163.0"
+	"devDependencies": {
+		"@types/node": "^25.5",
+		"@vitest/coverage-istanbul": "^4.1",
+		"jsdom": "^28.1",
+		"tsdown": "^0.21",
+		"typescript": "^5.9",
+		"vite": "npm:@voidzero-dev/vite-plus-core@latest",
+		"vite-plus": "latest",
+		"vitest": "npm:@voidzero-dev/vite-plus-test@latest"
+	},
+	"packageManager": "npm@11.11.1"
 }
