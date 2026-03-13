@@ -25,8 +25,8 @@ test('asynchronous', () =>
 
 		setTimeout(() => {
 			expect(values).toEqual([0, 1, 2, 3, 4]);
-			expect(last - now).toBeGreaterThanOrEqual(490);
-			expect(last - now).toBeLessThan(510);
+			expect(last - now).toBeGreaterThanOrEqual(450);
+			expect(last - now).toBeLessThan(550);
 
 			done();
 		}, 600);

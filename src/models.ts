@@ -92,8 +92,8 @@ type _NestedKeys<Value, Depth extends number = 5> = Depth extends 0
 /**
  * An extended version of `Partial` that allows for nested properties to be optional
  */
-export type NestedPartial<T> = {
-	[K in keyof T]?: T[K] extends object ? NestedPartial<T[K]> : T[K];
+export type NestedPartial<Value> = {
+	[Key in keyof Value]?: Value[Key] extends object ? NestedPartial<Value[Key]> : Value[Key];
 };
 
 /**

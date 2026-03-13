@@ -6,15 +6,15 @@
 	"description": "Atomic utilities for making your JavaScript better.",
 	"devDependencies": {
 		"@types/node": "^25.4",
-		"@vitest/coverage-istanbul": "^4",
+		"@vitest/coverage-istanbul": "^4.1",
 		"jsdom": "^28.1",
-		"oxfmt": "^0.38",
-		"oxlint": "^1.53",
-		"rolldown": "1.0.0-rc.8",
+		"oxfmt": "^0.40",
+		"oxlint": "^1.55",
+		"rolldown": "1.0.0-rc.9",
 		"tslib": "^2.8",
 		"typescript": "^5.9",
-		"vite": "8.0.0-beta.17",
-		"vitest": "^4"
+		"vite": "8.0.0",
+		"vitest": "^4.1"
 	},
 	"exports": {
 		"./package.json": "./package.json",
@@ -180,9 +180,10 @@
 		"rolldown:build": "npx rolldown -c",
 		"rolldown:watch": "npx rolldown -c ./rolldown.config.js --watch",
 		"test": "npx vitest --coverage",
+		"test:leak": "npx vitest --detect-async-leaks --coverage",
 		"watch": "npx vite build --watch"
 	},
 	"type": "module",
 	"types": "./types/index.d.ts",
-	"version": "0.162.0"
+	"version": "0.163.0"
 }

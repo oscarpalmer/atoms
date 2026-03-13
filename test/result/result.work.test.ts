@@ -256,12 +256,12 @@ test('return types', () => {
 
 	const promiseFailFlow = attempt.flow(
 		() => {},
-		() => new Promise(() => {}),
+		() => Promise.resolve(),
 	)();
 
 	const promiseFailPipe = attempt.pipe(
 		() => {},
-		() => new Promise(() => {}),
+		() => Promise.resolve(),
 	);
 
 	expect(isError(promiseFailFlow)).toBe(true);

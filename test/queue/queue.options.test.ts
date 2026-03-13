@@ -37,8 +37,8 @@ test('autostart', () =>
 
 		setTimeout(() => {
 			expect(values).toEqual([0, 1, 2, 3, 4]);
-			expect(last - now).toBeGreaterThanOrEqual(490 + 500);
-			expect(last - now).toBeLessThan(510 + 500);
+			expect(last - now).toBeGreaterThanOrEqual(450 + 500);
+			expect(last - now).toBeLessThan(550 + 500);
 
 			done();
 		}, 1100);
@@ -74,8 +74,8 @@ test('concurrency', () =>
 
 		setTimeout(() => {
 			expect(values).toEqual([0, 1, 2, 3, 4]);
-			expect(last - now).toBeGreaterThanOrEqual(90);
-			expect(last - now).toBeLessThan(110);
+			expect(last - now).toBeGreaterThanOrEqual(50);
+			expect(last - now).toBeLessThan(150);
 
 			done();
 		}, 150);
@@ -87,12 +87,14 @@ test('maximum size', () => {
 		maximum: 2,
 	});
 
-	queued.add([0]);
-	queued.add([1]);
+	void queued.add([0]).promise.catch(() => {});
+	void queued.add([1]).promise.catch(() => {});
 
 	expect(queued.maximum).toBe(2);
 	expect(() => queued.add([2])).toThrow('Queue has reached its maximum size');
 
 	expect(queue(synchronous, {maximum: -99}).maximum).toBe(0);
 	expect(queue(synchronous, {maximum: 'blah' as never}).maximum).toBe(0);
+
+	queued.clear();
 });

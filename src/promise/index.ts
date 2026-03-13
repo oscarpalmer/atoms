@@ -5,7 +5,6 @@ import {
 	PROMISE_ABORT_OPTIONS,
 	PROMISE_ABORT_EVENT,
 	PROMISE_MESSAGE_EXPECTATION_ATTEMPT,
-	PROMISE_MESSAGE_EXPECTATION_PROMISES,
 	PROMISE_STRATEGY_DEFAULT,
 	PROMISE_TYPE_FULFILLED,
 	PROMISE_TYPE_REJECTED,
@@ -17,6 +16,7 @@ import {
 	type PromisesResult,
 	type PromisesValue,
 	type PromisesValues,
+	type PromisesUnwrapped,
 } from './models';
 import {getTimedPromise} from './timed';
 
@@ -116,7 +116,11 @@ export async function attemptPromise<Value>(
 export async function promises<Items extends unknown[], Options extends PromisesOptions>(
 	items: [...Items],
 	options?: Options,
-): Promise<Options['strategy'] extends 'first' ? Items : PromisesValues<PromisesItems<Items>>>;
+): Promise<
+	Options['strategy'] extends 'first'
+		? PromisesUnwrapped<Items>
+		: PromisesValues<PromisesItems<Items>>
+>;
 
 /**
  * Handle a list of promises, returning their results in an ordered array.
@@ -142,7 +146,7 @@ export async function promises<Value, Options extends PromisesOptions>(
 export async function promises<Items extends unknown[]>(
 	items: [...Items],
 	strategy: 'first',
-): Promise<PromisesItems<Items>>;
+): Promise<PromisesUnwrapped<Items>>;
 
 /**
  * Handle a list of promises, returning their results in an ordered array.
@@ -172,7 +176,7 @@ export async function promises<Items extends unknown[]>(
  * @returns List of results
  */
 export async function promises<Value>(
-	items: Promise<Value>[],
+	items: Array<Promise<Value> | (() => Promise<Value>)>,
 	signal?: AbortSignal,
 ): Promise<PromisesValue<Value>[]>;
 
@@ -184,14 +188,17 @@ export async function promises(items: unknown[], options?: unknown): Promise<unk
 	}
 
 	if (!Array.isArray(items)) {
-		return Promise.reject(new TypeError(PROMISE_MESSAGE_EXPECTATION_PROMISES));
+		return Promise.resolve([]);
 	}
 
-	const actual = items.filter(item => item instanceof Promise);
+	const actual = items
+		.map(item => (typeof item === 'function' ? item() : item))
+		.filter(item => item instanceof Promise);
+
 	const {length} = actual;
 
 	if (length === 0) {
-		return Promise.reject(new TypeError(PROMISE_MESSAGE_EXPECTATION_PROMISES));
+		return Promise.resolve([]);
 	}
 
 	const complete = strategy === PROMISE_STRATEGY_DEFAULT;

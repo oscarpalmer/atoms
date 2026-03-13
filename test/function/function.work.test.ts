@@ -142,14 +142,14 @@ test('return types', async () => {
 	expect(() =>
 		flow(
 			() => {},
-			() => new Promise(() => {}),
+			() => Promise.resolve(),
 		)(),
 	).toThrow('Synchronous Flow received a promise. Use `flow.async` instead.');
 
 	expect(() =>
 		pipe(
 			() => {},
-			() => new Promise(() => {}),
+			() => Promise.resolve(),
 		),
 	).toThrow('Synchronous Pipe received a promise. Use `pipe.async` instead.');
 

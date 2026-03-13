@@ -45,6 +45,8 @@ export async function getTimedPromise<Value>(
 	]).then(value => {
 		timer.cancel();
 
+		rejector(undefined);
+
 		signal?.removeEventListener(PROMISE_ABORT_EVENT, abort);
 
 		return value;

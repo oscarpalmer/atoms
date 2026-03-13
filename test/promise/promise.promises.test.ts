@@ -25,12 +25,12 @@ test('abort', () =>
 		void promises(
 			[
 				new Promise<number>(resolve => setTimeout(() => resolve(1), 200)),
-				new Promise<number>(resolve => setTimeout(() => resolve(2), 200)),
+				() => new Promise<number>(resolve => setTimeout(() => resolve(2), 200)),
 				new Promise<number>(resolve => setTimeout(() => resolve(3), 200)),
 			],
 			{
-				eager: true,
 				signal: first.signal,
+				strategy: 'first',
 			},
 		)
 			.then(value => {
@@ -141,14 +141,12 @@ test('error', () => {
 	const {length} = values;
 
 	for (let index = 0; index < length; index += 1) {
-		promises(values[index] as never).catch(error => {
-			expect(error).toBeInstanceOf(TypeError);
-			expect(error.message).toBe('Promises expected an array of promises');
+		promises(values[index] as never).then(result => {
+			expect(result).toEqual([]);
 		});
 
-		promises([values[index]] as never).catch(error => {
-			expect(error).toBeInstanceOf(TypeError);
-			expect(error.message).toBe('Promises expected an array of promises');
+		promises([values[index]] as never).then(result => {
+			expect(result).toEqual([]);
 		});
 	}
 });
@@ -174,7 +172,7 @@ test('first', () =>
 		void promises(
 			[
 				new Promise<number>(resolve => resolve(1)),
-				new Promise<string>(resolve => resolve('2')),
+				() => new Promise<string>(resolve => resolve('2')),
 				new Promise<boolean>((_, reject) => reject(new Error('Nope!'))),
 			],
 			'first',

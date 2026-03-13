@@ -208,38 +208,30 @@ class Queue<CallbackParameters extends Parameters<GenericAsyncCallback>, Callbac
 		let item = this.#items.shift();
 
 		while (item != null) {
-			let handler: GenericCallback;
+			let error = false;
+
 			let result: unknown | CallbackResult;
 
 			try {
 				if (!(item.signal?.aborted ?? false)) {
 					result = await this.#callback(...item.parameters);
-					handler = item.resolve;
 				}
 			} catch (thrown) {
+				error = true;
 				result = thrown;
-				handler = item.reject;
 			}
 
 			if (this.#paused) {
 				const paused = item;
 
 				this.#handled.push(() => {
-					paused.signal?.removeEventListener(EVENT_NAME, paused.abort!);
-
-					if (!(paused.signal?.aborted ?? false)) {
-						handler(result);
-					}
+					handleResult(paused, error, result);
 				});
 
 				break;
 			}
 
-			item.signal?.removeEventListener(EVENT_NAME, item.abort!);
-
-			if (!(item.signal?.aborted ?? false)) {
-				handler!(result as CallbackResult);
-			}
+			handleResult(item, error, result);
 
 			item = this.#items.shift();
 		}
@@ -306,6 +298,24 @@ function getOptions(input?: QueueOptions): Required<QueueOptions> {
 		concurrency: getNumberOrDefault(options.concurrency, 1),
 		maximum: getNumberOrDefault(options.maximum, 0),
 	};
+}
+
+function handleResult<CallbackParameters extends Parameters<GenericAsyncCallback>, CallbackResult>(
+	item: QueuedItem<CallbackParameters, CallbackResult>,
+	error: boolean,
+	result: unknown,
+): void {
+	item.signal?.removeEventListener(EVENT_NAME, item.abort!);
+
+	if (item.signal?.aborted ?? false) {
+		item.reject();
+	} else {
+		if (error) {
+			item.reject(result);
+		} else {
+			item.resolve(result as CallbackResult);
+		}
+	}
 }
 
 /**

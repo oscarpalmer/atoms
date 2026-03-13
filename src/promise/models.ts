@@ -1,3 +1,4 @@
+import type {GenericCallback} from '../models';
 import type {Result} from '../result/models';
 
 // #region Types
@@ -83,7 +84,13 @@ export class PromiseTimeoutError extends Error {
 }
 
 export type PromisesItems<Items extends unknown[]> = {
-	[K in keyof Items]: Promise<Items[K]>;
+	[Key in keyof Items]: Items[Key] extends GenericCallback
+		? ReturnType<Items[Key]> extends Promise<infer Value>
+			? Promise<Value>
+			: never
+		: Items[Key] extends Promise<infer Value>
+			? Promise<Value>
+			: Promise<Items[Key]>;
 };
 
 export type PromisesOptions = {
@@ -92,13 +99,29 @@ export type PromisesOptions = {
 };
 
 export type PromisesResult<Items extends unknown[]> = {
-	[K in keyof Items]: Items[K] extends Promise<infer Value> ? Result<Awaited<Value>> : never;
+	[Key in keyof Items]: Items[Key] extends Promise<infer Value> ? Result<Awaited<Value>> : never;
+};
+
+export type PromisesUnwrapped<Items extends unknown[]> = {
+	[Key in keyof Items]: Items[Key] extends GenericCallback
+		? ReturnType<Items[Key]> extends Promise<infer Value>
+			? Awaited<Value>
+			: never
+		: Items[Key] extends Promise<infer Value>
+			? Awaited<Value>
+			: never;
 };
 
 export type PromisesValue<Value> = FulfilledPromise<Value> | RejectedPromise;
 
 export type PromisesValues<Items extends unknown[]> = {
-	[K in keyof Items]: Items[K] extends Promise<infer Value> ? PromisesValue<Awaited<Value>> : never;
+	[Key in keyof Items]: Items[Key] extends GenericCallback
+		? ReturnType<Items[Key]> extends Promise<infer Value>
+			? PromisesValue<Awaited<Value>>
+			: never
+		: Items[Key] extends Promise<infer Value>
+			? PromisesValue<Awaited<Value>>
+			: never;
 };
 
 export type RejectedPromise = {
@@ -117,8 +140,6 @@ export const PROMISE_ABORT_OPTIONS = {once: true};
 export const PROMISE_ERROR_NAME = 'PromiseTimeoutError';
 
 export const PROMISE_MESSAGE_EXPECTATION_ATTEMPT = 'Attempt expected a function or a promise';
-
-export const PROMISE_MESSAGE_EXPECTATION_PROMISES = 'Promises expected an array of promises';
 
 export const PROMISE_MESSAGE_EXPECTATION_RESULT = 'toResult expected a Promise';
 
