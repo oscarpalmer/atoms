@@ -1,10 +1,15 @@
+export * from './array/filter';
 export * from './array/group-by';
 export * from './array/index';
+export * from './array/move';
+export * from './array/swap';
 export * from './array/to-map';
 export * from './array/to-record';
 export * from './array/unique';
 
+export * from './function/assert';
 export * from './function/index';
+export * from './function/once';
 export * from './function/retry';
 export * from './function/work';
 

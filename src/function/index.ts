@@ -37,6 +37,5 @@ export function throttle<Callback extends GenericCallback>(
 
 export {noop} from '../internal/function/misc';
 export {memoize, type Memoized, type MemoizedOptions} from './memoize';
-export {once} from './once';
 
 // #endregion

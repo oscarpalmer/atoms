@@ -1,6 +1,6 @@
 {
 	"name": "@oscarpalmer/atoms",
-	"version": "0.164.0",
+	"version": "0.165.0",
 	"description": "Atomic utilities for making your JavaScript better.",
 	"keywords": [
 		"helper",
@@ -28,13 +28,25 @@
 			"types": "./dist/index.d.mts",
 			"default": "./dist/index.mjs"
 		},
+		"./array": {
+			"types": "./dist/array/index.d.mts",
+			"default": "./dist/array/index.mjs"
+		},
+		"./array/filter": {
+			"types": "./dist/array/filter.d.mts",
+			"default": "./dist/array/filter.mjs"
+		},
 		"./array/group-by": {
 			"types": "./dist/array/group-by.d.mts",
 			"default": "./dist/array/group-by.mjs"
 		},
-		"./array": {
-			"types": "./dist/array/index.d.mts",
-			"default": "./dist/array/index.mjs"
+		"./array/move": {
+			"types": "./dist/array/move.d.mts",
+			"default": "./dist/array/move.mjs"
+		},
+		"./array/swap": {
+			"types": "./dist/array/swap.d.mts",
+			"default": "./dist/array/swap.mjs"
 		},
 		"./array/to-map": {
 			"types": "./dist/array/to-map.d.mts",
@@ -43,10 +55,6 @@
 		"./array/to-record": {
 			"types": "./dist/array/to-record.d.mts",
 			"default": "./dist/array/to-record.mjs"
-		},
-		"./array/unique": {
-			"types": "./dist/array/unique.d.mts",
-			"default": "./dist/array/unique.mjs"
 		},
 		"./beacon": {
 			"types": "./dist/beacon.d.mts",
@@ -63,6 +71,10 @@
 		"./function/assert": {
 			"types": "./dist/function/assert.d.mts",
 			"default": "./dist/function/assert.mjs"
+		},
+		"./function/once": {
+			"types": "./dist/function/once.d.mts",
+			"default": "./dist/function/once.mjs"
 		},
 		"./function/retry": {
 			"types": "./dist/function/retry.d.mts",
@@ -94,6 +106,10 @@
 		"./promise": {
 			"types": "./dist/promise/index.d.mts",
 			"default": "./dist/promise/index.mjs"
+		},
+		"./promise/delay": {
+			"types": "./dist/promise/delay.d.mts",
+			"default": "./dist/promise/delay.mjs"
 		},
 		"./query": {
 			"types": "./dist/query.d.mts",
