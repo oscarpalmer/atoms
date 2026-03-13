@@ -1,6 +1,6 @@
 {
 	"name": "@oscarpalmer/atoms",
-	"version": "0.165.0",
+	"version": "0.165.1",
 	"description": "Atomic utilities for making your JavaScript better.",
 	"keywords": [
 		"helper",
@@ -110,6 +110,10 @@
 		"./promise/delay": {
 			"types": "./dist/promise/delay.d.mts",
 			"default": "./dist/promise/delay.mjs"
+		},
+		"./promise/models": {
+			"types": "./dist/promise/models.d.mts",
+			"default": "./dist/promise/models.mjs"
 		},
 		"./query": {
 			"types": "./dist/query.d.mts",
