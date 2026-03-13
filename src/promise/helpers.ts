@@ -1,5 +1,5 @@
 import type {RequiredKeys} from '../models';
-import {error, ok} from '../result';
+import {error, ok} from '../result/misc';
 import type {Result} from '../result/models';
 import {
 	PROMISE_STRATEGY_ALL,
