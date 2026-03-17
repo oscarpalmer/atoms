@@ -1,6 +1,6 @@
 {
 	"name": "@oscarpalmer/atoms",
-	"version": "0.165.2",
+	"version": "0.166.0",
 	"description": "Atomic utilities for making your JavaScript better.",
 	"keywords": [
 		"helper",
@@ -195,7 +195,7 @@
 	"devDependencies": {
 		"@types/node": "^25.5",
 		"@vitest/coverage-istanbul": "^4.1",
-		"jsdom": "^28.1",
+		"jsdom": "^29.0",
 		"tsdown": "^0.21",
 		"typescript": "^5.9",
 		"vite": "npm:@voidzero-dev/vite-plus-core@latest",

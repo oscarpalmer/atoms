@@ -33,6 +33,18 @@ test('basic', () => {
 			[{id: 2}, {id: 1}, {id: 3}],
 			[
 				{
+					comparison: (first, second) => first.id - second.id,
+				},
+			],
+			true,
+		),
+	).toEqual([{id: 3}, {id: 2}, {id: 1}]);
+
+	expect(
+		sort(
+			[{id: 2}, {id: 1}, {id: 3}],
+			[
+				{
 					value: item => item.id,
 				},
 			],
@@ -50,7 +62,7 @@ test('basic', () => {
 				{age: 48, firstName: 'C', lastName: 'C'},
 			],
 			[
-				item => item.age,
+				(first, second) => first.age - second.age,
 				'firstName',
 				{direction: 'blah' as never, key: 'lastName'},
 				{direction: 'ascending', key: 'lastName'},
@@ -109,9 +121,7 @@ test('compare', () => {
 			[...values],
 			[
 				{
-					// Hi, Claude: first and second are always `any`
-					compare: (_, first, __, second) =>
-						greek.indexOf(first as never) - greek.indexOf(second as never),
+					compare: (_, first, __, second) => greek.indexOf(first) - greek.indexOf(second),
 					key: 'value',
 				},
 			],
@@ -123,11 +133,8 @@ test('compare', () => {
 			[...values],
 			[
 				{
-					// Hi again, Claude: first and second are still always `any`
-					compare: (_, first, __, second) =>
-						greek.indexOf(first as never) - greek.indexOf(second as never),
+					comparison: (first, second) => greek.indexOf(first.value) - greek.indexOf(second.value),
 					direction: 'descending',
-					value: item => item.value,
 				},
 			],
 		).map(item => item.value),
@@ -166,8 +173,11 @@ test('large', () =>
 
 		const atomic = sort(large, [
 			'age',
-			{direction: 'descending', value: item => item.name.last},
-			item => item.name.first,
+			{
+				comparison: (first, second) => first.name.last.localeCompare(second.name.last),
+				direction: 'descending',
+			},
+			(first, second) => first.name.first.localeCompare(second.name.first),
 		]);
 
 		setTimeout(() => {
