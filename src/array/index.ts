@@ -21,4 +21,5 @@ export * from './splice';
 export * from './to-set';
 export * from './toggle';
 export * from './union';
+export * from './unique';
 export * from './update';
