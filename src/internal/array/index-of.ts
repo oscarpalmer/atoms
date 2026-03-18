@@ -22,10 +22,10 @@ export function indexOf<
  * @param value Value to match against
  * @returns Index of the first matching item, or `-1` if no match is found
  */
-export function indexOf<Item extends PlainObject, Key extends keyof Item>(
+export function indexOf<Item extends PlainObject, ItemKey extends keyof Item>(
 	array: Item[],
-	key: Key,
-	value: Item[Key],
+	key: ItemKey,
+	value: Item[ItemKey],
 ): number;
 
 /**

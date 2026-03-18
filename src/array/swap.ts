@@ -14,11 +14,11 @@ import {indexOfArray} from './position';
  * @param key Key to get an item's value for matching
  * @returns Original array with items swapped _(or unchanged if unable to swap)_
  */
-export function swap<Item extends PlainObject, Key extends keyof Item>(
+export function swap<Item extends PlainObject, ItemKey extends keyof Item>(
 	array: Item[],
 	first: Item[],
 	second: Item[],
-	key: Key,
+	key: ItemKey,
 ): Item[];
 
 /**
@@ -59,11 +59,11 @@ export function swap<Item>(array: Item[], first: Item[], second: Item[]): Item[]
  * @param key Key to get an item's value for matching
  * @returns Original array with items swapped _(or unchanged if unable to swap)_
  */
-export function swap<Item extends PlainObject, Key extends keyof Item>(
+export function swap<Item extends PlainObject, ItemKey extends keyof Item>(
 	array: Item[],
 	first: Item,
 	second: Item,
-	key: Key,
+	key: ItemKey,
 ): Item[];
 
 /**

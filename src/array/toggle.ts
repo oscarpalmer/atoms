@@ -21,10 +21,10 @@ export function toggle<Item>(
  * @param key Key to find existing item
  * @returns Original array
  */
-export function toggle<Item extends PlainObject, Key extends keyof Item>(
+export function toggle<Item extends PlainObject, ItemKey extends keyof Item>(
 	destination: Item[],
 	toggled: Item[],
-	key: Key,
+	key: ItemKey,
 ): Item[];
 
 /**

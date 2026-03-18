@@ -23,10 +23,10 @@ export function find<Item, Callback extends (item: Item, index: number, array: I
  * @param value Value to match against
  * @returns First item that matches the value, or `undefined` if no match is found
  */
-export function find<Item extends PlainObject, Key extends keyof Item>(
+export function find<Item extends PlainObject, ItemKey extends keyof Item>(
 	array: Item[],
-	key: Key,
-	value: Item[Key],
+	key: ItemKey,
+	value: Item[ItemKey],
 ): Item | undefined;
 
 /**

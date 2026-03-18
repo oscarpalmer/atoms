@@ -76,10 +76,10 @@ export function count<Item>(
  * @param value Value to match and count
  * @returns Number of items with the specified key value, or `NaN` if no count can be calculated
  */
-export function count<Item extends PlainObject, Key extends keyof Item>(
+export function count<Item extends PlainObject, ItemKey extends keyof Item>(
 	array: Item[],
-	key: Key,
-	value: Item[Key],
+	key: ItemKey,
+	value: Item[ItemKey],
 ): number;
 
 /**

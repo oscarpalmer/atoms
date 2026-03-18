@@ -22,10 +22,10 @@ export function partition<
  * @param value Value to match against
  * @returns Partitioned array of items
  */
-export function partition<Item extends PlainObject, Key extends keyof Item>(
+export function partition<Item extends PlainObject, ItemKey extends keyof Item>(
 	array: Item[],
-	key: Key,
-	value: Item[Key],
+	key: ItemKey,
+	value: Item[ItemKey],
 ): Item[][];
 
 /**

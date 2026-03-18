@@ -9,10 +9,10 @@ import type {PlainObject} from '../models';
  * @param keys Keys to use
  * @returns Partial object with only the specified keys
  */
-export function pick<Value extends PlainObject, Key extends keyof Value>(
+export function pick<Value extends PlainObject, ValueKey extends keyof Value>(
 	value: Value,
-	keys: Key[],
-): Pick<Value, Key> {
+	keys: ValueKey[],
+): Pick<Value, ValueKey> {
 	return partial(value, keys, false);
 }
 

@@ -81,9 +81,9 @@ export function max<Item>(
  * @param key Key to use for value
  * @returns Maximum value, or `NaN` if no maximum can be found
  */
-export function max<Item extends PlainObject, Key extends keyof NumericalValues<Item>>(
+export function max<Item extends PlainObject, ItemKey extends keyof NumericalValues<Item>>(
 	items: Item[],
-	key: Key,
+	key: ItemKey,
 ): number;
 
 /**

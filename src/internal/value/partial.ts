@@ -1,20 +1,20 @@
 import type {PlainObject} from '../../models';
 
-export function partial<Value extends object, Key extends keyof Value>(
+export function partial<Value extends object, ValueKey extends keyof Value>(
 	value: unknown,
-	keys: Key[],
+	keys: ValueKey[],
 	omit: true,
-): Omit<Value, Key>;
+): Omit<Value, ValueKey>;
 
-export function partial<Value extends object, Key extends keyof Value>(
+export function partial<Value extends object, ValueKey extends keyof Value>(
 	value: unknown,
-	keys: Key[],
+	keys: ValueKey[],
 	omit: false,
-): Pick<Value, Key>;
+): Pick<Value, ValueKey>;
 
-export function partial<Value extends object, Key extends keyof Value>(
+export function partial<Value extends object, ValueKey extends keyof Value>(
 	value: unknown,
-	providedKeys: Key[],
+	providedKeys: ValueKey[],
 	omit: boolean,
 ): Partial<Value> {
 	if (typeof value !== 'object' || value === null) {
@@ -37,7 +37,7 @@ export function partial<Value extends object, Key extends keyof Value>(
 			continue;
 		}
 
-		if (omit ? !providedKeys.includes(key as Key) : true) {
+		if (omit ? !providedKeys.includes(key as ValueKey) : true) {
 			(partials as PlainObject)[key] = (value as PlainObject)[key];
 		}
 	}

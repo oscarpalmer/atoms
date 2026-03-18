@@ -28,7 +28,7 @@ type UnionToIntersection<Union> = (
 export type Unsmushed<Value extends PlainObject> = Simplify<
 	Omit<
 		{
-			[Key in KeysOfUnion<Value>]: Value[Key];
+			[UnionKey in KeysOfUnion<Value>]: Value[UnionKey];
 		},
 		`${string}.${string}`
 	>

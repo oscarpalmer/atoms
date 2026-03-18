@@ -21,10 +21,10 @@ export function update<Item>(
  * @param key Key to find existing item
  * @returns Original array
  */
-export function update<Item extends PlainObject, Key extends keyof Item>(
+export function update<Item extends PlainObject, ItemKey extends keyof Item>(
 	destination: Item[],
 	updated: Item[],
-	key: Key,
+	key: ItemKey,
 ): Item[];
 
 /**

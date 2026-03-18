@@ -20,10 +20,10 @@ export function toSet<Item, Callback extends (item: Item, index: number, array: 
  * @param key Key to use for value
  * @returns Set of values
  */
-export function toSet<Item extends PlainObject, Key extends keyof Item>(
+export function toSet<Item extends PlainObject, ItemKey extends keyof Item>(
 	array: Item[],
-	key: Key,
-): Set<Item[Key]>;
+	key: ItemKey,
+): Set<Item[ItemKey]>;
 
 /**
  * Create a Set from an array of items

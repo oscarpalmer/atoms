@@ -16,10 +16,10 @@ type ExtractType = 'drop' | 'take';
  * @param value Value to match against
  * @returns New array with items dropped
  */
-export function drop<Item extends PlainObject, Key extends keyof Item>(
+export function drop<Item extends PlainObject, ItemKey extends keyof Item>(
 	array: Item[],
-	key: Key,
-	value: Item[Key],
+	key: ItemKey,
+	value: Item[ItemKey],
 ): Item[];
 
 /**
@@ -192,10 +192,10 @@ export function slice(array: unknown[], first?: number, second?: number): unknow
  * @param value Value to match against
  * @returns New array with taken items
  */
-export function take<Item extends PlainObject, Key extends keyof Item>(
+export function take<Item extends PlainObject, ItemKey extends keyof Item>(
 	array: Item[],
-	key: Key,
-	value: Item[Key],
+	key: ItemKey,
+	value: Item[ItemKey],
 ): Item[];
 
 /**

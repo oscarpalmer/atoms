@@ -22,10 +22,10 @@ export function filter<
  * @param value Value to match against
  * @returns Filtered array of items
  */
-export function filter<Item extends PlainObject, Key extends keyof Item>(
+export function filter<Item extends PlainObject, ItemKey extends keyof Item>(
 	array: Item[],
-	key: Key,
-	value: Item[Key],
+	key: ItemKey,
+	value: Item[ItemKey],
 ): Item[];
 
 /**
@@ -58,10 +58,10 @@ function removeFiltered<
 	Callback extends (item: Item, index: number, array: Item[]) => unknown,
 >(array: Item[], callback: Callback, value: ReturnType<Callback>): unknown[];
 
-function removeFiltered<Item extends PlainObject, Key extends keyof Item>(
+function removeFiltered<Item extends PlainObject, ItemKey extends keyof Item>(
 	array: Item[],
-	key: Key,
-	value: Item[Key],
+	key: ItemKey,
+	value: Item[ItemKey],
 ): unknown[];
 
 function removeFiltered<Item>(

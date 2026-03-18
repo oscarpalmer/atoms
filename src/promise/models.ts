@@ -84,13 +84,13 @@ export class PromiseTimeoutError extends Error {
 }
 
 export type PromisesItems<Items extends unknown[]> = {
-	[Key in keyof Items]: Items[Key] extends GenericCallback
-		? ReturnType<Items[Key]> extends Promise<infer Value>
+	[ItemsKey in keyof Items]: Items[ItemsKey] extends GenericCallback
+		? ReturnType<Items[ItemsKey]> extends Promise<infer Value>
 			? Promise<Value>
 			: never
-		: Items[Key] extends Promise<infer Value>
+		: Items[ItemsKey] extends Promise<infer Value>
 			? Promise<Value>
-			: Promise<Items[Key]>;
+			: Promise<Items[ItemsKey]>;
 };
 
 export type PromisesOptions = {
@@ -99,15 +99,17 @@ export type PromisesOptions = {
 };
 
 export type PromisesResult<Items extends unknown[]> = {
-	[Key in keyof Items]: Items[Key] extends Promise<infer Value> ? Result<Awaited<Value>> : never;
+	[ItemsKey in keyof Items]: Items[ItemsKey] extends Promise<infer Value>
+		? Result<Awaited<Value>>
+		: never;
 };
 
 export type PromisesUnwrapped<Items extends unknown[]> = {
-	[Key in keyof Items]: Items[Key] extends GenericCallback
-		? ReturnType<Items[Key]> extends Promise<infer Value>
+	[ItemsKey in keyof Items]: Items[ItemsKey] extends GenericCallback
+		? ReturnType<Items[ItemsKey]> extends Promise<infer Value>
 			? Awaited<Value>
 			: never
-		: Items[Key] extends Promise<infer Value>
+		: Items[ItemsKey] extends Promise<infer Value>
 			? Awaited<Value>
 			: never;
 };
@@ -115,11 +117,11 @@ export type PromisesUnwrapped<Items extends unknown[]> = {
 export type PromisesValue<Value> = FulfilledPromise<Value> | RejectedPromise;
 
 export type PromisesValues<Items extends unknown[]> = {
-	[Key in keyof Items]: Items[Key] extends GenericCallback
-		? ReturnType<Items[Key]> extends Promise<infer Value>
+	[ItemsKey in keyof Items]: Items[ItemsKey] extends GenericCallback
+		? ReturnType<Items[ItemsKey]> extends Promise<infer Value>
 			? PromisesValue<Awaited<Value>>
 			: never
-		: Items[Key] extends Promise<infer Value>
+		: Items[ItemsKey] extends Promise<infer Value>
 			? PromisesValue<Awaited<Value>>
 			: never;
 };

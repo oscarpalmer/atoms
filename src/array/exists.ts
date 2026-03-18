@@ -22,10 +22,10 @@ export function exists<
  * @param value Value to match against
  * @returns `true` if the item exists in the array, otherwise `false`
  */
-export function exists<Item extends PlainObject, Key extends keyof Item>(
+export function exists<Item extends PlainObject, ItemKey extends keyof Item>(
 	array: Item[],
-	key: Key,
-	value: Item[Key],
+	key: ItemKey,
+	value: Item[ItemKey],
 ): boolean;
 
 /**

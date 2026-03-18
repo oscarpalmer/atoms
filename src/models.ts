@@ -50,8 +50,8 @@ export type GenericCallback = (...args: any[]) => any;
  */
 export type Key = number | string;
 
-export type KeyedValue<Item, Key extends keyof Item> = Item[Key] extends PropertyKey
-	? Item[Key]
+export type KeyedValue<Item, ItemKey extends keyof Item> = Item[ItemKey] extends PropertyKey
+	? Item[ItemKey]
 	: never;
 
 /**
@@ -71,20 +71,24 @@ type _NestedKeys<Value, Depth extends number = 5> = Depth extends 0
 		? Value extends readonly [any, ...any]
 			? // Tuple: extract actual indices
 				{
-					[Key in keyof Value]-?: Key extends `${number}`
-						? NonNullable<Value[Key]> extends readonly any[] | PlainObject
-							? `${Key}` | `${Key}.${_NestedKeys<NonNullable<Value[Key]>, SubtractDepth<Depth>>}`
-							: `${Key}`
+					[ItemKey in keyof Value]-?: ItemKey extends `${number}`
+						? NonNullable<Value[ItemKey]> extends readonly any[] | PlainObject
+							?
+									| `${ItemKey}`
+									| `${ItemKey}.${_NestedKeys<NonNullable<Value[ItemKey]>, SubtractDepth<Depth>>}`
+							: `${ItemKey}`
 						: never;
 				}[number]
 			: // Array: use no indices
 				never
 		: Value extends PlainObject
 			? {
-					[Key in keyof Value]-?: Key extends number | string
-						? NonNullable<Value[Key]> extends readonly any[] | PlainObject
-							? `${Key}` | `${Key}.${_NestedKeys<NonNullable<Value[Key]>, SubtractDepth<Depth>>}`
-							: `${Key}`
+					[ItemKey in keyof Value]-?: ItemKey extends number | string
+						? NonNullable<Value[ItemKey]> extends readonly any[] | PlainObject
+							?
+									| `${ItemKey}`
+									| `${ItemKey}.${_NestedKeys<NonNullable<Value[ItemKey]>, SubtractDepth<Depth>>}`
+							: `${ItemKey}`
 						: never;
 				}[keyof Value]
 			: never;
@@ -93,7 +97,9 @@ type _NestedKeys<Value, Depth extends number = 5> = Depth extends 0
  * An extended version of `Partial` that allows for nested properties to be optional
  */
 export type NestedPartial<Value> = {
-	[Key in keyof Value]?: Value[Key] extends object ? NestedPartial<Value[Key]> : Value[Key];
+	[ItemKey in keyof Value]?: Value[ItemKey] extends object
+		? NestedPartial<Value[ItemKey]>
+		: Value[ItemKey];
 };
 
 /**
@@ -101,12 +107,12 @@ export type NestedPartial<Value> = {
  */
 export type NestedValue<Value extends PlainObject, Path extends string> = _NestedValue<Value, Path>;
 
-type _NestedValue<Value, Path extends string> = Path extends `${infer Key}.${infer Rest}`
-	? Key extends keyof Value
-		? undefined extends Value[Key]
-			? _NestedValue<Exclude<Value[Key], undefined>, Rest> | undefined
-			: _NestedValue<Value[Key], Rest>
-		: Key extends `${number}`
+type _NestedValue<Value, Path extends string> = Path extends `${infer ItemKey}.${infer Rest}`
+	? ItemKey extends keyof Value
+		? undefined extends Value[ItemKey]
+			? _NestedValue<Exclude<Value[ItemKey], undefined>, Rest> | undefined
+			: _NestedValue<Value[ItemKey], Rest>
+		: ItemKey extends `${number}`
 			? Value extends readonly any[]
 				? _NestedValue<Value[number], Rest>
 				: never
@@ -130,14 +136,18 @@ export type NestedValues<Value extends PlainObject> = {
  * The numerical keys of an object
  */
 export type NumericalKeys<Value> = {
-	[Key in keyof Value]: Key extends number ? Key : Key extends `${number}` ? Key : never;
+	[ItemKey in keyof Value]: ItemKey extends number
+		? ItemKey
+		: ItemKey extends `${number}`
+			? ItemKey
+			: never;
 }[keyof Value];
 
 /**
  * The numerical values of an object
  */
 export type NumericalValues<Item extends PlainObject> = {
-	[Key in keyof Item as Item[Key] extends number ? Key : never]: Item[Key];
+	[ItemKey in keyof Item as Item[ItemKey] extends number ? ItemKey : never]: Item[ItemKey];
 };
 
 /**
@@ -200,7 +210,7 @@ export type RequiredKeys<Model extends object, Keys extends keyof Model> = Requi
  *
  * _(Thanks, type-fest!)_
  */
-export type Simplify<Value> = {[Key in keyof Value]: Value[Key]} & {};
+export type Simplify<Value> = {[ValueKey in keyof Value]: Value[ValueKey]} & {};
 
 type SubtractDepth<Value extends number> = Value extends 5
 	? 4

@@ -12,7 +12,7 @@ import type {
 // #region Types
 
 export type Smushed<Value extends PlainObject> = Simplify<{
-	[Key in NestedKeys<Value>]: NestedValue<Value, ToString<Key>>;
+	[NestedKey in NestedKeys<Value>]: NestedValue<Value, ToString<NestedKey>>;
 }>;
 
 // #endregion

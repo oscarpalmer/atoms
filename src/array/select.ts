@@ -30,12 +30,12 @@ export function select<
  */
 export function select<
 	Item extends PlainObject,
-	Key extends keyof Item,
+	ItemKey extends keyof Item,
 	MapCallback extends (item: Item, index: number, array: Item[]) => unknown,
 >(
 	array: Item[],
-	filterKey: Key,
-	filterValue: Item[Key],
+	filterKey: ItemKey,
+	filterValue: Item[ItemKey],
 	mapCallback: MapCallback,
 ): Array<ReturnType<MapCallback>>;
 

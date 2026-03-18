@@ -1,6 +1,6 @@
 {
 	"name": "@oscarpalmer/atoms",
-	"version": "0.166.2",
+	"version": "0.166.3",
 	"description": "Atomic utilities for making your JavaScript better.",
 	"keywords": [
 		"helper",

@@ -24,8 +24,8 @@ export function difference<First, Second>(
 export function difference<
 	First extends PlainObject,
 	Second extends PlainObject,
-	Key extends keyof First & keyof Second,
->(first: First[], second: Second[], key: Key): First[];
+	SharedKey extends keyof First & keyof Second,
+>(first: First[], second: Second[], key: SharedKey): First[];
 
 /**
  * Get the items from the first array that are not in the second array

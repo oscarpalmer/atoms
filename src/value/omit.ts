@@ -9,10 +9,10 @@ import type {PlainObject} from '../models';
  * @param keys Keys to omit
  * @returns Partial object without the specified keys
  */
-export function omit<Value extends PlainObject, Key extends keyof Value>(
+export function omit<Value extends PlainObject, ValueKey extends keyof Value>(
 	value: Value,
-	keys: Key[],
-): Omit<Value, Key> {
+	keys: ValueKey[],
+): Omit<Value, ValueKey> {
 	return partial(value, keys, true);
 }
 

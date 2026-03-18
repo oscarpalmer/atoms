@@ -14,11 +14,11 @@ import {indexOfArray} from './position';
  * @param key Key to get an item's value for matching
  * @returns Original array with items moved _(or unchanged if unable to move)_
  */
-export function move<Item extends PlainObject, Key extends keyof Item>(
+export function move<Item extends PlainObject, ItemKey extends keyof Item>(
 	array: Item[],
 	from: Item | Item[],
 	to: Item | Item[],
-	key: Key,
+	key: ItemKey,
 ): Item[];
 
 /**
@@ -156,11 +156,11 @@ function moveIndices<Item>(array: Item[], from: number, to: number): Item[] {
  * @param key Key to get an item's value for matching
  * @returns Original array with items moved _(or unchanged if unable to move)_
  */
-function moveToIndex<Item extends PlainObject, Key extends keyof Item>(
+function moveToIndex<Item extends PlainObject, ItemKey extends keyof Item>(
 	array: Item[],
 	value: Item | Item[],
 	index: number,
-	key: Key,
+	key: ItemKey,
 ): Item[];
 
 /**

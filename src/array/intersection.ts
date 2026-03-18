@@ -23,8 +23,8 @@ export function intersection<First, Second>(
 export function intersection<
 	First extends Record<string, unknown>,
 	Second extends Record<string, unknown>,
-	Key extends keyof First & keyof Second,
->(first: First[], second: Second[], key: Key): First[];
+	SharedKey extends keyof First & keyof Second,
+>(first: First[], second: Second[], key: SharedKey): First[];
 
 /**
  * Get the common values between two arrays

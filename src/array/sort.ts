@@ -21,11 +21,11 @@ export type ArrayComparisonSorter<Item> = {
 /**
  * Sorting information for arrays _(using a key)_
  */
-export type ArrayKeySorter<Item extends PlainObject, Key extends keyof Item> = {
+export type ArrayKeySorter<Item extends PlainObject, ItemKey extends keyof Item> = {
 	/**
 	 * Comparator to use when comparing items and values
 	 */
-	compare?: CompareCallback<Item, Item[Key]>;
+	compare?: CompareCallback<Item, Item[ItemKey]>;
 	/**
 	 * Direction to sort by
 	 */
@@ -33,14 +33,14 @@ export type ArrayKeySorter<Item extends PlainObject, Key extends keyof Item> = {
 	/**
 	 * Key to sort by
 	 */
-	key: Key;
+	key: ItemKey;
 };
 
 /**
  * Sorters based on keys in an object
  */
 type ArrayKeySorters<Item extends PlainObject> = {
-	[Key in keyof Item]: ArrayKeySorter<Item, Key>;
+	[ItemKey in keyof Item]: ArrayKeySorter<Item, ItemKey>;
 }[keyof Item];
 
 /**
