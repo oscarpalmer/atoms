@@ -23,9 +23,7 @@ export function getTimer<Callback extends GenericCallback>(
 		start ??= now;
 
 		if (interval === 0 || now - start >= interval - OFFSET) {
-			if (throttle) {
-				start = now;
-			}
+			start = throttle ? now : undefined;
 
 			callback(...args);
 		} else {
@@ -37,7 +35,7 @@ export function getTimer<Callback extends GenericCallback>(
 
 	let args: Parameters<Callback>;
 	let frame: DOMHighResTimeStamp | undefined;
-	let start: DOMHighResTimeStamp;
+	let start: DOMHighResTimeStamp | undefined;
 
 	const timer = (...parameters: Parameters<Callback>): void => {
 		timer.cancel();
