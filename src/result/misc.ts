@@ -113,3 +113,9 @@ export function unwrap(value: unknown, defaultValue: unknown): unknown {
 const MESSAGE_PROMISE_RESULT = 'toPromise expected to receive a Result';
 
 // #endregion
+
+// #region Exports
+
+export {isError, isOk, isResult} from '../internal/result';
+
+// #endregion

@@ -1,6 +1,6 @@
 {
 	"name": "@oscarpalmer/atoms",
-	"version": "0.166.3",
+	"version": "0.167.0",
 	"description": "Atomic utilities for making your JavaScript better.",
 	"keywords": [
 		"helper",
@@ -111,9 +111,17 @@
 			"types": "./dist/promise/delay.d.mts",
 			"default": "./dist/promise/delay.mjs"
 		},
+		"./promise/misc": {
+			"types": "./dist/promise/misc.d.mts",
+			"default": "./dist/promise/misc.mjs"
+		},
 		"./promise/models": {
 			"types": "./dist/promise/models.d.mts",
 			"default": "./dist/promise/models.mjs"
+		},
+		"./promise/timed": {
+			"types": "./dist/promise/timed.d.mts",
+			"default": "./dist/promise/timed.mjs"
 		},
 		"./query": {
 			"types": "./dist/query.d.mts",
@@ -130,6 +138,26 @@
 		"./result": {
 			"types": "./dist/result/index.d.mts",
 			"default": "./dist/result/index.mjs"
+		},
+		"./result/flow": {
+			"types": "./dist/result/work/flow.d.mts",
+			"default": "./dist/result/work/flow.mjs"
+		},
+		"./result/match": {
+			"types": "./dist/result/match.d.mts",
+			"default": "./dist/result/match.mjs"
+		},
+		"./result/misc": {
+			"types": "./dist/result/misc.d.mts",
+			"default": "./dist/result/misc.mjs"
+		},
+		"./result/models": {
+			"types": "./dist/result/models.d.mts",
+			"default": "./dist/result/models.mjs"
+		},
+		"./result/pipe": {
+			"types": "./dist/result/work/pipe.d.mts",
+			"default": "./dist/result/work/pipe.mjs"
 		},
 		"./sized/map": {
 			"types": "./dist/sized/map.d.mts",

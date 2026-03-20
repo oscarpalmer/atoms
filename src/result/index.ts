@@ -95,12 +95,3 @@ attempt.pipe = attemptPipe;
 attempt.promise = attemptPromise;
 
 // #endregion
-
-// #region Exports
-
-export {isError, isOk, isResult} from '../internal/result';
-export {toResult as fromPromise} from '../promise/misc';
-export {error, ok, toPromise, unwrap} from './misc';
-export type {Err, ExtendedErr, ExtendedResult, Ok, Result} from './models';
-
-// #endregion

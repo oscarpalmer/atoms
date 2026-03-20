@@ -84,3 +84,10 @@ export async function toResult<Value>(
 }
 
 // #endregion
+
+// #region Exports
+
+export {toPromise as fromResult} from '../result/misc';
+export {isFulfilled, isRejected} from './helpers';
+
+// #endregion
