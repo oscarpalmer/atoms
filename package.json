@@ -1,6 +1,6 @@
 {
 	"name": "@oscarpalmer/atoms",
-	"version": "0.167.0",
+	"version": "0.168.0",
 	"description": "Atomic utilities for making your JavaScript better.",
 	"keywords": [
 		"helper",
@@ -43,6 +43,10 @@
 		"./array/move": {
 			"types": "./dist/array/move.d.mts",
 			"default": "./dist/array/move.mjs"
+		},
+		"./array/sort": {
+			"types": "./dist/array/sort.d.mts",
+			"default": "./dist/array/sort.mjs"
 		},
 		"./array/swap": {
 			"types": "./dist/array/swap.d.mts",

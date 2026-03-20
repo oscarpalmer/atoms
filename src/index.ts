@@ -2,6 +2,7 @@ export * from './array/filter';
 export * from './array/group-by';
 export * from './array/index';
 export * from './array/move';
+export * from './array/sort';
 export * from './array/swap';
 export * from './array/to-map';
 export * from './array/to-record';

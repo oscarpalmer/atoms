@@ -141,7 +141,7 @@ test('compare', () => {
 	).toEqual([...greek].reverse());
 });
 
-test('large', () =>
+test('large (with intializer)', () =>
 	new Promise<void>(done => {
 		const firstNames = ['Alice', 'Bob', 'Charlie', 'David'];
 		const lastNames = ['Avery', 'Baker', 'Charlie', 'Davidson'];
@@ -171,7 +171,7 @@ test('large', () =>
 			return first.name.first.localeCompare(second.name.first);
 		});
 
-		const atomic = sort(large, [
+		const sorter = sort.initialize<(typeof large)[0]>([
 			'age',
 			{
 				comparison: (first, second) => first.name.last.localeCompare(second.name.last),
@@ -179,6 +179,8 @@ test('large', () =>
 			},
 			(first, second) => first.name.first.localeCompare(second.name.first),
 		]);
+
+		const atomic = sorter(large);
 
 		setTimeout(() => {
 			const diffed = diff(native, atomic);
