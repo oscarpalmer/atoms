@@ -86,36 +86,28 @@ function cloneDataView(
 	return cloned;
 }
 
-function cloneMapOrSet<Value extends Map<unknown, unknown> | Set<unknown>>(
-	value: Value,
+function cloneMap(
+	map: Map<unknown, unknown>,
 	depth: number,
 	references: WeakMap<WeakKey, unknown>,
-): Value {
+): Map<unknown, unknown> {
 	if (depth >= MAX_CLONE_DEPTH) {
-		return value;
+		return map;
 	}
 
-	const isMap = value instanceof Map;
-	const cloned = isMap ? new Map<unknown, unknown>() : new Set<unknown>();
-	const entries = [...value.entries()];
-	const {length} = entries;
+	const cloned = new Map<unknown, unknown>();
+	const entries = map.entries();
 
-	for (let index = 0; index < length; index += 1) {
-		const entry = entries[index];
-
-		if (isMap) {
-			(cloned as Map<unknown, unknown>).set(
-				cloneValue(entry[0], depth + 1, references),
-				cloneValue(entry[1], depth + 1, references),
-			);
-		} else {
-			(cloned as Set<unknown>).add(cloneValue(entry[0], depth + 1, references));
-		}
+	for (const entry of entries) {
+		cloned.set(
+			cloneValue(entry[0], depth + 1, references),
+			cloneValue(entry[1], depth + 1, references),
+		);
 	}
 
-	references.set(value, cloned);
+	references.set(map, cloned);
 
-	return cloned as Value;
+	return cloned;
 }
 
 function cloneNode(node: Node, depth: number, references: WeakMap<WeakKey, unknown>): Node {
@@ -168,6 +160,28 @@ function cloneRegularExpression(
 	cloned.lastIndex = value.lastIndex;
 
 	references.set(value, cloned);
+
+	return cloned;
+}
+
+function cloneSet(
+	set: Set<unknown>,
+	depth: number,
+	references: WeakMap<WeakKey, unknown>,
+): Set<unknown> {
+	if (depth >= MAX_CLONE_DEPTH) {
+		return set;
+	}
+
+	const cloned = new Set<unknown>();
+	const values = [...set.values()];
+	const {length} = values;
+
+	for (let index = 0; index < length; index += 1) {
+		cloned.add(cloneValue(values[index], depth + 1, references));
+	}
+
+	references.set(set, cloned);
 
 	return cloned;
 }
@@ -227,11 +241,13 @@ function cloneValue(value: unknown, depth: number, references: WeakMap<WeakKey, 
 			return cloneRegularExpression(value, depth, references);
 
 		case value instanceof Map:
-		case value instanceof Set:
-			return cloneMapOrSet(value, depth, references);
+			return cloneMap(value, depth, references);
 
 		case value instanceof Node:
 			return cloneNode(value, depth, references);
+
+		case value instanceof Set:
+			return cloneSet(value, depth, references);
 
 		case isArrayOrPlainObject(value):
 			return clonePlainObject(value, depth, references);

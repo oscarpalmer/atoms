@@ -1,5 +1,5 @@
+import {isPrimitive} from '../is';
 import type {ArrayOrPlainObject, Constructor, PlainObject, TypedArray} from '../../models';
-import {chunk} from '../array/chunk';
 import {isPlainObject, isTypedArray} from '../is';
 import {getCompareHandlers} from './handlers';
 
@@ -122,21 +122,11 @@ function equalArray(first: unknown[], second: unknown[], options: Options): bool
 		}
 	}
 
-	const firstChunks = chunk(first.slice(offset, length - offset), ARRAY_THRESHOLD);
+	const end = length - offset;
 
-	const secondChunks = chunk(second.slice(offset, length - offset), ARRAY_THRESHOLD);
-
-	const chunksLength = firstChunks.length;
-
-	for (let chunkIndex = 0; chunkIndex < chunksLength; chunkIndex += 1) {
-		const firstChunk = firstChunks[chunkIndex];
-		const secondChunk = secondChunks[chunkIndex];
-		const chunkLength = firstChunk.length;
-
-		for (let index = 0; index < chunkLength; index += 1) {
-			if (!equalValue(firstChunk[index], secondChunk[index], options)) {
-				return false;
-			}
+	for (let index = offset; index < end; index += 1) {
+		if (!equalValue(first[index], second[index], options)) {
+			return false;
 		}
 	}
 
@@ -167,16 +157,11 @@ function equalMap(
 	}
 
 	const firstKeys = [...first.keys()];
-	const secondKeys = [...second.keys()];
-
-	if (firstKeys.some(key => !secondKeys.includes(key))) {
-		return false;
-	}
 
 	for (let index = 0; index < size; index += 1) {
 		const key = firstKeys[index];
 
-		if (!equalValue(first.get(key), second.get(key), options)) {
+		if (!second.has(key) || !equalValue(first.get(key), second.get(key), options)) {
 			return false;
 		}
 	}
@@ -197,16 +182,22 @@ function equalPlainObject(
 		secondKeys = secondKeys.filter(key => filterKey(key, options));
 	}
 
+	const useSet = secondKeys.length >= MINIMUM_LENGTH_FOR_SET;
+	const secondSet = useSet ? new Set(secondKeys) : undefined;
+
 	const {length} = firstKeys;
 
-	if (length !== secondKeys.length || firstKeys.some(key => !secondKeys.includes(key))) {
+	if (length !== secondKeys.length) {
 		return false;
 	}
 
 	for (let index = 0; index < length; index += 1) {
 		const key = firstKeys[index];
 
-		if (!equalValue(first[key as never], second[key as never], options)) {
+		if (
+			!(secondSet?.has(key) ?? secondKeys.includes(key)) ||
+			!equalValue(first[key as never], second[key as never], options)
+		) {
 			return false;
 		}
 	}
@@ -246,7 +237,11 @@ function equalSet(first: Set<unknown>, second: Set<unknown>, options: Options): 
 	for (let index = 0; index < size; index += 1) {
 		const firstValue = firstValues[index];
 
-		if (!secondValues.some(secondValue => equalValue(firstValue, secondValue, options))) {
+		if (
+			isPrimitive(firstValue)
+				? !second.has(firstValue)
+				: !secondValues.some(secondValue => equalValue(firstValue, secondValue, options))
+		) {
 			return false;
 		}
 	}
@@ -438,5 +433,7 @@ const ARRAY_THRESHOLD = 100;
 const ERROR_PROPERTIES: string[] = ['name', 'message'];
 
 const EXPRESSION_PROPERTIES: string[] = ['source', 'flags'];
+
+const MINIMUM_LENGTH_FOR_SET = 16;
 
 // #endregion

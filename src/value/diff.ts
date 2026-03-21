@@ -57,8 +57,8 @@ type KeyedDiffValue = {
 type Parameters = {
 	changes: KeyedDiffValue[];
 	key: PropertyKey;
+	options: Required<DiffOptions>;
 	values: {first: unknown; second: unknown};
-	relaxedNullish: boolean;
 	prefix?: string;
 };
 
@@ -106,7 +106,7 @@ export function diff<First, Second = First>(
 		return diffResult;
 	}
 
-	const diffs = getDiffs(first, second, relaxedNullish);
+	const diffs = getDiffs(first, second, {relaxedNullish});
 
 	const {length} = diffs;
 
@@ -127,7 +127,7 @@ function getChanges(
 	changes: KeyedDiffValue[],
 	first: unknown,
 	second: unknown,
-	relaxedNullish: boolean,
+	options: Required<DiffOptions>,
 	prefix?: string,
 ): KeyedDiffValue[] {
 	const checked = new Set<PropertyKey>();
@@ -151,7 +151,7 @@ function getChanges(
 			setChanges({
 				changes,
 				key,
-				relaxedNullish,
+				options,
 				prefix,
 				values: {first, second},
 			});
@@ -164,7 +164,7 @@ function getChanges(
 function getDiffs(
 	first: unknown,
 	second: unknown,
-	relaxedNullish: boolean,
+	options: Required<DiffOptions>,
 	prefix?: string,
 ): KeyedDiffValue[] {
 	const changes: KeyedDiffValue[] = [];
@@ -184,30 +184,29 @@ function getDiffs(
 		}
 	}
 
-	return getChanges(changes, first, second, relaxedNullish, prefix);
+	return getChanges(changes, first, second, options, prefix);
 }
 
 function setChanges(parameters: Parameters): void {
-	const {changes, key, prefix, relaxedNullish, values} = parameters;
-
-	const from = values.first?.[key as never];
-	const to = values.second?.[key as never];
-
-	if (equal(from, to, {relaxedNullish})) {
-		return;
-	}
+	const {changes, key, prefix, options, values} = parameters;
 
 	const prefixed = join([prefix, key], '.');
+
+	const from: unknown = values.first?.[key as never];
+	const to: unknown = values.second?.[key as never];
+
+	const nested = isArrayOrPlainObject(from) || isArrayOrPlainObject(to);
+	const diffs = nested ? getDiffs(from, to, options, prefixed) : [];
+
+	if (nested ? diffs.length === 0 : equal(from, to, options)) {
+		return;
+	}
 
 	const change = {
 		from,
 		to,
 		key: prefixed,
 	};
-
-	const nested = isArrayOrPlainObject(from) || isArrayOrPlainObject(to);
-
-	const diffs = nested ? getDiffs(from, to, relaxedNullish, prefixed) : [];
 
 	changes.push(change);
 

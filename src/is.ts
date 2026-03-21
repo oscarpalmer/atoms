@@ -88,20 +88,9 @@ export function isObject(value: unknown): value is object {
 	return (typeof value === 'object' && value !== null) || typeof value === 'function';
 }
 
-/**
- * - Is the value a primitive value?
- * @param value Value to check
- * @returns `true` if the value matches, otherwise `false`
- */
-export function isPrimitive(value: unknown): value is Primitive {
-	return value == null || EXPRESSION_PRIMITIVE.test(typeof value);
-}
-
 // #endregion
 
 // #region Variables
-
-const EXPRESSION_PRIMITIVE = /^(bigint|boolean|number|string|symbol)$/;
 
 const EXPRESSION_WHITESPACE = /^\s*$/;
 
@@ -116,6 +105,7 @@ export {
 	isKey,
 	isNumber,
 	isPlainObject,
+	isPrimitive,
 	isTypedArray,
 } from './internal/is';
 

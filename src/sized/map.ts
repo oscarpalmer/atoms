@@ -17,7 +17,7 @@ export class SizedMap<SizedKey = unknown, SizedValue = unknown> extends Map<Size
 	 * Is the Map full?
 	 */
 	get full(): boolean {
-		return this.size >= this.#maximumSize;
+		return super.size >= this.#maximumSize;
 	}
 
 	get maximum(): number {
@@ -75,26 +75,32 @@ export class SizedMap<SizedKey = unknown, SizedValue = unknown> extends Map<Size
 	 * @inheritdoc
 	 */
 	override get(key: SizedKey): SizedValue | undefined {
-		const value = super.get(key);
+		if (super.has(key)) {
+			const value = super.get(key) as SizedValue;
 
-		if (value !== undefined || this.has(key)) {
-			this.set(key, value as SizedValue);
+			this.#setValue(key, value, true);
+
+			return value;
 		}
-
-		return value;
 	}
 
 	/**
 	 * @inheritdoc
 	 */
 	override set(key: SizedKey, value: SizedValue): this {
-		if (this.has(key)) {
-			this.delete(key);
-		} else if (this.size >= this.#maximumSize) {
-			this.delete(this.keys().next().value as SizedKey);
+		return this.#setValue(key, value, super.has(key));
+	}
+
+	#setValue(key: SizedKey, value: SizedValue, has: boolean): this {
+		if (has) {
+			super.delete(key);
+		} else if (super.size >= this.#maximumSize) {
+			super.delete(super.keys().next().value as SizedKey);
 		}
 
-		return super.set(key, value);
+		super.set(key, value);
+
+		return this;
 	}
 }
 

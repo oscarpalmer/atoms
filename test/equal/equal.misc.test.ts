@@ -64,6 +64,40 @@ test('object', () => {
 	expect(equal({a: 1, b: 2}, {a: 1})).toBe(false);
 });
 
+test('object: many keys', () => {
+	const obj = {
+		a: 1,
+		b: 2,
+		c: 3,
+		d: 4,
+		e: 5,
+		f: 6,
+		g: 7,
+		h: 8,
+		i: 9,
+		j: 10,
+		l: 11,
+		m: 12,
+		n: 13,
+		o: 14,
+		p: 15,
+		q: 16,
+		r: 17,
+		s: 18,
+		t: 19,
+		u: 20,
+		v: 21,
+		w: 22,
+		x: 23,
+		y: 24,
+		z: 25,
+	};
+
+	expect(equal(obj, obj)).toBe(true);
+	expect(equal(obj, {...obj})).toBe(true);
+	expect(equal(obj, {...obj, o: 99})).toBe(false);
+});
+
 test('options', () => {
 	const symbol = Symbol('test');
 

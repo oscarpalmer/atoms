@@ -1,4 +1,11 @@
-import type {ArrayOrPlainObject, Constructor, Key, PlainObject, TypedArray} from '../models';
+import type {
+	ArrayOrPlainObject,
+	Constructor,
+	Key,
+	PlainObject,
+	Primitive,
+	TypedArray,
+} from '../models';
 
 // #region Functions
 
@@ -75,6 +82,15 @@ export function isPlainObject(value: unknown): value is PlainObject {
 }
 
 /**
+ * - Is the value a primitive value?
+ * @param value Value to check
+ * @returns `true` if the value matches, otherwise `false`
+ */
+export function isPrimitive(value: unknown): value is Primitive {
+	return value == null || EXPRESSION_PRIMITIVE.test(typeof value);
+}
+
+/**
  * Is the value a typed array?
  * @param value Value to check
  * @returns `true` if the value is a typed array, otherwise `false`
@@ -100,6 +116,8 @@ export function isTypedArray(value: unknown): value is TypedArray {
 // #endregion
 
 // #region Variables
+
+const EXPRESSION_PRIMITIVE = /^(bigint|boolean|number|string|symbol)$/;
 
 let TYPED_ARRAYS: Set<unknown>;
 

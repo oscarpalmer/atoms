@@ -71,10 +71,10 @@ export class SizedSet<Value = unknown> extends Set<Value> {
 	 * @inheritdoc
 	 */
 	override add(value: Value): this {
-		if (this.has(value)) {
-			this.delete(value);
+		if (super.has(value)) {
+			super.delete(value);
 		} else if (this.size >= this.#maximumSize) {
-			this.delete(this.values().next().value as Value);
+			super.delete(this.values().next().value as Value);
 		}
 
 		return super.add(value);
@@ -87,9 +87,10 @@ export class SizedSet<Value = unknown> extends Set<Value> {
 	 * @returns Found value if it exists, otherwise `undefined`
 	 */
 	get(value: Value, update?: boolean): Value | undefined {
-		if (this.has(value)) {
+		if (super.has(value)) {
 			if (update ?? false) {
-				this.delete(value);
+				super.delete(value);
+
 				this.add(value);
 			}
 
