@@ -243,7 +243,7 @@ function cloneValue(value: unknown, depth: number, references: WeakMap<WeakKey, 
 		case value instanceof Map:
 			return cloneMap(value, depth, references);
 
-		case value instanceof Node:
+		case typeof Node !== 'undefined' && value instanceof Node:
 			return cloneNode(value, depth, references);
 
 		case value instanceof Set:

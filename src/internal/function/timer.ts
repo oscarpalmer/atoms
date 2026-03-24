@@ -19,7 +19,9 @@ export function getTimer<Callback extends GenericCallback>(
 ): CancelableCallback<Callback> {
 	const interval = getInterval(time);
 
-	function run(now: DOMHighResTimeStamp): void {
+	function run(): void {
+		const now = performance.now();
+
 		start ??= now;
 
 		if (interval === 0 || now - start >= interval - OFFSET) {
@@ -27,25 +29,26 @@ export function getTimer<Callback extends GenericCallback>(
 
 			callback(...args);
 		} else {
-			frame = requestAnimationFrame(run);
+			id = startTimer(run);
 		}
 	}
 
 	const throttle = type === TIMER_THROTTLE;
 
 	let args: Parameters<Callback>;
-	let frame: DOMHighResTimeStamp | undefined;
-	let start: DOMHighResTimeStamp | undefined;
+	let id: number;
+	let start: number | undefined;
 
 	const timer = (...parameters: Parameters<Callback>): void => {
 		timer.cancel();
 
 		args = parameters;
-		frame = requestAnimationFrame(run);
+
+		id = startTimer(run);
 	};
 
 	timer.cancel = (): void => {
-		cancelAnimationFrame(frame!);
+		clearTimer(id);
 	};
 
 	return timer as CancelableCallback<Callback>;
@@ -62,5 +65,9 @@ export const TIMER_DEBOUNCE: TimerType = 'debounce';
 export const TIMER_THROTTLE: TimerType = 'throttle';
 
 export const TIMER_WAIT: TimerType = 'wait';
+
+const clearTimer = typeof cancelAnimationFrame === 'function' ? cancelAnimationFrame : clearTimeout;
+
+const startTimer = typeof requestAnimationFrame === 'function' ? requestAnimationFrame : setTimeout;
 
 // #endregion
