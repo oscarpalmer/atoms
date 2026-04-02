@@ -6,6 +6,19 @@
 export type ArrayOrPlainObject = unknown[] | Record<PropertyKey, unknown>;
 
 /**
+ * An asynchronous callback that can be canceled
+ */
+export type AsyncCancelableCallback<Callback extends GenericAsyncCallback | GenericCallback> =
+	(ReturnType<Callback> extends Promise<any>
+		? (...args: Parameters<Callback>) => Promise<Awaited<ReturnType<Callback>>>
+		: (...args: Parameters<Callback>) => Promise<ReturnType<Callback>>) & {
+		/**
+		 * Cancel the callback
+		 */
+		cancel: () => void;
+	};
+
+/**
  * For mathicng any `void`, `Date`, primitive, or `RegExp` values
  *
  * (Thanks, type-fest!)
@@ -13,7 +26,7 @@ export type ArrayOrPlainObject = unknown[] | Record<PropertyKey, unknown>;
 export type BuiltIns = void | Date | Primitive | RegExp;
 
 /**
- * An extend callback that can be canceled
+ * A synchronous callback that can be canceled
  */
 export type CancelableCallback<Callback extends GenericCallback> = Callback & {
 	/**

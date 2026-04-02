@@ -10,6 +10,7 @@ export * from './array/unique';
 
 export * from './function/assert';
 export * from './function/index';
+export * from './function/limit';
 export * from './function/once';
 export * from './function/retry';
 export * from './function/work';

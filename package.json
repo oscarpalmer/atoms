@@ -1,6 +1,6 @@
 {
 	"name": "@oscarpalmer/atoms",
-	"version": "0.170.0",
+	"version": "0.171.0",
 	"description": "Atomic utilities for making your JavaScript better.",
 	"keywords": [
 		"helper",
@@ -75,6 +75,10 @@
 		"./function/assert": {
 			"types": "./dist/function/assert.d.mts",
 			"default": "./dist/function/assert.mjs"
+		},
+		"./function/limit": {
+			"types": "./dist/function/limit.d.mts",
+			"default": "./dist/function/limit.mjs"
 		},
 		"./function/once": {
 			"types": "./dist/function/once.d.mts",
@@ -221,7 +225,6 @@
 		"tsdown:build": "npx tsdown -c ./tsdown.config.ts",
 		"tsdown:watch": "npx tsdown -c ./tsdown.config.ts --watch",
 		"test": "npx vp test run --coverage",
-		"test:leak": "npx vp test run --detect-async-leaks --coverage",
 		"watch": "npx vite build --watch"
 	},
 	"devDependencies": {
