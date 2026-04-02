@@ -1,7 +1,6 @@
 import {getArray} from './array/get';
 import {isNumber} from './internal/is';
 import {getString} from './internal/string';
-import type {Primitive} from './models';
 
 // #region Functions
 

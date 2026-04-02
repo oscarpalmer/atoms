@@ -40,11 +40,17 @@ test('asynchronous', () =>
 				});
 		}
 
-		const second = debounce.async(() => new Promise<void>(resolve => setTimeout(() => {
-			result.second.count += 1;
+		const second = debounce.async(
+			() =>
+				new Promise<void>(resolve =>
+					setTimeout(() => {
+						result.second.count += 1;
 
-			resolve();
-		}, 50)), 25);
+						resolve();
+					}, 50),
+				),
+			25,
+		);
 
 		for (let index = 0; index < 100; index += 1) {
 			void second()

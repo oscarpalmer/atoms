@@ -8,7 +8,6 @@ export default defineConfig({
 		singleQuote: true,
 		useTabs: true,
 	},
-	lint: {},
 	logLevel: 'silent',
 	pack: {
 		dts: true,
