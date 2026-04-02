@@ -8,7 +8,7 @@
  * @typedef Plugin
  * @property {string} message
  * @property {string} name
- * @property {string} selector
+ * @property {string[]} selectors
  * @property {import('eslint').Rule.RuleModule} value
  */
 
@@ -59,7 +59,7 @@ export function getPlugin(name, methods, validator, prefix) {
 	return {
 		message,
 		name: name.full,
-		selector: `CallExpression[callee.type="${memberExpression}"][callee.object.type="${arrayExpression}"][callee.property.type="${identifierType}"]`,
+		selectors: getSelectors(methods),
 		value: {
 			create(context) {
 				return {
@@ -81,6 +81,27 @@ export function getPlugin(name, methods, validator, prefix) {
 			},
 		},
 	};
+}
+
+/**
+ * @param {Set<string>} methods
+ * @returns {string[]}
+ */
+function getSelectors(methods) {
+	const array = [...methods];
+	const {length} = array;
+
+	const selectors = [];
+
+	for (let index = 0; index < length; index += 1) {
+		const method = array[index];
+
+		selectors.push(
+			`CallExpression[callee.type="${memberExpression}"][callee.object.type="${arrayExpression}"][callee.property.type="${identifierType}"][callee.property.name="${method}"]`,
+		);
+	}
+
+	return selectors;
 }
 
 /**
