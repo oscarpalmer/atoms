@@ -25,7 +25,7 @@
  * @param {string|undefined} prefix
  * @returns {string}
  */
-function getMethodNames(methods, prefix) {
+function getMethods(methods, prefix) {
 	const array = [...methods];
 	const {length} = array;
 
@@ -38,6 +38,8 @@ function getMethodNames(methods, prefix) {
 
 		if (index === 0) {
 			names = `'${name}'`;
+		} else if (length === 2) {
+			names += ` and '${name}'`;
 		} else {
 			names += index === length - 1 ? `, and '${name}'` : `, '${name}'`;
 		}
@@ -47,24 +49,31 @@ function getMethodNames(methods, prefix) {
 }
 
 /**
- * @param {Name} name
+ * @param {string} type
+ * @param {string} name
  * @param {Set<string>} methods
- * @param {Validator} validator
- * @param {string|undefined} prefix
+ * @param {boolean|undefined} isStatic
+ * @param {boolean|undefined} isGlobal
  * @returns {Plugin}
  */
-export function getPlugin(name, methods, validator, prefix) {
-	const message = `Prefer using '${name.short}' (@oscarpalmer/atoms) instead of ${getMethodNames(methods, prefix)}`;
+export function getPlugin(type, name, methods, isStatic, isGlobal) {
+	const globalMethod = isGlobal ?? false;
+	const staticMethod = isStatic ?? false;
+
+	const fullName = `${type}.${name}`;
+	const prefix = globalMethod ? undefined : staticMethod ? objects[type] : prefixes[type];
+
+	const message = `Prefer using '${name}' (@oscarpalmer/atoms) instead of ${getMethods(methods, prefix)}`;
 
 	return {
 		message,
-		name: name.full,
-		selectors: getSelectors(methods),
+		name: fullName,
+		selectors: getSelectors(type, methods, staticMethod, globalMethod),
 		value: {
-			create(context) {
+			createOnce(context) {
 				return {
 					CallExpression(node) {
-						if (validator(context, node, methods)) {
+						if (isCall(type, context, node, methods, staticMethod, globalMethod)) {
 							context.report({
 								message,
 								node,
@@ -84,12 +93,21 @@ export function getPlugin(name, methods, validator, prefix) {
 }
 
 /**
+ * @param {string} type
  * @param {Set<string>} methods
+ * @param {boolean} isStatic
+ * @param {boolean} isGlobal
  * @returns {string[]}
  */
-function getSelectors(methods) {
+function getSelectors(type, methods, isStatic, isGlobal) {
 	const array = [...methods];
 	const {length} = array;
+
+	const origin = isGlobal
+		? ''
+		: isStatic
+			? `[callee.object.type="${identifierExpression}"][callee.object.name="${objects[type]}"]`
+			: `[callee.object.type="${typeExpressions[type]}"]`;
 
 	const selectors = [];
 
@@ -97,7 +115,9 @@ function getSelectors(methods) {
 		const method = array[index];
 
 		selectors.push(
-			`CallExpression[callee.type="${memberExpression}"][callee.object.type="${arrayExpression}"][callee.property.type="${identifierType}"][callee.property.name="${method}"]`,
+			isGlobal
+				? `CallExpression[callee.name="${method}"]`
+				: `CallExpression[callee.type="${memberExpression}"]${origin}[callee.property.type="${identifierExpression}"][callee.property.name="${method}"]`,
 		);
 	}
 
@@ -105,29 +125,106 @@ function getSelectors(methods) {
 }
 
 /**
+ * @param {string} type
+ * @param {import('eslint').Rule.RuleContext} context
+ * @param {import('estree').CallExpression & import('eslint').Rule.NodeParentExtension} node
+ * @param {Set<string>} methods
+ * @param {boolean} isStatic
+ * @param {boolean} isGlobal
+ * @returns {boolean}
+ */
+function isCall(type, context, node, methods, isStatic, isGlobal) {
+	const {callee} = node;
+
+	if (isGlobal) {
+		return methods.has(callee.name);
+	}
+
+	if (callee.type !== memberExpression || !methods.has(callee.property.name)) {
+		return false;
+	}
+
+	return isStatic
+		? isStaticMethod(type, context, node, methods)
+		: isInstanceMethod(type, context, node, methods);
+}
+
+/**
+ * @param {string} type
  * @param {import('eslint').Rule.RuleContext} context
  * @param {import('estree').CallExpression & import('eslint').Rule.NodeParentExtension} node
  * @param {Set<string>} methods
  * @returns {boolean}
  */
-export function isArrayMethod(context, node, methods) {
-	const {callee} = node;
+function isInstanceMethod(type, context, node, methods) {
+	const {object, property} = node.callee;
 
-	if (callee.type !== memberExpression) {
+	if (object.type === literalExpression) {
+		return isLiteralMethod(type, context, node, methods);
+	}
+
+	if (object.type !== typeExpressions[type]) {
+		return property.type === identifierExpression && isLiteralMethod(type, context, node, methods);
+	}
+
+	return property.type === identifierExpression;
+}
+
+/**
+ * @param {string} type
+ * @param {import('eslint').Rule.RuleContext} context
+ * @param {import('estree').CallExpression & import('eslint').Rule.NodeParentExtension} node
+ * @param {Set<string>} methods
+ * @returns {boolean}
+ */
+function isLiteralMethod(type, context, node, methods) {
+	// TODO: check literal value
+
+	return false;
+}
+
+/**
+ * @param {string} type
+ * @param {import('eslint').Rule.RuleContext} context
+ * @param {import('estree').CallExpression & import('eslint').Rule.NodeParentExtension} node
+ * @param {Set<string>} methods
+ * @returns {boolean}
+ */
+function isStaticMethod(type, context, node, methods) {
+	const {object, property} = node.callee;
+
+	if (object.type !== identifierExpression || object.name !== objects[type]) {
 		return false;
 	}
 
-	const {object, property} = callee;
-
-	return (
-		object.type === arrayExpression &&
-		property.type === identifierType &&
-		methods.has(property.name)
-	);
+	return property.type === identifierExpression;
 }
 
 const arrayExpression = 'ArrayExpression';
 
+const identifierExpression = 'Identifier';
+
+const literalExpression = 'Literal';
+
 const memberExpression = 'MemberExpression';
 
-const identifierType = 'Identifier';
+const objectExpression = 'ObjectExpression';
+
+const objects = {
+	array: 'Array',
+	math: 'Math',
+	promise: 'Promise',
+	string: 'String',
+	value: 'Object',
+};
+
+const prefixes = {
+	array: 'Array.prototype',
+	string: 'String.prototype',
+};
+
+const typeExpressions = {
+	array: arrayExpression,
+	string: literalExpression,
+	value: objectExpression,
+};

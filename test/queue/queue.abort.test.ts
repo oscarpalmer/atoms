@@ -22,7 +22,7 @@ test('abort', () =>
 		for (let index = 1; index < 5; index += 1) {
 			void queued
 				.add([index], signals[index].signal)
-				.promise.then(value => {
+				.promise.then(({value}) => {
 					values.push(value ** 2);
 				})
 				.catch(error => {

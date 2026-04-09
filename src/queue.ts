@@ -100,9 +100,9 @@ class Queue<CallbackParameters extends Parameters<GenericAsyncCallback>, Callbac
 		const id = this.#identify();
 
 		let rejector: (reason?: unknown) => void;
-		let resolver: (value: CallbackResult) => void;
+		let resolver: (value: QueuedResult<CallbackResult>) => void;
 
-		const promise = new Promise<CallbackResult>((resolve, reject) => {
+		const promise = new Promise<QueuedResult<CallbackResult>>((resolve, reject) => {
 			rejector = reject;
 			resolver = resolve;
 		});
@@ -225,13 +225,13 @@ class Queue<CallbackParameters extends Parameters<GenericAsyncCallback>, Callbac
 				const paused = item;
 
 				this.#handled.push(() => {
-					handleResult(paused, error, result);
+					handleResult(paused, error, result, this.#items.length === 0);
 				});
 
 				break;
 			}
 
-			handleResult(item, error, result);
+			handleResult(item, error, result, this.#items.length === 0);
 
 			item = this.#items.shift();
 		}
@@ -264,18 +264,35 @@ type QueueOptions = {
 };
 
 type Queued<Value> = {
+	/**
+	 * ID of the queued promise _(can be used to remove it from the queue)_
+	 */
 	readonly id: number;
-	readonly promise: Promise<Value>;
+	/**
+	 * Queued promise
+	 */
+	readonly promise: Promise<QueuedResult<Value>>;
 };
 
 type QueuedItem<CallbackParameters extends Parameters<GenericAsyncCallback>, CallbackResult> = {
 	abort?: () => void;
 	id: number;
 	parameters: CallbackParameters;
-	promise: Promise<CallbackResult>;
+	promise: Promise<QueuedResult<CallbackResult>>;
 	reject: (reason?: unknown) => void;
-	resolve: (value: CallbackResult) => void;
+	resolve: (value: QueuedResult<CallbackResult>) => void;
 	signal?: AbortSignal;
+};
+
+type QueuedResult<Value> = {
+	/**
+	 * Has the queue finished processing all items?
+	 */
+	finished: boolean;
+	/**
+	 * Result for the queued promise
+	 */
+	value: Value;
 };
 
 // #endregion
@@ -304,6 +321,7 @@ function handleResult<CallbackParameters extends Parameters<GenericAsyncCallback
 	item: QueuedItem<CallbackParameters, CallbackResult>,
 	error: boolean,
 	result: unknown,
+	finished: boolean,
 ): void {
 	item.signal?.removeEventListener(EVENT_NAME, item.abort!);
 
@@ -313,7 +331,10 @@ function handleResult<CallbackParameters extends Parameters<GenericAsyncCallback
 		if (error) {
 			item.reject(result);
 		} else {
-			item.resolve(result as CallbackResult);
+			item.resolve({
+				finished,
+				value: result as CallbackResult,
+			});
 		}
 	}
 }
@@ -373,6 +394,6 @@ const MESSAGE_REMOVE = 'Item removed from queue';
 
 // #region Exports
 
-export {queue, QueueError, type Queue, type Queued, type QueueOptions};
+export {queue, QueueError, type Queue, type Queued, type QueueOptions, type QueuedResult};
 
 // #endregion

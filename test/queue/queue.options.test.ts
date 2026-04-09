@@ -14,7 +14,7 @@ test('autostart', () =>
 		let last: number;
 
 		for (let index = 0; index < 5; index += 1) {
-			void queued.add([index]).promise.then(value => {
+			void queued.add([index]).promise.then(({value}) => {
 				values.push(value);
 
 				last = Date.now();
@@ -58,7 +58,7 @@ test('concurrency', () =>
 		let last: number;
 
 		for (let index = 0; index < 5; index += 1) {
-			void queued.add([index]).promise.then(value => {
+			void queued.add([index]).promise.then(({value}) => {
 				values.push(value);
 
 				last = Date.now();
