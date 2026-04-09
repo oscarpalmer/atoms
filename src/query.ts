@@ -16,13 +16,13 @@ export function fromQuery(query: string): PlainObject {
 		return {};
 	}
 
-	const parts = query.split('&');
+	const parts = query.split(AMPERSAND);
 	const {length} = parts;
 
 	const parameters: PlainObject = {};
 
 	for (let index = 0; index < length; index += 1) {
-		const decoded = parts[index].split('=').map(tryDecode);
+		const decoded = parts[index].split(EQUAL).map(tryDecode);
 		const key = decoded[0].replace(EXPRESSION_ARRAY_SUFFIX, '');
 
 		if (!ignoreKey(key)) {
@@ -64,10 +64,6 @@ function getQueryValue(value: string): unknown {
 		return value === TRUE;
 	}
 
-	if (EXPRESSION_NOPARSE.test(value)) {
-		return value;
-	}
-
 	const asNumber = getNumber(value);
 
 	if (!Number.isNaN(asNumber)) {
@@ -90,7 +86,7 @@ function isDecodable(value: unknown): value is boolean | number | string {
 }
 
 function setQueryValue(parameters: PlainObject, key: string, value: string): void {
-	if (key.includes('.')) {
+	if (EXPRESSION_DOT.test(key)) {
 		setValue(parameters, key, getQueryValue(value));
 	} else {
 		if (key in parameters) {
@@ -114,7 +110,7 @@ export function toQuery(parameters: PlainObject): string {
 	return isPlainObject(parameters)
 		? join(
 				getParts(parameters, false).filter(part => part.length > 0),
-				'&',
+				AMPERSAND,
 			)
 		: '';
 }
@@ -123,11 +119,15 @@ export function toQuery(parameters: PlainObject): string {
 
 // #region Variables
 
+const AMPERSAND = '&';
+
+const EQUAL = '=';
+
 const EXPRESSION_ARRAY_SUFFIX = /\[\]$/;
 
 const EXPRESSION_BOOLEAN = /^(false|true)$/;
 
-const EXPRESSION_NOPARSE = /[_]/;
+const EXPRESSION_DOT = /\./g;
 
 const TRUE = 'true';
 

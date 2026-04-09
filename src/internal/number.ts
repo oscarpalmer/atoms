@@ -94,9 +94,7 @@ export function getNumber(value: unknown): number {
 		return Number.parseInt(trimmed.slice(2), isBinary ? 2 : OCTAL_VALUE);
 	}
 
-	return Number(
-		EXPRESSION_HEX.test(trimmed) ? trimmed : trimmed.replace(EXPRESSION_UNDERSCORE, ''),
-	);
+	return Number(trimmed);
 }
 
 // #endregion
@@ -105,11 +103,7 @@ export function getNumber(value: unknown): number {
 
 const EXPRESSION_BINARY = /^0b[01]+$/i;
 
-const EXPRESSION_HEX = /^0x[0-9a-f]+$/i;
-
 const EXPRESSION_OCTAL = /^0o[0-7]+$/i;
-
-const EXPRESSION_UNDERSCORE = /_/g;
 
 const EXPRESSION_ZEROISH = /^\s*0+\s*$/;
 

@@ -54,7 +54,7 @@ test('getNumber', () => {
 	expect(getNumber('000')).toBe(0);
 	expect(getNumber('123')).toBe(123);
 	expect(getNumber('123.456')).toBe(123.456);
-	expect(getNumber('123_456.789')).toBe(123456.789);
+	expect(getNumber('123_456.789')).toBeNaN();
 	expect(getNumber('0b101')).toBe(5);
 	expect(getNumber('0o10')).toBe(8);
 	expect(getNumber('0x10')).toBe(16);
