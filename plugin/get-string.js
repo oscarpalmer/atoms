@@ -27,9 +27,7 @@ function isStringify(node) {
 
 const message = "Prefer 'getString' (@oscarpalmer/atoms) instead of 'toString' and 'String'";
 
-const selectors = [
-	`[callee.name="${stringName}"]`,
-];
+const selectors = [`[callee.name="String"]`];
 
 export default {
 	message,
