@@ -1,6 +1,6 @@
 import {isPlainObject} from './internal/is';
 import {getNumber} from './internal/number';
-import {ignoreKey, join, tryDecode, tryEncode} from './internal/string';
+import {getString, ignoreKey, join, tryDecode, tryEncode} from './internal/string';
 import {setValue} from './internal/value/set';
 import type {ArrayOrPlainObject, PlainObject} from './models';
 
@@ -50,9 +50,9 @@ function getParts(value: ArrayOrPlainObject, fromArray: boolean, prefix?: string
 		} else if (isPlainObject(val)) {
 			parts.push(...getParts(val, false, full));
 		} else if (isDecodable(val)) {
-			parts.push(`${tryEncode(full)}=${tryEncode(val)}`);
+			parts.push(`${getString(tryEncode(full))}=${getString(tryEncode(val))}`);
 		} else if (val instanceof Date) {
-			parts.push(`${tryEncode(full)}=${val.toJSON()}`);
+			parts.push(`${getString(tryEncode(full))}=${val.toJSON()}`);
 		}
 	}
 
@@ -62,6 +62,10 @@ function getParts(value: ArrayOrPlainObject, fromArray: boolean, prefix?: string
 function getQueryValue(value: string): unknown {
 	if (EXPRESSION_BOOLEAN.test(value)) {
 		return value === TRUE;
+	}
+
+	if (EXPRESSION_NOPARSE.test(value)) {
+		return value;
 	}
 
 	const asNumber = getNumber(value);
@@ -122,6 +126,8 @@ export function toQuery(parameters: PlainObject): string {
 const EXPRESSION_ARRAY_SUFFIX = /\[\]$/;
 
 const EXPRESSION_BOOLEAN = /^(false|true)$/;
+
+const EXPRESSION_NOPARSE = /[_]/;
 
 const TRUE = 'true';
 

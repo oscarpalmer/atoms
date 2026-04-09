@@ -8,7 +8,7 @@ const query = {
 	date: `full=${date.toJSON()}&partial=2025-01-01`,
 	ignored: '__proto__=ignored&nested.prototype=ignored&constructor=ignored',
 	objects: '',
-	simple: 'a=1&b=Hello%20World&c=true',
+	simple: 'a=123&b=Hello%20World&c=true&d=1_2_3',
 };
 
 const parameters = {
@@ -30,9 +30,10 @@ const parameters = {
 		set: new Set([1, 2, 3]),
 	},
 	simple: {
-		a: 1,
+		a: 123,
 		b: 'Hello World',
 		c: true,
+		d: '1_2_3',
 	},
 };
 
