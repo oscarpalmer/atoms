@@ -1,6 +1,6 @@
 {
 	"name": "@oscarpalmer/atoms",
-	"version": "0.175.0",
+	"version": "0.176.0",
 	"description": "Atomic utilities for making your JavaScript better.",
 	"keywords": [
 		"helper",
@@ -199,6 +199,10 @@
 		"./value/clone": {
 			"types": "./dist/value/clone.d.mts",
 			"default": "./dist/value/clone.mjs"
+		},
+		"./value/collection": {
+			"types": "./dist/value/collection.d.mts",
+			"default": "./dist/value/collection.mjs"
 		},
 		"./value/compare": {
 			"types": "./dist/internal/value/compare.d.mts",

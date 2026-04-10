@@ -29,6 +29,7 @@ export * from './string/match';
 export * from './string/template';
 
 export * from './value/clone';
+export * from './value/collection';
 export * from './value/diff';
 export * from './value/index';
 export * from './value/merge';
