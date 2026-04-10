@@ -27,13 +27,13 @@ export type TestArrayPosition<Item> = {
 	};
 };
 
-const complex: TestArrayItem[] = [
-	{id: 1, age: 25, name: 'Alice'},
-	{id: 2, age: 30, name: 'Bob'},
-	{id: 3, age: 35, name: 'Charlie'},
-	{id: 4, age: 30, name: 'Alice'},
-	{id: 5, age: 35, name: 'David'},
-];
+const alice: TestArrayItem = {id: 1, age: 25, name: 'Alice'};
+const aliceAgain: TestArrayItem = {id: 4, age: 30, name: 'Alice'};
+const bob: TestArrayItem = {id: 2, age: 30, name: 'Bob'};
+const charlie: TestArrayItem = {id: 3, age: 35, name: 'Charlie'};
+const david: TestArrayItem = {id: 5, age: 35, name: 'David'};
+
+const complex: TestArrayItem[] = [alice, bob, charlie,  aliceAgain, david];
 
 const keys = ['id', (item: TestArrayItem) => item.id] as Array<
 	keyof TestArrayItem | ((item: TestArrayItem) => unknown)
@@ -963,4 +963,11 @@ export const arrayFixture = {
 	sets,
 	simple,
 	swap,
+	people: {
+		alice,
+		aliceAgain,
+		bob,
+		charlie,
+		david,
+	},
 };

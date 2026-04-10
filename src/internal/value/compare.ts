@@ -80,38 +80,20 @@ compare.register = registerComparator;
 
 compare.unregister = unregisterComparator;
 
-/**
- * Register a custom comparison handler for a class
- * @param constructor Class constructor
- * @param handler Method name or comparison function _(defaults to `compare`)_
- */
-function registerComparator<Instance>(
-	constructor: Constructor<Instance>,
-	handler?: string | ((first: Instance, second: Instance) => number),
-): void {
-	compare.handlers.register(constructor, handler);
-}
-
-/**
- * Unregister a custom comparison handler for a class
- * @param constructor Class constructor
- */
-function unregisterComparator<Instance>(constructor: Constructor<Instance>): void {
-	compare.handlers.unregister(constructor);
-}
-
-function compareNumbers(
-	first: bigint | boolean | number,
-	second: bigint | boolean | number,
-): number {
-	const firstNumber = Number(first);
-	const secondNumber = Number(second);
-
-	if (Object.is(firstNumber, secondNumber)) {
+function compareNumbers(first: bigint | number, second: bigint | number): number {
+	if (Object.is(first, second)) {
 		return 0;
 	}
 
-	return firstNumber > secondNumber ? 1 : -1;
+	if (Number.isNaN(first)) {
+		return -1;
+	}
+
+	if (Number.isNaN(second)) {
+		return 1;
+	}
+
+	return first > second ? 1 : -1;
 }
 
 function compareSymbols(first: symbol, second: symbol): number {
@@ -147,13 +129,33 @@ function getComparisonParts(value: unknown): unknown[] {
 	return typeof value === 'object' ? [value] : words(getString(value));
 }
 
+/**
+ * Register a custom comparison handler for a class
+ * @param constructor Class constructor
+ * @param handler Method name or comparison function _(defaults to `compare`)_
+ */
+function registerComparator<Instance>(
+	constructor: Constructor<Instance>,
+	handler?: string | ((first: Instance, second: Instance) => number),
+): void {
+	compare.handlers.register(constructor, handler);
+}
+
+/**
+ * Unregister a custom comparison handler for a class
+ * @param constructor Class constructor
+ */
+function unregisterComparator<Instance>(constructor: Constructor<Instance>): void {
+	compare.handlers.unregister(constructor);
+}
+
 // #endregion
 
 // #region Variables
 
 const comparators: Record<string, Comparator> = {
 	bigint: compareNumbers,
-	boolean: compareNumbers,
+	boolean: (first, second) => compareNumbers(first ? 1 : 0, second ? 1 : 0),
 	number: compareNumbers,
 	symbol: compareSymbols,
 };

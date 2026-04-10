@@ -11,6 +11,10 @@ test('', () => {
 	expect(compare(0n, 1n)).toBe(-1);
 	expect(compare(1n, 0n)).toBe(1);
 
+	expect(compare(Number.NaN, 123)).toBe(-1);
+	expect(compare(123, Number.NaN)).toBe(1);
+	expect(compare(Number.NaN, Number.NaN)).toBe(0);
+
 	expect(compare(false, false)).toBe(0);
 	expect(compare(false, true)).toBe(-1);
 	expect(compare(true, false)).toBe(1);
