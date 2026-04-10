@@ -142,6 +142,64 @@ test('compare', () => {
 	).toEqual([...greek].reverse());
 });
 
+test('index', () => {
+	const numbers = [
+		[1, 2, 3, 4, 5],
+		[5, 4, 3, 2, 1],
+		[3, 1, 4, 5, 2],
+	];
+
+	let result = [
+		[3, 0],
+		[0, 3],
+		[5, 4],
+	];
+
+	let {length} = numbers;
+
+	for (let index = 0; index < length; index += 1) {
+		expect(sort.index(numbers[index], 3)).toBe(result[index][0]);
+		expect(sort.index(numbers[index], 3, true)).toBe(result[index][1]);
+	}
+
+	const {alice, aliceAgain, bob, charlie, david} = arrayFixture.people;
+
+	const people = [
+		[alice, bob, charlie, david],
+		[david, charlie, bob, alice],
+		[charlie, alice, david, bob],
+	];
+
+	result = [
+		[1, 0],
+		[0, 3],
+		[0, 4],
+	];
+
+	let sorters: unknown[] = [{key: 'age'}, {key: 'name'}];
+
+	for (let index = 0; index < length; index += 1) {
+		expect(sort.index(people[index], aliceAgain, sorters as never)).toBe(result[index][0]);
+		expect(sort.index(people[index], aliceAgain, sorters as never, true)).toBe(result[index][1]);
+	}
+
+	result = [
+		[2, 0],
+		[0, 3],
+		[0, 4],
+	];
+
+	sorters = [{key: 'age'}, {direction: 'descending', key: 'name'}];
+
+	for (let index = 0; index < length; index += 1) {
+		expect(sort.index(people[index], aliceAgain, sorters as never)).toBe(result[index][0]);
+		expect(sort.index(people[index], aliceAgain, sorters as never, true)).toBe(result[index][1]);
+	}
+
+	expect(sort.index('blah' as never, 3)).toBe(-1);
+	expect(sort.index([], 3)).toBe(0);
+});
+
 test('is', () => {
 	const numbers = [
 		[1, 2, 3, 3, 4, 5],
