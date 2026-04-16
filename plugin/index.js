@@ -15,10 +15,11 @@ export const arrayPlugins = [
 	getPlugin('array', 'slice', new Set(['slice'])),
 	getPlugin('array', 'sort', new Set(['sort'])),
 	getPlugin('array', 'splice', new Set(['splice'])),
-	getPlugin('array', 'times', new Set(['from']), true),
+	// getPlugin('array', 'times', new Set(['from']), true),
 ];
 
 export const mathPlugins = [
+	getPlugin('math', 'ceil', new Set(['ceil']), true),
 	getPlugin('math', 'floor', new Set(['floor']), true),
 	getPlugin('math', 'max', new Set(['max']), true),
 	getPlugin('math', 'min', new Set(['min']), true),

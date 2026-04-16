@@ -14,6 +14,7 @@ test('', () => {
 	).toEqual([2, 4]);
 
 	expect(select(arrayFixture.complex, 'id', 3, item => item.age)).toEqual([35]);
+	expect(select(arrayFixture.complex, 'id', 3, 'age')).toEqual([35]);
 
 	expect(
 		select(
@@ -23,6 +24,8 @@ test('', () => {
 			item => item.age,
 		),
 	).toEqual([35]);
+
+	expect(select(arrayFixture.complex, item => item.id, 3, 'age')).toEqual([35]);
 
 	expect(select('blah' as never, 99, item => item)).toEqual([]);
 });

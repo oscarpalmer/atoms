@@ -15,6 +15,7 @@ export * from './partition';
 export * from './position';
 export * from './push';
 export * from './select';
+export * from './single';
 export * from './slice';
 export * from './splice';
 export * from './to-set';

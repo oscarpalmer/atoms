@@ -1,6 +1,6 @@
 {
 	"name": "@oscarpalmer/atoms",
-	"version": "0.176.0",
+	"version": "0.177.0",
 	"description": "Atomic utilities for making your JavaScript better.",
 	"keywords": [
 		"helper",
@@ -37,9 +37,17 @@
 			"types": "./dist/array/filter.d.mts",
 			"default": "./dist/array/filter.mjs"
 		},
+		"./array/first": {
+			"types": "./dist/array/first.d.mts",
+			"default": "./dist/array/first.mjs"
+		},
 		"./array/group-by": {
 			"types": "./dist/array/group-by.d.mts",
 			"default": "./dist/array/group-by.mjs"
+		},
+		"./array/last": {
+			"types": "./dist/array/last.d.mts",
+			"default": "./dist/array/last.mjs"
 		},
 		"./array/move": {
 			"types": "./dist/array/move.d.mts",

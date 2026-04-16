@@ -33,7 +33,7 @@ const bob: TestArrayItem = {id: 2, age: 30, name: 'Bob'};
 const charlie: TestArrayItem = {id: 3, age: 35, name: 'Charlie'};
 const david: TestArrayItem = {id: 5, age: 35, name: 'David'};
 
-const complex: TestArrayItem[] = [alice, bob, charlie,  aliceAgain, david];
+const complex: TestArrayItem[] = [alice, bob, charlie, aliceAgain, david];
 
 const keys = ['id', (item: TestArrayItem) => item.id] as Array<
 	keyof TestArrayItem | ((item: TestArrayItem) => unknown)
@@ -409,6 +409,10 @@ const move = {
 		values: [...simple],
 	},
 };
+
+const nested = Array.from({length: 5}, () => ({
+	values: [1, 2, 3, 4, 5],
+}));
 
 const swap = {
 	keys,
@@ -959,6 +963,7 @@ const position = {
 export const arrayFixture = {
 	complex,
 	move,
+	nested,
 	position,
 	sets,
 	simple,

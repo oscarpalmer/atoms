@@ -52,7 +52,7 @@ export function exists(array: unknown[], ...parameters: unknown[]): boolean {
 		return Array.isArray(array) ? array.includes(parameters[0]) : false;
 	}
 
-	return (findValue(FIND_VALUE_INDEX, array, parameters) as number) > -1;
+	return (findValue(FIND_VALUE_INDEX, array, parameters, false) as number) > -1;
 }
 
 // #endregion

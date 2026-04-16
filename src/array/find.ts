@@ -1,10 +1,10 @@
-import {FIND_VALUE_VALUE, findValue} from '../internal/array/find';
+import {FIND_VALUE_ITEM, findValue} from '../internal/array/find';
 import type {PlainObject} from '../models';
 
 // #region Functions
 
 /**
- * Get the first items matching the given value
+ * Get the first item matching the given value
  * @param array Array to search in
  * @param callback Callback to get an item's value for matching
  * @param value Value to match against
@@ -48,8 +48,8 @@ export function find<Item>(
  */
 export function find<Item>(array: Item[], value: Item): Item | undefined;
 
-export function find<Item>(array: unknown[], ...parameters: unknown[]): Item | undefined {
-	return findValue(FIND_VALUE_VALUE, array, parameters) as Item | undefined;
+export function find(array: unknown[], ...parameters: unknown[]): unknown {
+	return findValue(FIND_VALUE_ITEM, array, parameters, false);
 }
 
 // #endregion

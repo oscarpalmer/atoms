@@ -5,7 +5,20 @@ import {
 	isEmpty,
 	isInstanceOf,
 	isKey,
+	isNonArrayOrPlainObject,
+	isNonConstructor,
+	isNonEmpty,
+	isNonInstanceOf,
+	isNonKey,
 	isNonNullable,
+	isNonNullableOrEmpty,
+	isNonNullableOrWhitespace,
+	isNonNumber,
+	isNonNumerical,
+	isNonObject,
+	isNonPlainObject,
+	isNonPrimitive,
+	isNonTypedArray,
 	isNullable,
 	isNullableOrEmpty,
 	isNullableOrWhitespace,
@@ -27,64 +40,96 @@ test('isArrayOrPlainObject', () => {
 
 	for (; index < length; index += 1) {
 		expect(isArrayOrPlainObject(values[index])).toBe(expected[index]);
+		expect(isNonArrayOrPlainObject(values[index])).not.toBe(expected[index]);
 	}
 });
 
 test('isConstructor', () => {
 	for (let index = 0; index < length; index += 1) {
 		expect(isConstructor(values[index])).toBe(false);
+		expect(isNonConstructor(values[index])).toBe(true);
 	}
 
 	const constructors = [Array, Object, Map, Set, Date, RegExp, Promise, Error];
 
 	for (const constructor of constructors) {
 		expect(isConstructor(constructor)).toBe(true);
+		expect(isNonConstructor(constructor)).toBe(false);
 	}
 });
 
 test('isEmpty', () => {
 	for (let index = 0; index < length; index += 1) {
-		expect(isEmpty(values[index])).toBe(index < 3 || index === 4 || index === 15 || index > 17);
+		const result = index < 3 || index === 4 || index === 15 || index > 17;
+
+		expect(isEmpty(values[index])).toBe(result);
+		expect(isNonEmpty(values[index])).not.toBe(result);
 	}
 
-	expect(isEmpty([])).toBe(true);
-	expect(isEmpty([null])).toBe(true);
-	expect(isEmpty([undefined])).toBe(true);
-	expect(isEmpty([123])).toBe(false);
+	const items = [
+		[],
+		[null],
+		[undefined],
+		[123],
+		{},
+		{key: null},
+		{key: undefined},
+		{key: 123},
+		new Map(),
+		new Set(),
+		new Map([['key', null]]),
+		new Set([undefined]),
+		new Map([['key', 123]]),
+		new Set([123]),
+	];
 
-	expect(isEmpty({})).toBe(true);
-	expect(isEmpty({key: null})).toBe(true);
-	expect(isEmpty({key: undefined})).toBe(true);
-	expect(isEmpty({key: 123})).toBe(false);
+	const result = [
+		true,
+		true,
+		true,
+		false,
+		true,
+		true,
+		true,
+		false,
+		true,
+		true,
+		true,
+		true,
+		false,
+		false,
+	];
 
-	expect(isEmpty(new Map())).toBe(true);
-	expect(isEmpty(new Set())).toBe(true);
-	expect(isEmpty(new Map([['key', null]]))).toBe(true);
-	expect(isEmpty(new Set([undefined]))).toBe(true);
-	expect(isEmpty(new Map([['key', 123]]))).toBe(false);
-	expect(isEmpty(new Set([123]))).toBe(false);
+	for (let index = 0; index < items.length; index += 1) {
+		expect(isEmpty(items[index])).toBe(result[index]);
+		expect(isNonEmpty(items[index])).not.toBe(result[index]);
+	}
 });
 
 test('isInstanceOf', () => {
 	for (let index = 0; index < length; index += 1) {
-		expect(isInstanceOf(Object, values[index])).toBe(index === 2 || index === 3 || index > 14);
+		const result = index === 2 || index === 3 || index > 14;
+
+		expect(isInstanceOf(Object, values[index])).toBe(result);
+		expect(isNonInstanceOf(Object, values[index])).not.toBe(result);
 	}
 
-	expect(isInstanceOf(Array, [])).toBe(true);
-	expect(isInstanceOf(Object, {})).toBe(true);
-	expect(isInstanceOf(Map, new Map())).toBe(true);
-	expect(isInstanceOf(Set, new Set())).toBe(true);
-	expect(isInstanceOf(Date, new Date())).toBe(true);
-	expect(isInstanceOf(RegExp, /test/)).toBe(true);
-	expect(isInstanceOf(Promise, Promise.resolve())).toBe(true);
-	expect(isInstanceOf(Error, new Error())).toBe(true);
+	const items = [[], {}, new Map(), new Set(), new Date(), /test/, Promise.resolve(), new Error()];
+
+	for (let index = 0; index < items.length; index += 1) {
+		expect(isInstanceOf(Object, items[index])).toBe(true);
+		expect(isNonInstanceOf(Object, items[index])).toBe(false);
+	}
 });
 
 test('isKey', () => {
 	const indices = [4, 5, 6, 7, 8, 9, 10, 11];
 
 	for (let index = 0; index < length; index += 1) {
-		expect(isKey(values[index])).toBe(indices.includes(index));
+		const result = indices.includes(index);
+
+		expect(isKey(values[index])).toBe(result);
+		expect(isNonKey(values[index])).not.toBe(result);
 	}
 });
 
@@ -109,6 +154,7 @@ test('isNullableOrEmpty', () => {
 
 	for (let index = 0; index < length; index += 1) {
 		expect(isNullableOrEmpty(values[index])).toBe(expected[index]);
+		expect(isNonNullableOrEmpty(values[index])).not.toBe(expected[index]);
 	}
 });
 
@@ -117,6 +163,7 @@ test('isNullableOrWhitespace', () => {
 
 	for (let index = 0; index < length; index += 1) {
 		expect(isNullableOrWhitespace(values[index])).toBe(expected[index]);
+		expect(isNonNullableOrWhitespace(values[index])).not.toBe(expected[index]);
 	}
 });
 
@@ -125,6 +172,7 @@ test('isNumber', () => {
 
 	for (let index = 0; index < length; index += 1) {
 		expect(isNumber(values[index])).toBe(expected[index]);
+		expect(isNonNumber(values[index])).not.toBe(expected[index]);
 	}
 });
 
@@ -133,6 +181,7 @@ test('isNumerical', () => {
 
 	for (let index = 0; index < length; index += 1) {
 		expect(isNumerical(values[index])).toBe(expected[index]);
+		expect(isNonNumerical(values[index])).not.toBe(expected[index]);
 	}
 });
 
@@ -144,6 +193,7 @@ test('isObject', () => {
 
 	for (let index = 0; index < length; index += 1) {
 		expect(isObject(values[index])).toBe(expected[index]);
+		expect(isNonObject(values[index])).not.toBe(expected[index]);
 	}
 });
 
@@ -152,6 +202,7 @@ test('isPlainObject', () => {
 
 	for (let index = 0; index < length; index += 1) {
 		expect(isPlainObject(values[index])).toBe(expected[index]);
+		expect(isNonPlainObject(values[index])).not.toBe(expected[index]);
 	}
 });
 
@@ -160,12 +211,14 @@ test('isPrimitive', () => {
 
 	for (let index = 0; index < length; index += 1) {
 		expect(isPrimitive(values[index])).toBe(expected[index]);
+		expect(isNonPrimitive(values[index])).not.toBe(expected[index]);
 	}
 });
 
 test('isTypedArray', () => {
 	for (let index = 0; index < length; index += 1) {
 		expect(isTypedArray(values[index])).toBe(false);
+		expect(isNonTypedArray(values[index])).toBe(true);
 	}
 
 	const arrays = [
@@ -182,7 +235,8 @@ test('isTypedArray', () => {
 		new BigInt64Array([1n, 2n, 3n]),
 	];
 
-	for (const array of arrays) {
-		expect(isTypedArray(array)).toBe(true);
+	for (let index = 0; index < arrays.length; index += 1) {
+		expect(isTypedArray(arrays[index])).toBe(true);
+		expect(isNonTypedArray(arrays[index])).toBe(false);
 	}
 });

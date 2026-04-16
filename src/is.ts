@@ -31,12 +31,61 @@ export function isEmpty(value: unknown): boolean {
 }
 
 /**
+ * Is the value not empty, or holding non-empty values?
+ * @param value Value to check
+ * @returns `true` if the value is not considered empty, otherwise `false`
+ */
+export function isNonEmpty(value: unknown): boolean {
+	return !isEmpty(value);
+}
+
+/**
  * Is the value not `undefined` or `null`?
  * @param value Value to check
  * @returns `true` if the value is not `undefined` or `null`, otherwise `false`
  */
-export function isNonNullable(value: unknown): value is Exclude<unknown, undefined | null> {
+export function isNonNullable<Value>(value: Value): value is Exclude<Value, undefined | null> {
 	return value != null;
+}
+
+/**
+ * Is the value not `undefined`, `null`, or stringified as an empty _(no whitespace)_ string?
+ * @param value Value to check
+ * @returns `true` if the value is not `undefined`, `null`, or matches an empty string, otherwise `false`
+ */
+export function isNonNullableOrEmpty<Value>(
+	value: Value,
+): value is Exclude<Value, undefined | null | ''> {
+	return value != null && getString(value) !== '';
+}
+
+/**
+ * Is the value not `undefined`, `null`, or stringified as a whitespace-only string?
+ * @param value Value to check
+ * @returns `true` if the value is not `undefined`, `null`, or matches a whitespace-only string, otherwise `false`
+ */
+export function isNonNullableOrWhitespace<Value>(
+	value: Value,
+): value is Exclude<Value, undefined | null | ''> {
+	return value != null && !EXPRESSION_WHITESPACE.test(getString(value));
+}
+
+/**
+ * Is the value not a number or a number-like string?
+ * @param value Value to check
+ * @returns `true` if the value is not a number or a number-like string, otherwise `false`
+ */
+export function isNonNumerical<Value>(value: Value): value is Exclude<Value, number | `${number}`> {
+	return !isNumerical(value);
+}
+
+/**
+ * Is the value not an object _(or function)_?
+ * @param value Value to check
+ * @returns `true` if the value is not an object, otherwise `false`
+ */
+export function isNonObject<Value>(value: Value): value is Exclude<Value, object> {
+	return !isObject(value);
 }
 
 /**
@@ -49,18 +98,18 @@ export function isNullable(value: unknown): value is undefined | null {
 }
 
 /**
- * Is the value `undefined`, `null`, or an empty _(no whitespace)_ string?
+ * Is the value `undefined`, `null`, or stringified as an empty _(no whitespace)_ string?
  * @param value Value to check
- * @returns `true` if the value is nullable or an empty string, otherwise `false`
+ * @returns `true` if the value is nullable or matches an empty string, otherwise `false`
  */
 export function isNullableOrEmpty(value: unknown): value is undefined | null | '' {
 	return value == null || getString(value) === '';
 }
 
 /**
- * Is the value `undefined`, `null`, or a whitespace-only string?
+ * Is the value `undefined`, `null`, or stringified as a whitespace-only string?
  * @param value Value to check
- * @returns `true` if the value is nullable or a whitespace-only string, otherwise `false`
+ * @returns `true` if the value is nullable or matches a whitespace-only string, otherwise `false`
  */
 export function isNullableOrWhitespace(value: unknown): value is undefined | null | '' {
 	return value == null || EXPRESSION_WHITESPACE.test(getString(value));
@@ -69,7 +118,7 @@ export function isNullableOrWhitespace(value: unknown): value is undefined | nul
 /**
  * Is the value a number or a number-like string?
  * @param value Value to check
- * @returns `true` if the value is a number or a parseable string, otherwise `false`
+ * @returns `true` if the value is a number or a number-like string, otherwise `false`
  */
 export function isNumerical(value: unknown): value is number | `${number}` {
 	return (
@@ -102,6 +151,14 @@ export {
 	isConstructor,
 	isInstanceOf,
 	isKey,
+	isNonArrayOrPlainObject,
+	isNonConstructor,
+	isNonInstanceOf,
+	isNonKey,
+	isNonNumber,
+	isNonPlainObject,
+	isNonPrimitive,
+	isNonTypedArray,
 	isNumber,
 	isPlainObject,
 	isPrimitive,

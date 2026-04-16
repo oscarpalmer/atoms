@@ -50,6 +50,84 @@ export function isKey(value: unknown): value is Key {
 }
 
 /**
+ * Is the value not an array or a plain object?
+ * @param value Value to check
+ * @returns `true` if the value is not an array or a plain object, otherwise `false`
+ */
+export function isNonArrayOrPlainObject<Value>(
+	value: Value,
+): value is Exclude<Value, ArrayOrPlainObject> {
+	return !isArrayOrPlainObject(value);
+}
+
+/**
+ * Is the value not a constructor function?
+ * @param value Value to check
+ * @returns `true` if the value is not a constructor function, otherwise `false`
+ */
+export function isNonConstructor<Value>(value: Value): value is Exclude<Value, Constructor> {
+	return !isConstructor(value);
+}
+
+/**
+ * Is the value not an instance of the constructor?
+ * @param constructor Class constructor
+ * @param value Value to check
+ * @returns `true` if the value is not an instance of the constructor, otherwise `false`
+ */
+export function isNonInstanceOf<Instance, Value>(
+	constructor: Constructor<Instance>,
+	value: Value,
+): value is Exclude<Value, Instance> {
+	return !isInstanceOf(constructor, value);
+}
+
+/**
+ * Is the value not a key?
+ * @param value Value to check
+ * @returns `true` if the value is not a `Key` _(`number` or `string`)_, otherwise `false`
+ */
+export function isNonKey<Value>(value: Value): value is Exclude<Value, Key> {
+	return !isKey(value);
+}
+
+/**
+ * Is the value not a number?
+ * @param value Value to check
+ * @returns `true` if the value is not a `number`, otherwise `false`
+ */
+export function isNonNumber<Value>(value: Value): value is Exclude<Value, number> {
+	return !isNumber(value);
+}
+
+/**
+ * Is the value not a plain object?
+ * @param value Value to check
+ * @returns `true` if the value is not a plain object, otherwise `false`
+ */
+export function isNonPlainObject<Value>(value: Value): value is Exclude<Value, PlainObject> {
+	return !isPlainObject(value);
+}
+
+/**
+ * Is the value not a primitive value?
+ * @param value Value to check
+ * @returns `true` if the value is not a primitive value, otherwise `false`
+ */
+export function isNonPrimitive<Value>(value: Value): value is Exclude<Value, Primitive> {
+	return !isPrimitive(value);
+}
+
+/**
+ * Is the value not a typed array?
+ * @param value Value to check
+ * @returns `true` if the value is not a typed array, otherwise `false`
+ */
+export function isNonTypedArray<Value>(value: Value): value is Exclude<Value, TypedArray> {
+	return !isTypedArray(value);
+}
+
+/**
  * Is the value a number?
  * @param value Value to check
  * @returns `true` if the value is a `number`, otherwise `false`
@@ -87,7 +165,19 @@ export function isPlainObject(value: unknown): value is PlainObject {
  * @returns `true` if the value matches, otherwise `false`
  */
 export function isPrimitive(value: unknown): value is Primitive {
-	return value == null || EXPRESSION_PRIMITIVE.test(typeof value);
+	if (value == null) {
+		return true;
+	}
+
+	const type = typeof value;
+
+	return (
+		type === 'bigint' ||
+		type === 'boolean' ||
+		type === 'number' ||
+		type === 'string' ||
+		type === 'symbol'
+	);
 }
 
 /**
@@ -96,7 +186,7 @@ export function isPrimitive(value: unknown): value is Primitive {
  * @returns `true` if the value is a typed array, otherwise `false`
  */
 export function isTypedArray(value: unknown): value is TypedArray {
-	TYPED_ARRAYS ??= new Set<unknown>([
+	(isTypedArray as any).types ??= new Set<unknown>([
 		Int8Array,
 		Uint8Array,
 		Uint8ClampedArray,
@@ -110,15 +200,7 @@ export function isTypedArray(value: unknown): value is TypedArray {
 		BigUint64Array,
 	]);
 
-	return TYPED_ARRAYS.has((value as TypedArray)?.constructor);
+	return (isTypedArray as any).types.has((value as TypedArray)?.constructor);
 }
-
-// #endregion
-
-// #region Variables
-
-const EXPRESSION_PRIMITIVE = /^(bigint|boolean|number|string|symbol)$/;
-
-let TYPED_ARRAYS: Set<unknown>;
 
 // #endregion

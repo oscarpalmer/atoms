@@ -1,8 +1,8 @@
-import {getArrayCallbacks} from './callbacks';
+import {getArrayCallback, getArrayCallbacks} from './callbacks';
 
 // #region Types
 
-type FindValueType = 'index' | 'value';
+type FindValueType = 'index' | 'item';
 
 type FindValuesResult = {
 	matched: unknown[];
@@ -21,14 +21,19 @@ type Parameters = {
 
 // #region Functions
 
-export function findValue(type: FindValueType, array: unknown[], parameters: unknown[]): unknown {
+export function findValue(
+	type: FindValueType,
+	array: unknown[],
+	parameters: unknown[],
+	reversed: boolean,
+): unknown {
 	const findIndex = type === FIND_VALUE_INDEX;
 
 	if (!Array.isArray(array) || array.length === 0) {
 		return findIndex ? -1 : undefined;
 	}
 
-	const {bool, key, value} = getParameters(parameters);
+	const {bool, key, value} = getFindParameters(parameters);
 
 	const callbacks = getArrayCallbacks(bool, key);
 
@@ -42,7 +47,7 @@ export function findValue(type: FindValueType, array: unknown[], parameters: unk
 		return findIndex ? index : array[index];
 	}
 
-	return findValueInArray(array, callbacks.keyed, value, findIndex);
+	return findValueInArray(array, callbacks.keyed, value, findIndex, reversed);
 }
 
 function findValueInArray(
@@ -50,11 +55,12 @@ function findValueInArray(
 	callback: ((item: unknown, index: number, array: unknown[]) => boolean) | undefined,
 	value: unknown,
 	findIndex: boolean,
+	reversed: boolean,
 ): unknown {
 	const {length} = array;
 
 	for (let index = 0; index < length; index += 1) {
-		const item = array[index];
+		const item = reversed ? array.at(-(index + 1)) : array[index];
 
 		if (Object.is(callback?.(item, index, array), value)) {
 			return findIndex ? index : item;
@@ -62,6 +68,26 @@ function findValueInArray(
 	}
 
 	return findIndex ? -1 : undefined;
+}
+
+export function findAbsoluteValueOrDefault(
+	array: unknown[],
+	parameters: unknown[],
+	defaultValue: unknown,
+	useDefaultValue: boolean,
+	reversed: boolean,
+): unknown {
+	if (parameters.length === 0) {
+		if (Array.isArray(array) && array.length > 0) {
+			return reversed ? array.at(-1) : array[0];
+		}
+
+		return useDefaultValue ? defaultValue : undefined;
+	}
+
+	const index = findValue(FIND_VALUE_INDEX, array, parameters, reversed) as number;
+
+	return index > -1 ? array[index] : useDefaultValue ? defaultValue : undefined;
 }
 
 export function findValues(
@@ -80,7 +106,7 @@ export function findValues(
 	}
 
 	const {length} = array;
-	const {bool, key, value} = getParameters(parameters);
+	const {bool, key, value} = getFindParameters(parameters);
 	const callbacks = getArrayCallbacks(bool, key);
 
 	if (type === FIND_VALUES_UNIQUE && callbacks?.keyed == null && length >= UNIQUE_THRESHOLD) {
@@ -89,7 +115,7 @@ export function findValues(
 		return result;
 	}
 
-	const mapCallback = typeof mapper === 'function' ? mapper : undefined;
+	const mapCallback = getArrayCallback(mapper);
 
 	if (callbacks?.bool != null || (type === FIND_VALUES_ALL && key == null)) {
 		const callback = callbacks?.bool ?? (item => Object.is(item, value));
@@ -127,7 +153,7 @@ export function findValues(
 	return result;
 }
 
-function getParameters(original: unknown[]): Parameters {
+export function getFindParameters(original: unknown[]): Parameters {
 	const {length} = original;
 
 	return {
@@ -143,7 +169,7 @@ function getParameters(original: unknown[]): Parameters {
 
 export const FIND_VALUE_INDEX: FindValueType = 'index';
 
-export const FIND_VALUE_VALUE: FindValueType = 'value';
+export const FIND_VALUE_ITEM: FindValueType = 'item';
 
 export const FIND_VALUES_ALL: FindValuesType = 'all';
 
