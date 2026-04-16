@@ -1,4 +1,62 @@
+import {isTemplateStringsArray} from '../internal/is';
+import {getString} from '../internal/string';
+
 // #region Functions
+
+export function dedent(strings: TemplateStringsArray, ...values: unknown[]): string;
+
+export function dedent(value: string): string;
+
+export function dedent(value: string | TemplateStringsArray, ...values: unknown[]): string {
+	let actual: string;
+
+	if (isTemplateStringsArray(value)) {
+		actual = interpolate(value, values);
+	} else {
+		actual = value;
+	}
+
+	if (typeof actual !== 'string') {
+		return '';
+	}
+
+	const lines = actual.split('\n');
+	const {length} = lines;
+
+	if (length === 1) {
+		return actual.trim();
+	}
+
+	const lastIndex = length - 1;
+
+	const lengths: number[] = [];
+
+	for (let index = 0; index < length; index += 1) {
+		const [, indentation] = /^(\s+)/.exec(lines[index]) ?? [];
+
+		if (indentation != null) {
+			lengths.push(indentation.length);
+		}
+	}
+
+	if (lengths.length === 0) {
+		return actual.trim();
+	}
+
+	const minimum = Math.min(...lengths);
+
+	const pattern = new RegExp(`^\\s{0,${minimum}}`);
+
+	let result = '';
+
+	for (let index = 0; index < length; index += 1) {
+		const line = lines[index];
+
+		result += line.replace(pattern, '') + (index === lastIndex ? '' : '\n');
+	}
+
+	return result.trim();
+}
 
 /**
  * Get a new UUID-string _(version 4)_
@@ -22,6 +80,18 @@ export function getUuid(): string {
 		hex.substring(16, 20),
 		hex.substring(20, 32),
 	].join('-');
+}
+
+function interpolate(strings: TemplateStringsArray, values: unknown[]): string {
+	const {length} = strings;
+
+	let interpolated = '';
+
+	for (let index = 0; index < length; index += 1) {
+		interpolated += `${strings[index]}${getString(values[index])}`;
+	}
+
+	return interpolated;
 }
 
 /**
@@ -78,6 +148,8 @@ export function truncate(value: string, length: number, suffix?: string): string
 	return `${value.slice(0, truncatedLength)}${actualSuffix}`;
 }
 
+// #endregion
+
 // #region Variables
 
 const ZERO = '0';
@@ -86,4 +158,8 @@ const ZERO = '0';
 
 // #endregion
 
+// #region Exports
+
 export {getString, join, words} from '../internal/string';
+
+// #endregion

@@ -18,6 +18,29 @@ export class TestStringItemWithToString {
 	}
 }
 
+const indentations = {
+	cases: [
+		'',
+		'    ',
+		`  Hello,\n		World!\n  `,
+		`	<div>
+		<p>Hello, world!</p>
+<p>Not indented</p>
+	</div>				`,
+		`Nothing\nis\nindented`,
+	],
+	results: [
+		'',
+		'',
+		'Hello,\nWorld!',
+		`<div>
+	<p>Hello, world!</p>
+<p>Not indented</p>
+</div>`,
+		`Nothing\nis\nindented`,
+	],
+};
+
 const strings = [
 	'Hello, world!',
 	'The quick brown fox jumps over the lazy dog',
@@ -26,5 +49,6 @@ const strings = [
 ];
 
 export const stringFixture = {
+	indentations,
 	strings,
 };

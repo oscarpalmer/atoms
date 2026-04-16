@@ -29,6 +29,7 @@ import {
 	isPrimitive,
 	isTypedArray,
 } from '../src';
+import {isNonTemplateStringsArray, isTemplateStringsArray} from '../src/internal/is';
 import {isFixture} from './.fixtures/is.fixture';
 
 const {values, length} = isFixture;
@@ -213,6 +214,20 @@ test('isPrimitive', () => {
 		expect(isPrimitive(values[index])).toBe(expected[index]);
 		expect(isNonPrimitive(values[index])).not.toBe(expected[index]);
 	}
+});
+
+test('isTemplateStringsArray', () => {
+	for (let index = 0; index < length; index += 1) {
+		expect(isTemplateStringsArray(values[index])).toBe(false);
+		expect(isNonTemplateStringsArray(values[index])).toBe(true);
+	}
+
+	function tester(strings: TemplateStringsArray) {
+		expect(isTemplateStringsArray(strings)).toBe(true);
+		expect(isNonTemplateStringsArray(strings)).toBe(false);
+	}
+
+	tester``;
 });
 
 test('isTypedArray', () => {

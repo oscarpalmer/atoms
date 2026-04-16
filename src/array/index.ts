@@ -14,6 +14,7 @@ export * from './intersection';
 export * from './partition';
 export * from './position';
 export * from './push';
+export * from './reverse';
 export * from './select';
 export * from './single';
 export * from './slice';

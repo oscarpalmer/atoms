@@ -1,9 +1,26 @@
 import {expect, test} from 'vitest';
-import {getString, getUuid, join, parse, template, trim, truncate, words} from '../../src';
+import {dedent, getString, getUuid, join, parse, template, trim, truncate, words} from '../../src';
 import {
 	TestStringItemWithToString,
 	TestStringItemWithoutToString,
+	stringFixture,
 } from '../.fixtures/string.fixture';
+
+test('dedent', () => {
+	for (let index = 0; index < stringFixture.indentations.cases.length; index += 1) {
+		expect(dedent(stringFixture.indentations.cases[index])).toBe(
+			stringFixture.indentations.results[index],
+		);
+	}
+
+	expect(dedent`	<div>
+		<p>Hello, ${123}!</p>
+</div>				`).toBe(`<div>
+	<p>Hello, 123!</p>
+</div>`);
+
+	expect(dedent(123 as never)).toBe('');
+});
 
 test('getString', () => {
 	expect(getString(undefined)).toBe('');

@@ -119,6 +119,17 @@ export function isNonPrimitive<Value>(value: Value): value is Exclude<Value, Pri
 }
 
 /**
+ * Is the value not a template strings array?
+ * @param value Value to check
+ * @returns `true` if the value is not a `TemplateStringsArray`, otherwise `false`
+ */
+export function isNonTemplateStringsArray<Value>(
+	value: Value,
+): value is Exclude<Value, TemplateStringsArray> {
+	return !isTemplateStringsArray(value);
+}
+
+/**
  * Is the value not a typed array?
  * @param value Value to check
  * @returns `true` if the value is not a typed array, otherwise `false`
@@ -178,6 +189,15 @@ export function isPrimitive(value: unknown): value is Primitive {
 		type === 'string' ||
 		type === 'symbol'
 	);
+}
+
+/**
+ * Is the value a template strings array?
+ * @param value Value to check
+ * @returns `true` if the value is a `TemplateStringsArray`, otherwise `false`
+ */
+export function isTemplateStringsArray(value: unknown): value is TemplateStringsArray {
+	return Array.isArray(value) && Array.isArray((value as unknown as TemplateStringsArray).raw);
 }
 
 /**
