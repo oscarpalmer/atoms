@@ -1,6 +1,6 @@
 {
 	"name": "@oscarpalmer/atoms",
-	"version": "0.178.0",
+	"version": "0.179.0",
 	"description": "Atomic utilities for making your JavaScript better.",
 	"keywords": [
 		"helper",
@@ -191,6 +191,10 @@
 		"./string/case": {
 			"types": "./dist/string/case.d.mts",
 			"default": "./dist/string/case.mjs"
+		},
+		"./string/fuzzy": {
+			"types": "./dist/string/fuzzy.d.mts",
+			"default": "./dist/string/fuzzy.mjs"
 		},
 		"./string/match": {
 			"types": "./dist/string/match.d.mts",
