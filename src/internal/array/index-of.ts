@@ -48,7 +48,7 @@ export function indexOf<Item>(
 export function indexOf<Item>(array: Item[], item: Item): number;
 
 export function indexOf(array: unknown[], ...parameters: unknown[]): number {
-	return findValue(FIND_VALUE_INDEX, array, parameters) as number;
+	return findValue(FIND_VALUE_INDEX, array, parameters, false) as number;
 }
 
 // #endregion
