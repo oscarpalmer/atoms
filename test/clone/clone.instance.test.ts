@@ -1,5 +1,5 @@
 import {expect, test} from 'vitest';
-import {clone, isPlainObject} from '../../src';
+import {clone, deregisterCloner, isPlainObject} from '../../src';
 import {TestCloneItem} from '../.fixtures/clone.fixture';
 
 test('instance', () => {
@@ -37,7 +37,7 @@ test('instance', () => {
 	expect(cloned.id).toBe(original.id);
 	expect(cloned.name).toBe('callback');
 
-	clone.unregister(TestCloneItem);
+	clone.deregister(TestCloneItem);
 
 	cloned = clone(original);
 
@@ -51,7 +51,7 @@ test('instance', () => {
 	expect(cloned).not.toBe(original);
 	expect(isPlainObject(cloned)).toBe(true);
 
-	clone.unregister(TestCloneItem);
+	deregisterCloner(TestCloneItem);
 
 	clone.register(TestCloneItem, clone);
 
@@ -74,5 +74,5 @@ test('instance', () => {
 	expect(cloned).not.toBe(original);
 	expect(isPlainObject(cloned)).toBe(true);
 
-	clone.unregister(123 as never);
+	clone.deregister(123 as never);
 });

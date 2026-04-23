@@ -172,87 +172,7 @@ function getComparisonValue(
 	return 0;
 }
 
-/**
- * Get the index for an item _(to be inserted into an array of items)_ based on sorters _(and an optional default direction)_
- *
- * _(If the array is not sorted, it will be treated as sorted, and the result may be inaccurate)_
- * @param array Array to get the index from
- * @param item Item to get the index for
- * @param sorters Sorters to use to determine sorting
- * @param descending Sorted in descending order? _(defaults to `false`; overridden by individual sorters)_
- * @returns Index for item
- */
-function getIndex<Item>(
-	array: Item[],
-	item: Item,
-	sorters: Array<ArraySorter<Item>>,
-	descending?: boolean,
-): number;
-
-/**
- * Get the index for an item _(to be inserted into an array of items)_ based on a sorter _(and an optional default direction)_
- *
- * _(If the array is not sorted, it will be treated as sorted, and the result may be inaccurate)_
- * @param array Array to get the index from
- * @param item Item to get the index for
- * @param sorter Sorter to use to determine sorting
- * @param descending Sorted in descending order? _(defaults to `false`; overridden by individual sorters)_
- * @returns Index for item
- */
-function getIndex<Item>(
-	array: Item[],
-	item: Item,
-	sorter: ArraySorter<Item>,
-	descending?: boolean,
-): number;
-
-/**
- * Get the index for an item _(to be inserted into an array of items)_ based on an optional default direction_
- *
- * _(If the array is not sorted, it will be treated as sorted, and the result may be inaccurate)_
- * @param array Array to get the index from
- * @param item Item to get the index for
- * @param descending Sorted in descending order? _(defaults to `false`)_
- * @returns Index for item
- */
-function getIndex<Item>(array: Item[], item: Item, descending?: boolean): number;
-
-function getIndex(array: unknown[], item: unknown, first?: unknown, second?: unknown): number {
-	return getSortedIndex(array, item, getSorters(first, getModifier(first, second)));
-}
-
-function getModifier(first: unknown, second: unknown): number {
-	const direction =
-		first === true || second === true ? SORT_DIRECTION_DESCENDING : SORT_DIRECTION_ASCENDING;
-
-	return modifiers[direction];
-}
-
-function getObjectSorter(obj: PlainObject, modifier: number): InternalSorter | undefined {
-	let sorter: InternalSorter | undefined;
-
-	if (typeof obj.comparison === 'function') {
-		sorter = getComparisonSorter(obj.comparison, modifier);
-	} else if (typeof obj.key === 'string') {
-		sorter = getValueSorter(obj.key, modifier);
-
-		if (typeof obj.compare === 'function') {
-			sorter.compare = {
-				complex: obj.compare,
-			};
-		}
-	} else if (typeof obj.value === 'function') {
-		sorter = getValueSorter(obj.value, modifier);
-	}
-
-	if (sorter != null && typeof obj.direction === 'string') {
-		sorter.modifier = modifiers[obj.direction as SortDirection] ?? modifier;
-	}
-
-	return sorter;
-}
-
-function getSortedIndex(array: unknown[], item: unknown, sorters: InternalSorter[]): number {
+function getIndex(array: unknown[], item: unknown, sorters: InternalSorter[]): number {
 	if (!Array.isArray(array)) {
 		return -1;
 	}
@@ -287,6 +207,97 @@ function getSortedIndex(array: unknown[], item: unknown, sorters: InternalSorter
 	}
 
 	return low;
+}
+
+function getModifier(first: unknown, second: unknown): number {
+	const direction =
+		first === true || second === true ? SORT_DIRECTION_DESCENDING : SORT_DIRECTION_ASCENDING;
+
+	return modifiers[direction];
+}
+
+function getObjectSorter(obj: PlainObject, modifier: number): InternalSorter | undefined {
+	let sorter: InternalSorter | undefined;
+
+	if (typeof obj.comparison === 'function') {
+		sorter = getComparisonSorter(obj.comparison, modifier);
+	} else if (typeof obj.key === 'string') {
+		sorter = getValueSorter(obj.key, modifier);
+
+		if (typeof obj.compare === 'function') {
+			sorter.compare = {
+				complex: obj.compare,
+			};
+		}
+	} else if (typeof obj.value === 'function') {
+		sorter = getValueSorter(obj.value, modifier);
+	}
+
+	if (sorter != null && typeof obj.direction === 'string') {
+		sorter.modifier = modifiers[obj.direction as SortDirection] ?? modifier;
+	}
+
+	return sorter;
+}
+
+/**
+ * Get the index for an item _(to be inserted into an array of items)_ based on sorters _(and an optional default direction)_
+ *
+ * _(If the array is not sorted, it will be treated as sorted, and the result may be inaccurate)_
+ *
+ * Available as `getSortedIndex` and `sort.index`
+ * @param array Array to get the index from
+ * @param item Item to get the index for
+ * @param sorters Sorters to use to determine sorting
+ * @param descending Sorted in descending order? _(defaults to `false`; overridden by individual sorters)_
+ * @returns Index for item
+ */
+export function getSortedIndex<Item>(
+	array: Item[],
+	item: Item,
+	sorters: Array<ArraySorter<Item>>,
+	descending?: boolean,
+): number;
+
+/**
+ * Get the index for an item _(to be inserted into an array of items)_ based on a sorter _(and an optional default direction)_
+ *
+ * _(If the array is not sorted, it will be treated as sorted, and the result may be inaccurate)_
+ *
+ * Available as `getSortedIndex` and `sort.index`
+ * @param array Array to get the index from
+ * @param item Item to get the index for
+ * @param sorter Sorter to use to determine sorting
+ * @param descending Sorted in descending order? _(defaults to `false`; overridden by individual sorters)_
+ * @returns Index for item
+ */
+export function getSortedIndex<Item>(
+	array: Item[],
+	item: Item,
+	sorter: ArraySorter<Item>,
+	descending?: boolean,
+): number;
+
+/**
+ * Get the index for an item _(to be inserted into an array of items)_ based on an optional default direction_
+ *
+ * _(If the array is not sorted, it will be treated as sorted, and the result may be inaccurate)_
+ *
+ * Available as `getSortedIndex` and `sort.index`
+ * @param array Array to get the index from
+ * @param item Item to get the index for
+ * @param descending Sorted in descending order? _(defaults to `false`)_
+ * @returns Index for item
+ */
+export function getSortedIndex<Item>(array: Item[], item: Item, descending?: boolean): number;
+
+export function getSortedIndex(
+	array: unknown[],
+	item: unknown,
+	first?: unknown,
+	second?: unknown,
+): number {
+	return getIndex(array, item, getSorters(first, getModifier(first, second)));
 }
 
 function getSorter(value: unknown, modifier: number): InternalSorter | undefined {
@@ -348,36 +359,45 @@ function getValueSorter(value: string | Function, modifier: number): InternalSor
 
 /**
  * Initialize a sort handler with sorters _(and an optional default direction)_
+ *
+ * Available as `initializeSorter` and `sort.initialize`
  * @param sorters Sorters to use for sorting
  * @param descending Sort in descending order? _(defaults to `false`; overridden by individual sorters)_
  * @returns Sort handler
  */
-function initializeSort<Item>(
+export function initializeSorter<Item>(
 	sorters: Array<ArraySorter<Item>>,
 	descending?: boolean,
 ): Sorter<Item>;
 
 /**
  * Initialize a sort handler with a sorter _(and an optional default direction)_
+ *
+ * Available as `initializeSorter` and `sort.initialize`
  * @param sorter Sorter to use for sorting
  * @param descending Sort in descending order? _(defaults to `false`; overridden by individual sorters)_
  * @returns Sort handler
  */
-function initializeSort<Item>(sorter: ArraySorter<Item>, descending?: boolean): Sorter<Item>;
+export function initializeSorter<Item>(
+	sorter: ArraySorter<Item>,
+	descending?: boolean,
+): Sorter<Item>;
 
 /**
  * Initialize a sort handler _(with an optional default direction)_
+ *
+ * Available as `initializeSorter` and `sort.initialize`
  * @param descending Sort in descending order? _(defaults to `false`)_
  * @returns Sort handler
  */
-function initializeSort<Item>(descending?: boolean): Sorter<Item>;
+export function initializeSorter<Item>(descending?: boolean): Sorter<Item>;
 
-function initializeSort(first?: unknown, second?: unknown): Sorter<unknown> {
+export function initializeSorter(first?: unknown, second?: unknown): Sorter<unknown> {
 	const sorters = getSorters(first, getModifier(first, second));
 
 	const sorter = (array: unknown[]) => sortArray(array, sorters);
 
-	sorter.index = (array: unknown[], item: unknown) => getSortedIndex(array, item, sorters);
+	sorter.index = (array: unknown[], item: unknown) => getIndex(array, item, sorters);
 	sorter.is = (array: unknown[]) => isSortedArray(array, sorters);
 
 	return sorter as unknown as Sorter<unknown>;
@@ -390,7 +410,7 @@ function initializeSort(first?: unknown, second?: unknown): Sorter<unknown> {
  * @param descending Sorted in descending order? _(defaults to `false`; overridden by individual sorters)_
  * @returns `true` if sorted, otherwise `false`
  */
-function isSorted<Item>(
+export function isSorted<Item>(
 	array: Item[],
 	sorters: Array<ArraySorter<Item>>,
 	descending?: boolean,
@@ -403,17 +423,23 @@ function isSorted<Item>(
  * @param descending Sorted in descending order? _(defaults to `false`; overridden by individual sorters)_
  * @returns `true` if sorted, otherwise `false`
  */
-function isSorted<Item>(array: Item[], sorter: ArraySorter<Item>, descending?: boolean): boolean;
+export function isSorted<Item>(
+	array: Item[],
+	sorter: ArraySorter<Item>,
+	descending?: boolean,
+): boolean;
 
 /**
  * Is the array sorted?
+ *
+ * Available as `isSorted` and `sort.is`
  * @param array Array to check
  * @param descending Sorted in descending order? _(defaults to `false`)_
  * @returns `true` if sorted, otherwise `false`
  */
-function isSorted<Item>(array: Item[], descending?: boolean): boolean;
+export function isSorted<Item>(array: Item[], descending?: boolean): boolean;
 
-function isSorted(array: unknown[], first?: unknown, second?: unknown): boolean {
+export function isSorted(array: unknown[], first?: unknown, second?: unknown): boolean {
 	return isSortedArray(array, getSorters(first, getModifier(first, second)));
 }
 
@@ -513,10 +539,8 @@ function sortArray(array: unknown[], sorters: InternalSorter[]): unknown[] {
 		: array;
 }
 
-sort.index = getIndex;
-
-sort.initialize = initializeSort;
-
+sort.index = getSortedIndex;
+sort.initialize = initializeSorter;
 sort.is = isSorted;
 
 // #endregion

@@ -1,5 +1,5 @@
 import {expect, test} from 'vitest';
-import {fuzzy} from '../../src';
+import {fuzzy, fuzzyMatch} from '../../src';
 import {arrayFixture} from '../.fixtures/array.fixture';
 
 const {complex, people} = arrayFixture;
@@ -169,6 +169,23 @@ test('complex', () => {
 		exact: [people.alice, people.aliceAgain],
 		similar: [],
 	});
+});
+
+test('match', () => {
+	const aResults = [true, true, true, true, false];
+	const aaResults = [true, false, true, false, false];
+	const eaResults = [false, true, false, true, false];
+
+	for (let index = 0; index < greek.length; index += 1) {
+		const item = greek[index];
+
+		expect(fuzzy.match(item, 'a')).toBe(aResults[index]);
+		expect(fuzzy.match(item, 'aa')).toBe(aaResults[index]);
+		expect(fuzzy.match(item, 'ea')).toBe(eaResults[index]);
+	}
+
+	expect(fuzzyMatch(123 as never, 'a')).toBe(false);
+	expect(fuzzyMatch('a', 123 as never)).toBe(false);
 });
 
 test('options', () => {

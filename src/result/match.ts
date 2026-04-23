@@ -8,7 +8,7 @@ import type {AnyResult, ExtendedErr, ResultMatch} from './models';
  * @param result Result to handle
  * @param handler Match callbacks
  */
-async function asyncMatchResult<Value, Returned, E = Error>(
+export async function asyncMatchResult<Value, Returned, E = Error>(
 	result: AnyResult<Value, E> | Promise<AnyResult<Value, E>> | (() => Promise<AnyResult<Value, E>>),
 	handler: ResultMatch<Value, Returned, E>,
 ): Promise<Returned>;
@@ -19,13 +19,13 @@ async function asyncMatchResult<Value, Returned, E = Error>(
  * @param ok Ok callback
  * @param error Error callback
  */
-async function asyncMatchResult<Value, Returned, E = Error>(
+export async function asyncMatchResult<Value, Returned, E = Error>(
 	result: AnyResult<Value, E> | Promise<AnyResult<Value, E>> | (() => Promise<AnyResult<Value, E>>),
 	ok: ResultMatch<Value, Returned, E>['ok'],
 	error: ResultMatch<Value, Returned, E>['error'],
 ): Promise<Returned>;
 
-async function asyncMatchResult<Value, Returned, E = Error>(
+export async function asyncMatchResult<Value, Returned, E = Error>(
 	result: AnyResult<Value, E> | Promise<AnyResult<Value, E>> | (() => Promise<AnyResult<Value, E>>),
 	first: ResultMatch<Value, Returned, E> | ResultMatch<Value, Returned, E>['ok'],
 	error?: ResultMatch<Value, Returned, E>['error'],
@@ -58,6 +58,8 @@ async function asyncMatchResult<Value, Returned, E = Error>(
 
 /**
  * Handles a result with match callbacks
+ *
+ * Available as `matchResult` and `attempt.match`
  * @param result Result to handle
  * @param handler Match callbacks
  */
@@ -68,6 +70,8 @@ export function matchResult<Value, Returned, E = Error>(
 
 /**
  * Handles a result with match callbacks
+ *
+ * Available as `matchResult` and `attempt.match`
  * @param result Result to handle
  * @param ok Ok callback
  * @param error Error callback

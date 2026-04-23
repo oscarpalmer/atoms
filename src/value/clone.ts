@@ -26,29 +26,8 @@ clone.handlers = getSelfHandlers(clone, {
 	method: CLONE_NAME,
 });
 
+clone.deregister = deregisterCloner;
 clone.register = registerCloner;
-
-clone.unregister = unregisterCloner;
-
-/**
- * Register a clone handler for a specific class
- * @param constructor Class constructor
- * @param handler Method name or clone function _(defaults to `clone`)_
- */
-function registerCloner<Instance>(
-	constructor: Constructor<Instance>,
-	handler?: string | ((value: Instance) => Instance),
-): void {
-	clone.handlers.register(constructor, handler);
-}
-
-/**
- * Unregister a clone handler for a specific class
- * @param constructor Class constructor
- */
-function unregisterCloner<Instance>(constructor: Constructor<Instance>): void {
-	clone.handlers.unregister(constructor);
-}
 
 function cloneArrayBuffer(
 	value: ArrayBuffer,
@@ -258,6 +237,30 @@ function cloneValue(value: unknown, depth: number, references: WeakMap<WeakKey, 
 		default:
 			return clone.handlers.handle(value, depth, references);
 	}
+}
+
+/**
+ * Deregister a clone handler for a specific class
+ *
+ * Available as `deregisterCloner` and `template.deregister`
+ * @param constructor Class constructor
+ */
+export function deregisterCloner<Instance>(constructor: Constructor<Instance>): void {
+	clone.handlers.deregister(constructor);
+}
+
+/**
+ * Register a clone handler for a specific class
+ *
+ * Available as `registerCloner` and `template.register`
+ * @param constructor Class constructor
+ * @param handler Method name or clone function _(defaults to `clone`)_
+ */
+export function registerCloner<Instance>(
+	constructor: Constructor<Instance>,
+	handler?: string | ((value: Instance) => Instance),
+): void {
+	clone.handlers.register(constructor, handler);
 }
 
 function tryStructuredClone(

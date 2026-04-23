@@ -1,3 +1,8 @@
+/**
+ * Reverse the order of items in an array
+ * @param array Array to reverse
+ * @returns Reversed array
+ */
 export function reverse<Item>(array: Item[]): Item[] {
 	if (!Array.isArray(array)) {
 		return [];

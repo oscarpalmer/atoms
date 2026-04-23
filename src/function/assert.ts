@@ -31,12 +31,14 @@ assert.is = assertIs;
 
 /**
  * Creates an asserter that asserts a condition is true, throwing an error if it is not
+ *
+ * Available as `assertCondition` and `assert.condition`
  * @param condition Condition to assert
  * @param message Error message
  * @param error Error constructor
  * @returns Asserter
  */
-function assertCondition<Value>(
+export function assertCondition<Value>(
 	condition: (value: unknown) => boolean,
 	message: string,
 	error?: ErrorConstructor,
@@ -48,10 +50,12 @@ function assertCondition<Value>(
 
 /**
  * Asserts that a value is defined throwing an error if it is not
+ *
+ * Available as `assertDefined` and `assert.defined`
  * @param value Value to assert
  * @param message Error message
  */
-function assertDefined<Value>(
+export function assertDefined<Value>(
 	value: unknown,
 	message?: string,
 ): asserts value is Exclude<Value, null | undefined> {
@@ -60,12 +64,14 @@ function assertDefined<Value>(
 
 /**
  * Creates an asserter that asserts a value is an instance of a constructor, throwing an error if it is not
+ *
+ * Available as `assertInstanceOf` and `assert.instanceOf`
  * @param constructor Constructor to check against
  * @param message Error message
  * @param error Error constructor
  * @returns Asserter
  */
-function assertInstanceOf<Value>(
+export function assertInstanceOf<Value>(
 	constructor: Constructor<Value>,
 	message: string,
 	error?: ErrorConstructor,
@@ -77,12 +83,14 @@ function assertInstanceOf<Value>(
 
 /**
  * Creates an asserter that asserts a value is of a specific type, throwing an error if it is not
+ *
+ * Available as `assertIs` and `assert.is`
  * @param condition Type guard function to check the value
  * @param message Error message
  * @param error Error constructor
  * @returns Asserter
  */
-function assertIs<Value>(
+export function assertIs<Value>(
 	condition: (value: unknown) => value is Value,
 	message: string,
 	error?: ErrorConstructor,

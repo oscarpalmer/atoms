@@ -21,9 +21,11 @@ export function getString(value: unknown): string {
 	}
 
 	if (typeof value !== 'object') {
+		// oxlint-disable-next-line typescript/no-base-to-string: the whole point of this function is to get a string representation of any value, so calling `String` on it is fine
 		return String(value);
 	}
 
+	// oxlint-disable-next-line typescript/no-base-to-string: ditto
 	const asString = String(value.valueOf?.() ?? value);
 
 	return asString.startsWith('[object ') ? JSON.stringify(value) : asString;

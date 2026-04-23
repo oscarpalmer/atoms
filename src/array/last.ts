@@ -55,26 +55,30 @@ last.default = lastOrDefault;
 
 /**
  * Get the last item matching the given value
+ *
+ * Available as `lastOrDefault` and `last.default`
  * @param array Array to search in
  * @param defaultValue Default value to return if no match is found
  * @param callback Callback to get an item's value for matching
  * @param value Value to match against
  * @returns Last item that matches the value, or the default value if no match is found
  */
-function lastOrDefault<
+export function lastOrDefault<
 	Item,
 	Callback extends (item: Item, index: number, array: Item[]) => unknown,
 >(array: Item[], defaultValue: Item, callback: Callback, value: ReturnType<Callback>): Item;
 
 /**
  * Get the last item matching the given value by key
+ *
+ * Available as `lastOrDefault` and `last.default`
  * @param array Array to search in
  * @param defaultValue Default value to return if no match is found
  * @param key Key to get an item's value for matching
  * @param value Value to match against
  * @returns Last item that matches the value, or the default value if no match is found
  */
-function lastOrDefault<Item extends PlainObject, ItemKey extends keyof Item>(
+export function lastOrDefault<Item extends PlainObject, ItemKey extends keyof Item>(
 	array: Item[],
 	defaultValue: Item,
 	key: ItemKey,
@@ -83,12 +87,14 @@ function lastOrDefault<Item extends PlainObject, ItemKey extends keyof Item>(
 
 /**
  * Get the last item matching the filter
+ *
+ * Available as `lastOrDefault` and `last.default`
  * @param array Array to search in
  * @param defaultValue Default value to return if no match is found
  * @param filter Filter callback to match items
  * @returns Last item that matches the filter, or the default value if no match is found
  */
-function lastOrDefault<Item>(
+export function lastOrDefault<Item>(
 	array: Item[],
 	defaultValue: Item,
 	filter: (item: Item, index: number, array: Item[]) => boolean,
@@ -96,13 +102,19 @@ function lastOrDefault<Item>(
 
 /**
  * Get the last item from an array
+ *
+ * Available as `lastOrDefault` and `last.default`
  * @param array Array to get from
  * @param defaultValue Default value to return if the array is empty
  * @return Last item from the array, or the default value if the array is empty
  */
-function lastOrDefault<Item>(array: Item[], defaultValue: Item): Item;
+export function lastOrDefault<Item>(array: Item[], defaultValue: Item): Item;
 
-function lastOrDefault(array: unknown[], defaultValue: unknown, ...parameters: unknown[]): unknown {
+export function lastOrDefault(
+	array: unknown[],
+	defaultValue: unknown,
+	...parameters: unknown[]
+): unknown {
 	return findAbsoluteValueOrDefault(array, parameters, defaultValue, true, true);
 }
 

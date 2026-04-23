@@ -120,12 +120,14 @@ groupBy.arrays = groupArraysBy;
 
 /**
  * Create a record from an array of items using a specific key and value, grouping values into arrays
+ *
+ * Available as `groupArraysBy` and `groupBy.arrays`
  * @param array Array to group
  * @param key Callback to get an item's grouping key
  * @param value Callback to get an item's value
  * @returns Record of keyed values
  */
-function groupArraysBy<
+export function groupArraysBy<
 	Item,
 	KeyCallback extends (item: Item, index: number, array: Item[]) => Key,
 	ValueCallback extends (item: Item, index: number, array: Item[]) => unknown,
@@ -137,12 +139,14 @@ function groupArraysBy<
 
 /**
  * Create a record from an array of items using a specific key and value, grouping values into arrays
+ *
+ * Available as `groupArraysBy` and `groupBy.arrays`
  * @param array Array to group
  * @param key Callback to get an item's grouping key
  * @param value Key to use for value
  * @returns Record of keyed values
  */
-function groupArraysBy<
+export function groupArraysBy<
 	Item extends PlainObject,
 	KeyCallback extends (item: Item, index: number, array: Item[]) => Key,
 	ItemValue extends keyof Item,
@@ -154,12 +158,14 @@ function groupArraysBy<
 
 /**
  * Create a record from an array of items using a specific key and value, grouping values into arrays
+ *
+ * Available as `groupArraysBy` and `groupBy.arrays`
  * @param array Array to group
  * @param key Key to use for grouping
  * @param value Callback to get an item's value
  * @returns Record of keyed values
  */
-function groupArraysBy<
+export function groupArraysBy<
 	Item extends PlainObject,
 	ItemKey extends keyof Item,
 	ValueCallback extends (item: Item, index: number, array: Item[]) => unknown,
@@ -171,12 +177,14 @@ function groupArraysBy<
 
 /**
  * Create a record from an array of items using a specific key and value, grouping values into arrays
+ *
+ * Available as `groupArraysBy` and `groupBy.arrays`
  * @param array Array to group
  * @param key Key to use for grouping
  * @param value Key to use for value
  * @returns Record of keyed values
  */
-function groupArraysBy<
+export function groupArraysBy<
 	Item extends PlainObject,
 	ItemKey extends keyof Item,
 	ItemValue extends keyof Item,
@@ -188,27 +196,31 @@ function groupArraysBy<
 
 /**
  * Create a record from an array of items using a specific key, grouping items into arrays
+ *
+ * Available as `groupArraysBy` and `groupBy.arrays`
  * @param array Array to group
  * @param callback Callback to get an item's grouping key
  * @returns Record of keyed items
  */
-function groupArraysBy<Item, Callback extends (item: Item, index: number, array: Item[]) => Key>(
-	array: Item[],
-	callback: Callback,
-): Record<ReturnType<Callback>, Item[]>;
+export function groupArraysBy<
+	Item,
+	Callback extends (item: Item, index: number, array: Item[]) => Key,
+>(array: Item[], callback: Callback): Record<ReturnType<Callback>, Item[]>;
 
 /**
  * Create a record from an array of items using a specific key, grouping items into arrays
+ *
+ * Available as `groupArraysBy` and `groupBy.arrays`
  * @param array Array to group
  * @param key Key to use for grouping
  * @returns Record of keyed items
  */
-function groupArraysBy<Item extends PlainObject, ItemKey extends keyof Item>(
+export function groupArraysBy<Item extends PlainObject, ItemKey extends keyof Item>(
 	array: Item[],
 	key: ItemKey,
 ): Simplify<Record<KeyedValue<Item, ItemKey>, Item[]>>;
 
-function groupArraysBy(array: unknown[], first?: unknown, second?: unknown): unknown {
+export function groupArraysBy(array: unknown[], first?: unknown, second?: unknown): unknown {
 	return groupValues(array, first, second, true);
 }
 

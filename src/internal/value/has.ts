@@ -1,14 +1,6 @@
 import type {NestedKeys, NestedValue, PlainObject, ToString} from '../../models';
+import type {Result} from '../../result/models';
 import {getNestedValue} from './misc';
-
-// #region Types
-
-export type HasValue<Value> = {
-	exists: boolean;
-	value: Value;
-};
-
-// #endregion
 
 // #region Functions
 
@@ -37,38 +29,46 @@ export function hasValue<Data extends PlainObject>(
 ): boolean;
 
 export function hasValue(data: PlainObject, path: string, ignoreCase?: boolean): boolean {
-	return getNestedValue(data, path, ignoreCase === true).exists;
+	return getNestedValue(data, path, ignoreCase === true).ok;
 }
 
-hasValue.get = getWithHasValue;
+hasValue.get = hasValueResult;
 
 /**
  * Check if a nested property is defined in an object, and get its value if it is
+ *
+ * Available as `hasValueResult` and `hasValue.get`
  * @param data Object to check in
  * @param path Path for property
  * @param ignoreCase If `true`, the path matching is case-insensitive
  * @return Result object
  */
-function getWithHasValue<Data extends PlainObject, Path extends NestedKeys<Data>>(
+function hasValueResult<Data extends PlainObject, Path extends NestedKeys<Data>>(
 	data: Data,
 	path: Path,
 	ignoreCase?: boolean,
-): HasValue<NestedValue<Data, ToString<Path>>>;
+): Result<NestedValue<Data, ToString<Path>>, undefined>;
 
 /**
  * Check if a nested property is defined in an object, and get its value if it is
+ *
+ * Available as `hasValueResult` and `hasValue.get`
  * @param data Object to check in
  * @param path Path for property
  * @param ignoreCase If `true`, the path matching is case-insensitive
  * @return Result object
  */
-function getWithHasValue<Data extends PlainObject>(
+function hasValueResult<Data extends PlainObject>(
 	data: Data,
 	path: string,
 	ignoreCase?: boolean,
-): HasValue<unknown>;
+): Result<unknown, undefined>;
 
-function getWithHasValue(data: PlainObject, path: string, ignoreCase?: boolean): HasValue<unknown> {
+function hasValueResult(
+	data: PlainObject,
+	path: string,
+	ignoreCase?: boolean,
+): Result<unknown, undefined> {
 	return getNestedValue(data, path, ignoreCase === true);
 }
 

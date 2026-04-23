@@ -7,13 +7,14 @@ type Options = {
 };
 
 export function getCompareHandlers<Value>(owner: GenericCallback, options: Options) {
-	const {get, register, unregister} = getHandlers(owner, options);
+	const handlers = getHandlers(owner, options);
 
 	return {
-		register,
-		unregister,
+		deregister(constructor: Constructor) {
+			handlers.deregister(constructor);
+		},
 		handle(first: unknown, second: unknown, ...parameters: unknown[]): Value {
-			const handler = get(first, second);
+			const handler = handlers.get(first, second);
 
 			if (handler == null) {
 				return options.callback(first, second, ...parameters);
@@ -23,6 +24,9 @@ export function getCompareHandlers<Value>(owner: GenericCallback, options: Optio
 				? handler(first, second)
 				: (first as any)[handler](second);
 		},
+		register(constructor: Constructor, handler?: string | GenericCallback) {
+			handlers.register(constructor, handler);
+		},
 	};
 }
 
@@ -30,6 +34,9 @@ function getHandlers(owner: GenericCallback, options: Options) {
 	const handlers = new WeakMap<Constructor, string | GenericCallback>();
 
 	return {
+		deregister(constructor: Constructor) {
+			handlers.delete(constructor);
+		},
 		get(first: unknown, second: unknown): string | GenericCallback | undefined {
 			if (
 				isConstructable(first) &&
@@ -58,26 +65,27 @@ function getHandlers(owner: GenericCallback, options: Options) {
 				handlers.set(constructor, actual);
 			}
 		},
-		unregister(constructor: Constructor) {
-			handlers.delete(constructor);
-		},
 	};
 }
 
 export function getSelfHandlers(owner: GenericCallback, options: Options) {
-	const {get, register, unregister} = getHandlers(owner, options);
+	const handlers = getHandlers(owner, options);
 
 	return {
-		register,
-		unregister,
+		deregister(constructor: Constructor) {
+			handlers.deregister(constructor);
+		},
 		handle(value: unknown, ...parameters: unknown[]) {
-			const handler = get(value, value);
+			const handler = handlers.get(value, value);
 
 			if (handler == null) {
 				return options.callback(value, ...parameters);
 			}
 
 			return typeof handler === 'function' ? handler(value) : (value as any)[handler]();
+		},
+		register(constructor: Constructor, handler?: string | GenericCallback) {
+			handlers.register(constructor, handler);
 		},
 	};
 }

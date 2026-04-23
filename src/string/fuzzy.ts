@@ -61,7 +61,7 @@ class Fuzzy<Item> {
 			this.#state.items,
 			this.#state.strings,
 			value,
-			options == null ? this.#state : getOptions(options, this.#state),
+			options == null ? this.#state : getFuzzyOptions(options, this.#state),
 		);
 	}
 }
@@ -165,7 +165,7 @@ function getItems<Item>(items: FuzzyItem<Item>[]): Item[] {
 		.map(({item}) => item);
 }
 
-function getOptions<Item>(
+function getFuzzyOptions<Item>(
 	input: unknown,
 	state?: FuzzyState<Item>,
 ): RequiredKeys<FuzzyOptions, 'tolerance'> {
@@ -179,18 +179,14 @@ function getOptions<Item>(
 		options.limit = state?.limit;
 	}
 
-	if (typeof options.tolerance === 'number' && !Number.isNaN(options.tolerance)) {
-		options.tolerance = options.tolerance < 0 ? 0 : Math.floor(options.tolerance);
-	} else {
-		options.tolerance = state?.tolerance ?? PROXIMITY_THRESHOLD;
-	}
+	options.tolerance = getTolerance(options.tolerance, state);
 
 	return options as RequiredKeys<FuzzyOptions, 'tolerance'>;
 }
 
 function getState<Item>(items: Item[], input: unknown): FuzzyState<Item> {
 	const handler = getHandler(input);
-	const options = getOptions(input);
+	const options = getFuzzyOptions(input);
 
 	return {
 		handler,
@@ -199,6 +195,14 @@ function getState<Item>(items: Item[], input: unknown): FuzzyState<Item> {
 		strings: items.map(handler),
 		tolerance: options.tolerance,
 	};
+}
+
+function getTolerance<Item>(input: unknown, state?: FuzzyState<Item>): number {
+	if (typeof input === 'number' && !Number.isNaN(input)) {
+		return input < 0 ? 0 : Math.floor(input);
+	}
+
+	return state?.tolerance ?? PROXIMITY_THRESHOLD;
 }
 
 /**
@@ -234,6 +238,28 @@ export function fuzzy(items: unknown[], configuration?: unknown): Fuzzy<unknown>
 	}
 
 	return new Fuzzy(getState(items, configuration));
+}
+
+fuzzy.match = fuzzyMatch;
+
+/**
+ * Does the needle match the haystack in a fuzzy way?
+ * @param haystack Haystack to search through
+ * @param needle Needle to search for
+ * @returns `true` if the needle matches the haystack in a fuzzy way, `false` otherwise
+ */
+export function fuzzyMatch(haystack: string, needle: string): boolean {
+	if (typeof haystack !== 'string' || typeof needle !== 'string') {
+		return false;
+	}
+
+	const trimmed = needle.trim();
+
+	if (includes(haystack, trimmed, true)) {
+		return true;
+	}
+
+	return getScore(haystack, trimmed) > -1;
 }
 
 function isSubsequence(haystack: string, needle: string): boolean {

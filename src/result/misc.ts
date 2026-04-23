@@ -5,7 +5,7 @@ import type {AnyResult, Err, ExtendedErr, Ok, Result} from './models';
 
 /**
  * Creates an extended error result
- * @param error Error value
+ * @param value Error value
  * @param original Original error
  * @returns Error result
  */
@@ -13,7 +13,7 @@ export function error<E>(value: E, original: Error): ExtendedErr<E>;
 
 /**
  * Creates an error result
- * @param error Error value
+ * @param value Error value
  * @returns Error result
  */
 export function error<E>(value: E): Err<E>;
@@ -51,7 +51,7 @@ export function ok<Value>(value: Value): Ok<Value> {
  * Converts a result to a promise
  *
  * Resolves if ok, rejects for error
- * @param result Result to convert
+ * @param callback Callback to get the result
  * @returns Promised result
  */
 export async function toPromise<Value, E = Error>(

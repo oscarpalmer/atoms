@@ -27,6 +27,8 @@ export type RetryOptions = {
 
 /**
  * Retry a callback a specified number of times, with a delay between attempts
+ *
+ * Available as `asyncRetry` and `retry.async`
  * @param callback Callback to retry
  * @param options Retry options
  * @returns Callback result
@@ -38,6 +40,8 @@ async function asyncRetry<Callback extends GenericAsyncCallback>(
 
 /**
  * Retry a callback a specified number of times, with a delay between attempts
+ *
+ * Available as `asyncRetry` and `retry.async`
  * @param callback Callback to retry
  * @param options Retry options
  * @returns Callback result
@@ -49,6 +53,8 @@ async function asyncRetry<Callback extends GenericCallback>(
 
 /**
  * Retry a callback a specified number of times, with a delay between attempts
+ *
+ * Available as `asyncRetry` and `retry.async`
  * @param callback Callback to retry
  * @param options Retry options
  * @returns Callback result
@@ -72,7 +78,7 @@ async function asyncRetry<Callback extends GenericCallback>(
 			} else {
 				attempts += 1;
 
-				timer();
+				void timer();
 			}
 		}
 	}
@@ -90,7 +96,7 @@ async function asyncRetry<Callback extends GenericCallback>(
 		rejector = reject;
 		resolver = resolve;
 
-		handle();
+		void handle();
 	});
 }
 

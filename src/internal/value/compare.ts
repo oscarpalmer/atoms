@@ -76,9 +76,8 @@ compare.handlers = getCompareHandlers<number>(compare, {
 	method: COMPARE_NAME,
 });
 
+compare.deregister = deregisterComparator;
 compare.register = registerComparator;
-
-compare.unregister = unregisterComparator;
 
 function compareNumbers(first: bigint | number, second: bigint | number): number {
 	if (Object.is(first, second)) {
@@ -121,6 +120,16 @@ function compareValue(
 	return compare.handlers.handle(first, second, compareStrings);
 }
 
+/**
+ * Deregister a custom comparison handler for a class
+ *
+ * Available as `deregisterComparator` and `compare.deregister`
+ * @param constructor Class constructor
+ */
+export function deregisterComparator<Instance>(constructor: Constructor<Instance>): void {
+	compare.handlers.deregister(constructor);
+}
+
 function getComparisonParts(value: unknown): unknown[] {
 	if (Array.isArray(value)) {
 		return value;
@@ -131,22 +140,16 @@ function getComparisonParts(value: unknown): unknown[] {
 
 /**
  * Register a custom comparison handler for a class
+ *
+ * Available as `registerComparator` and `compare.register`
  * @param constructor Class constructor
  * @param handler Method name or comparison function _(defaults to `compare`)_
  */
-function registerComparator<Instance>(
+export function registerComparator<Instance>(
 	constructor: Constructor<Instance>,
 	handler?: string | ((first: Instance, second: Instance) => number),
 ): void {
 	compare.handlers.register(constructor, handler);
-}
-
-/**
- * Unregister a custom comparison handler for a class
- * @param constructor Class constructor
- */
-function unregisterComparator<Instance>(constructor: Constructor<Instance>): void {
-	compare.handlers.unregister(constructor);
 }
 
 // #endregion

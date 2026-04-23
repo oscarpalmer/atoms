@@ -177,7 +177,7 @@ function isInstanceMethod(type, context, node, methods) {
  * @param {Set<string>} methods
  * @returns {boolean}
  */
-function isLiteralMethod(type, context, node, methods) {
+function isLiteralMethod(_, __, ___, ____) {
 	// TODO: check literal value
 
 	return false;
@@ -190,7 +190,7 @@ function isLiteralMethod(type, context, node, methods) {
  * @param {Set<string>} methods
  * @returns {boolean}
  */
-function isStaticMethod(type, context, node, methods) {
+function isStaticMethod(type, context, node, _) {
 	const {object, property} = node.callee;
 
 	if (object.type !== identifierExpression || object.name !== objects[type]) {

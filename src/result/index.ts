@@ -9,41 +9,51 @@ import {attemptPipe} from './work/pipe';
 
 /**
  * Executes a promise, catching any errors, and returns a result
+ *
+ * Available as `asyncAttempt` and `attempt.async`
  * @param promise Promise to execute
  * @param error Error value
  * @returns Callback result
  */
-async function asyncAttempt<Value, E>(
+export async function asyncAttempt<Value, E>(
 	promise: Promise<Value>,
 	error: E,
 ): Promise<ExtendedResult<Awaited<Value>, E>>;
 
 /**
  * Executes a callback asynchronously, catching any errors, and returns a result
+ *
+ * Available as `asyncAttempt` and `attempt.async`
  * @param callback Callback to execute
  * @param error Error value
  * @returns Callback result
  */
-async function asyncAttempt<Value, E>(
+export async function asyncAttempt<Value, E>(
 	callback: () => Promise<Value>,
 	error: E,
 ): Promise<ExtendedResult<Awaited<Value>, E>>;
 
 /**
  * Executes a promise, catching any errors, and returns a result
+ *
+ * Available as `asyncAttempt` and `attempt.async`
  * @param promise Promise to execute
  * @returns Callback result
  */
-async function asyncAttempt<Value>(promise: Promise<Value>): Promise<Result<Awaited<Value>>>;
+export async function asyncAttempt<Value>(promise: Promise<Value>): Promise<Result<Awaited<Value>>>;
 
 /**
  * Executes a callback asynchronously, catching any errors, and returns a result
+ *
+ * Available as `asyncAttempt` and `attempt.async`
  * @param callback Callback to execute
  * @returns Callback result
  */
-async function asyncAttempt<Value>(callback: () => Promise<Value>): Promise<Result<Awaited<Value>>>;
+export async function asyncAttempt<Value>(
+	callback: () => Promise<Value>,
+): Promise<Result<Awaited<Value>>>;
 
-async function asyncAttempt<Value, E>(
+export async function asyncAttempt<Value, E>(
 	value: Promise<Value> | (() => Promise<Value>),
 	err?: E,
 ): Promise<unknown> {

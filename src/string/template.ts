@@ -69,10 +69,12 @@ function handleTemplate(
 
 /**
  * Create a templater with predefined options
+ *
+ * Available as `initializeTemplater` and `template.initialize`
  * @param options Templating options
  * @returns Templater function
  */
-function initializeTemplater(options?: Partial<TemplateOptions>): Templater {
+export function initializeTemplater(options?: Partial<TemplateOptions>): Templater {
 	const {ignoreCase, pattern} = getTemplateOptions(options);
 
 	return (value: string, variables?: PlainObject): string => {

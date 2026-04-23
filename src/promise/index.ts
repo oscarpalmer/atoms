@@ -24,6 +24,8 @@ import {getTimedPromise} from './timed';
 
 /**
  * Wrap a promise with safety handlers, with optional abort capabilities and timeout
+ *
+ * Available as `attemptPromise` and `attempt.promise`
  * @param promise Promise to wrap
  * @param options Options for the promise
  * @returns Wrapped promise
@@ -35,6 +37,8 @@ export async function attemptPromise<Value>(
 
 /**
  * Wrap a promise-returning callback with safety handlers, with optional abort capabilities and timeout
+ *
+ * Available as `attemptPromise` and `attempt.promise`
  * @param callback Callback to wrap
  * @param options Options for the promise
  * @returns Promise-wrapped callback
@@ -46,6 +50,8 @@ export async function attemptPromise<Value>(
 
 /**
  * Wrap a callback with a promise and safety handlers, with optional abort capabilities and timeout
+ *
+ * Available as `attemptPromise` and `attempt.promise`
  * @param callback Callback to wrap
  * @param options Options for the promise
  * @returns Promise-wrapped callback
@@ -99,7 +105,7 @@ export async function attemptPromise<Value>(
 	const promise = new Promise<Value>((resolve, reject) => {
 		rejector = reject;
 
-		handler(resolve, reject);
+		void handler(resolve, reject);
 	});
 
 	return time > 0 ? getTimedPromise(promise, time, signal) : promise;
@@ -253,11 +259,13 @@ promises.result = resultPromises;
  * Handle a list of promises, returning their results in an ordered array of results _({@link Result})_.
  *
  * Depending on the strategy, the function will either reject on the first error encountered or return an array of rejected and resolved results
+ *
+ * Available as `resultPromises` and `promises.result`
  * @param items List of promises
  * @param signal AbortSignal for aborting the operation _(when aborted, the promise will reject with the reason of the signal)_
  * @returns List of results
  */
-async function resultPromises<Items extends unknown[]>(
+export async function resultPromises<Items extends unknown[]>(
 	items: [...Items],
 	signal?: AbortSignal,
 ): Promise<PromisesResult<PromisesItems<Items>>>;
@@ -266,16 +274,18 @@ async function resultPromises<Items extends unknown[]>(
  * Handle a list of promises, returning their results in an ordered array of results _({@link Result})_.
  *
  * Depending on the strategy, the function will either reject on the first error encountered or return an array of rejected and resolved results
+ *
+ * Available as `resultPromises` and `promises.result`
  * @param items List of promises
  * @param signal AbortSignal for aborting the operation _(when aborted, the promise will reject with the reason of the signal)_
  * @returns List of results
  */
-async function resultPromises<Value>(
+export async function resultPromises<Value>(
 	items: Promise<Value>[],
 	signal?: AbortSignal,
 ): Promise<Result<Awaited<Value>>[]>;
 
-async function resultPromises(
+export async function resultPromises(
 	items: Promise<unknown>[],
 	signal?: AbortSignal,
 ): Promise<Result<unknown>[]> {

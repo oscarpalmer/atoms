@@ -227,6 +227,7 @@ test('isTemplateStringsArray', () => {
 		expect(isNonTemplateStringsArray(strings)).toBe(false);
 	}
 
+	// oxlint-disable-next-line no-unused-expressions Actually used, so no worries
 	tester``;
 });
 

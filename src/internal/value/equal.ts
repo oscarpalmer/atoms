@@ -1,6 +1,5 @@
-import {isPrimitive} from '../is';
 import type {ArrayOrPlainObject, Constructor, PlainObject, TypedArray} from '../../models';
-import {isPlainObject, isTypedArray} from '../is';
+import {isPlainObject, isPrimitive, isTypedArray} from '../is';
 import {getCompareHandlers} from './handlers';
 
 // #region Types
@@ -25,6 +24,15 @@ export type EqualOptions = {
 
 type Equalizer = {
 	/**
+	 * Are two strings equal?
+	 * @param first First string
+	 * @param second Second string
+	 * @param ignoreCase If `true`, comparison will be case-insensitive
+	 * @returns `true` if the strings are equal, otherwise `false`
+	 */
+	(first: string, second: string, ignoreCase?: boolean): boolean;
+
+	/**
 	 * Are two values equal?
 	 * @param first First value
 	 * @param second Second value
@@ -33,20 +41,20 @@ type Equalizer = {
 	(first: unknown, second: unknown): boolean;
 
 	/**
+	 * Deregister a equality comparison handler for a specific class
+	 * @param constructor Class constructor
+	 */
+	deregister: <Instance>(constructor: Constructor<Instance>) => void;
+
+	/**
 	 * Register a equality comparison function for a specific class
 	 * @param constructor Class constructor
-	 * @param fn Comparison function
+	 * @param handler Comparison function
 	 */
 	register: <Instance>(
 		constructor: Constructor<Instance>,
 		handler: (first: Instance, second: Instance) => boolean,
 	) => void;
-
-	/**
-	 * Unregister a equality comparison handler for a specific class
-	 * @param constructor Class constructor
-	 */
-	unregister: <Instance>(constructor: Constructor<Instance>) => void;
 };
 
 type Options = {
@@ -64,6 +72,35 @@ type OptionsKeys<Values> = {
 // #endregion
 
 // #region Functions
+
+/**
+ * Deregister a equality comparison handler for a specific class
+ *
+ * Available as `deregisterEqualizer` and `equal.deregister`
+ * @param constructor Class constructor
+ */
+export function deregisterEqualizer<Instance>(constructor: Constructor<Instance>): void {
+	equal.handlers.deregister(constructor);
+}
+
+function filterKey(key: string | symbol, options: Options): boolean {
+	if (typeof key !== 'string') {
+		return true;
+	}
+
+	if (
+		options.ignoreExpressions.enabled &&
+		options.ignoreExpressions.values.some(expression => expression.test(key))
+	) {
+		return false;
+	}
+
+	if (options.ignoreKeys.enabled && options.ignoreKeys.values.has(key)) {
+		return false;
+	}
+
+	return true;
+}
 
 /**
  * Are two strings equal?
@@ -91,11 +128,9 @@ equal.handlers = getCompareHandlers<boolean>(equal, {
 	callback: Object.is,
 });
 
+equal.deregister = deregisterEqualizer;
 equal.initialize = initializeEqualizer;
-
 equal.register = registerEqualizer;
-
-equal.unregister = unregisterEqualizer;
 
 function equalArray(first: unknown[], second: unknown[], options: Options): boolean {
 	const {length} = first;
@@ -322,61 +357,6 @@ function equalValue(first: unknown, second: unknown, options: Options): boolean 
 	}
 }
 
-/**
- * Create an equalizer with predefined options
- * @param options Comparison options
- * @returns Equalizer function
- */
-function initializeEqualizer(options?: EqualOptions): Equalizer {
-	const actual = getEqualOptions(options);
-
-	const equalizer = (first: unknown, second: unknown): boolean => equalValue(first, second, actual);
-
-	equalizer.register = registerEqualizer;
-	equalizer.unregister = unregisterEqualizer;
-
-	return equalizer;
-}
-
-/**
- * Register a equality comparison function for a specific class
- * @param constructor Class constructor
- * @param fn Comparison function
- */
-function registerEqualizer<Instance>(
-	constructor: Constructor<Instance>,
-	handler: (first: Instance, second: Instance) => boolean,
-): void {
-	equal.handlers.register(constructor, handler);
-}
-
-/**
- * Unregister a equality comparison handler for a specific class
- * @param constructor Class constructor
- */
-function unregisterEqualizer<Instance>(constructor: Constructor<Instance>): void {
-	equal.handlers.unregister(constructor);
-}
-
-function filterKey(key: string | symbol, options: Options): boolean {
-	if (typeof key !== 'string') {
-		return true;
-	}
-
-	if (
-		options.ignoreExpressions.enabled &&
-		options.ignoreExpressions.values.some(expression => expression.test(key))
-	) {
-		return false;
-	}
-
-	if (options.ignoreKeys.enabled && options.ignoreKeys.values.has(key)) {
-		return false;
-	}
-
-	return true;
-}
-
 function getEqualOptions(input?: boolean | EqualOptions): Options {
 	const options: Options = {
 		ignoreCase: false,
@@ -420,6 +400,38 @@ function getEqualOptions(input?: boolean | EqualOptions): Options {
 	options.relaxedNullish = input.relaxedNullish === true;
 
 	return options;
+}
+
+/**
+ * Create an equalizer with predefined options
+ *
+ * Available as `initializeEqualizer` and `equal.initialize`
+ * @param options Comparison options
+ * @returns Equalizer function
+ */
+export function initializeEqualizer(options?: EqualOptions): Equalizer {
+	const actual = getEqualOptions(options);
+
+	const equalizer = (first: unknown, second: unknown): boolean => equalValue(first, second, actual);
+
+	equalizer.deregister = deregisterEqualizer;
+	equalizer.register = registerEqualizer;
+
+	return equalizer;
+}
+
+/**
+ * Register a equality comparison function for a specific class
+ *
+ * Available as `registerEqualizer` and `equal.register`
+ * @param constructor Class constructor
+ * @param handler Comparison function
+ */
+export function registerEqualizer<Instance>(
+	constructor: Constructor<Instance>,
+	handler: (first: Instance, second: Instance) => boolean,
+): void {
+	equal.handlers.register(constructor, handler);
 }
 
 // #endregion

@@ -163,6 +163,8 @@ function swapArrays(array: unknown[], from: unknown[], to: unknown[], key: unkno
  * Swap two indiced items in an array
  *
  * If either index is out of bounds, the array will be returned unchanged
+ *
+ * Available as `swapIndices` and `swap.indices`
  * @param array Array of items to swap
  * @param first First index _(can be negative to count from the end)_
  * @param second Second index _(can be negative to count from the end)_

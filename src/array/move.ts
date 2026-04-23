@@ -112,12 +112,14 @@ move.toIndex = moveToIndex;
  * Move an item from one index to another within an array
  *
  * If the from index is out of bounds, the array will be returned unchanged
+ *
+ * Available as `moveIndices` and `move.indices`
  * @param array Array to move within
  * @param from Index to move from
  * @param to Index to move to
  * @returns Original array with item moved _(or unchanged if unable to move)_
  */
-function moveIndices<Item>(array: Item[], from: number, to: number): Item[] {
+export function moveIndices<Item>(array: Item[], from: number, to: number): Item[] {
 	if (!Array.isArray(array)) {
 		return [];
 	}
@@ -150,13 +152,15 @@ function moveIndices<Item>(array: Item[], from: number, to: number): Item[] {
  * Move an item _(or array of items)_ to an index within an array
  *
  * If the value is not present in the array, or if the index is out of bounds, the array will be returned unchanged
+ *
+ * Available as `moveToIndex` and `move.toIndex`
  * @param array Array to move within
  * @param value Item or items to move
  * @param index Index to move to
  * @param key Key to get an item's value for matching
  * @returns Original array with items moved _(or unchanged if unable to move)_
  */
-function moveToIndex<Item extends PlainObject, ItemKey extends keyof Item>(
+export function moveToIndex<Item extends PlainObject, ItemKey extends keyof Item>(
 	array: Item[],
 	value: Item | Item[],
 	index: number,
@@ -167,13 +171,15 @@ function moveToIndex<Item extends PlainObject, ItemKey extends keyof Item>(
  * Move an item _(or array of items)_ to an index within an array
  *
  * If the value is not present in the array, or if the index is out of bounds, the array will be returned unchanged
+ *
+ * Available as `moveToIndex` and `move.toIndex`
  * @param array Array to move within
  * @param value Item or items to move
  * @param index Index to move to
  * @param callback Callback to get an item's value for matching
  * @returns Original array with items moved _(or unchanged if unable to move)_
  */
-function moveToIndex<Item>(
+export function moveToIndex<Item>(
 	array: Item[],
 	value: Item | Item[],
 	index: number,
@@ -184,14 +190,21 @@ function moveToIndex<Item>(
  * Move an item _(or array of items)_ to an index within an array
  *
  * If the value is not present in the array, or if the index is out of bounds, the array will be returned unchanged
+ *
+ * Available as `moveToIndex` and `move.toIndex`
  * @param array Array to move within
  * @param value Item or items to move
  * @param index Index to move to
  * @returns Original array with items moved _(or unchanged if unable to move)_
  */
-function moveToIndex<Item>(array: Item[], value: Item | Item[], index: number): Item[];
+export function moveToIndex<Item>(array: Item[], value: Item | Item[], index: number): Item[];
 
-function moveToIndex(array: unknown[], value: unknown, index: number, key?: unknown): unknown[] {
+export function moveToIndex(
+	array: unknown[],
+	value: unknown,
+	index: number,
+	key?: unknown,
+): unknown[] {
 	if (!Array.isArray(array)) {
 		return [];
 	}

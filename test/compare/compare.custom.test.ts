@@ -1,5 +1,5 @@
 import {expect, test} from 'vitest';
-import {compare} from '../../src';
+import {compare, deregisterCloner, deregisterComparator} from '../../src';
 
 test('', () => {
 	class Test {
@@ -25,7 +25,7 @@ test('', () => {
 	expect(compare(alpha, omega)).toBe(-1);
 	expect(compare(omega, alpha)).toBe(1);
 
-	compare.unregister(Test);
+	compare.deregister(Test);
 
 	expect(compare(alpha, omega)).toBe(-1);
 	expect(compare(omega, alpha)).toBe(1);
@@ -37,7 +37,7 @@ test('', () => {
 	expect(compare(alpha, omega)).toBe(1);
 	expect(compare(omega, alpha)).toBe(-1);
 
-	compare.unregister(Test);
+	deregisterComparator(Test);
 
 	expect(compare(alpha, omega)).toBe(-1);
 	expect(compare(omega, alpha)).toBe(1);
@@ -47,7 +47,7 @@ test('', () => {
 	expect(compare(alpha, omega)).toBe(1);
 	expect(compare(omega, alpha)).toBe(-1);
 
-	compare.unregister(Test);
+	compare.deregister(Test);
 
 	expect(compare(alpha, omega)).toBe(-1);
 	expect(compare(omega, alpha)).toBe(1);
@@ -57,7 +57,7 @@ test('', () => {
 	expect(compare(alpha, omega)).toBe(-1);
 	expect(compare(omega, alpha)).toBe(1);
 
-	compare.unregister(Test);
+	compare.deregister(Test);
 
 	expect(compare(alpha, omega)).toBe(-1);
 	expect(compare(omega, alpha)).toBe(1);
@@ -67,7 +67,7 @@ test('', () => {
 	expect(compare(alpha, omega)).toBe(-1);
 	expect(compare(omega, alpha)).toBe(1);
 
-	compare.unregister(Test);
+	deregisterCloner(Test);
 
 	compare.register('blah' as never, compare);
 

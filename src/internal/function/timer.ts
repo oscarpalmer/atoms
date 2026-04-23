@@ -77,9 +77,11 @@ export function getAsyncTimer<Callback extends GenericAsyncCallback | GenericCal
 		last = next;
 
 		if (throttle) {
-			run(next);
+			void run(next);
 		} else {
-			id = startTimer(() => run(next));
+			id = startTimer(() => {
+				void run(next);
+			});
 		}
 
 		return next.promise;

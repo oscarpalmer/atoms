@@ -30,15 +30,15 @@ test('hasValue', () => {
 	expect(hasValue(nested, 'constructor')).toBe(false);
 	expect(hasValue(nested, 'prototype')).toBe(false);
 
-	expect(hasValue.get(nested, 'a.c.d')).toEqual({exists: true, value: 123});
+	expect(hasValue.get(nested, 'a.c.d')).toEqual({ok: true, value: 123});
 
-	expect(hasValue.get(nested, '')).toEqual({exists: false, value: undefined});
-	expect(hasValue.get(nested, 'a.B.1.C.1', true)).toEqual({exists: false, value: undefined});
-	expect(hasValue.get(nested, 'a.b.99.c')).toEqual({exists: false, value: undefined});
+	expect(hasValue.get(nested, '')).toEqual({ok: false, value: undefined});
+	expect(hasValue.get(nested, 'a.B.1.C.1', true)).toEqual({ok: false, value: undefined});
+	expect(hasValue.get(nested, 'a.b.99.c')).toEqual({ok: false, value: undefined});
 
-	expect(hasValue.get(nested, '__proto__')).toEqual({exists: false, value: undefined});
-	expect(hasValue.get(nested, 'constructor')).toEqual({exists: false, value: undefined});
-	expect(hasValue.get(nested, 'prototype')).toEqual({exists: false, value: undefined});
+	expect(hasValue.get(nested, '__proto__')).toEqual({ok: false, value: undefined});
+	expect(hasValue.get(nested, 'constructor')).toEqual({ok: false, value: undefined});
+	expect(hasValue.get(nested, 'prototype')).toEqual({ok: false, value: undefined});
 });
 
 test('setValue', () => {

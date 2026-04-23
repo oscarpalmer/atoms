@@ -152,7 +152,7 @@ export function select<Item extends PlainObject, MapKey extends keyof Item>(
 export function select<
 	Item,
 	MapCallback extends (item: Item, index: number, array: Item[]) => unknown,
->(array: Item[], filter: Item, map: MapCallback): Array<ReturnType<MapCallback>>;
+>(array: Item[], item: Item, map: MapCallback): Array<ReturnType<MapCallback>>;
 
 /**
  * Get a filtered and mapped array of items
@@ -163,7 +163,7 @@ export function select<
  */
 export function select<Item extends PlainObject, MapKey extends keyof Item>(
 	array: Item[],
-	filter: Item,
+	item: Item,
 	map: MapKey,
 ): Array<Item[MapKey]>;
 

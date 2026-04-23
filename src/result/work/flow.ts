@@ -28,26 +28,32 @@ export type AttemptFlowPromise<Callback extends GenericCallback, Value> = (
 
 /**
  * Create an asynchronous Flow, a function that attempts to pipe a value through a series of functions
+ *
+ * Available as `attemptAsyncFlow` and `attempt.flow.async`
  * @returns Flow function
  */
-function attemptAsyncFlow<Fn extends GenericCallback>(
+export function attemptAsyncFlow<Fn extends GenericCallback>(
 	fn: Fn,
 ): AttemptFlowPromise<Fn, ReturnType<Fn>>;
 
 /**
  * Create an asynchronous Flow, a function that pipes values through a series of functions
+ *
+ * Available as `attemptAsyncFlow` and `attempt.flow.async`
  * @returns Flow function
  */
-function attemptAsyncFlow<First extends GenericCallback, Second>(
+export function attemptAsyncFlow<First extends GenericCallback, Second>(
 	first: First,
 	second: (value: Awaited<UnwrapValue<ReturnType<First>>>) => Second,
 ): AttemptFlowPromise<First, Second>;
 
 /**
  * Create an asynchronous Flow, a function that pipes values through a series of functions
+ *
+ * Available as `attemptAsyncFlow` and `attempt.flow.async`
  * @returns Flow function
  */
-function attemptAsyncFlow<First extends GenericCallback, Second, Third>(
+export function attemptAsyncFlow<First extends GenericCallback, Second, Third>(
 	first: First,
 	second: (value: Awaited<UnwrapValue<ReturnType<First>>>) => Second,
 	third: (value: Awaited<UnwrapValue<Second>>) => Third,
@@ -55,9 +61,11 @@ function attemptAsyncFlow<First extends GenericCallback, Second, Third>(
 
 /**
  * Create an asynchronous Flow, a function that pipes values through a series of functions
+ *
+ * Available as `attemptAsyncFlow` and `attempt.flow.async`
  * @returns Flow function
  */
-function attemptAsyncFlow<First extends GenericCallback, Second, Third, Fourth>(
+export function attemptAsyncFlow<First extends GenericCallback, Second, Third, Fourth>(
 	first: First,
 	second: (value: Awaited<UnwrapValue<ReturnType<First>>>) => Second,
 	third: (value: Awaited<UnwrapValue<Second>>) => Third,
@@ -66,9 +74,11 @@ function attemptAsyncFlow<First extends GenericCallback, Second, Third, Fourth>(
 
 /**
  * Create an asynchronous Flow, a function that pipes values through a series of functions
+ *
+ * Available as `attemptAsyncFlow` and `attempt.flow.async`
  * @returns Flow function
  */
-function attemptAsyncFlow<First extends GenericCallback, Second, Third, Fourth, Fifth>(
+export function attemptAsyncFlow<First extends GenericCallback, Second, Third, Fourth, Fifth>(
 	first: First,
 	second: (value: Awaited<UnwrapValue<ReturnType<First>>>) => Second,
 	third: (value: Awaited<UnwrapValue<Second>>) => Third,
@@ -78,9 +88,18 @@ function attemptAsyncFlow<First extends GenericCallback, Second, Third, Fourth, 
 
 /**
  * Create an asynchronous Flow, a function that pipes values through a series of functions
+ *
+ * Available as `attemptAsyncFlow` and `attempt.flow.async`
  * @returns Flow function
  */
-function attemptAsyncFlow<First extends GenericCallback, Second, Third, Fourth, Fifth, Sixth>(
+export function attemptAsyncFlow<
+	First extends GenericCallback,
+	Second,
+	Third,
+	Fourth,
+	Fifth,
+	Sixth,
+>(
 	first: First,
 	second: (value: Awaited<UnwrapValue<ReturnType<First>>>) => Second,
 	third: (value: Awaited<UnwrapValue<Second>>) => Third,
@@ -91,9 +110,11 @@ function attemptAsyncFlow<First extends GenericCallback, Second, Third, Fourth, 
 
 /**
  * Create an asynchronous Flow, a function that pipes values through a series of functions
+ *
+ * Available as `attemptAsyncFlow` and `attempt.flow.async`
  * @returns Flow function
  */
-function attemptAsyncFlow<
+export function attemptAsyncFlow<
 	First extends GenericCallback,
 	Second,
 	Third,
@@ -113,9 +134,11 @@ function attemptAsyncFlow<
 
 /**
  * Create an asynchronous Flow, a function that pipes values through a series of functions
+ *
+ * Available as `attemptAsyncFlow` and `attempt.flow.async`
  * @returns Flow function
  */
-function attemptAsyncFlow<
+export function attemptAsyncFlow<
 	First extends GenericCallback,
 	Second,
 	Third,
@@ -137,9 +160,11 @@ function attemptAsyncFlow<
 
 /**
  * Create an asynchronous Flow, a function that pipes values through a series of functions
+ *
+ * Available as `attemptAsyncFlow` and `attempt.flow.async`
  * @returns Flow function
  */
-function attemptAsyncFlow<
+export function attemptAsyncFlow<
 	First extends GenericCallback,
 	Second,
 	Third,
@@ -163,9 +188,11 @@ function attemptAsyncFlow<
 
 /**
  * Create an asynchronous Flow, a function that pipes values through a series of functions
+ *
+ * Available as `attemptAsyncFlow` and `attempt.flow.async`
  * @returns Flow function
  */
-function attemptAsyncFlow<
+export function attemptAsyncFlow<
 	First extends GenericCallback,
 	Second,
 	Third,
@@ -191,22 +218,26 @@ function attemptAsyncFlow<
 
 /**
  * Create an asynchronous Flow, a function that pipes values through a series of functions
+ *
+ * Available as `attemptAsyncFlow` and `attempt.flow.async`
  * @returns Flow function
  */
-function attemptAsyncFlow<Fn extends GenericCallback>(
+export function attemptAsyncFlow<Fn extends GenericCallback>(
 	fn: Fn,
 	...fns: Array<(value: Awaited<UnwrapValue<ReturnType<Fn>>>) => unknown>
 ): AttemptFlowPromise<Fn, ReturnType<Fn>>;
 
 /**
  * Create an asynchronous Flow, a function that pipes values through a series of functions
+ *
+ * Available as `attemptAsyncFlow` and `attempt.flow.async`
  * @returns Flow function
  */
-function attemptAsyncFlow(
+export function attemptAsyncFlow(
 	...fns: GenericCallback[]
 ): (...args: unknown[]) => Promise<Result<unknown>>;
 
-function attemptAsyncFlow(
+export function attemptAsyncFlow(
 	...fns: GenericCallback[]
 ): (...args: unknown[]) => Promise<Result<unknown>> {
 	let Flow: GenericCallback;
@@ -233,12 +264,16 @@ function attemptAsyncFlow(
 
 /**
  * Create a Flow, a function that attempts to pipe values through a function
+ *
+ * Available as `attemptFlow` and `attempt.flow`
  * @returns Flow function
  */
 export function attemptFlow<Fn extends GenericCallback>(fn: Fn): AttemptFlow<Fn, ReturnType<Fn>>;
 
 /**
  * Create a Flow, a function that attempts to pipe values through a series of functions
+ *
+ * Available as `attemptFlow` and `attempt.flow`
  * @returns Flow function
  */
 export function attemptFlow<First extends GenericCallback, Second>(
@@ -248,6 +283,8 @@ export function attemptFlow<First extends GenericCallback, Second>(
 
 /**
  * Create a Flow, a function that attempts to pipe values through a series of functions
+ *
+ * Available as `attemptFlow` and `attempt.flow`
  * @returns Flow function
  */
 export function attemptFlow<First extends GenericCallback, Second, Third>(
@@ -258,6 +295,8 @@ export function attemptFlow<First extends GenericCallback, Second, Third>(
 
 /**
  * Create a Flow, a function that attempts to pipe values through a series of functions
+ *
+ * Available as `attemptFlow` and `attempt.flow`
  * @returns Flow function
  */
 export function attemptFlow<First extends GenericCallback, Second, Third, Fourth>(
@@ -269,6 +308,8 @@ export function attemptFlow<First extends GenericCallback, Second, Third, Fourth
 
 /**
  * Create a Flow, a function that attempts to pipe values through a series of functions
+ *
+ * Available as `attemptFlow` and `attempt.flow`
  * @returns Flow function
  */
 export function attemptFlow<First extends GenericCallback, Second, Third, Fourth, Fifth>(
@@ -281,6 +322,8 @@ export function attemptFlow<First extends GenericCallback, Second, Third, Fourth
 
 /**
  * Create a Flow, a function that attempts to pipe values through a series of functions
+ *
+ * Available as `attemptFlow` and `attempt.flow`
  * @returns Flow function
  */
 export function attemptFlow<First extends GenericCallback, Second, Third, Fourth, Fifth, Sixth>(
@@ -294,6 +337,8 @@ export function attemptFlow<First extends GenericCallback, Second, Third, Fourth
 
 /**
  * Create a Flow, a function that attempts to pipe values through a series of functions
+ *
+ * Available as `attemptFlow` and `attempt.flow`
  * @returns Flow function
  */
 export function attemptFlow<
@@ -316,6 +361,8 @@ export function attemptFlow<
 
 /**
  * Create a Flow, a function that attempts to pipe values through a series of functions
+ *
+ * Available as `attemptFlow` and `attempt.flow`
  * @returns Flow function
  */
 export function attemptFlow<
@@ -340,6 +387,8 @@ export function attemptFlow<
 
 /**
  * Create a Flow, a function that attempts to pipe values through a series of functions
+ *
+ * Available as `attemptFlow` and `attempt.flow`
  * @returns Flow function
  */
 export function attemptFlow<
@@ -366,6 +415,8 @@ export function attemptFlow<
 
 /**
  * Create a Flow, a function that attempts to pipe values through a series of functions
+ *
+ * Available as `attemptFlow` and `attempt.flow`
  * @returns Flow function
  */
 export function attemptFlow<
@@ -394,6 +445,8 @@ export function attemptFlow<
 
 /**
  * Create a Flow, a function that attempts to pipe values through a series of functions
+ *
+ * Available as `attemptFlow` and `attempt.flow`
  * @returns Flow function
  */
 export function attemptFlow<First extends GenericCallback>(
@@ -403,6 +456,8 @@ export function attemptFlow<First extends GenericCallback>(
 
 /**
  * Create a Flow, a function that attempts to pipe values through a series of functions
+ *
+ * Available as `attemptFlow` and `attempt.flow`
  * @returns Flow function
  */
 export function attemptFlow(...fns: GenericCallback[]): (...args: unknown[]) => Result<unknown>;

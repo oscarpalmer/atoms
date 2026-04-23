@@ -81,6 +81,20 @@ function handleMerge(values: ArrayOrPlainObject[], options: Options): ArrayOrPla
 }
 
 /**
+ * Create a merger with predefined options
+ *
+ * Available as `initializeMerger` and `merge.initialize`
+ * @param options Merging options
+ * @returns Merger function
+ */
+export function initializeMerger(options?: MergeOptions): Merger {
+	const actual = getMergeOptions(options);
+
+	return <Model extends ArrayOrPlainObject>(values: NestedPartial<Model>[]): Model =>
+		handleMerge(values, actual) as Model;
+}
+
+/**
  * Merge multiple arrays or objects into a single one
  * @param values Values to merge
  * @param options Merging options
@@ -110,18 +124,6 @@ export function merge(
 }
 
 merge.initialize = initializeMerger;
-
-/**
- * Create a merger with predefined options
- * @param options Merging options
- * @returns Merger function
- */
-function initializeMerger(options?: MergeOptions): Merger {
-	const actual = getMergeOptions(options);
-
-	return <Model extends ArrayOrPlainObject>(values: NestedPartial<Model>[]): Model =>
-		handleMerge(values, actual) as Model;
-}
 
 function mergeObjects(
 	values: ArrayOrPlainObject[],

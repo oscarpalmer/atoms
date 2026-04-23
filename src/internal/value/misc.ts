@@ -1,4 +1,6 @@
 import type {PlainObject} from '../../models';
+import {error, ok} from '../../result/misc';
+import type {Result} from '../../result/models';
 import {ignoreKey} from '../string';
 
 // #region Functions
@@ -15,14 +17,14 @@ export function getNestedValue(
 	data: object,
 	path: string,
 	ignoreCase: boolean,
-): {exists: boolean; value: unknown} {
+): Result<unknown, undefined> {
 	if (
 		typeof data !== 'object' ||
 		data === null ||
 		typeof path !== 'string' ||
 		path.trim().length === 0
 	) {
-		return {exists: false, value: undefined};
+		return error(undefined);
 	}
 
 	const shouldIgnoreCase = ignoreCase === true;
@@ -41,14 +43,14 @@ export function getNestedValue(
 
 		const handled = handleValue(current, part, null, true, shouldIgnoreCase);
 
-		if (!handled.exists) {
+		if (!handled.ok) {
 			return handled;
 		}
 
 		current = handled.value as object;
 	}
 
-	return {exists: true, value: current};
+	return ok(current);
 }
 
 export function getPaths(path: string, lowercase: boolean): string | string[] {
@@ -67,7 +69,7 @@ export function handleValue(
 	value: unknown,
 	get: true,
 	ignoreCase: boolean,
-): {exists: boolean; value: unknown};
+): Result<unknown, undefined>;
 
 export function handleValue(
 	data: object,
@@ -83,19 +85,19 @@ export function handleValue(
 	value: unknown,
 	get: boolean,
 	ignoreCase: boolean,
-): {exists: boolean; value: unknown} | void {
+): Result<unknown, undefined> | void {
 	if (typeof data === 'object' && data !== null && !ignoreKey(path)) {
 		const key = ignoreCase ? findKey(path, data) : path;
 
 		if (get) {
-			return {exists: key in data, value: data[key as never]};
+			return key in data ? ok(data[key as never]) : error(undefined);
 		}
 
 		(data as PlainObject)[key] = typeof value === 'function' ? value(data[key as never]) : value;
 	}
 
 	if (get) {
-		return {exists: false, value: undefined};
+		return error(undefined);
 	}
 }
 
