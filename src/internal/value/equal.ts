@@ -1,5 +1,5 @@
 import type {ArrayOrPlainObject, Constructor, PlainObject, TypedArray} from '../../models';
-import {isPlainObject, isPrimitive, isTypedArray} from '../is';
+import {isNonPlainObject, isPlainObject, isPrimitive, isTypedArray} from '../is';
 import {getCompareHandlers} from './handlers';
 
 // #region Types
@@ -377,7 +377,7 @@ function getEqualOptions(input?: boolean | EqualOptions): Options {
 		return options;
 	}
 
-	if (!isPlainObject(input)) {
+	if (isNonPlainObject(input)) {
 		return options;
 	}
 

@@ -1,14 +1,17 @@
+import type {PlainObject} from '../models';
 import type {Err, ExtendedErr, Ok, Result} from '../result/models';
-import {isPlainObject} from './is';
+import {isNonPlainObject} from './is';
 
 // #region Functions
 
 function _isResult(value: unknown, okValue: boolean): value is Result<unknown, unknown> {
-	if (!isPlainObject(value)) {
+	if (isNonPlainObject(value)) {
 		return false;
 	}
 
-	return value.ok === okValue && (okValue ? PROPERTY_VALUE : PROPERTY_ERROR) in value;
+	return (
+		(value as PlainObject).ok === okValue && (okValue ? PROPERTY_VALUE : PROPERTY_ERROR) in value
+	);
 }
 
 /**

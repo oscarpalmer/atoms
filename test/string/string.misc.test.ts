@@ -68,8 +68,14 @@ test(
 );
 
 test('join', () => {
-	expect(join([null, undefined, 'a', new TestStringItemWithToString('b'), 'c'])).toBe('abc');
-	expect(join([null, undefined, 'a', new TestStringItemWithToString('b'), 'c'], '.')).toBe('a.b.c');
+	const values = [null, undefined, 'a', '   ', new TestStringItemWithToString('b'), 'c'];
+
+	expect(join(values)).toBe('abc');
+	expect(join(values, '.')).toBe('a.b.c');
+	expect(join(values, 123 as never)).toBe('abc');
+
+	expect(join([])).toBe('');
+	expect(join(123 as never)).toBe('');
 });
 
 test('parse', () => {

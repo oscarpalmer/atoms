@@ -9,15 +9,28 @@ import type {ArrayOrPlainObject, NestedPartial, PlainObject} from '../models';
  */
 export type MergeOptions = {
 	/**
+	 * Assign values to the first array or object instead of creating a new one?
+	 */
+	assignValues?: boolean;
+	/**
 	 * Key _(or key epxressions)_ for values that should be replaced
+	 *
 	 * ```ts
 	 * merge([{items: [1, 2, 3]}, {items: [99]}]); // {items: [99]}
 	 * ```
 	 */
 	replaceableObjects?: string | RegExp | Array<string | RegExp>;
+	/**
+	 * Skip nullable values when merging objects?
+	 *
+	 * ```ts
+	 * merge({a: 1, b: 2}, {b: null, c: 3}, {d: null}); // {a: 1, b: 2, c: 3}
+	 * ```
+	 */
 	skipNullableAny?: boolean;
 	/**
 	 * Skip nullable values when merging arrays?
+	 *
 	 * ```ts
 	 * merge([1, 2, 3], [null, null, 99]); // [1, 2, 99]
 	 * ```
@@ -35,6 +48,7 @@ export type Merger<Model extends ArrayOrPlainObject = ArrayOrPlainObject> = (
 ) => Model;
 
 type Options = {
+	assignValues: boolean;
 	replaceableObjects: ReplaceableObjectsCallback | undefined;
 	skipNullableAny: boolean;
 	skipNullableInArrays: boolean;
@@ -48,6 +62,7 @@ type ReplaceableObjectsCallback = (name: string) => boolean;
 
 function getMergeOptions(options?: MergeOptions): Options {
 	const actual: Options = {
+		assignValues: false,
 		replaceableObjects: undefined,
 		skipNullableAny: false,
 		skipNullableInArrays: false,
@@ -59,6 +74,7 @@ function getMergeOptions(options?: MergeOptions): Options {
 
 	actual.replaceableObjects = getReplaceableObjects(options.replaceableObjects);
 
+	actual.assignValues = options.assignValues === true;
 	actual.skipNullableAny = options.skipNullableAny === true;
 	actual.skipNullableInArrays = options.skipNullableInArrays === true;
 
@@ -132,7 +148,7 @@ function mergeObjects(
 ): ArrayOrPlainObject {
 	const {length} = values;
 	const isArray = values.every(Array.isArray);
-	const merged = (isArray ? [] : {}) as PlainObject;
+	const merged = (options.assignValues ? values[0] : isArray ? [] : {}) as PlainObject;
 
 	for (let outerIndex = 0; outerIndex < length; outerIndex += 1) {
 		const item = values[outerIndex] as PlainObject;

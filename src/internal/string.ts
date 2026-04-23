@@ -1,5 +1,3 @@
-import {compact} from './array/compact';
-
 // #region Functions
 
 /**
@@ -36,15 +34,35 @@ export function ignoreKey(key: string): boolean {
 }
 
 /**
- * Join an array of values into a string
- * @param value Array of values
+ * Join an array of values into a string _(while ignoring empty values)_
+ *
+ * _(`null`, `undefined`, and any values that become whitespace-only strings are considered empty)_
+ * @param array Array of values
  * @param delimiter Delimiter to use between values
  * @returns Joined string
  */
-export function join(value: unknown[], delimiter?: string): string {
-	return compact(value)
-		.map(getString)
-		.join(typeof delimiter === 'string' ? delimiter : '');
+export function join(array: unknown[], delimiter?: string): string {
+	if (!Array.isArray(array)) {
+		return '';
+	}
+
+	const {length} = array;
+
+	if (length === 0) {
+		return '';
+	}
+
+	const values: string[] = [];
+
+	for (let index = 0; index < length; index += 1) {
+		const item = getString(array[index]);
+
+		if (item.trim().length > 0) {
+			values.push(item);
+		}
+	}
+
+	return values.join(typeof delimiter === 'string' ? delimiter : '');
 }
 
 function tryCallback<T, U>(value: T, callback: (value: T) => U): U {

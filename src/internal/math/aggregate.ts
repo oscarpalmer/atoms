@@ -1,5 +1,5 @@
 import type {NumericalValues, PlainObject} from '../../models';
-import {isNumber} from '../is';
+import {isNonNumber} from '../is';
 
 // #region Types
 
@@ -40,7 +40,7 @@ export function aggregate(type: AggregationType, array: unknown[], key: unknown)
 
 		const value = callback == null ? item : callback(item as never, index, array);
 
-		if (!isNumber(value)) {
+		if (isNonNumber(value)) {
 			continue;
 		}
 

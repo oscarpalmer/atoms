@@ -2,6 +2,25 @@ import {expect, test} from 'vitest';
 import {merge, type NestedPartial} from '../../src';
 import {TestValueMergeable} from '../.fixtures/value.fixture';
 
+test('assign', () => {
+	const first = {a: 1, b: {c: 2}};
+	const second = {b: {d: 3}};
+
+	const merged = merge([first, second], {
+		assignValues: true,
+	});
+
+	expect(merged).toEqual({
+		a: 1,
+		b: {
+			c: 2,
+			d: 3,
+		},
+	});
+
+	expect(merged).toBe(first);
+});
+
 test('merge', () => {
 	const first: NestedPartial<TestValueMergeable> = {
 		age: 99,

@@ -22,6 +22,20 @@ type Parameters = {
 // #region Functions
 
 export function findValue(
+	type: Exclude<FindValueType, 'item'>,
+	array: unknown[],
+	parameters: unknown[],
+	reversed: boolean,
+): number;
+
+export function findValue(
+	type: Exclude<FindValueType, 'index'>,
+	array: unknown[],
+	parameters: unknown[],
+	reversed: boolean,
+): unknown;
+
+export function findValue(
 	type: FindValueType,
 	array: unknown[],
 	parameters: unknown[],
@@ -38,11 +52,17 @@ export function findValue(
 	const callbacks = getArrayCallbacks(bool, key);
 
 	if (callbacks?.bool == null && callbacks?.keyed == null) {
-		return findIndex ? array.indexOf(value) : array.find(item => Object.is(item, value));
+		if (findIndex) {
+			return reversed ? array.lastIndexOf(value) : array.indexOf(value);
+		}
+
+		return reversed
+			? array.findLast(item => Object.is(item, value))
+			: array.find(item => Object.is(item, value));
 	}
 
 	if (callbacks.bool != null) {
-		const index = array.findIndex(callbacks.bool);
+		const index = reversed ? array.findLastIndex(callbacks.bool) : array.findIndex(callbacks.bool);
 
 		return findIndex ? index : array[index];
 	}
@@ -167,9 +187,9 @@ export function getFindParameters(original: unknown[]): Parameters {
 
 // #region Variables
 
-export const FIND_VALUE_INDEX: FindValueType = 'index';
+export const FIND_VALUE_INDEX = 'index';
 
-export const FIND_VALUE_ITEM: FindValueType = 'item';
+export const FIND_VALUE_ITEM = 'item';
 
 export const FIND_VALUES_ALL: FindValuesType = 'all';
 

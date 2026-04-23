@@ -1,4 +1,4 @@
-import {isPlainObject} from '../internal/is';
+import {isNonPlainObject} from '../internal/is';
 import type {NumericalKeys, PlainObject} from '../models';
 
 // #region Functions
@@ -50,7 +50,7 @@ export function getArray(value: unknown, indiced?: unknown): unknown[] {
 		return [...value.values()];
 	}
 
-	if (!isPlainObject(value)) {
+	if (isNonPlainObject(value)) {
 		return [value];
 	}
 

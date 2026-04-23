@@ -1,5 +1,5 @@
 import type {Constructor, GenericCallback} from '../../models';
-import {isConstructor} from '../is';
+import {isNonConstructor} from '../is';
 
 type Options = {
 	callback: GenericCallback;
@@ -47,7 +47,7 @@ function getHandlers(owner: GenericCallback, options: Options) {
 			}
 		},
 		register(constructor: Constructor, handler?: string | GenericCallback) {
-			if (!isConstructor(constructor) || handler === owner) {
+			if (isNonConstructor(constructor) || handler === owner) {
 				return;
 			}
 

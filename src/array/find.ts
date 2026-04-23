@@ -52,4 +52,62 @@ export function find(array: unknown[], ...parameters: unknown[]): unknown {
 	return findValue(FIND_VALUE_ITEM, array, parameters, false);
 }
 
+find.last = findLast;
+
+/**
+ * Get the last item matching the given value
+ *
+ * Available as `findLast` and `find.last`
+ * @param array Array to search in
+ * @param callback Callback to get an item's value for matching
+ * @param value Value to match against
+ * @returns Last item that matches the value, or `undefined` if no match is found
+ */
+export function findLast<
+	Item,
+	Callback extends (item: Item, index: number, array: Item[]) => unknown,
+>(array: Item[], callback: Callback, value: ReturnType<Callback>): Item | undefined;
+
+/**
+ * Get the last item matching the given value by key
+ *
+ * Available as `findLast` and `find.last`
+ * @param array Array to search in
+ * @param key Key to get an item's value for matching
+ * @param value Value to match against
+ * @returns Last item that matches the value, or `undefined` if no match is found
+ */
+export function findLast<Item extends PlainObject, ItemKey extends keyof Item>(
+	array: Item[],
+	key: ItemKey,
+	value: Item[ItemKey],
+): Item | undefined;
+
+/**
+ * Get the last item matching the filter
+ *
+ * Available as `findLast` and `find.last`
+ * @param array Array to search in
+ * @param filter Filter callback to match items
+ * @returns Last item that matches the filter, or `undefined` if no match is found
+ */
+export function findLast<Item>(
+	array: Item[],
+	filter: (item: Item, index: number, array: Item[]) => boolean,
+): Item | undefined;
+
+/**
+ * Get the last item matching the given value
+ *
+ * Available as `findLast` and `find.last`
+ * @param array Array to search in
+ * @param value Value to match against
+ * @returns Last item that matches the value, or `undefined` if no match is found
+ */
+export function findLast<Item>(array: Item[], value: Item): Item | undefined;
+
+export function findLast(array: unknown[], ...parameters: unknown[]): unknown {
+	return findValue(FIND_VALUE_ITEM, array, parameters, true);
+}
+
 // #endregion
