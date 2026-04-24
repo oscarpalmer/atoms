@@ -17,9 +17,19 @@ export type NormalizeOptions = {
 	 */
 	lowerCase?: boolean;
 	/**
+	 * Remove special characters from the string? _(defaults to `false`)_
+	 *
+	 * _(Punctuation and symbol characters are considered special)_
+	 */
+	special?: boolean;
+	/**
 	 * Trim the string? _(defaults to `true`)_
 	 */
 	trim?: boolean;
+	/**
+	 * Shorten consecutive whitespace characters to a single space? _(defaults to `true`)_
+	 */
+	whitespace?: boolean;
 };
 
 /**
@@ -70,7 +80,9 @@ function getNormalizeOptions(input?: NormalizeOptions): Options {
 	return {
 		deburr: options.deburr !== false,
 		lowerCase: options.lowerCase !== false,
+		special: options.special === true,
 		trim: options.trim !== false,
+		whitespace: options.whitespace !== false,
 	};
 }
 
@@ -110,6 +122,10 @@ function normalizeString(value: string, options: Options): string {
 		result = result.trim();
 	}
 
+	if (options.whitespace) {
+		result = result.replace(WHITESPACE_PATTERN, WHITESPACE_REPLACEMENT);
+	}
+
 	if (options.deburr) {
 		result = deburr(result);
 	}
@@ -118,7 +134,11 @@ function normalizeString(value: string, options: Options): string {
 		result = lowerCase(result);
 	}
 
-	return result;
+	if (options.special) {
+		result = result.replace(SPECIAL_PATTERN, SPECIAL_REPLACEMENT);
+	}
+
+	return result.normalize(NORMALIZATION_NORMALIZATION);
 }
 
 // #endregion
@@ -163,6 +183,16 @@ const DEBURR_NORMALIZATION = 'NFD';
 const DEBURR_PATTERN_CHARACTERS = new RegExp(`(${Object.keys(DEBURR_CHARACTERS).join('|')})`, 'g');
 
 const DEBURR_PATTERN_SIMPLE = /[\u0300-\u036f]/g;
+
+const NORMALIZATION_NORMALIZATION = 'NFC';
+
+const SPECIAL_PATTERN = /[\p{P}\p{S}]/gu;
+
+const SPECIAL_REPLACEMENT = '';
+
+const WHITESPACE_PATTERN = /\s+/g;
+
+const WHITESPACE_REPLACEMENT = ' ';
 
 let deburrMemoizer: Memoized<typeof deburr>;
 
