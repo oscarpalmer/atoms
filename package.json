@@ -105,6 +105,10 @@
 			"types": "./dist/is.d.mts",
 			"default": "./dist/is.mjs"
 		},
+		"./kalas": {
+			"types": "./dist/kalas.d.mts",
+			"default": "./dist/kalas.mjs"
+		},
 		"./logger": {
 			"types": "./dist/logger.d.mts",
 			"default": "./dist/logger.mjs"
@@ -199,6 +203,10 @@
 		"./string/match": {
 			"types": "./dist/string/match.d.mts",
 			"default": "./dist/string/match.mjs"
+		},
+		"./string/normalize": {
+			"types": "./dist/string/normalize.d.mts",
+			"default": "./dist/string/normalize.mjs"
 		},
 		"./string/template": {
 			"types": "./dist/string/template.d.mts",
