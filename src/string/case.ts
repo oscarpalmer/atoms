@@ -58,7 +58,13 @@ export function kebabCase(value: string): string {
  * @returns Lower-cased string
  */
 export function lowerCase(value: string): string {
-	return typeof value === 'string' ? value.toLocaleLowerCase() : '';
+	if (typeof value !== 'string') {
+		return '';
+	}
+
+	memoizedLowerCase ??= memoize(v => v.toLocaleLowerCase());
+
+	return memoizedLowerCase.run(value);
 }
 
 /**
@@ -85,12 +91,12 @@ export function snakeCase(value: string): string {
  * @returns Title-cased string
  */
 export function titleCase(value: string): string {
-	if (typeof value !== 'string') {
+	if (typeof value !== 'string' || value.length === 0) {
 		return '';
 	}
 
 	memoizedTitleCase ??= memoize(v =>
-		v.length < 1 ? capitalize(v) : join(words(v).map(capitalize), ' '),
+		v.length < 2 ? capitalize(v) : join(words(v).map(capitalize), ' '),
 	);
 
 	return memoizedTitleCase.run(value);
@@ -167,7 +173,13 @@ function toCaseCallback(this: Options, value: string): string {
  * @returns Upper-cased string
  */
 export function upperCase(value: string): string {
-	return typeof value === 'string' ? value.toLocaleUpperCase() : '';
+	if (typeof value !== 'string' || value.length === 0) {
+		return '';
+	}
+
+	memoizedUpperCase ??= memoize(v => v.toLocaleUpperCase());
+
+	return memoizedUpperCase.run(value);
 }
 
 // #endregion
@@ -207,6 +219,10 @@ const delimiters: Record<Case, string> = {
 
 let memoizedCapitalize: Memoized<(value: string) => string>;
 
+let memoizedLowerCase: Memoized<(value: string) => string>;
+
 let memoizedTitleCase: Memoized<(value: string) => string>;
+
+let memoizedUpperCase: Memoized<(value: string) => string>;
 
 // #endregion

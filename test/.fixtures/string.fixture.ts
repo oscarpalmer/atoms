@@ -42,6 +42,8 @@ const indentations = {
 };
 
 const strings = [
+	'a',
+	'A',
 	'Hello, world!',
 	'The quick brown fox jumps over the lazy dog',
 	'Η γρήγορη καφέ αλεπού πηδάει πάνω από το τεμπέλικο σκυλί',

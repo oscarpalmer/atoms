@@ -25,10 +25,13 @@ export * from './internal/value/get';
 export * from './internal/value/has';
 export * from './internal/value/set';
 
+export * from './kalas';
+
 export * from './string/case';
 export * from './string/fuzzy';
 export * from './string/index';
 export * from './string/match';
+export * from './string/normalize';
 export * from './string/template';
 
 export * from './value/clone';

@@ -71,6 +71,8 @@ test('kebabCase', () => {
 
 test('lowercase', () => {
 	const expected = [
+		'a',
+		'a',
 		'hello, world!',
 		'the quick brown fox jumps over the lazy dog',
 		'η γρήγορη καφέ αλεπού πηδάει πάνω από το τεμπέλικο σκυλί',
@@ -81,6 +83,7 @@ test('lowercase', () => {
 		expect(lowerCase(strings[index])).toBe(expected[index]);
 	}
 
+	expect(lowerCase('')).toBe('');
 	expect(lowerCase(123 as never)).toBe('');
 });
 
@@ -126,6 +129,8 @@ test('snakeCase', () => {
 
 test('titleCase', () => {
 	const expected = [
+		'A',
+		'A',
 		'Hello World',
 		'The Quick Brown Fox Jumps Over The Lazy Dog',
 		'Η Γρήγορη Καφέ Αλεπού Πηδάει Πάνω Από Το Τεμπέλικο Σκυλί',
@@ -142,6 +147,8 @@ test('titleCase', () => {
 
 test('upperCase', () => {
 	const expected = [
+		'A',
+		'A',
 		'HELLO, WORLD!',
 		'THE QUICK BROWN FOX JUMPS OVER THE LAZY DOG',
 		'Η ΓΡΉΓΟΡΗ ΚΑΦΈ ΑΛΕΠΟΎ ΠΗΔΆΕΙ ΠΆΝΩ ΑΠΌ ΤΟ ΤΕΜΠΈΛΙΚΟ ΣΚΥΛΊ',
@@ -152,5 +159,6 @@ test('upperCase', () => {
 		expect(upperCase(strings[index])).toBe(expected[index]);
 	}
 
+	expect(upperCase('')).toBe('');
 	expect(upperCase(123 as never)).toBe('');
 });
