@@ -11,6 +11,11 @@ export type Shaken<Value extends PlainObject> = {
 
 // #region Functions
 
+/**
+ * Shake an object, removing all keys with `undefined` values
+ * @param value Object to shake
+ * @returns Shaken object
+ */
 export function shake<Value extends PlainObject>(value: Value): Shaken<Value> {
 	const shaken: PlainObject = {};
 

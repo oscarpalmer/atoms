@@ -1,16 +1,28 @@
 import {expect, test} from 'vitest';
-import {merge, type NestedPartial} from '../../src';
+import {assign, merge, type NestedPartial} from '../../src';
 import {TestValueMergeable} from '../.fixtures/value.fixture';
 
+type Assigned = {
+	a: number;
+	b: {
+		c: number;
+		d: number;
+		e: number;
+	};
+};
+
 test('assign', () => {
-	const first = {a: 1, b: {c: 2}};
-	const second = {b: {d: 3}};
+	const first: NestedPartial<Assigned> = {a: 1, b: {c: 2}};
 
-	const merged = merge([first, second], {
-		assignValues: true,
-	});
+	let assigned: Assigned = assign<Assigned>(first, [
+		{
+			b: {
+				d: 3,
+			},
+		},
+	]);
 
-	expect(merged).toEqual({
+	expect(assigned).toEqual({
 		a: 1,
 		b: {
 			c: 2,
@@ -18,7 +30,28 @@ test('assign', () => {
 		},
 	});
 
-	expect(merged).toBe(first);
+	expect(assigned).toBe(first);
+
+	const assigner = assign.initialize<Assigned>();
+
+	assigned = assigner(first, [
+		{
+			b: {
+				e: 4,
+			},
+		},
+	]);
+
+	expect(assigned).toEqual({
+		a: 1,
+		b: {
+			c: 2,
+			d: 3,
+			e: 4,
+		},
+	});
+
+	expect(assigned).toBe(first);
 });
 
 test('merge', () => {
@@ -169,4 +202,23 @@ test('merge', () => {
 
 	expect(merge('blah' as never)).toEqual({});
 	expect(merge(['blah' as never])).toEqual({});
+});
+
+test('merge: assign', () => {
+	const first = {a: 1, b: {c: 2}};
+	const second = {b: {d: 3}};
+
+	const merged = merge([first, second], {
+		assignValues: true,
+	});
+
+	expect(merged).toEqual({
+		a: 1,
+		b: {
+			c: 2,
+			d: 3,
+		},
+	});
+
+	expect(merged).toBe(first);
 });

@@ -1,4 +1,5 @@
 import {defineConfig} from 'vite-plus';
+import rules from './plugin/rules.js';
 
 export default defineConfig({
 	base: './',
@@ -7,6 +8,12 @@ export default defineConfig({
 		bracketSpacing: false,
 		singleQuote: true,
 		useTabs: true,
+	},
+	lint: {
+		jsPlugins: ['./plugin/index.js'],
+		rules: {
+			...rules,
+		},
 	},
 	logLevel: 'silent',
 	pack: {

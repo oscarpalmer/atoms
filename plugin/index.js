@@ -30,8 +30,10 @@ export const miscPlugins = [
 	tryCatchPlugin,
 	getPlugin('number', 'getNumber', new Set(['Number']), true, true),
 	getPlugin('promise', 'promises', new Set(['all', 'allSettled']), true),
+	getPlugin('value', 'assign', new Set(['assign']), true),
 	getPlugin('value', 'clone', new Set(['structuredClone']), true, true),
 	getPlugin('value', 'equal', new Set(['is']), true),
+	getPlugin('value', 'freeze', new Set(['freeze']), true),
 ];
 
 export const stringPlugins = [

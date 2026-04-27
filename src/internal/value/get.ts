@@ -1,4 +1,5 @@
 import type {NestedKeys, NestedValue, PlainObject, ToString} from '../../models';
+import type {Ok} from '../../result/models';
 import {getNestedValue} from './misc';
 
 // #region Functions
@@ -28,7 +29,7 @@ export function getValue<Data extends PlainObject>(
 ): unknown;
 
 export function getValue(data: PlainObject, path: string, ignoreCase?: boolean): unknown {
-	return getNestedValue(data, path, ignoreCase === true).value;
+	return (getNestedValue(data, path, ignoreCase === true) as Ok<unknown>).value;
 }
 
 // #endregion

@@ -20,16 +20,16 @@ function _isResult(value: unknown, okValue: boolean): value is Result<unknown, u
  * @returns `true` if the result is an extended error, `false` otherwise
  */
 export function isError<Value, E = Error>(
-	value: ExtendedErr<E> | Result<Value, E>,
+	result: ExtendedErr<E> | Result<Value, E>,
 	extended: true,
-): value is ExtendedErr<E>;
+): result is ExtendedErr<E>;
 
 /**
  * Is the result an error?
  * @param result Result to check
  * @returns `true` if the result is an error, `false` otherwise
  */
-export function isError<Value, E = Error>(value: Result<Value, E>): value is Err<E>;
+export function isError<Value, E = Error>(result: Result<Value, E>): result is Err<E>;
 
 /**
  * Is the value an error?

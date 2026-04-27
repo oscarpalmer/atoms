@@ -39,6 +39,7 @@ export * from './value/collection';
 export * from './value/diff';
 export * from './value/index';
 export * from './value/merge';
+export * from './value/transform';
 
 export * from './beacon';
 export * from './color';

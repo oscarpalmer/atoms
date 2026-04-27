@@ -494,6 +494,19 @@ function isSortedArray(array: unknown[], sorters: InternalSorter[]): boolean {
 }
 
 /**
+ * Sort an array of items using a comparison callback
+ * @param array Array to sort
+ * @param comparator Comparator to use for sorting
+ * @param descending Sort in descending order? _(defaults to `false`; overridden by individual sorters)_
+ * @returns Sorted array
+ */
+export function sort<Item>(
+	array: Item[],
+	comparator: (first: Item, second: Item) => number,
+	descending?: boolean,
+): Item[];
+
+/**
  * Sort an array of items, using multiple sorters to sort by specific values
  * @param array Array to sort
  * @param sorters Sorters to use for sorting
@@ -507,7 +520,7 @@ export function sort<Item>(
 ): Item[];
 
 /**
- * Sort an array of items, using multiple sorters to sort by specific values
+ * Sort an array of items, using a single sorter to sort by a specific value
  * @param array Array to sort
  * @param sorter Sorter to use for sorting
  * @param descending Sort in descending order? _(defaults to `false`; overridden by individual sorters)_

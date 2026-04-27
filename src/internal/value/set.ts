@@ -1,4 +1,5 @@
 import type {NestedKeys, NestedValue, PlainObject} from '../../models';
+import type {Ok} from '../../result/models';
 import {getPaths, handleValue} from './misc';
 
 // #region Functions
@@ -77,7 +78,8 @@ export function setValue(data: object, path: string, value: unknown, ignoreCase?
 			break;
 		}
 
-		let next = handleValue(target, currentPath, null, true, shouldIgnoreCase).value;
+		let next = (handleValue(target, currentPath, null, true, shouldIgnoreCase) as Ok<unknown>)
+			.value;
 
 		if (typeof next !== 'object' || next === null) {
 			const nextPath = paths[index + 1];

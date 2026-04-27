@@ -13,6 +13,12 @@ test('basic', () => {
 
 	expect(sort([2, 1, 3], [{} as never])).toEqual([1, 2, 3]);
 
+	expect(sort([{id: 2}, {id: 1}, {id: 3}], (first, second) => first.id - second.id, true)).toEqual([
+		{id: 3},
+		{id: 2},
+		{id: 1},
+	]);
+
 	expect(sort([{id: 2}, {id: 1}, {id: 3}], 'id')).toEqual([{id: 1}, {id: 2}, {id: 3}]);
 
 	expect(sort([{id: 2}, {id: 1}, {id: 3}], 'id', true)).toEqual([{id: 3}, {id: 2}, {id: 1}]);

@@ -88,6 +88,8 @@ function getNormalizeOptions(input?: NormalizeOptions): Options {
 
 /**
  * Initialize a string normalizer
+ *
+ * Available as `initializeNormalizer` and `normalize.initialize`
  * @param options Normalization options
  * @returns Normalizer function
  */

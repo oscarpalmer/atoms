@@ -5,6 +5,22 @@ import type {ArrayOrPlainObject, NestedPartial, PlainObject} from '../models';
 // #region Types
 
 /**
+ * Options for assigning values
+ */
+export type AssignOptions = Omit<MergeOptions, 'assignValues'>;
+
+/**
+ * Assign values from multiple arrays or objects to the first one
+ * @param to Value to assign to
+ * @param from Values to assign
+ * @returns Assigned value
+ */
+export type Assigner<Model extends ArrayOrPlainObject = ArrayOrPlainObject> = (
+	to: NestedPartial<Model>,
+	from: NestedPartial<Model>[],
+) => Model;
+
+/**
  * Options for merging values
  */
 export type MergeOptions = {
@@ -60,6 +76,27 @@ type ReplaceableObjectsCallback = (name: string) => boolean;
 
 // #region Functions
 
+/**
+ * Assign values from multiple arrays or objects to the first one
+ * @param to Value to assign to
+ * @param from Values to assign
+ * @param options Assigning options
+ * @returns Assigned value
+ */
+export function assign<Model extends ArrayOrPlainObject>(
+	to: NestedPartial<Model>,
+	from: NestedPartial<Model>[],
+	options?: AssignOptions,
+): Model {
+	const actual = getMergeOptions(options);
+
+	actual.assignValues = true;
+
+	return mergeValues([to, ...from], actual, true) as Model;
+}
+
+assign.initialize = initializeAssigner;
+
 function getMergeOptions(options?: MergeOptions): Options {
 	const actual: Options = {
 		assignValues: false,
@@ -94,6 +131,24 @@ function getReplaceableObjects(value: unknown): ReplaceableObjectsCallback | und
 
 function handleMerge(values: ArrayOrPlainObject[], options: Options): ArrayOrPlainObject {
 	return !Array.isArray(values) || values.length === 0 ? {} : mergeValues(values, options, true);
+}
+
+/**
+ * Create an assigner with predefined options
+ *
+ * Available as `initializeAssigner` and `assign.initialize`
+ * @param options Assigning options
+ * @returns Assigner function
+ */
+export function initializeAssigner<Model extends ArrayOrPlainObject>(
+	options?: AssignOptions,
+): Assigner<Model> {
+	const actual = getMergeOptions(options);
+
+	actual.assignValues = true;
+
+	return ((to: ArrayOrPlainObject, from: NestedPartial<ArrayOrPlainObject>[]): ArrayOrPlainObject =>
+		mergeValues([to, ...from], actual, true)) as Assigner<Model>;
 }
 
 /**
@@ -139,6 +194,7 @@ export function merge(
 	return handleMerge(values, getMergeOptions(options));
 }
 
+merge.assign = assign;
 merge.initialize = initializeMerger;
 
 function mergeObjects(
