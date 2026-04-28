@@ -49,7 +49,7 @@ export function single(array: unknown[], ...parameters: unknown[]): unknown {
 	const {matched} = findValues(FIND_VALUES_ALL, array, parameters);
 
 	if (matched.length > 1) {
-		throw new Error(MESSAGE);
+		throw new Error(SINGLE_MESSAGE);
 	}
 
 	return matched[0];
@@ -59,6 +59,6 @@ export function single(array: unknown[], ...parameters: unknown[]): unknown {
 
 // #region Variables
 
-const MESSAGE = 'Multiple items were found';
+const SINGLE_MESSAGE = 'Multiple items were found';
 
 // #endregion

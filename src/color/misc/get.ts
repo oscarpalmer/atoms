@@ -17,7 +17,7 @@ import {
 } from '../constants';
 import {Color} from '../instance';
 import type {HSLAColor, HSLColor, RGBAColor, RGBColor} from '../models';
-import {getState} from './state';
+import {getColorState} from './state';
 
 // #region Functions
 
@@ -31,7 +31,7 @@ function getClampedValue(value: unknown, minimum: number, maximum: number): numb
  * @returns Foreground color
  */
 export function getForegroundColor(value: unknown): Color {
-	const state = getState(value);
+	const state = getColorState(value);
 	const {blue, green, red} = state.rgb;
 
 	const values = [blue / MAX_HEX, green / MAX_HEX, red / MAX_HEX];
@@ -63,7 +63,7 @@ export function getForegroundColor(value: unknown): Color {
  * @returns Hex color
  */
 export function getHexaColor(value: unknown): string {
-	const {alpha, hex} = getState(value);
+	const {alpha, hex} = getColorState(value);
 
 	return `${hex}${alpha.hex}`;
 }
@@ -74,7 +74,7 @@ export function getHexaColor(value: unknown): string {
  * @returns Hex color
  */
 export function getHexColor(value: unknown): string {
-	return getState(value).hex;
+	return getColorState(value).hex;
 }
 
 export function getHexValue(value: unknown): number {
@@ -91,7 +91,7 @@ export function getDegrees(value: unknown): number {
  * @returns HSLA color
  */
 export function getHslaColor(value: unknown): HSLAColor {
-	const {alpha, hsl} = getState(value);
+	const {alpha, hsl} = getColorState(value);
 
 	return {
 		...hsl,
@@ -105,7 +105,7 @@ export function getHslaColor(value: unknown): HSLAColor {
  * @returns HSL color
  */
 export function getHslColor(value: unknown): HSLColor {
-	return getState(value).hsl;
+	return getColorState(value).hsl;
 }
 
 export function getPercentage(value: unknown): number {
@@ -118,7 +118,7 @@ export function getPercentage(value: unknown): number {
  * @returns RGBA color
  */
 export function getRgbaColor(value: unknown): RGBAColor {
-	const {alpha, rgb} = getState(value);
+	const {alpha, rgb} = getColorState(value);
 
 	return {
 		...rgb,
@@ -132,7 +132,7 @@ export function getRgbaColor(value: unknown): RGBAColor {
  * @returns RGB color
  */
 export function getRgbColor(value: unknown): RGBColor {
-	return getState(value).rgb;
+	return getColorState(value).rgb;
 }
 
 // #endregion

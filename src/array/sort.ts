@@ -458,9 +458,9 @@ function isSortedArray(array: unknown[], sorters: InternalSorter[]): boolean {
 
 	let offset = 0;
 
-	if (length >= ARRAY_THRESHOLD) {
-		offset = Math.round(length / ARRAY_PEEK_PERCENTAGE);
-		offset = offset > ARRAY_THRESHOLD ? ARRAY_THRESHOLD : offset;
+	if (length >= SORT_THRESHOLD) {
+		offset = Math.round(length / SORT_PEEK_PERCENTAGE);
+		offset = offset > SORT_THRESHOLD ? SORT_THRESHOLD : offset;
 
 		for (let index = 0; index < offset; index += 1) {
 			const [firstItem, firstOffset] = [array[index], array[index + 1]];
@@ -560,9 +560,9 @@ sort.is = isSorted;
 
 // #region Variables
 
-const ARRAY_PEEK_PERCENTAGE = 10;
+const SORT_PEEK_PERCENTAGE = 10;
 
-const ARRAY_THRESHOLD = 100;
+const SORT_THRESHOLD = 100;
 
 export const SORT_DIRECTION_ASCENDING: SortDirection = 'ascending';
 

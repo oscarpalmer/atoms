@@ -39,7 +39,7 @@ type OnceState<Value> = {
 export function asyncOnce<Callback extends GenericAsyncCallback>(
 	callback: Callback,
 ): OnceAsyncCallback<Callback> {
-	assert(() => typeof callback === 'function', MESSAGE_EXPECTATION);
+	assert(() => typeof callback === 'function', ONCE_MESSAGE_EXPECTATION);
 
 	const state: OnceAsyncState<Awaited<ReturnType<Callback>>> = {
 		called: false,
@@ -52,7 +52,7 @@ export function asyncOnce<Callback extends GenericAsyncCallback>(
 
 	const fn = (...parameters: Parameters<Callback>): Promise<Awaited<ReturnType<Callback>>> => {
 		if (state.cleared) {
-			return Promise.reject(new Error(MESSAGE_CLEARED));
+			return Promise.reject(new Error(ONCE_MESSAGE_CLEARED));
 		}
 
 		if (state.finished) {
@@ -72,10 +72,10 @@ export function asyncOnce<Callback extends GenericAsyncCallback>(
 
 			void callback(...parameters)
 				.then(value => {
-					handleResult(state, value, false);
+					handleOnceResult(state, value, false);
 				})
 				.catch(error => {
-					handleResult(state, error, true);
+					handleOnceResult(state, error, true);
 				});
 		});
 	};
@@ -107,7 +107,7 @@ export function asyncOnce<Callback extends GenericAsyncCallback>(
 	return fn as OnceAsyncCallback<Callback>;
 }
 
-function handleResult<Value>(state: OnceAsyncState<Value>, value: unknown, error: boolean): void {
+function handleOnceResult<Value>(state: OnceAsyncState<Value>, value: unknown, error: boolean): void {
 	state.error = error;
 	state.finished = true;
 	state.value = value as Value;
@@ -132,7 +132,7 @@ function handleResult<Value>(state: OnceAsyncState<Value>, value: unknown, error
  * @returns Once callback
  */
 export function once<Callback extends GenericCallback>(callback: Callback): OnceCallback<Callback> {
-	assert(() => typeof callback === 'function', MESSAGE_EXPECTATION);
+	assert(() => typeof callback === 'function', ONCE_MESSAGE_EXPECTATION);
 
 	const state: OnceState<ReturnType<Callback>> = {
 		called: false,
@@ -142,7 +142,7 @@ export function once<Callback extends GenericCallback>(callback: Callback): Once
 
 	const fn = (...parameters: Parameters<Callback>): ReturnType<Callback> => {
 		if (state.cleared) {
-			throw new Error(MESSAGE_CLEARED);
+			throw new Error(ONCE_MESSAGE_CLEARED);
 		}
 
 		if (state.called) {
@@ -183,8 +183,8 @@ once.async = asyncOnce;
 
 // #region Variables
 
-const MESSAGE_CLEARED = 'Once has been cleared';
+const ONCE_MESSAGE_CLEARED = 'Once has been cleared';
 
-const MESSAGE_EXPECTATION = 'Once expected a function';
+const ONCE_MESSAGE_EXPECTATION = 'Once expected a function';
 
 // #endregion

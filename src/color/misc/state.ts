@@ -17,7 +17,7 @@ import {isColor, isHexColor, isHslLike, isRgbLike} from './is';
 
 // #region Functions
 
-export function getState(value: unknown): ColorState {
+export function getColorState(value: unknown): ColorState {
 	if (typeof value === 'string') {
 		const normalized = getNormalizedHex(value, true);
 		const hex = normalized.slice(0, LENGTH_LONG);

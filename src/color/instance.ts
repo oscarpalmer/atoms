@@ -1,7 +1,7 @@
 import {SPACE_HSL, SPACE_RGB} from './constants';
 import {formatColor} from './misc';
 import {getAlpha} from './misc/alpha';
-import {getState, setHexColor, setHSLColor, setRGBColor} from './misc/state';
+import {getColorState, setHexColor, setHSLColor, setRGBColor} from './misc/state';
 import type {ColorState, HSLAColor, HSLColor, RGBAColor, RGBColor} from './models';
 
 // #region Classes
@@ -118,7 +118,7 @@ export class Color {
 	}
 
 	constructor(value: unknown) {
-		this.#state = getState(value);
+		this.#state = getColorState(value);
 
 		Object.defineProperty(this, '$color', {
 			value: true,

@@ -1,3 +1,4 @@
+import {getNumberOrDefault} from '../internal/number';
 import type {RequiredKeys} from '../models';
 import {error, ok} from '../result/misc';
 import type {Result} from '../result/models';
@@ -16,14 +17,10 @@ import {
 
 // #region Functions
 
-function getNumberOrDefault(value: unknown): number {
-	return typeof value === 'number' && value > 0 ? value : 0;
-}
-
 export function getPromiseOptions(input: unknown): RequiredKeys<PromiseOptions, 'time'> {
 	if (typeof input === 'number') {
 		return {
-			time: getNumberOrDefault(input),
+			time: getNumberOrDefault(input, 0),
 		};
 	}
 
@@ -35,7 +32,7 @@ export function getPromiseOptions(input: unknown): RequiredKeys<PromiseOptions, 
 
 	return {
 		signal: options.signal instanceof AbortSignal ? options.signal : undefined,
-		time: getNumberOrDefault(options.time),
+		time: getNumberOrDefault(options.time, 0),
 	};
 }
 

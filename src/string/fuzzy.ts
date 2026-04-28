@@ -184,7 +184,7 @@ function getFuzzyOptions<Item>(
 	return options as RequiredKeys<FuzzyOptions, 'tolerance'>;
 }
 
-function getState<Item>(items: Item[], input: unknown): FuzzyState<Item> {
+function getFuzzyState<Item>(items: Item[], input: unknown): FuzzyState<Item> {
 	const handler = getHandler(input);
 	const options = getFuzzyOptions(input);
 
@@ -237,7 +237,7 @@ export function fuzzy(items: unknown[], configuration?: unknown): Fuzzy<unknown>
 		throw new TypeError(MESSAGE_ARRAY);
 	}
 
-	return new Fuzzy(getState(items, configuration));
+	return new Fuzzy(getFuzzyState(items, configuration));
 }
 
 fuzzy.match = fuzzyMatch;

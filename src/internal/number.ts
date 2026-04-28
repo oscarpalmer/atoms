@@ -97,6 +97,12 @@ export function getNumber(value: unknown): number {
 	return Number(trimmed);
 }
 
+export function getNumberOrDefault(value: unknown, defaultValue: number, minimum?: number): number {
+	return typeof value === 'number' && !Number.isNaN(value) && value >= (minimum ?? 0)
+		? Math.floor(value)
+		: defaultValue;
+}
+
 // #endregion
 
 // #region Variables

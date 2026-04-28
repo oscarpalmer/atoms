@@ -1,3 +1,4 @@
+import {getNumberOrDefault} from './internal/number';
 import type {GenericAsyncCallback, GenericCallback} from './models';
 
 // #region Types
@@ -471,13 +472,13 @@ class Queue<CallbackParameters extends Parameters<GenericAsyncCallback>, Callbac
 				const paused = item;
 
 				this.#handled.push(() => {
-					handleResult(paused, error, result, this.#items.length === 0);
+					handleQueuedResult(paused, error, result, this.#items.length === 0);
 				});
 
 				break;
 			}
 
-			handleResult(item, error, result, this.#items.length === 0);
+			handleQueuedResult(item, error, result, this.#items.length === 0);
 
 			item = this.#items.shift();
 		}
@@ -554,21 +555,20 @@ function getBooleanOrDefault(value: unknown, defaultValue: boolean): boolean {
 	return typeof value === 'boolean' ? value : defaultValue;
 }
 
-function getNumberOrDefault(value: unknown, defaultValue: number): number {
-	return typeof value === 'number' && value > 0 ? Math.floor(value) : defaultValue;
-}
-
 function getOptions(input?: QueueOptions): Required<QueueOptions> {
 	const options = typeof input === 'object' && input != null ? input : {};
 
 	return {
 		autostart: getBooleanOrDefault(options.autostart, true),
-		concurrency: getNumberOrDefault(options.concurrency, 1),
+		concurrency: getNumberOrDefault(options.concurrency, 1, 1),
 		maximum: getNumberOrDefault(options.maximum, 0),
 	};
 }
 
-function handleResult<CallbackParameters extends Parameters<GenericAsyncCallback>, CallbackResult>(
+function handleQueuedResult<
+	CallbackParameters extends Parameters<GenericAsyncCallback>,
+	CallbackResult,
+>(
 	item: QueuedItem<CallbackParameters, CallbackResult>,
 	error: boolean,
 	result: unknown,
@@ -676,11 +676,11 @@ const STATUS_PAUSED: StatusKey = 'paused';
 
 export {
 	type KeyedQueue,
-	type QueueError,
 	type Queue,
 	type Queued,
-	type QueueOptions,
 	type QueuedResult,
+	type QueueError,
+	type QueueOptions,
 };
 
 // #endregion

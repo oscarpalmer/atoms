@@ -11,7 +11,7 @@ export class RetryError extends Error {
 	) {
 		super(message);
 
-		this.name = ERROR_NAME;
+		this.name = RETRY_ERROR_NAME;
 	}
 }
 
@@ -64,7 +64,7 @@ async function asyncRetry<Callback extends GenericCallback>(
 	options?: RetryOptions,
 ): Promise<ReturnType<Callback>> {
 	if (typeof callback !== 'function') {
-		throw new TypeError(MESSAGE_EXPECTATION);
+		throw new TypeError(RETRY_MESSAGE_EXPECTATION);
 	}
 
 	async function handle(): Promise<void> {
@@ -74,7 +74,7 @@ async function asyncRetry<Callback extends GenericCallback>(
 			resolver(result);
 		} catch (error) {
 			if (attempts >= times || !when(error)) {
-				rejector(new RetryError(MESSAGE_FAILED, error));
+				rejector(new RetryError(RETRY_MESSAGE_FAILED, error));
 			} else {
 				attempts += 1;
 
@@ -125,7 +125,7 @@ export function retry<Callback extends GenericCallback>(
 	options?: Omit<RetryOptions, 'delay'>,
 ): ReturnType<Callback> {
 	if (typeof callback !== 'function') {
-		throw new TypeError(MESSAGE_EXPECTATION);
+		throw new TypeError(RETRY_MESSAGE_EXPECTATION);
 	}
 
 	const {times, when} = getRetryOptions(options);
@@ -146,7 +146,7 @@ export function retry<Callback extends GenericCallback>(
 		}
 	}
 
-	throw new RetryError(MESSAGE_FAILED, last);
+	throw new RetryError(RETRY_MESSAGE_FAILED, last);
 }
 
 retry.async = asyncRetry;
@@ -159,10 +159,10 @@ function shouldRetry(): boolean {
 
 // #region Variables
 
-const ERROR_NAME = 'RetryError';
+const RETRY_ERROR_NAME = 'RetryError';
 
-const MESSAGE_EXPECTATION = 'Retry expected a function';
+const RETRY_MESSAGE_EXPECTATION = 'Retry expected a function';
 
-const MESSAGE_FAILED = 'Retry failed';
+const RETRY_MESSAGE_FAILED = 'Retry failed';
 
 // #endregion

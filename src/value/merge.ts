@@ -194,7 +194,6 @@ export function merge(
 	return handleMerge(values, getMergeOptions(options));
 }
 
-merge.assign = assign;
 merge.initialize = initializeMerger;
 
 function mergeObjects(

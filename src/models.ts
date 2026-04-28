@@ -19,7 +19,7 @@ export type AsyncCancelableCallback<Callback extends GenericAsyncCallback | Gene
 	};
 
 /**
- * For mathicng any `void`, `Date`, primitive, or `RegExp` values
+ * For matching any `void`, `Date`, primitive, or `RegExp` values
  *
  * (Thanks, type-fest!)
  */
