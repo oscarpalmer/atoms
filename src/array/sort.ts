@@ -104,6 +104,11 @@ type InternalSorterCompare = {
  */
 export type SortDirection = 'ascending' | 'descending';
 
+/**
+ * Sorter for an array with predefined sorters
+ *
+ * Can be used to sort an array, get the predicted index for an item, and check if an array is sorted
+ */
 export type Sorter<Item> = {
 	/**
 	 * Sort an array of items
@@ -245,7 +250,7 @@ function getObjectSorter(obj: PlainObject, modifier: number): InternalSorter | u
  *
  * _(If the array is not sorted, it will be treated as sorted, and the result may be inaccurate)_
  *
- * Available as `getSortedIndex` and `sort.index`
+ * Available as `getSortedIndex` and `sort.getIndex`
  * @param array Array to get the index from
  * @param item Item to get the index for
  * @param sorters Sorters to use to determine sorting
@@ -264,7 +269,7 @@ export function getSortedIndex<Item>(
  *
  * _(If the array is not sorted, it will be treated as sorted, and the result may be inaccurate)_
  *
- * Available as `getSortedIndex` and `sort.index`
+ * Available as `getSortedIndex` and `sort.getIndex`
  * @param array Array to get the index from
  * @param item Item to get the index for
  * @param sorter Sorter to use to determine sorting
@@ -283,7 +288,7 @@ export function getSortedIndex<Item>(
  *
  * _(If the array is not sorted, it will be treated as sorted, and the result may be inaccurate)_
  *
- * Available as `getSortedIndex` and `sort.index`
+ * Available as `getSortedIndex` and `sort.getIndex`
  * @param array Array to get the index from
  * @param item Item to get the index for
  * @param descending Sorted in descending order? _(defaults to `false`)_
@@ -552,7 +557,7 @@ function sortArray(array: unknown[], sorters: InternalSorter[]): unknown[] {
 		: array;
 }
 
-sort.index = getSortedIndex;
+sort.getIndex = getSortedIndex;
 sort.initialize = initializeSorter;
 sort.is = isSorted;
 

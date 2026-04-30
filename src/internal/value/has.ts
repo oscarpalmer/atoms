@@ -43,11 +43,11 @@ hasValue.get = hasValueResult;
  * @param ignoreCase If `true`, the path matching is case-insensitive
  * @return Result object
  */
-function hasValueResult<Data extends PlainObject, Path extends NestedKeys<Data>>(
+export function hasValueResult<Data extends PlainObject, Path extends NestedKeys<Data>>(
 	data: Data,
 	path: Path,
 	ignoreCase?: boolean,
-): Result<NestedValue<Data, ToString<Path>>, undefined>;
+): Result<NestedValue<Data, ToString<Path>>, string>;
 
 /**
  * Check if a nested property is defined in an object, and get its value if it is
@@ -58,17 +58,17 @@ function hasValueResult<Data extends PlainObject, Path extends NestedKeys<Data>>
  * @param ignoreCase If `true`, the path matching is case-insensitive
  * @return Result object
  */
-function hasValueResult<Data extends PlainObject>(
+export function hasValueResult<Data extends PlainObject>(
 	data: Data,
 	path: string,
 	ignoreCase?: boolean,
-): Result<unknown, undefined>;
+): Result<unknown, string>;
 
-function hasValueResult(
+export function hasValueResult(
 	data: PlainObject,
 	path: string,
 	ignoreCase?: boolean,
-): Result<unknown, undefined> {
+): Result<unknown, string> {
 	return getNestedValue(data, path, ignoreCase === true);
 }
 

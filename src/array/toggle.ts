@@ -1,6 +1,8 @@
 import {updateInArray} from '../internal/array/update';
 import type {PlainObject} from '../models';
 
+// #region Functions
+
 /**
  * Toggle an item in an array: if the item exists, it will be removed; if it doesn't, it will be added
  * @param destination Array to toggle within
@@ -38,3 +40,5 @@ export function toggle<Item>(destination: Item[], toggled: Item[]): Item[];
 export function toggle(array: unknown[], values: unknown[], key?: unknown): unknown[] {
 	return updateInArray(array, values, key, false);
 }
+
+// #endregion

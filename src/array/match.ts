@@ -1,9 +1,12 @@
-// #region Types
-
 import {getArrayCallback} from '../internal/array/callbacks';
 import type {PlainObject} from '../models';
 
-export type ArrayPosition = 'end' | 'inside' | 'invalid' | 'outside' | 'same' | 'start';
+// #region Types
+
+/**
+ * Comparison of an array within another array
+ */
+export type ArrayComparison = 'end' | 'inside' | 'invalid' | 'outside' | 'same' | 'start';
 
 // #endregion
 
@@ -54,11 +57,11 @@ export function endsWithArray(haystack: unknown[], needle: unknown[], key?: unkn
  * @param key Key to get an item's value for matching
  * @returns Position of the needle within the haystack
  */
-export function getArrayPosition<Item extends PlainObject>(
+export function getArrayComparison<Item extends PlainObject>(
 	haystack: Item[],
 	needle: Item[],
 	key: keyof Item,
-): ArrayPosition;
+): ArrayComparison;
 
 /**
  * Get the position of an array within another array
@@ -67,11 +70,11 @@ export function getArrayPosition<Item extends PlainObject>(
  * @param callback Callback to get an item's value for matching
  * @returns Position of the needle within the haystack
  */
-export function getArrayPosition<Item>(
+export function getArrayComparison<Item>(
 	haystack: Item[],
 	needle: Item[],
 	callback: (item: Item, index: number, array: Item[]) => unknown,
-): ArrayPosition;
+): ArrayComparison;
 
 /**
  * Get the position of an array within another array
@@ -79,29 +82,29 @@ export function getArrayPosition<Item>(
  * @param needle Needle array
  * @returns Position of the needle within the haystack
  */
-export function getArrayPosition<Item>(haystack: Item[], needle: Item[]): ArrayPosition;
+export function getArrayComparison<Item>(haystack: Item[], needle: Item[]): ArrayComparison;
 
-export function getArrayPosition(
+export function getArrayComparison(
 	haystack: unknown[],
 	needle: unknown[],
 	key?: unknown,
-): ArrayPosition {
+): ArrayComparison {
 	return getPosition(haystack, needle, key)[1];
 }
 
-function getName(start: number, haystack: number, needle: number): ArrayPosition {
+function getName(start: number, haystack: number, needle: number): ArrayComparison {
 	if (start === 0) {
-		return haystack === needle ? POSITION_SAME : POSITION_START;
+		return haystack === needle ? COMPARISON_SAME : COMPARISON_START;
 	}
 
-	return start + needle === haystack ? POSITION_END : POSITION_INSIDE;
+	return start + needle === haystack ? COMPARISON_END : COMPARISON_INSIDE;
 }
 
 function getPosition(
 	haystack: unknown[],
 	needle: unknown[],
 	key?: unknown,
-): readonly [number, ArrayPosition] {
+): readonly [number, ArrayComparison] {
 	if (!Array.isArray(haystack) || !Array.isArray(needle)) {
 		return invalid;
 	}
@@ -278,26 +281,26 @@ export function startsWithArray(haystack: unknown[], needle: unknown[], key?: un
 
 // #region Variables
 
-const POSITION_END: ArrayPosition = 'end';
+const COMPARISON_END: ArrayComparison = 'end';
 
-const POSITION_INSIDE: ArrayPosition = 'inside';
+const COMPARISON_INSIDE: ArrayComparison = 'inside';
 
-const POSITION_INVALID: ArrayPosition = 'invalid';
+const COMPARISON_INVALID: ArrayComparison = 'invalid';
 
-const POSITION_OUTSIDE: ArrayPosition = 'outside';
+const COMPARISON_OUTSIDE: ArrayComparison = 'outside';
 
-const POSITION_SAME: ArrayPosition = 'same';
+const COMPARISON_SAME: ArrayComparison = 'same';
 
-const POSITION_START: ArrayPosition = 'start';
+const COMPARISON_START: ArrayComparison = 'start';
 
-const endings = new Set<ArrayPosition>([POSITION_END, POSITION_SAME]);
+const endings = new Set<ArrayComparison>([COMPARISON_END, COMPARISON_SAME]);
 
-const invalid = [-1, POSITION_INVALID] as const;
+const invalid = [-1, COMPARISON_INVALID] as const;
 
-const outside = [-1, POSITION_OUTSIDE] as const;
+const outside = [-1, COMPARISON_OUTSIDE] as const;
 
-const outsides = new Set<ArrayPosition>([POSITION_INVALID, POSITION_OUTSIDE]);
+const outsides = new Set<ArrayComparison>([COMPARISON_INVALID, COMPARISON_OUTSIDE]);
 
-const starts = new Set<ArrayPosition>([POSITION_START, POSITION_SAME]);
+const starts = new Set<ArrayComparison>([COMPARISON_START, COMPARISON_SAME]);
 
 // #endregion

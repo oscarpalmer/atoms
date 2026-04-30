@@ -42,18 +42,16 @@ test('asynchronous', () =>
 		const firstController = new AbortController();
 		const secondController = new AbortController();
 
-		void attempt
-			.promise(
-				new Promise<number>(resolve => {
-					setTimeout(() => {
-						resolve(3);
-					}, 250);
-				}),
-				firstController.signal,
-			)
-			.catch(error => {
-				errors[1] = error;
-			});
+		void attemptPromise(
+			new Promise<number>(resolve => {
+				setTimeout(() => {
+					resolve(3);
+				}, 250);
+			}),
+			firstController.signal,
+		).catch(error => {
+			errors[1] = error;
+		});
 
 		firstController.abort('Aborted during');
 		secondController.abort('Aborted before');

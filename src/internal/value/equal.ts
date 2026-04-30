@@ -22,6 +22,11 @@ export type EqualOptions = {
 	relaxedNullish?: boolean;
 };
 
+/**
+ * An equalizer function for comparing values for equality, with predefined options
+ *
+ * Can be used to compare values, and register or deregister equality comparison handlers for specific classes
+ */
 type Equalizer = {
 	/**
 	 * Are two strings equal?

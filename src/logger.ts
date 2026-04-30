@@ -2,6 +2,11 @@ import {noop} from './internal/function/misc';
 
 // #region Types
 
+/**
+ * A logger that can be used to log messages to the console
+ *
+ * _(Logging can be enabled or disabled by setting the `enabled` property)_
+ */
 class Logger {
 	/**
 	 * Log any number of values at the "debug" log level
@@ -83,12 +88,18 @@ class Logger {
 	}
 }
 
+/**
+ * A named timer that can be used to log durations to the console
+ */
 class Time {
 	#logger: typeof console.timeLog | undefined;
 	#stopper: typeof console.timeEnd | undefined;
 
 	readonly #state: TimeState;
 
+	/**
+	 * Is the timer active? _(i.e. has it been started and not stopped, and is logging enabled?)_
+	 */
 	get active(): boolean {
 		return this.#state.started && !this.#state.stopped && enabled;
 	}

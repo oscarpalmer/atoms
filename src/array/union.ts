@@ -1,5 +1,7 @@
 import {COMPARE_SETS_UNION, compareSets} from '../internal/array/sets';
 
+// #region Functions
+
 /**
  * Get the combined, unique values from two arrays
  * @param first First array
@@ -37,3 +39,5 @@ export function union<First, Second>(first: First[], second: Second[]): (First |
 export function union(first: unknown[], second: unknown[], key?: unknown): unknown[] {
 	return compareSets(COMPARE_SETS_UNION, first, second, key);
 }
+
+// #endregion

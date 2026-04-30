@@ -5,6 +5,9 @@ import type {GenericAsyncCallback, GenericCallback} from './models';
 
 type HandleType = 'clear' | 'pause' | 'resume';
 
+/**
+ * A queue that can be used to manage (a)synchronous tasks with a specific key
+ */
 class KeyedQueue<CallbackParameters extends Parameters<GenericAsyncCallback>, CallbackResult> {
 	readonly #callback: GenericAsyncCallback;
 
@@ -240,6 +243,9 @@ class KeyedQueue<CallbackParameters extends Parameters<GenericAsyncCallback>, Ca
 	}
 }
 
+/**
+ * A queue that can be used to manage (a)synchronous tasks
+ */
 class Queue<CallbackParameters extends Parameters<GenericAsyncCallback>, CallbackResult> {
 	readonly #callback: GenericAsyncCallback;
 
@@ -487,6 +493,9 @@ class Queue<CallbackParameters extends Parameters<GenericAsyncCallback>, Callbac
 	}
 }
 
+/**
+ * An error thrown by the Queue when an operation fails
+ */
 class QueueError extends Error {
 	constructor(message: string) {
 		super(message);
@@ -510,9 +519,12 @@ type QueueOptions = {
 	maximum?: number;
 };
 
+/**
+ * A queued item
+ */
 type Queued<Value> = {
 	/**
-	 * ID of the queued promise _(can be used to remove it from the queue)_
+	 * ID of the queued item _(can be used to remove it from the queue)_
 	 */
 	readonly id: number;
 	/**

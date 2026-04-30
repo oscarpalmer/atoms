@@ -2,7 +2,9 @@ import {getArrayCallback} from '../internal/array/callbacks';
 import {indexOf} from '../internal/array/index-of';
 import {arraysOverlap} from '../internal/array/overlap';
 import type {PlainObject} from '../models';
-import {indexOfArray} from './position';
+import {indexOfArray} from './match';
+
+// #region Functions
 
 /**
  * Swap two smaller arrays within a larger array
@@ -211,3 +213,5 @@ function swapValues(array: unknown[], from: unknown, to: unknown, key?: unknown)
 
 	return swapIndices(array, first, second);
 }
+
+// #endregion

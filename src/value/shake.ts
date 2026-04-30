@@ -3,6 +3,9 @@ import type {PlainObject} from '../models';
 
 // #region Types
 
+/**
+ * A shaken object, without any `undefined` values
+ */
 export type Shaken<Value extends PlainObject> = {
 	[Key in keyof Value]: Value[Key] extends undefined ? never : Value[Key];
 };

@@ -4,6 +4,9 @@ import type {GenericAsyncCallback, GenericCallback} from '../models';
 
 // #region Types
 
+/**
+ * An error thrown when a retry fails
+ */
 export class RetryError extends Error {
 	constructor(
 		message: string,

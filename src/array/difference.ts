@@ -1,6 +1,8 @@
 import {COMPARE_SETS_DIFFERENCE, compareSets} from '../internal/array/sets';
 import type {PlainObject} from '../models';
 
+// #region Functions
+
 /**
  * Get the items from the first array that are not in the second array
  * @param first First array
@@ -38,3 +40,5 @@ export function difference<First, Second>(first: First[], second: Second[]): Fir
 export function difference(first: unknown[], second: unknown[], key?: unknown): unknown[] {
 	return compareSets(COMPARE_SETS_DIFFERENCE, first, second, key);
 }
+
+// #endregion

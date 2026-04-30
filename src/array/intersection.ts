@@ -1,5 +1,7 @@
 import {COMPARE_SETS_INTERSECTION, compareSets} from '../internal/array/sets';
 
+// #region Functions
+
 /**
  * Get the common values between two arrays
  * @param first First array
@@ -37,3 +39,5 @@ export function intersection<First, Second>(first: First[], second: Second[]): F
 export function intersection(first: unknown[], second: unknown[], key?: unknown): unknown[] {
 	return compareSets(COMPARE_SETS_INTERSECTION, first, second, key);
 }
+
+// #endregion

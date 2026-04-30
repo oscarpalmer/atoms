@@ -24,8 +24,6 @@ import {getTimedPromise} from './timed';
 
 /**
  * Wrap a promise with safety handlers, with optional abort capabilities and timeout
- *
- * Available as `attemptPromise` and `attempt.promise`
  * @param promise Promise to wrap
  * @param options Options for the promise
  * @returns Wrapped promise
@@ -37,8 +35,6 @@ export async function attemptPromise<Value>(
 
 /**
  * Wrap a promise-returning callback with safety handlers, with optional abort capabilities and timeout
- *
- * Available as `attemptPromise` and `attempt.promise`
  * @param callback Callback to wrap
  * @param options Options for the promise
  * @returns Promise-wrapped callback
@@ -50,8 +46,6 @@ export async function attemptPromise<Value>(
 
 /**
  * Wrap a callback with a promise and safety handlers, with optional abort capabilities and timeout
- *
- * Available as `attemptPromise` and `attempt.promise`
  * @param callback Callback to wrap
  * @param options Options for the promise
  * @returns Promise-wrapped callback

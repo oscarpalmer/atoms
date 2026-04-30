@@ -1,6 +1,8 @@
 import {arraysOverlap} from '../internal/array/overlap';
 import type {PlainObject} from '../models';
-import {indexOfArray} from './position';
+import {indexOfArray} from './match';
+
+// #region Functions
 
 /**
  * Move an item _(or array of items)_ to the position of another item _(or array of items)_ within an array
@@ -239,3 +241,5 @@ export function moveToIndex(
 
 	return array;
 }
+
+// #endregion

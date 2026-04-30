@@ -1,10 +1,11 @@
 import {getSizedMaximum} from '../internal/sized';
 
-// #region Types and classes
+// #region Types
 
 /**
- * - A Set with a maximum size
- * - Behavior is similar to a _LRU_-cache, where the oldest values are removed
+ * A Set with a maximum size
+ *
+ * Behavior is similar to a _LRU_-cache, where the oldest values are removed
  */
 export class SizedSet<Value = unknown> extends Set<Value> {
 	/**

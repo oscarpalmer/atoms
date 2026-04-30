@@ -11,6 +11,9 @@ import type {
 
 // #region Types
 
+/**
+ * A smushed object, with all nested objects flattened into a single level, using dot notation keys
+ */
 export type Smushed<Value extends PlainObject> = Simplify<{
 	[NestedKey in NestedKeys<Value>]: NestedValue<Value, ToString<NestedKey>>;
 }>;

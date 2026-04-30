@@ -39,11 +39,8 @@ export {
 } from './misc/is';
 
 export {getNormalizedHex, hexToHsl, hexToHsla, hexToRgb, hexToRgba} from './space/hex';
-
 export {hslToHex, hslToRgb, hslToRgba} from './space/hsl';
-
 export {rgbToHex, rgbToHsl, rgbToHsla} from './space/rgb';
-
 export type {Color, HSLAColor, HSLColor, RGBAColor, RGBColor};
 
 // #endregion

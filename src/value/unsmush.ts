@@ -25,6 +25,9 @@ type UnionToIntersection<Union> = (
 	? Intersection & Union
 	: never;
 
+/**
+ * An unsmushed object, with all dot notation keys turned into nested keys
+ */
 export type Unsmushed<Value extends PlainObject> = Simplify<
 	Omit<
 		{

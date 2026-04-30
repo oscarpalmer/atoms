@@ -5,6 +5,8 @@ import type {AnyResult, ExtendedErr, ResultMatch} from './models';
 
 /**
  * Handles a result with match callbacks
+ *
+ * Available as `asyncMatchResult` and `matchResult.async`
  * @param result Result to handle
  * @param handler Match callbacks
  */
@@ -15,6 +17,8 @@ export async function asyncMatchResult<Value, Returned, E = Error>(
 
 /**
  * Handles a result with match callbacks
+ *
+ * Available as `asyncMatchResult` and `matchResult.async`
  * @param result Result to handle
  * @param ok Ok callback
  * @param error Error callback
@@ -58,8 +62,6 @@ export async function asyncMatchResult<Value, Returned, E = Error>(
 
 /**
  * Handles a result with match callbacks
- *
- * Available as `matchResult` and `attempt.match`
  * @param result Result to handle
  * @param handler Match callbacks
  */
@@ -70,8 +72,6 @@ export function matchResult<Value, Returned, E = Error>(
 
 /**
  * Handles a result with match callbacks
- *
- * Available as `matchResult` and `attempt.match`
  * @param result Result to handle
  * @param ok Ok callback
  * @param error Error callback

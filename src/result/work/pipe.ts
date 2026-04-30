@@ -17,7 +17,7 @@ type WrapValue<Value> = Result<UnwrapValue<Value>>;
 /**
  * Attempt to pipe a value through a function
  *
- * Available as `attemptAsyncPipe` and `attempt.pipe.async`
+ * Available as `attemptAsyncPipe` and `attemptPipe.async`
  * @param initial Initial value
  * @returns Piped result
  */
@@ -29,7 +29,7 @@ export async function attemptAsyncPipe<Initial, Piped>(
 /**
  * Attempt to pipe a value through a series of functions
  *
- * Available as `attemptAsyncPipe` and `attempt.pipe.async`
+ * Available as `attemptAsyncPipe` and `attemptPipe.async`
  * @param initial Initial value
  * @returns Piped result
  */
@@ -42,7 +42,7 @@ export async function attemptAsyncPipe<Initial, First, Second>(
 /**
  * Attempt to pipe a value through a series of functions
  *
- * Available as `attemptAsyncPipe` and `attempt.pipe.async`
+ * Available as `attemptAsyncPipe` and `attemptPipe.async`
  * @param initial Initial value
  * @returns Piped result
  */
@@ -56,7 +56,7 @@ export async function attemptAsyncPipe<Initial, First, Second, Third>(
 /**
  * Attempt to pipe a value through a series of functions
  *
- * Available as `attemptAsyncPipe` and `attempt.pipe.async`
+ * Available as `attemptAsyncPipe` and `attemptPipe.async`
  * @param initial Initial value
  * @returns Piped result
  */
@@ -71,7 +71,7 @@ export async function attemptAsyncPipe<Initial, First, Second, Third, Fourth>(
 /**
  * Attempt to pipe a value through a series of functions
  *
- * Available as `attemptAsyncPipe` and `attempt.pipe.async`
+ * Available as `attemptAsyncPipe` and `attemptPipe.async`
  * @param initial Initial value
  * @returns Piped result
  */
@@ -87,7 +87,7 @@ export async function attemptAsyncPipe<Initial, First, Second, Third, Fourth, Fi
 /**
  * Attempt to pipe a value through a series of functions
  *
- * Available as `attemptAsyncPipe` and `attempt.pipe.async`
+ * Available as `attemptAsyncPipe` and `attemptPipe.async`
  * @param initial Initial value
  * @returns Piped result
  */
@@ -104,7 +104,7 @@ export async function attemptAsyncPipe<Initial, First, Second, Third, Fourth, Fi
 /**
  * Attempt to pipe a value through a series of functions
  *
- * Available as `attemptAsyncPipe` and `attempt.pipe.async`
+ * Available as `attemptAsyncPipe` and `attemptPipe.async`
  * @param initial Initial value
  * @returns Piped result
  */
@@ -131,7 +131,7 @@ export async function attemptAsyncPipe<
 /**
  * Attempt to pipe a value through a series of functions
  *
- * Available as `attemptAsyncPipe` and `attempt.pipe.async`
+ * Available as `attemptAsyncPipe` and `attemptPipe.async`
  * @param initial Initial value
  * @returns Piped result
  */
@@ -160,7 +160,7 @@ export async function attemptAsyncPipe<
 /**
  * Attempt to pipe a value through a series of functions
  *
- * Available as `attemptAsyncPipe` and `attempt.pipe.async`
+ * Available as `attemptAsyncPipe` and `attemptPipe.async`
  * @param initial Initial value
  * @returns Piped result
  */
@@ -191,7 +191,7 @@ export async function attemptAsyncPipe<
 /**
  * Attempt to pipe a value through a series of functions
  *
- * Available as `attemptAsyncPipe` and `attempt.pipe.async`
+ * Available as `attemptAsyncPipe` and `attemptPipe.async`
  * @param initial Initial value
  * @returns Piped result
  */
@@ -224,7 +224,7 @@ export async function attemptAsyncPipe<
 /**
  * Attempt to pipe a result through a series of functions
  *
- * Available as `attemptAsyncPipe` and `attempt.pipe.async`
+ * Available as `attemptAsyncPipe` and `attemptPipe.async`
  * @param initial Initial result
  * @returns Piped result
  */
@@ -265,8 +265,6 @@ export async function attemptAsyncPipe(
 
 /**
  * Attempt to pipe a value through a function
- *
- * Available as `attemptPipe` and `attempt.pipe`
  * @param initial Initial value
  * @returns Piped result
  */
@@ -277,8 +275,6 @@ export function attemptPipe<Initial, Pipe>(
 
 /**
  * Attempt to pipe a value through a series of functions
- *
- * Available as `attemptPipe` and `attempt.pipe`
  * @param initial Initial value
  * @returns Piped result
  */
@@ -290,8 +286,6 @@ export function attemptPipe<Initial, First, Second>(
 
 /**
  * Attempt to pipe a value through a series of functions
- *
- * Available as `attemptPipe` and `attempt.pipe`
  * @param initial Initial value
  * @returns Piped result
  */
@@ -304,8 +298,6 @@ export function attemptPipe<Initial, First, Second, Third>(
 
 /**
  * Attempt to pipe a value through a series of functions
- *
- * Available as `attemptPipe` and `attempt.pipe`
  * @param initial Initial value
  * @returns Piped result
  */
@@ -319,8 +311,6 @@ export function attemptPipe<Initial, First, Second, Third, Fourth>(
 
 /**
  * Attempt to pipe a value through a series of functions
- *
- * Available as `attemptPipe` and `attempt.pipe`
  * @param initial Initial value
  * @returns Piped result
  */
@@ -335,8 +325,6 @@ export function attemptPipe<Initial, First, Second, Third, Fourth, Fifth>(
 
 /**
  * Attempt to pipe a value through a series of functions
- *
- * Available as `attemptPipe` and `attempt.pipe`
  * @param initial Initial value
  * @returns Piped result
  */
@@ -352,8 +340,6 @@ export function attemptPipe<Initial, First, Second, Third, Fourth, Fifth, Sixth>
 
 /**
  * Attempt to pipe a value through a series of functions
- *
- * Available as `attemptPipe` and `attempt.pipe`
  * @param initial Initial value
  * @returns Piped result
  */
@@ -370,8 +356,6 @@ export function attemptPipe<Initial, First, Second, Third, Fourth, Fifth, Sixth,
 
 /**
  * Attempt to pipe a value through a series of functions
- *
- * Available as `attemptPipe` and `attempt.pipe`
  * @param initial Initial value
  * @returns Piped result
  */
@@ -389,8 +373,6 @@ export function attemptPipe<Initial, First, Second, Third, Fourth, Fifth, Sixth,
 
 /**
  * Attempt to pipe a value through a series of functions
- *
- * Available as `attemptPipe` and `attempt.pipe`
  * @param initial Initial value
  * @returns Piped result
  */
@@ -420,8 +402,6 @@ export function attemptPipe<
 
 /**
  * Attempt to pipe a value through a series of functions
- *
- * Available as `attemptPipe` and `attempt.pipe`
  * @param initial Initial value
  * @returns Piped result
  */
@@ -453,8 +433,6 @@ export function attemptPipe<
 
 /**
  * Attempt to pipe a result through a series of functions
- *
- * Available as `attemptPipe` and `attempt.pipe`
  * @param initial Initial result
  * @returns Piped result
  */

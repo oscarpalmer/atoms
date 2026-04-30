@@ -17,14 +17,13 @@ export function getNestedValue(
 	data: object,
 	path: string,
 	ignoreCase: boolean,
-): Result<unknown, undefined> {
-	if (
-		typeof data !== 'object' ||
-		data === null ||
-		typeof path !== 'string' ||
-		path.trim().length === 0
-	) {
-		return error(undefined);
+): Result<unknown, string> {
+	if (typeof data !== 'object' || data === null) {
+		return error(NESTED_MESSAGE_INPUT);
+	}
+
+	if (typeof path !== 'string' || path.trim().length === 0) {
+		return error(NESTED_MESSAGE_PATH);
 	}
 
 	const shouldIgnoreCase = ignoreCase === true;
@@ -69,7 +68,7 @@ export function handleValue(
 	value: unknown,
 	get: true,
 	ignoreCase: boolean,
-): Result<unknown, undefined>;
+): Result<unknown, string>;
 
 export function handleValue(
 	data: object,
@@ -85,19 +84,23 @@ export function handleValue(
 	value: unknown,
 	get: boolean,
 	ignoreCase: boolean,
-): Result<unknown, undefined> | void {
-	if (typeof data === 'object' && data !== null && !ignoreKey(path)) {
+): Result<unknown, string> | void {
+	if (typeof data === 'object' && data !== null) {
+		if (ignoreKey(path)) {
+			return error(NESTED_MESSAGE_UNSAFE);
+		}
+
 		const key = ignoreCase ? findKey(path, data) : path;
 
 		if (get) {
-			return key in data ? ok(data[key as never]) : error(undefined);
+			return key in data ? ok(data[key as never]) : error(NESTED_MESSAGE_MISSING);
 		}
 
 		(data as PlainObject)[key] = typeof value === 'function' ? value(data[key as never]) : value;
 	}
 
 	if (get) {
-		return error(undefined);
+		return error(NESTED_MESSAGE_MISSING);
 	}
 }
 
@@ -110,5 +113,13 @@ const EXPRESSION_BRACKET = /\[(\w+)\]/g;
 const EXPRESSION_DOTS = /^\.|\.$/g;
 
 const EXPRESSION_NESTED = /\.|\[\w+\]/;
+
+const NESTED_MESSAGE_INPUT = 'Expected data to be an object';
+
+const NESTED_MESSAGE_MISSING = 'Expected property to exist in object';
+
+const NESTED_MESSAGE_PATH = 'Expected path to be a string';
+
+const NESTED_MESSAGE_UNSAFE = 'Access to this property is not allowed';
 
 // #endregion

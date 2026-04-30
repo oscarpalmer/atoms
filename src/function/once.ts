@@ -107,7 +107,11 @@ export function asyncOnce<Callback extends GenericAsyncCallback>(
 	return fn as OnceAsyncCallback<Callback>;
 }
 
-function handleOnceResult<Value>(state: OnceAsyncState<Value>, value: unknown, error: boolean): void {
+function handleOnceResult<Value>(
+	state: OnceAsyncState<Value>,
+	value: unknown,
+	error: boolean,
+): void {
 	state.error = error;
 	state.finished = true;
 	state.value = value as Value;

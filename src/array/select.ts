@@ -1,6 +1,8 @@
 import {FIND_VALUES_ALL, findValues} from '../internal/array/find';
 import type {PlainObject} from '../models';
 
+// #region Functions
+
 /**
  * Get a filtered and mapped array of items
  * @param array Array to search in

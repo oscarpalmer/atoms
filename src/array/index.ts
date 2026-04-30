@@ -12,7 +12,7 @@ export * from './get';
 export * from './insert';
 export * from './intersection';
 export * from './partition';
-export * from './position';
+export * from './match';
 export * from './push';
 export * from './reverse';
 export * from './select';

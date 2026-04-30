@@ -10,6 +10,7 @@ test('getValue', () => {
 	expect(getValue(nested, '')).toBe(undefined);
 	expect(getValue(nested, 'a.B.1.C.1', true)).toBe(undefined);
 	expect(getValue(nested, 'a.b.99.c')).toBe(undefined);
+	expect(getValue(nested, 'a.c.d.e')).toBe(undefined);
 
 	expect(getValue(nested, '__proto__')).toBe(undefined);
 	expect(getValue(nested, 'constructor')).toBe(undefined);
@@ -32,13 +33,37 @@ test('hasValue', () => {
 
 	expect(hasValue.get(nested, 'a.c.d')).toEqual({ok: true, value: 123});
 
-	expect(hasValue.get(nested, '')).toEqual({ok: false, value: undefined});
-	expect(hasValue.get(nested, 'a.B.1.C.1', true)).toEqual({ok: false, value: undefined});
-	expect(hasValue.get(nested, 'a.b.99.c')).toEqual({ok: false, value: undefined});
+	expect(hasValue.get(nested, '')).toEqual({ok: false, error: 'Expected path to be a string'});
 
-	expect(hasValue.get(nested, '__proto__')).toEqual({ok: false, value: undefined});
-	expect(hasValue.get(nested, 'constructor')).toEqual({ok: false, value: undefined});
-	expect(hasValue.get(nested, 'prototype')).toEqual({ok: false, value: undefined});
+	expect(hasValue.get(nested, 'a.B.1.C.1', true)).toEqual({
+		ok: false,
+		error: 'Expected property to exist in object',
+	});
+
+	expect(hasValue.get(nested, 'a.b.99.c')).toEqual({
+		ok: false,
+		error: 'Expected property to exist in object',
+	});
+
+	expect(hasValue.get(nested, '__proto__')).toEqual({
+		ok: false,
+		error: 'Access to this property is not allowed',
+	});
+
+	expect(hasValue.get(nested, 'constructor')).toEqual({
+		ok: false,
+		error: 'Access to this property is not allowed',
+	});
+
+	expect(hasValue.get(nested, 'prototype')).toEqual({
+		ok: false,
+		error: 'Access to this property is not allowed',
+	});
+
+	expect(hasValue.get('blah' as never, 'a.b.c.d')).toEqual({
+		ok: false,
+		error: 'Expected data to be an object',
+	});
 });
 
 test('setValue', () => {

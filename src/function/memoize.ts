@@ -5,6 +5,9 @@ import {SizedMap} from '../sized/map';
 
 // #region Types
 
+/**
+ * A memoized function, caching and retrieving results based on the its parameters _(or a custom cache key)_
+ */
 class Memoized<Callback extends GenericCallback> {
 	readonly #state: MemoizedState<Callback>;
 

@@ -3,6 +3,9 @@ import type {Result} from '../result/models';
 
 // #region Types
 
+/**
+ * A promise that can be canceled
+ */
 export class CancelablePromise<Value = void> extends Promise<Value> {
 	#rejector!: (reason: unknown) => void;
 
@@ -29,8 +32,17 @@ export class CancelablePromise<Value = void> extends Promise<Value> {
 	}
 }
 
+/**
+ * A promise that was fulfilled
+ */
 export type FulfilledPromise<Value> = {
+	/**
+	 * Status of the promise
+	 */
 	status: typeof PROMISE_TYPE_FULFILLED;
+	/**
+	 * Value of the promise
+	 */
 	value: Awaited<Value>;
 };
 
@@ -44,6 +56,9 @@ export type PromiseHandlers = {
 	reject: (reason: unknown) => void;
 };
 
+/**
+ * Options for a promise-handling function
+ */
 export type PromiseOptions = {
 	/**
 	 * AbortSignal for aborting the promise; when aborted, the promise will reject with the reason of the signal
@@ -75,6 +90,9 @@ export type PromiseParameters = {
  */
 export type PromiseStrategy = 'complete' | 'first';
 
+/**
+ * An error thrown when a promise times out
+ */
 export class PromiseTimeoutError extends Error {
 	constructor() {
 		super(PROMISE_MESSAGE_TIMEOUT);
@@ -93,8 +111,17 @@ export type PromisesItems<Items extends unknown[]> = {
 			: Promise<Items[ItemsKey]>;
 };
 
+/**
+ * Options for handling multiple promises
+ */
 export type PromisesOptions = {
+	/**
+	 * AbortSignal for aborting the promises; when aborted, the promises will reject with the reason of the signal
+	 */
 	signal?: AbortSignal;
+	/**
+	 * Strategy for handling the promises; defaults to `complete`
+	 */
 	strategy?: PromiseStrategy;
 };
 
@@ -126,8 +153,17 @@ export type PromisesValues<Items extends unknown[]> = {
 			: never;
 };
 
+/**
+ * A promise that was rejected
+ */
 export type RejectedPromise = {
+	/**
+	 * Status of the promise
+	 */
 	status: typeof PROMISE_TYPE_REJECTED;
+	/**
+	 * Reason for the rejection
+	 */
 	reason: unknown;
 };
 

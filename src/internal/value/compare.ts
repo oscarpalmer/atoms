@@ -45,6 +45,7 @@ export function compare(first: unknown, second: unknown): number {
 	const firstParts = getComparisonParts(first);
 	const secondParts = getComparisonParts(second);
 	const length = max([firstParts.length, secondParts.length]);
+
 	const lastIndex = length - 1;
 
 	for (let index = 0; index < length; index += 1) {
@@ -147,7 +148,7 @@ function getComparisonParts(value: unknown): unknown[] {
  */
 export function registerComparator<Instance>(
 	constructor: Constructor<Instance>,
-	handler?: string | ((first: Instance, second: Instance) => number),
+	handler?: string | Comparator<Instance>,
 ): void {
 	compare.handlers.register(constructor, handler);
 }

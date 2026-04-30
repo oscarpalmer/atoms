@@ -4,9 +4,17 @@ import {getAlpha} from './misc/alpha';
 import {getColorState, setHexColor, setHSLColor, setRGBColor} from './misc/state';
 import type {ColorState, HSLAColor, HSLColor, RGBAColor, RGBColor} from './models';
 
-// #region Classes
+// #region Types
 
+/**
+ * A color that is represented in multiple color formats
+ */
 export class Color {
+	/**
+	 * A property to identify this as a Color instance, used for type checking
+	 *
+	 * @internal
+	 */
 	declare private readonly $color: boolean;
 
 	readonly #state: ColorState;

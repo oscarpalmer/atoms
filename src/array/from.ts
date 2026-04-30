@@ -1,3 +1,5 @@
+// #region Functions
+
 /**
  * Get an array with a specified length, filled with indices
  * @param length Length of the array
@@ -87,3 +89,5 @@ export function times(length: number, value?: unknown): unknown[] {
 
 	return values;
 }
+
+// #endregion

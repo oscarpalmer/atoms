@@ -4,6 +4,9 @@ import type {PlainObject} from './models';
 
 // #region Types
 
+/**
+ * A beacon is a lighthouse, holding an observable value that can be subscribed to and emitted from
+ */
 class Beacon<Value> {
 	readonly #options: Options;
 	readonly #state: BeaconState<Value>;
@@ -122,6 +125,9 @@ type BeaconState<Value> = {
 	value: Value;
 };
 
+/**
+ * An observable holds a value and allows observers to subscribe to changes in that value
+ */
 class Observable<Value> {
 	readonly #state: ObservableState<Value>;
 
@@ -186,6 +192,9 @@ type ObservableState<Value> = {
 	observers: Map<Subscription<Value>, Observer<Value>>;
 };
 
+/**
+ * An observer receives notifications from an observable
+ */
 type Observer<Value> = {
 	/**
 	 * Callback for when the observable is completed
@@ -203,6 +212,9 @@ type Observer<Value> = {
 
 type Options = Required<BeaconOptions<unknown>>;
 
+/**
+ * A subscription represents an active subscription to an observable, holding its state and allowing it to be destroyed or unsubscribed from
+ */
 class Subscription<Value> {
 	readonly #state: SubscriptionState<Value>;
 

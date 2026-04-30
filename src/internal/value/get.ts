@@ -1,4 +1,4 @@
-import type {NestedKeys, NestedValue, PlainObject, ToString} from '../../models';
+import type {NestedKeys, NestedValue, PlainObject} from '../../models';
 import type {Ok} from '../../result/models';
 import {getNestedValue} from './misc';
 
@@ -13,7 +13,7 @@ import {getNestedValue} from './misc';
 export function getValue<Data extends PlainObject, Path extends NestedKeys<Data>>(
 	data: Data,
 	path: Path,
-): NestedValue<Data, ToString<Path>>;
+): NestedValue<Data, Path>;
 
 /**
  * Get the value from an object using an unknown path

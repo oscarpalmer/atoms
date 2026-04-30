@@ -1,3 +1,5 @@
+// #region Functions
+
 /**
  * Reverse the order of items in an array
  * @param array Array to reverse
@@ -26,3 +28,5 @@ export function reverse<Item>(array: Item[]): Item[] {
 
 	return array;
 }
+
+// #endregion Functions

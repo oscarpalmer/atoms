@@ -1,8 +1,8 @@
 import {expect, test} from 'vitest';
-import {attempt, Err, error, isError, isOk, ok, Ok} from '../../src';
+import {attempt, attemptFlow, attemptPipe, Err, error, isError, isOk, ok, Ok} from '../../src';
 
 test('flow: asynchronous', async () => {
-	const nameTransformer = attempt.flow.async(
+	const nameTransformer = attemptFlow.async(
 		async (name: string) => name.trim(),
 		async name => name.split(' '),
 		async parts => parts.map(part => part[0].toUpperCase() + part.slice(1)),
@@ -19,14 +19,14 @@ test('flow: asynchronous', async () => {
 	expect(isError(invalidName)).toBe(true);
 	expect((invalidName as Err<Error>).error).toBeInstanceOf(Error);
 
-	const invalidFlow = await attempt.flow.async(() => {}, 'not a function' as never)();
+	const invalidFlow = await attemptFlow.async(() => {}, 'not a function' as never)();
 
 	expect(isError(invalidFlow)).toBe(true);
 	expect((invalidFlow as Err<Error>).error.message).toBe(
 		'Flow expected to receive an array of functions',
 	);
 
-	const handleResult = attempt.flow.async(
+	const handleResult = attemptFlow.async(
 		(_: unknown) => {},
 		() => 'Test value!',
 	);
@@ -42,7 +42,7 @@ test('flow: asynchronous', async () => {
 });
 
 test('flow: synchronous', () => {
-	const nameTransformer = attempt.flow(
+	const nameTransformer = attemptFlow(
 		(name: string) => name.trim(),
 		name => name.split(' '),
 		parts => parts.map(part => part[0].toUpperCase() + part.slice(1)),
@@ -59,14 +59,14 @@ test('flow: synchronous', () => {
 	expect(isError(invalidName)).toBe(true);
 	expect((invalidName as Err<Error>).error).toBeInstanceOf(Error);
 
-	const invalidFlow = attempt.flow(() => {}, 'not a function' as never)();
+	const invalidFlow = attemptFlow(() => {}, 'not a function' as never)();
 
 	expect(isError(invalidFlow)).toBe(true);
 	expect((invalidFlow as Err<Error>).error.message).toBe(
 		'Flow expected to receive an array of functions',
 	);
 
-	const handleResult = attempt.flow(
+	const handleResult = attemptFlow(
 		(_: unknown) => {},
 		() => 'Test value!',
 	);
@@ -82,38 +82,38 @@ test('flow: synchronous', () => {
 });
 
 test('pipe: asynchronous', async () => {
-	const fn = await attempt.pipe.async(
+	const fn = await attemptPipe.async(
 		() => 123,
 		x => x + 1,
 		x => x * 2,
 	);
 
-	const same = await attempt.pipe.async(
+	const same = await attemptPipe.async(
 		123,
 		x => x + 1,
 		x => x * 2,
 	);
 
-	const diff = await attempt.pipe.async(
+	const diff = await attemptPipe.async(
 		123,
 		x => x + 1,
 		x => String(x),
 		x => `${x} is a number`,
 	);
 
-	const resultOk = await attempt.pipe.async(
+	const resultOk = await attemptPipe.async(
 		attempt(() => 123),
 		x => x + 1,
 		x => x * 2,
 	);
 
-	const resultErr = await attempt.pipe.async(
+	const resultErr = await attemptPipe.async(
 		attempt(() => {
 			throw new Error('Test error');
 		}),
 	);
 
-	const simple = await attempt.pipe.async(123);
+	const simple = await attemptPipe.async(123);
 
 	expect(isOk(fn)).toBe(true);
 	expect((fn as Ok<number>).value).toBe(248);
@@ -135,7 +135,7 @@ test('pipe: asynchronous', async () => {
 
 	//
 
-	const invalid = await attempt.pipe.async(123, (x: number) => x + 1, 'not a function' as never);
+	const invalid = await attemptPipe.async(123, (x: number) => x + 1, 'not a function' as never);
 
 	expect(isError(invalid)).toBe(true);
 
@@ -143,44 +143,44 @@ test('pipe: asynchronous', async () => {
 		'Pipe expected to receive an array of functions',
 	);
 
-	const failed = await attempt.pipe.async(123 as never, (value: string) => value.trim());
+	const failed = await attemptPipe.async(123 as never, (value: string) => value.trim());
 
 	expect(isError(failed)).toBe(true);
 });
 
 test('pipe: synchronous', () => {
-	const fn = attempt.pipe(
+	const fn = attemptPipe(
 		() => 123,
 		x => x + 1,
 		x => x * 2,
 	);
 
-	const same = attempt.pipe(
+	const same = attemptPipe(
 		123,
 		x => x + 1,
 		x => x * 2,
 	);
 
-	const diff = attempt.pipe(
+	const diff = attemptPipe(
 		123,
 		x => x + 1,
 		x => String(x),
 		x => `${x} is a number`,
 	);
 
-	const resultOk = attempt.pipe(
+	const resultOk = attemptPipe(
 		attempt(() => 123),
 		x => x + 1,
 		x => x * 2,
 	);
 
-	const resultErr = attempt.pipe(
+	const resultErr = attemptPipe(
 		attempt(() => {
 			throw new Error('Test error');
 		}),
 	);
 
-	const simple = attempt.pipe(123);
+	const simple = attemptPipe(123);
 
 	expect(isOk(fn)).toBe(true);
 	expect((fn as Ok<number>).value).toBe(248);
@@ -202,7 +202,7 @@ test('pipe: synchronous', () => {
 
 	//
 
-	const invalid = attempt.pipe(123, (x: number) => x + 1, 'not a function' as never);
+	const invalid = attemptPipe(123, (x: number) => x + 1, 'not a function' as never);
 
 	expect(isError(invalid)).toBe(true);
 
@@ -210,18 +210,18 @@ test('pipe: synchronous', () => {
 		'Pipe expected to receive an array of functions',
 	);
 
-	const failed = attempt.pipe(123 as never, (value: string) => value.trim());
+	const failed = attemptPipe(123 as never, (value: string) => value.trim());
 
 	expect(isError(failed)).toBe(true);
 });
 
 test('return types', () => {
-	const basicFlow = attempt.flow(
+	const basicFlow = attemptFlow(
 		() => 'Initial value!',
 		() => attempt(() => 'Returned value!'),
 	)();
 
-	const basicPipe = attempt.pipe(
+	const basicPipe = attemptPipe(
 		() => {},
 		() => attempt(() => 'Test value!'),
 	);
@@ -232,7 +232,7 @@ test('return types', () => {
 	expect((basicFlow as Ok<string>).value).toBe('Returned value!');
 	expect((basicPipe as Ok<string>).value).toBe('Test value!');
 
-	const errorFlow = attempt.flow(
+	const errorFlow = attemptFlow(
 		() => {},
 		() =>
 			attempt(() => {
@@ -240,7 +240,7 @@ test('return types', () => {
 			}),
 	)();
 
-	const errorPipe = attempt.pipe(
+	const errorPipe = attemptPipe(
 		() => {},
 		() =>
 			attempt(() => {
@@ -254,12 +254,12 @@ test('return types', () => {
 	expect((errorFlow as Err<Error>).error.message).toBe('Test error!');
 	expect((errorPipe as Err<Error>).error.message).toBe('Test error!');
 
-	const promiseFailFlow = attempt.flow(
+	const promiseFailFlow = attemptFlow(
 		() => {},
 		() => Promise.resolve(),
 	)();
 
-	const promiseFailPipe = attempt.pipe(
+	const promiseFailPipe = attemptPipe(
 		() => {},
 		() => Promise.resolve(),
 	);
@@ -275,12 +275,12 @@ test('return types', () => {
 		'Synchronous Pipe received a promise. Use `pipe.async` instead.',
 	);
 
-	const nestingFailFlow = attempt.flow(
+	const nestingFailFlow = attemptFlow(
 		() => {},
 		() => () => () => {},
 	)();
 
-	const nestingFailPipe = attempt.pipe(
+	const nestingFailPipe = attemptPipe(
 		() => {},
 		() => () => () => {},
 	);

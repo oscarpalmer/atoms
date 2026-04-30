@@ -3,15 +3,24 @@ import type {GenericCallback, PlainObject} from '../models';
 
 // #region Types
 
+/**
+ * A callback transform an object's properties
+ */
 type TransformCallback<Value extends PlainObject, Key extends keyof Value> = (
 	key: Key,
 	value: Value[Key],
 ) => Value[Key];
 
+/**
+ * A collection of keyed callbacks to transform an object's properties
+ */
 type TransformCallbacks<Value extends PlainObject> = Partial<{
 	[Key in keyof Value]: (value: Value[Key]) => Value[Key];
 }>;
 
+/**
+ * A transformer function for an object, with predefined callbacks for transforming its properties
+ */
 export type Transformer<Value extends PlainObject> = {
 	(value: Value): Value;
 };

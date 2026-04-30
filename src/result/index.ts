@@ -1,9 +1,5 @@
-import {attemptPromise} from '../promise';
-import {matchResult} from './match';
 import {getError, ok} from './misc';
 import type {ExtendedErr, ExtendedResult, Result} from './models';
-import {attemptFlow} from './work/flow';
-import {attemptPipe} from './work/pipe';
 
 // #region Functions
 
@@ -99,9 +95,5 @@ export function attempt<Value, E>(
 }
 
 attempt.async = asyncAttempt;
-attempt.flow = attemptFlow;
-attempt.match = matchResult;
-attempt.pipe = attemptPipe;
-attempt.promise = attemptPromise;
 
 // #endregion

@@ -1,5 +1,5 @@
 import {expect, test} from 'vitest';
-import {assert} from '../../src/function/assert';
+import {assert, AssertProperty} from '../../src/function/assert';
 import {TestFunctionItem, testIsString} from '../.fixtures/function.fixture';
 
 test('assert', () => {
@@ -64,4 +64,42 @@ test('assert.is', () => {
 
 	expect(() => assertStringWithType('test')).not.toThrow();
 	expect(() => assertStringWithType(123)).toThrow(TypeError);
+});
+
+test('assert.property', () => {
+	type Data = {
+		a: {
+			b: {
+				c: number;
+				d: string;
+				e: boolean;
+			};
+		};
+	};
+
+	type HasD = {
+		a: {
+			b: {
+				d: string;
+			};
+		};
+	};
+
+	const hasD: AssertProperty<Data, 'a.b.d', HasD> = assert.property(
+		'a.b.d',
+		value => value === undefined || typeof value === 'string',
+		'bad',
+	);
+
+	expect(() => hasD({a: {b: {c: 1, d: 'hello', e: true}}})).not.toThrow();
+	expect(() => hasD({a: {b: {c: 1, e: true}}})).toThrow('bad');
+	expect(() => hasD({a: {b: {c: 1, d: 123, e: true}}})).toThrow('bad');
+	expect(() => hasD({a: {b: {c: 1, d: undefined, e: 'not boolean'}}})).not.toThrow();
+	expect(() => hasD({a: {b: {c: 1, d: 'hello', e: true, f: 'extra'}}})).not.toThrow();
+	expect(() => hasD({a: {b: {c: 1, d: 'hello', e: true, f: {g: 'extra nested'}}}})).not.toThrow();
+	expect(() =>
+		hasD({a: {b: {c: 1, d: 'hello', e: true, f: {g: 'extra nested', h: 123}}}}),
+	).not.toThrow();
+
+	expect(() => hasD({a: {b: {c: 1, d: 123, e: true}}})).toThrow('bad');
 });

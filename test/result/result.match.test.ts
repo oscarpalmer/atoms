@@ -1,5 +1,5 @@
 import {expect, test} from 'vitest';
-import {attempt, error, ok, Result} from '../../src';
+import {attempt, error, matchResult, ok, Result} from '../../src';
 
 test('match: asynchronous', async () => {
 	const handler = {
@@ -11,14 +11,14 @@ test('match: asynchronous', async () => {
 		},
 	};
 
-	let errorResponse = await attempt.match.async(
+	let errorResponse = await matchResult.async(
 		attempt(() => {
 			throw 'failure 1';
 		}),
 		handler,
 	);
 
-	let okResponse = await attempt.match.async(
+	let okResponse = await matchResult.async(
 		attempt(() => 'success 1'),
 		handler,
 	);
@@ -29,19 +29,19 @@ test('match: asynchronous', async () => {
 	const errorResult = error('failure 2');
 	const okResult = ok('success 2');
 
-	errorResponse = await attempt.match.async(errorResult, handler);
-	okResponse = await attempt.match.async(okResult, handler);
+	errorResponse = await matchResult.async(errorResult, handler);
+	okResponse = await matchResult.async(okResult, handler);
 
 	expect(errorResponse).toBe('failure 2');
 	expect(okResponse).toBe('success 2');
 
-	errorResponse += (await attempt.match.async(errorResult, handler.ok, handler.error)) as string;
-	okResponse += (await attempt.match.async(okResult, handler.ok, handler.error)) as string;
+	errorResponse += (await matchResult.async(errorResult, handler.ok, handler.error)) as string;
+	okResponse += (await matchResult.async(okResult, handler.ok, handler.error)) as string;
 
 	expect(errorResponse).toBe('failure 2failure 2');
 	expect(okResponse).toBe('success 2success 2');
 
-	const promisedResponse = await attempt.match.async(
+	const promisedResponse = await matchResult.async(
 		new Promise<Result<string, string>>(resolve => resolve(ok('success 3'))),
 		value => value,
 		() => 'failure 3',
@@ -49,28 +49,28 @@ test('match: asynchronous', async () => {
 
 	expect(promisedResponse).toBe('success 3');
 
-	await expect(attempt.match.async('blah' as never, handler)).rejects.toThrow(Error);
-	await expect(attempt.match.async(() => 'blah' as never, handler)).rejects.toThrow(Error);
+	await expect(matchResult.async('blah' as never, handler)).rejects.toThrow(Error);
+	await expect(matchResult.async(() => 'blah' as never, handler)).rejects.toThrow(Error);
 
 	await expect(
-		attempt.match.async(errorResult, {
+		matchResult.async(errorResult, {
 			error: 'blah' as never,
 			ok: 'blah' as never,
 		}),
 	).rejects.toThrow(Error);
 
 	await expect(
-		attempt.match.async(okResult, {
+		matchResult.async(okResult, {
 			error: 'blah' as never,
 			ok: 'blah' as never,
 		}),
 	).rejects.toThrow(Error);
 
-	await expect(attempt.match.async(errorResult, 'blah' as never, 'blah' as never)).rejects.toThrow(
+	await expect(matchResult.async(errorResult, 'blah' as never, 'blah' as never)).rejects.toThrow(
 		Error,
 	);
 
-	await expect(attempt.match.async(okResult, 'blah' as never, 'blah' as never)).rejects.toThrow(
+	await expect(matchResult.async(okResult, 'blah' as never, 'blah' as never)).rejects.toThrow(
 		Error,
 	);
 });
@@ -85,14 +85,14 @@ test('match: synchronous', () => {
 		},
 	};
 
-	let errorResponse = attempt.match(
+	let errorResponse = matchResult(
 		attempt(() => {
 			throw 'failure 1';
 		}),
 		handler,
 	);
 
-	let okResponse = attempt.match(
+	let okResponse = matchResult(
 		attempt(() => 'success 1'),
 		handler,
 	);
@@ -103,35 +103,35 @@ test('match: synchronous', () => {
 	const errorResult = error('failure 2');
 	const okResult = ok('success 2');
 
-	errorResponse = attempt.match(errorResult, handler);
-	okResponse = attempt.match(okResult, handler);
+	errorResponse = matchResult(errorResult, handler);
+	okResponse = matchResult(okResult, handler);
 
 	expect(errorResponse).toBe('failure 2');
 	expect(okResponse).toBe('success 2');
 
-	errorResponse += attempt.match(errorResult, handler.ok, handler.error) as string;
-	okResponse += attempt.match(okResult, handler.ok, handler.error) as string;
+	errorResponse += matchResult(errorResult, handler.ok, handler.error) as string;
+	okResponse += matchResult(okResult, handler.ok, handler.error) as string;
 
 	expect(errorResponse).toBe('failure 2failure 2');
 	expect(okResponse).toBe('success 2success 2');
 
-	expect(() => attempt.match('blah' as never, handler)).toThrow(Error);
-	expect(() => attempt.match(() => 'blah' as never, handler)).toThrow(Error);
+	expect(() => matchResult('blah' as never, handler)).toThrow(Error);
+	expect(() => matchResult(() => 'blah' as never, handler)).toThrow(Error);
 
 	expect(() =>
-		attempt.match(errorResult, {
+		matchResult(errorResult, {
 			error: 'blah' as never,
 			ok: 'blah' as never,
 		}),
 	).toThrow(Error);
 
 	expect(() =>
-		attempt.match(okResult, {
+		matchResult(okResult, {
 			error: 'blah' as never,
 			ok: 'blah' as never,
 		}),
 	).toThrow(Error);
 
-	expect(() => attempt.match(errorResult, 'blah' as never, 'blah' as never)).toThrow(Error);
-	expect(() => attempt.match(okResult, 'blah' as never, 'blah' as never)).toThrow(Error);
+	expect(() => matchResult(errorResult, 'blah' as never, 'blah' as never)).toThrow(Error);
+	expect(() => matchResult(okResult, 'blah' as never, 'blah' as never)).toThrow(Error);
 });

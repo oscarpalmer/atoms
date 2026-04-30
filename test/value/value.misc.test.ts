@@ -105,7 +105,7 @@ test('pick', () => {
 	expect(pick({a: 1}, [])).toEqual({});
 });
 
-test('', () => {
+test('shake', () => {
 	expect(
 		shake({
 			a: 123,

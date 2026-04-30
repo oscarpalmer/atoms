@@ -1,4 +1,4 @@
-import {ArrayPosition} from '../../src';
+import {ArrayComparison} from '../../src';
 
 export type TestArrayItem = {
 	age: number;
@@ -22,7 +22,7 @@ export type TestArrayPosition<Item> = {
 		endsWith: boolean;
 		includes: boolean;
 		indexOf: number;
-		position: ArrayPosition;
+		comparison: ArrayComparison;
 		startsWith: boolean;
 	};
 };
@@ -45,6 +45,270 @@ const sets = {
 };
 
 const simple = [1, 2, 3, 4, 5];
+
+const match = {
+	keys,
+	complex: {
+		cases: [
+			{
+				items: complex.slice(0, 1),
+				result: {
+					endsWith: false,
+					includes: true,
+					indexOf: 0,
+					comparison: 'start',
+					startsWith: true,
+				},
+			},
+			{
+				items: complex.slice(1, 2),
+				result: {
+					endsWith: false,
+					includes: true,
+					indexOf: 1,
+					comparison: 'inside',
+					startsWith: false,
+				},
+			},
+			{
+				items: complex.slice(2, 3),
+				result: {
+					endsWith: false,
+					includes: true,
+					indexOf: 2,
+					comparison: 'inside',
+					startsWith: false,
+				},
+			},
+			{
+				items: complex.slice(3, 4),
+				result: {
+					endsWith: false,
+					includes: true,
+					indexOf: 3,
+					comparison: 'inside',
+					startsWith: false,
+				},
+			},
+			{
+				items: complex.slice(4),
+				result: {endsWith: true, includes: true, indexOf: 4, comparison: 'end', startsWith: false},
+			},
+			{
+				items: complex.slice(0, 2),
+				result: {
+					endsWith: false,
+					includes: true,
+					indexOf: 0,
+					comparison: 'start',
+					startsWith: true,
+				},
+			},
+			{
+				items: complex.slice(1, 3),
+				result: {
+					endsWith: false,
+					includes: true,
+					indexOf: 1,
+					comparison: 'inside',
+					startsWith: false,
+				},
+			},
+			{
+				items: complex.slice(2, 4),
+				result: {
+					endsWith: false,
+					includes: true,
+					indexOf: 2,
+					comparison: 'inside',
+					startsWith: false,
+				},
+			},
+			{
+				items: complex.slice(3),
+				result: {endsWith: true, includes: true, indexOf: 3, comparison: 'end', startsWith: false},
+			},
+			{
+				items: complex.slice(0, 3),
+				result: {
+					endsWith: false,
+					includes: true,
+					indexOf: 0,
+					comparison: 'start',
+					startsWith: true,
+				},
+			},
+			{
+				items: complex.slice(1, 4),
+				result: {
+					endsWith: false,
+					includes: true,
+					indexOf: 1,
+					comparison: 'inside',
+					startsWith: false,
+				},
+			},
+			{
+				items: complex.slice(2),
+				result: {endsWith: true, includes: true, indexOf: 2, comparison: 'end', startsWith: false},
+			},
+			{
+				items: complex.slice(0, 4),
+				result: {
+					endsWith: false,
+					includes: true,
+					indexOf: 0,
+					comparison: 'start',
+					startsWith: true,
+				},
+			},
+			{
+				items: complex.slice(1),
+				result: {endsWith: true, includes: true, indexOf: 1, comparison: 'end', startsWith: false},
+			},
+			{
+				items: complex.slice(0),
+				result: {endsWith: true, includes: true, indexOf: 0, comparison: 'same', startsWith: true},
+			},
+		] as TestArrayPosition<TestArrayItem>[],
+		values: complex.map(item => ({...item})),
+	},
+	simple: {
+		cases: [
+			{
+				items: ['a'],
+				result: {
+					endsWith: false,
+					includes: true,
+					indexOf: 0,
+					comparison: 'start',
+					startsWith: true,
+				},
+			},
+			{
+				items: ['b'],
+				result: {
+					endsWith: false,
+					includes: true,
+					indexOf: 1,
+					comparison: 'inside',
+					startsWith: false,
+				},
+			},
+			{
+				items: ['c'],
+				result: {
+					endsWith: false,
+					includes: true,
+					indexOf: 2,
+					comparison: 'inside',
+					startsWith: false,
+				},
+			},
+			{
+				items: ['d'],
+				result: {
+					endsWith: false,
+					includes: true,
+					indexOf: 3,
+					comparison: 'inside',
+					startsWith: false,
+				},
+			},
+			{
+				items: ['e'],
+				result: {endsWith: true, includes: true, indexOf: 4, comparison: 'end', startsWith: false},
+			},
+			{
+				items: ['a', 'b'],
+				result: {
+					endsWith: false,
+					includes: true,
+					indexOf: 0,
+					comparison: 'start',
+					startsWith: true,
+				},
+			},
+			{
+				items: ['b', 'c'],
+				result: {
+					endsWith: false,
+					includes: true,
+					indexOf: 1,
+					comparison: 'inside',
+					startsWith: false,
+				},
+			},
+			{
+				items: ['c', 'd'],
+				result: {
+					endsWith: false,
+					includes: true,
+					indexOf: 2,
+					comparison: 'inside',
+					startsWith: false,
+				},
+			},
+			{
+				items: ['d', 'e'],
+				result: {endsWith: true, includes: true, indexOf: 3, comparison: 'end', startsWith: false},
+			},
+			{
+				items: ['a', 'b', 'c'],
+				result: {
+					endsWith: false,
+					includes: true,
+					indexOf: 0,
+					comparison: 'start',
+					startsWith: true,
+				},
+			},
+			{
+				items: ['b', 'c', 'd'],
+				result: {
+					endsWith: false,
+					includes: true,
+					indexOf: 1,
+					comparison: 'inside',
+					startsWith: false,
+				},
+			},
+			{
+				items: ['c', 'd', 'e'],
+				result: {endsWith: true, includes: true, indexOf: 2, comparison: 'end', startsWith: false},
+			},
+			{
+				items: ['a', 'b', 'c', 'd'],
+				result: {
+					endsWith: false,
+					includes: true,
+					indexOf: 0,
+					comparison: 'start',
+					startsWith: true,
+				},
+			},
+			{
+				items: ['b', 'c', 'd', 'e'],
+				result: {endsWith: true, includes: true, indexOf: 1, comparison: 'end', startsWith: false},
+			},
+			{
+				items: ['a', 'b', 'c', 'd', 'e'],
+				result: {endsWith: true, includes: true, indexOf: 0, comparison: 'same', startsWith: true},
+			},
+			{
+				items: ['x'],
+				result: {
+					endsWith: false,
+					includes: false,
+					indexOf: -1,
+					comparison: 'outside',
+					startsWith: false,
+				},
+			},
+		] as TestArrayPosition<string>[],
+		values: ['a', 'b', 'c', 'd', 'e'],
+	},
+};
 
 const move = {
 	keys,
@@ -744,227 +1008,11 @@ const swap = {
 	},
 };
 
-const position = {
-	keys,
-	complex: {
-		cases: [
-			{
-				items: complex.slice(0, 1),
-				result: {endsWith: false, includes: true, indexOf: 0, position: 'start', startsWith: true},
-			},
-			{
-				items: complex.slice(1, 2),
-				result: {
-					endsWith: false,
-					includes: true,
-					indexOf: 1,
-					position: 'inside',
-					startsWith: false,
-				},
-			},
-			{
-				items: complex.slice(2, 3),
-				result: {
-					endsWith: false,
-					includes: true,
-					indexOf: 2,
-					position: 'inside',
-					startsWith: false,
-				},
-			},
-			{
-				items: complex.slice(3, 4),
-				result: {
-					endsWith: false,
-					includes: true,
-					indexOf: 3,
-					position: 'inside',
-					startsWith: false,
-				},
-			},
-			{
-				items: complex.slice(4),
-				result: {endsWith: true, includes: true, indexOf: 4, position: 'end', startsWith: false},
-			},
-			{
-				items: complex.slice(0, 2),
-				result: {endsWith: false, includes: true, indexOf: 0, position: 'start', startsWith: true},
-			},
-			{
-				items: complex.slice(1, 3),
-				result: {
-					endsWith: false,
-					includes: true,
-					indexOf: 1,
-					position: 'inside',
-					startsWith: false,
-				},
-			},
-			{
-				items: complex.slice(2, 4),
-				result: {
-					endsWith: false,
-					includes: true,
-					indexOf: 2,
-					position: 'inside',
-					startsWith: false,
-				},
-			},
-			{
-				items: complex.slice(3),
-				result: {endsWith: true, includes: true, indexOf: 3, position: 'end', startsWith: false},
-			},
-			{
-				items: complex.slice(0, 3),
-				result: {endsWith: false, includes: true, indexOf: 0, position: 'start', startsWith: true},
-			},
-			{
-				items: complex.slice(1, 4),
-				result: {
-					endsWith: false,
-					includes: true,
-					indexOf: 1,
-					position: 'inside',
-					startsWith: false,
-				},
-			},
-			{
-				items: complex.slice(2),
-				result: {endsWith: true, includes: true, indexOf: 2, position: 'end', startsWith: false},
-			},
-			{
-				items: complex.slice(0, 4),
-				result: {endsWith: false, includes: true, indexOf: 0, position: 'start', startsWith: true},
-			},
-			{
-				items: complex.slice(1),
-				result: {endsWith: true, includes: true, indexOf: 1, position: 'end', startsWith: false},
-			},
-			{
-				items: complex.slice(0),
-				result: {endsWith: true, includes: true, indexOf: 0, position: 'same', startsWith: true},
-			},
-		] as TestArrayPosition<TestArrayItem>[],
-		values: complex.map(item => ({...item})),
-	},
-	simple: {
-		cases: [
-			{
-				items: ['a'],
-				result: {endsWith: false, includes: true, indexOf: 0, position: 'start', startsWith: true},
-			},
-			{
-				items: ['b'],
-				result: {
-					endsWith: false,
-					includes: true,
-					indexOf: 1,
-					position: 'inside',
-					startsWith: false,
-				},
-			},
-			{
-				items: ['c'],
-				result: {
-					endsWith: false,
-					includes: true,
-					indexOf: 2,
-					position: 'inside',
-					startsWith: false,
-				},
-			},
-			{
-				items: ['d'],
-				result: {
-					endsWith: false,
-					includes: true,
-					indexOf: 3,
-					position: 'inside',
-					startsWith: false,
-				},
-			},
-			{
-				items: ['e'],
-				result: {endsWith: true, includes: true, indexOf: 4, position: 'end', startsWith: false},
-			},
-			{
-				items: ['a', 'b'],
-				result: {endsWith: false, includes: true, indexOf: 0, position: 'start', startsWith: true},
-			},
-			{
-				items: ['b', 'c'],
-				result: {
-					endsWith: false,
-					includes: true,
-					indexOf: 1,
-					position: 'inside',
-					startsWith: false,
-				},
-			},
-			{
-				items: ['c', 'd'],
-				result: {
-					endsWith: false,
-					includes: true,
-					indexOf: 2,
-					position: 'inside',
-					startsWith: false,
-				},
-			},
-			{
-				items: ['d', 'e'],
-				result: {endsWith: true, includes: true, indexOf: 3, position: 'end', startsWith: false},
-			},
-			{
-				items: ['a', 'b', 'c'],
-				result: {endsWith: false, includes: true, indexOf: 0, position: 'start', startsWith: true},
-			},
-			{
-				items: ['b', 'c', 'd'],
-				result: {
-					endsWith: false,
-					includes: true,
-					indexOf: 1,
-					position: 'inside',
-					startsWith: false,
-				},
-			},
-			{
-				items: ['c', 'd', 'e'],
-				result: {endsWith: true, includes: true, indexOf: 2, position: 'end', startsWith: false},
-			},
-			{
-				items: ['a', 'b', 'c', 'd'],
-				result: {endsWith: false, includes: true, indexOf: 0, position: 'start', startsWith: true},
-			},
-			{
-				items: ['b', 'c', 'd', 'e'],
-				result: {endsWith: true, includes: true, indexOf: 1, position: 'end', startsWith: false},
-			},
-			{
-				items: ['a', 'b', 'c', 'd', 'e'],
-				result: {endsWith: true, includes: true, indexOf: 0, position: 'same', startsWith: true},
-			},
-			{
-				items: ['x'],
-				result: {
-					endsWith: false,
-					includes: false,
-					indexOf: -1,
-					position: 'outside',
-					startsWith: false,
-				},
-			},
-		] as TestArrayPosition<string>[],
-		values: ['a', 'b', 'c', 'd', 'e'],
-	},
-};
-
 export const arrayFixture = {
 	complex,
+	match,
 	move,
 	nested,
-	position,
 	sets,
 	simple,
 	swap,
