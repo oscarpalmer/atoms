@@ -5,10 +5,20 @@ import type {PlainObject} from '../models';
 
 /**
  * Get a partitioned array of items
+ *
  * @param array Array to search in
  * @param callback Callback to get an item's value for matching
  * @param value Value to match against
  * @returns Partitioned array of items
+ *
+ * @example
+ * ```typescript
+ * partition(
+ *   [{id: 1}, {id: 2}, {id: 3}],
+ *   item => item.id,
+ *   2,
+ * ); // => [[{id: 2}], [{id: 1}, {id: 3}]]
+ * ```
  */
 export function partition<
 	Item,
@@ -17,10 +27,20 @@ export function partition<
 
 /**
  * Get a partitioned array of items
+ *
  * @param array Array to search in
  * @param key Key to get an item's value for matching
  * @param value Value to match against
  * @returns Partitioned array of items
+ *
+ * @example
+ * ```typescript
+ * partition(
+ *   [{id: 1}, {id: 2}, {id: 3}],
+ *   'id',
+ *   2,
+ * ); // => [[{id: 2}], [{id: 1}, {id: 3}]]
+ * ```
  */
 export function partition<Item extends PlainObject, ItemKey extends keyof Item>(
 	array: Item[],
@@ -30,9 +50,18 @@ export function partition<Item extends PlainObject, ItemKey extends keyof Item>(
 
 /**
  * Get a partitioned array of items
+ *
  * @param array Array to search in
  * @param filter Filter callback to match items
  * @returns Partitioned array of items
+ *
+ * @example
+ * ```typescript
+ * partition(
+ *   [{id: 1}, {id: 2}, {id: 3}],
+ *   item => item.id === 2,
+ * ); // => [[{id: 2}], [{id: 1}, {id: 3}]]
+ * ```
  */
 export function partition<Item>(
 	array: Item[],
@@ -41,9 +70,15 @@ export function partition<Item>(
 
 /**
  * Get a partitioned array of items matching the given item
+ *
  * @param array Array to search in
  * @param item Item to match against
  * @returns Partitioned array of items
+ *
+ * @example
+ * ```typescript
+ * partition([1, 2, 3, 4, 5], 3); // => [[3], [1, 2, 4, 5]]
+ * ```
  */
 export function partition<Item>(array: Item[], item: Item): Item[][];
 

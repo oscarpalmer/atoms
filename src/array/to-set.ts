@@ -5,9 +5,18 @@ import type {PlainObject} from '../models';
 
 /**
  * Create a Set from an array of items using a callback
+ *
  * @param array Array to convert
  * @param callback Callback to get an item's value
  * @returns Set of values
+ *
+ * @example
+ * ```typescript
+ * toSet(
+ *   [{id: 1}, {id: 2}, {id: 3}],
+ *   item => item.id,
+ * ); // => Set { 1, 2, 3 }
+ * ```
  */
 export function toSet<Item, Callback extends (item: Item, index: number, array: Item[]) => unknown>(
 	array: Item[],
@@ -16,9 +25,18 @@ export function toSet<Item, Callback extends (item: Item, index: number, array: 
 
 /**
  * Create a Set from an array of items using a key
+ *
  * @param array Array to convert
  * @param key Key to use for value
  * @returns Set of values
+ *
+ * @example
+ * ```typescript
+ * toSet(
+ *   [{id: 1}, {id: 2}, {id: 3}],
+ *   'id',
+ * ); // => Set { 1, 2, 3 }
+ * ```
  */
 export function toSet<Item extends PlainObject, ItemKey extends keyof Item>(
 	array: Item[],
@@ -27,8 +45,14 @@ export function toSet<Item extends PlainObject, ItemKey extends keyof Item>(
 
 /**
  * Create a Set from an array of items
+ *
  * @param array Array to convert
  * @returns Set of items
+ *
+ * @example
+ * ```typescript
+ * toSet([1, 2, 3]); // => Set { 1, 2, 3 }
+ * ```
  */
 export function toSet<Item>(array: Item[]): Set<Item>;
 

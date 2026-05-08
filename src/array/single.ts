@@ -7,10 +7,20 @@ import type {PlainObject} from '../models';
  * Get the _only_ item matching the given value
  *
  * Throws an error if multiple items match the value
+ *
  * @param array Array to search in
  * @param callback Callback to get an item's value for matching
  * @param value Value to match against
  * @returns Only item that matches the value, or `undefined` if no match is found
+ *
+ * @example
+ * ```typescript
+ * single(
+ *   [{id: 1}, {id: 2}, {id: 3}],
+ *   item => item.id,
+ *   2
+ * ); // => {id: 2}
+ * ```
  */
 export function single<
 	Item,
@@ -21,10 +31,20 @@ export function single<
  * Get the _only_ item matching the given value by key
  *
  * Throws an error if multiple items match the value
+ *
  * @param array Array to search in
  * @param key Key to get an item's value for matching
  * @param value Value to match against
  * @returns Only item that matches the value, or `undefined` if no match is found
+ *
+ * @example
+ * ```typescript
+ * single(
+ *   [{id: 1}, {id: 2}, {id: 3}],
+ *   'id',
+ *   2
+ * ); // => {id: 2}
+ * ```
  */
 export function single<Item extends PlainObject, ItemKey extends keyof Item>(
 	array: Item[],
@@ -36,9 +56,18 @@ export function single<Item extends PlainObject, ItemKey extends keyof Item>(
  * Get the _only_ item matching the filter
  *
  * Throws an error if multiple items match the filter
+ *
  * @param array Array to search in
  * @param filter Filter callback to match items
  * @returns Only item that matches the filter, or `undefined` if no match is found
+ *
+ * @example
+ * ```typescript
+ * single(
+ *   [{id: 1}, {id: 2}, {id: 3}],
+ *   item => item.id === 2
+ * ); // => {id: 2}
+ * ```
  */
 export function single<Item>(
 	array: Item[],

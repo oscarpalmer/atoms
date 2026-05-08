@@ -2,9 +2,15 @@
 
 /**
  * Compact an array _(removing all false-y values)_
+ *
  * @param array Array to compact
  * @param strict True to remove all false-y values
  * @returns Compacted array
+ *
+ * @example
+ * ```typescript
+ * compact([0, 1, '', 'hello', false, true, null, undefined]); // => [1, 'hello', true]
+ * ```
  */
 export function compact<Item>(
 	array: Item[],
@@ -13,8 +19,14 @@ export function compact<Item>(
 
 /**
  * Compact an array _(removing all `null` and `undefined` values)_
+ *
  * @param array Array to compact
  * @returns Compacted array
+ *
+ * @example
+ * ```typescript
+ * compact([0, 1, '', 'hello', false, true, null, undefined]); // => [0, 1, '', 'hello', false, true]
+ * ```
  */
 export function compact<Item>(array: Item[]): Exclude<Item, null | undefined>[];
 

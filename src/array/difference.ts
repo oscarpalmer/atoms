@@ -5,10 +5,20 @@ import type {PlainObject} from '../models';
 
 /**
  * Get the items from the first array that are not in the second array
+ *
  * @param first First array
  * @param second Second array
  * @param callback Callback to get an item's value for comparison
  * @returns Unique values from the first array
+ *
+ * @example
+ * ```typescript
+ * difference(
+ *   [{id: 1}, {id: 2}, {id: 3}],
+ *   [{id: 2}, {id: 4}],
+ *   item => item.id,
+ * ); // => [{id: 1}, {id: 3}]
+ * ```
  */
 export function difference<First, Second>(
 	first: First[],
@@ -18,10 +28,20 @@ export function difference<First, Second>(
 
 /**
  * Get the items from the first array that are not in the second array
+ *
  * @param first First array
  * @param second Second array
  * @param key Key to get an item's value for comparison
  * @returns Unique values from the first array
+ *
+ * @example
+ * ```typescript
+ * difference(
+ *   [{id: 1}, {id: 2}, {id: 3}],
+ *   [{id: 2}, {id: 4}],
+ *   'id',
+ * ); // => [{id: 1}, {id: 3}]
+ * ```
  */
 export function difference<
 	First extends PlainObject,
@@ -31,9 +51,18 @@ export function difference<
 
 /**
  * Get the items from the first array that are not in the second array
+ *
  * @param first First array
  * @param second Second array
  * @returns Unique values from the first array
+ *
+ * @example
+ * ```typescript
+ * difference(
+ *   [1, 2, 3],
+ *   [2, 4],
+ * ); // => [1, 3]
+ * ```
  */
 export function difference<First, Second>(first: First[], second: Second[]): First[];
 

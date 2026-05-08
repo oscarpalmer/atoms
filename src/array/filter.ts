@@ -4,13 +4,23 @@ import type {PlainObject} from '../models';
 // #region Functions
 
 /**
- * Get a filtered array of items that do not match the filter
+ * Get a filtered array of items that do not match the value
  *
  * Available as `exclude` and `filter.remove`
+ *
  * @param array Array to search in
  * @param callback Callback to get an item's value for matching
  * @param value Value to match against
  * @returns Filtered array of items that do not match the filter
+ *
+ * @example
+ * ```typescript
+ * exclude(
+ *   [{id: 1}, {id: 2}, {id: 3}],
+ *   item => item.id,
+ *   2,
+ * ); // => [{id: 1}, {id: 3}]
+ * ```
  */
 export function exclude<
 	Item,
@@ -18,13 +28,23 @@ export function exclude<
 >(array: Item[], callback: Callback, value: ReturnType<Callback>): unknown[];
 
 /**
- * Get a filtered array of items that do not match the filter
+ * Get a filtered array of items that do not match the value
  *
  * Available as `exclude` and `filter.remove`
+ *
  * @param array Array to search in
  * @param key Key to get an item's value for matching
  * @param value Value to match against
  * @returns Filtered array of items that do not match the filter
+ *
+ * @example
+ * ```typescript
+ * exclude(
+ *   [{id: 1}, {id: 2}, {id: 3}],
+ *   'id',
+ *   2,
+ * ); // => [{id: 1}, {id: 3}]
+ * ```
  */
 export function exclude<Item extends PlainObject, ItemKey extends keyof Item>(
 	array: Item[],
@@ -36,9 +56,18 @@ export function exclude<Item extends PlainObject, ItemKey extends keyof Item>(
  * Get a filtered array of items that do not match the filter
  *
  * Available as `exclude` and `filter.remove`
+ *
  * @param array Array to search in
  * @param filter Filter callback to match items
  * @returns Filtered array of items that do not match the filter
+ *
+ * @example
+ * ```typescript
+ * exclude(
+ *   [{id: 1}, {id: 2}, {id: 3}],
+ *   item => item.id === 2,
+ * ); // => [{id: 1}, {id: 3}]
+ * ```
  */
 export function exclude<Item>(
 	array: Item[],
@@ -49,9 +78,15 @@ export function exclude<Item>(
  * Get a filtered array of items that do not match the given item
  *
  * Available as `exclude` and `filter.remove`
+ *
  * @param array Array to search in
  * @param item Item to match against
  * @returns Filtered array of items that do not match the given item
+ *
+ * @example
+ * ```typescript
+ * exclude([1, 2, 3], 2); // => [1, 3]
+ * ```
  */
 export function exclude<Item>(array: Item[], item: Item): unknown[];
 
@@ -61,10 +96,20 @@ export function exclude(array: unknown[], ...parameters: unknown[]): unknown[] {
 
 /**
  * Get a filtered array of items
+ *
  * @param array Array to search in
  * @param callback Callback to get an item's value for matching
  * @param value Value to match against
  * @returns Filtered array of items
+ *
+ * @example
+ * ```typescript
+ * filter(
+ *   [{id: 1}, {id: 2}, {id: 3}],
+ *   item => item.id,
+ *   2,
+ * ); // => [{id: 2}]
+ * ```
  */
 export function filter<
 	Item,
@@ -73,10 +118,20 @@ export function filter<
 
 /**
  * Get a filtered array of items
+ *
  * @param array Array to search in
  * @param key Key to get an item's value for matching
  * @param value Value to match against
  * @returns Filtered array of items
+ *
+ * @example
+ * ```typescript
+ * filter(
+ *   [{id: 1}, {id: 2}, {id: 3}],
+ *   'id',
+ *   2,
+ * ); // => [{id: 2}]
+ * ```
  */
 export function filter<Item extends PlainObject, ItemKey extends keyof Item>(
 	array: Item[],
@@ -86,9 +141,18 @@ export function filter<Item extends PlainObject, ItemKey extends keyof Item>(
 
 /**
  * Get a filtered array of items matching the filter
+ *
  * @param array Array to search in
  * @param filter Filter callback to match items
  * @returns Filtered array of items
+ *
+ * @example
+ * ```typescript
+ * filter(
+ *   [{id: 1}, {id: 2}, {id: 3}],
+ *   item => item.id === 2,
+ * ); // => [{id: 2}]
+ * ```
  */
 export function filter<Item>(
 	array: Item[],
@@ -97,9 +161,15 @@ export function filter<Item>(
 
 /**
  * Get a filtered array of items matching the given item
+ *
  * @param array Array to search in
  * @param item Item to match against
  * @returns Filtered array of items
+ *
+ * @example
+ * ```typescript
+ * filter([1, 2, 3], 2); // => [2]
+ * ```
  */
 export function filter<Item>(array: Item[], item: Item): Item[];
 

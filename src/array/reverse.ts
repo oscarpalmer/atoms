@@ -2,6 +2,7 @@
 
 /**
  * Reverse the order of items in an array
+ *
  * @param array Array to reverse
  * @returns Reversed array
  */

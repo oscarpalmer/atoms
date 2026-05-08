@@ -7,10 +7,20 @@ import type {Key, KeyedValue, PlainObject, Simplify} from '../models';
  * Create a record from an array of items using callbacks
  *
  * If multiple items have the same key, the latest item will be used
+ *
  * @param array Array to convert
  * @param key Callback to get an item's grouping key
  * @param value Callback to get an item's value
  * @returns Record of keyed values
+ *
+ * @example
+ * ```typescript
+ * toRecord(
+ *   [{id: 1, value: 10}, {id: 2, value: 20}, {id: 3, value: 10}],
+ *   item => item.value,
+ *   item => item.id,
+ * ); // => { 10: 3, 20: 2 }
+ * ```
  */
 export function toRecord<
 	Item,
@@ -26,10 +36,20 @@ export function toRecord<
  * Create a record from an array of items using a callback and value
  *
  * If multiple items have the same key, the latest item will be used
+ *
  * @param array Array to convert
  * @param callback Callback to get an item's grouping key
  * @param value Key to use for value
  * @returns Record with keys
+ *
+ * @example
+ * ```typescript
+ * toRecord(
+ *   [{id: 1, value: 10}, {id: 2, value: 20}, {id: 3, value: 10}],
+ *   item => item.value,
+ *   'id',
+ * ); // => { 10: 3, 20: 2 }
+ * ```
  */
 export function toRecord<
 	Item extends PlainObject,
@@ -45,10 +65,20 @@ export function toRecord<
  * Create a record from an array of items using a key and callback
  *
  * If multiple items have the same key, the latest item will be used
+ *
  * @param array Array to convert
  * @param key Key to use for grouping
  * @param callback Callback to get an item's value
  * @returns Record with keys
+ *
+ * @example
+ * ```typescript
+ * toRecord(
+ *   [{id: 1, value: 10}, {id: 2, value: 20}, {id: 3, value: 10}],
+ *   'value',
+ *   item => item.id,
+ * ); // => { 10: 3, 20: 2 }
+ * ```
  */
 export function toRecord<
 	Item extends PlainObject,
@@ -64,10 +94,20 @@ export function toRecord<
  * Create a record from an array of items using a key and value
  *
  * If multiple items have the same key, the latest item will be used
+ *
  * @param array Array to convert
  * @param key Key to use for grouping
  * @param value Key to use for value
  * @returns Record of keyed values
+ *
+ * @example
+ * ```typescript
+ * toRecord(
+ *   [{id: 1, value: 10}, {id: 2, value: 20}, {id: 3, value: 10}],
+ *   'value',
+ *   'id',
+ * ); // => { 10: 3, 20: 2 }
+ * ```
  */
 export function toRecord<
 	Item extends PlainObject,
@@ -83,9 +123,18 @@ export function toRecord<
  * Create a record from an array of items using a callback
  *
  * If multiple items have the same key, the latest item will be used
+ *
  * @param array Array to convert
  * @param callback Callback to get an item's grouping key
  * @returns Record of keyed values
+ *
+ * @example
+ * ```typescript
+ * toRecord(
+ *   [{id: 1, value: 10}, {id: 2, value: 20}, {id: 3, value: 10}],
+ *   item => item.value,
+ * ); // => { 10: {id: 3, value: 10}, 20: {id: 2, value: 20} }
+ * ```
  */
 export function toRecord<Item, Callback extends (item: Item, index: number, array: Item[]) => Key>(
 	array: Item[],
@@ -96,9 +145,18 @@ export function toRecord<Item, Callback extends (item: Item, index: number, arra
  * Create a record from an array of items using a key
  *
  * If multiple items have the same key, the latest item will be used
+ *
  * @param array Array to convert
  * @param key Key to use for grouping
  * @returns Record of keyed values
+ *
+ * @example
+ * ```typescript
+ * toRecord(
+ *   [{id: 1, value: 10}, {id: 2, value: 20}, {id: 3, value: 10}],
+ *   'value',
+ * ); // => { 10: {id: 3, value: 10}, 20: {id: 2, value: 20} }
+ * ```
  */
 export function toRecord<Item extends PlainObject, ItemKey extends keyof Item>(
 	array: Item[],
@@ -107,8 +165,16 @@ export function toRecord<Item extends PlainObject, ItemKey extends keyof Item>(
 
 /**
  * Create a record from an array of items _(using indices as keys)_
+ *
  * @param array Array to convert
  * @returns Record of indiced values
+ *
+ * @example
+ * ```typescript
+ * toRecord(
+ *   [{id: 1, value: 10}, {id: 2, value: 20}, {id: 3, value: 10}],
+ * ); // => { 0: {id: 1, value: 10}, 1: {id: 2, value: 20}, 2: {id: 3, value: 10} }
+ * ```
  */
 export function toRecord<Item>(array: Item[]): Record<number, Item>;
 
@@ -122,10 +188,20 @@ toRecord.arrays = toRecordArrays;
  * Create a record from an array of items using callbacks, grouping values into arrays
  *
  * Available as `toRecordArrays` and `toRecord.arrays`
+ *
  * @param array Array to convert
  * @param key Callback to get an item's grouping key
  * @param value Callback to get an item's value
  * @returns Record of keyed arrays of values
+ *
+ * @example
+ * ```typescript
+ * toRecordArrays(
+ *   [{id: 1, value: 10}, {id: 2, value: 20}, {id: 3, value: 10}],
+ *   item => item.value,
+ *   item => item.id,
+ * ); // => { 10: [1, 3], 20: [2] }
+ * ```
  */
 export function toRecordArrays<
 	Item,
@@ -141,10 +217,20 @@ export function toRecordArrays<
  * Create a record from an array of items using a callback and value, grouping values into arrays
  *
  * Available as `toRecordArrays` and `toRecord.arrays`
+ *
  * @param array Array to convert
  * @param callback Callback to get an item's grouping key
  * @param value Key to use for value
  * @returns Record of keyed arrays of values
+ *
+ * @example
+ * ```typescript
+ * toRecordArrays(
+ *   [{id: 1, value: 10}, {id: 2, value: 20}, {id: 3, value: 10}],
+ *   item => item.value,
+ *   'id',
+ * ); // => { 10: [1, 3], 20: [2] }
+ * ```
  */
 export function toRecordArrays<
 	Item extends PlainObject,
@@ -160,10 +246,20 @@ export function toRecordArrays<
  * Create a record from an array of items using a key and callback, grouping values into arrays
  *
  * Available as `toRecordArrays` and `toRecord.arrays`
+ *
  * @param array Array to convert
  * @param key Key to use for grouping
  * @param callback Callback to get an item's value
  * @returns Record of keyed arrays of values
+ *
+ * @example
+ * ```typescript
+ * toRecordArrays(
+ *   [{id: 1, value: 10}, {id: 2, value: 20}, {id: 3, value: 10}],
+ *   'value',
+ *   item => item.id,
+ * ); // => { 10: [1, 3], 20: [2] }
+ * ```
  */
 export function toRecordArrays<
 	Item extends PlainObject,
@@ -179,10 +275,20 @@ export function toRecordArrays<
  * Create a record from an array of items using a key and value, grouping values into arrays
  *
  * Available as `toRecordArrays` and `toRecord.arrays`
+ *
  * @param array Array to convert
  * @param key Key to use for grouping
  * @param value Key to use for value
  * @returns Record of keyed arrays of values
+ *
+ * @example
+ * ```typescript
+ * toRecordArrays(
+ *   [{id: 1, value: 10}, {id: 2, value: 20}, {id: 3, value: 10}],
+ *   'value',
+ *   'id',
+ * ); // => { 10: [1, 3], 20: [2] }
+ * ```
  */
 export function toRecordArrays<
 	Item extends PlainObject,
@@ -198,9 +304,18 @@ export function toRecordArrays<
  * Create a record from an array of items using a callback, grouping items into arrays
  *
  * Available as `toRecordArrays` and `toRecord.arrays`
+ *
  * @param array Array to convert
  * @param callback Callback to get an item's grouping key
  * @returns Record of keyed arrays of items
+ *
+ * @example
+ * ```typescript
+ * toRecordArrays(
+ *   [{id: 1, value: 10}, {id: 2, value: 20}, {id: 3, value: 10}],
+ *   item => item.value,
+ * ); // => { 10: [{id: 1, value: 10}, {id: 3, value: 10}], 20: [{id: 2, value: 20}] }
+ * ```
  */
 export function toRecordArrays<
 	Item,
@@ -211,9 +326,18 @@ export function toRecordArrays<
  * Create a record from an array of items using a key, grouping items into arrays
  *
  * Available as `toRecordArrays` and `toRecord.arrays`
+ *
  * @param array Array to convert
  * @param key Key to use for grouping
  * @returns Record of keyed arrays of items
+ *
+ * @example
+ * ```typescript
+ * toRecordArrays(
+ *   [{id: 1, value: 10}, {id: 2, value: 20}, {id: 3, value: 10}],
+ *   'value',
+ * ); // => { 10: [{id: 1, value: 10}, {id: 3, value: 10}], 20: [{id: 2, value: 20}] }
+ * ```
  */
 export function toRecordArrays<Item extends PlainObject, ItemKey extends keyof Item>(
 	array: Item[],

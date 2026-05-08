@@ -4,10 +4,20 @@ import {COMPARE_SETS_INTERSECTION, compareSets} from '../internal/array/sets';
 
 /**
  * Get the common values between two arrays
+ *
  * @param first First array
  * @param second Second array
  * @param callback Callback to get an item's value for comparison
  * @returns Common values from both arrays
+ *
+ * @example
+ * ```typescript
+ * intersection(
+ *   [{id: 1}, {id: 2}, {id: 3}],
+ *   [{id: 2}, {id: 3}, {id: 4}],
+ *   item => item.id,
+ * ); // => [{id: 2}, {id: 3}]
+ * ```
  */
 export function intersection<First, Second>(
 	first: First[],
@@ -17,10 +27,20 @@ export function intersection<First, Second>(
 
 /**
  * Get the common values between two arrays
+ *
  * @param first First array
  * @param second Second array
  * @param key Key to get an item's value for comparison
  * @returns Common values from both arrays
+ *
+ * @example
+ * ```typescript
+ * intersection(
+ *   [{id: 1}, {id: 2}, {id: 3}],
+ *   [{id: 2}, {id: 3}, {id: 4}],
+ *   'id',
+ * ); // => [{id: 2}, {id: 3}]
+ * ```
  */
 export function intersection<
 	First extends Record<string, unknown>,
@@ -30,9 +50,18 @@ export function intersection<
 
 /**
  * Get the common values between two arrays
+ *
  * @param first First array
  * @param second Second array
  * @returns Common values from both arrays
+ *
+ * @example
+ * ```typescript
+ * intersection(
+ *   [1, 2, 3],
+ *   [2, 3, 4],
+ * ); // => [2, 3]
+ * ```
  */
 export function intersection<First, Second>(first: First[], second: Second[]): First[];
 

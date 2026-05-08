@@ -5,8 +5,15 @@ import type {NumericalKeys, PlainObject} from '../models';
 
 /**
  * Get an array from an object, where only values with numerical keys will be included
+ *
  * @param value Object to convert to an array
  * @returns Array holding the values of the object's numerical keys
+ *
+ * @example
+ * ```typescript
+ * getArray({0: 'a', 1: 'b', 2: 'c', d: 'd'}, true); // => ['a', 'b', 'c']
+ * getArray({a: 'a', b: 'b', c: 'c', d: 'd'}, true); // => []
+ * ```
  */
 export function getArray<Value extends PlainObject>(
 	value: Value,
@@ -15,31 +22,30 @@ export function getArray<Value extends PlainObject>(
 
 /**
  * Get an array from an object
+ *
  * @param value Object to convert to an array
  * @returns Array holding the values of the object
+ *
+ * @example
+ * ```typescript
+ * getArray({0: 'a', 1: 'b', 2: 'c', d: 'd'}); // => ['a', 'b', 'c', 'd']
+ * getArray({a: 'a', b: 'b', c: 'c', d: 'd'}); // => ['a', 'b', 'c', 'd']
+ * ```
  */
 export function getArray<Value extends PlainObject>(value: Value): Value[keyof Value][];
 
 /**
- * Get an array
+ * Get an array from a value
+ *
  * @param value Original array
  * @returns Original array
+ *
+ * @example
+ * ```typescript
+ * getArray(123); // => [123]
+ * ```
  */
 export function getArray<Item>(value: Item[]): Item[];
-
-/**
- * Get an array from a value
- * @param value Value to convert to an array
- * @returns Array holding the value
- */
-export function getArray<Item>(value: Item): Item[];
-
-/**
- * Get an array from an unknown value
- * @param value Value to convert to an array
- * @returns Array of value
- */
-export function getArray(value: unknown): unknown[];
 
 export function getArray(value: unknown, indiced?: unknown): unknown[] {
 	if (Array.isArray(value)) {

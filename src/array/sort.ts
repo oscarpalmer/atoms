@@ -112,6 +112,7 @@ export type SortDirection = 'ascending' | 'descending';
 export type Sorter<Item> = {
 	/**
 	 * Sort an array of items
+	 *
 	 * @param array Array to sort
 	 * @returns Sorted array
 	 */
@@ -121,6 +122,7 @@ export type Sorter<Item> = {
 	 * Get the index for an item _(to be inserted into an array of items)_
 	 *
 	 * _(If the array is not sorted, it will be treated as sorted, and the result may be inaccurate)_
+	 *
 	 * @param array Array to get the index from
 	 * @param item Item to get the index for
 	 * @returns Index for item
@@ -129,6 +131,7 @@ export type Sorter<Item> = {
 
 	/**
 	 * Is the array sorted?
+	 *
 	 * @param array Array to check
 	 * @returns `true` if sorted, otherwise `false`
 	 */
@@ -251,6 +254,7 @@ function getObjectSorter(obj: PlainObject, modifier: number): InternalSorter | u
  * _(If the array is not sorted, it will be treated as sorted, and the result may be inaccurate)_
  *
  * Available as `getSortedIndex` and `sort.getIndex`
+ *
  * @param array Array to get the index from
  * @param item Item to get the index for
  * @param sorters Sorters to use to determine sorting
@@ -270,6 +274,7 @@ export function getSortedIndex<Item>(
  * _(If the array is not sorted, it will be treated as sorted, and the result may be inaccurate)_
  *
  * Available as `getSortedIndex` and `sort.getIndex`
+ *
  * @param array Array to get the index from
  * @param item Item to get the index for
  * @param sorter Sorter to use to determine sorting
@@ -289,6 +294,7 @@ export function getSortedIndex<Item>(
  * _(If the array is not sorted, it will be treated as sorted, and the result may be inaccurate)_
  *
  * Available as `getSortedIndex` and `sort.getIndex`
+ *
  * @param array Array to get the index from
  * @param item Item to get the index for
  * @param descending Sorted in descending order? _(defaults to `false`)_
@@ -366,6 +372,7 @@ function getValueSorter(value: string | Function, modifier: number): InternalSor
  * Initialize a sort handler with sorters _(and an optional default direction)_
  *
  * Available as `initializeSorter` and `sort.initialize`
+ *
  * @param sorters Sorters to use for sorting
  * @param descending Sort in descending order? _(defaults to `false`; overridden by individual sorters)_
  * @returns Sort handler
@@ -379,6 +386,7 @@ export function initializeSorter<Item>(
  * Initialize a sort handler with a sorter _(and an optional default direction)_
  *
  * Available as `initializeSorter` and `sort.initialize`
+ *
  * @param sorter Sorter to use for sorting
  * @param descending Sort in descending order? _(defaults to `false`; overridden by individual sorters)_
  * @returns Sort handler
@@ -392,6 +400,7 @@ export function initializeSorter<Item>(
  * Initialize a sort handler _(with an optional default direction)_
  *
  * Available as `initializeSorter` and `sort.initialize`
+ *
  * @param descending Sort in descending order? _(defaults to `false`)_
  * @returns Sort handler
  */
@@ -410,6 +419,7 @@ export function initializeSorter(first?: unknown, second?: unknown): Sorter<unkn
 
 /**
  * Is the array sorted according to the sorters _(and the optional default direction)_?
+ *
  * @param array Array to check
  * @param sorters Sorters to determine sorting
  * @param descending Sorted in descending order? _(defaults to `false`; overridden by individual sorters)_
@@ -423,6 +433,7 @@ export function isSorted<Item>(
 
 /**
  * Is the array sorted according to the sorter _(and the optional default direction)_?
+ *
  * @param array Array to check
  * @param sorter Sorter to determine sorting
  * @param descending Sorted in descending order? _(defaults to `false`; overridden by individual sorters)_
@@ -438,6 +449,7 @@ export function isSorted<Item>(
  * Is the array sorted?
  *
  * Available as `isSorted` and `sort.is`
+ *
  * @param array Array to check
  * @param descending Sorted in descending order? _(defaults to `false`)_
  * @returns `true` if sorted, otherwise `false`
@@ -500,10 +512,19 @@ function isSortedArray(array: unknown[], sorters: InternalSorter[]): boolean {
 
 /**
  * Sort an array of items using a comparison callback
+ *
  * @param array Array to sort
  * @param comparator Comparator to use for sorting
  * @param descending Sort in descending order? _(defaults to `false`; overridden by individual sorters)_
  * @returns Sorted array
+ *
+ * @example
+ * ```typescript
+ * sort(
+ *   [{id: 3}, {id: 1}, {id: 2}],
+ *   (first, second) => first.id - second.id,
+ * ); // => [{id: 1}, {id: 2}, {id: 3}]
+ * ```
  */
 export function sort<Item>(
 	array: Item[],

@@ -11,23 +11,20 @@ type ExtractType = 'drop' | 'take';
 
 /**
  * Drop items from the start of an array until they match a value
- * @param array Original array
- * @param key Key to get an item's value for matching
- * @param value Value to match against
- * @returns New array with items dropped
- */
-export function drop<Item extends PlainObject, ItemKey extends keyof Item>(
-	array: Item[],
-	key: ItemKey,
-	value: Item[ItemKey],
-): Item[];
-
-/**
- * Drop items from the start of an array until they match a value
+ *
  * @param array Original array
  * @param callback Callback to get an item's value for matching
  * @param value Value to match against
- * @return New array with items dropped
+ * @returns New array with items dropped
+ *
+ * @example
+ * ```typescript
+ * drop(
+ *   [{id: 1}, {id: 2}, {id: 3}],
+ *   item => item.id,
+ *   2,
+ * ); // => [{id: 2}, {id: 3}]
+ * ```
  */
 export function drop<Item, Callback extends (item: Item, index: number, array: Item[]) => unknown>(
 	array: Item[],
@@ -36,10 +33,42 @@ export function drop<Item, Callback extends (item: Item, index: number, array: I
 ): Item[];
 
 /**
+ * Drop items from the start of an array until they match a value
+ *
+ * @param array Original array
+ * @param key Key to get an item's value for matching
+ * @param value Value to match against
+ * @returns New array with items dropped
+ *
+ * @example
+ * ```typescript
+ * drop(
+ *   [{id: 1}, {id: 2}, {id: 3}],
+ *   'id',
+ *   2,
+ * ); // => [{id: 2}, {id: 3}]
+ * ```
+ */
+export function drop<Item extends PlainObject, ItemKey extends keyof Item>(
+	array: Item[],
+	key: ItemKey,
+	value: Item[ItemKey],
+): Item[];
+
+/**
  * Drop items from the start of an array while they match a filter
+ *
  * @param array Original array
  * @param callback Filter callback to match items
- * @return New array with items dropped
+ * @returns New array with items dropped
+ *
+ * @example
+ * ```typescript
+ * drop(
+ *   [{id: 1}, {id: 2}, {id: 3}],
+ *   item => item.id === 2,
+ * ); // => [{id: 2}, {id: 3}]
+ * ```
  */
 export function drop<Item extends PlainObject>(
 	array: Item[],
@@ -48,9 +77,16 @@ export function drop<Item extends PlainObject>(
 
 /**
  * Drop a specified number of items, from the start if `>= 0`, or from the end if `< 0`
+ *
  * @param array Original array
  * @param count Number of items to drop
  * @returns New array with items dropped
+ *
+ * @example
+ * ```typescript
+ * drop([1, 2, 3, 4, 5], 2);  // => [3, 4, 5]
+ * drop([1, 2, 3, 4, 5], -2); // => [1, 2, 3]
+ * ```
  */
 export function drop(array: unknown[], count: number): unknown[];
 
@@ -138,25 +174,43 @@ function extract(
 
 /**
  * Slice an array, returning a new array with a specified range of items
+ *
  * @param array Original array
  * @param start Start index _(inclusive)_
  * @param end End index _(exclusive)_
- * @return New array with sliced items
+ * @returns New array with sliced items
+ *
+ * @example
+ * ```typescript
+ * slice([1, 2, 3, 4, 5], 1, 4); // => [2, 3, 4]
+ * ```
  */
 export function slice<Item>(array: Item[], start: number, end: number): Item[];
 
 /**
- * Slice an array, returning a new array with a specified number of items
+ * Slice an array, returning a new array with a specified number of items _(from the start)_
+ *
  * @param array Original array
- * @param count Maximum sixe of the new array
- * @return New array with sliced items
+ * @param count Maximum size of the new array
+ * @returns New array with sliced items
+ *
+ * @example
+ * ```typescript
+ * slice([1, 2, 3, 4, 5], 3); // => [1, 2, 3]
+ * ```
  */
 export function slice<Item>(array: Item[], count: number): Item[];
 
 /**
  * Slice an array
+ *
  * @param array Array to slice
  * @returns Sliced array
+ *
+ * @example
+ * ```typescript
+ * slice([1, 2, 3]); // => [1, 2, 3]
+ * ```
  */
 export function slice<Item>(array: Item[]): Item[];
 
@@ -187,23 +241,20 @@ export function slice(array: unknown[], first?: number, second?: number): unknow
 
 /**
  * Take items from the start of an array until they match a value
- * @param array Original array
- * @param key Key to get an item's value for matching
- * @param value Value to match against
- * @returns New array with taken items
- */
-export function take<Item extends PlainObject, ItemKey extends keyof Item>(
-	array: Item[],
-	key: ItemKey,
-	value: Item[ItemKey],
-): Item[];
-
-/**
- * Take items from the start of an array until they match a value
+ *
  * @param array Original array
  * @param callback Callback to get an item's value for matching
  * @param value Value to match against
- * @return New array with taken items
+ * @returns New array with taken items
+ *
+ * @example
+ * ```typescript
+ * take(
+ *   [{id: 1}, {id: 2}, {id: 3}],
+ *   item => item.id,
+ *   2,
+ * ); // => [{id: 1}]
+ * ```
  */
 export function take<Item, Callback extends (item: Item, index: number, array: Item[]) => unknown>(
 	array: Item[],
@@ -212,10 +263,42 @@ export function take<Item, Callback extends (item: Item, index: number, array: I
 ): Item[];
 
 /**
+ * Take items from the start of an array until they match a value
+ *
+ * @param array Original array
+ * @param key Key to get an item's value for matching
+ * @param value Value to match against
+ * @returns New array with taken items
+ *
+ * @example
+ * ```typescript
+ * take(
+ *   [{id: 1}, {id: 2}, {id: 3}],
+ *   'id',
+ *   2,
+ * ); // => [{id: 1}]
+ * ```
+ */
+export function take<Item extends PlainObject, ItemKey extends keyof Item>(
+	array: Item[],
+	key: ItemKey,
+	value: Item[ItemKey],
+): Item[];
+
+/**
  * Take items from the start of an array while they match a filter
+ *
  * @param array Original array
  * @param callback Filter callback to match items
- * @return New array with taken items
+ * @returns New array with taken items
+ *
+ * @example
+ * ```typescript
+ * take(
+ *   [{id: 1}, {id: 2}, {id: 3}],
+ *   item => item.id === 2,
+ * ); // => [{id: 1}]
+ * ```
  */
 export function take<Item extends PlainObject>(
 	array: Item[],
@@ -224,9 +307,16 @@ export function take<Item extends PlainObject>(
 
 /**
  * Take a specified number of items, from the start if `>= 0`, or from the end if `< 0`
+ *
  * @param array Original array
  * @param count Number of items to take
  * @returns New array with taken items
+ *
+ * @example
+ * ```typescript
+ * take([1, 2, 3, 4, 5], 2);  // => [1, 2]
+ * take([1, 2, 3, 4, 5], -2); // => [4, 5]
+ * ```
  */
 export function take(array: unknown[], count: number): unknown[];
 

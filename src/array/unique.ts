@@ -5,9 +5,18 @@ import type {PlainObject} from '../models';
 
 /**
  * Get an array of unique items
+ *
  * @param array Original array
  * @param callback Callback to get an item's value
  * @returns Array of unique items
+ *
+ * @example
+ * ```typescript
+ * unique(
+ *   [{id: 1}, {id: 2}, {id: 3}, {id: 2}],
+ *   item => item.id,
+ * ); // => [{id: 1}, {id: 2}, {id: 3}]
+ * ```
  */
 export function unique<Item>(
 	array: Item[],
@@ -16,9 +25,18 @@ export function unique<Item>(
 
 /**
  * Get an array of unique items
+ *
  * @param array Original array
  * @param key Key to use for unique value
  * @returns Array of unique items
+ *
+ * @example
+ * ```typescript
+ * unique(
+ *   [{id: 1}, {id: 2}, {id: 3}, {id: 2}],
+ *   'id',
+ * ); // => [{id: 1}, {id: 2}, {id: 3}]
+ * ```
  */
 export function unique<Item extends PlainObject, ItemKey extends keyof Item>(
 	array: Item[],
@@ -27,8 +45,14 @@ export function unique<Item extends PlainObject, ItemKey extends keyof Item>(
 
 /**
  * Get an array of unique items
+ *
  * @param array Original array
  * @returns Array of unique items
+ *
+ * @example
+ * ```typescript
+ * unique([1, 2, 3, 2]); // => [1, 2, 3]
+ * ```
  */
 export function unique<Item>(array: Item[]): Item[];
 

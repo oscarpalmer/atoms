@@ -1,6 +1,6 @@
 {
 	"name": "@oscarpalmer/atoms",
-	"version": "0.185.0",
+	"version": "0.186.0",
 	"description": "Atomic utilities for making your JavaScript better.",
 	"keywords": [
 		"helper",
@@ -253,13 +253,13 @@
 		"watch": "npx vite build --watch"
 	},
 	"devDependencies": {
-		"@oxlint/plugins": "^1.62",
+		"@oxlint/plugins": "^1.63",
 		"@types/node": "^25.6",
 		"@vitest/coverage-istanbul": "^4.1",
-		"eslint": "^10.2",
+		"eslint": "^10.3",
 		"jsdom": "^29.1",
-		"tsdown": "^0.21",
-		"typescript": "^5.9",
+		"tsdown": "^0.22",
+		"typescript": "^6",
 		"vite": "npm:@voidzero-dev/vite-plus-core@latest",
 		"vite-plus": "latest",
 		"vitest": "npm:@voidzero-dev/vite-plus-test@latest"

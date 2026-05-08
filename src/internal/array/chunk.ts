@@ -2,9 +2,15 @@
 
 /**
  * Chunk an array into smaller arrays
+ *
  * @param array Array to chunk
  * @param size Size of each chunk _(minimum is `1`, maximum is `5000`; defaults to `5000`)_
  * @returns Array of arrays
+ *
+ * @example
+ * ```typescript
+ * chunk([1, 2, 3, 4, 5], 2); // => [[1, 2], [3, 4], [5]]
+ * ```
  */
 export function chunk<Item>(array: Item[], size?: number): Item[][] {
 	if (!Array.isArray(array)) {

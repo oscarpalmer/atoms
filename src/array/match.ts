@@ -16,21 +16,17 @@ export type ArrayComparison = 'end' | 'inside' | 'invalid' | 'outside' | 'same' 
  * Does the needle array end the haystack array?
  * @param haystack Haystack array
  * @param needle Needle array
- * @param key Key to get an item's value for matching
- * @return `true` if the haystack ends with the needle, otherwise `false`
- */
-export function endsWithArray<Item extends PlainObject>(
-	haystack: Item[],
-	needle: Item[],
-	key: keyof Item,
-): boolean;
-
-/**
- * Does the needle array end the haystack array?
- * @param haystack Haystack array
- * @param needle Needle array
  * @param callback Callback to get an item's value for matching
- * @return `true` if the haystack ends with the needle, otherwise `false`
+ * @returns `true` if the haystack ends with the needle, otherwise `false`
+ *
+ * @example
+ * ```typescript
+ * endsWithArray(
+ *   [{id: 1}, {id: 2}, {id: 3}],
+ *   [{id: 2}, {id: 3}],
+ *   item => item.id,
+ * ); // => true
+ * ```
  */
 export function endsWithArray<Item>(
 	haystack: Item[],
@@ -40,9 +36,38 @@ export function endsWithArray<Item>(
 
 /**
  * Does the needle array end the haystack array?
+ *
  * @param haystack Haystack array
  * @param needle Needle array
- * @return `true` if the haystack ends with the needle, otherwise `false`
+ * @param key Key to get an item's value for matching
+ * @returns `true` if the haystack ends with the needle, otherwise `false`
+ *
+ * @example
+ * ```typescript
+ * endsWithArray(
+ *   [{id: 1}, {id: 2}, {id: 3}],
+ *   [{id: 2}, {id: 3}],
+ *   'id',
+ * ); // => true
+ * ```
+ */
+export function endsWithArray<Item extends PlainObject>(
+	haystack: Item[],
+	needle: Item[],
+	key: keyof Item,
+): boolean;
+
+/**
+ * Does the needle array end the haystack array?
+ *
+ * @param haystack Haystack array
+ * @param needle Needle array
+ * @returns `true` if the haystack ends with the needle, otherwise `false`
+ *
+ * @example
+ * ```typescript
+ * endsWithArray([1, 2, 3], [2, 3]); // => true
+ * ```
  */
 export function endsWithArray<Item>(haystack: Item[], needle: Item[]): boolean;
 
@@ -52,23 +77,20 @@ export function endsWithArray(haystack: unknown[], needle: unknown[], key?: unkn
 
 /**
  * Get the position of an array within another array
- * @param haystack Haystack array
- * @param needle Needle array
- * @param key Key to get an item's value for matching
- * @returns Position of the needle within the haystack
- */
-export function getArrayComparison<Item extends PlainObject>(
-	haystack: Item[],
-	needle: Item[],
-	key: keyof Item,
-): ArrayComparison;
-
-/**
- * Get the position of an array within another array
+ *
  * @param haystack Haystack array
  * @param needle Needle array
  * @param callback Callback to get an item's value for matching
  * @returns Position of the needle within the haystack
+ *
+ * @example
+ * ```typescript
+ * getArrayComparison(
+ *   [{id: 1}, {id: 2}, {id: 3}],
+ *   [{id: 2}, {id: 3}],
+ *   item => item.id,
+ * ); // => 'end'
+ * ```
  */
 export function getArrayComparison<Item>(
 	haystack: Item[],
@@ -78,9 +100,38 @@ export function getArrayComparison<Item>(
 
 /**
  * Get the position of an array within another array
+ *
+ * @param haystack Haystack array
+ * @param needle Needle array
+ * @param key Key to get an item's value for matching
+ * @returns Position of the needle within the haystack
+ *
+ * @example
+ * ```typescript
+ * getArrayComparison(
+ *   [{id: 1}, {id: 2}, {id: 3}],
+ *   [{id: 2}, {id: 3}],
+ *   'id',
+ * ); // => 'end'
+ * ```
+ */
+export function getArrayComparison<Item extends PlainObject>(
+	haystack: Item[],
+	needle: Item[],
+	key: keyof Item,
+): ArrayComparison;
+
+/**
+ * Get the position of an array within another array
+ *
  * @param haystack Haystack array
  * @param needle Needle array
  * @returns Position of the needle within the haystack
+ *
+ * @example
+ * ```typescript
+ * getArrayComparison([1, 2, 3], [2, 3]); // => 'end'
+ * ```
  */
 export function getArrayComparison<Item>(haystack: Item[], needle: Item[]): ArrayComparison;
 
@@ -165,23 +216,20 @@ function getPosition(
 
 /**
  * Does the needle array exist within the haystack array?
- * @param haystack Haystack array
- * @param needle Needle array
- * @param key Key to get an item's value for matching
- * @return `true` if the haystack includes the needle, otherwise `false`
- */
-export function includesArray<Item extends PlainObject>(
-	haystack: Item[],
-	needle: Item[],
-	key: keyof Item,
-): boolean;
-
-/**
- * Does the needle array exist within the haystack array?
+ *
  * @param haystack Haystack array
  * @param needle Needle array
  * @param callback Callback to get an item's value for matching
- * @return `true` if the haystack includes the needle, otherwise `false`
+ * @returns `true` if the haystack includes the needle, otherwise `false`
+ *
+ * @example
+ * ```typescript
+ * includesArray(
+ *   [{id: 1}, {id: 2}, {id: 3}],
+ *   [{id: 2}, {id: 3}],
+ *   item => item.id,
+ * ); // => true
+ * ```
  */
 export function includesArray<Item>(
 	haystack: Item[],
@@ -191,9 +239,38 @@ export function includesArray<Item>(
 
 /**
  * Does the needle array exist within the haystack array?
+ *
  * @param haystack Haystack array
  * @param needle Needle array
- * @return `true` if the haystack includes the needle, otherwise `false`
+ * @param key Key to get an item's value for matching
+ * @returns `true` if the haystack includes the needle, otherwise `false`
+ *
+ * @example
+ * ```typescript
+ * includesArray(
+ *   [{id: 1}, {id: 2}, {id: 3}],
+ *   [{id: 2}, {id: 3}],
+ *   'id',
+ * ); // => true
+ * ```
+ */
+export function includesArray<Item extends PlainObject>(
+	haystack: Item[],
+	needle: Item[],
+	key: keyof Item,
+): boolean;
+
+/**
+ * Does the needle array exist within the haystack array?
+ *
+ * @param haystack Haystack array
+ * @param needle Needle array
+ * @returns `true` if the haystack includes the needle, otherwise `false`
+ *
+ * @example
+ * ```typescript
+ * includesArray([1, 2, 3], [2, 3]); // => true
+ * ```
  */
 export function includesArray<Item>(haystack: Item[], needle: Item[]): boolean;
 
@@ -203,23 +280,20 @@ export function includesArray(haystack: unknown[], needle: unknown[], key?: unkn
 
 /**
  * Get the index of an array within another array
- * @param haystack Haystack array
- * @param needle Needle array
- * @param key Key to get an item's value for matching
- * @return Index of the needle's start within the haystack, or `-1` if it is not found
- */
-export function indexOfArray<Item extends PlainObject>(
-	haystack: Item[],
-	needle: Item[],
-	key: keyof Item,
-): number;
-
-/**
- * Get the index of an array within another array
+ *
  * @param haystack Haystack array
  * @param needle Needle array
  * @param callback Callback to get an item's value for matching
- * @return Index of the needle's start within the haystack, or `-1` if it is not found
+ * @returns Index of the needle's start within the haystack, or `-1` if it is not found
+ *
+ * @example
+ * ```typescript
+ * indexOfArray(
+ *   [{id: 1}, {id: 2}, {id: 3}],
+ *   [{id: 2}, {id: 3}],
+ *   item => item.id,
+ * ); // => 1
+ * ```
  */
 export function indexOfArray<Item>(
 	haystack: Item[],
@@ -229,9 +303,38 @@ export function indexOfArray<Item>(
 
 /**
  * Get the index of an array within another array
+ *
  * @param haystack Haystack array
  * @param needle Needle array
- * @return Index of the needle's start within the haystack, or `-1` if it is not found
+ * @param key Key to get an item's value for matching
+ * @returns Index of the needle's start within the haystack, or `-1` if it is not found
+ *
+ * @example
+ * ```typescript
+ * indexOfArray(
+ *   [{id: 1}, {id: 2}, {id: 3}],
+ *   [{id: 2}, {id: 3}],
+ *   'id',
+ * ); // => 1
+ * ```
+ */
+export function indexOfArray<Item extends PlainObject>(
+	haystack: Item[],
+	needle: Item[],
+	key: keyof Item,
+): number;
+
+/**
+ * Get the index of an array within another array
+ *
+ * @param haystack Haystack array
+ * @param needle Needle array
+ * @returns Index of the needle's start within the haystack, or `-1` if it is not found
+ *
+ * @example
+ * ```typescript
+ * indexOfArray([1, 2, 3], [2, 3]); // => 1
+ * ```
  */
 export function indexOfArray<Item>(haystack: Item[], needle: Item[]): number;
 
@@ -241,23 +344,20 @@ export function indexOfArray(haystack: unknown[], needle: unknown[], key?: unkno
 
 /**
  * Does the needle array start the haystack array?
- * @param haystack Haystack array
- * @param needle Needle array
- * @param key Key to get an item's value for matching
- * @return `true` if the haystack starts with the needle, otherwise `false`
- */
-export function startsWithArray<Item extends PlainObject>(
-	haystack: Item[],
-	needle: Item[],
-	key: keyof Item,
-): boolean;
-
-/**
- * Does the needle array start the haystack array?
+ *
  * @param haystack Haystack array
  * @param needle Needle array
  * @param callback Callback to get an item's value for matching
- * @return `true` if the haystack starts with the needle, otherwise `false`
+ * @returns `true` if the haystack starts with the needle, otherwise `false`
+ *
+ * @example
+ * ```typescript
+ * startsWithArray(
+ *   [{id: 1}, {id: 2}, {id: 3}],
+ *   [{id: 1}, {id: 2}],
+ *   item => item.id,
+ * ); // => true
+ * ```
  */
 export function startsWithArray<Item>(
 	haystack: Item[],
@@ -267,9 +367,38 @@ export function startsWithArray<Item>(
 
 /**
  * Does the needle array start the haystack array?
+ *
  * @param haystack Haystack array
  * @param needle Needle array
- * @return `true` if the haystack starts with the needle, otherwise `false`
+ * @param key Key to get an item's value for matching
+ * @returns `true` if the haystack starts with the needle, otherwise `false`
+ *
+ * @example
+ * ```typescript
+ * startsWithArray(
+ *   [{id: 1}, {id: 2}, {id: 3}],
+ *   [{id: 1}, {id: 2}],
+ *   'id',
+ * ); // => true
+ * ```
+ */
+export function startsWithArray<Item extends PlainObject>(
+	haystack: Item[],
+	needle: Item[],
+	key: keyof Item,
+): boolean;
+
+/**
+ * Does the needle array start the haystack array?
+ *
+ * @param haystack Haystack array
+ * @param needle Needle array
+ * @returns `true` if the haystack starts with the needle, otherwise `false`
+ *
+ * @example
+ * ```typescript
+ * startsWithArray([1, 2, 3], [1, 2]); // => true
+ * ```
  */
 export function startsWithArray<Item>(haystack: Item[], needle: Item[]): boolean;
 

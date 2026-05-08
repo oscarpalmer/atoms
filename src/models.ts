@@ -260,4 +260,22 @@ export type TypedArray =
 	| BigInt64Array
 	| BigUint64Array;
 
+/**
+ * Converts a union type to an intersection type
+ *
+ * @example
+ * ```typescript
+ * type A = {a: string};
+ * type B = {b: number};
+ * type C = UnionToIntersection<A | B>; // {a: string} & {b: number}
+ * ```
+ *
+ * Thanks, type-fest!
+ */
+export type UnionToIntersection<Union> = (
+	Union extends unknown ? (distributedUnion: Union) => void : never
+) extends (mergedIntersection: infer Intersection) => void
+	? Intersection & Union
+	: never;
+
 // #endregion

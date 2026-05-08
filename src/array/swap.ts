@@ -10,28 +10,34 @@ import {indexOfArray} from './match';
  * Swap two smaller arrays within a larger array
  *
  * If either of the smaller arrays are not present in the larger array, or if they overlap, the larger array will be returned unchanged
- * @param array Array of items to swap
- * @param first First array
- * @param second Second array
- * @param key Key to get an item's value for matching
- * @returns Original array with items swapped _(or unchanged if unable to swap)_
- */
-export function swap<Item extends PlainObject, ItemKey extends keyof Item>(
-	array: Item[],
-	first: Item[],
-	second: Item[],
-	key: ItemKey,
-): Item[];
-
-/**
- * Swap two smaller arrays within a larger array
  *
- * If either of the smaller arrays are not present in the larger array, or if they overlap, the larger array will be returned unchanged
  * @param array Array of items to swap
  * @param first First array
  * @param second Second array
  * @param callback Callback to get an item's value for matching
  * @returns Original array with items swapped _(or unchanged if unable to swap)_
+ *
+ * @example
+ * ```typescript
+ * swap(
+ *   [
+ *     {id: 1, name: 'Alice'},
+ *     {id: 2, name: 'Bob'},
+ *     {id: 3, name: 'Charlie'},
+ *   ],
+ *   [
+ *     {id: 2, name: 'Bob'},
+ *   ],
+ *   [
+ *     {id: 3, name: 'Charlie'},
+ *   ],
+ *   item => item.id,
+ * ); // => [
+ *    //   {id: 1, name: 'Alice'},
+ *    //   {id: 3, name: 'Charlie'},
+ *    //   {id: 2, name: 'Bob'},
+ *    // ]
+ * ```
  */
 export function swap<Item>(
 	array: Item[],
@@ -44,10 +50,60 @@ export function swap<Item>(
  * Swap two smaller arrays within a larger array
  *
  * If either of the smaller arrays are not present in the larger array, or if they overlap, the larger array will be returned unchanged
+ *
+ * @param array Array of items to swap
+ * @param first First array
+ * @param second Second array
+ * @param key Key to get an item's value for matching
+ * @returns Original array with items swapped _(or unchanged if unable to swap)_
+ *
+ * @example
+ * ```typescript
+ * swap(
+ *   [
+ *     {id: 1, name: 'Alice'},
+ *     {id: 2, name: 'Bob'},
+ *     {id: 3, name: 'Charlie'},
+ *   ],
+ *   [
+ *     {id: 2, name: 'Bob'},
+ *   ],
+ *   [
+ *     {id: 3, name: 'Charlie'},
+ *   ],
+ *   'id',
+ * ); // => [
+ *    //   {id: 1, name: 'Alice'},
+ *    //   {id: 3, name: 'Charlie'},
+ *    //   {id: 2, name: 'Bob'},
+ *    // ]
+ * ```
+ */
+export function swap<Item extends PlainObject, ItemKey extends keyof Item>(
+	array: Item[],
+	first: Item[],
+	second: Item[],
+	key: ItemKey,
+): Item[];
+
+/**
+ * Swap two smaller arrays within a larger array
+ *
+ * If either of the smaller arrays are not present in the larger array, or if they overlap, the larger array will be returned unchanged
+ *
  * @param array Array of items to swap
  * @param first First array
  * @param second Second array
  * @returns Original array with items swapped _(or unchanged if unable to swap)_
+ *
+ * @example
+ * ```typescript
+ * swap(
+ *   [1, 2, 3, 4, 5, 6],
+ *   [1, 2],
+ *   [5, 6],
+ * ); // => [5, 6, 3, 4, 1, 2]
+ * ```
  */
 export function swap<Item>(array: Item[], first: Item[], second: Item[]): Item[];
 
@@ -55,11 +111,66 @@ export function swap<Item>(array: Item[], first: Item[], second: Item[]): Item[]
  * Swap two indiced items in an array
  *
  * If either of the items are not present in the array, the array will be returned unchanged
+ *
+ * @param array Array of items to swap
+ * @param first First item
+ * @param second Second item
+ * @param callback Callback to get an item's value for matching
+ * @returns Original array with items swapped _(or unchanged if unable to swap)_
+ *
+ * @example
+ * ```typescript
+ * swap(
+ *   [
+ *     {id: 1, name: 'Alice'},
+ *     {id: 2, name: 'Bob'},
+ *     {id: 3, name: 'Charlie'},
+ *   ],
+ *   {id: 2, name: 'Bob'},
+ *   {id: 3, name: 'Charlie'},
+ *   item => item.id,
+ * ); // => [
+ *    //   {id: 1, name: 'Alice'},
+ *    //   {id: 3, name: 'Charlie'},
+ *    //   {id: 2, name: 'Bob'},
+ *    // ]
+ * ```
+ */
+export function swap<Item>(
+	array: Item[],
+	first: Item,
+	second: Item,
+	callback: (item: Item, index: number, array: Item[]) => unknown,
+): Item[];
+
+/**
+ * Swap two indiced items in an array
+ *
+ * If either of the items are not present in the array, the array will be returned unchanged
+ *
  * @param array Array of items to swap
  * @param first First item
  * @param second Second item
  * @param key Key to get an item's value for matching
  * @returns Original array with items swapped _(or unchanged if unable to swap)_
+ *
+ * @example
+ * ```typescript
+ * swap(
+ *   [
+ *     {id: 1, name: 'Alice'},
+ *     {id: 2, name: 'Bob'},
+ *     {id: 3, name: 'Charlie'},
+ *   ],
+ *   {id: 2, name: 'Bob'},
+ *   {id: 3, name: 'Charlie'},
+ *   'id',
+ * ); // => [
+ *    //   {id: 1, name: 'Alice'},
+ *    //   {id: 3, name: 'Charlie'},
+ *    //   {id: 2, name: 'Bob'},
+ *    // ]
+ * ```
  */
 export function swap<Item extends PlainObject, ItemKey extends keyof Item>(
 	array: Item[],
@@ -71,26 +182,19 @@ export function swap<Item extends PlainObject, ItemKey extends keyof Item>(
 /**
  * Swap two indiced items in an array
  *
- * If either of the items are not present in the array, the array will be returned unchanged
- * @param array Array of items to swap
- * @param first First item
- * @param second Second item
- * @param callback Callback to get an item's value for matching
- * @returns Original array with items swapped _(or unchanged if unable to swap)_
- */
-export function swap<Item>(
-	array: Item[],
-	first: Item,
-	second: Item,
-	callback: (item: Item, index: number, array: Item[]) => unknown,
-): Item[];
-
-/**
- * Swap two indiced items in an array
  * @param array Array of items to swap
  * @param first First item
  * @param second Second item
  * @returns Original array with items swapped _(or unchanged if unable to swap)_
+ *
+ * @example
+ * ```typescript
+ * swap(
+ *   [1, 2, 3, 4, 5, 6],
+ *   2,
+ *   5,
+ * ); // => [1, 5, 3, 4, 2, 6]
+ * ```
  */
 export function swap<Item>(array: Item[], first: Item, second: Item): Item[];
 
@@ -167,6 +271,7 @@ function swapArrays(array: unknown[], from: unknown[], to: unknown[], key: unkno
  * If either index is out of bounds, the array will be returned unchanged
  *
  * Available as `swapIndices` and `swap.indices`
+ *
  * @param array Array of items to swap
  * @param first First index _(can be negative to count from the end)_
  * @param second Second index _(can be negative to count from the end)_

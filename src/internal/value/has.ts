@@ -8,7 +8,7 @@ import {getNestedValue} from './misc';
  * Check if a nested property is defined in an object
  * @param data Object to check in
  * @param path Path for property
- * @return `true` if the property exists, `false` otherwise
+ * @returns `true` if the property exists, `false` otherwise
  */
 export function hasValue<Data extends PlainObject, Path extends NestedKeys<Data>>(
 	data: Data,
@@ -20,7 +20,7 @@ export function hasValue<Data extends PlainObject, Path extends NestedKeys<Data>
  * @param data Object to check in
  * @param path Path for property
  * @param ignoreCase If `true`, the path matching is case-insensitive
- * @return `true` if the property exists, `false` otherwise
+ * @returns `true` if the property exists, `false` otherwise
  */
 export function hasValue<Data extends PlainObject>(
 	data: Data,
@@ -41,7 +41,7 @@ hasValue.get = hasValueResult;
  * @param data Object to check in
  * @param path Path for property
  * @param ignoreCase If `true`, the path matching is case-insensitive
- * @return Result object
+ * @returns Result object
  */
 export function hasValueResult<Data extends PlainObject, Path extends NestedKeys<Data>>(
 	data: Data,
@@ -56,7 +56,7 @@ export function hasValueResult<Data extends PlainObject, Path extends NestedKeys
  * @param data Object to check in
  * @param path Path for property
  * @param ignoreCase If `true`, the path matching is case-insensitive
- * @return Result object
+ * @returns Result object
  */
 export function hasValueResult<Data extends PlainObject>(
 	data: Data,

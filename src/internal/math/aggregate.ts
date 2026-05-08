@@ -66,6 +66,17 @@ export function getAggregateCallback(key: unknown): Function | undefined {
 
 /**
  * Get the maximum value from a list of items
+ *
+ * @example
+ * ```typescript
+ * max(
+ *   [{id: 1, value: 10}, {id: 2, value: 20}],
+ *   item => item.value,
+ * ); // 20
+ *
+ * max([], item => item.value); // Number.NaN
+ * ```
+ *
  * @param items List of items
  * @param callback Callback to get an item's value
  * @returns Maximum value, or `NaN` if no maximum can be found
@@ -77,6 +88,17 @@ export function max<Item>(
 
 /**
  * Get the maximum value from a list of items
+ *
+ * @example
+ * ```typescript
+ * max(
+ *   [{id: 1, value: 10}, {id: 2, value: 20}],
+ *   'value',
+ * ); // 20
+ *
+ * max([], 'value'); // Number.NaN
+ * ```
+ *
  * @param items List of items
  * @param key Key to use for value
  * @returns Maximum value, or `NaN` if no maximum can be found
@@ -88,6 +110,13 @@ export function max<Item extends PlainObject, ItemKey extends keyof NumericalVal
 
 /**
  * Get the maximum value from a list of numbers
+ *
+ * @example
+ * ```typescript
+ * max([10, 20]); // 20
+ * max([]);       // Number.NaN
+ * ```
+ *
  * @param values List of numbers
  * @returns Maximum value, or `NaN` if no maximum can be found
  */

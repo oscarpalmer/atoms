@@ -7,10 +7,20 @@ import type {Key, KeyedValue, PlainObject, Simplify} from '../models';
  * Create a record from an array of items using a specific key and value
  *
  * If multiple items have the same key, the latest item's value will be used
+ *
  * @param array Array to group
  * @param key Callback to get an item's grouping key
  * @param value Callback to get an item's value
  * @returns Record of keyed values
+ *
+ * @example
+ * ```typescript
+ * groupBy(
+ *   [{id: 1, value: 10}, {id: 2, value: 20}, {id: 3, value: 10}],
+ *   item => item.value,
+ *   item => item,
+ * ); // => {10: {id: 3, value: 10}, 20: {id: 2, value: 20}}
+ * ```
  */
 export function groupBy<
 	Item,
@@ -26,10 +36,20 @@ export function groupBy<
  * Create a record from an array of items using a specific key and value
  *
  * If multiple items have the same key, the latest item's value will be used
+ *
  * @param array Array to group
  * @param key Callback to get an item's grouping key
  * @param value Key to use for value
  * @returns Record of keyed values
+ *
+ * @example
+ * ```typescript
+ * groupBy(
+ *   [{id: 1, value: 10}, {id: 2, value: 20}, {id: 3, value: 10}],
+ *   item => item.value,
+ *   'id'
+ * ); // => {10: 3, 20: 2}
+ * ```
  */
 export function groupBy<
 	Item extends PlainObject,
@@ -45,10 +65,20 @@ export function groupBy<
  * Create a record from an array of items using a specific key and value
  *
  * If multiple items have the same key, the latest item's value will be used
+ *
  * @param array Array to group
  * @param key Key to use for grouping
  * @param value Callback to get an item's value
  * @returns Record of keyed values
+ *
+ * @example
+ * ```typescript
+ * groupBy(
+ *   [{id: 1, value: 10}, {id: 2, value: 20}, {id: 3, value: 10}],
+ *   'value',
+ *   item => item,
+ * ); // => {10: {id: 3, value: 10}, 20: {id: 2, value: 20}}
+ * ```
  */
 export function groupBy<
 	Item extends PlainObject,
@@ -64,10 +94,20 @@ export function groupBy<
  * Create a record from an array of items using a specific key and value
  *
  * If multiple items have the same key, the latest item's value will be used
+ *
  * @param array Array to group
  * @param key Key to use for grouping
  * @param value Key to use for value
  * @returns Record of keyed values
+ *
+ * @example
+ * ```typescript
+ * groupBy(
+ *   [{id: 1, value: 10}, {id: 2, value: 20}, {id: 3, value: 10}],
+ *   'value',
+ *   'id'
+ * ); // => {10: 3, 20: 2}
+ * ```
  */
 export function groupBy<
 	Item extends PlainObject,
@@ -83,9 +123,18 @@ export function groupBy<
  * Create a record from an array of items using a specific key
  *
  * If multiple items have the same key, the latest item will be used
+ *
  * @param array Array to group
  * @param callback Callback to get an item's grouping key
  * @returns Record of keyed items
+ *
+ * @example
+ * ```typescript
+ * groupBy(
+ *   [{id: 1, value: 10}, {id: 2, value: 20}, {id: 3, value: 10}],
+ *   item => item.value,
+ * ); // => {10: {id: 3, value: 10}, 20: {id: 2, value: 20}}
+ * ```
  */
 export function groupBy<Item, Callback extends (item: Item, index: number, array: Item[]) => Key>(
 	array: Item[],
@@ -96,9 +145,18 @@ export function groupBy<Item, Callback extends (item: Item, index: number, array
  * Create a record from an array of items using a specific key
  *
  * If multiple items have the same key, the latest item will be used
+ *
  * @param array Array to group
  * @param key Key to use for grouping
  * @returns Record of keyed items
+ *
+ * @example
+ * ```typescript
+ * groupBy(
+ *   [{id: 1, value: 10}, {id: 2, value: 20}, {id: 3, value: 10}],
+ *   'value',
+ * ); // => {10: {id: 3, value: 10}, 20: {id: 2, value: 20}}
+ * ```
  */
 export function groupBy<Item extends PlainObject, ItemKey extends keyof Item>(
 	array: Item[],
@@ -107,8 +165,16 @@ export function groupBy<Item extends PlainObject, ItemKey extends keyof Item>(
 
 /**
  * Create a record from an array of items _(using indices as keys)_
+ *
  * @param array Array to group
  * @returns Record of indiced items
+ *
+ * @example
+ * ```typescript
+ * groupBy(
+ *   [{id: 1, value: 10}, {id: 2, value: 20}, {id: 3, value: 10}],
+ * ); // => {0: {id: 1, value: 10}, 1: {id: 2, value: 20}, 2: {id: 3, value: 10}}
+ * ```
  */
 export function groupBy<Item>(array: Item[]): Record<number, Item>;
 
@@ -122,10 +188,23 @@ groupBy.arrays = groupArraysBy;
  * Create a record from an array of items using a specific key and value, grouping values into arrays
  *
  * Available as `groupArraysBy` and `groupBy.arrays`
+ *
  * @param array Array to group
  * @param key Callback to get an item's grouping key
  * @param value Callback to get an item's value
  * @returns Record of keyed values
+ *
+ * @example
+ * ```typescript
+ * groupArraysBy(
+ *   [{id: 1, value: 10}, {id: 2, value: 20}, {id: 3, value: 10}],
+ *   item => item.value,
+ *   item => item,
+ * ); // => {
+ *    //   10: [{id: 1, value: 10}, {id: 3, value: 10}],
+ *    //   20: [{id: 2, value: 20}],
+ *    // }
+ * ```
  */
 export function groupArraysBy<
 	Item,
@@ -141,10 +220,23 @@ export function groupArraysBy<
  * Create a record from an array of items using a specific key and value, grouping values into arrays
  *
  * Available as `groupArraysBy` and `groupBy.arrays`
+ *
  * @param array Array to group
  * @param key Callback to get an item's grouping key
  * @param value Key to use for value
  * @returns Record of keyed values
+ *
+ * @example
+ * ```typescript
+ * groupArraysBy(
+ *   [{id: 1, value: 10}, {id: 2, value: 20}, {id: 3, value: 10}],
+ *   item => item.value,
+ *   'id',
+ * ); // => {
+ *    //   10: [1, 3],
+ *    //   20: [2],
+ *    // }
+ * ```
  */
 export function groupArraysBy<
 	Item extends PlainObject,
@@ -160,10 +252,23 @@ export function groupArraysBy<
  * Create a record from an array of items using a specific key and value, grouping values into arrays
  *
  * Available as `groupArraysBy` and `groupBy.arrays`
+ *
  * @param array Array to group
  * @param key Key to use for grouping
  * @param value Callback to get an item's value
  * @returns Record of keyed values
+ *
+ * @example
+ * ```typescript
+ * groupArraysBy(
+ *   [{id: 1, value: 10}, {id: 2, value: 20}, {id: 3, value: 10}],
+ *   'value',
+ *   item => item,
+ * ); // => {
+ *    //   10: [{id: 1, value: 10}, {id: 3, value: 10}],
+ *    //   20: [{id: 2, value: 20}],
+ *    // }
+ * ```
  */
 export function groupArraysBy<
 	Item extends PlainObject,
@@ -179,10 +284,23 @@ export function groupArraysBy<
  * Create a record from an array of items using a specific key and value, grouping values into arrays
  *
  * Available as `groupArraysBy` and `groupBy.arrays`
+ *
  * @param array Array to group
  * @param key Key to use for grouping
  * @param value Key to use for value
  * @returns Record of keyed values
+ *
+ * @example
+ * ```typescript
+ * groupArraysBy(
+ *   [{id: 1, value: 10}, {id: 2, value: 20}, {id: 3, value: 10}],
+ *   'value',
+ *   'id',
+ * ); // => {
+ *    //   10: [1, 3],
+ *    //   20: [2],
+ *    // }
+ * ```
  */
 export function groupArraysBy<
 	Item extends PlainObject,
@@ -198,9 +316,21 @@ export function groupArraysBy<
  * Create a record from an array of items using a specific key, grouping items into arrays
  *
  * Available as `groupArraysBy` and `groupBy.arrays`
+ *
  * @param array Array to group
  * @param callback Callback to get an item's grouping key
  * @returns Record of keyed items
+ *
+ * @example
+ * ```typescript
+ * groupArraysBy(
+ *   [{id: 1, value: 10}, {id: 2, value: 20}, {id: 3, value: 10}],
+ *   item => item.value,
+ * ); // => {
+ *    //   10: [{id: 1, value: 10}, {id: 3, value: 10}],
+ *    //   20: [{id: 2, value: 20}],
+ *    // }
+ * ```
  */
 export function groupArraysBy<
 	Item,
@@ -211,9 +341,21 @@ export function groupArraysBy<
  * Create a record from an array of items using a specific key, grouping items into arrays
  *
  * Available as `groupArraysBy` and `groupBy.arrays`
+ *
  * @param array Array to group
  * @param key Key to use for grouping
  * @returns Record of keyed items
+ *
+ * @example
+ * ```typescript
+ * groupArraysBy(
+ *   [{id: 1, value: 10}, {id: 2, value: 20}, {id: 3, value: 10}],
+ *   'value',
+ * ); // => {
+ *    //   10: [{id: 1, value: 10}, {id: 3, value: 10}],
+ *    //   20: [{id: 2, value: 20}],
+ *    // }
+ * ```
  */
 export function groupArraysBy<Item extends PlainObject, ItemKey extends keyof Item>(
 	array: Item[],

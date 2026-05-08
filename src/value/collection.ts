@@ -13,7 +13,7 @@ export function inMap<Value>(map: Map<unknown, Value>, value: Value): boolean;
  * @param map Map to check in
  * @param value Value to check for
  * @param key To return the key for the value
- * @return The key for the value if it exists, otherwise `undefined`
+ * @returns The key for the value if it exists, otherwise `undefined`
  */
 export function inMap<Key, Value>(map: Map<Key, Value>, value: Value, key: true): Key;
 

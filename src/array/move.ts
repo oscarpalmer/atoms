@@ -10,30 +10,21 @@ import {indexOfArray} from './match';
  * When moving to the front of the array, the moved items will be placed __before__ the target item. When moving to the back of the array, the moved items will be placed __after__ the target item.
  *
  * If either of values are not present in the array, or if they overlap, the array will be returned unchanged
- * @param array Array to move within
- * @param from Item or items to move
- * @param to Item or items to move to
- * @param key Key to get an item's value for matching
- * @returns Original array with items moved _(or unchanged if unable to move)_
- */
-export function move<Item extends PlainObject, ItemKey extends keyof Item>(
-	array: Item[],
-	from: Item | Item[],
-	to: Item | Item[],
-	key: ItemKey,
-): Item[];
-
-/**
- * Move an item _(or array of items)_ to the position of another item _(or array of items)_ within an array
  *
- * When moving to the front of the array, the moved items will be placed __before__ the target item. When moving to the back of the array, the moved items will be placed __after__ the target item.
- *
- * If either of values are not present in the array, or if they overlap, the array will be returned unchanged
  * @param array Array to move within
  * @param from Item or items to move
  * @param to Item or items to move to
  * @param callback Callback to get an item's value for matching
  * @returns Original array with items moved _(or unchanged if unable to move)_
+ *
+ * @example
+ * ```typescript
+ * const array = [{id: 1}, {id: 2}, {id: 3}, {id: 4}];
+ *
+ * move(array, {id: 1}, {id: 3}, item => item.id);            // => [{id: 2}, {id: 3}, {id: 1}, {id: 4}]
+ * move(array, [{id: 2}, {id: 3}], {id: 4}, item => item.id); // => [{id: 1}, {id: 4}, {id: 2}, {id: 3}]
+ * move(array, {id: 5}, {id: 1}, item => item.id);            // => [{id: 1}, {id: 2}, {id: 3}, {id: 4}] (unchanged)
+ * ```
  */
 export function move<Item>(
 	array: Item[],
@@ -48,10 +39,49 @@ export function move<Item>(
  * When moving to the front of the array, the moved items will be placed __before__ the target item. When moving to the back of the array, the moved items will be placed __after__ the target item.
  *
  * If either of values are not present in the array, or if they overlap, the array will be returned unchanged
+ *
+ * @param array Array to move within
+ * @param from Item or items to move
+ * @param to Item or items to move to
+ * @param key Key to get an item's value for matching
+ * @returns Original array with items moved _(or unchanged if unable to move)_
+ *
+ * @example
+ * ```typescript
+ * const array = [{id: 1}, {id: 2}, {id: 3}, {id: 4}];
+ *
+ * move(array, {id: 1}, {id: 3}, 'id');            // => [{id: 2}, {id: 3}, {id: 1}, {id: 4}]
+ * move(array, [{id: 2}, {id: 3}], {id: 4}, 'id'); // => [{id: 1}, {id: 4}, {id: 2}, {id: 3}]
+ * move(array, {id: 5}, {id: 1}, 'id');            // => [{id: 1}, {id: 2}, {id: 3}, {id: 4}] (unchanged)
+ * ```
+ */
+export function move<Item extends PlainObject, ItemKey extends keyof Item>(
+	array: Item[],
+	from: Item | Item[],
+	to: Item | Item[],
+	key: ItemKey,
+): Item[];
+
+/**
+ * Move an item _(or array of items)_ to the position of another item _(or array of items)_ within an array
+ *
+ * When moving to the front of the array, the moved items will be placed __before__ the target item. When moving to the back of the array, the moved items will be placed __after__ the target item.
+ *
+ * If either of values are not present in the array, or if they overlap, the array will be returned unchanged
+ *
  * @param array Array to move within
  * @param from Item or items to move
  * @param to Item or items to move to
  * @returns Original array with items moved _(or unchanged if unable to move)_
+ *
+ * @example
+ * ```typescript
+ * const array = [1, 2, 3, 4];
+ *
+ * move(array, 1, 3);      // => [2, 3, 1, 4]
+ * move(array, [2, 3], 4); // => [1, 4, 2, 3]
+ * move(array, 5, 1);      // => [1, 2, 3, 4] (unchanged)
+ * ```
  */
 export function move<Item>(array: Item[], from: Item | Item[], to: Item | Item[]): Item[];
 
@@ -116,10 +146,20 @@ move.toIndex = moveToIndex;
  * If the from index is out of bounds, the array will be returned unchanged
  *
  * Available as `moveIndices` and `move.indices`
+ *
  * @param array Array to move within
  * @param from Index to move from
  * @param to Index to move to
  * @returns Original array with item moved _(or unchanged if unable to move)_
+ *
+ * @example
+ * ```typescript
+ * const array = [1, 2, 3, 4];
+ *
+ * moveIndices(array, 0, 2);  // => [2, 3, 1, 4]
+ * moveIndices(array, -1, 0); // => [4, 2, 3, 1]
+ * moveIndices(array, 5, 1);  // => [4, 2, 3, 1] (unchanged)
+ * ```
  */
 export function moveIndices<Item>(array: Item[], from: number, to: number): Item[] {
 	if (!Array.isArray(array)) {
@@ -156,25 +196,16 @@ export function moveIndices<Item>(array: Item[], from: number, to: number): Item
  * If the value is not present in the array, or if the index is out of bounds, the array will be returned unchanged
  *
  * Available as `moveToIndex` and `move.toIndex`
- * @param array Array to move within
- * @param value Item or items to move
- * @param index Index to move to
- * @param key Key to get an item's value for matching
- * @returns Original array with items moved _(or unchanged if unable to move)_
- */
-export function moveToIndex<Item extends PlainObject, ItemKey extends keyof Item>(
-	array: Item[],
-	value: Item | Item[],
-	index: number,
-	key: ItemKey,
-): Item[];
-
-/**
- * Move an item _(or array of items)_ to an index within an array
  *
- * If the value is not present in the array, or if the index is out of bounds, the array will be returned unchanged
+ * @example
+ * ```typescript
+ * const array = [{id: 1}, {id: 2}, {id: 3}, {id: 4}];
  *
- * Available as `moveToIndex` and `move.toIndex`
+ * moveToIndex(array, {id: 1}, 2, item => item.id);            // => [{id: 2}, {id: 3}, {id: 1}, {id: 4}]
+ * moveToIndex(array, [{id: 2}, {id: 3}], 3, item => item.id); // => [{id: 1}, {id: 4}, {id: 2}, {id: 3}]
+ * moveToIndex(array, {id: 5}, 1, item => item.id);            // => [{id: 1}, {id: 2}, {id: 3}, {id: 4}] (unchanged)
+ * ```
+ *
  * @param array Array to move within
  * @param value Item or items to move
  * @param index Index to move to
@@ -194,10 +225,49 @@ export function moveToIndex<Item>(
  * If the value is not present in the array, or if the index is out of bounds, the array will be returned unchanged
  *
  * Available as `moveToIndex` and `move.toIndex`
+ *
+ * @param array Array to move within
+ * @param value Item or items to move
+ * @param index Index to move to
+ * @param key Key to get an item's value for matching
+ * @returns Original array with items moved _(or unchanged if unable to move)_
+ *
+ * @example
+ * ```typescript
+ * const array = [{id: 1}, {id: 2}, {id: 3}, {id: 4}];
+ *
+ * moveToIndex(array, {id: 1}, 2, 'id');            // => [{id: 2}, {id: 3}, {id: 1}, {id: 4}]
+ * moveToIndex(array, [{id: 2}, {id: 3}], 3, 'id'); // => [{id: 1}, {id: 4}, {id: 2}, {id: 3}]
+ * moveToIndex(array, {id: 5}, 1, 'id');            // => [{id: 1}, {id: 2}, {id: 3}, {id: 4}] (unchanged)
+ * ```
+ */
+export function moveToIndex<Item extends PlainObject, ItemKey extends keyof Item>(
+	array: Item[],
+	value: Item | Item[],
+	index: number,
+	key: ItemKey,
+): Item[];
+
+/**
+ * Move an item _(or array of items)_ to an index within an array
+ *
+ * If the value is not present in the array, or if the index is out of bounds, the array will be returned unchanged
+ *
+ * Available as `moveToIndex` and `move.toIndex`
+ *
  * @param array Array to move within
  * @param value Item or items to move
  * @param index Index to move to
  * @returns Original array with items moved _(or unchanged if unable to move)_
+ *
+ * @example
+ * ```typescript
+ * const array = [1, 2, 3, 4];
+ *
+ * moveToIndex(array, 1, 2);      // => [2, 3, 1, 4]
+ * moveToIndex(array, [2, 3], 3); // => [1, 4, 2, 3]
+ * moveToIndex(array, 5, 1);      // => [1, 2, 3, 4] (unchanged)
+ * ```
  */
 export function moveToIndex<Item>(array: Item[], value: Item | Item[], index: number): Item[];
 

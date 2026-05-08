@@ -75,7 +75,7 @@ export function initializeTransformer<Value extends PlainObject>(
  *
  * Available as `initializeTransformer` and `transform.initialize`
  * @param transformers Keyed transformer functions
- * @return Transformer
+ * @returns Transformer
  */
 export function initializeTransformer<Value extends PlainObject>(
 	transformers: TransformCallbacks<Value>,

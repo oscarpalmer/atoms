@@ -6,8 +6,19 @@ import {getNestedValue} from './misc';
 
 /**
  * Get the value from an object using a known path
+ *
+ * @example
+ * ```typescript
+ * const data = {foo: {bar: {baz: 42}}};
+ *
+ * getValue(data, 'foo');         // {bar: {baz: 42}}
+ * getValue(data, 'foo.bar');     // {baz: 42}
+ * getValue(data, 'foo.bar.baz'); // 42
+ * getValue(data, 'foo.nope');    // undefined
+ * ```
+ *
  * @param data Object to get value from
- * @param path Path for value, e.g., `foo.bar.baz`
+ * @param path Path for value
  * @returns Found value, or `undefined`
  */
 export function getValue<Data extends PlainObject, Path extends NestedKeys<Data>>(
@@ -17,9 +28,20 @@ export function getValue<Data extends PlainObject, Path extends NestedKeys<Data>
 
 /**
  * Get the value from an object using an unknown path
+ *
+ * @example
+ * ```typescript
+ * const data = {foo: {bar: {baz: 42}}};
+ *
+ * getValue(data, 'foo');               // {bar: {baz: 42}}
+ * getValue(data, 'foo.bar');           // {baz: 42}
+ * getValue(data, 'Foo.Bar.Baz', true); // 42
+ * getValue(data, 'foo.nope');          // undefined
+ * ```
+ *
  * @param data Object to get value from
- * @param path Path for value, e.g., `foo.bar.baz`
- * @param ignoreCase If `true`, the path matching is case-insensitive
+ * @param path Path for value
+ * @param ignoreCase If `true`, path matching is case-insensitive
  * @returns Found value, or `undefined`
  */
 export function getValue<Data extends PlainObject>(

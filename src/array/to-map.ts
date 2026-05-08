@@ -43,10 +43,20 @@ function getMapValues(
  * Create a Map from an array of items using callbacks
  *
  * If multiple items have the same key, the latest item's value will be used
+ *
  * @param array Array to convert
  * @param key Callback to get an item's grouping key
  * @param value Callback to get an item's value
  * @returns Map of keyed values
+ *
+ * @example
+ * ```typescript
+ * toMap(
+ *   [{id: 1, value: 10}, {id: 2, value: 20}, {id: 3, value: 10}],
+ *   item => item.value,
+ *   item => item.id,
+ * ); // => Map { 10 => 3, 20 => 2 }
+ * ```
  */
 export function toMap<
 	Item,
@@ -62,10 +72,20 @@ export function toMap<
  * Create a Map from an array of items using a callback and value
  *
  * If multiple items have the same key, the latest item's value will be used
+ *
  * @param array Array to convert
  * @param key Callback to get an item's grouping key
  * @param value Key to use for value
  * @returns Map of keyed values
+ *
+ * @example
+ * ```typescript
+ * toMap(
+ *   [{id: 1, value: 10}, {id: 2, value: 20}, {id: 3, value: 10}],
+ *   item => item.value,
+ *   'id',
+ * ); // => Map { 10 => 3, 20 => 2 }
+ * ```
  */
 export function toMap<
 	Item extends PlainObject,
@@ -77,10 +97,20 @@ export function toMap<
  * Create a Map from an array of items using a key and callback
  *
  * If multiple items have the same key, the latest item's value will be used
+ *
  * @param array Array to convert
  * @param key Key to use for grouping
  * @param value Callback to get an item's value
  * @returns Map of keyed values
+ *
+ * @example
+ * ```typescript
+ * toMap(
+ *   [{id: 1, value: 10}, {id: 2, value: 20}, {id: 3, value: 10}],
+ *   'value',
+ *   item => item.id,
+ * ); // => Map { 10 => 3, 20 => 2 }
+ * ```
  */
 export function toMap<
 	Item extends PlainObject,
@@ -92,10 +122,20 @@ export function toMap<
  * Create a Map from an array of items using a key and value
  *
  * If multiple items have the same key, the latest item's value will be used
+ *
  * @param array Array to convert
  * @param key Key to use for grouping
  * @param value Key to use for value
  * @returns Map of keyed values
+ *
+ * @example
+ * ```typescript
+ * toMap(
+ *   [{id: 1, value: 10}, {id: 2, value: 20}, {id: 3, value: 10}],
+ *   'value',
+ *   'id',
+ * ); // => Map { 10 => 3, 20 => 2 }
+ * ```
  */
 export function toMap<
 	Item extends PlainObject,
@@ -107,9 +147,18 @@ export function toMap<
  * Create a Map from an array of items using a callback
  *
  * If multiple items have the same key, the latest item will be used
+ *
  * @param array Array to convert
  * @param callback Callback to get an item's grouping key
  * @returns Map of keyed items
+ *
+ * @example
+ * ```typescript
+ * toMap(
+ *   [{id: 1, value: 10}, {id: 2, value: 20}, {id: 3, value: 10}],
+ *   item => item.value,
+ * ); // => Map { 10 => {id: 3, value: 10}, 20 => {id: 2, value: 20} }
+ * ```
  */
 export function toMap<Item, Callback extends (item: Item, index: number, array: Item[]) => Key>(
 	array: Item[],
@@ -120,9 +169,18 @@ export function toMap<Item, Callback extends (item: Item, index: number, array: 
  * Create a Map from an array of items using a key
  *
  * If multiple items have the same key, the latest item will be used
+ *
  * @param array Array to convert
  * @param key Key to use for grouping
  * @returns Map of keyed items
+ *
+ * @example
+ * ```typescript
+ * toMap(
+ *   [{id: 1, value: 10}, {id: 2, value: 20}, {id: 3, value: 10}],
+ *   'value',
+ * ); // => Map { 10 => {id: 3, value: 10}, 20 => {id: 2, value: 20} }
+ * ```
  */
 export function toMap<Item extends PlainObject, ItemKey extends keyof Item>(
 	array: Item[],
@@ -131,8 +189,16 @@ export function toMap<Item extends PlainObject, ItemKey extends keyof Item>(
 
 /**
  * Create a Map from an array of items _(using indices as keys)_
+ *
  * @param array Array to convert
  * @returns Map of indiced items
+ *
+ * @example
+ * ```typescript
+ * toMap(
+ *   [{id: 1, value: 10}, {id: 2, value: 20}, {id: 3, value: 10}],
+ * ); // => Map { 0 => {id: 1, value: 10}, 1 => {id: 2, value: 20}, 2 => {id: 3, value: 10} }
+ * ```
  */
 export function toMap<Item>(array: Item[]): Map<number, Item>;
 
@@ -146,10 +212,20 @@ toMap.arrays = toMapArrays;
  * Create a Map from an array of items using callbacks, grouping values into arrays
  *
  * Available as `toMapArrays` and `toMap.arrays`
+ *
  * @param array Array to convert
  * @param key Callback to get an item's grouping key
  * @param value Callback to get an item's value
  * @returns Map of keyed arrays of values
+ *
+ * @example
+ * ```typescript
+ * toMapArrays(
+ *   [{id: 1, value: 10}, {id: 2, value: 20}, {id: 3, value: 10}],
+ *   item => item.value,
+ *   item => item.id,
+ * ); // => Map { 10 => [1, 3], 20 => [2] }
+ * ```
  */
 export function toMapArrays<
 	Item,
@@ -165,10 +241,20 @@ export function toMapArrays<
  * Create a Map from an array of items using a callback and value, grouping values into arrays
  *
  * Available as `toMapArrays` and `toMap.arrays`
+ *
  * @param array Array to convert
  * @param key Callback to get an item's grouping key
  * @param value Key to use for value
  * @returns Map of keyed arrays of values
+ *
+ * @example
+ * ```typescript
+ * toMapArrays(
+ *   [{id: 1, value: 10}, {id: 2, value: 20}, {id: 3, value: 10}],
+ *   item => item.value,
+ *   'id',
+ * ); // => Map { 10 => [1, 3], 20 => [2] }
+ * ```
  */
 export function toMapArrays<
 	Item extends PlainObject,
@@ -184,10 +270,20 @@ export function toMapArrays<
  * Create a Map from an array of items using a key and callback, grouping values into arrays
  *
  * Available as `toMapArrays` and `toMap.arrays`
+ *
  * @param array Array to convert
  * @param key Key to use for grouping
  * @param value Callback to get an item's value
  * @returns Map of keyed arrays of values
+ *
+ * @example
+ * ```typescript
+ * toMapArrays(
+ *   [{id: 1, value: 10}, {id: 2, value: 20}, {id: 3, value: 10}],
+ *   'value',
+ *   item => item.id,
+ * ); // => Map { 10 => [1, 3], 20 => [2] }
+ * ```
  */
 export function toMapArrays<
 	Item extends PlainObject,
@@ -203,10 +299,20 @@ export function toMapArrays<
  * Create a Map from an array of items using a key and value, grouping values into arrays
  *
  * Available as `toMapArrays` and `toMap.arrays`
+ *
  * @param array Array to convert
  * @param key Key to use for grouping
  * @param value Key to use for value
  * @returns Map of keyed arrays of values
+ *
+ * @example
+ * ```typescript
+ * toMapArrays(
+ *   [{id: 1, value: 10}, {id: 2, value: 20}, {id: 3, value: 10}],
+ *   'value',
+ *   'id',
+ * ); // => Map { 10 => [1, 3], 20 => [2] }
+ * ```
  */
 export function toMapArrays<
 	Item extends PlainObject,
@@ -218,9 +324,18 @@ export function toMapArrays<
  * Create a Map from an array of items using a callback, grouping items into arrays
  *
  * Available as `toMapArrays` and `toMap.arrays`
+ *
  * @param array Array to convert
  * @param callback Callback to get an item's grouping key
  * @returns Map of keyed arrays of items
+ *
+ * @example
+ * ```typescript
+ * toMapArrays(
+ *   [{id: 1, value: 10}, {id: 2, value: 20}, {id: 3, value: 10}],
+ *   item => item.value,
+ * ); // => Map { 10 => [{id: 1, value: 10}, {id: 3, value: 10}], 20 => [{id: 2, value: 20}] }
+ * ```
  */
 export function toMapArrays<
 	Item,
@@ -231,9 +346,18 @@ export function toMapArrays<
  * Create a Map from an array of items using a key, grouping items into arrays
  *
  * Available as `toMapArrays` and `toMap.arrays`
+ *
  * @param array Array to convert
  * @param key Key to use for grouping
  * @returns Map of keyed arrays of items
+ *
+ * @example
+ * ```typescript
+ * toMapArrays(
+ *   [{id: 1, value: 10}, {id: 2, value: 20}, {id: 3, value: 10}],
+ *   'value',
+ * ); // => Map { 10 => [{id: 1, value: 10}, {id: 3, value: 10}], 20 => [{id: 2, value: 20}] }
+ * ```
  */
 export function toMapArrays<Item extends PlainObject, ItemKey extends keyof Item>(
 	array: Item[],

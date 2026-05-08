@@ -5,10 +5,20 @@ import type {PlainObject} from '../../models';
 
 /**
  * Get the index of the first matching item by callback
+ *
  * @param array Array to search in
  * @param callback Callback to get an item's value
  * @param value Value to match against
  * @returns Index of the first matching item, or `-1` if no match is found
+ *
+ * @example
+ * ```typescript
+ * indexOf(
+ *   [{id: 1}, {id: 2}, {id: 3}],
+ *   item => item.id,
+ *   2,
+ * ); // => 1
+ * ```
  */
 export function indexOf<
 	Item,
@@ -17,10 +27,20 @@ export function indexOf<
 
 /**
  * Get the index of the first matching item by key
+ *
  * @param array Array to search in
  * @param key Key to match items by
  * @param value Value to match against
  * @returns Index of the first matching item, or `-1` if no match is found
+ *
+ * @example
+ * ```typescript
+ * indexOf(
+ *   [{id: 1}, {id: 2}, {id: 3}],
+ *   'id',
+ *   2,
+ * ); // => 1
+ * ```
  */
 export function indexOf<Item extends PlainObject, ItemKey extends keyof Item>(
 	array: Item[],
@@ -30,9 +50,18 @@ export function indexOf<Item extends PlainObject, ItemKey extends keyof Item>(
 
 /**
  * Get the index of the first item matching the filter
+ *
  * @param array Array to search in
  * @param filter Filter callback to match items
  * @returns Index of the first matching item, or `-1` if no match is found
+ *
+ * @example
+ * ```typescript
+ * indexOf(
+ *   [{id: 1}, {id: 2}, {id: 3}],
+ *   item => item.id === 2,
+ * ); // => 1
+ * ```
  */
 export function indexOf<Item>(
 	array: Item[],
@@ -41,9 +70,15 @@ export function indexOf<Item>(
 
 /**
  * Get the index of the first item matching the given item
+ *
  * @param array Array to search in
  * @param item Item to match against
  * @returns Index of the first matching item, or `-1` if no match is found
+ *
+ * @example
+ * ```typescript
+ * indexOf([1, 2, 3, 4, 5], 3); // => 2
+ * ```
  */
 export function indexOf<Item>(array: Item[], item: Item): number;
 
@@ -57,10 +92,20 @@ indexOf.last = lastIndexOf;
  * Get the index of the last matching item by callback
  *
  * Available as `lastIndexOf` and `indexOf.last`
+ *
  * @param array Array to search in
  * @param callback Callback to get an item's value
  * @param value Value to match against
  * @returns Index of the last matching item, or `-1` if no match is found
+ *
+ * @example
+ * ```typescript
+ * lastIndexOf(
+ *   [{id: 1}, {id: 2}, {id: 3}, {id: 2}],
+ *   item => item.id,
+ *   2,
+ * ); // => 3
+ * ```
  */
 export function lastIndexOf<
 	Item,
@@ -71,10 +116,20 @@ export function lastIndexOf<
  * Get the index of the last matching item by key
  *
  * Available as `lastIndexOf` and `indexOf.last`
+ *
  * @param array Array to search in
  * @param key Key to match items by
  * @param value Value to match against
  * @returns Index of the last matching item, or `-1` if no match is found
+ *
+ * @example
+ * ```typescript
+ * lastIndexOf(
+ *   [{id: 1}, {id: 2}, {id: 3}, {id: 2}],
+ *   'id',
+ *   2,
+ * ); // => 3
+ * ```
  */
 export function lastIndexOf<Item extends PlainObject, ItemKey extends keyof Item>(
 	array: Item[],
@@ -86,9 +141,18 @@ export function lastIndexOf<Item extends PlainObject, ItemKey extends keyof Item
  * Get the index of the last item matching the filter
  *
  * Available as `lastIndexOf` and `indexOf.last`
+ *
  * @param array Array to search in
  * @param filter Filter callback to match items
  * @returns Index of the last matching item, or `-1` if no match is found
+ *
+ * @example
+ * ```typescript
+ * lastIndexOf(
+ *   [{id: 1}, {id: 2}, {id: 3}, {id: 2}],
+ *   item => item.id === 2,
+ * ); // => 3
+ * ```
  */
 export function lastIndexOf<Item>(
 	array: Item[],
@@ -99,9 +163,15 @@ export function lastIndexOf<Item>(
  * Get the index of the last item matching the given item
  *
  * Available as `lastIndexOf` and `indexOf.last`
+ *
  * @param array Array to search in
  * @param item Item to match against
  * @returns Index of the last matching item, or `-1` if no match is found
+ *
+ * @example
+ * ```typescript
+ * lastIndexOf([1, 2, 3, 2, 1], 2); // => 3
+ * ```
  */
 export function lastIndexOf<Item>(array: Item[], item: Item): number;
 

@@ -1,6 +1,6 @@
 import {isArrayOrPlainObject} from '../internal/is';
 import {setValue} from '../internal/value/set';
-import type {PlainObject, Simplify} from '../models';
+import type {PlainObject, Simplify, UnionToIntersection} from '../models';
 
 // #region Types
 
@@ -15,15 +15,6 @@ type OrderedKey = {
 	order: number;
 	value: string;
 };
-
-/**
- * Thanks, type-fest!
- */
-type UnionToIntersection<Union> = (
-	Union extends unknown ? (distributedUnion: Union) => void : never
-) extends (mergedIntersection: infer Intersection) => void
-	? Intersection & Union
-	: never;
 
 /**
  * An unsmushed object, with all dot notation keys turned into nested keys

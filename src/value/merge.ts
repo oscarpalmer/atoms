@@ -1,6 +1,5 @@
 import {isArrayOrPlainObject} from '../internal/is';
-import {join} from '../internal/string';
-import type {ArrayOrPlainObject, NestedPartial, PlainObject} from '../models';
+import type {ArrayOrPlainObject, NestedPartial, PlainObject, UnionToIntersection} from '../models';
 
 // #region Types
 
@@ -9,16 +8,19 @@ import type {ArrayOrPlainObject, NestedPartial, PlainObject} from '../models';
  */
 export type AssignOptions = Omit<MergeOptions, 'assignValues'>;
 
-/**
- * Assign values from multiple arrays or objects to the first one
- * @param to Value to assign to
- * @param from Values to assign
- * @returns Assigned value
- */
-export type Assigner<Model extends ArrayOrPlainObject = ArrayOrPlainObject> = (
-	to: NestedPartial<Model>,
-	from: NestedPartial<Model>[],
-) => Model;
+export type Assigner = {
+	/**
+	 * Assign values from one or more objects to the first one
+	 *
+	 * @param to Value to assign to
+	 * @param from Values to assign
+	 * @returns Assigned value
+	 */
+	<To extends PlainObject, From extends PlainObject[]>(
+		to: To,
+		from: [...From],
+	): To & UnionToIntersection<From[number]>;
+};
 
 /**
  * Options for merging values
@@ -54,14 +56,17 @@ export type MergeOptions = {
 	skipNullableInArrays?: boolean;
 };
 
-/**
- * Merge multiple arrays or objects into a single one
- * @param values Values to merge
- * @returns Merged value
- */
-export type Merger<Model extends ArrayOrPlainObject = ArrayOrPlainObject> = (
-	values: NestedPartial<Model>[],
-) => Model;
+export type Merger = {
+	/**
+	 * Merge multiple arrays or objects into a single one
+	 *
+	 * @param values Values to merge
+	 * @returns Merged value
+	 */
+	<Values extends ArrayOrPlainObject[]>(
+		values: NestedPartial<Values[number]>[],
+	): UnionToIntersection<Values[number]>;
+};
 
 type Options = {
 	assignValues: boolean;
@@ -77,22 +82,23 @@ type ReplaceableObjectsCallback = (name: string) => boolean;
 // #region Functions
 
 /**
- * Assign values from multiple arrays or objects to the first one
+ * Assign values from one or more objects to the first one
+ *
  * @param to Value to assign to
  * @param from Values to assign
  * @param options Assigning options
  * @returns Assigned value
  */
-export function assign<Model extends ArrayOrPlainObject>(
-	to: NestedPartial<Model>,
-	from: NestedPartial<Model>[],
+export function assign<To extends PlainObject, From extends PlainObject[]>(
+	to: To,
+	from: [...From],
 	options?: AssignOptions,
-): Model {
+): To & UnionToIntersection<From[number]> {
 	const actual = getMergeOptions(options);
 
 	actual.assignValues = true;
 
-	return mergeValues([to, ...from], actual, true) as Model;
+	return mergeValues([to, ...from], actual) as To & UnionToIntersection<From[number]>;
 }
 
 assign.initialize = initializeAssigner;
@@ -129,69 +135,50 @@ function getReplaceableObjects(value: unknown): ReplaceableObjectsCallback | und
 	}
 }
 
-function handleMerge(values: ArrayOrPlainObject[], options: Options): ArrayOrPlainObject {
-	return !Array.isArray(values) || values.length === 0 ? {} : mergeValues(values, options, true);
-}
-
 /**
  * Create an assigner with predefined options
  *
  * Available as `initializeAssigner` and `assign.initialize`
+ *
  * @param options Assigning options
  * @returns Assigner function
  */
-export function initializeAssigner<Model extends ArrayOrPlainObject>(
-	options?: AssignOptions,
-): Assigner<Model> {
+export function initializeAssigner(options?: AssignOptions): Assigner {
 	const actual = getMergeOptions(options);
 
 	actual.assignValues = true;
 
-	return ((to: ArrayOrPlainObject, from: NestedPartial<ArrayOrPlainObject>[]): ArrayOrPlainObject =>
-		mergeValues([to, ...from], actual, true)) as Assigner<Model>;
+	return ((to: PlainObject, from: PlainObject[]): PlainObject =>
+		mergeValues([to, ...from], actual) as PlainObject) as Assigner;
 }
 
 /**
  * Create a merger with predefined options
  *
  * Available as `initializeMerger` and `merge.initialize`
+ *
  * @param options Merging options
  * @returns Merger function
  */
 export function initializeMerger(options?: MergeOptions): Merger {
 	const actual = getMergeOptions(options);
 
-	return <Model extends ArrayOrPlainObject>(values: NestedPartial<Model>[]): Model =>
-		handleMerge(values, actual) as Model;
+	return ((values: NestedPartial<ArrayOrPlainObject>[]): ArrayOrPlainObject =>
+		mergeValues(values, actual)) as Merger;
 }
 
 /**
  * Merge multiple arrays or objects into a single one
+ *
  * @param values Values to merge
  * @param options Merging options
  * @returns Merged value
  */
-export function merge<Model extends ArrayOrPlainObject>(
-	values: NestedPartial<Model>[],
+export function merge<Values extends ArrayOrPlainObject[]>(
+	values: [...Values],
 	options?: MergeOptions,
-): Model;
-
-/**
- * Merge multiple arrays or objects into a single one
- * @param values Values to merge
- * @param options Merging options
- * @returns Merged value
- */
-export function merge(
-	values: NestedPartial<ArrayOrPlainObject>[],
-	options?: MergeOptions,
-): ArrayOrPlainObject;
-
-export function merge(
-	values: NestedPartial<ArrayOrPlainObject>[],
-	options?: MergeOptions,
-): ArrayOrPlainObject {
-	return handleMerge(values, getMergeOptions(options));
+): UnionToIntersection<Values[number]> {
+	return mergeValues(values, getMergeOptions(options)) as UnionToIntersection<Values[number]>;
 }
 
 merge.initialize = initializeMerger;
@@ -199,20 +186,23 @@ merge.initialize = initializeMerger;
 function mergeObjects(
 	values: ArrayOrPlainObject[],
 	options: Options,
+	destination?: ArrayOrPlainObject,
 	prefix?: string,
 ): ArrayOrPlainObject {
 	const {length} = values;
-	const isArray = values.every(Array.isArray);
-	const merged = (options.assignValues ? values[0] : isArray ? [] : {}) as PlainObject;
 
-	for (let outerIndex = 0; outerIndex < length; outerIndex += 1) {
+	const isArray = Array.isArray(destination ?? values[0]);
+	const merged = (destination ?? (isArray ? [] : {})) as PlainObject;
+
+	const offset = destination == null ? 0 : 1;
+
+	for (let outerIndex = offset; outerIndex < length; outerIndex += 1) {
 		const item = values[outerIndex] as PlainObject;
 		const keys = Object.keys(item);
 		const size = keys.length;
 
 		for (let innerIndex = 0; innerIndex < size; innerIndex += 1) {
 			const key = keys[innerIndex];
-			const full = join([prefix, key], '.');
 
 			const next = item[key];
 			const previous = merged[key];
@@ -221,12 +211,20 @@ function mergeObjects(
 				continue;
 			}
 
+			const full =
+				options.replaceableObjects == null ? undefined : prefix == null ? key : `${prefix}.${key}`;
+
 			if (
 				isArrayOrPlainObject(next) &&
 				isArrayOrPlainObject(previous) &&
-				!(options.replaceableObjects?.(full) ?? false)
+				!(options.replaceableObjects?.(full!) ?? false)
 			) {
-				merged[key] = mergeValues([previous, next], options, false, full);
+				merged[key] = mergeObjects(
+					[previous, next],
+					options,
+					(destination == null ? undefined : merged[key]) as ArrayOrPlainObject,
+					full,
+				);
 			} else {
 				merged[key] = next;
 			}
@@ -239,12 +237,36 @@ function mergeObjects(
 function mergeValues(
 	values: ArrayOrPlainObject[],
 	options: Options,
-	validate: boolean,
 	prefix?: string,
 ): ArrayOrPlainObject {
-	const actual = validate ? values.filter(isArrayOrPlainObject) : values;
+	if (!Array.isArray(values)) {
+		return {};
+	}
 
-	return actual.length > 1 ? mergeObjects(actual, options, prefix) : (actual[0] ?? {});
+	const actual = values.filter(isArrayOrPlainObject);
+
+	if (actual.length === 0) {
+		return {};
+	}
+
+	if (
+		options.assignValues &&
+		actual.length === 2 &&
+		!Array.isArray(actual[0]) &&
+		Object.keys(actual[0]).length === 0
+	) {
+		return Object.assign(actual[0], actual[1]);
+	}
+
+	if (actual.length > 1) {
+		return mergeObjects(actual, options, options.assignValues ? actual[0] : undefined, prefix);
+	}
+
+	return options.assignValues
+		? actual[0]
+		: Array.isArray(actual[0])
+			? actual[0].slice()
+			: {...actual[0]};
 }
 
 // #endregion

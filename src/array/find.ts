@@ -5,10 +5,20 @@ import type {PlainObject} from '../models';
 
 /**
  * Get the first item matching the given value
+ *
  * @param array Array to search in
  * @param callback Callback to get an item's value for matching
  * @param value Value to match against
  * @returns First item that matches the value, or `undefined` if no match is found
+ *
+ * @example
+ * ```typescript
+ * find(
+ *   [{id: 1, value: 10}, {id: 2, value: 20}, {id: 3, value: 10}],
+ *   item => item.value,
+ *   10,
+ * ); // => {id: 1, value: 10}
+ * ```
  */
 export function find<Item, Callback extends (item: Item, index: number, array: Item[]) => unknown>(
 	array: Item[],
@@ -18,10 +28,20 @@ export function find<Item, Callback extends (item: Item, index: number, array: I
 
 /**
  * Get the first item matching the given value by key
+ *
  * @param array Array to search in
  * @param key Key to get an item's value for matching
  * @param value Value to match against
  * @returns First item that matches the value, or `undefined` if no match is found
+ *
+ * @example
+ * ```typescript
+ * find(
+ *   [{id: 1, value: 10}, {id: 2, value: 20}, {id: 3, value: 10}],
+ *   'value',
+ *   10,
+ * ); // => {id: 1, value: 10}
+ * ```
  */
 export function find<Item extends PlainObject, ItemKey extends keyof Item>(
 	array: Item[],
@@ -31,9 +51,18 @@ export function find<Item extends PlainObject, ItemKey extends keyof Item>(
 
 /**
  * Get the first item matching the filter
+ *
  * @param array Array to search in
  * @param filter Filter callback to match items
  * @returns First item that matches the filter, or `undefined` if no match is found
+ *
+ * @example
+ * ```typescript
+ * find(
+ *   [{id: 1, value: 10}, {id: 2, value: 20}, {id: 3, value: 10}],
+ *   item => item.value === 10,
+ * ); // => {id: 1, value: 10}
+ * ```
  */
 export function find<Item>(
 	array: Item[],
@@ -42,9 +71,15 @@ export function find<Item>(
 
 /**
  * Get the first item matching the given value
+ *
  * @param array Array to search in
  * @param value Value to match against
  * @returns First item that matches the value, or `undefined` if no match is found
+ *
+ * @example
+ * ```typescript
+ * find([1, 2, 3, 2, 1], 1); // => 1
+ * ```
  */
 export function find<Item>(array: Item[], value: Item): Item | undefined;
 
@@ -58,10 +93,20 @@ find.last = findLast;
  * Get the last item matching the given value
  *
  * Available as `findLast` and `find.last`
+ *
  * @param array Array to search in
  * @param callback Callback to get an item's value for matching
  * @param value Value to match against
  * @returns Last item that matches the value, or `undefined` if no match is found
+ *
+ * @example
+ * ```typescript
+ * findLast(
+ *   [{id: 1, value: 10}, {id: 2, value: 20}, {id: 3, value: 10}],
+ *   item => item.value,
+ *   10,
+ * ); // => {id: 3, value: 10}
+ * ```
  */
 export function findLast<
 	Item,
@@ -72,10 +117,20 @@ export function findLast<
  * Get the last item matching the given value by key
  *
  * Available as `findLast` and `find.last`
+ *
  * @param array Array to search in
  * @param key Key to get an item's value for matching
  * @param value Value to match against
  * @returns Last item that matches the value, or `undefined` if no match is found
+ *
+ * @example
+ * ```typescript
+ * findLast(
+ *   [{id: 1, value: 10}, {id: 2, value: 20}, {id: 3, value: 10}],
+ *   'value',
+ *   10,
+ * ); // => {id: 3, value: 10}
+ * ```
  */
 export function findLast<Item extends PlainObject, ItemKey extends keyof Item>(
 	array: Item[],
@@ -87,9 +142,18 @@ export function findLast<Item extends PlainObject, ItemKey extends keyof Item>(
  * Get the last item matching the filter
  *
  * Available as `findLast` and `find.last`
+ *
  * @param array Array to search in
  * @param filter Filter callback to match items
  * @returns Last item that matches the filter, or `undefined` if no match is found
+ *
+ * @example
+ * ```typescript
+ * findLast(
+ *   [{id: 1, value: 10}, {id: 2, value: 20}, {id: 3, value: 10}],
+ *   item => item.value === 10,
+ * ); // => {id: 3, value: 10}
+ * ```
  */
 export function findLast<Item>(
 	array: Item[],
@@ -100,9 +164,15 @@ export function findLast<Item>(
  * Get the last item matching the given value
  *
  * Available as `findLast` and `find.last`
+ *
  * @param array Array to search in
  * @param value Value to match against
  * @returns Last item that matches the value, or `undefined` if no match is found
+ *
+ * @example
+ * ```typescript
+ * findLast([1, 2, 3, 2, 1], 1); // => 1
+ * ```
  */
 export function findLast<Item>(array: Item[], value: Item): Item | undefined;
 

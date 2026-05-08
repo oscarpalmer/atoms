@@ -4,10 +4,20 @@ import {COMPARE_SETS_UNION, compareSets} from '../internal/array/sets';
 
 /**
  * Get the combined, unique values from two arrays
+ *
  * @param first First array
  * @param second Second array
  * @param callback Callback to get an item's value for comparison
  * @returns Combined, unique values from both arrays
+ *
+ * @example
+ * ```typescript
+ * union(
+ *   [{id: 1}, {id: 2}, {id: 3}],
+ *   [{id: 2}, {id: 4}],
+ *   item => item.id,
+ * ); // => [{id: 1}, {id: 2}, {id: 3}, {id: 4}]
+ * ```
  */
 export function union<First, Second>(
 	first: First[],
@@ -17,10 +27,20 @@ export function union<First, Second>(
 
 /**
  * Get the combined, unique values from two arrays
+ *
  * @param first First array
  * @param second Second array
  * @param key Key to get an item's value for comparison
  * @returns Combined, unique values from both arrays
+ *
+ * @example
+ * ```typescript
+ * union(
+ *   [{id: 1}, {id: 2}, {id: 3}],
+ *   [{id: 2}, {id: 4}],
+ *   'id',
+ * ); // => [{id: 1}, {id: 2}, {id: 3}, {id: 4}]
+ * ```
  */
 export function union<
 	First extends Record<string, unknown>,
@@ -30,9 +50,18 @@ export function union<
 
 /**
  * Get the combined, unique values from two arrays
+ *
  * @param first First array
  * @param second Second array
  * @returns Combined, unique values from both arrays
+ *
+ * @example
+ * ```typescript
+ * union(
+ *   [1, 2, 3],
+ *   [2, 4],
+ * ); // => [1, 2, 3, 4]
+ * ```
  */
 export function union<First, Second>(first: First[], second: Second[]): (First | Second)[];
 
