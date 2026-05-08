@@ -42,7 +42,7 @@ export function getArray<Value extends PlainObject>(value: Value): Value[keyof V
  *
  * @example
  * ```typescript
- * getArray(123); // => [123]
+ * getArray([123]); // => [123]
  * ```
  */
 export function getArray<Item>(value: Item[]): Item[];
@@ -58,7 +58,7 @@ export function getArray<Item>(value: Item[]): Item[];
  * getArray(123); // => [123]
  * ```
  */
-export function getArray(value: unknown): unknown[];
+export function getArray<Value>(value: Value): Value[];
 
 export function getArray(value: unknown, indiced?: unknown): unknown[] {
 	if (Array.isArray(value)) {
