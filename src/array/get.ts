@@ -47,6 +47,19 @@ export function getArray<Value extends PlainObject>(value: Value): Value[keyof V
  */
 export function getArray<Item>(value: Item[]): Item[];
 
+/**
+ * Get an array from an unknown value
+ *
+ * @param value Value to convert to an array
+ * @returns Array of value
+ *
+ * @example
+ * ```typescript
+ * getArray(123); // => [123]
+ * ```
+ */
+export function getArray(value: unknown): unknown[];
+
 export function getArray(value: unknown, indiced?: unknown): unknown[] {
 	if (Array.isArray(value)) {
 		return value;
