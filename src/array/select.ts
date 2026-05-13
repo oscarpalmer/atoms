@@ -153,6 +153,7 @@ export function select<
 
 /**
  * Get a filtered and mapped array of items
+ *
  * @param array Array to search in
  * @param filterCallback Filter callback to match items
  * @param mapKey Key to get an item's value for mapping

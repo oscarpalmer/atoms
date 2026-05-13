@@ -4,11 +4,11 @@ import type {PlainObject} from '../models';
 // #region Functions
 
 /**
- * Create a Set from an array of items using a callback
+ * Create a _Set_ from an array of items using a callback
  *
  * @param array Array to convert
  * @param callback Callback to get an item's value
- * @returns Set of values
+ * @returns _Set_ of values
  *
  * @example
  * ```typescript
@@ -24,11 +24,11 @@ export function toSet<Item, Callback extends (item: Item, index: number, array: 
 ): Set<ReturnType<Callback>>;
 
 /**
- * Create a Set from an array of items using a key
+ * Create a _Set_ from an array of items using a key
  *
  * @param array Array to convert
  * @param key Key to use for value
- * @returns Set of values
+ * @returns _Set_ of values
  *
  * @example
  * ```typescript
@@ -44,10 +44,10 @@ export function toSet<Item extends PlainObject, ItemKey extends keyof Item>(
 ): Set<Item[ItemKey]>;
 
 /**
- * Create a Set from an array of items
+ * Create a _Set_ from an array of items
  *
  * @param array Array to convert
- * @returns Set of items
+ * @returns _Set_ of items
  *
  * @example
  * ```typescript

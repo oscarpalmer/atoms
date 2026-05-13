@@ -70,6 +70,7 @@ function flattenObject(
 
 /**
  * Smush an object into a flat object that uses dot notation keys
+ *
  * @param value Object to smush
  * @returns Smushed object with dot notation keys
  */

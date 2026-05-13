@@ -1,14 +1,15 @@
 import {expect, test} from 'vitest';
-import {kalas} from '../src';
+import {herald} from '../src';
 
-type Party = {
+type Events = {
 	foo: (id: number, name: string) => void;
 	bar: () => void;
 	baz: () => void;
 };
 
 test('', () => {
-	const party = kalas<Party>(['bar', 'baz', 'foo']);
+	const announcer = herald<Events>(['bar', 'baz', 'foo']);
+	const {events} = announcer;
 
 	const count = {
 		bar: [0, 0],
@@ -41,19 +42,19 @@ test('', () => {
 		count.bar[1] += 1;
 	};
 
-	const unsubscribeFooOne = party.events.subscribe('foo', onFooA);
+	const unsubscribeFooOne = events.subscribe('foo', onFooA);
 
-	const unsubscribeNoopOne = party.events.subscribe('foo', 123 as never);
-	const unsubscribeNoopTwo = party.events.subscribe('xyz' as never, onBarOne as never);
+	const unsubscribeNoopOne = events.subscribe('foo', 123 as never);
+	const unsubscribeNoopTwo = events.subscribe('xyz' as never, onBarOne as never);
 
 	expect(typeof unsubscribeNoopOne).toBe('function');
 	expect(typeof unsubscribeNoopTwo).toBe('function');
 
-	party.events.subscribe('foo', onFooB);
-	party.events.subscribe('bar', onBarOne);
-	party.events.subscribe('bar', onBarTwo);
+	events.subscribe('foo', onFooB);
+	events.subscribe('bar', onBarOne);
+	events.subscribe('bar', onBarTwo);
 
-	party.events.subscribe('baz', () => {
+	announcer.events.subscribe('baz', () => {
 		count.baz += 1;
 	});
 
@@ -68,9 +69,9 @@ test('', () => {
 		b: undefined,
 	});
 
-	party.emit('foo', 1, 'Alice');
-	party.emit('bar');
-	party.emit('baz');
+	announcer.emit('foo', 1, 'Alice');
+	announcer.emit('bar');
+	announcer.emit('baz');
 
 	expect(count).toEqual({
 		bar: [1, 1],
@@ -85,9 +86,9 @@ test('', () => {
 
 	unsubscribeFooOne();
 
-	party.emit('foo', 2, 'Bob');
-	party.emit('bar');
-	party.emit('baz');
+	announcer.emit('foo', 2, 'Bob');
+	announcer.emit('bar');
+	announcer.emit('baz');
 
 	expect(count).toEqual({
 		bar: [2, 2],
@@ -100,14 +101,14 @@ test('', () => {
 		b: '#2: Bob',
 	});
 
-	party.events.unsubscribe('foo', onFooB);
+	events.unsubscribe('foo', onFooB);
 
-	party.events.unsubscribe('foo', 123 as never);
-	party.events.unsubscribe('xyz' as never, onBarOne as never);
+	events.unsubscribe('foo', 123 as never);
+	events.unsubscribe('xyz' as never, onBarOne as never);
 
-	party.emit('foo', 3, 'Charlie');
-	party.emit('bar');
-	party.emit('baz');
+	announcer.emit('foo', 3, 'Charlie');
+	announcer.emit('bar');
+	announcer.emit('baz');
 
 	expect(count).toEqual({
 		bar: [3, 3],
@@ -120,30 +121,13 @@ test('', () => {
 		b: '#2: Bob',
 	});
 
-	party.events.unsubscribe('bar', onBarOne);
-	party.events.unsubscribe('bar');
-	party.events.unsubscribe('bar');
+	events.unsubscribe('bar', onBarOne);
+	events.unsubscribe('bar');
+	events.unsubscribe('bar');
 
-	party.emit('foo', 4, 'Dave');
-	party.emit('bar');
-	party.emit('baz');
-
-	expect(count).toEqual({
-		bar: [3, 3],
-		baz: 4,
-		foo: [1, 2],
-	});
-
-	expect(result).toEqual({
-		a: '#1: Alice',
-		b: '#2: Bob',
-	});
-
-	party.clear();
-
-	party.emit('foo', 5, 'Eve');
-	party.emit('bar');
-	party.emit('baz');
+	announcer.emit('foo', 4, 'Dave');
+	announcer.emit('bar');
+	announcer.emit('baz');
 
 	expect(count).toEqual({
 		bar: [3, 3],
@@ -156,7 +140,24 @@ test('', () => {
 		b: '#2: Bob',
 	});
 
-	expect(() => kalas([])).toThrow();
-	expect(() => kalas([123 as never])).toThrow();
-	expect(() => kalas(123 as never)).toThrow();
+	announcer.clear();
+
+	announcer.emit('foo', 5, 'Eve');
+	announcer.emit('bar');
+	announcer.emit('baz');
+
+	expect(count).toEqual({
+		bar: [3, 3],
+		baz: 4,
+		foo: [1, 2],
+	});
+
+	expect(result).toEqual({
+		a: '#1: Alice',
+		b: '#2: Bob',
+	});
+
+	expect(() => herald([])).toThrow();
+	expect(() => herald([123 as never])).toThrow();
+	expect(() => herald(123 as never)).toThrow();
 });

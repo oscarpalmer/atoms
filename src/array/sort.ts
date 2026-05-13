@@ -149,7 +149,7 @@ function getComparisonSorter(callback: Function, modifier: number): InternalSort
 			simple: callback,
 		},
 		get: false,
-		identifier: String(callback),
+		identifier: callback.toString(),
 	};
 }
 
@@ -253,7 +253,7 @@ function getObjectSorter(obj: PlainObject, modifier: number): InternalSorter | u
  *
  * _(If the array is not sorted, it will be treated as sorted, and the result may be inaccurate)_
  *
- * Available as `getSortedIndex` and `sort.getIndex`
+ * _Available as `getSortedIndex` and `sort.getIndex`_
  *
  * @param array Array to get the index from
  * @param item Item to get the index for
@@ -273,7 +273,7 @@ export function getSortedIndex<Item>(
  *
  * _(If the array is not sorted, it will be treated as sorted, and the result may be inaccurate)_
  *
- * Available as `getSortedIndex` and `sort.getIndex`
+ * _Available as `getSortedIndex` and `sort.getIndex`_
  *
  * @param array Array to get the index from
  * @param item Item to get the index for
@@ -293,7 +293,7 @@ export function getSortedIndex<Item>(
  *
  * _(If the array is not sorted, it will be treated as sorted, and the result may be inaccurate)_
  *
- * Available as `getSortedIndex` and `sort.getIndex`
+ * _Available as `getSortedIndex` and `sort.getIndex`_
  *
  * @param array Array to get the index from
  * @param item Item to get the index for
@@ -360,18 +360,20 @@ function getSorters(value: unknown, modifier: number): InternalSorter[] {
 }
 
 function getValueSorter(value: string | Function, modifier: number): InternalSorter {
+	const isFunction = typeof value === 'function';
+
 	return {
 		modifier,
 		get: true,
-		identifier: String(value),
-		value: typeof value === 'function' ? value : (item: unknown) => (item as PlainObject)[value],
+		identifier: isFunction ? value.toString() : value,
+		value: isFunction ? value : (item: unknown) => (item as PlainObject)[value],
 	};
 }
 
 /**
  * Initialize a sort handler with sorters _(and an optional default direction)_
  *
- * Available as `initializeSorter` and `sort.initialize`
+ * _Available as `initializeSorter` and `sort.initialize`_
  *
  * @param sorters Sorters to use for sorting
  * @param descending Sort in descending order? _(defaults to `false`; overridden by individual sorters)_
@@ -385,7 +387,7 @@ export function initializeSorter<Item>(
 /**
  * Initialize a sort handler with a sorter _(and an optional default direction)_
  *
- * Available as `initializeSorter` and `sort.initialize`
+ * _Available as `initializeSorter` and `sort.initialize`_
  *
  * @param sorter Sorter to use for sorting
  * @param descending Sort in descending order? _(defaults to `false`; overridden by individual sorters)_
@@ -399,7 +401,7 @@ export function initializeSorter<Item>(
 /**
  * Initialize a sort handler _(with an optional default direction)_
  *
- * Available as `initializeSorter` and `sort.initialize`
+ * _Available as `initializeSorter` and `sort.initialize`_
  *
  * @param descending Sort in descending order? _(defaults to `false`)_
  * @returns Sort handler
@@ -448,7 +450,7 @@ export function isSorted<Item>(
 /**
  * Is the array sorted?
  *
- * Available as `isSorted` and `sort.is`
+ * _Available as `isSorted` and `sort.is`_
  *
  * @param array Array to check
  * @param descending Sorted in descending order? _(defaults to `false`)_
@@ -534,6 +536,7 @@ export function sort<Item>(
 
 /**
  * Sort an array of items, using multiple sorters to sort by specific values
+ *
  * @param array Array to sort
  * @param sorters Sorters to use for sorting
  * @param descending Sort in descending order? _(defaults to `false`; overridden by individual sorters)_
@@ -547,6 +550,7 @@ export function sort<Item>(
 
 /**
  * Sort an array of items, using a single sorter to sort by a specific value
+ *
  * @param array Array to sort
  * @param sorter Sorter to use for sorting
  * @param descending Sort in descending order? _(defaults to `false`; overridden by individual sorters)_
@@ -556,6 +560,7 @@ export function sort<Item>(array: Item[], sorter: ArraySorter<Item>, descending?
 
 /**
  * Sort an array of items
+ *
  * @param array Array to sort
  * @param descending Sort in descending order? _(defaults to `false`)_
  * @returns Sorted array

@@ -129,4 +129,8 @@ test('', () => {
 		expect(error).toBeInstanceOf(Error);
 		expect((error as Error).message).toBe('The Memoized instance has been destroyed');
 	}
+
+	// Error
+
+	expect(() => memoize('blah' as never)).toThrow();
 });

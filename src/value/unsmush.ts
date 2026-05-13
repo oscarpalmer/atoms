@@ -52,6 +52,7 @@ function getKeys(value: PlainObject): OrderedKey[] {
 
 /**
  * Unsmush a smushed object _(turning dot notation keys into nested keys)_
+ *
  * @param value Object to unsmush
  * @returns Unsmushed object with nested keys
  */

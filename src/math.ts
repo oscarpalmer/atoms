@@ -13,9 +13,10 @@ import type {NumericalValues, PlainObject} from './models';
 
 /**
  * Get the average value from a list of items
+ *
  * @param items List of items
  * @param callback Callback to get an item's value
- * @returns Average value, or `NaN` if no average can be calculated
+ * @returns Average value, or `Number.NaN` if no average can be calculated
  */
 export function average<Item>(
 	items: Item[],
@@ -24,9 +25,10 @@ export function average<Item>(
 
 /**
  * Get the average value from a list of items
+ *
  * @param items List of items
  * @param key Key to use for value
- * @returns Average value, or `NaN` if no average can be calculated
+ * @returns Average value, or `Number.NaN` if no average can be calculated
  */
 export function average<Item extends PlainObject>(
 	items: Item[],
@@ -35,8 +37,9 @@ export function average<Item extends PlainObject>(
 
 /**
  * Get the average value from a list of numbers
+ *
  * @param numbers List of numbers
- * @returns Average value, or `NaN` if no average can be calculated
+ * @returns Average value, or `Number.NaN` if no average can be calculated
  */
 export function average(numbers: number[]): number;
 
@@ -48,9 +51,10 @@ export function average(array: unknown[], key?: unknown): number {
 
 /**
  * Round a number up
+ *
  * @param value Number to round up
  * @param decimals Number of decimal places to round to _(defaults to `0`)_
- * @returns Rounded number, or `NaN` if the value if unable to be rounded
+ * @returns Rounded number, or `Number.NaN` if the value if unable to be rounded
  */
 export function ceil(value: number, decimals?: number): number {
 	return roundNumber(Math.ceil, value, decimals);
@@ -58,10 +62,11 @@ export function ceil(value: number, decimals?: number): number {
 
 /**
  * Count the number of items in an array that match a specific value
+ *
  * @param array Array to count for
  * @param callback Callback to get an item's value
  * @param value Value to match and count
- * @returns Number of items that match the condition, or `NaN` if no count can be calculated
+ * @returns Number of items that match the condition, or `Number.NaN` if no count can be calculated
  */
 export function count<Item>(
 	array: Item[],
@@ -71,10 +76,11 @@ export function count<Item>(
 
 /**
  * Count the number of items in an array that have a specific value
+ *
  * @param array Array to count for
  * @param key Key to use for value
  * @param value Value to match and count
- * @returns Number of items with the specified key value, or `NaN` if no count can be calculated
+ * @returns Number of items with the specified key value, or `Number.NaN` if no count can be calculated
  */
 export function count<Item extends PlainObject, ItemKey extends keyof Item>(
 	array: Item[],
@@ -84,8 +90,9 @@ export function count<Item extends PlainObject, ItemKey extends keyof Item>(
 
 /**
  * Count the number of items in an array
+ *
  * @param values Array to count for
- * @returns Number of items, or `NaN` if no count can be calculated
+ * @returns Number of items, or `Number.NaN` if no count can be calculated
  */
 export function count(values: unknown[]): number;
 
@@ -117,9 +124,10 @@ export function count(array: unknown[], key?: unknown, value?: unknown): number 
 
 /**
  * Round a number down
+ *
  * @param value Number to round down
  * @param decimals Number of decimal places to round to _(defaults to `0`)_
- * @returns Rounded number, or `NaN` if the value if unable to be rounded
+ * @returns Rounded number, or `Number.NaN` if the value if unable to be rounded
  */
 export function floor(value: number, decimals?: number): number {
 	return roundNumber(Math.floor, value, decimals);
@@ -127,9 +135,10 @@ export function floor(value: number, decimals?: number): number {
 
 /**
  * Get the median value from a list of items
+ *
  * @param array List of items
  * @param callback Callback to get an item's value
- * @returns Median value, or `NaN` if no median can be calculated
+ * @returns Median value, or `Number.NaN` if no median can be calculated
  */
 export function median<Item>(
 	array: Item[],
@@ -138,9 +147,10 @@ export function median<Item>(
 
 /**
  * Get the median value from a list of items
+ *
  * @param array List of items
  * @param key Key to use for value
- * @returns Median value, or `NaN` if no median can be calculated
+ * @returns Median value, or `Number.NaN` if no median can be calculated
  */
 export function median<Item extends PlainObject>(
 	array: Item[],
@@ -149,8 +159,9 @@ export function median<Item extends PlainObject>(
 
 /**
  * Get the median value from a list of numbers
+ *
  * @param array List of numbers
- * @returns Median value, or `NaN` if no median can be calculated
+ * @returns Median value, or `Number.NaN` if no median can be calculated
  */
 export function median(array: number[]): number;
 
@@ -189,9 +200,10 @@ export function median(array: unknown[], key?: unknown): number {
 
 /**
  * Get the minimum value from a list of items
+ *
  * @param items List of items
  * @param callback Callback to get an item's value
- * @returns Minimum value, or `NaN` if no minimum can be found
+ * @returns Minimum value, or `Number.NaN` if no minimum can be found
  */
 export function min<Item>(
 	items: Item[],
@@ -200,9 +212,10 @@ export function min<Item>(
 
 /**
  * Get the minimum value from a list of items
+ *
  * @param items List of items
  * @param key Key to use for value
- * @returns Minimum value, or `NaN` if no minimum can be found
+ * @returns Minimum value, or `Number.NaN` if no minimum can be found
  */
 export function min<Item extends PlainObject>(
 	items: Item[],
@@ -211,8 +224,9 @@ export function min<Item extends PlainObject>(
 
 /**
  * Get the minimum value from a list of numbers
+ *
  * @param values List of numbers
- * @returns Minimum value, or `NaN` if no minimum can be found
+ * @returns Minimum value, or `Number.NaN` if no minimum can be found
  */
 export function min(values: number[]): number;
 
@@ -222,9 +236,10 @@ export function min(array: unknown[], key?: unknown): number {
 
 /**
  * Round a number
+ *
  * @param value Number to round
  * @param decimals Number of decimal places to round to _(defaults to `0`)_
- * @returns Rounded number, or `NaN` if the value if unable to be rounded
+ * @returns Rounded number, or `Number.NaN` if the value if unable to be rounded
  */
 export function round(value: number, decimals?: number): number {
 	return roundNumber(Math.round, value, decimals);
@@ -250,9 +265,10 @@ function roundNumber(
 
 /**
  * Get the sum of a list of items
+ *
  * @param items List of items
  * @param callback Callback to get an item's value
- * @returns Sum of the values, or `NaN` if no sum can be calculated
+ * @returns Sum of the values, or `Number.NaN` if no sum can be calculated
  */
 export function sum<Item>(
 	items: Item[],
@@ -261,9 +277,10 @@ export function sum<Item>(
 
 /**
  * Get the sum of a list of items
+ *
  * @param items List of items
  * @param key Key to use for value
- * @returns Sum of the values, or `NaN` if no sum can be calculated
+ * @returns Sum of the values, or `Number.NaN` if no sum can be calculated
  */
 export function sum<Item extends PlainObject>(
 	items: Item[],
@@ -272,8 +289,9 @@ export function sum<Item extends PlainObject>(
 
 /**
  * Get the sum of a list of numbers
+ *
  * @param values List of numbers
- * @returns Sum of the numbers, or `NaN` if no sum can be calculated
+ * @returns Sum of the numbers, or `Number.NaN` if no sum can be calculated
  */
 export function sum(values: number[]): number;
 

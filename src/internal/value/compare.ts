@@ -19,6 +19,7 @@ const COMPARE_NAME: string = 'compare';
 
 /**
  * Compare two values _(for sorting purposes)_
+ *
  * @param first First value
  * @param second Second value
  * @returns `0` if equal; `-1` first comes before second; `1` first comes after second
@@ -124,7 +125,8 @@ function compareValue(
 /**
  * Deregister a custom comparison handler for a class
  *
- * Available as `deregisterComparator` and `compare.deregister`
+ * _Available as `deregisterComparator` and `compare.deregister`_
+ *
  * @param constructor Class constructor
  */
 export function deregisterComparator<Instance>(constructor: Constructor<Instance>): void {
@@ -142,7 +144,8 @@ function getComparisonParts(value: unknown): unknown[] {
 /**
  * Register a custom comparison handler for a class
  *
- * Available as `registerComparator` and `compare.register`
+ * _Available as `registerComparator` and `compare.register`_
+ *
  * @param constructor Class constructor
  * @param handler Method name or comparison function _(defaults to `compare`)_
  */

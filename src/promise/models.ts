@@ -4,7 +4,7 @@ import type {Result} from '../result/models';
 // #region Types
 
 /**
- * A promise that can be canceled
+ * A _Promise_ that can be canceled
  */
 export class CancelablePromise<Value = void> extends Promise<Value> {
 	#rejector!: (reason: unknown) => void;
@@ -24,8 +24,9 @@ export class CancelablePromise<Value = void> extends Promise<Value> {
 	}
 
 	/**
-	 * Cancel the promise, rejecting it with an optional reason
-	 * @param reason Optional reason for canceling the promise
+	 * Cancel the _Promise_, rejecting it with an optional reason
+	 *
+	 * @param reason Optional reason for canceling the _Promise_
 	 */
 	cancel(reason?: unknown): void {
 		this.#rejector(reason);
@@ -33,15 +34,15 @@ export class CancelablePromise<Value = void> extends Promise<Value> {
 }
 
 /**
- * A promise that was fulfilled
+ * A _Promise_ that was fulfilled
  */
 export type FulfilledPromise<Value> = {
 	/**
-	 * Status of the promise
+	 * Status of the _Promise_
 	 */
 	status: typeof PROMISE_TYPE_FULFILLED;
 	/**
-	 * Value of the promise
+	 * Value of the _Promise_
 	 */
 	value: Awaited<Value>;
 };
@@ -57,15 +58,15 @@ export type PromiseHandlers = {
 };
 
 /**
- * Options for a promise-handling function
+ * Options for a _Promise_-handling function
  */
 export type PromiseOptions = {
 	/**
-	 * AbortSignal for aborting the promise; when aborted, the promise will reject with the reason of the signal
+	 * AbortSignal for aborting the _Promise_; when aborted, the _Promise_ will reject with the reason of the signal
 	 */
 	signal?: AbortSignal;
 	/**
-	 * How long to wait for (in milliseconds; defaults to `0`)
+	 * How long to wait for _(in milliseconds; defaults to `0`)_
 	 */
 	time?: number;
 };
@@ -81,12 +82,10 @@ export type PromiseParameters = {
 };
 
 /**
- * Promise handling strategy
+ * _Promise_ handling strategy
  *
- * - `complete`: wait for all promises to settle, then return the results
- * 	- Returns an array of fulfilled and/or rejected results
- * - `first`: rejects on the first rejected promise
- * 	- Returns an array of values
+ * - `complete`: wait for all _Promises_ to settle, then return the results, as an array of fulfilled and/or rejected results
+ * - `first`: rejects on the first rejected _Promise_, and returns an array of values
  */
 export type PromiseStrategy = 'complete' | 'first';
 
@@ -112,15 +111,15 @@ export type PromisesItems<Items extends unknown[]> = {
 };
 
 /**
- * Options for handling multiple promises
+ * Options for handling multiple _Promises_
  */
 export type PromisesOptions = {
 	/**
-	 * AbortSignal for aborting the promises; when aborted, the promises will reject with the reason of the signal
+	 * AbortSignal for aborting the _Promises_; when aborted, the _Promises_ will reject with the reason of the signal
 	 */
 	signal?: AbortSignal;
 	/**
-	 * Strategy for handling the promises; defaults to `complete`
+	 * Strategy for handling the _Promises_; defaults to `complete`
 	 */
 	strategy?: PromiseStrategy;
 };
@@ -154,11 +153,11 @@ export type PromisesValues<Items extends unknown[]> = {
 };
 
 /**
- * A promise that was rejected
+ * A _Promise_ that was rejected
  */
 export type RejectedPromise = {
 	/**
-	 * Status of the promise
+	 * Status of the _Promise_
 	 */
 	status: typeof PROMISE_TYPE_REJECTED;
 	/**

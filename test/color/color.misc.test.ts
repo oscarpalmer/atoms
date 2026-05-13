@@ -27,7 +27,7 @@ test('formatting', () => {
 
 		const color = getColor(hslas[index]);
 
-		expect(String(color)).toBe(`#${hex}`);
+		expect(color.toString()).toBe(`#${hex}`);
 
 		expect(color.toHexString()).toBe(`#${hex}`);
 		expect(color.toHexString(true)).toBe(`#${hex}${getAlphaHexadecimal(alphas[index])}`);

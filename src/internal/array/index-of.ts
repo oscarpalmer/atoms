@@ -91,7 +91,7 @@ indexOf.last = lastIndexOf;
 /**
  * Get the index of the last matching item by callback
  *
- * Available as `lastIndexOf` and `indexOf.last`
+ * _Available as `lastIndexOf` and `indexOf.last`_
  *
  * @param array Array to search in
  * @param callback Callback to get an item's value
@@ -115,7 +115,7 @@ export function lastIndexOf<
 /**
  * Get the index of the last matching item by key
  *
- * Available as `lastIndexOf` and `indexOf.last`
+ * _Available as `lastIndexOf` and `indexOf.last`_
  *
  * @param array Array to search in
  * @param key Key to match items by
@@ -140,7 +140,7 @@ export function lastIndexOf<Item extends PlainObject, ItemKey extends keyof Item
 /**
  * Get the index of the last item matching the filter
  *
- * Available as `lastIndexOf` and `indexOf.last`
+ * _Available as `lastIndexOf` and `indexOf.last`_
  *
  * @param array Array to search in
  * @param filter Filter callback to match items
@@ -162,7 +162,7 @@ export function lastIndexOf<Item>(
 /**
  * Get the index of the last item matching the given item
  *
- * Available as `lastIndexOf` and `indexOf.last`
+ * _Available as `lastIndexOf` and `indexOf.last`_
  *
  * @param array Array to search in
  * @param item Item to match against

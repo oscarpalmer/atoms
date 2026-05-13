@@ -173,7 +173,7 @@ function extract(
 }
 
 /**
- * Slice an array, returning a new array with a specified range of items
+ * Slice an array _(returning a new array with a specified range of items)_
  *
  * @param array Original array
  * @param start Start index _(inclusive)_
@@ -188,7 +188,7 @@ function extract(
 export function slice<Item>(array: Item[], start: number, end: number): Item[];
 
 /**
- * Slice an array, returning a new array with a specified number of items _(from the start)_
+ * Slice an array _(returning a new array with a specified number of items, from the start)_
  *
  * @param array Original array
  * @param count Maximum size of the new array
@@ -202,7 +202,7 @@ export function slice<Item>(array: Item[], start: number, end: number): Item[];
 export function slice<Item>(array: Item[], count: number): Item[];
 
 /**
- * Slice an array
+ * Slice an array _(returning a new array with all items)_
  *
  * @param array Array to slice
  * @returns Sliced array

@@ -6,6 +6,7 @@ import {join} from './internal/string';
 
 /**
  * Get a random boolean
+ *
  * @returns Random boolean
  */
 export function getRandomBoolean(): boolean {
@@ -14,6 +15,7 @@ export function getRandomBoolean(): boolean {
 
 /**
  * Get a random string of characters with a specified length
+ *
  * @param length Length of random string
  * @param selection String of characters to select from _(defaults to lowercase English alphabet)_
  * @returns Random string of characters
@@ -36,6 +38,7 @@ export function getRandomCharacters(length: number, selection?: string): string 
 
 /**
  * Get a random hexadecimal color
+ *
  * @param prefix Prefix the color with `#`? _(defaults to `false`)_
  * @returns Random hexadecimal color string in the format `(#)RRGGBB`
  */
@@ -45,6 +48,7 @@ export function getRandomColor(prefix?: boolean): string {
 
 /**
  * Get a random hexadecimal character
+ *
  * @returns Random hexadecimal character from `0-9` and `A-F`
  */
 export function getRandomHex(): string {
@@ -53,6 +57,7 @@ export function getRandomHex(): string {
 
 /**
  * Get a random item from an array
+ *
  * @param array Array to get a random item from
  * @returns Random item from the array, or `undefined` if unable to retrieve one
  */
@@ -66,6 +71,7 @@ export function getRandomItem<Value>(array: Value[]): Value | undefined {
 
 /**
  * Get an amount of random items from an array
+ *
  * @param array Array to get random items from
  * @param amount Amount of items to return
  * @returns Array of random items
@@ -74,6 +80,7 @@ export function getRandomItems<Value>(array: Value[], amount: number): Value[];
 
 /**
  * Get a shuffled array
+ *
  * @param array Array to get random items from
  * @returns Shuffled version of the original array
  */
@@ -113,6 +120,6 @@ const HEX_MAXIMUM = 15;
 
 // #region Exports
 
-export {getRandomFloat, getRandomInteger} from './internal/random';
+export {getRandomFloatingNumber as getRandomFloat, getRandomInteger} from './internal/random';
 
 // #endregion

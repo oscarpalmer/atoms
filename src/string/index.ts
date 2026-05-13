@@ -1,10 +1,21 @@
 import {isTemplateStringsArray} from '../internal/is';
-import {getString} from '../internal/string';
+import {interpolate} from '../internal/string';
 
 // #region Functions
 
+/**
+ * Dedent a string template, removing common leading whitespace from each line
+ *
+ * @returns Dedented string
+ */
 export function dedent(strings: TemplateStringsArray, ...values: unknown[]): string;
 
+/**
+ * Dedent a string, removing common leading whitespace from each line
+ *
+ * @param value String to dedent
+ * @returns Dedented string
+ */
 export function dedent(value: string): string;
 
 export function dedent(value: string | TemplateStringsArray, ...values: unknown[]): string {
@@ -59,7 +70,8 @@ export function dedent(value: string | TemplateStringsArray, ...values: unknown[
 }
 
 /**
- * Get a new UUID-string _(version 4)_
+ * Get a new UUID string _(version 4)_
+ *
  * @returns UUID string
  */
 export function getUuid(): string {
@@ -82,20 +94,9 @@ export function getUuid(): string {
 	].join('-');
 }
 
-function interpolate(strings: TemplateStringsArray, values: unknown[]): string {
-	const {length} = strings;
-
-	let interpolated = '';
-
-	for (let index = 0; index < length; index += 1) {
-		interpolated += `${strings[index]}${getString(values[index])}`;
-	}
-
-	return interpolated;
-}
-
 /**
  * Parse a JSON string into its proper value _(or `undefined` if it fails)_
+ *
  * @param value JSON string to parse
  * @param reviver Reviver function to transform the parsed values
  * @returns Parsed value or `undefined` if parsing fails
@@ -113,6 +114,7 @@ export function parse(
 
 /**
  * Trim a string _(removing whitespace from both ends)_
+ *
  * @param value String to trim
  * @returns Trimmed string
  */
@@ -121,7 +123,8 @@ export function trim(value: string): string {
 }
 
 /**
- * Truncate a string to a specified length, when possible
+ * Truncate a string to a specified length
+ *
  * @param value String to truncate
  * @param length Maximum length of the string after truncation
  * @param suffix Suffix to append to the truncated string

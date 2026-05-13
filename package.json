@@ -1,6 +1,6 @@
 {
 	"name": "@oscarpalmer/atoms",
-	"version": "0.186.2",
+	"version": "0.187.0",
 	"description": "Atomic utilities for making your JavaScript better.",
 	"keywords": [
 		"helper",
@@ -101,13 +101,13 @@
 			"types": "./dist/function/work.d.mts",
 			"default": "./dist/function/work.mjs"
 		},
+		"./herald": {
+			"types": "./dist/herald.d.mts",
+			"default": "./dist/herald.mjs"
+		},
 		"./is": {
 			"types": "./dist/is.d.mts",
 			"default": "./dist/is.mjs"
-		},
-		"./kalas": {
-			"types": "./dist/kalas.d.mts",
-			"default": "./dist/kalas.mjs"
 		},
 		"./logger": {
 			"types": "./dist/logger.d.mts",
@@ -232,6 +232,10 @@
 			"types": "./dist/value/diff.d.mts",
 			"default": "./dist/value/diff.mjs"
 		},
+		"./value/freeze": {
+			"types": "./dist/value/freeze.d.mts",
+			"default": "./dist/value/freeze.mjs"
+		},
 		"./value/equal": {
 			"types": "./dist/internal/value/equal.d.mts",
 			"default": "./dist/internal/value/equal.mjs"
@@ -253,8 +257,8 @@
 		"watch": "npx vite build --watch"
 	},
 	"devDependencies": {
-		"@oxlint/plugins": "^1.63",
-		"@types/node": "^25.6",
+		"@oxlint/plugins": "^1.64",
+		"@types/node": "^25.7",
 		"@vitest/coverage-istanbul": "^4.1",
 		"eslint": "^10.3",
 		"jsdom": "^29.1",

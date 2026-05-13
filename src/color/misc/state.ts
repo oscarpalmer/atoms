@@ -63,7 +63,7 @@ export function getColorState(value: unknown): ColorState {
 	}
 
 	state.alpha ??= getAlpha(ALPHA_FULL_VALUE);
-	state.hex ??= String(HEX_BLACK);
+	state.hex ??= HEX_BLACK;
 	state.hsl ??= {...DEFAULT_HSL};
 	state.rgb ??= {...DEFAULT_RGB};
 

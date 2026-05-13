@@ -8,6 +8,7 @@ import type {ArrayOrPlainObject, PlainObject} from './models';
 
 /**
  * Convert a query string to a plain _(nested)_ object
+ *
  * @param query Query string to convert
  * @returns Plain object representation of the query string
  */
@@ -103,6 +104,7 @@ function setQueryValue(parameters: PlainObject, key: string, value: string): voi
 
 /**
  * Convert a plain _(nested)_ object to a query string
+ *
  * @param parameters Plain object to convert
  * @returns Query string representation of the object
  */

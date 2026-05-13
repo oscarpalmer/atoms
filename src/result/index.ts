@@ -4,10 +4,11 @@ import type {ExtendedErr, ExtendedResult, Result} from './models';
 // #region Functions
 
 /**
- * Executes a promise, catching any errors, and returns a result
+ * Executes a _Promise_, catching any errors, and returns a result
  *
- * Available as `asyncAttempt` and `attempt.async`
- * @param promise Promise to execute
+ * _Available as `asyncAttempt` and `attempt.async`_
+ *
+ * @param promise _Promise_ to execute
  * @param error Error value
  * @returns Callback result
  */
@@ -19,7 +20,8 @@ export async function asyncAttempt<Value, E>(
 /**
  * Executes a callback asynchronously, catching any errors, and returns a result
  *
- * Available as `asyncAttempt` and `attempt.async`
+ * _Available as `asyncAttempt` and `attempt.async`_
+ *
  * @param callback Callback to execute
  * @param error Error value
  * @returns Callback result
@@ -30,10 +32,11 @@ export async function asyncAttempt<Value, E>(
 ): Promise<ExtendedResult<Awaited<Value>, E>>;
 
 /**
- * Executes a promise, catching any errors, and returns a result
+ * Executes a _Promise_, catching any errors, and returns a result
  *
- * Available as `asyncAttempt` and `attempt.async`
- * @param promise Promise to execute
+ * _Available as `asyncAttempt` and `attempt.async`_
+ *
+ * @param promise _Promise_ to execute
  * @returns Callback result
  */
 export async function asyncAttempt<Value>(promise: Promise<Value>): Promise<Result<Awaited<Value>>>;
@@ -41,7 +44,8 @@ export async function asyncAttempt<Value>(promise: Promise<Value>): Promise<Resu
 /**
  * Executes a callback asynchronously, catching any errors, and returns a result
  *
- * Available as `asyncAttempt` and `attempt.async`
+ * _Available as `asyncAttempt` and `attempt.async`_
+ *
  * @param callback Callback to execute
  * @returns Callback result
  */
@@ -68,6 +72,7 @@ export async function asyncAttempt<Value, E>(
 
 /**
  * Executes a callback, catching any errors, and returns a result
+ *
  * @param callback Callback to execute
  * @param error Error value
  * @returns Callback result
@@ -76,6 +81,7 @@ export function attempt<Value, E>(callback: () => Value, error: E): ExtendedResu
 
 /**
  * Executes a callback, catching any errors, and returns a result
+ *
  * @param callback Callback to execute
  * @returns Callback result
  */

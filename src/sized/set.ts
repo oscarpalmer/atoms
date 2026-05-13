@@ -3,18 +3,18 @@ import {getSizedMaximum} from '../internal/sized';
 // #region Types
 
 /**
- * A Set with a maximum size
+ * A _Set_ with a maximum size
  *
- * Behavior is similar to a _LRU_-cache, where the oldest values are removed
+ * Behavior is similar to a _LRU_ cache, where the oldest values are removed
  */
 export class SizedSet<Value = unknown> extends Set<Value> {
 	/**
-	 * The maximum size of the Set
+	 * The maximum size of the _Set_
 	 */
 	readonly #maximumSize: number;
 
 	/**
-	 * Is the Set full?
+	 * Is the _Set_ full?
 	 */
 	get full(): boolean {
 		return this.size >= this.#maximumSize;
@@ -25,24 +25,27 @@ export class SizedSet<Value = unknown> extends Set<Value> {
 	}
 
 	/**
-	 * Create a new SizedSet with values and a maximum size _(2^20)_
-	 * @param values Array of values to initialize the SizedSet with
-	 * @template Value Type of the values in the SizedSet
+	 * Create a new _SizedSet_ with values and a maximum size _(2^20)_
+	 *
+	 * @param values Array of values to initialize the _SizedSet_ with
+	 * @template Value Type of the values in the _SizedSet_
 	 */
 	constructor(values: Value[]);
 
 	/**
-	 * Create a new SizedSet with a maximum size _(but clamped at 2^24)_
-	 * @param maximum Maximum size of the SizedSet
-	 * @template Value Type of the values in the SizedSet
+	 * Create a new _SizedSet_ with a maximum size _(but clamped at 2^24)_
+	 *
+	 * @param maximum Maximum size of the _SizedSet_ _(defaults to 2^20; clamped at 2^24)_
+	 * @template Value Type of the values in the _SizedSet_
 	 */
 	constructor(maximum: number);
 
 	/**
-	 * Create a new SizedSet with _(optional)_ values and a maximum size _(defaults to 2^20; clamped at 2^24)_
-	 * @param values Array of values to initialize the SizedSet with
-	 * @param maximum Maximum size of the SizedSet
-	 * @template Value Type of the values in the SizedSet
+	 * Create a new _SizedSet_ with _(optional)_ values and a maximum size
+	 *
+	 * @param values Array of values to initialize the _SizedSet_ with
+	 * @param maximum Maximum size of the _SizedSet_ _(defaults to 2^20; clamped at 2^24)_
+	 * @template Value Type of the values in the _SizedSet_
 	 */
 	constructor(values?: Value[], maximum?: number);
 
@@ -82,9 +85,10 @@ export class SizedSet<Value = unknown> extends Set<Value> {
 	}
 
 	/**
-	 * Get a value from the SizedSet, if it exists _(and move it to the end)_
-	 * @param value Value to get from the SizedSet
-	 * @param update Update the value's position in the SizedSet? _(defaults to `false`)_
+	 * Get a value from the _SizedSet_, if it exists _(and optionally move it to the end)_
+	 *
+	 * @param value Value to get from the _SizedSet_
+	 * @param update Update the value's position in the _SizedSet_? _(defaults to `false`)_
 	 * @returns Found value if it exists, otherwise `undefined`
 	 */
 	get(value: Value, update?: boolean): Value | undefined {

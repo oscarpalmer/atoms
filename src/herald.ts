@@ -4,40 +4,45 @@ import type {GenericCallback} from './models';
 // #region Types
 
 class Events<Map extends Record<string, GenericCallback>> {
-	readonly #kalas: Kalas<Map>;
+	readonly #herald: Herald<Map>;
 
-	constructor(kalas: Kalas<Map>) {
-		this.#kalas = kalas;
+	constructor(herald: Herald<Map>) {
+		this.#herald = herald;
 	}
 
 	/**
 	 * Subscribe to an event with a callback
+	 *
 	 * @param event Event name
 	 * @param callback Callback function
 	 * @returns Unsubscriber function
 	 */
 	subscribe<Event extends keyof Map>(event: Event, callback: Map[Event]): Unsubscriber {
-		return this.#kalas.subscribe(event, callback);
+		return this.#herald.subscribe(event, callback);
 	}
 
 	/**
 	 * Unsubscribe from an event with a callback _(or all callbacks, if no callback is provided)_
+	 *
 	 * @param event Event name
 	 * @param callback Callback function
 	 * @returns Unsubscriber function
 	 */
 	unsubscribe<Event extends keyof Map>(event: Event, callback?: Map[Event]): void {
-		return this.#kalas.unsubscribe(event, callback);
+		return this.#herald.unsubscribe(event, callback);
 	}
 }
 
-class Kalas<Map extends Record<string, GenericCallback>> {
+/**
+ * A _Herald_ is an announcer for named events, allowing emission, subscription, and unsubscription of events
+ */
+class Herald<Map extends Record<string, GenericCallback>> {
 	readonly #names: Set<keyof Map>;
 
 	readonly #subscribers = new Map<keyof Map, Set<Map[keyof Map]>>();
 
 	/**
-	 * Events interface for subscribing and unsubscribing to events
+	 * Events interface for subscribing to and unsubscribing from events
 	 */
 	declare readonly events: Events<Map>;
 
@@ -58,6 +63,7 @@ class Kalas<Map extends Record<string, GenericCallback>> {
 
 	/**
 	 * Emit an event with parameters
+	 *
 	 * @param event Event name
 	 * @param parameters Event parameters
 	 */
@@ -75,6 +81,7 @@ class Kalas<Map extends Record<string, GenericCallback>> {
 
 	/**
 	 * Subscribe to an event with a callback
+	 *
 	 * @param event Event name
 	 * @param callback Callback function
 	 * @returns Unsubscriber function
@@ -101,6 +108,7 @@ class Kalas<Map extends Record<string, GenericCallback>> {
 
 	/**
 	 * Unsubscribe from an event with a callback _(or all callbacks, if no callback is provided)_
+	 *
 	 * @param event Event name
 	 * @param callback Callback function
 	 */
@@ -134,13 +142,14 @@ export type Unsubscriber = () => void;
 // #region Functions
 
 /**
- * Create a Kalas _(party)_ for named events
+ * Create a _Herald_ for announcing named events
+ *
  * @param names Event names
- * @returns Kalas instance
+ * @returns _Herald_ instance
  */
-export function kalas<Events extends Record<string, GenericCallback>>(
+export function herald<Events extends Record<string, GenericCallback>>(
 	names: (keyof Events)[],
-): Kalas<Events> {
+): Herald<Events> {
 	if (
 		!Array.isArray(names) ||
 		names.length === 0 ||
@@ -149,19 +158,19 @@ export function kalas<Events extends Record<string, GenericCallback>>(
 		throw new Error(MESSAGE);
 	}
 
-	return new Kalas<Events>(names);
+	return new Herald<Events>(names);
 }
 
 // #endregion
 
 // #region Variables
 
-const MESSAGE = 'Kalas requires an array of event names.';
+const MESSAGE = 'Herald requires an array of event names.';
 
 // #endregion
 
 // #region Exports
 
-export {type Events, type Kalas};
+export {type Events, type Herald};
 
 // #endregion

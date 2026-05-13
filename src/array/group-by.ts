@@ -187,7 +187,7 @@ groupBy.arrays = groupArraysBy;
 /**
  * Create a record from an array of items using a specific key and value, grouping values into arrays
  *
- * Available as `groupArraysBy` and `groupBy.arrays`
+ * _Available as `groupArraysBy` and `groupBy.arrays`_
  *
  * @param array Array to group
  * @param key Callback to get an item's grouping key
@@ -219,7 +219,7 @@ export function groupArraysBy<
 /**
  * Create a record from an array of items using a specific key and value, grouping values into arrays
  *
- * Available as `groupArraysBy` and `groupBy.arrays`
+ * _Available as `groupArraysBy` and `groupBy.arrays`_
  *
  * @param array Array to group
  * @param key Callback to get an item's grouping key
@@ -251,7 +251,7 @@ export function groupArraysBy<
 /**
  * Create a record from an array of items using a specific key and value, grouping values into arrays
  *
- * Available as `groupArraysBy` and `groupBy.arrays`
+ * _Available as `groupArraysBy` and `groupBy.arrays`_
  *
  * @param array Array to group
  * @param key Key to use for grouping
@@ -283,7 +283,7 @@ export function groupArraysBy<
 /**
  * Create a record from an array of items using a specific key and value, grouping values into arrays
  *
- * Available as `groupArraysBy` and `groupBy.arrays`
+ * _Available as `groupArraysBy` and `groupBy.arrays`_
  *
  * @param array Array to group
  * @param key Key to use for grouping
@@ -315,7 +315,7 @@ export function groupArraysBy<
 /**
  * Create a record from an array of items using a specific key, grouping items into arrays
  *
- * Available as `groupArraysBy` and `groupBy.arrays`
+ * _Available as `groupArraysBy` and `groupBy.arrays`_
  *
  * @param array Array to group
  * @param callback Callback to get an item's grouping key
@@ -340,7 +340,7 @@ export function groupArraysBy<
 /**
  * Create a record from an array of items using a specific key, grouping items into arrays
  *
- * Available as `groupArraysBy` and `groupBy.arrays`
+ * _Available as `groupArraysBy` and `groupBy.arrays`_
  *
  * @param array Array to group
  * @param key Key to use for grouping

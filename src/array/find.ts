@@ -92,7 +92,7 @@ find.last = findLast;
 /**
  * Get the last item matching the given value
  *
- * Available as `findLast` and `find.last`
+ * _Available as `findLast` and `find.last`_
  *
  * @param array Array to search in
  * @param callback Callback to get an item's value for matching
@@ -116,7 +116,7 @@ export function findLast<
 /**
  * Get the last item matching the given value by key
  *
- * Available as `findLast` and `find.last`
+ * _Available as `findLast` and `find.last`_
  *
  * @param array Array to search in
  * @param key Key to get an item's value for matching
@@ -141,7 +141,7 @@ export function findLast<Item extends PlainObject, ItemKey extends keyof Item>(
 /**
  * Get the last item matching the filter
  *
- * Available as `findLast` and `find.last`
+ * _Available as `findLast` and `find.last`_
  *
  * @param array Array to search in
  * @param filter Filter callback to match items
@@ -163,7 +163,7 @@ export function findLast<Item>(
 /**
  * Get the last item matching the given value
  *
- * Available as `findLast` and `find.last`
+ * _Available as `findLast` and `find.last`_
  *
  * @param array Array to search in
  * @param value Value to match against

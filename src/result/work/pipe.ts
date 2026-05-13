@@ -17,9 +17,10 @@ type WrapValue<Value> = Result<UnwrapValue<Value>>;
 /**
  * Attempt to pipe a value through a function
  *
- * Available as `attemptAsyncPipe` and `attemptPipe.async`
+ * _Available as `attemptAsyncPipe` and `attemptPipe.async`_
+ *
  * @param initial Initial value
- * @returns Piped result
+ * @returns _Piped_ result
  */
 export async function attemptAsyncPipe<Initial, Piped>(
 	initial: GenericCallback | Initial | Promise<Initial> | Result<Initial>,
@@ -29,9 +30,10 @@ export async function attemptAsyncPipe<Initial, Piped>(
 /**
  * Attempt to pipe a value through a series of functions
  *
- * Available as `attemptAsyncPipe` and `attemptPipe.async`
+ * _Available as `attemptAsyncPipe` and `attemptPipe.async`_
+ *
  * @param initial Initial value
- * @returns Piped result
+ * @returns _Piped_ result
  */
 export async function attemptAsyncPipe<Initial, First, Second>(
 	initial: GenericCallback | Initial | Promise<Initial> | Result<Initial>,
@@ -42,9 +44,10 @@ export async function attemptAsyncPipe<Initial, First, Second>(
 /**
  * Attempt to pipe a value through a series of functions
  *
- * Available as `attemptAsyncPipe` and `attemptPipe.async`
+ * _Available as `attemptAsyncPipe` and `attemptPipe.async`_
+ *
  * @param initial Initial value
- * @returns Piped result
+ * @returns _Piped_ result
  */
 export async function attemptAsyncPipe<Initial, First, Second, Third>(
 	initial: GenericCallback | Initial | Promise<Initial> | Result<Initial>,
@@ -56,9 +59,10 @@ export async function attemptAsyncPipe<Initial, First, Second, Third>(
 /**
  * Attempt to pipe a value through a series of functions
  *
- * Available as `attemptAsyncPipe` and `attemptPipe.async`
+ * _Available as `attemptAsyncPipe` and `attemptPipe.async`_
+ *
  * @param initial Initial value
- * @returns Piped result
+ * @returns _Piped_ result
  */
 export async function attemptAsyncPipe<Initial, First, Second, Third, Fourth>(
 	initial: GenericCallback | Initial | Promise<Initial> | Result<Initial>,
@@ -71,9 +75,10 @@ export async function attemptAsyncPipe<Initial, First, Second, Third, Fourth>(
 /**
  * Attempt to pipe a value through a series of functions
  *
- * Available as `attemptAsyncPipe` and `attemptPipe.async`
+ * _Available as `attemptAsyncPipe` and `attemptPipe.async`_
+ *
  * @param initial Initial value
- * @returns Piped result
+ * @returns _Piped_ result
  */
 export async function attemptAsyncPipe<Initial, First, Second, Third, Fourth, Fifth>(
 	initial: GenericCallback | Initial | Promise<Initial> | Result<Initial>,
@@ -87,9 +92,10 @@ export async function attemptAsyncPipe<Initial, First, Second, Third, Fourth, Fi
 /**
  * Attempt to pipe a value through a series of functions
  *
- * Available as `attemptAsyncPipe` and `attemptPipe.async`
+ * _Available as `attemptAsyncPipe` and `attemptPipe.async`_
+ *
  * @param initial Initial value
- * @returns Piped result
+ * @returns _Piped_ result
  */
 export async function attemptAsyncPipe<Initial, First, Second, Third, Fourth, Fifth, Sixth>(
 	initial: GenericCallback | Initial | Promise<Initial> | Result<Initial>,
@@ -104,9 +110,10 @@ export async function attemptAsyncPipe<Initial, First, Second, Third, Fourth, Fi
 /**
  * Attempt to pipe a value through a series of functions
  *
- * Available as `attemptAsyncPipe` and `attemptPipe.async`
+ * _Available as `attemptAsyncPipe` and `attemptPipe.async`_
+ *
  * @param initial Initial value
- * @returns Piped result
+ * @returns _Piped_ result
  */
 export async function attemptAsyncPipe<
 	Initial,
@@ -131,9 +138,10 @@ export async function attemptAsyncPipe<
 /**
  * Attempt to pipe a value through a series of functions
  *
- * Available as `attemptAsyncPipe` and `attemptPipe.async`
+ * _Available as `attemptAsyncPipe` and `attemptPipe.async`_
+ *
  * @param initial Initial value
- * @returns Piped result
+ * @returns _Piped_ result
  */
 export async function attemptAsyncPipe<
 	Initial,
@@ -160,9 +168,10 @@ export async function attemptAsyncPipe<
 /**
  * Attempt to pipe a value through a series of functions
  *
- * Available as `attemptAsyncPipe` and `attemptPipe.async`
+ * _Available as `attemptAsyncPipe` and `attemptPipe.async`_
+ *
  * @param initial Initial value
- * @returns Piped result
+ * @returns _Piped_ result
  */
 export async function attemptAsyncPipe<
 	Initial,
@@ -191,9 +200,10 @@ export async function attemptAsyncPipe<
 /**
  * Attempt to pipe a value through a series of functions
  *
- * Available as `attemptAsyncPipe` and `attemptPipe.async`
+ * _Available as `attemptAsyncPipe` and `attemptPipe.async`_
+ *
  * @param initial Initial value
- * @returns Piped result
+ * @returns _Piped_ result
  */
 export async function attemptAsyncPipe<
 	Initial,
@@ -224,9 +234,10 @@ export async function attemptAsyncPipe<
 /**
  * Attempt to pipe a result through a series of functions
  *
- * Available as `attemptAsyncPipe` and `attemptPipe.async`
+ * _Available as `attemptAsyncPipe` and `attemptPipe.async`_
+ *
  * @param initial Initial result
- * @returns Piped result
+ * @returns _Piped_ result
  */
 export async function attemptAsyncPipe<Initial>(
 	initial: GenericCallback | Initial | Promise<Initial> | Result<Initial>,
@@ -265,8 +276,9 @@ export async function attemptAsyncPipe(
 
 /**
  * Attempt to pipe a value through a function
+ *
  * @param initial Initial value
- * @returns Piped result
+ * @returns _Piped_ result
  */
 export function attemptPipe<Initial, Pipe>(
 	initial: GenericCallback | Initial | Result<Initial>,
@@ -275,8 +287,9 @@ export function attemptPipe<Initial, Pipe>(
 
 /**
  * Attempt to pipe a value through a series of functions
+ *
  * @param initial Initial value
- * @returns Piped result
+ * @returns _Piped_ result
  */
 export function attemptPipe<Initial, First, Second>(
 	initial: GenericCallback | Initial | Result<Initial>,
@@ -286,8 +299,9 @@ export function attemptPipe<Initial, First, Second>(
 
 /**
  * Attempt to pipe a value through a series of functions
+ *
  * @param initial Initial value
- * @returns Piped result
+ * @returns _Piped_ result
  */
 export function attemptPipe<Initial, First, Second, Third>(
 	initial: GenericCallback | Initial | Result<Initial>,
@@ -298,8 +312,9 @@ export function attemptPipe<Initial, First, Second, Third>(
 
 /**
  * Attempt to pipe a value through a series of functions
+ *
  * @param initial Initial value
- * @returns Piped result
+ * @returns _Piped_ result
  */
 export function attemptPipe<Initial, First, Second, Third, Fourth>(
 	initial: GenericCallback | Initial | Result<Initial>,
@@ -311,8 +326,9 @@ export function attemptPipe<Initial, First, Second, Third, Fourth>(
 
 /**
  * Attempt to pipe a value through a series of functions
+ *
  * @param initial Initial value
- * @returns Piped result
+ * @returns _Piped_ result
  */
 export function attemptPipe<Initial, First, Second, Third, Fourth, Fifth>(
 	initial: GenericCallback | Initial | Result<Initial>,
@@ -325,8 +341,9 @@ export function attemptPipe<Initial, First, Second, Third, Fourth, Fifth>(
 
 /**
  * Attempt to pipe a value through a series of functions
+ *
  * @param initial Initial value
- * @returns Piped result
+ * @returns _Piped_ result
  */
 export function attemptPipe<Initial, First, Second, Third, Fourth, Fifth, Sixth>(
 	initial: GenericCallback | Initial | Result<Initial>,
@@ -340,8 +357,9 @@ export function attemptPipe<Initial, First, Second, Third, Fourth, Fifth, Sixth>
 
 /**
  * Attempt to pipe a value through a series of functions
+ *
  * @param initial Initial value
- * @returns Piped result
+ * @returns _Piped_ result
  */
 export function attemptPipe<Initial, First, Second, Third, Fourth, Fifth, Sixth, Seventh>(
 	initial: GenericCallback | Initial | Result<Initial>,
@@ -356,8 +374,9 @@ export function attemptPipe<Initial, First, Second, Third, Fourth, Fifth, Sixth,
 
 /**
  * Attempt to pipe a value through a series of functions
+ *
  * @param initial Initial value
- * @returns Piped result
+ * @returns _Piped_ result
  */
 export function attemptPipe<Initial, First, Second, Third, Fourth, Fifth, Sixth, Seventh, Eighth>(
 	initial: GenericCallback | Initial | Result<Initial>,
@@ -373,8 +392,9 @@ export function attemptPipe<Initial, First, Second, Third, Fourth, Fifth, Sixth,
 
 /**
  * Attempt to pipe a value through a series of functions
+ *
  * @param initial Initial value
- * @returns Piped result
+ * @returns _Piped_ result
  */
 export function attemptPipe<
 	Initial,
@@ -402,8 +422,9 @@ export function attemptPipe<
 
 /**
  * Attempt to pipe a value through a series of functions
+ *
  * @param initial Initial value
- * @returns Piped result
+ * @returns _Piped_ result
  */
 export function attemptPipe<
 	Initial,
@@ -433,8 +454,9 @@ export function attemptPipe<
 
 /**
  * Attempt to pipe a result through a series of functions
+ *
  * @param initial Initial result
- * @returns Piped result
+ * @returns _Piped_ result
  */
 export function attemptPipe<Initial>(
 	initial: GenericCallback | Initial | Result<Initial>,

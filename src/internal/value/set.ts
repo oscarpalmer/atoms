@@ -6,10 +6,18 @@ import {getPaths, handleValue} from './misc';
 
 /**
  * Update the value in an object using a known path
+ *
  * @param data Object to set value in
  * @param path Path for value, e.g., `foo.bar.baz`
  * @param updater Function to update the current value
  * @returns Updated object
+ *
+ * @example
+ * ```typescript
+ * const data = {foo: {bar: {baz: 42}}};
+ *
+ * setValue(data, 'foo.bar.baz', (current) => current + 1); // => {foo: {bar: {baz: 43}}}
+ * ```
  */
 export function setValue<Data extends PlainObject, Path extends NestedKeys<Data>>(
 	data: Data,
@@ -19,10 +27,18 @@ export function setValue<Data extends PlainObject, Path extends NestedKeys<Data>
 
 /**
  * Set the value in an object using a known path
+ *
  * @param data Object to set value in
  * @param path Path for value, e.g., `foo.bar.baz`
  * @param value Value to set
  * @returns Updated object
+ *
+ * @example
+ * ```typescript
+ * const data = {foo: {bar: {baz: 42}}};
+ *
+ * setValue(data, 'foo.bar.baz', 99); // => {foo: {bar: {baz: 99}}}
+ * ```
  */
 export function setValue<Data extends PlainObject, Path extends NestedKeys<Data>>(
 	data: Data,
@@ -32,11 +48,19 @@ export function setValue<Data extends PlainObject, Path extends NestedKeys<Data>
 
 /**
  * Set the value in an object using an unknown path
+ *
  * @param data Object to set value in
  * @param path Path for value, e.g., `foo.bar.baz`
  * @param value Value to set
  * @param ignoreCase If `true`, the path matching is case-insensitive
  * @returns Updated object
+ *
+ * @example
+ * ```typescript
+ * const data = {foo: {bar: {baz: 42}}};
+ *
+ * setValue(data, 'Foo.Bar.Baz', 99, true); // => {foo: {bar: {baz: 99}}}
+ * ```
  */
 export function setValue<Data extends PlainObject>(
 	data: Data,

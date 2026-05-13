@@ -32,9 +32,10 @@ type OnceState<Value> = {
 /**
  * Create an asynchronous function that can only be called once, rejecting or resolving the same result on subsequent calls
  *
- * Available as `asyncOnce` and `once.async`
+ * _Available as `asyncOnce` and `once.async`_
+ *
  * @param callback Callback to use once
- * @returns Once callback
+ * @returns _Once_ callback
  */
 export function asyncOnce<Callback extends GenericAsyncCallback>(
 	callback: Callback,
@@ -132,8 +133,9 @@ function handleOnceResult<Value>(
 
 /**
  * Create a function that can only be called once, returning the same value on subsequent calls
+ *
  * @param callback Callback to use once
- * @returns Once callback
+ * @returns _Once_ callback
  */
 export function once<Callback extends GenericCallback>(callback: Callback): OnceCallback<Callback> {
 	assert(() => typeof callback === 'function', ONCE_MESSAGE_EXPECTATION);

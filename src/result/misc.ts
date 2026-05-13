@@ -5,6 +5,7 @@ import type {AnyResult, Err, ExtendedErr, Ok, Result} from './models';
 
 /**
  * Creates an extended error result
+ *
  * @param value Error value
  * @param original Original error
  * @returns Error result
@@ -13,6 +14,7 @@ export function error<E>(value: E, original: Error): ExtendedErr<E>;
 
 /**
  * Creates an error result
+ *
  * @param value Error value
  * @returns Error result
  */
@@ -37,6 +39,7 @@ export function getError<E>(value: E, original?: Error): Err<E> | ExtendedErr<E>
 
 /**
  * Creates an ok result
+ *
  * @param value Value
  * @returns Ok result
  */
@@ -48,9 +51,10 @@ export function ok<Value>(value: Value): Ok<Value> {
 }
 
 /**
- * Converts a result to a promise
+ * Converts a result to a _Promise_
  *
  * Resolves if ok, rejects for error
+ *
  * @param callback Callback to get the result
  * @returns Promised result
  */
@@ -59,19 +63,21 @@ export async function toPromise<Value, E = Error>(
 ): Promise<Value>;
 
 /**
- * Converts a result to a promise
+ * Converts a result to a _Promise_
  *
  * Resolves if ok, rejects for error
- * @param result Result to convert
+ *
+ * @param result _Result_ to convert
  * @returns Promised result
  */
 export async function toPromise<Value, E = Error>(result: AnyResult<Value, E>): Promise<Value>;
 
 /**
- * Converts a result to a promise
+ * Converts a _Result_ to a _Promise_
  *
  * Resolves if ok, rejects for error
- * @param result Result to convert
+ *
+ * @param result _Result_ to convert
  * @returns Promised result
  */
 export async function toPromise<Value, E = Error>(
@@ -88,17 +94,19 @@ export async function toPromise<Value, E = Error>(
 
 /**
  * Gets the value of an ok result _(or a default value)_
- * @param value Result to unwrap
+ *
+ * @param value _Result_ to unwrap
  * @param defaultValue Default value
- * @returns Value of the result _(or the default value)_
+ * @returns Value of the _Result_ _(or the default value)_
  */
 export function unwrap<Value, E = Error>(value: Result<Value, E>, defaultValue: Value): Value;
 
 /**
  * Gets the value of an ok result _(or a default value)_
- * @param value Result to unwrap
+ *
+ * @param value _Result_ to unwrap
  * @param defaultValue Default value
- * @returns Value of the result _(or the default value)_
+ * @returns Value of the _Result_ _(or the default value)_
  */
 export function unwrap(value: unknown, defaultValue: unknown): unknown;
 

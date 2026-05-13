@@ -12,9 +12,10 @@ import {
 // #region Functions
 
 /**
- * Create a cancelable promise
- * @param executor Executor function for the promise
- * @returns Cancelable promise
+ * Create a cancelable _Promise_
+ *
+ * @param executor Executor function for the _Promise_
+ * @returns Cancelable _Promise_
  */
 export function cancelable<Value>(
 	executor: (resolve: (value: Value) => void, reject: (reason: unknown) => void) => void,
@@ -58,15 +59,17 @@ export function settlePromise(
 }
 
 /**
- * Converts a promise to a promised result
- * @param callback Promise callback
+ * Converts a _Promise_ to a promised result
+ *
+ * @param callback _Promise_ callback
  * @returns Promised result
  */
 export async function toResult<Value>(callback: () => Promise<Value>): Promise<Result<Value>>;
 
 /**
- * Converts a promise to a promised result
- * @param promise Promise to convert
+ * Converts a _Promise_ to a promised result
+ *
+ * @param promise _Promise_ to convert
  * @returns Promised result
  */
 export async function toResult<Value>(promise: Promise<Value>): Promise<Result<Value>>;

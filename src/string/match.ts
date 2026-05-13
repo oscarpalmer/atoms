@@ -10,6 +10,7 @@ type Match = 'endsWith' | 'includes' | 'startsWith';
 
 /**
  * Check if a string ends with a specified substring
+ *
  * @param haystack String to look in
  * @param needle String to look for
  * @param ignoreCase Ignore case when matching? _(defaults to `false`)_
@@ -21,6 +22,7 @@ export function endsWith(haystack: string, needle: string, ignoreCase?: boolean)
 
 /**
  * Check if a string includes a specified substring
+ *
  * @param haystack String to look in
  * @param needle String to look for
  * @param ignoreCase Ignore case when matching? _(defaults to `false`)_
@@ -53,6 +55,7 @@ function matchCallback(
 
 /**
  * Check if a string starts with a specified substring
+ *
  * @param haystack String to look in
  * @param needle String to look for
  * @param ignoreCase Ignore case when matching? _(defaults to `false`)_

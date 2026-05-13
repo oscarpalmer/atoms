@@ -6,16 +6,19 @@ export type Alpha = {
 };
 
 type ColorWithAlpha = {
+	/**
+	 * Alpha channel _(opacity)_ of the color _(in percentage; 0-100)_
+	 */
 	alpha: number;
 };
 
 /**
- * An _HSL_-color with an alpha channel
+ * An _HSL_ color with an alpha channel _(opacity)_
  */
 export type HSLAColor = HSLColor & ColorWithAlpha;
 
 /**
- * An _HSL_-color
+ * An _HSL_ color
  */
 export type HSLColor = {
 	/**
@@ -33,12 +36,12 @@ export type HSLColor = {
 };
 
 /**
- * An _RGB_-color with an alpha channel
+ * An _RGB_ color with an alpha channel _(opacity)_
  */
 export type RGBAColor = RGBColor & ColorWithAlpha;
 
 /**
- * An _RGB_-color
+ * An _RGB_ color
  */
 export type RGBColor = {
 	/**

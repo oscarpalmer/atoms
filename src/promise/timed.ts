@@ -54,10 +54,11 @@ export async function getTimedPromise<Value>(
 }
 
 /**
- * Create a promise that should be settled within a certain amount of time
- * @param promise Promise to settle
+ * Create a _Promise_ that should be settled within a certain amount of time
+ *
+ * @param promise _Promise_ to settle
  * @param options Timed options
- * @returns Timed promise
+ * @returns Timed _Promise_
  */
 export async function timed<Value>(
 	promise: Promise<Value>,
@@ -65,10 +66,11 @@ export async function timed<Value>(
 ): Promise<Value>;
 
 /**
- * Create a promise that should be settled within a certain amount of time
- * @param promise Promise to settle
+ * Create a _Promise_ that should be settled within a certain amount of time
+ *
+ * @param promise _Promise_ to settle
  * @param time How long to wait for _(in milliseconds; defaults to `0`)_
- * @returns Timed promise
+ * @returns Timed _Promise_
  */
 export async function timed<Value>(promise: Promise<Value>, time: number): Promise<Value>;
 

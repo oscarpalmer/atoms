@@ -17,6 +17,8 @@ export * from './function/once';
 export * from './function/retry';
 export * from './function/work';
 
+export * from './herald';
+
 export * from './internal/function/misc';
 export * from './internal/string';
 export * from './internal/value/compare';
@@ -24,8 +26,6 @@ export * from './internal/value/equal';
 export * from './internal/value/get';
 export * from './internal/value/has';
 export * from './internal/value/set';
-
-export * from './kalas';
 
 export * from './string/case';
 export * from './string/fuzzy';
@@ -37,6 +37,7 @@ export * from './string/template';
 export * from './value/clone';
 export * from './value/collection';
 export * from './value/diff';
+export * from './value/freeze';
 export * from './value/index';
 export * from './value/merge';
 export * from './value/transform';

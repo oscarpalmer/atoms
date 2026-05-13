@@ -4,6 +4,7 @@ import {isNumber} from './is';
 
 /**
  * Is the number between a minimum and maximum value?
+ *
  * @param value Value to check
  * @param minimum Minimum value
  * @param maximum Maximum value
@@ -26,11 +27,18 @@ export function between(value: number, minimum: number, maximum: number): boolea
 
 /**
  * Clamp a number between a minimum and maximum value
+ *
  * @param value Value to clamp
  * @param minimum Minimum value
  * @param maximum Maximum value
  * @param loop If `true`, the value will loop around when smaller than the minimum or larger than the maximum _(defaults to `false`)_
  * @returns Clamped value
+ *
+ * @example
+ * ```typescript
+ * clamp(10, 0, 5);       // => 5
+ * clamp(10, 0, 5, true); // => 0
+ * ```
  */
 export function clamp(value: number, minimum: number, maximum: number, loop?: boolean): number {
 	if (![value, minimum, maximum].every(isNumber)) {
@@ -47,9 +55,12 @@ export function clamp(value: number, minimum: number, maximum: number, loop?: bo
 }
 
 /**
- * Get the number value from an unknown value _(based on Lodash)_
+ * Get the number value from an unknown value
+ *
+ * _(Based on Lodash)_
+ *
  * @param value Original value
- * @returns Original value as a number, or `NaN` if the value is unable to be parsed
+ * @returns Original value as a number, or `Number.NaN` if the value is unable to be parsed
  */
 export function getNumber(value: unknown): number {
 	if (typeof value === 'number') {

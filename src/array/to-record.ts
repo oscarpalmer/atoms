@@ -187,7 +187,7 @@ toRecord.arrays = toRecordArrays;
 /**
  * Create a record from an array of items using callbacks, grouping values into arrays
  *
- * Available as `toRecordArrays` and `toRecord.arrays`
+ * _Available as `toRecordArrays` and `toRecord.arrays`_
  *
  * @param array Array to convert
  * @param key Callback to get an item's grouping key
@@ -216,7 +216,7 @@ export function toRecordArrays<
 /**
  * Create a record from an array of items using a callback and value, grouping values into arrays
  *
- * Available as `toRecordArrays` and `toRecord.arrays`
+ * _Available as `toRecordArrays` and `toRecord.arrays`_
  *
  * @param array Array to convert
  * @param callback Callback to get an item's grouping key
@@ -245,7 +245,7 @@ export function toRecordArrays<
 /**
  * Create a record from an array of items using a key and callback, grouping values into arrays
  *
- * Available as `toRecordArrays` and `toRecord.arrays`
+ * _Available as `toRecordArrays` and `toRecord.arrays`_
  *
  * @param array Array to convert
  * @param key Key to use for grouping
@@ -274,7 +274,7 @@ export function toRecordArrays<
 /**
  * Create a record from an array of items using a key and value, grouping values into arrays
  *
- * Available as `toRecordArrays` and `toRecord.arrays`
+ * _Available as `toRecordArrays` and `toRecord.arrays`_
  *
  * @param array Array to convert
  * @param key Key to use for grouping
@@ -303,7 +303,7 @@ export function toRecordArrays<
 /**
  * Create a record from an array of items using a callback, grouping items into arrays
  *
- * Available as `toRecordArrays` and `toRecord.arrays`
+ * _Available as `toRecordArrays` and `toRecord.arrays`_
  *
  * @param array Array to convert
  * @param callback Callback to get an item's grouping key
@@ -325,7 +325,7 @@ export function toRecordArrays<
 /**
  * Create a record from an array of items using a key, grouping items into arrays
  *
- * Available as `toRecordArrays` and `toRecord.arrays`
+ * _Available as `toRecordArrays` and `toRecord.arrays`_
  *
  * @param array Array to convert
  * @param key Key to use for grouping

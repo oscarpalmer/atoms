@@ -6,14 +6,14 @@ import {assert, type Asserter} from './assert';
 // #region Types
 
 /**
- * A synchronous Flow, a function that pipe a value through a series of functions
+ * A synchronous _Flow_, a function that pipe a value through a series of functions
  */
 export type Flow<Callback extends GenericCallback, Value> = (
 	...args: Parameters<Callback>
 ) => UnwrapValue<Value>;
 
 /**
- * An asynchronous Flow, a function that pipes a value through a series of functions
+ * An asynchronous _Flow_, a function that pipes a value through a series of functions
  */
 export type FlowPromise<Callback extends GenericCallback, Value> = (
 	...args: Parameters<Callback>
@@ -28,18 +28,20 @@ export type FlowPromise<Callback extends GenericCallback, Value> = (
 // #region Asynchronous
 
 /**
- * Create an asynchronous Flow, a function that pipes values through a function
+ * Create an asynchronous _Flow_, a function that pipes values through a function
  *
- * Available as `asyncFlow` and `flow.async`
- * @returns Flow function
+ * _Available as `asyncFlow` and `flow.async`_
+ *
+ * @returns _Flow_ function
  */
 export function asyncFlow<Fn extends GenericCallback>(fn: Fn): FlowPromise<Fn, ReturnType<Fn>>;
 
 /**
- * Create an asynchronous Flow, a function that pipes values through a series of functions
+ * Create an asynchronous _Flow_, a function that pipes values through a series of functions
  *
- * Available as `asyncFlow` and `flow.async`
- * @returns Flow function
+ * _Available as `asyncFlow` and `flow.async`_
+ *
+ * @returns _Flow_ function
  */
 export function asyncFlow<First extends GenericCallback, Second>(
 	first: First,
@@ -47,10 +49,11 @@ export function asyncFlow<First extends GenericCallback, Second>(
 ): FlowPromise<First, Second>;
 
 /**
- * Create an asynchronous Flow, a function that pipes values through a series of functions
+ * Create an asynchronous _Flow_, a function that pipes values through a series of functions
  *
- * Available as `asyncFlow` and `flow.async`
- * @returns Flow function
+ * _Available as `asyncFlow` and `flow.async`_
+ *
+ * @returns _Flow_ function
  */
 export function asyncFlow<First extends GenericCallback, Second, Third>(
 	first: First,
@@ -59,10 +62,11 @@ export function asyncFlow<First extends GenericCallback, Second, Third>(
 ): FlowPromise<First, Third>;
 
 /**
- * Create an asynchronous Flow, a function that pipes values through a series of functions
+ * Create an asynchronous _Flow_, a function that pipes values through a series of functions
  *
- * Available as `asyncFlow` and `flow.async`
- * @returns Flow function
+ * _Available as `asyncFlow` and `flow.async`_
+ *
+ * @returns _Flow_ function
  */
 export function asyncFlow<First extends GenericCallback, Second, Third, Fourth>(
 	first: First,
@@ -72,10 +76,11 @@ export function asyncFlow<First extends GenericCallback, Second, Third, Fourth>(
 ): FlowPromise<First, Fourth>;
 
 /**
- * Create an asynchronous Flow, a function that pipes values through a series of functions
+ * Create an asynchronous _Flow_, a function that pipes values through a series of functions
  *
- * Available as `asyncFlow` and `flow.async`
- * @returns Flow function
+ * _Available as `asyncFlow` and `flow.async`_
+ *
+ * @returns _Flow_ function
  */
 export function asyncFlow<First extends GenericCallback, Second, Third, Fourth, Fifth>(
 	first: First,
@@ -86,10 +91,11 @@ export function asyncFlow<First extends GenericCallback, Second, Third, Fourth, 
 ): FlowPromise<First, Fifth>;
 
 /**
- * Create an asynchronous Flow, a function that pipes values through a series of functions
+ * Create an asynchronous _Flow_, a function that pipes values through a series of functions
  *
- * Available as `asyncFlow` and `flow.async`
- * @returns Flow function
+ * _Available as `asyncFlow` and `flow.async`_
+ *
+ * @returns _Flow_ function
  */
 export function asyncFlow<First extends GenericCallback, Second, Third, Fourth, Fifth, Sixth>(
 	first: First,
@@ -101,10 +107,11 @@ export function asyncFlow<First extends GenericCallback, Second, Third, Fourth, 
 ): FlowPromise<First, Sixth>;
 
 /**
- * Create an asynchronous Flow, a function that pipes values through a series of functions
+ * Create an asynchronous _Flow_, a function that pipes values through a series of functions
  *
- * Available as `asyncFlow` and `flow.async`
- * @returns Flow function
+ * _Available as `asyncFlow` and `flow.async`_
+ *
+ * @returns _Flow_ function
  */
 export function asyncFlow<
 	First extends GenericCallback,
@@ -125,10 +132,11 @@ export function asyncFlow<
 ): FlowPromise<First, Seventh>;
 
 /**
- * Create an asynchronous Flow, a function that pipes values through a series of functions
+ * Create an asynchronous _Flow_, a function that pipes values through a series of functions
  *
- * Available as `asyncFlow` and `flow.async`
- * @returns Flow function
+ * _Available as `asyncFlow` and `flow.async`_
+ *
+ * @returns _Flow_ function
  */
 export function asyncFlow<
 	First extends GenericCallback,
@@ -151,10 +159,11 @@ export function asyncFlow<
 ): FlowPromise<First, Eighth>;
 
 /**
- * Create an asynchronous Flow, a function that pipes values through a series of functions
+ * Create an asynchronous _Flow_, a function that pipes values through a series of functions
  *
- * Available as `asyncFlow` and `flow.async`
- * @returns Flow function
+ * _Available as `asyncFlow` and `flow.async`_
+ *
+ * @returns _Flow_ function
  */
 export function asyncFlow<
 	First extends GenericCallback,
@@ -179,10 +188,11 @@ export function asyncFlow<
 ): FlowPromise<First, Ninth>;
 
 /**
- * Create an asynchronous Flow, a function that pipes values through a series of functions
+ * Create an asynchronous _Flow_, a function that pipes values through a series of functions
  *
- * Available as `asyncFlow` and `flow.async`
- * @returns Flow function
+ * _Available as `asyncFlow` and `flow.async`_
+ *
+ * @returns _Flow_ function
  */
 export function asyncFlow<
 	First extends GenericCallback,
@@ -209,10 +219,11 @@ export function asyncFlow<
 ): FlowPromise<First, Tenth>;
 
 /**
- * Create an asynchronous Flow, a function that pipes values through a series of functions
+ * Create an asynchronous _Flow_, a function that pipes values through a series of functions
  *
- * Available as `asyncFlow` and `flow.async`
- * @returns Flow function
+ * _Available as `asyncFlow` and `flow.async`_
+ *
+ * @returns _Flow_ function
  */
 export function asyncFlow<Fn extends GenericCallback>(
 	fn: Fn,
@@ -220,10 +231,11 @@ export function asyncFlow<Fn extends GenericCallback>(
 ): FlowPromise<Fn, ReturnType<Fn>>;
 
 /**
- * Create an asynchronous Flow, a function that pipes values through a series of functions
+ * Create an asynchronous _Flow_, a function that pipes values through a series of functions
  *
- * Available as `asyncFlow` and `flow.async`
- * @returns Flow function
+ * _Available as `asyncFlow` and `flow.async`_
+ *
+ * @returns _Flow_ function
  */
 export function asyncFlow(...fns: GenericCallback[]): (...args: unknown[]) => Promise<unknown>;
 
@@ -249,14 +261,16 @@ export function asyncFlow(...fns: GenericCallback[]): (...args: unknown[]) => Pr
 // #region Synchronous
 
 /**
- * Create a Flow, a function that pipes values through a function
- * @returns Flow function
+ * Create a _Flow_, a function that pipes values through a function
+ *
+ * @returns _Flow_ function
  */
 export function flow<Fn extends GenericCallback>(fn: Fn): Flow<Fn, ReturnType<Fn>>;
 
 /**
- * Create a Flow, a function that pipes values through a series of functions
- * @returns Flow function
+ * Create a _Flow_, a function that pipes values through a series of functions
+ *
+ * @returns _Flow_ function
  */
 export function flow<First extends GenericCallback, Second>(
 	first: First,
@@ -264,8 +278,9 @@ export function flow<First extends GenericCallback, Second>(
 ): Flow<First, Second>;
 
 /**
- * Create a Flow, a function that pipes values through a series of functions
- * @returns Flow function
+ * Create a _Flow_, a function that pipes values through a series of functions
+ *
+ * @returns _Flow_ function
  */
 export function flow<First extends GenericCallback, Second, Third>(
 	first: First,
@@ -274,8 +289,9 @@ export function flow<First extends GenericCallback, Second, Third>(
 ): Flow<First, Third>;
 
 /**
- * Create a Flow, a function that pipes values through a series of functions
- * @returns Flow function
+ * Create a _Flow_, a function that pipes values through a series of functions
+ *
+ * @returns _Flow_ function
  */
 export function flow<First extends GenericCallback, Second, Third, Fourth>(
 	first: First,
@@ -285,8 +301,9 @@ export function flow<First extends GenericCallback, Second, Third, Fourth>(
 ): Flow<First, Fourth>;
 
 /**
- * Create a Flow, a function that pipes values through a series of functions
- * @returns Flow function
+ * Create a _Flow_, a function that pipes values through a series of functions
+ *
+ * @returns _Flow_ function
  */
 export function flow<First extends GenericCallback, Second, Third, Fourth, Fifth>(
 	first: First,
@@ -297,8 +314,9 @@ export function flow<First extends GenericCallback, Second, Third, Fourth, Fifth
 ): Flow<First, Fifth>;
 
 /**
- * Create a Flow, a function that pipes values through a series of functions
- * @returns Flow function
+ * Create a _Flow_, a function that pipes values through a series of functions
+ *
+ * @returns _Flow_ function
  */
 export function flow<First extends GenericCallback, Second, Third, Fourth, Fifth, Sixth>(
 	first: First,
@@ -310,8 +328,9 @@ export function flow<First extends GenericCallback, Second, Third, Fourth, Fifth
 ): Flow<First, Sixth>;
 
 /**
- * Create a Flow, a function that pipes values through a series of functions
- * @returns Flow function
+ * Create a _Flow_, a function that pipes values through a series of functions
+ *
+ * @returns _Flow_ function
  */
 export function flow<First extends GenericCallback, Second, Third, Fourth, Fifth, Sixth, Seventh>(
 	first: First,
@@ -324,8 +343,9 @@ export function flow<First extends GenericCallback, Second, Third, Fourth, Fifth
 ): Flow<First, Seventh>;
 
 /**
- * Create a Flow, a function that pipes values through a series of functions
- * @returns Flow function
+ * Create a _Flow_, a function that pipes values through a series of functions
+ *
+ * @returns _Flow_ function
  */
 export function flow<
 	First extends GenericCallback,
@@ -348,8 +368,9 @@ export function flow<
 ): Flow<First, Eighth>;
 
 /**
- * Create a Flow, a function that pipes values through a series of functions
- * @returns Flow function
+ * Create a _Flow_, a function that pipes values through a series of functions
+ *
+ * @returns _Flow_ function
  */
 export function flow<
 	First extends GenericCallback,
@@ -374,8 +395,9 @@ export function flow<
 ): Flow<First, Ninth>;
 
 /**
- * Create a Flow, a function that pipes values through a series of functions
- * @returns Flow function
+ * Create a _Flow_, a function that pipes values through a series of functions
+ *
+ * @returns _Flow_ function
  */
 export function flow<
 	First extends GenericCallback,
@@ -402,8 +424,9 @@ export function flow<
 ): Flow<First, Tenth>;
 
 /**
- * Create a Flow, a function that pipes values through a series of functions
- * @returns Flow function
+ * Create a _Flow_, a function that pipes values through a series of functions
+ *
+ * @returns _Flow_ function
  */
 export function flow<First extends GenericCallback>(
 	first: First,
@@ -411,8 +434,9 @@ export function flow<First extends GenericCallback>(
 ): Flow<First, ReturnType<First>>;
 
 /**
- * Create a Flow, a function that pipes values through a series of functions
- * @returns Flow function
+ * Create a _Flow_, a function that pipes values through a series of functions
+ *
+ * @returns _Flow_ function
  */
 export function flow(...fns: GenericCallback[]): (...args: unknown[]) => unknown;
 
@@ -446,9 +470,10 @@ flow.async = asyncFlow;
 /**
  * Pipe a value through a function
  *
- * Available as `asyncPipe` and `pipe.async`
+ * _Available as `asyncPipe` and `pipe.async`_
+ *
  * @param value Initial value
- * @returns Piped result
+ * @returns _Piped_ result
  */
 export async function asyncPipe<Initial, Piped>(
 	value: Initial,
@@ -458,9 +483,10 @@ export async function asyncPipe<Initial, Piped>(
 /**
  * Pipe a value through a series of functions
  *
- * Available as `asyncPipe` and `pipe.async`
+ * _Available as `asyncPipe` and `pipe.async`_
+ *
  * @param value Initial value
- * @returns Piped result
+ * @returns _Piped_ result
  */
 export async function asyncPipe<Initial, First, Second>(
 	value: Initial,
@@ -471,9 +497,10 @@ export async function asyncPipe<Initial, First, Second>(
 /**
  * Pipe a value through a series of functions
  *
- * Available as `asyncPipe` and `pipe.async`
+ * _Available as `asyncPipe` and `pipe.async`_
+ *
  * @param value Initial value
- * @returns Piped result
+ * @returns _Piped_ result
  */
 export async function asyncPipe<Initial, First, Second, Third>(
 	value: Initial,
@@ -485,9 +512,10 @@ export async function asyncPipe<Initial, First, Second, Third>(
 /**
  * Pipe a value through a series of functions
  *
- * Available as `asyncPipe` and `pipe.async`
+ * _Available as `asyncPipe` and `pipe.async`_
+ *
  * @param value Initial value
- * @returns Piped result
+ * @returns _Piped_ result
  */
 export async function asyncPipe<Initial, First, Second, Third, Fourth>(
 	value: Initial,
@@ -500,9 +528,10 @@ export async function asyncPipe<Initial, First, Second, Third, Fourth>(
 /**
  * Pipe a value through a series of functions
  *
- * Available as `asyncPipe` and `pipe.async`
+ * _Available as `asyncPipe` and `pipe.async`_
+ *
  * @param value Initial value
- * @returns Piped result
+ * @returns _Piped_ result
  */
 export async function asyncPipe<Initial, First, Second, Third, Fourth, Fifth>(
 	value: Initial,
@@ -516,9 +545,10 @@ export async function asyncPipe<Initial, First, Second, Third, Fourth, Fifth>(
 /**
  * Pipe a value through a series of functions
  *
- * Available as `asyncPipe` and `pipe.async`
+ * _Available as `asyncPipe` and `pipe.async`_
+ *
  * @param value Initial value
- * @returns Piped result
+ * @returns _Piped_ result
  */
 export async function asyncPipe<Initial, First, Second, Third, Fourth, Fifth, Sixth>(
 	value: Initial,
@@ -533,9 +563,10 @@ export async function asyncPipe<Initial, First, Second, Third, Fourth, Fifth, Si
 /**
  * Pipe a value through a series of functions
  *
- * Available as `asyncPipe` and `pipe.async`
+ * _Available as `asyncPipe` and `pipe.async`_
+ *
  * @param value Initial value
- * @returns Piped result
+ * @returns _Piped_ result
  */
 export async function asyncPipe<Initial, First, Second, Third, Fourth, Fifth, Sixth, Seventh>(
 	value: Initial,
@@ -551,9 +582,10 @@ export async function asyncPipe<Initial, First, Second, Third, Fourth, Fifth, Si
 /**
  * Pipe a value through a series of functions
  *
- * Available as `asyncPipe` and `pipe.async`
+ * _Available as `asyncPipe` and `pipe.async`_
+ *
  * @param value Initial value
- * @returns Piped result
+ * @returns _Piped_ result
  */
 export async function asyncPipe<
 	Initial,
@@ -580,9 +612,10 @@ export async function asyncPipe<
 /**
  * Pipe a value through a series of functions
  *
- * Available as `asyncPipe` and `pipe.async`
+ * _Available as `asyncPipe` and `pipe.async`_
+ *
  * @param value Initial value
- * @returns Piped result
+ * @returns _Piped_ result
  */
 export async function asyncPipe<
 	Initial,
@@ -611,9 +644,10 @@ export async function asyncPipe<
 /**
  * Pipe a value through a series of functions
  *
- * Available as `asyncPipe` and `pipe.async`
+ * _Available as `asyncPipe` and `pipe.async`_
+ *
  * @param value Initial value
- * @returns Piped result
+ * @returns _Piped_ result
  */
 export async function asyncPipe<
 	Initial,
@@ -644,9 +678,10 @@ export async function asyncPipe<
 /**
  * Pipe a value through a series of functions
  *
- * Available as `asyncPipe` and `pipe.async`
+ * _Available as `asyncPipe` and `pipe.async`_
+ *
  * @param value Initial value
- * @returns Piped result
+ * @returns _Piped_ result
  */
 export async function asyncPipe<Value>(
 	value: Value,
@@ -656,9 +691,10 @@ export async function asyncPipe<Value>(
 /**
  * Pipe a value through a series of functions
  *
- * Available as `asyncPipe` and `pipe.async`
+ * _Available as `asyncPipe` and `pipe.async`_
+ *
  * @param value Initial value
- * @returns Piped result
+ * @returns _Piped_ result
  */
 export async function asyncPipe(
 	value: unknown,
@@ -680,8 +716,9 @@ export async function asyncPipe(
 
 /**
  * Pipe a value through a function
+ *
  * @param value Initial value
- * @returns Piped result
+ * @returns _Piped_ result
  */
 export function pipe<Initial, Piped>(
 	value: Initial,
@@ -690,8 +727,9 @@ export function pipe<Initial, Piped>(
 
 /**
  * Pipe a value through a series of functions
+ *
  * @param value Initial value
- * @returns Piped result
+ * @returns _Piped_ result
  */
 export function pipe<Initial, First, Second>(
 	value: Initial,
@@ -701,8 +739,9 @@ export function pipe<Initial, First, Second>(
 
 /**
  * Pipe a value through a series of functions
+ *
  * @param value Initial value
- * @returns Piped result
+ * @returns _Piped_ result
  */
 export function pipe<Initial, First, Second, Third>(
 	value: Initial,
@@ -713,8 +752,9 @@ export function pipe<Initial, First, Second, Third>(
 
 /**
  * Pipe a value through a series of functions
+ *
  * @param value Initial value
- * @returns Piped result
+ * @returns _Piped_ result
  */
 export function pipe<Initial, First, Second, Third, Fourth>(
 	value: Initial,
@@ -726,8 +766,9 @@ export function pipe<Initial, First, Second, Third, Fourth>(
 
 /**
  * Pipe a value through a series of functions
+ *
  * @param value Initial value
- * @returns Piped result
+ * @returns _Piped_ result
  */
 export function pipe<Initial, First, Second, Third, Fourth, Fifth>(
 	value: Initial,
@@ -740,8 +781,9 @@ export function pipe<Initial, First, Second, Third, Fourth, Fifth>(
 
 /**
  * Pipe a value through a series of functions
+ *
  * @param value Initial value
- * @returns Piped result
+ * @returns _Piped_ result
  */
 export function pipe<Initial, First, Second, Third, Fourth, Fifth, Sixth>(
 	value: Initial,
@@ -755,8 +797,9 @@ export function pipe<Initial, First, Second, Third, Fourth, Fifth, Sixth>(
 
 /**
  * Pipe a value through a series of functions
+ *
  * @param value Initial value
- * @returns Piped result
+ * @returns _Piped_ result
  */
 export function pipe<Initial, First, Second, Third, Fourth, Fifth, Sixth, Seventh>(
 	value: Initial,
@@ -771,8 +814,9 @@ export function pipe<Initial, First, Second, Third, Fourth, Fifth, Sixth, Sevent
 
 /**
  * Pipe a value through a series of functions
+ *
  * @param value Initial value
- * @returns Piped result
+ * @returns _Piped_ result
  */
 export function pipe<Initial, First, Second, Third, Fourth, Fifth, Sixth, Seventh, Eighth>(
 	value: Initial,
@@ -788,8 +832,9 @@ export function pipe<Initial, First, Second, Third, Fourth, Fifth, Sixth, Sevent
 
 /**
  * Pipe a value through a series of functions
+ *
  * @param value Initial value
- * @returns Piped result
+ * @returns _Piped_ result
  */
 export function pipe<Initial, First, Second, Third, Fourth, Fifth, Sixth, Seventh, Eighth, Ninth>(
 	value: Initial,
@@ -806,8 +851,9 @@ export function pipe<Initial, First, Second, Third, Fourth, Fifth, Sixth, Sevent
 
 /**
  * Pipe a value through a series of functions
+ *
  * @param value Initial value
- * @returns Piped result
+ * @returns _Piped_ result
  */
 export function pipe<
 	Initial,
@@ -837,8 +883,9 @@ export function pipe<
 
 /**
  * Pipe a value through a series of functions
+ *
  * @param value Initial value
- * @returns Piped result
+ * @returns _Piped_ result
  */
 export function pipe<Value>(
 	value: Value,
@@ -847,8 +894,9 @@ export function pipe<Value>(
 
 /**
  * Pipe a value through a series of functions
+ *
  * @param value Initial value
- * @returns Piped result
+ * @returns _Piped_ result
  */
 export function pipe(value: unknown, ...pipes: Array<(value: unknown) => unknown>): unknown;
 

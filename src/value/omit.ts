@@ -5,6 +5,7 @@ import type {PlainObject} from '../models';
 
 /**
  * Create a new object without the specified keys
+ *
  * @param value Original object
  * @param keys Keys to omit
  * @returns Partial object without the specified keys

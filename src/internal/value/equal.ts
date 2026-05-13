@@ -30,6 +30,7 @@ export type EqualOptions = {
 type Equalizer = {
 	/**
 	 * Are two strings equal?
+	 *
 	 * @param first First string
 	 * @param second Second string
 	 * @param ignoreCase If `true`, comparison will be case-insensitive
@@ -39,6 +40,7 @@ type Equalizer = {
 
 	/**
 	 * Are two values equal?
+	 *
 	 * @param first First value
 	 * @param second Second value
 	 * @returns `true` if the values are equal, otherwise `false`
@@ -47,12 +49,14 @@ type Equalizer = {
 
 	/**
 	 * Deregister a equality comparison handler for a specific class
+	 *
 	 * @param constructor Class constructor
 	 */
 	deregister: <Instance>(constructor: Constructor<Instance>) => void;
 
 	/**
 	 * Register a equality comparison function for a specific class
+	 *
 	 * @param constructor Class constructor
 	 * @param handler Comparison function
 	 */
@@ -81,7 +85,8 @@ type OptionsKeys<Values> = {
 /**
  * Deregister a equality comparison handler for a specific class
  *
- * Available as `deregisterEqualizer` and `equal.deregister`
+ * _Available as `deregisterEqualizer` and `equal.deregister`_
+ *
  * @param constructor Class constructor
  */
 export function deregisterEqualizer<Instance>(constructor: Constructor<Instance>): void {
@@ -109,6 +114,7 @@ function filterKey(key: string | symbol, options: Options): boolean {
 
 /**
  * Are two strings equal?
+ *
  * @param first First string
  * @param second Second string
  * @param ignoreCase If `true`, comparison will be case-insensitive
@@ -118,6 +124,7 @@ export function equal(first: string, second: string, ignoreCase?: boolean): bool
 
 /**
  * Are two values equal?
+ *
  * @param first First value
  * @param second Second value
  * @param options Comparison options
@@ -331,7 +338,7 @@ function equalValue(first: unknown, second: unknown, options: Options): boolean 
 			return equalArrayBuffer(first, second, options);
 
 		case first instanceof Date && second instanceof Date:
-			return Object.is(Number(first), Number(second));
+			return Object.is(first.getTime(), (second as Date).getTime());
 
 		case first instanceof DataView && second instanceof DataView:
 			return equalDataView(first, second, options);
@@ -410,7 +417,8 @@ function getEqualOptions(input?: boolean | EqualOptions): Options {
 /**
  * Create an equalizer with predefined options
  *
- * Available as `initializeEqualizer` and `equal.initialize`
+ * _Available as `initializeEqualizer` and `equal.initialize`_
+ *
  * @param options Comparison options
  * @returns Equalizer function
  */
@@ -428,7 +436,8 @@ export function initializeEqualizer(options?: EqualOptions): Equalizer {
 /**
  * Register a equality comparison function for a specific class
  *
- * Available as `registerEqualizer` and `equal.register`
+ * _Available as `registerEqualizer` and `equal.register`_
+ *
  * @param constructor Class constructor
  * @param handler Comparison function
  */

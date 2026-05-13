@@ -11,14 +11,24 @@ const CLONE_NAME = 'clone';
 // #region Functions
 
 /**
+ * Clone any kind of value _(shallowly)_
+ *
+ * @param value Value to clone
+ * @param flat Clone only the value itself, without cloning nested values
+ * @returns Cloned value
+ */
+export function clone<Value>(value: Value, flat: true): Value;
+
+/**
  * Clone any kind of value _(deeply, if needed)_
+ *
  * @param value Value to clone
  * @returns Cloned value
  */
 export function clone<Value>(value: Value): Value;
 
-export function clone(value: unknown): unknown {
-	return cloneValue(value, 0, new WeakMap());
+export function clone(value: unknown, flat?: boolean): unknown {
+	return flat === true ? copy(value) : cloneValue(value, 0, new WeakMap(), false);
 }
 
 clone.handlers = getSelfHandlers(clone, {
@@ -69,6 +79,7 @@ function cloneMap(
 	map: Map<unknown, unknown>,
 	depth: number,
 	references: WeakMap<WeakKey, unknown>,
+	flat: boolean,
 ): Map<unknown, unknown> {
 	if (depth >= MAX_CLONE_DEPTH) {
 		return map;
@@ -79,8 +90,8 @@ function cloneMap(
 
 	for (const entry of entries) {
 		cloned.set(
-			cloneValue(entry[0], depth + 1, references),
-			cloneValue(entry[1], depth + 1, references),
+			flat ? entry[0] : cloneValue(entry[0], depth + 1, references, false),
+			flat ? entry[1] : cloneValue(entry[1], depth + 1, references, false),
 		);
 	}
 
@@ -101,12 +112,13 @@ function cloneNode(node: Node, depth: number, references: WeakMap<WeakKey, unkno
 	return cloned;
 }
 
-function clonePlainObject(
+function cloneObject(
 	value: ArrayOrPlainObject,
 	depth: number,
 	references: WeakMap<WeakKey, unknown>,
+	flat: boolean,
 ): ArrayOrPlainObject {
-	if (depth >= MAX_CLONE_DEPTH) {
+	if (flat || depth >= MAX_CLONE_DEPTH) {
 		return Array.isArray(value) ? value.slice() : {...value};
 	}
 
@@ -117,7 +129,7 @@ function clonePlainObject(
 	for (let index = 0; index < length; index += 1) {
 		const key = keys[index];
 
-		cloned[key] = cloneValue((value as PlainObject)[key], depth + 1, references);
+		cloned[key] = cloneValue((value as PlainObject)[key], depth + 1, references, false);
 	}
 
 	references.set(value, cloned);
@@ -147,6 +159,7 @@ function cloneSet(
 	set: Set<unknown>,
 	depth: number,
 	references: WeakMap<WeakKey, unknown>,
+	flat: boolean,
 ): Set<unknown> {
 	if (depth >= MAX_CLONE_DEPTH) {
 		return set;
@@ -157,7 +170,7 @@ function cloneSet(
 	const {length} = values;
 
 	for (let index = 0; index < length; index += 1) {
-		cloned.add(cloneValue(values[index], depth + 1, references));
+		cloned.add(flat ? values[index] : cloneValue(values[index], depth + 1, references, false));
 	}
 
 	references.set(set, cloned);
@@ -181,25 +194,22 @@ function cloneTypedArray(
 	return cloned as TypedArray;
 }
 
-function cloneValue(value: unknown, depth: number, references: WeakMap<WeakKey, unknown>): unknown {
+function cloneValue(
+	value: unknown,
+	depth: number,
+	references: WeakMap<WeakKey, unknown>,
+	flat: boolean,
+): unknown {
 	switch (true) {
 		case value == null:
-			return value;
-
 		case typeof value === 'bigint':
-			return BigInt(value);
-
 		case typeof value === 'boolean':
-			return Boolean(value);
+		case typeof value === 'number':
+		case typeof value === 'string':
+			return value;
 
 		case typeof value === 'function':
 			return;
-
-		case typeof value === 'number':
-			return Number(value);
-
-		case typeof value === 'string':
-			return String(value);
 
 		case typeof value === 'symbol':
 			return Symbol(value.description);
@@ -220,16 +230,16 @@ function cloneValue(value: unknown, depth: number, references: WeakMap<WeakKey, 
 			return cloneRegularExpression(value, depth, references);
 
 		case value instanceof Map:
-			return cloneMap(value, depth, references);
+			return cloneMap(value, depth, references, flat);
 
 		case typeof Node !== 'undefined' && value instanceof Node:
 			return cloneNode(value, depth, references);
 
 		case value instanceof Set:
-			return cloneSet(value, depth, references);
+			return cloneSet(value, depth, references, flat);
 
 		case isArrayOrPlainObject(value):
-			return clonePlainObject(value, depth, references);
+			return cloneObject(value, depth, references, flat);
 
 		case isTypedArray(value):
 			return cloneTypedArray(value, depth, references);
@@ -240,9 +250,23 @@ function cloneValue(value: unknown, depth: number, references: WeakMap<WeakKey, 
 }
 
 /**
+ * Copy any kind of value
+ *
+ * - Clones the value shallowly, without cloning nested values
+ * - To copy a value deeply, use `clone` instead
+ *
+ * @param value Value to copy
+ * @returns Copied value
+ */
+export function copy<Value>(value: Value): Value {
+	return cloneValue(value, 0, new WeakMap(), true) as Value;
+}
+
+/**
  * Deregister a clone handler for a specific class
  *
- * Available as `deregisterCloner` and `template.deregister`
+ * _Available as `deregisterCloner` and `template.deregister`_
+ *
  * @param constructor Class constructor
  */
 export function deregisterCloner<Instance>(constructor: Constructor<Instance>): void {
@@ -252,9 +276,10 @@ export function deregisterCloner<Instance>(constructor: Constructor<Instance>): 
 /**
  * Register a clone handler for a specific class
  *
- * Available as `registerCloner` and `template.register`
+ * _Available as `registerCloner` and `template.register`_
+ *
  * @param constructor Class constructor
- * @param handler Method name or clone function _(defaults to `clone`)_
+ * @param handler Method name or clone function _(defaults to method name `clone`)_
  */
 export function registerCloner<Instance>(
 	constructor: Constructor<Instance>,

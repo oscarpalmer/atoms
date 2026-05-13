@@ -8,6 +8,9 @@ import type {ArrayOrPlainObject, NestedPartial, PlainObject, UnionToIntersection
  */
 export type AssignOptions = Omit<MergeOptions, 'assignValues'>;
 
+/**
+ * An assigner function for assigning values from one or more objects to the first one
+ */
 export type Assigner = {
 	/**
 	 * Assign values from one or more objects to the first one
@@ -34,7 +37,7 @@ export type MergeOptions = {
 	 * Key _(or key epxressions)_ for values that should be replaced
 	 *
 	 * ```ts
-	 * merge([{items: [1, 2, 3]}, {items: [99]}]); // {items: [99]}
+	 * merge([{items: [1, 2, 3]}, {items: [99]}]); // => {items: [99]}
 	 * ```
 	 */
 	replaceableObjects?: string | RegExp | Array<string | RegExp>;
@@ -42,7 +45,7 @@ export type MergeOptions = {
 	 * Skip nullable values when merging objects?
 	 *
 	 * ```ts
-	 * merge({a: 1, b: 2}, {b: null, c: 3}, {d: null}); // {a: 1, b: 2, c: 3}
+	 * merge({a: 1, b: 2}, {b: null, c: 3}, {d: null}); // => {a: 1, b: 2, c: 3}
 	 * ```
 	 */
 	skipNullableAny?: boolean;
@@ -50,12 +53,15 @@ export type MergeOptions = {
 	 * Skip nullable values when merging arrays?
 	 *
 	 * ```ts
-	 * merge([1, 2, 3], [null, null, 99]); // [1, 2, 99]
+	 * merge([1, 2, 3], [null, null, 99]); // => [1, 2, 99]
 	 * ```
 	 */
 	skipNullableInArrays?: boolean;
 };
 
+/**
+ * A merger function for merging multiple arrays or objects into a single one
+ */
 export type Merger = {
 	/**
 	 * Merge multiple arrays or objects into a single one
@@ -138,7 +144,7 @@ function getReplaceableObjects(value: unknown): ReplaceableObjectsCallback | und
 /**
  * Create an assigner with predefined options
  *
- * Available as `initializeAssigner` and `assign.initialize`
+ * _Available as `initializeAssigner` and `assign.initialize`_
  *
  * @param options Assigning options
  * @returns Assigner function
@@ -155,7 +161,7 @@ export function initializeAssigner(options?: AssignOptions): Assigner {
 /**
  * Create a merger with predefined options
  *
- * Available as `initializeMerger` and `merge.initialize`
+ * _Available as `initializeMerger` and `merge.initialize`_
  *
  * @param options Merging options
  * @returns Merger function

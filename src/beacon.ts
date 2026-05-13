@@ -58,6 +58,7 @@ class Beacon<Value> {
 
 	/**
 	 * Emit a new value
+	 *
 	 * @param value Value to set and emit
 	 * @param finish Finish the beacon after emitting? _(defaults to `false`)_
 	 */
@@ -67,6 +68,7 @@ class Beacon<Value> {
 
 	/**
 	 * Emit an error
+	 *
 	 * @param value Error to emit
 	 * @param finish Finish the beacon after emitting? _(defaults to `false`)_
 	 */
@@ -110,6 +112,7 @@ class Beacon<Value> {
 type BeaconOptions<Value> = {
 	/**
 	 * Method for comparing values for equality
+	 *
 	 * @param first First value
 	 * @param second Second value
 	 * @returns `true` if the values are equal, otherwise `false`
@@ -148,6 +151,7 @@ class Observable<Value> {
 
 	/**
 	 * Subscribe to value changes
+	 *
 	 * @param onNext Callback for when the observable receives a new value
 	 * @param onError Callback for when the observable receives an error
 	 * @param onComplete Callback for when the observable is completed
@@ -161,6 +165,7 @@ class Observable<Value> {
 
 	/**
 	 * Subscribe to value changes
+	 *
 	 * @param observer Observer for changes
 	 * @returns Subscription to the observable
 	 */
@@ -265,6 +270,7 @@ type SubscriptionState<Value> = {
 
 /**
  * Create a new beacon
+ *
  * @param value Initial value
  * @param options Beacon options
  * @returns Beacon instance

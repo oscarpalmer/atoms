@@ -1,4 +1,3 @@
-export {freeze, type Frozen} from './freeze';
 export {omit} from './omit';
 export {pick} from './pick';
 export {shake, type Shaken} from './shake';

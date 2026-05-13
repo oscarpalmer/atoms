@@ -21,6 +21,21 @@ export function getArray<Value extends PlainObject>(
 ): Value[NumericalKeys<Value>][];
 
 /**
+ * Get an array from a map
+ *
+ * @param value Map to convert to an array
+ * @returns Array holding the entries of the map
+ *
+ * @example
+ * ```typescript
+ * getArray(
+ *   new Map([['a', 1], ['b', 2], ['c', 3]]),
+ * ); // => [['a', 1], ['b', 2], ['c', 3]]
+ * ```
+ */
+export function getArray<Key, Value>(map: Map<Key, Value>): [Key, Value][];
+
+/**
  * Get an array from an object
  *
  * @param value Object to convert to an array
@@ -32,7 +47,22 @@ export function getArray<Value extends PlainObject>(
  * getArray({a: 'a', b: 'b', c: 'c', d: 'd'}); // => ['a', 'b', 'c', 'd']
  * ```
  */
-export function getArray<Value extends PlainObject>(value: Value): Value[keyof Value][];
+export function getArray<Value extends PlainObject>(
+	value: Value,
+): [keyof Value, Value[keyof Value]][];
+
+/**
+ * Get an array from a set
+ *
+ * @param value Set to convert to an array
+ * @returns Array holding the values of the set
+ *
+ * @example
+ * ```typescript
+ * getArray(new Set([123, 456, 789])); // => [123, 456, 789]
+ * ```
+ */
+export function getArray<Value>(set: Set<Value>): Value[];
 
 /**
  * Get an array from a value
@@ -65,7 +95,11 @@ export function getArray(value: unknown, indiced?: unknown): unknown[] {
 		return value;
 	}
 
-	if (value instanceof Map || value instanceof Set) {
+	if (value instanceof Map) {
+		return [...value.entries()];
+	}
+
+	if (value instanceof Set) {
 		return [...value.values()];
 	}
 
@@ -74,7 +108,7 @@ export function getArray(value: unknown, indiced?: unknown): unknown[] {
 	}
 
 	if (indiced !== true) {
-		return Object.values(value);
+		return Object.entries(value);
 	}
 
 	const keys = Object.keys(value);
@@ -84,9 +118,10 @@ export function getArray(value: unknown, indiced?: unknown): unknown[] {
 
 	for (let index = 0; index < length; index += 1) {
 		const key = keys[index];
+		const asNumber = Number.parseInt(key, 10);
 
-		if (!Number.isNaN(Number(key))) {
-			array.push(value[key]);
+		if (!Number.isNaN(asNumber)) {
+			array[asNumber] = (value as Record<string, unknown>)[key];
 		}
 	}
 

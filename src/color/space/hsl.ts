@@ -42,9 +42,12 @@ export function hslToHex(hsl: HSLAColor | HSLColor, alpha?: boolean): string {
 }
 
 /**
- * Convert an HSL(A) color to an RGB color
+ * Convert an _HSL(A)_ color to an _RGB_ color
  *
- * Thanks, https://github.com/color-js/color.js/blob/main/src/spaces/hsl.js#L61
+ * _If the value is unable to be converted, a black RGB color will be returned_
+ *
+ * _Thanks, https://github.com/color-js/color.js/blob/main/src/spaces/hsl.js#L61_
+ *
  * @param hsl HSL(A) color
  * @returns RGB color
  */
@@ -59,9 +62,12 @@ export function hslToRgb(hsl: HSLAColor | HSLColor): RGBColor {
 }
 
 /**
- * Convert an HSL(A) color to an RGBA color
+ * Convert an _HSL(A)_ color to an _RGBA_ color
  *
- * Thanks, https://github.com/color-js/color.js/blob/main/src/spaces/hsl.js#L61
+ * _If the value is unable to be converted, a black RGBA color with an alpha channel (opactiy) of `0` will be returned_
+ *
+ * _Thanks, https://github.com/color-js/color.js/blob/main/src/spaces/hsl.js#L61_
+ *
  * @param hsl HSL(A) color
  * @returns RGBA color
  */

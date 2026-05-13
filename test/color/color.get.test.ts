@@ -28,6 +28,7 @@ test('getColor + isColor', () => {
 		expect(color.hsla).toEqual({...hsls[index], alpha: 1});
 		expect(color.rgb).toEqual(rgbs[index]);
 		expect(color.rgba).toEqual({...rgbs[index], alpha: 1});
+		expect(color.alpha).toBe(1);
 
 		let next = getRandomItem(indices.filter(value => value !== index));
 
@@ -82,6 +83,8 @@ test('getForegroundColor', () => {
 	for (let index = 0; index < length; index += 1) {
 		expect(getForegroundColor(rgbs[index]).hex).toBe(foregrounds[index]);
 	}
+
+	expect(getForegroundColor('invalid').hex).toBe('ffffff');
 });
 
 test('getHex(a)Color', () => {

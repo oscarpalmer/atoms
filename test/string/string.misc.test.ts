@@ -1,5 +1,5 @@
 import {expect, test} from 'vitest';
-import {dedent, getString, getUuid, join, parse, template, trim, truncate, words} from '../../src';
+import {dedent, getString, getUuid, join, parse, trim, truncate, words} from '../../src';
 import {
 	TestStringItemWithToString,
 	TestStringItemWithoutToString,
@@ -91,48 +91,6 @@ test('parse', () => {
 	expect(parse('[1,2,3]')).toEqual([1, 2, 3]);
 	expect(parse('{}')).toEqual({});
 	expect(parse('{"a":1}')).toEqual({a: 1});
-});
-
-test('template', () => {
-	const basic = '{{a.0.b.1.c}}, {{a.0.b.1.c}}!';
-	const custom = '<a.0.b.1.c>, <a.0.b.1.c>!';
-
-	const templater = template.initialize();
-
-	const variables = {
-		a: [
-			{
-				B: [
-					null,
-					{
-						c: 'Hello',
-					},
-				],
-			},
-		],
-	};
-
-	expect(template(basic, variables)).toBe(', !');
-	expect(templater(custom, variables)).toBe('<a.0.b.1.c>, <a.0.b.1.c>!');
-
-	expect(
-		template(basic, variables, {
-			ignoreCase: true,
-		}),
-	).toBe('Hello, Hello!');
-
-	expect(
-		template(custom, variables, {
-			ignoreCase: true,
-			pattern: /<([^>]+)>/g,
-		}),
-	).toBe('Hello, Hello!');
-
-	expect(template(123 as never, variables)).toBe('');
-
-	expect(template('This will not be {{templated}}', 'blah' as never)).toBe(
-		'This will not be {{templated}}',
-	);
 });
 
 test('truncate', () => {

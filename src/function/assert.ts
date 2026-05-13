@@ -4,7 +4,7 @@ import type {Constructor, NestedKeys, NestedValue, PlainObject} from '../models'
 // #region Types
 
 /**
- * Asserter for a nested property of a value
+ * Asserter for a property of a value
  */
 export type AssertProperty<
 	Value extends PlainObject,
@@ -33,6 +33,7 @@ type NestedPick<Value, Path extends string> = Value extends PlainObject
 
 /**
  * Asserts that a condition is true, throwing an error if it is not
+ *
  * @param condition Condition to assert
  * @param message Error message
  * @param error Error constructor _(defaults to `Error`)_
@@ -54,13 +55,14 @@ assert.is = assertIs;
 assert.property = assertProperty;
 
 /**
- * Creates an asserter that asserts a condition is true, throwing an error if it is not
+ * Creates an _Asserter_ that asserts a condition is true, throwing an error if it is not
  *
- * Available as `assertCondition` and `assert.condition`
+ * _Available as `assertCondition` and `assert.condition`_
+ *
  * @param condition Condition to assert
  * @param message Error message
  * @param error Error constructor _(defaults to `Error`)_
- * @returns Asserter
+ * @returns _Asserter_
  */
 export function assertCondition<Value>(
 	condition: (value: unknown) => boolean,
@@ -75,7 +77,8 @@ export function assertCondition<Value>(
 /**
  * Asserts that a value is defined, throwing an error if it is not
  *
- * Available as `assertDefined` and `assert.defined`
+ * _Available as `assertDefined` and `assert.defined`_
+ *
  * @param value Value to assert
  * @param message Error message
  * @param error Error constructor _(defaults to `Error`)_
@@ -89,13 +92,14 @@ export function assertDefined<Value>(
 }
 
 /**
- * Creates an asserter that asserts a value is an instance of a constructor, throwing an error if it is not
+ * Creates an _Asserter_ that asserts a value is an instance of a constructor, throwing an error if it is not
  *
- * Available as `assertInstanceOf` and `assert.instanceOf`
+ * _Available as `assertInstanceOf` and `assert.instanceOf`_
+ *
  * @param constructor Constructor to check against
  * @param message Error message
  * @param error Error constructor _(defaults to `Error`)_
- * @returns Asserter
+ * @returns _Asserter_
  */
 export function assertInstanceOf<Value>(
 	constructor: Constructor<Value>,
@@ -108,13 +112,14 @@ export function assertInstanceOf<Value>(
 }
 
 /**
- * Creates an asserter that asserts a value is of a specific type, throwing an error if it is not
+ * Creates an _Asserter_ that asserts a value is of a specific type, throwing an error if it is not
  *
- * Available as `assertIs` and `assert.is`
+ * _Available as `assertIs` and `assert.is`_
+ *
  * @param condition Type guard function to check the value
  * @param message Error message
  * @param error Error constructor _(defaults to `Error`)_
- * @returns Asserter
+ * @returns _Asserter_
  */
 export function assertIs<Value>(
 	condition: (value: unknown) => value is Value,
@@ -127,14 +132,15 @@ export function assertIs<Value>(
 }
 
 /**
- * Creates an asserter that asserts a property of a value exists and satisfies a condition, throwing an error if it does not
+ * Creates an _Asserter_ that asserts a property of a value exists and satisfies a condition, throwing an error if it does not
  *
- * Available as `assertProperty` and `assert.property`
+ * _Available as `assertProperty` and `assert.property`_
+ *
  * @param path Path to the property to check, e.g., `foo.bar.baz` for a nested property
  * @param condition Condition to assert for the property
  * @param message Error message
  * @param error Error constructor _(defaults to `Error`)_
- * @returns Asserter
+ * @returns _Asserter_
  */
 export function assertProperty<
 	Value extends PlainObject,

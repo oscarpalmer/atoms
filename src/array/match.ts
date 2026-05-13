@@ -13,7 +13,8 @@ export type ArrayComparison = 'end' | 'inside' | 'invalid' | 'outside' | 'same' 
 // #region Functions
 
 /**
- * Does the needle array end the haystack array?
+ * Is the needle array at the end of the haystack array?
+ *
  * @param haystack Haystack array
  * @param needle Needle array
  * @param callback Callback to get an item's value for matching
@@ -35,7 +36,7 @@ export function endsWithArray<Item>(
 ): boolean;
 
 /**
- * Does the needle array end the haystack array?
+ * Is the needle array at the end of the haystack array?
  *
  * @param haystack Haystack array
  * @param needle Needle array
@@ -58,7 +59,7 @@ export function endsWithArray<Item extends PlainObject>(
 ): boolean;
 
 /**
- * Does the needle array end the haystack array?
+ * Is the needle array at the end of the haystack array?
  *
  * @param haystack Haystack array
  * @param needle Needle array
@@ -343,7 +344,7 @@ export function indexOfArray(haystack: unknown[], needle: unknown[], key?: unkno
 }
 
 /**
- * Does the needle array start the haystack array?
+ * Is the needle array at the start of the haystack array?
  *
  * @param haystack Haystack array
  * @param needle Needle array
@@ -366,7 +367,7 @@ export function startsWithArray<Item>(
 ): boolean;
 
 /**
- * Does the needle array start the haystack array?
+ * Is the needle array at the start of the haystack array?
  *
  * @param haystack Haystack array
  * @param needle Needle array
@@ -389,7 +390,7 @@ export function startsWithArray<Item extends PlainObject>(
 ): boolean;
 
 /**
- * Does the needle array start the haystack array?
+ * Is the needle array at the start of the haystack array?
  *
  * @param haystack Haystack array
  * @param needle Needle array

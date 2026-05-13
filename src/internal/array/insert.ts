@@ -20,7 +20,7 @@ function insertChunkedValues(
 	const chunked = chunk(items);
 	const lastIndex = chunked.length - 1;
 
-	let index = Number(chunked.length);
+	let index = chunked.length;
 	let returned: unknown[] | undefined;
 
 	while (index > 0) {

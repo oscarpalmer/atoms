@@ -68,18 +68,20 @@ export function getStrategyOrDefault(value: unknown): PromiseStrategy {
 }
 
 /**
- * Is the value a fulfilled promise result?
+ * Is the value a fulfilled _Promise_ result?
+ *
  * @param value Value to check
- * @returns `true` if the value is a fulfilled promise result, `false` otherwise
+ * @returns `true` if the value is a fulfilled _Promise_ result, `false` otherwise
  */
 export function isFulfilled<Value>(value: unknown): value is FulfilledPromise<Value> {
 	return isType(value, PROMISE_TYPE_FULFILLED);
 }
 
 /**
- * Is the value a rejected promise result?
+ * Is the value a rejected _Promise_ result?
+ *
  * @param value Value to check
- * @returns `true` if the value is a rejected promise result, `false` otherwise
+ * @returns `true` if the value is a rejected _Promise_ result, `false` otherwise
  */
 export function isRejected(value: unknown): value is RejectedPromise {
 	return isType(value, PROMISE_TYPE_REJECTED);

@@ -4,6 +4,7 @@ import {getRandomInteger} from '../random';
 
 /**
  * Shuffle items in array
+ *
  * @param array Original array
  * @returns Shuffled array
  */
@@ -18,7 +19,7 @@ export function shuffle<Item>(array: Item[]): Item[] {
 		return shuffled;
 	}
 
-	let index = Number(shuffled.length);
+	let index = shuffled.length;
 
 	while (--index >= 0) {
 		const random = getRandomInteger(0, index);

@@ -62,7 +62,8 @@ function getTransformer<Value extends PlainObject, Key extends keyof Value>(
 /**
  * Initialize a transformer for an object with a transformer function
  *
- * Available as `initializeTransformer` and `transform.initialize`
+ * _Available as `initializeTransformer` and `transform.initialize`_
+ *
  * @param transform Transformer function
  * @returns Transformer
  */
@@ -73,7 +74,8 @@ export function initializeTransformer<Value extends PlainObject>(
 /**
  * Initialize a transformer for an object with transformer functions
  *
- * Available as `initializeTransformer` and `transform.initialize`
+ * _Available as `initializeTransformer` and `transform.initialize`_
+ *
  * @param transformers Keyed transformer functions
  * @returns Transformer
  */
@@ -90,7 +92,8 @@ export function initializeTransformer<Value extends PlainObject>(
 }
 
 /**
- * Transform and objects properties using a transformer functior
+ * Transform and objects properties using a transformer function
+ *
  * @param value Object to transform
  * @param transform Transformer function
  * @returns Transformed object
@@ -102,6 +105,7 @@ export function transform<Value extends PlainObject, Key extends keyof Value>(
 
 /**
  * Transform and objects properties using a transformer object
+ *
  * @param value Object to transform
  * @param transformers Keyed transformer functions
  * @returns Transformed object

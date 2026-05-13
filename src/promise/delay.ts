@@ -7,6 +7,7 @@ import {PROMISE_ABORT_OPTIONS, PROMISE_ABORT_EVENT, type PromiseOptions} from '.
 
 /**
  * Create a delayed promise that resolves after a certain amount of time, or rejects if aborted
+ *
  * @param options Options for the delay
  * @returns Delayed promise
  */
@@ -14,6 +15,7 @@ export function delay(options?: PromiseOptions): Promise<void>;
 
 /**
  * Create a delayed promise that resolves after a certain amount of time
+ *
  * @param time How long to wait for _(in milliseconds; defaults to `0`)_
  * @returns Delayed promise
  */

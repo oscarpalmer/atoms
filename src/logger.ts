@@ -79,19 +79,20 @@ class Logger {
 	}
 
 	/**
-	 * Start a logged timer with a label
-	 * @param label Label for the timer
-	 * @returns Time instance
+	 * Start a timed logger with a label
+	 *
+	 * @param label Label for the logger
+	 * @returns _Timed_ instance
 	 */
-	time(label: string): Time {
-		return new Time(label);
+	time(label: string): Timed {
+		return new Timed(label);
 	}
 }
 
 /**
  * A named timer that can be used to log durations to the console
  */
-class Time {
+class Timed {
 	#logger: typeof console.timeLog | undefined;
 	#stopper: typeof console.timeEnd | undefined;
 
@@ -165,6 +166,6 @@ let enabled = true;
 
 // #region Exports
 
-export {logger, type Logger, type Time};
+export {logger, type Logger, type Timed};
 
 // #endregion

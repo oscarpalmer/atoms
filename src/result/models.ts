@@ -46,6 +46,7 @@ export type Result<Value, E = Error> = Err<E> | Ok<Value>;
 export type ResultMatch<Value, Returned, E = Error> = {
 	/**
 	 * Callback for error result
+	 *
 	 * @param error Error value
 	 * @param original Original error, if available
 	 * @returns Value to return
@@ -53,6 +54,7 @@ export type ResultMatch<Value, Returned, E = Error> = {
 	error: (error: E, original?: Error) => Returned;
 	/**
 	 * Callback for ok result
+	 *
 	 * @param value Ok value
 	 * @returns Value to return
 	 */

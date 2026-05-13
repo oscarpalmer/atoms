@@ -17,15 +17,27 @@ test('', () => {
 	expect(getArray(simple)).toEqual(simple);
 
 	const object = {
-		123: 'one two three',
+		1: 'one two three',
 		alpha: 'omega',
-		999: 'nine nine nine',
+		5: 'nine nine nine',
 		value: {hello: 'world'},
 	};
 
-	expect(getArray(object)).toEqual(['one two three', 'nine nine nine', 'omega', {hello: 'world'}]);
+	expect(getArray(object)).toEqual([
+		['1', 'one two three'],
+		['5', 'nine nine nine'],
+		['alpha', 'omega'],
+		['value', {hello: 'world'}],
+	]);
 
-	expect(getArray(object, true)).toEqual(['one two three', 'nine nine nine']);
+	expect(getArray(object, true)).toEqual([
+		undefined,
+		'one two three',
+		undefined,
+		undefined,
+		undefined,
+		'nine nine nine',
+	]);
 
 	expect(
 		getArray(
@@ -35,6 +47,11 @@ test('', () => {
 				['c', 3],
 			]),
 		),
-	).toEqual([1, 2, 3]);
+	).toEqual([
+		['a', 1],
+		['b', 2],
+		['c', 3],
+	]);
+
 	expect(getArray(new Set(['a', 'b', 'c']))).toEqual(['a', 'b', 'c']);
 });

@@ -7,7 +7,7 @@ import {indexOfArray} from './match';
 /**
  * Move an item _(or array of items)_ to the position of another item _(or array of items)_ within an array
  *
- * When moving to the front of the array, the moved items will be placed __before__ the target item. When moving to the back of the array, the moved items will be placed __after__ the target item.
+ * When moving to the front of the array, the moved items will be placed __before__ the target item. When moving to the back of the array, the moved items will be placed __after__ the target item
  *
  * If either of values are not present in the array, or if they overlap, the array will be returned unchanged
  *
@@ -36,7 +36,7 @@ export function move<Item>(
 /**
  * Move an item _(or array of items)_ to the position of another item _(or array of items)_ within an array
  *
- * When moving to the front of the array, the moved items will be placed __before__ the target item. When moving to the back of the array, the moved items will be placed __after__ the target item.
+ * When moving to the front of the array, the moved items will be placed __before__ the target item. When moving to the back of the array, the moved items will be placed __after__ the target item
  *
  * If either of values are not present in the array, or if they overlap, the array will be returned unchanged
  *
@@ -65,7 +65,7 @@ export function move<Item extends PlainObject, ItemKey extends keyof Item>(
 /**
  * Move an item _(or array of items)_ to the position of another item _(or array of items)_ within an array
  *
- * When moving to the front of the array, the moved items will be placed __before__ the target item. When moving to the back of the array, the moved items will be placed __after__ the target item.
+ * When moving to the front of the array, the moved items will be placed __before__ the target item. When moving to the back of the array, the moved items will be placed __after__ the target item
  *
  * If either of values are not present in the array, or if they overlap, the array will be returned unchanged
  *
@@ -145,7 +145,7 @@ move.toIndex = moveToIndex;
  *
  * If the from index is out of bounds, the array will be returned unchanged
  *
- * Available as `moveIndices` and `move.indices`
+ * _Available as `moveIndices` and `move.indices`_
  *
  * @param array Array to move within
  * @param from Index to move from
@@ -195,7 +195,7 @@ export function moveIndices<Item>(array: Item[], from: number, to: number): Item
  *
  * If the value is not present in the array, or if the index is out of bounds, the array will be returned unchanged
  *
- * Available as `moveToIndex` and `move.toIndex`
+ * _Available as `moveToIndex` and `move.toIndex`_
  *
  * @example
  * ```typescript
@@ -224,7 +224,7 @@ export function moveToIndex<Item>(
  *
  * If the value is not present in the array, or if the index is out of bounds, the array will be returned unchanged
  *
- * Available as `moveToIndex` and `move.toIndex`
+ * _Available as `moveToIndex` and `move.toIndex`_
  *
  * @param array Array to move within
  * @param value Item or items to move
@@ -253,7 +253,7 @@ export function moveToIndex<Item extends PlainObject, ItemKey extends keyof Item
  *
  * If the value is not present in the array, or if the index is out of bounds, the array will be returned unchanged
  *
- * Available as `moveToIndex` and `move.toIndex`
+ * _Available as `moveToIndex` and `move.toIndex`_
  *
  * @param array Array to move within
  * @param value Item or items to move

@@ -14,6 +14,8 @@ class Fuzzy<Item> {
 
 	/**
 	 * Get items currently being searched through
+	 *
+	 * @returns Original items
 	 */
 	get items(): Item[] {
 		return this.#state.items.slice();
@@ -21,6 +23,8 @@ class Fuzzy<Item> {
 
 	/**
 	 * Set new items to search through
+	 *
+	 * @param items New items to search through
 	 */
 	set items(items: Item[]) {
 		if (Array.isArray(items)) {
@@ -31,6 +35,8 @@ class Fuzzy<Item> {
 
 	/**
 	 * Get strings currently being searched through _(the stringified version of `items`)_
+	 *
+	 * @returns Stringified items
 	 */
 	get strings(): string[] {
 		return this.#state.strings.slice();
@@ -42,6 +48,7 @@ class Fuzzy<Item> {
 
 	/**
 	 * Search for items matching the given value
+	 *
 	 * @param value Value to search for
 	 * @param options Search options
 	 * @returns Search results, with exact matches _(ordered)_ and similar matches _(ordered by relevance)_
@@ -50,6 +57,7 @@ class Fuzzy<Item> {
 
 	/**
 	 * Search for items matching the given value
+	 *
 	 * @param value Value to search for
 	 * @param limit Maximum number of combined items to return in `exact` and `similar`
 	 * @returns Search results, with exact matches _(ordered)_ and similar matches _(ordered by relevance)_
@@ -70,9 +78,8 @@ export type FuzzyConfiguration<Item> = {
 	/**
 	 * Handler to stringify items
 	 *
-	 * May be a function that takes an item and returns a string, or if items are plain objects, a key of the item to use to grab a string value from
-	 *
-	 * Defaults to `getString`
+	 * - May be a function that takes an item and returns a string, or if items are plain objects, a key of the item to use to grab a string value from
+	 * - Defaults to `getString`
 	 */
 	handler?: (item: Item) => string;
 } & (Item extends PlainObject
@@ -80,7 +87,7 @@ export type FuzzyConfiguration<Item> = {
 			/**
 			 * Key to use to stringify items
 			 *
-			 * Prioritized over `handler`
+			 * _Prioritized over `handler`_
 			 */
 			key?: keyof Item;
 		}
@@ -98,7 +105,10 @@ export type FuzzyOptions = {
 	 */
 	limit?: number;
 	/**
-	 * Maximum score difference between the best and worst similar matches included in results; higher values cast a wider net _(defaults to 5)_
+	 * Maximum score difference between the best and worst similar matches included in results
+	 *
+	 * - Higher values cast a wider net
+	 * - Defaults to `5`
 	 */
 	tolerance?: number;
 };
@@ -207,6 +217,7 @@ function getTolerance<Item>(input: unknown, state?: FuzzyState<Item>): number {
 
 /**
  * Create a fuzzy searcher for an array of items
+ *
  * @param items Items to search through
  * @param key Key to use to stringify items
  * @returns Fuzzy searcher
@@ -218,6 +229,7 @@ export function fuzzy<Item extends PlainObject, ItemKey extends keyof Item>(
 
 /**
  * Create a fuzzy searcher for an array of items
+ *
  * @param items Items to search through
  * @param handler Handler to stringify items
  * @returns Fuzzy searcher
@@ -226,6 +238,7 @@ export function fuzzy<Item>(items: Item[], handler?: (item: Item) => string): Fu
 
 /**
  * Create a fuzzy searcher for an array of items
+ *
  * @param items Items to search through
  * @param configuration Fuzzy configuration
  * @returns Fuzzy searcher
@@ -244,6 +257,7 @@ fuzzy.match = fuzzyMatch;
 
 /**
  * Does the needle match the haystack in a fuzzy way?
+ *
  * @param haystack Haystack to search through
  * @param needle Needle to search for
  * @returns `true` if the needle matches the haystack in a fuzzy way, `false` otherwise

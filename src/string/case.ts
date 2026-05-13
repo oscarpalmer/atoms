@@ -17,6 +17,7 @@ type Options = {
 
 /**
  * Convert a string to camel case _(thisIsCamelCase)_
+ *
  * @param value String to convert
  * @returns Camel-cased string
  */
@@ -26,6 +27,7 @@ export function camelCase(value: string): string {
 
 /**
  * Capitalize the first letter of a string _(and lowercase the rest)_
+ *
  * @param value String to capitalize
  * @returns Capitalized string
  */
@@ -45,6 +47,7 @@ export function capitalize(value: string): string {
 
 /**
  * Convert a string to kebab case _(this-is-kebab-case)_
+ *
  * @param value String to convert
  * @returns Kebab-cased string
  */
@@ -54,6 +57,7 @@ export function kebabCase(value: string): string {
 
 /**
  * Convert a string to lower case
+ *
  * @param value String to convert
  * @returns Lower-cased string
  */
@@ -69,6 +73,7 @@ export function lowerCase(value: string): string {
 
 /**
  * Convert a string to pascal case _(ThisIsPascalCase)_
+ *
  * @param value String to convert
  * @returns Pascal-cased string
  */
@@ -78,6 +83,7 @@ export function pascalCase(value: string): string {
 
 /**
  * Convert a string to snake case _(this_is_snake_case)_
+ *
  * @param value String to convert
  * @returns Snake-cased string
  */
@@ -87,6 +93,7 @@ export function snakeCase(value: string): string {
 
 /**
  * Convert a string to title case _(Capitalizing Every Word)_
+ *
  * @param value String to convert
  * @returns Title-cased string
  */
@@ -169,6 +176,7 @@ function toCaseCallback(this: Options, value: string): string {
 
 /**
  * Convert a string to upper case
+ *
  * @param value String to convert
  * @returns Upper-cased string
  */

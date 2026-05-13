@@ -38,6 +38,7 @@ export type NormalizeOptions = {
 export type Normalizer = {
 	/**
 	 * Normalize a string
+	 *
 	 * @param value String to normalize
 	 * @returns Normalized string
 	 */
@@ -52,6 +53,7 @@ type Options = Required<NormalizeOptions>;
 
 /**
  * Deburr a string, removing diacritical marks
+ *
  * @param value String to deburr
  * @returns Deburred string
  */
@@ -89,7 +91,8 @@ function getNormalizeOptions(input?: NormalizeOptions): Options {
 /**
  * Initialize a string normalizer
  *
- * Available as `initializeNormalizer` and `normalize.initialize`
+ * _Available as `initializeNormalizer` and `normalize.initialize`_
+ *
  * @param options Normalization options
  * @returns Normalizer function
  */
@@ -102,7 +105,8 @@ export function initializeNormalizer(options?: NormalizeOptions): Normalizer {
 /**
  * Normalize a string
  *
- * By default, the string will be trimmed, deburred, and then lowercased
+ * _By default, the string will be trimmed, deburred, and then lowercased_
+ *
  * @param value String to normalize
  * @param options Normalization options
  * @returns Normalized string

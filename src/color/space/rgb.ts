@@ -77,21 +77,27 @@ export function getRgbValue(value: Record<keyof RGBColor, unknown>): RGBColor {
 }
 
 /**
- * Convert an RGB(A) color to a hex color _(with optional alpha channel)_
- * @param rgb RGB(A) color
- * @param alpha Include alpha channel? _(defaults to `false`)_
- * @returns Hex color
+ * Convert an _RGB(A)_ color to a hex color _(with optional alpha channel, i.e., opacity)_
+ *
+ * _If the value is unable to be converted, a black hex color will be returned_
+ *
+ * @param rgb _RGB(A)_ color
+ * @param alpha Include alpha channel _(opacity)_? _(defaults to `false`)_
+ * @returns Hex color string
  */
 export function rgbToHex(rgb: RGBAColor | RGBColor, alpha?: boolean): string {
 	return convertRgbToHex(isRgbLike(rgb) ? getRgbValue(rgb) : {...DEFAULT_RGB}, alpha ?? false);
 }
 
 /**
- * Convert an RGB(A) color to an HSL color
+ * Convert an _RGB(A)_ color to an _HSL_ color
  *
- * Thanks, https://github.com/color-js/color.js/blob/main/src/spaces/hsl.js#L26
- * @param rgb RGB(A) color
- * @returns HSL color
+ * _If the value is unable to be converted, a black HSL color will be returned_
+ *
+ * _Thanks, https://github.com/color-js/color.js/blob/main/src/spaces/hsl.js#L26_
+ *
+ * @param rgb _RGB(A)_ color
+ * @returns _HSL_ color
  */
 export function rgbToHsl(rgb: RGBAColor | RGBColor): HSLColor {
 	const {hue, lightness, saturation} = convertRgbToHsla(rgb);
@@ -104,11 +110,14 @@ export function rgbToHsl(rgb: RGBAColor | RGBColor): HSLColor {
 }
 
 /**
- * Convert an RGB(A) color to an HSLA color
+ * Convert an _RGB(A)_ color to an _HSLA_ color
  *
- * Thanks, https://github.com/color-js/color.js/blob/main/src/spaces/hsl.js#L26
- * @param rgb RGB(A) color
- * @returns HSLA color
+ * _If the value is unable to be converted, a black _HSLA_ color with an alpha channel (opacity) of `0` will be returned_
+ *
+ * _Thanks, https://github.com/color-js/color.js/blob/main/src/spaces/hsl.js#L26_
+ *
+ * @param rgb _RGB(A)_ color
+ * @returns _HSLA_ color
  */
 export function rgbToHsla(rgb: RGBAColor | RGBColor): HSLAColor {
 	return convertRgbToHsla(rgb);

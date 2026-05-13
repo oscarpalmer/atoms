@@ -6,7 +6,7 @@ import type {PlainObject} from '../models';
 /**
  * Get a filtered array of items that do not match the value
  *
- * Available as `exclude` and `filter.remove`
+ * _Available as `exclude` and `filter.remove`_
  *
  * @param array Array to search in
  * @param callback Callback to get an item's value for matching
@@ -30,7 +30,7 @@ export function exclude<
 /**
  * Get a filtered array of items that do not match the value
  *
- * Available as `exclude` and `filter.remove`
+ * _Available as `exclude` and `filter.remove`_
  *
  * @param array Array to search in
  * @param key Key to get an item's value for matching
@@ -55,7 +55,7 @@ export function exclude<Item extends PlainObject, ItemKey extends keyof Item>(
 /**
  * Get a filtered array of items that do not match the filter
  *
- * Available as `exclude` and `filter.remove`
+ * _Available as `exclude` and `filter.remove`_
  *
  * @param array Array to search in
  * @param filter Filter callback to match items
@@ -77,7 +77,7 @@ export function exclude<Item>(
 /**
  * Get a filtered array of items that do not match the given item
  *
- * Available as `exclude` and `filter.remove`
+ * _Available as `exclude` and `filter.remove`_
  *
  * @param array Array to search in
  * @param item Item to match against

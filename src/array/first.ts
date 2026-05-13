@@ -93,7 +93,7 @@ first.default = firstOrDefault;
 /**
  * Get the first item matching the given value, or a default value if no match is found
  *
- * Available as `firstOrDefault` and `first.default`
+ * _Available as `firstOrDefault` and `first.default`_
  *
  * @param array Array to search in
  * @param defaultValue Default value to return if no match is found
@@ -119,7 +119,7 @@ export function firstOrDefault<
 /**
  * Get the first item matching the given value by key, or a default value if no match is found
  *
- * Available as `firstOrDefault` and `first.default`
+ * _Available as `firstOrDefault` and `first.default`_
  *
  * @param array Array to search in
  * @param defaultValue Default value to return if no match is found
@@ -147,7 +147,7 @@ export function firstOrDefault<Item extends PlainObject, ItemKey extends keyof I
 /**
  * Get the first item matching the filter, or a default value if no match is found
  *
- * Available as `firstOrDefault` and `first.default`
+ * _Available as `firstOrDefault` and `first.default`_
  *
  * @param array Array to search in
  * @param defaultValue Default value to return if no match is found
@@ -172,7 +172,7 @@ export function firstOrDefault<Item>(
 /**
  * Get the first item from an array, or a default value if the array is empty
  *
- * Available as `firstOrDefault` and `first.default`
+ * _Available as `firstOrDefault` and `first.default`_
  *
  * @param array Array to get from
  * @param defaultValue Default value to return if the array is empty

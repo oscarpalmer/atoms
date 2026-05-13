@@ -16,6 +16,7 @@ export type Shaken<Value extends PlainObject> = {
 
 /**
  * Shake an object, removing all keys with `undefined` values
+ *
  * @param value Object to shake
  * @returns Shaken object
  */

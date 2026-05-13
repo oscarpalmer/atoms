@@ -16,7 +16,7 @@ class KeyedQueue<CallbackParameters extends Parameters<GenericAsyncCallback>, Ca
 	readonly #queues: Map<string, Queue<Tail<CallbackParameters>, CallbackResult>> = new Map();
 
 	/**
-	 * Is any queue active?
+	 * Get keys of all active queues
 	 */
 	get active(): string[] {
 		return this.#getStatus(STATUS_ACTIVE);
@@ -37,14 +37,14 @@ class KeyedQueue<CallbackParameters extends Parameters<GenericAsyncCallback>, Ca
 	}
 
 	/**
-	 * Are all queues empty?
+	 * Get keys of all empty queues
 	 */
 	get empty(): string[] {
 		return this.#getStatus(STATUS_EMPTY);
 	}
 
 	/**
-	 * Are all queues full?
+	 * Get keys of all full queues
 	 */
 	get full(): string[] {
 		return this.#getStatus(STATUS_FULL);
@@ -100,6 +100,7 @@ class KeyedQueue<CallbackParameters extends Parameters<GenericAsyncCallback>, Ca
 
 	/**
 	 * Queue an item for a specific key
+	 *
 	 * @param key Key to queue the item for
 	 * @param parameters Parameters to use when item runs
 	 * @param signal Optional signal to abort the item
@@ -115,6 +116,7 @@ class KeyedQueue<CallbackParameters extends Parameters<GenericAsyncCallback>, Ca
 
 	/**
 	 * Clear all items for a specific key _(or all items for all keys, if no key is provided)_
+	 *
 	 * @param key Optional key to clear the queue for
 	 */
 	clear(key?: string): void {
@@ -123,6 +125,7 @@ class KeyedQueue<CallbackParameters extends Parameters<GenericAsyncCallback>, Ca
 
 	/**
 	 * Get the queue for a specific key
+	 *
 	 * @param key Key to get the queue for
 	 * @returns Queue for the key, or `undefined` if it doesn't exist
 	 */
@@ -132,6 +135,7 @@ class KeyedQueue<CallbackParameters extends Parameters<GenericAsyncCallback>, Ca
 
 	/**
 	 * Pause the queue for a specific key _(or all queues, if no key is provided)_
+	 *
 	 * @param key Optional key to pause the queue for
 	 */
 	pause(key?: string): void {
@@ -140,6 +144,7 @@ class KeyedQueue<CallbackParameters extends Parameters<GenericAsyncCallback>, Ca
 
 	/**
 	 * Remove a specific item for a specific key
+	 *
 	 * @param key Key to remove the item for
 	 * @param id ID of the item to remove
 	 */
@@ -149,6 +154,7 @@ class KeyedQueue<CallbackParameters extends Parameters<GenericAsyncCallback>, Ca
 	 * Remove a queue and its items for a specific key
 	 *
 	 * _(To remove all items for a specific key, use `clear()` instead)_
+	 *
 	 * @param key Key to remove the queue for
 	 */
 	remove(key: string): void;
@@ -186,6 +192,7 @@ class KeyedQueue<CallbackParameters extends Parameters<GenericAsyncCallback>, Ca
 
 	/**
 	 * Resume the queue for a specific key _(or all queues, if no key is provided)_
+	 *
 	 * @param key Optional key to resume the queue for
 	 */
 	resume(key?: string): void {
@@ -329,6 +336,7 @@ class Queue<CallbackParameters extends Parameters<GenericAsyncCallback>, Callbac
 
 	/**
 	 * Add an item to the queue
+	 *
 	 * @param parameters Parameters to use when item runs
 	 * @param signal Optional signal to abort the item
 	 * @returns Queued item
@@ -404,6 +412,7 @@ class Queue<CallbackParameters extends Parameters<GenericAsyncCallback>, Callbac
 
 	/**
 	 * Remove and reject a specific item in the queue
+	 *
 	 * @param id ID of queued item
 	 */
 	remove(id: number): void {
@@ -615,6 +624,7 @@ export function keyedQueue<Callback extends GenericAsyncCallback>(
 
 /**
  * Create a queue for an asynchronous callback function
+ *
  * @param callback Callback function for queued items
  * @param options Queue options
  * @returns Queue instance
@@ -625,7 +635,8 @@ export function queue<Callback extends (key: string, ...parameters: any[]) => Pr
 ): Queue<Parameters<Callback>, Awaited<ReturnType<Callback>>>;
 
 /**
- * Create a queue for an asynchronous callback function
+ * Create a queue for a synchronous callback function
+ *
  * @param callback Callback function for queued items
  * @param options Queue options
  * @returns Queue instance

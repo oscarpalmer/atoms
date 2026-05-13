@@ -91,7 +91,7 @@ last.default = lastOrDefault;
 /**
  * Get the last item matching the given value
  *
- * Available as `lastOrDefault` and `last.default`
+ * _Available as `lastOrDefault` and `last.default`_
  *
  * @param array Array to search in
  * @param defaultValue Default value to return if no match is found
@@ -117,7 +117,7 @@ export function lastOrDefault<
 /**
  * Get the last item matching the given value by key
  *
- * Available as `lastOrDefault` and `last.default`
+ * _Available as `lastOrDefault` and `last.default`_
  *
  * @param array Array to search in
  * @param defaultValue Default value to return if no match is found
@@ -145,7 +145,7 @@ export function lastOrDefault<Item extends PlainObject, ItemKey extends keyof It
 /**
  * Get the last item matching the filter
  *
- * Available as `lastOrDefault` and `last.default`
+ * _Available as `lastOrDefault` and `last.default`_
  *
  * @param array Array to search in
  * @param defaultValue Default value to return if no match is found
@@ -170,7 +170,7 @@ export function lastOrDefault<Item>(
 /**
  * Get the last item from an array
  *
- * Available as `lastOrDefault` and `last.default`
+ * _Available as `lastOrDefault` and `last.default`_
  *
  * @param array Array to get from
  * @param defaultValue Default value to return if the array is empty

@@ -5,9 +5,13 @@ import type {HSLAColor, HSLColor, RGBAColor, RGBColor} from './models';
 // #region Functions
 
 /**
- * Get a Color from any kind of value
+ * Get a _Color_ from any kind of value
+ *
+ * - Values that can be parsed are: hex(a) color strings, _HSL(A)_ color objects, and _RGB(A)_ color objects
+ * - If the value is unable to be parsed, a black _Color_ will be returned
+ *
  * @param value Original value
- * @returns Color instance
+ * @returns _Color_ instance
  */
 export function getColor(value: unknown): Color {
 	return isColor(value) ? value : new Color(value);

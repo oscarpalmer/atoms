@@ -2,8 +2,20 @@
 
 /**
  * Get the string value from any value
+ *
  * @param value Original value
  * @returns String representation of the value
+ *
+ * @example
+ * ```typescript
+ * getString(null)       // => ''
+ * getString('foo')      // => 'foo'
+ * getString(123)        // => '123'
+ * getString(true)       // => 'true'
+ * getString([1, 2, 3])  // => '1,2,3'
+ * getString({a: 1})     // => '{"a":1}'
+ * getString(() => 123)  // => '123'
+ * ```
  */
 export function getString(value: unknown): string {
 	if (typeof value === 'string') {
@@ -31,10 +43,25 @@ export function ignoreKey(key: string): boolean {
 	return EXPRESSION_IGNORED.test(key);
 }
 
+export function interpolate(strings: TemplateStringsArray, values: unknown[]): string {
+	const {length} = strings;
+
+	let interpolated = '';
+
+	for (let index = 0; index < length; index += 1) {
+		const value = values[index];
+
+		interpolated += `${strings[index]}${Array.isArray(value) ? join(value.map(getString)) : getString(value)}`;
+	}
+
+	return interpolated;
+}
+
 /**
  * Join an array of values into a string _(while ignoring empty values)_
  *
  * _(`null`, `undefined`, and any values that become whitespace-only strings are considered empty)_
+ *
  * @param array Array of values
  * @param delimiter Delimiter to use between values
  * @returns Joined string
@@ -81,6 +108,7 @@ export function tryEncode(value: boolean | number | string): unknown {
 
 /**
  * Split a string into words _(and other readable parts)_
+ *
  * @param value Original string
  * @returns Array of words found in the string
  */

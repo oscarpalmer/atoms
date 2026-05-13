@@ -4,11 +4,13 @@ import type {AnyResult, ExtendedErr, ResultMatch} from './models';
 // #region Functions
 
 /**
- * Handles a result with match callbacks
+ * Handles a _Result_ with match callbacks
  *
- * Available as `asyncMatchResult` and `matchResult.async`
- * @param result Result to handle
+ * _Available as `asyncMatchResult` and `matchResult.async`_
+ *
+ * @param result _Result_ to handle
  * @param handler Match callbacks
+ * @returns Matched value-_Promise_
  */
 export async function asyncMatchResult<Value, Returned, E = Error>(
 	result: AnyResult<Value, E> | Promise<AnyResult<Value, E>> | (() => Promise<AnyResult<Value, E>>),
@@ -16,12 +18,14 @@ export async function asyncMatchResult<Value, Returned, E = Error>(
 ): Promise<Returned>;
 
 /**
- * Handles a result with match callbacks
+ * Handles a _Result_ with match callbacks
  *
- * Available as `asyncMatchResult` and `matchResult.async`
- * @param result Result to handle
+ * _Available as `asyncMatchResult` and `matchResult.async`_
+ *
+ * @param result _Result_ to handle
  * @param ok Ok callback
  * @param error Error callback
+ * @returns Matched value-_Promise_
  */
 export async function asyncMatchResult<Value, Returned, E = Error>(
 	result: AnyResult<Value, E> | Promise<AnyResult<Value, E>> | (() => Promise<AnyResult<Value, E>>),
@@ -61,9 +65,11 @@ export async function asyncMatchResult<Value, Returned, E = Error>(
 }
 
 /**
- * Handles a result with match callbacks
- * @param result Result to handle
+ * Handles a _Result_ with match callbacks
+ *
+ * @param result _Result_ to handle
  * @param handler Match callbacks
+ * @returns Matched value
  */
 export function matchResult<Value, Returned, E = Error>(
 	result: AnyResult<Value, E> | (() => AnyResult<Value, E>),
@@ -71,10 +77,12 @@ export function matchResult<Value, Returned, E = Error>(
 ): Returned;
 
 /**
- * Handles a result with match callbacks
- * @param result Result to handle
+ * Handles a _Result_ with match callbacks
+ *
+ * @param result _Result_ to handle
  * @param ok Ok callback
  * @param error Error callback
+ * @returns Matched value
  */
 export function matchResult<Value, Returned, E = Error>(
 	result: AnyResult<Value, E> | (() => AnyResult<Value, E>),

@@ -6,6 +6,7 @@ import {getString} from './internal/string';
 
 /**
  * Is the value empty, or only containing `null` or `undefined` values?
+ *
  * @param value Value to check
  * @returns `true` if the value is considered empty, otherwise `false`
  */
@@ -22,7 +23,9 @@ export function isEmpty(value: unknown): boolean {
 	const {length} = values;
 
 	for (let index = 0; index < length; index += 1) {
-		if (values[index] != null) {
+		const item = values[index];
+
+		if (Array.isArray(item) ? item[1] != null : item != null) {
 			return false;
 		}
 	}
@@ -32,6 +35,7 @@ export function isEmpty(value: unknown): boolean {
 
 /**
  * Is the value not empty, or holding non-empty values?
+ *
  * @param value Value to check
  * @returns `true` if the value is not considered empty, otherwise `false`
  */
@@ -41,6 +45,7 @@ export function isNonEmpty(value: unknown): boolean {
 
 /**
  * Is the value not `undefined` or `null`?
+ *
  * @param value Value to check
  * @returns `true` if the value is not `undefined` or `null`, otherwise `false`
  */
@@ -50,6 +55,7 @@ export function isNonNullable<Value>(value: Value): value is Exclude<Value, unde
 
 /**
  * Is the value not `undefined`, `null`, or stringified as an empty _(no whitespace)_ string?
+ *
  * @param value Value to check
  * @returns `true` if the value is not `undefined`, `null`, or matches an empty string, otherwise `false`
  */
@@ -61,6 +67,7 @@ export function isNonNullableOrEmpty<Value>(
 
 /**
  * Is the value not `undefined`, `null`, or stringified as a whitespace-only string?
+ *
  * @param value Value to check
  * @returns `true` if the value is not `undefined`, `null`, or matches a whitespace-only string, otherwise `false`
  */
@@ -72,6 +79,7 @@ export function isNonNullableOrWhitespace<Value>(
 
 /**
  * Is the value not a number or a number-like string?
+ *
  * @param value Value to check
  * @returns `true` if the value is not a number or a number-like string, otherwise `false`
  */
@@ -81,6 +89,7 @@ export function isNonNumerical<Value>(value: Value): value is Exclude<Value, num
 
 /**
  * Is the value not an object _(or function)_?
+ *
  * @param value Value to check
  * @returns `true` if the value is not an object, otherwise `false`
  */
@@ -90,6 +99,7 @@ export function isNonObject<Value>(value: Value): value is Exclude<Value, object
 
 /**
  * Is the value `undefined` or `null`?
+ *
  * @param value Value to check
  * @returns `true` if the value is `undefined` or `null`, otherwise `false`
  */
@@ -99,6 +109,7 @@ export function isNullable(value: unknown): value is undefined | null {
 
 /**
  * Is the value `undefined`, `null`, or stringified as an empty _(no whitespace)_ string?
+ *
  * @param value Value to check
  * @returns `true` if the value is nullable or matches an empty string, otherwise `false`
  */
@@ -108,6 +119,7 @@ export function isNullableOrEmpty(value: unknown): value is undefined | null | '
 
 /**
  * Is the value `undefined`, `null`, or stringified as a whitespace-only string?
+ *
  * @param value Value to check
  * @returns `true` if the value is nullable or matches a whitespace-only string, otherwise `false`
  */
@@ -117,6 +129,7 @@ export function isNullableOrWhitespace(value: unknown): value is undefined | nul
 
 /**
  * Is the value a number or a number-like string?
+ *
  * @param value Value to check
  * @returns `true` if the value is a number or a number-like string, otherwise `false`
  */
@@ -129,6 +142,7 @@ export function isNumerical(value: unknown): value is number | `${number}` {
 
 /**
  * Is the value an object _(or function)_?
+ *
  * @param value Value to check
  * @returns `true` if the value matches, otherwise `false`
  */

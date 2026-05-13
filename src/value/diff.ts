@@ -27,7 +27,8 @@ export type DiffResult<First, Second = First> = {
 	 */
 	type: DiffType;
 	/**
-	 * - The differences between the two values
+	 * The differences between the two values
+	 *
 	 * - Keys are in dot notation
 	 * - Values are objects with `from` and `to` properties
 	 */
@@ -68,6 +69,7 @@ type Parameters = {
 
 /**
  * Find the differences between two values
+ *
  * @param first First value
  * @param second Second value
  * @param options Comparison options

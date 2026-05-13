@@ -1,9 +1,18 @@
-import {isPlainObject} from '../internal/is';
-import {getString} from '../internal/string';
+import {isPlainObject, isTemplateStringsArray} from '../internal/is';
+import {getString, interpolate} from '../internal/string';
 import {getValue} from '../internal/value/get';
 import type {PlainObject} from '../models';
 
 // #region Types
+
+/**
+ * Renderer for a string template with variables
+ *
+ * @param variables Variables to use
+ * @param options Templating options
+ * @returns Templated string
+ */
+type Renderer = (variables?: PlainObject, options?: Partial<TemplateOptions>) => string;
 
 /**
  * Options for templating strings
@@ -19,17 +28,38 @@ export type TemplateOptions = {
 	pattern?: RegExp;
 };
 
+type Templater = {
+	/**
+	 * Render a string from a template with variables
+	 *
+	 * @returns Templated string
+	 */
+	(strings: TemplateStringsArray, ...values: unknown[]): TemplaterRenderer;
+
+	/**
+	 * Render a string from a template with variables
+	 *
+	 * @param value Template string
+	 * @param variables Variables to use
+	 * @returns Templated string
+	 */
+	(value: string, variables?: PlainObject): string;
+};
+
 /**
- * Render a string from a template with variables
- * @param value Template string
- * @param variables Variables to use
- * @returns Templated string
+ * Render a template string with variables
  */
-type Templater = (value: string, variables?: PlainObject) => string;
+type TemplaterRenderer = (variables?: PlainObject) => string;
 
 // #endregion
 
 // #region Functions
+
+function getRenderer(strings: TemplateStringsArray, values: unknown[]): Renderer {
+	return (variables?: PlainObject, options?: Partial<TemplateOptions>) => {
+		return template(interpolate(strings, values), variables, options);
+	};
+}
 
 function getTemplateOptions(input?: Partial<TemplateOptions>): Required<TemplateOptions> {
 	const options = isPlainObject(input) ? (input as TemplateOptions) : {};
@@ -50,7 +80,7 @@ function handleTemplate(
 		return '';
 	}
 
-	if (typeof variables !== 'object' || variables === null) {
+	if (typeof variables !== 'object' || variables === null || Object.keys(variables).length === 0) {
 		return value;
 	}
 
@@ -68,22 +98,34 @@ function handleTemplate(
 }
 
 /**
- * Create a templater with predefined options
+ * Create a _Templater_ with predefined options
  *
- * Available as `initializeTemplater` and `template.initialize`
+ * _Available as `initializeTemplater` and `template.initialize`_
+ *
  * @param options Templating options
- * @returns Templater function
+ * @returns _Templater_ function
  */
 export function initializeTemplater(options?: Partial<TemplateOptions>): Templater {
 	const {ignoreCase, pattern} = getTemplateOptions(options);
 
-	return (value: string, variables?: PlainObject): string => {
-		return handleTemplate(value, pattern, ignoreCase, variables);
-	};
+	return ((value: string | TemplateStringsArray, ...parameters: unknown[]) => {
+		return isTemplateStringsArray(value)
+			? (variables?: PlainObject) =>
+					handleTemplate(interpolate(value, parameters), pattern, ignoreCase, variables)
+			: handleTemplate(value, pattern, ignoreCase, parameters[0] as PlainObject);
+	}) as Templater;
 }
 
 /**
+ * Get a _Renderer_ for a string template
+ *
+ * @returns _Renderer_ function
+ */
+export function template(strings: TemplateStringsArray, ...values: unknown[]): Renderer;
+
+/**
  * Render a string from a template with variables
+ *
  * @param value Template string
  * @param variables Variables to use
  * @param options Templating options
@@ -91,12 +133,21 @@ export function initializeTemplater(options?: Partial<TemplateOptions>): Templat
  */
 export function template(
 	value: string,
-	variables: PlainObject,
+	variables?: PlainObject,
 	options?: Partial<TemplateOptions>,
-): string {
-	const {ignoreCase, pattern} = getTemplateOptions(options);
+): string;
 
-	return handleTemplate(value, pattern, ignoreCase, variables);
+export function template(
+	value: string | TemplateStringsArray,
+	...parameters: unknown[]
+): string | Renderer {
+	if (isTemplateStringsArray(value)) {
+		return getRenderer(value, parameters);
+	}
+
+	const {ignoreCase, pattern} = getTemplateOptions(parameters[1] as Partial<TemplateOptions>);
+
+	return handleTemplate(value, pattern, ignoreCase, parameters[0] as PlainObject);
 }
 
 template.initialize = initializeTemplater;

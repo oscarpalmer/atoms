@@ -27,6 +27,10 @@ function getClampedValue(value: unknown, minimum: number, maximum: number): numb
 
 /**
  * Get a foreground color _(usually text)_ based on a background color's luminance
+ *
+ * - Values that can be parsed are: hex(a) color strings, _HSL(A)_ color objects, and _RGB(A)_ color objects
+ * - If the value cannot be parsed, a white foreground color will be returned
+ *
  * @param value Original value
  * @returns Foreground color
  */
@@ -58,9 +62,13 @@ export function getForegroundColor(value: unknown): Color {
 }
 
 /**
- * Get the hex color _(with alpha channel)_ from any kind of value
+ * Get the hex color _(with alpha channel, i.e., opacity)_ from any kind of value
+ *
+ * - Values that can be parsed are: hex(a) color strings, _HSL(A)_ color objects, and _RGB(A)_ color objects
+ * - If the value cannot be parsed, a black hex color with an alpha channel of `0` will be returned
+ *
  * @param value Original value
- * @returns Hex color
+ * @returns Hex color string
  */
 export function getHexaColor(value: unknown): string {
 	const {alpha, hex} = getColorState(value);
@@ -70,8 +78,12 @@ export function getHexaColor(value: unknown): string {
 
 /**
  * Get the hex color from any kind of value
+ *
+ * - Values that can be parsed are: hex(a) color strings, _HSL(A)_ color objects, and _RGB(A)_ color objects
+ * - If the value cannot be parsed, a black hex color will be returned
+ *
  * @param value Original value
- * @returns Hex color
+ * @returns Hex color string
  */
 export function getHexColor(value: unknown): string {
 	return getColorState(value).hex;
@@ -86,9 +98,13 @@ export function getDegrees(value: unknown): number {
 }
 
 /**
- * Get the HSLA color from any kind of value
+ * Get the _HSLA_ color from any kind of value
+ *
+ * - Values that can be parsed are: hex(a) color strings, _HSL(A)_ color objects, and _RGB(A)_ color objects
+ * - If the value cannot be parsed, a black _HSLA_ color with an alpha channel _(opacity)_ of `0` will be returned
+ *
  * @param value Original value
- * @returns HSLA color
+ * @returns _HSLA_ color
  */
 export function getHslaColor(value: unknown): HSLAColor {
 	const {alpha, hsl} = getColorState(value);
@@ -100,9 +116,13 @@ export function getHslaColor(value: unknown): HSLAColor {
 }
 
 /**
- * Get the HSL color from any kind of value
+ * Get the _HSL_ color from any kind of value
+ *
+ * - Values that can be parsed are: hex(a) color strings, _HSL(A)_ color objects, and _RGB(A)_ color objects
+ * - If the value cannot be parsed, a black _HSL_ color will be returned
+ *
  * @param value Original value
- * @returns HSL color
+ * @returns _HSL_ color
  */
 export function getHslColor(value: unknown): HSLColor {
 	return getColorState(value).hsl;
@@ -113,9 +133,13 @@ export function getPercentage(value: unknown): number {
 }
 
 /**
- * Get the RGBA color from any kind of value
+ * Get the _RGBA_ color from any kind of value
+ *
+ * - Values that can be parsed are: hex(a) color strings, _HSL(A)_ color objects, and _RGB(A)_ color objects
+ * - If the value cannot be parsed, a black _RGBA_ color with an alpha channel _(opacity)_ of `0` will be returned
+ *
  * @param value Original value
- * @returns RGBA color
+ * @returns _RGBA_ color
  */
 export function getRgbaColor(value: unknown): RGBAColor {
 	const {alpha, rgb} = getColorState(value);
@@ -127,9 +151,13 @@ export function getRgbaColor(value: unknown): RGBAColor {
 }
 
 /**
- * Get the RGB color from any kind of value
+ * Get the _RGB_ color from any kind of value
+ *
+ * - Values that can be parsed are: hex(a) color strings, _HSL(A)_ color objects, and _RGB(A)_ color objects
+ * - If the value cannot be parsed, a black _RGB_ color will be returned
+ *
  * @param value Original value
- * @returns RGB color
+ * @returns _RGB_ color
  */
 export function getRgbColor(value: unknown): RGBColor {
 	return getColorState(value).rgb;

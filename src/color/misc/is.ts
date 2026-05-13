@@ -33,9 +33,10 @@ function isBytey(value: unknown): value is number {
 }
 
 /**
- * Is the value a Color?
+ * Is the value a _Color_?
+ *
  * @param value Value to check
- * @returns `true` if the value is a Color, otherwise `false`
+ * @returns `true` if the value is a _Color_, otherwise `false`
  */
 export function isColor(value: unknown): value is Color {
 	return typeof value === 'object' && value !== null && '$color' in value && value.$color === true;
@@ -75,9 +76,19 @@ function isDegree(value: unknown): value is number {
 
 /**
  * Is the value a hex color?
+ *
  * @param value Value to check
- * @param alpha Allow alpha channel? _(defaults to `true`)_
+ * @param alpha Allow alpha channel _(opacity)_? _(defaults to `true`)_
  * @returns `true` if the value is a hex color, otherwise `false`
+ *
+ * @example
+ * ```typescript
+ * isHexColor('ff0000');  // => true
+ * isHexColor('#ff0000'); // => true
+ *
+ * isHexColor('#ff000050');        // => true
+ * isHexColor('#ff000050', false); // => false
+ * ```
  */
 export function isHexColor(value: unknown, alpha?: boolean): value is string {
 	if (typeof value !== 'string') {
@@ -96,18 +107,20 @@ export function isHexColor(value: unknown, alpha?: boolean): value is string {
 }
 
 /**
- * Is the value an HSLA color?
+ * Is the value an _HSLA_ color?
+ *
  * @param value Value to check
- * @returns `true` if the value is an HSLA color, otherwise `false`
+ * @returns `true` if the value is an _HSLA_ color, otherwise `false`
  */
 export function isHslaColor(value: unknown): value is HSLAColor {
 	return isColorValue(value, KEYS_HSLA);
 }
 
 /**
- * Is the value an HSL color?
+ * Is the value an _HSL_ color?
+ *
  * @param value Value to check
- * @returns `true` if the value is an HSL color, otherwise `false`
+ * @returns `true` if the value is an _HSL_ color, otherwise `false`
  */
 export function isHslColor(value: unknown): value is HSLColor {
 	return isColorValue(value, KEYS_HSLA) || isColorValue(value, KEYS_HSL);
@@ -118,18 +131,20 @@ export function isHslLike(value: unknown): value is Record<keyof HSLColor, unkno
 }
 
 /**
- * Is the value an RGBA color?
+ * Is the value an _RGBA_ color?
+ *
  * @param value Value to check
- * @returns `true` if the value is an RGBA color, otherwise `false`
+ * @returns `true` if the value is an _RGBA_ color, otherwise `false`
  */
 export function isRgbaColor(value: unknown): value is RGBAColor {
 	return isColorValue(value, KEYS_RGBA);
 }
 
 /**
- * Is the value an RGB color?
+ * Is the value an _RGB_ color?
+ *
  * @param value Value to check
- * @returns `true` if the value is an RGB color, otherwise `false`
+ * @returns `true` if the value is an _RGB_ color, otherwise `false`
  */
 export function isRgbColor(value: unknown): value is RGBColor {
 	return isColorValue(value, KEYS_RGBA) || isColorValue(value, KEYS_RGB);

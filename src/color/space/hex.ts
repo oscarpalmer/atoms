@@ -36,9 +36,12 @@ function convertHexToRgba(value: string): RGBAColor {
 
 /**
  * Get the normalized hex color from a value
+ *
+ * _If the value is unable to be parsed or normalized, a hex color of `000000` will be returned, with the alpha channel _(opacity)_ value `0` included, if specified_
+ *
  * @param value Value to normalize
- * @param alpha Include alpha channel? _(defaults to `false`)_
- * @returns Normalized hex color, or `000000` if the value is unable to be normalized
+ * @param alpha Include alpha channel _(opacity)_? _(defaults to `false`)_
+ * @returns Normalized hex color
  */
 export function getNormalizedHex(value: unknown, alpha?: boolean): string {
 	const includeAlpha = alpha ?? false;
@@ -78,9 +81,12 @@ export function hexToHsla(value: string): HSLAColor {
 }
 
 /**
- * Convert a hex color to an RGB color
+ * Convert a hex color to an _RGB_ color
+ *
+ * _If the value is unable to be converted, a black RGB color will be returned_
+ *
  * @param value Original value
- * @returns RGB color
+ * @returns _RGB_ color
  */
 export function hexToRgb(value: string): RGBColor {
 	const {blue, green, red} = convertHexToRgba(value);
@@ -89,9 +95,12 @@ export function hexToRgb(value: string): RGBColor {
 }
 
 /**
- * Convert a hex color to an RGBA color
+ * Convert a hex color to an _RGBA_ color
+ *
+ * _If the value is unable to be converted, a black RGBA color with an alpha channel (opacity) of `0` will be returned_
+ *
  * @param value Original value
- * @returns RGBA color
+ * @returns _RGBA_ color
  */
 export function hexToRgba(value: string): RGBAColor {
 	return convertHexToRgba(value);

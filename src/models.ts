@@ -21,7 +21,7 @@ export type AsyncCancelableCallback<Callback extends GenericAsyncCallback | Gene
 /**
  * For matching any `void`, `Date`, primitive, or `RegExp` values
  *
- * (Thanks, type-fest!)
+ * _(Thanks, type-fest!)_
  */
 export type BuiltIns = void | Date | Primitive | RegExp;
 
@@ -139,7 +139,7 @@ type _NestedValue<Value, Path extends string> = Path extends `${infer ItemKey}.$
 			: never;
 
 /**
- * The nested (keyed) values of an object _(up to 5 levels deep)_
+ * The nested _(keyed)_ values of an object _(up to 5 levels deep)_
  */
 export type NestedValues<Value extends PlainObject> = {
 	[Path in NestedKeys<Value>]: NestedValue<Value, Path>;
@@ -267,7 +267,7 @@ export type TypedArray =
  * ```typescript
  * type A = {a: string};
  * type B = {b: number};
- * type C = UnionToIntersection<A | B>; // {a: string} & {b: number}
+ * type C = UnionToIntersection<A | B>; // => {a: string} & {b: number}
  * ```
  *
  * Thanks, type-fest!
