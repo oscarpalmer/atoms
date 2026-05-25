@@ -17,18 +17,40 @@ export function fromQuery(query: string): PlainObject {
 		return {};
 	}
 
-	const parts = query.split(AMPERSAND);
+	const parts = query
+		.split(AMPERSAND)
+		.map(part => part.split(EQUAL).map(tryDecode))
+		.sort(([first], [second]) => first.localeCompare(second));
+
 	const {length} = parts;
 
 	const parameters: PlainObject = {};
 
-	for (let index = 0; index < length; index += 1) {
-		const decoded = parts[index].split(EQUAL).map(tryDecode);
-		const key = decoded[0].replace(EXPRESSION_ARRAY_SUFFIX, '');
+	let position = 0;
+	let array: string | undefined;
 
-		if (!ignoreKey(key)) {
-			setQueryValue(parameters, key, decoded[1]);
+	for (let index = 0; index < length; index += 1) {
+		const [key, value] = parts[index];
+
+		if (EXPRESSION_ARRAY_SUFFIX.test(key)) {
+			const named = key.replace(EXPRESSION_ARRAY_SUFFIX, '');
+
+			if (named !== array) {
+				array = named;
+				position = 0;
+			}
+		} else {
+			array = undefined;
+			position = 0;
 		}
+
+		const full = array == null ? key : `${array}.${position}`;
+
+		if (!ignoreKey(full)) {
+			setValue(parameters, full, getQueryValue(value));
+		}
+
+		position += 1;
 	}
 
 	return parameters;
@@ -44,16 +66,19 @@ function getParts(value: ArrayOrPlainObject, fromArray: boolean, prefix?: string
 		const key = keys[index];
 		const val = value[key as never];
 
-		const full = join([prefix, fromArray ? undefined : key], '.');
+		const fullKey = join([prefix, fromArray ? undefined : key], DOT);
+
+		const encodedKey = getString(tryEncode(fullKey));
+		const prefixedKey = fromArray ? join([encodedKey, index], DOT) : encodedKey;
 
 		if (Array.isArray(val)) {
-			parts.push(...getParts(val, true, full));
+			parts.push(...getParts(val, true, fullKey));
 		} else if (isPlainObject(val)) {
-			parts.push(...getParts(val, false, full));
+			parts.push(...getParts(val, false, fullKey));
 		} else if (isDecodable(val)) {
-			parts.push(`${getString(tryEncode(full))}=${getString(tryEncode(val))}`);
+			parts.push(`${prefixedKey}=${getString(tryEncode(val))}`);
 		} else if (val instanceof Date) {
-			parts.push(`${getString(tryEncode(full))}=${val.toJSON()}`);
+			parts.push(`${prefixedKey}=${val.toJSON()}`);
 		}
 	}
 
@@ -86,22 +111,6 @@ function isDecodable(value: unknown): value is boolean | number | string {
 	return TYPES.has(typeof value);
 }
 
-function setQueryValue(parameters: PlainObject, key: string, value: string): void {
-	if (EXPRESSION_DOT.test(key)) {
-		setValue(parameters, key, getQueryValue(value));
-	} else {
-		if (key in parameters) {
-			if (!Array.isArray(parameters[key])) {
-				parameters[key] = [parameters[key]];
-			}
-
-			(parameters[key] as unknown[]).push(getQueryValue(value) as never);
-		} else {
-			parameters[key] = getQueryValue(value) as never;
-		}
-	}
-}
-
 /**
  * Convert a plain _(nested)_ object to a query string
  *
@@ -123,13 +132,13 @@ export function toQuery(parameters: PlainObject): string {
 
 const AMPERSAND = '&';
 
+const DOT = '.';
+
 const EQUAL = '=';
 
 const EXPRESSION_ARRAY_SUFFIX = /\[\]$/;
 
 const EXPRESSION_BOOLEAN = /^(false|true)$/;
-
-const EXPRESSION_DOT = /\./g;
 
 const TRUE = 'true';
 

@@ -109,7 +109,7 @@ export function setValue(data: object, path: string, value: unknown, ignoreCase?
 			const nextPath = paths[index + 1];
 
 			if (EXPRESSION_INDEX.test(nextPath)) {
-				next = Array.from({length: Number.parseInt(nextPath, 10) + 1}, () => undefined);
+				next = Array.from({length: Number(nextPath) + 1}, () => undefined);
 			} else {
 				next = {};
 			}
