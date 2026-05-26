@@ -70,9 +70,9 @@ test(
 test('join', () => {
 	const values = [null, undefined, 'a', '   ', new TestStringItemWithToString('b'), 'c'];
 
-	expect(join(values)).toBe('abc');
-	expect(join(values, '.')).toBe('a.b.c');
-	expect(join(values, 123 as never)).toBe('abc');
+	expect(join(values)).toBe('a   bc');
+	expect(join(values, '.')).toBe('a.   .b.c');
+	expect(join(values, 123 as never)).toBe('a   bc');
 
 	expect(join([])).toBe('');
 	expect(join(123 as never)).toBe('');

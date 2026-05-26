@@ -82,7 +82,7 @@ export function join(array: unknown[], delimiter?: string): string {
 	for (let index = 0; index < length; index += 1) {
 		const item = getString(array[index]);
 
-		if (item.trim().length > 0) {
+		if (item.length > 0) {
 			values.push(item);
 		}
 	}
