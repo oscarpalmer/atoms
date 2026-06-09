@@ -50,17 +50,27 @@ test(
 	'getUuid',
 	() =>
 		new Promise<void>(done => {
-			const ids = new Set<string>();
+			const defaultValues = new Set<string>();
+			const htmlValues = new Set<string>();
+			const ignoredValues = new Set<string>();
 
 			const length = 100_000;
 
 			let index = 0;
 
 			for (; index < length; index += 1) {
-				ids.add(getUuid());
+				defaultValues.add(getUuid());
+				htmlValues.add(getUuid(true));
+				ignoredValues.add(getUuid('blah' as never));
 			}
 
-			expect(ids.size).toBe(length);
+			expect(defaultValues.size).toBe(length);
+			expect(htmlValues.size).toBe(length);
+			expect(ignoredValues.size).toBe(length);
+
+			expect([...defaultValues].some(value => /^\d/.test(value))).toBe(true);
+			expect([...htmlValues].some(value => /^\d/.test(value))).toBe(false);
+			expect([...ignoredValues].some(value => /^\d/.test(value))).toBe(true);
 
 			done();
 		}),

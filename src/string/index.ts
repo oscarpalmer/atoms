@@ -70,28 +70,55 @@ export function dedent(value: string | TemplateStringsArray, ...values: unknown[
 }
 
 /**
+ * Get a new UUID string _(version 4)_ for use in _HTML_
+ *
+ * @param html Use _HTML_-friendly format
+ * @returns UUID string
+ */
+export function getUuid(html: true): string;
+
+/**
  * Get a new UUID string _(version 4)_
  *
  * @returns UUID string
  */
-export function getUuid(): string {
-	const bytes = new Uint8Array(16);
+export function getUuid(): string;
 
-	crypto.getRandomValues(bytes);
+/**
+ * Get a new UUID string _(version 4)_
+ *
+ * @returns UUID string
+ */
+export function getUuid(html?: unknown): string {
+	const forHTML = html === true;
 
-	bytes[6] = (bytes[6] & 0x0f) | 0x40;
+	let uuid: string;
 
-	bytes[8] = (bytes[8] & 0x3f) | 0x80;
+	while (true) {
+		const bytes = new Uint8Array(16);
 
-	const hex = Array.from(bytes, byte => byte.toString(16).padStart(2, ZERO)).join('');
+		crypto.getRandomValues(bytes);
 
-	return [
-		hex.substring(0, 8),
-		hex.substring(8, 12),
-		hex.substring(12, 16),
-		hex.substring(16, 20),
-		hex.substring(20, 32),
-	].join('-');
+		bytes[6] = (bytes[6] & 0x0f) | 0x40;
+
+		bytes[8] = (bytes[8] & 0x3f) | 0x80;
+
+		const hex = Array.from(bytes, byte => byte.toString(16).padStart(2, ZERO)).join('');
+
+		uuid = [
+			hex.substring(0, 8),
+			hex.substring(8, 12),
+			hex.substring(12, 16),
+			hex.substring(16, 20),
+			hex.substring(20, 32),
+		].join('-');
+
+		if (!forHTML || !NUMERICAL_PREFIX_PATTERN.test(uuid)) {
+			break;
+		}
+	}
+
+	return uuid;
 }
 
 /**
@@ -154,6 +181,8 @@ export function truncate(value: string, length: number, suffix?: string): string
 // #endregion
 
 // #region Variables
+
+const NUMERICAL_PREFIX_PATTERN = /^\d/;
 
 const ZERO = '0';
 

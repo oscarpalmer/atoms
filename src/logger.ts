@@ -2,97 +2,70 @@ import {noop} from './internal/function/misc';
 
 // #region Types
 
-/**
- * A logger that can be used to log messages to the console
- *
- * _(Logging can be enabled or disabled by setting the `enabled` property)_
- */
-class Logger {
+type LoggerInstance = {
 	/**
 	 * Log any number of values at the "debug" log level
 	 */
-	get debug(): typeof console.debug {
-		return enabled ? console.debug : noop;
-	}
+	get debug(): typeof console.debug;
 
 	/**
 	 * Log the value and shows all its properties
 	 */
-	get dir(): typeof console.dir {
-		return enabled ? console.dir : noop;
-	}
+	get dir(): typeof console.dir;
 
 	/**
 	 * Is logging to the console enabled? _(defaults to `true`)_
 	 */
-	get enabled(): boolean {
-		return enabled;
-	}
+	get enabled(): boolean;
 
 	/**
 	 * Enable or disable logging to the console
 	 */
-	set enabled(value: boolean) {
-		enabled = typeof value === 'boolean' ? value : enabled;
-	}
+	set enabled(value: boolean);
 
 	/**
 	 * Log any number of values at the "error" log level
 	 */
-	get error(): typeof console.error {
-		return enabled ? console.error : noop;
-	}
+	get error(): typeof console.error;
 
 	/**
 	 * Log any number of values at the "info" log level
 	 */
-	get info(): typeof console.info {
-		return enabled ? console.info : noop;
-	}
+	get info(): typeof console.info;
 
 	/**
 	 * Log any number of values at the "log" log level
 	 */
-	get log(): typeof console.log {
-		return enabled ? console.log : noop;
-	}
+	get log(): typeof console.log;
 
 	/**
 	 * Log data as a table, with optional properties to use as columns
 	 */
-	get table(): typeof console.table {
-		return enabled ? console.table : noop;
-	}
+	get table(): typeof console.table;
 
 	/**
 	 * Log any number of values together with a trace from where it was called
 	 */
-	get trace(): typeof console.trace {
-		return enabled ? console.trace : noop;
-	}
+	get trace(): typeof console.trace;
 
 	/**
 	 * Log any number of values at the "warn" log level
 	 */
-	get warn(): typeof console.warn {
-		return enabled ? console.warn : noop;
-	}
+	get warn(): typeof console.warn;
 
 	/**
 	 * Start a timed logger with a label
 	 *
 	 * @param label Label for the logger
-	 * @returns _Timed_ instance
+	 * @returns _TimedLogger_ instance
 	 */
-	time(label: string): Timed {
-		return new Timed(label);
-	}
-}
+	time(label: string): TimedLogger;
+};
 
 /**
  * A named timer that can be used to log durations to the console
  */
-class Timed {
+class TimedLogger {
 	#logger: typeof console.timeLog | undefined;
 	#stopper: typeof console.timeEnd | undefined;
 
@@ -158,7 +131,42 @@ type TimeState = {
 
 // #region Variables
 
-const logger = new Logger();
+const methods = ['debug', 'dir', 'error', 'info', 'log', 'table', 'trace', 'warn'] as const;
+
+/**
+ * A logger that can be used to log messages to the console
+ *
+ * _(Logging can be enabled or disabled by setting the `enabled` property)_
+ */
+const Logger = (() => {
+	const instance = {};
+
+	Object.defineProperties(instance, {
+		enabled: {
+			get() {
+				return enabled;
+			},
+			set(value: boolean) {
+				enabled = typeof value === 'boolean' ? value : enabled;
+			},
+		},
+		time: {
+			value(label: string) {
+				return new TimedLogger(label);
+			},
+		},
+	});
+
+	for (const method of methods) {
+		Object.defineProperty(instance, method, {
+			get() {
+				return enabled ? console[method].bind(console) : noop;
+			},
+		});
+	}
+
+	return Object.freeze(instance);
+})() as LoggerInstance;
 
 let enabled = true;
 
@@ -166,6 +174,6 @@ let enabled = true;
 
 // #region Exports
 
-export {logger, type Logger, type Timed};
+export {Logger, type TimedLogger};
 
 // #endregion

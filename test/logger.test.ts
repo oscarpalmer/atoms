@@ -1,50 +1,50 @@
 import {expect, test} from 'vitest';
-import {logger, noop} from '../src';
+import {Logger, noop} from '../src';
 
 test('log', () => {
-	logger.log('test');
+	Logger.log('test');
 
-	expect(logger.enabled).toBe(true);
+	expect(Logger.enabled).toBe(true);
 
-	logger.debug('debug');
-	logger.dir({test: 'dir'});
-	logger.error('error');
-	logger.info('info');
-	logger.log('log');
-	logger.table([{test: 'table'}]);
-	logger.trace('trace');
-	logger.warn('warn');
+	Logger.debug('debug');
+	Logger.dir({test: 'dir'});
+	Logger.error('error');
+	Logger.info('info');
+	Logger.log('log');
+	Logger.table([{test: 'table'}]);
+	Logger.trace('trace');
+	Logger.warn('warn');
 
-	logger.enabled = false;
+	Logger.enabled = false;
 
-	expect(logger.enabled).toBe(false);
+	expect(Logger.enabled).toBe(false);
 
-	expect(logger.debug).toBeTypeOf('function');
-	expect(logger.dir).toBeTypeOf('function');
-	expect(logger.error).toBeTypeOf('function');
-	expect(logger.info).toBeTypeOf('function');
-	expect(logger.log).toBeTypeOf('function');
-	expect(logger.table).toBeTypeOf('function');
-	expect(logger.trace).toBeTypeOf('function');
-	expect(logger.warn).toBeTypeOf('function');
+	expect(Logger.debug).toBeTypeOf('function');
+	expect(Logger.dir).toBeTypeOf('function');
+	expect(Logger.error).toBeTypeOf('function');
+	expect(Logger.info).toBeTypeOf('function');
+	expect(Logger.log).toBeTypeOf('function');
+	expect(Logger.table).toBeTypeOf('function');
+	expect(Logger.trace).toBeTypeOf('function');
+	expect(Logger.warn).toBeTypeOf('function');
 
-	logger.enabled = 123 as never;
+	Logger.enabled = 123 as never;
 
-	expect(logger.enabled).toBe(false);
+	expect(Logger.enabled).toBe(false);
 
-	logger.enabled = true;
+	Logger.enabled = true;
 
-	expect(logger.enabled).toBe(true);
+	expect(Logger.enabled).toBe(true);
 
-	logger.enabled = 123 as never;
+	Logger.enabled = 123 as never;
 
-	expect(logger.enabled).toBe(true);
+	expect(Logger.enabled).toBe(true);
 });
 
-test('log.time', () => {
-	logger.enabled = true;
+test('Logger.time', () => {
+	Logger.enabled = true;
 
-	const one = logger.time('test');
+	const one = Logger.time('test');
 
 	expect(one).toBeTypeOf('object');
 	expect(one.active).toBe(true);
@@ -63,19 +63,19 @@ test('log.time', () => {
 	expect(one.active).toBe(false);
 	expect(one.log).toBe(noop);
 
-	const two = logger.time('test');
+	const two = Logger.time('test');
 
 	expect(two).toBeTypeOf('object');
 	expect(two.active).toBe(true);
 	expect(two.log).not.toBe(noop);
 
-	logger.enabled = false;
+	Logger.enabled = false;
 
 	expect(two.active).toBe(false);
 	expect(two.log).toBe(noop);
 	expect(two.stop).toBe(noop);
 
-	logger.enabled = true;
+	Logger.enabled = true;
 
 	expect(two.active).toBe(true);
 	expect(two.log).not.toBe(noop);
@@ -91,15 +91,15 @@ test('log.time', () => {
 	expect(two.active).toBe(false);
 	expect(two.log).toBe(noop);
 
-	logger.enabled = false;
+	Logger.enabled = false;
 
-	const three = logger.time('test');
+	const three = Logger.time('test');
 
 	expect(three.active).toBe(false);
 	expect(three.log).toBe(noop);
 	expect(three.stop).toBe(noop);
 
-	logger.enabled = true;
+	Logger.enabled = true;
 
 	expect(three.active).toBe(false);
 	expect(three.log).toBe(noop);
