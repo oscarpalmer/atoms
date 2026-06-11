@@ -92,8 +92,6 @@ export function getUuid(): string;
 export function getUuid(html?: unknown): string {
 	const forHTML = html === true;
 
-	let uuid: string;
-
 	while (true) {
 		const bytes = new Uint8Array(16);
 
@@ -105,20 +103,20 @@ export function getUuid(html?: unknown): string {
 
 		const hex = Array.from(bytes, byte => byte.toString(16).padStart(2, ZERO)).join('');
 
-		uuid = [
-			hex.substring(0, 8),
+		const first = hex.substring(0, 8);
+
+		if (forHTML && NUMERICAL_PREFIX_PATTERN.test(first)) {
+			continue;
+		}
+
+		return [
+			first,
 			hex.substring(8, 12),
 			hex.substring(12, 16),
 			hex.substring(16, 20),
 			hex.substring(20, 32),
-		].join('-');
-
-		if (!forHTML || !NUMERICAL_PREFIX_PATTERN.test(uuid)) {
-			break;
-		}
+		].join(forHTML ? DELIMITER_UUID_HTML : DELIMITER_UUID_DEFAULT);
 	}
-
-	return uuid;
 }
 
 /**
@@ -181,6 +179,10 @@ export function truncate(value: string, length: number, suffix?: string): string
 // #endregion
 
 // #region Variables
+
+const DELIMITER_UUID_DEFAULT = '-';
+
+const DELIMITER_UUID_HTML = '_';
 
 const NUMERICAL_PREFIX_PATTERN = /^\d/;
 

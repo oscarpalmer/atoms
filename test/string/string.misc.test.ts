@@ -72,6 +72,10 @@ test(
 			expect([...htmlValues].some(value => /^\d/.test(value))).toBe(false);
 			expect([...ignoredValues].some(value => /^\d/.test(value))).toBe(true);
 
+			expect([...defaultValues].every(value => value.includes('-'))).toBe(true);
+			expect([...htmlValues].every(value => value.includes('_'))).toBe(true);
+			expect([...ignoredValues].every(value => value.includes('-'))).toBe(true);
+
 			done();
 		}),
 	60_000,
