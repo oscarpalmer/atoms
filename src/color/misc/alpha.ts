@@ -1,6 +1,6 @@
+import {round} from '../../internal/math/misc';
 import {
 	ALPHA_FULL_HEX_LONG,
-	ALPHA_FULL_VALUE,
 	ALPHA_NONE_HEX,
 	ALPHA_NONE_VALUE,
 	DEFAULT_ALPHA,
@@ -31,11 +31,11 @@ export function getAlphaHexadecimal(value: number): string {
 		return ALPHA_NONE_HEX;
 	}
 
-	if (value === ALPHA_FULL_VALUE) {
+	if (value === MAX_PERCENT) {
 		return ALPHA_FULL_HEX_LONG;
 	}
 
-	return Math.round(value * MAX_HEX).toString(16);
+	return round(value * MAX_HEX).toString(16);
 }
 
 function getAlphaFromValue(value: number): Alpha {
@@ -48,15 +48,11 @@ function getAlphaFromValue(value: number): Alpha {
 }
 
 export function getAlphaValue(original: number): number {
-	if (Number.isNaN(original) || original >= MAX_PERCENT || original === ALPHA_FULL_VALUE) {
-		return ALPHA_FULL_VALUE;
+	if (Number.isNaN(original) || original >= MAX_PERCENT) {
+		return MAX_PERCENT;
 	}
 
-	if (original < ALPHA_NONE_VALUE) {
-		return ALPHA_NONE_VALUE;
-	}
-
-	return original <= ALPHA_FULL_VALUE ? original : original / MAX_PERCENT;
+	return original <= ALPHA_NONE_VALUE ? ALPHA_NONE_VALUE : original;
 }
 
 // #endregion

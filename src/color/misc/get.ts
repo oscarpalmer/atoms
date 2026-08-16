@@ -16,7 +16,7 @@ import {
 	SRGB_LUMINANCE_THRESHOLD,
 } from '../constants';
 import {Color} from '../instance';
-import type {HSLAColor, HSLColor, RGBAColor, RGBColor} from '../models';
+import type {HSLAColor, HSLColor, HWBAColor, HWBColor, RGBAColor, RGBColor} from '../models';
 import {getColorState} from './state';
 
 // #region Functions
@@ -65,7 +65,7 @@ export function getForegroundColor(value: unknown): Color {
  * Get the hex color _(with alpha channel, i.e., opacity)_ from any kind of value
  *
  * - Values that can be parsed are: hex(a) color strings, _HSL(A)_ color objects, and _RGB(A)_ color objects
- * - If the value cannot be parsed, a black hex color with an alpha channel of `0` will be returned
+ * - If the value cannot be parsed, a black hex color will be returned
  *
  * @param value Original value
  * @returns Hex color string
@@ -101,7 +101,7 @@ export function getDegrees(value: unknown): number {
  * Get the _HSLA_ color from any kind of value
  *
  * - Values that can be parsed are: hex(a) color strings, _HSL(A)_ color objects, and _RGB(A)_ color objects
- * - If the value cannot be parsed, a black _HSLA_ color with an alpha channel _(opacity)_ of `0` will be returned
+ * - If the value cannot be parsed, a black _HSLA_ color will be returned
  *
  * @param value Original value
  * @returns _HSLA_ color
@@ -111,6 +111,37 @@ export function getHslaColor(value: unknown): HSLAColor {
 
 	return {
 		...hsl,
+		alpha: alpha.value,
+	};
+}
+
+/**
+ * Get the _HWB_ color from any kind of value
+ *
+ * - Values that can be parsed are: hex(a) color strings, _HSL(A)_ color objects, _HWB_ color objects, and _RGB(A)_ color objects
+ * - If the value cannot be parsed, a black _HWB_ color will be returned
+ *
+ * @param value Original value
+ * @returns _HWB_ color
+ */
+export function getHwbColor(value: unknown): HWBColor {
+	return getColorState(value).hwb;
+}
+
+/**
+ * Get the _HWBA_ color from any kind of value
+ *
+ * - Values that can be parsed are: hex(a) color strings, _HSL(A)_ color objects, _HWB_ color objects, and _RGB(A)_ color objects
+ * - If the value cannot be parsed, a black _HWBA_ color will be returned
+ *
+ * @param value Original value
+ * @returns _HWBA_ color
+ */
+export function getHwbaColor(value: unknown): HWBAColor {
+	const {alpha, hwb} = getColorState(value);
+
+	return {
+		...hwb,
 		alpha: alpha.value,
 	};
 }
@@ -136,7 +167,7 @@ export function getPercentage(value: unknown): number {
  * Get the _RGBA_ color from any kind of value
  *
  * - Values that can be parsed are: hex(a) color strings, _HSL(A)_ color objects, and _RGB(A)_ color objects
- * - If the value cannot be parsed, a black _RGBA_ color with an alpha channel _(opacity)_ of `0` will be returned
+ * - If the value cannot be parsed, a black _RGBA_ color will be returned
  *
  * @param value Original value
  * @returns _RGBA_ color

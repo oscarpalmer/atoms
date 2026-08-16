@@ -35,6 +35,23 @@ export type HSLColor = {
 	saturation: number;
 };
 
+export type HWBColor = {
+	/**
+	 * Blackness of the color _(in percentage; 0-100)_
+	 */
+	blackness: number;
+	/**
+	 * Hue of the color _(in degrees; 0-360)_
+	 */
+	hue: number;
+	/**
+	 * Whiteness of the color _(in percentage; 0-100)_
+	 */
+	whiteness: number;
+};
+
+export type HWBAColor = HWBColor & ColorWithAlpha;
+
 /**
  * An _RGB_ color with an alpha channel _(opacity)_
  */
@@ -58,7 +75,7 @@ export type RGBColor = {
 	red: number;
 };
 
-export type ColorProperty = 'alpha' | 'blue' | 'green' | 'hue' | 'lightness' | 'red' | 'saturation';
+export type ColorProperty = 'alpha' | keyof HSLColor | keyof HWBColor | keyof RGBColor;
 
 export type ColorSpace = 'hsl' | 'rgb';
 
@@ -66,6 +83,7 @@ export type ColorState = {
 	alpha: Alpha;
 	hex: string;
 	hsl: HSLColor;
+	hwb: HWBColor;
 	rgb: RGBColor;
 };
 

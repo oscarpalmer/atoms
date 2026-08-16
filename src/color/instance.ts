@@ -1,8 +1,15 @@
-import {SPACE_HSL, SPACE_RGB} from './constants';
-import {formatColor} from './misc';
+import {formatHslColor, formatHwbColor, formatRgbColor} from './misc';
 import {getAlpha} from './misc/alpha';
-import {getColorState, setHexColor, setHSLColor, setRGBColor} from './misc/state';
-import type {ColorState, HSLAColor, HSLColor, RGBAColor, RGBColor} from './models';
+import {getColorState, setHexColor, setHSLColor, setHWBColor, setRGBColor} from './misc/state';
+import type {
+	ColorState,
+	HSLAColor,
+	HSLColor,
+	HWBAColor,
+	HWBColor,
+	RGBAColor,
+	RGBColor,
+} from './models';
 
 // #region Types
 
@@ -20,19 +27,16 @@ export class Color {
 	readonly #state: ColorState;
 
 	/**
-	 * Get the alpha channel _(opacity)_ of the color
+	 * Get the alpha channel _(opacity)_ of the color as a percentage between `0` and `100`
 	 *
-	 * @returns Current alpha channel value between `0` and `1`
+	 * @returns Current alpha channel value
 	 */
 	get alpha(): number {
 		return this.#state.alpha.value;
 	}
 
 	/**
-	 * Set the alpha channel _(opacity)_ of the color, as:
-	 *
-	 * - A number between `0` and `1`, where `0` is fully transparent and `1` is fully opaque
-	 * - A number between `0` and `100`, where `0` is fully transparent and `100` is fully opaque
+	 * Set the alpha channel _(opacity)_ of the color as a percentage between `0` and `100`
 	 *
 	 * @param value New alpha channel value
 	 */
@@ -94,7 +98,7 @@ export class Color {
 	 * @returns Current color as an _HSL_ color
 	 */
 	get hsl(): HSLColor {
-		return this.#state.hsl;
+		return {...this.#state.hsl};
 	}
 
 	/**
@@ -128,12 +132,51 @@ export class Color {
 	}
 
 	/**
+	 * Get the color as an _HWB_ color
+	 *
+	 * @returns Current color as an _HWB_ color
+	 */
+	get hwb(): HWBColor {
+		return {...this.#state.hwb};
+	}
+
+	/**
+	 * Set colors from an _HWB_ color
+	 *
+	 * @param value New _HWB_ color
+	 */
+	set hwb(value: HWBColor) {
+		setHWBColor(this.#state, value, false);
+	}
+
+	/**
+	 * Get the color as an _HWBA_ color
+	 *
+	 * @returns Current color as an _HWBA_ color
+	 */
+	get hwba(): HWBAColor {
+		return {
+			...this.#state.hwb,
+			alpha: this.#state.alpha.value,
+		};
+	}
+
+	/**
+	 * Set colors and alpha from an _HWBA_ color
+	 *
+	 * @param value New _HWBA_ color
+	 */
+	set hwba(value: HWBAColor) {
+		setHWBColor(this.#state, value, true);
+	}
+
+	/**
 	 * Get the color as an _RGB_ color
 	 *
 	 * @returns Current color as an _RGB_ color
 	 */
 	get rgb(): RGBColor {
-		return this.#state.rgb;
+		return {...this.#state.rgb};
 	}
 
 	/**
@@ -191,7 +234,17 @@ export class Color {
 	 * @returns _HSL(A)_ color string
 	 */
 	toHslString(alpha?: boolean): string {
-		return formatColor(SPACE_HSL, this, alpha === true);
+		return formatHslColor(this, alpha === true);
+	}
+
+	/**
+	 * Get the color as an _HWB(A)_ string
+	 *
+	 * @param alpha Include alpha channel _(opacity)_? _(defaults to `false`)_
+	 * @returns _HWB(A)_ color string
+	 */
+	toHwbString(alpha?: boolean): string {
+		return formatHwbColor(this, alpha === true);
 	}
 
 	/**
@@ -201,7 +254,7 @@ export class Color {
 	 * @returns _RGB(A)_ color string
 	 */
 	toRgbString(alpha?: boolean): string {
-		return formatColor(SPACE_RGB, this, alpha === true);
+		return formatRgbColor(this, alpha === true);
 	}
 
 	/**

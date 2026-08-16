@@ -7,6 +7,7 @@ import {
 	getAggregateCallback,
 	getAggregated,
 } from './internal/math/aggregate';
+import {roundNumber} from './internal/math/misc';
 import type {NumericalValues, PlainObject} from './models';
 
 // #region Functions
@@ -235,35 +236,6 @@ export function min(array: unknown[], key?: unknown): number {
 }
 
 /**
- * Round a number
- *
- * @param value Number to round
- * @param decimals Number of decimal places to round to _(defaults to `0`)_
- * @returns Rounded number, or `Number.NaN` if the value if unable to be rounded
- */
-export function round(value: number, decimals?: number): number {
-	return roundNumber(Math.round, value, decimals);
-}
-
-function roundNumber(
-	callback: (value: number) => number,
-	value: number,
-	decimals?: number,
-): number {
-	if (typeof value !== 'number') {
-		return Number.NaN;
-	}
-
-	if (typeof decimals !== 'number' || decimals < 1) {
-		return callback(value);
-	}
-
-	const mod = 10 ** decimals;
-
-	return callback((value + Number.EPSILON) * mod) / mod;
-}
-
-/**
  * Get the sum of a list of items
  *
  * @param items List of items
@@ -304,5 +276,6 @@ export function sum(array: unknown[], key?: unknown): number {
 // #region Exports
 
 export {max} from './internal/math/aggregate';
+export {round} from './internal/math/misc';
 
 // #endregion

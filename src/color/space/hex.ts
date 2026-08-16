@@ -1,3 +1,4 @@
+import {round} from '../../internal/math/misc';
 import {join} from '../../internal/string';
 import {
 	ALPHA_FULL_HEX_LONG,
@@ -9,9 +10,10 @@ import {
 	LENGTH_SHORT,
 	MAX_HEX,
 } from '../constants';
+import {getHexValue, getPercentage} from '../misc/get';
 import {isHexColor} from '../misc/is';
-import type {HSLAColor, HSLColor, RGBAColor, RGBColor} from '../models';
-import {convertRgbToHsla} from './rgb';
+import type {HSLAColor, HSLColor, HWBAColor, HWBColor, RGBAColor, RGBColor} from '../models';
+import {convertRgbToHsla, convertRgbToHwba} from './rgb';
 
 // #region Functions
 
@@ -27,10 +29,10 @@ function convertHexToRgba(value: string): RGBAColor {
 	}
 
 	return {
-		alpha: values[3] / MAX_HEX,
-		blue: values[2],
-		green: values[1],
-		red: values[0],
+		alpha: getPercentage((values[3] / MAX_HEX) * 100),
+		blue: getHexValue(round(values[2])),
+		green: getHexValue(round(values[1])),
+		red: getHexValue(round(values[0])),
 	};
 }
 
@@ -66,6 +68,14 @@ export function getNormalizedHex(value: unknown, alpha?: boolean): string {
 	return `${hex}${a}`;
 }
 
+/**
+ * Convert a hex color string to a _HSL_ color
+ *
+ * _If the value is unable to be converted, a black _HSL_ color will be returned_
+ *
+ * @param value Hex color string
+ * @returns _HSL_ color
+ */
 export function hexToHsl(value: string): HSLColor {
 	const {hue, lightness, saturation} = hexToHsla(value);
 
@@ -76,14 +86,52 @@ export function hexToHsl(value: string): HSLColor {
 	};
 }
 
+/**
+ * Convert a hex color string to a _HSLA_ color
+ *
+ * _If the value is unable to be converted, a black _HSLA_ color will be returned_
+ *
+ * @param value Hex color string
+ * @returns _HSLA_ color
+ */
 export function hexToHsla(value: string): HSLAColor {
 	return convertRgbToHsla(convertHexToRgba(value));
 }
 
 /**
+ * Convert a hex color string to a _HWB_ color
+ *
+ * _If the value is unable to be converted, a black _HWB_ color will be returned_
+ *
+ * @param value Hex color string
+ * @returns _HWB_ color
+ */
+export function hexToHwb(value: string): HWBColor {
+	const {blackness, hue, whiteness} = hexToHwba(value);
+
+	return {
+		blackness,
+		hue,
+		whiteness,
+	};
+}
+
+/**
+ * Convert a hex color string to a _HWBA_ color
+ *
+ * _If the value is unable to be converted, a black _HWBA_ color will be returned_
+ *
+ * @param value Hex color string
+ * @returns _HWBA_ color
+ */
+export function hexToHwba(value: string): HWBAColor {
+	return convertRgbToHwba(convertHexToRgba(value));
+}
+
+/**
  * Convert a hex color to an _RGB_ color
  *
- * _If the value is unable to be converted, a black RGB color will be returned_
+ * _If the value is unable to be converted, a black _RGB_ color will be returned_
  *
  * @param value Original value
  * @returns _RGB_ color
@@ -97,7 +145,7 @@ export function hexToRgb(value: string): RGBColor {
 /**
  * Convert a hex color to an _RGBA_ color
  *
- * _If the value is unable to be converted, a black RGBA color with an alpha channel (opacity) of `0` will be returned_
+ * _If the value is unable to be converted, a black _RGBA_ color will be returned_
  *
  * @param value Original value
  * @returns _RGBA_ color

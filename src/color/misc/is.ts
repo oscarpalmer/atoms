@@ -1,12 +1,13 @@
 import {between} from '../../internal/number';
 import type {PlainObject} from '../../models';
 import {
-	ALPHA_FULL_VALUE,
 	ALPHA_NONE_VALUE,
 	EXPRESSION_HEX_LONG,
 	EXPRESSION_HEX_SHORT,
 	KEYS_HSL,
 	KEYS_HSLA,
+	KEYS_HWB,
+	KEYS_HWBA,
 	KEYS_RGB,
 	KEYS_RGBA,
 	LENGTH_LONG,
@@ -16,7 +17,15 @@ import {
 	MAX_PERCENT,
 } from '../constants';
 import type {Color} from '../index';
-import type {ColorProperty, HSLAColor, HSLColor, RGBAColor, RGBColor} from '../models';
+import type {
+	ColorProperty,
+	HSLAColor,
+	HSLColor,
+	HWBAColor,
+	HWBColor,
+	RGBAColor,
+	RGBColor,
+} from '../models';
 
 // ##region Functions
 
@@ -25,7 +34,7 @@ function hasKeys(value: unknown, keys: ColorProperty[]): boolean {
 }
 
 function isAlpha(value: unknown): value is number {
-	return typeof value === 'number' && between(value, ALPHA_NONE_VALUE, ALPHA_FULL_VALUE);
+	return typeof value === 'number' && between(value, ALPHA_NONE_VALUE, MAX_PERCENT);
 }
 
 function isBytey(value: unknown): value is number {
@@ -117,6 +126,16 @@ export function isHslaColor(value: unknown): value is HSLAColor {
 }
 
 /**
+ * Is the value like an _HSLA_ color?
+ *
+ * @param value Value to check
+ * @returns `true` if the value is like an _HSLA_ color, otherwise `false`
+ */
+export function isHslaLike(value: unknown): value is Record<keyof HSLAColor, unknown> {
+	return hasKeys(value, KEYS_HSLA);
+}
+
+/**
  * Is the value an _HSL_ color?
  *
  * @param value Value to check
@@ -126,8 +145,54 @@ export function isHslColor(value: unknown): value is HSLColor {
 	return isColorValue(value, KEYS_HSLA) || isColorValue(value, KEYS_HSL);
 }
 
+/**
+ * Is the value like an _HSL_ color?
+ *
+ * @param value Value to check
+ * @returns `true` if the value is like an _HSL_ color, otherwise `false`
+ */
 export function isHslLike(value: unknown): value is Record<keyof HSLColor, unknown> {
 	return hasKeys(value, KEYS_HSL);
+}
+
+/**
+ * Is the value an _HWBA_ color?
+ *
+ * @param value Value to check
+ * @returns `true` if the value is an _HWBA_ color, otherwise `false`
+ */
+export function isHwbaColor(value: unknown): value is HWBAColor {
+	return isColorValue(value, KEYS_HWBA);
+}
+
+/**
+ * Is the value like an _HWBA_ color?
+ *
+ * @param value Value to check
+ * @returns `true` if the value is like an _HWBA_ color, otherwise `false`
+ */
+export function isHwbaLike(value: unknown): value is Record<keyof HWBAColor, unknown> {
+	return hasKeys(value, KEYS_HWBA);
+}
+
+/**
+ * Is the value an _HWB_ color?
+ *
+ * @param value Value to check
+ * @returns `true` if the value is an _HWB_ color, otherwise `false`
+ */
+export function isHwbColor(value: unknown): value is HWBColor {
+	return isColorValue(value, KEYS_HWB) || isColorValue(value, KEYS_HWBA);
+}
+
+/**
+ * Is the value like an _HWB_ color?
+ *
+ * @param value Value to check
+ * @returns `true` if the value is like an _HWB_ color, otherwise `false`
+ */
+export function isHwbLike(value: unknown): value is Record<keyof HWBColor, unknown> {
+	return hasKeys(value, KEYS_HWB);
 }
 
 /**
@@ -141,6 +206,16 @@ export function isRgbaColor(value: unknown): value is RGBAColor {
 }
 
 /**
+ * Is the value like an _RGBA_ color?
+ *
+ * @param value Value to check
+ * @returns `true` if the value is like an _RGBA_ color, otherwise `false`
+ */
+export function isRgbaLike(value: unknown): value is Record<keyof RGBAColor, unknown> {
+	return hasKeys(value, KEYS_RGBA);
+}
+
+/**
  * Is the value an _RGB_ color?
  *
  * @param value Value to check
@@ -150,6 +225,12 @@ export function isRgbColor(value: unknown): value is RGBColor {
 	return isColorValue(value, KEYS_RGBA) || isColorValue(value, KEYS_RGB);
 }
 
+/**
+ * Is the value like an _RGB_ color?
+ *
+ * @param value Value to check
+ * @returns `true` if the value is like an _RGB_ color, otherwise `false`
+ */
 export function isRgbLike(value: unknown): value is Record<keyof RGBColor, unknown> {
 	return hasKeys(value, KEYS_RGB);
 }
@@ -164,12 +245,14 @@ function isPercentage(value: unknown): value is number {
 
 const validators: Record<ColorProperty, (value: unknown) => value is number> = {
 	alpha: isAlpha,
+	blackness: isPercentage,
 	blue: isBytey,
 	green: isBytey,
 	hue: isDegree,
 	lightness: isPercentage,
 	saturation: isPercentage,
 	red: isBytey,
+	whiteness: isPercentage,
 };
 
 // #endregion
