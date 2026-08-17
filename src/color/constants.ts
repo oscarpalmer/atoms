@@ -17,14 +17,14 @@ export const DEFAULT_ALPHA: Alpha = {
 
 export const DEFAULT_HSL: HSLColor = {
 	hue: 0,
-	lightness: 0,
 	saturation: 0,
+	lightness: 0,
 };
 
 export const DEFAULT_HWB: HWBColor = {
-	blackness: 100,
 	hue: 0,
 	whiteness: 0,
+	blackness: 100,
 };
 
 export const DEFAULT_RGB: RGBColor = {

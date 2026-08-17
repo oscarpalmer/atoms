@@ -18,8 +18,8 @@ import type {
 	RGBAColor,
 	RGBColor,
 } from '../models';
-import {getNormalizedHex, hexToRgb} from '../space/hex';
-import {getHslValue, hslToHwb, hslToRgb} from '../space/hsl';
+import {getNormalizedHex, hexToHsl, hexToRgb} from '../space/hex';
+import {getHslValue, hslToHex, hslToHwb, hslToRgb} from '../space/hsl';
 import {getHwbValue, hwbToHex, hwbToHsl, hwbToRgb} from '../space/hwb';
 import {getRgbValue, rgbToHex, rgbToHsl, rgbToHwb} from '../space/rgb';
 import {getAlpha} from './alpha';
@@ -30,17 +30,7 @@ import {isColor, isHexColor, isHslLike, isHwbLike, isRgbLike} from './is';
 
 export function getColorState(value: unknown): ColorState {
 	if (typeof value === 'string') {
-		const normalized = getNormalizedHex(value, true);
-		const hex = normalized.slice(0, LENGTH_LONG);
-		const rgb = hexToRgb(hex);
-
-		return {
-			hex,
-			rgb,
-			alpha: getAlpha(normalized.slice(LENGTH_LONG)),
-			hsl: rgbToHsl(rgb),
-			hwb: rgbToHwb(rgb),
-		};
+		return getColorStateForHex(value);
 	}
 
 	if (isColor(value)) {
@@ -59,38 +49,81 @@ export function getColorState(value: unknown): ColorState {
 		state.alpha = getAlpha((value as HSLAColor).alpha);
 
 		if (KEYS_HSL.every(key => key in value)) {
-			state.hsl = getHslValue(value as Record<keyof HSLColor, unknown>);
-			state.rgb = hslToRgb(state.hsl);
-			state.hex = rgbToHex(state.rgb);
-			state.hwb = hslToHwb(state.hsl);
-
-			return state as ColorState;
+			return getColorStateForHsl(state, value as Record<keyof HSLColor, unknown>);
 		}
 
 		if (KEYS_HWB.every(key => key in value)) {
-			state.hwb = getHwbValue(value as Record<keyof HWBColor, unknown>);
-			state.hex = hwbToHex(state.hwb);
-			state.hsl = hwbToHsl(state.hwb);
-			state.rgb = hwbToRgb(state.hwb);
-
-			return state as ColorState;
+			return getColorStateForHwb(state, value as Record<keyof HWBColor, unknown>);
 		}
 
 		if (KEYS_RGB.every(key => key in value)) {
-			state.rgb = getRgbValue(value as Record<keyof RGBColor, unknown>);
-			state.hex = rgbToHex(state.rgb);
-			state.hsl = rgbToHsl(state.rgb);
-			state.hwb = rgbToHwb(state.rgb);
-
-			return state as ColorState;
+			return getColorStateForRgb(state, value as Record<keyof RGBColor, unknown>);
 		}
 	}
 
-	state.alpha ??= getAlpha(MAX_PERCENT);
-	state.hex ??= HEX_BLACK;
-	state.hsl ??= {...DEFAULT_HSL};
-	state.hwb ??= {...DEFAULT_HWB};
-	state.rgb ??= {...DEFAULT_RGB};
+	return getDefaultColorState(state);
+}
+
+function getColorStateForHex(value: string): ColorState {
+	const normalized = getNormalizedHex(value, true);
+	const hex = normalized.slice(0, LENGTH_LONG);
+
+	const hsl = hexToHsl(hex);
+
+	return {
+		hex,
+		hsl,
+		alpha: getAlpha(normalized.slice(LENGTH_LONG)),
+		hwb: hslToHwb(hsl),
+		rgb: hslToRgb(hsl),
+	};
+}
+
+function getColorStateForHsl(
+	state: Partial<ColorState>,
+	value: Record<keyof HSLColor, unknown>,
+): ColorState {
+	state.hsl = getHslValue(value);
+
+	state.rgb = hslToRgb(state.hsl);
+	state.hex = hslToHex(state.hsl);
+	state.hwb = hslToHwb(state.hsl);
+
+	return state as ColorState;
+}
+
+function getColorStateForHwb(
+	state: Partial<ColorState>,
+	value: Record<keyof HWBColor, unknown>,
+): ColorState {
+	state.hwb = getHwbValue(value);
+
+	state.hsl = hwbToHsl(state.hwb);
+	state.rgb = hwbToRgb(state.hwb);
+	state.hex = hwbToHex(state.hwb);
+
+	return state as ColorState;
+}
+
+function getColorStateForRgb(
+	state: Partial<ColorState>,
+	value: Record<keyof RGBColor, unknown>,
+): ColorState {
+	state.rgb = getRgbValue(value);
+
+	state.hex = rgbToHex(state.rgb);
+	state.hsl = rgbToHsl(state.rgb);
+	state.hwb = rgbToHwb(state.rgb);
+
+	return state as ColorState;
+}
+
+function getDefaultColorState(state: Partial<ColorState>): ColorState {
+	state.alpha = getAlpha(MAX_PERCENT);
+	state.hex = HEX_BLACK;
+	state.hsl = {...DEFAULT_HSL};
+	state.hwb = {...DEFAULT_HWB};
+	state.rgb = {...DEFAULT_RGB};
 
 	return state as ColorState;
 }
@@ -102,11 +135,13 @@ export function setHexColor(state: ColorState, value: string, alpha: boolean): v
 
 	const normalized = getNormalizedHex(value, true);
 	const hex = normalized.slice(0, LENGTH_LONG);
-	const rgb = hexToRgb(hex);
+	const hsl = hexToHsl(hex);
 
 	state.hex = hex;
-	state.hsl = rgbToHsl(rgb);
-	state.rgb = rgb;
+	state.hsl = hsl;
+
+	state.rgb = hslToRgb(hsl);
+	state.hwb = hslToHwb(hsl);
 
 	if (alpha) {
 		state.alpha = getAlpha(normalized.slice(LENGTH_LONG));
@@ -120,15 +155,15 @@ export function setHSLColor(state: ColorState, value: unknown, alpha: boolean): 
 
 	const hsl = {
 		hue: getDegrees((value as HSLColor).hue),
-		lightness: getPercentage((value as HSLColor).lightness),
 		saturation: getPercentage((value as HSLColor).saturation),
+		lightness: getPercentage((value as HSLColor).lightness),
 	};
 
-	const rgb = hslToRgb(hsl);
-
-	state.hex = rgbToHex(rgb);
 	state.hsl = hsl;
-	state.rgb = rgb;
+
+	state.hex = hslToHex(hsl);
+	state.hwb = hslToHwb(hsl);
+	state.rgb = hslToRgb(hsl);
 
 	if (alpha) {
 		state.alpha = getAlpha((value as HSLAColor).alpha);
@@ -141,18 +176,16 @@ export function setHWBColor(state: ColorState, value: unknown, alpha: boolean): 
 	}
 
 	const hwb = {
-		blackness: getPercentage((value as HWBColor).blackness),
 		hue: getDegrees((value as HWBColor).hue),
 		whiteness: getPercentage((value as HWBColor).whiteness),
+		blackness: getPercentage((value as HWBColor).blackness),
 	};
 
-	const hsl = hwbToHsl(hwb);
-	const rgb = hslToRgb(hsl);
-
-	state.hex = rgbToHex(rgb);
-	state.hsl = hsl;
 	state.hwb = hwb;
-	state.rgb = rgb;
+
+	state.hex = hwbToHex(hwb);
+	state.hsl = hwbToHsl(hwb);
+	state.rgb = hwbToRgb(hwb);
 
 	if (alpha) {
 		state.alpha = getAlpha((value as HWBAColor).alpha);
@@ -170,9 +203,13 @@ export function setRGBColor(state: ColorState, value: unknown, alpha: boolean): 
 		red: getHexValue((value as RGBColor).red),
 	};
 
-	state.hex = rgbToHex(rgb);
-	state.hsl = rgbToHsl(rgb);
+	const hsl = rgbToHsl(rgb);
+
+	state.hsl = hsl;
 	state.rgb = rgb;
+
+	state.hex = hslToHex(hsl);
+	state.hwb = hslToHwb(hsl);
 
 	if (alpha) {
 		state.alpha = getAlpha((value as RGBAColor).alpha);

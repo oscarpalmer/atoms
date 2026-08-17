@@ -11,6 +11,7 @@ import {
 	getRgbaColor,
 	getRgbColor,
 	isColor,
+	round,
 } from '../../src';
 import {getHwbaColor, getHwbColor} from '../../src/color/misc/get';
 import {colorFixture} from '../.fixtures/color.fixture';
@@ -18,15 +19,43 @@ import {colorFixture} from '../.fixtures/color.fixture';
 const {foregrounds, hexes, hsls, hslas, hwbs, hwbas, instances, rgbas, rgbs, shorts} = colorFixture;
 const {length} = hexes;
 
+function roundColor(value: number): number {
+	// Often a precision loss when converting colors,
+	// so we round the values to 4 decimal places for comparison,
+	// which should be acceptable decimal precision for color values
+
+	return round(value, 4);
+}
+
+function roundColors<Values extends Record<string, number>>(values: Values): Values {
+	const keys = Object.keys(values) as (keyof Values)[];
+	const {length} = keys;
+
+	const cloned: Partial<Values> = {};
+
+	for (let index = 0; index < length; index += 1) {
+		const key = keys[index];
+
+		cloned[key] = roundColor(values[key]) as never;
+	}
+
+	return cloned as Values;
+}
+
 test('getColor + isColor', () => {
 	const indices = Array.from({length}).map((_, index) => index);
 
 	for (let index = 0; index < length; index += 1) {
 		const color = getColor(hexes[index]);
 
+		const hsl = roundColors(hsls[index]);
+		const hwb = roundColors(hwbs[index]);
+
 		expect(color.hex).toEqual(hexes[index]);
-		expect(color.hsl).toEqual(hsls[index]);
-		expect(color.hsla).toEqual({...hsls[index], alpha: 100});
+		expect(roundColors(color.hsl)).toEqual(hsl);
+		expect(roundColors(color.hsla)).toEqual({...hsl, alpha: 100});
+		expect(roundColors(color.hwb)).toEqual(roundColors(hwb));
+		expect(roundColors(color.hwba)).toEqual({...hwb, alpha: 100});
 		expect(color.rgb).toEqual(rgbs[index]);
 		expect(color.rgba).toEqual({...rgbs[index], alpha: 100});
 		expect(color.alpha).toBe(100);
@@ -37,7 +66,8 @@ test('getColor + isColor', () => {
 			color.hex = hexes[next];
 
 			expect(color.hex).toEqual(hexes[next]);
-			expect(color.hsl).toEqual(hsls[next]);
+			expect(roundColors(color.hsl)).toEqual(roundColors(hsls[next]));
+			expect(roundColors(color.hwb)).toEqual(roundColors(hwbs[next]));
 			expect(color.rgb).toEqual(rgbs[next]);
 		}
 
@@ -47,7 +77,8 @@ test('getColor + isColor', () => {
 			color.hsl = hsls[next];
 
 			expect(color.hex).toEqual(hexes[next]);
-			expect(color.hsl).toEqual(hsls[next]);
+			expect(roundColors(color.hsl)).toEqual(roundColors(hsls[next]));
+			expect(roundColors(color.hwb)).toEqual(roundColors(hwbs[next]));
 			expect(color.rgb).toEqual(rgbs[next]);
 		}
 
@@ -57,7 +88,8 @@ test('getColor + isColor', () => {
 			color.rgb = rgbs[next];
 
 			expect(color.hex).toEqual(hexes[next]);
-			expect(color.hsl).toEqual(hsls[next]);
+			expect(roundColors(color.hsl)).toEqual(roundColors(hsls[next]));
+			expect(roundColors(color.hwb)).toEqual(roundColors(hwbs[next]));
 			expect(color.rgb).toEqual(rgbs[next]);
 		}
 	}
@@ -82,10 +114,31 @@ test('getColor + isColor', () => {
 
 test('getForegroundColor', () => {
 	for (let index = 0; index < length; index += 1) {
-		expect(getForegroundColor(rgbs[index]).hex).toBe(foregrounds[index]);
+		const foreground = foregrounds[index];
+
+		expect(getForegroundColor(hexes[index]).hex).toBe(foreground);
+		expect(getForegroundColor(hslas[index]).hex).toBe(foreground);
+		expect(getForegroundColor(hsls[index]).hex).toBe(foreground);
+		expect(getForegroundColor(hwbas[index]).hex).toBe(foreground);
+		expect(getForegroundColor(hwbs[index]).hex).toBe(foreground);
+		expect(getForegroundColor(rgbas[index]).hex).toBe(foreground);
+		expect(getForegroundColor(rgbs[index]).hex).toBe(foreground);
+
+		expect(getForegroundColor(hexes[index], true)).toBe(foreground);
+		expect(getForegroundColor(hslas[index], true)).toBe(foreground);
+		expect(getForegroundColor(hsls[index], true)).toBe(foreground);
+		expect(getForegroundColor(hwbas[index], true)).toBe(foreground);
+		expect(getForegroundColor(hwbs[index], true)).toBe(foreground);
+		expect(getForegroundColor(rgbas[index], true)).toBe(foreground);
+		expect(getForegroundColor(rgbs[index], true)).toBe(foreground);
 	}
 
-	expect(getForegroundColor('invalid').hex).toBe('ffffff');
+	const white = 'ffffff';
+
+	expect(getForegroundColor('invalid').hex).toBe(white);
+	expect(getForegroundColor('invalid', true)).toBe(white);
+	expect(getForegroundColor(123).hex).toBe(white);
+	expect(getForegroundColor(123, true)).toBe(white);
 });
 
 test('getHex(a)Color', () => {
@@ -116,15 +169,15 @@ test('getHex(a)Color', () => {
 
 test('getHslaColor', () => {
 	for (let index = 0; index < length; index += 1) {
-		const hsl = hsls[index];
-		const hsla = hslas[index];
+		const hsl = roundColors(hsls[index]);
+		const hsla = roundColors(hslas[index]);
 
-		expect(getHslaColor(hexes[index])).toEqual({...hsl, alpha: 100});
-		expect(getHslaColor(hsl)).toEqual({...hsl, alpha: 100});
-		expect(getHslaColor(hsla)).toEqual(hsla);
-		expect(getHslaColor(instances[index])).toEqual({...hsl, alpha: 100});
-		expect(getHslaColor(rgbs[index])).toEqual({...hsl, alpha: 100});
-		expect(getHslaColor(rgbas[index])).toEqual({...hsl, alpha: hsla.alpha});
+		expect(roundColors(getHslaColor(hexes[index]))).toEqual({...hsl, alpha: 100});
+		expect(roundColors(getHslaColor(hsl))).toEqual({...hsl, alpha: 100});
+		expect(roundColors(getHslaColor(hsla))).toEqual(hsla);
+		expect(roundColors(getHslaColor(instances[index]))).toEqual({...hsl, alpha: 100});
+		expect(roundColors(getHslaColor(rgbs[index]))).toEqual({...hsl, alpha: 100});
+		expect(roundColors(getHslaColor(rgbas[index]))).toEqual({...hsl, alpha: hsla.alpha});
 	}
 });
 
@@ -134,23 +187,23 @@ test('getHslColor', () => {
 
 		const hsl = getHslColor(hsls[index]);
 
-		expect(hsl.hue).toBe(hue);
-		expect(hsl.lightness).toBe(lightness);
-		expect(hsl.saturation).toBe(saturation);
+		expect(roundColor(hsl.hue)).toBe(roundColor(hue));
+		expect(roundColor(hsl.lightness)).toBe(roundColor(lightness));
+		expect(roundColor(hsl.saturation)).toBe(roundColor(saturation));
 	}
 });
 
 test('getHwbaColor', () => {
 	for (let index = 0; index < length; index += 1) {
-		const hwb = hwbs[index];
-		const hwba = hwbas[index];
+		const hwb = roundColors(hwbs[index]);
+		const hwba = roundColors(hwbas[index]);
 
-		expect(getHwbaColor(hexes[index])).toEqual({...hwb, alpha: 100});
-		expect(getHwbaColor(hwb)).toEqual({...hwb, alpha: 100});
-		expect(getHwbaColor(hwba)).toEqual(hwba);
-		expect(getHwbaColor(instances[index])).toEqual({...hwb, alpha: 100});
-		expect(getHwbaColor(rgbs[index])).toEqual({...hwb, alpha: 100});
-		expect(getHwbaColor(rgbas[index])).toEqual({...hwb, alpha: hwba.alpha});
+		expect(roundColors(getHwbaColor(hexes[index]))).toEqual({...hwb, alpha: 100});
+		expect(roundColors(getHwbaColor(hwb))).toEqual({...hwb, alpha: 100});
+		expect(roundColors(getHwbaColor(hwba))).toEqual(hwba);
+		expect(roundColors(getHwbaColor(instances[index]))).toEqual({...hwb, alpha: 100});
+		expect(roundColors(getHwbaColor(rgbs[index]))).toEqual({...hwb, alpha: 100});
+		expect(roundColors(getHwbaColor(rgbas[index]))).toEqual({...hwb, alpha: hwba.alpha});
 	}
 });
 
@@ -160,10 +213,14 @@ test('getHwbColor', () => {
 
 		const hwb = getHwbColor(hwbs[index]);
 
-		expect(hwb.hue).toBe(hue);
-		expect(hwb.whiteness).toBe(whiteness);
-		expect(hwb.blackness).toBe(blackness);
+		expect(roundColor(hwb.hue)).toBe(roundColor(hue));
+		expect(roundColor(hwb.whiteness)).toBe(roundColor(whiteness));
+		expect(roundColor(hwb.blackness)).toBe(roundColor(blackness));
 	}
+
+	const {hex} = getColor({hue: 0, whiteness: 75, blackness: 75});
+
+	expect(hex).toBe('808080');
 });
 
 test('getNormalizedHex', () => {

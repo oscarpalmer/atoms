@@ -7,7 +7,7 @@ import type {HSLAColor, HSLColor, HWBColor, HWBAColor, RGBAColor, RGBColor} from
 /**
  * Get a _Color_ from any kind of value
  *
- * - Values that can be parsed are: hex(a) color strings, _HSL(A)_ color objects, and _RGB(A)_ color objects
+ * - Values that can be parsed are: hex(a) color strings, as well as _HSL(A)_, _HWB(A)_, and _RGB(A)_ color objects
  * - If the value is unable to be parsed, a black _Color_ will be returned
  *
  * @param value Original value
@@ -27,6 +27,8 @@ export {
 	getHexColor,
 	getHslaColor,
 	getHslColor,
+	getHwbColor,
+	getHwbaColor,
 	getRgbaColor,
 	getRgbColor,
 } from './misc/get';

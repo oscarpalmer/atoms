@@ -1,6 +1,5 @@
 import {join} from '../../internal/string';
 import {DEFAULT_RGB, MAX_HEX, MAX_PERCENT} from '../constants';
-import {getFixedColorValue} from '../misc';
 import {getAlpha, getAlphaValue} from '../misc/alpha';
 import {getHexValue} from '../misc/get';
 import {isRgbLike} from '../misc/is';
@@ -59,10 +58,10 @@ export function convertRgbToHsla(value: unknown): HSLAColor {
 	}
 
 	return {
+		hue,
+		saturation: saturation * MAX_PERCENT,
+		lightness: lightness * MAX_PERCENT,
 		alpha: getAlphaValue((value as RGBAColor)?.alpha ?? MAX_PERCENT),
-		hue: getFixedColorValue(hue),
-		lightness: getFixedColorValue(lightness * MAX_PERCENT),
-		saturation: getFixedColorValue(saturation * MAX_PERCENT),
 	};
 }
 
@@ -81,10 +80,10 @@ export function convertRgbToHwba(value: unknown): HWBAColor {
 	}
 
 	return {
+		hue,
+		whiteness: min * MAX_PERCENT,
+		blackness: (1 - max) * MAX_PERCENT,
 		alpha: getAlphaValue((value as RGBAColor)?.alpha ?? MAX_PERCENT),
-		blackness: getFixedColorValue((1 - max) * MAX_PERCENT),
-		hue: getFixedColorValue(hue),
-		whiteness: getFixedColorValue(min * MAX_PERCENT),
 	};
 }
 
@@ -98,11 +97,9 @@ function getRgbHue(values: RgbValues): number {
 		case green:
 			return (blue - red) / delta + 2;
 
-		case red:
+		default:
 			return (green - blue) / delta + (green < blue ? 6 : 0);
 	}
-
-	return 0;
 }
 
 export function getRgbValue(value: Record<keyof RGBColor, unknown>): RGBColor {
@@ -113,9 +110,7 @@ export function getRgbValue(value: Record<keyof RGBColor, unknown>): RGBColor {
 	};
 }
 
-function getRgbValues(value: unknown): RgbValues {
-	const rgb = isRgbLike(value) ? getRgbValue(value) : {...DEFAULT_RGB};
-
+function getRgbValues(rgb: RGBColor): RgbValues {
 	const blue = rgb.blue / MAX_HEX;
 	const green = rgb.green / MAX_HEX;
 	const red = rgb.red / MAX_HEX;
@@ -190,8 +185,8 @@ export function rgbToHwb(rgb: RGBAColor | RGBColor): HWBColor {
 
 	return {
 		hue,
-		blackness,
 		whiteness,
+		blackness,
 	};
 }
 

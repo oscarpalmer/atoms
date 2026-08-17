@@ -27,14 +27,4 @@ export function formatRgbColor(color: Color, alpha: boolean): string {
 	return `rgb(${red} ${green} ${blue}${suffix})`;
 }
 
-export function getFixedColorValue(value: number): number {
-	return round(value, DECIMAL_PLACES);
-}
-
-// #endregion
-
-// #region Variables
-
-const DECIMAL_PLACES = 4;
-
 // #endregion

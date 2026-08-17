@@ -1,4 +1,3 @@
-import {round} from '../../internal/math/misc';
 import {join} from '../../internal/string';
 import {
 	ALPHA_FULL_HEX_LONG,
@@ -30,9 +29,9 @@ function convertHexToRgba(value: string): RGBAColor {
 
 	return {
 		alpha: getPercentage((values[3] / MAX_HEX) * 100),
-		blue: getHexValue(round(values[2])),
-		green: getHexValue(round(values[1])),
-		red: getHexValue(round(values[0])),
+		blue: getHexValue(values[2]),
+		green: getHexValue(values[1]),
+		red: getHexValue(values[0]),
 	};
 }
 
@@ -110,9 +109,9 @@ export function hexToHwb(value: string): HWBColor {
 	const {blackness, hue, whiteness} = hexToHwba(value);
 
 	return {
-		blackness,
 		hue,
 		whiteness,
+		blackness,
 	};
 }
 

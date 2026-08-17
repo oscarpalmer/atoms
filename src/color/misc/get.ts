@@ -1,3 +1,4 @@
+import {round} from '../../internal/math/misc';
 import {clamp} from '../../number';
 import {
 	HEX_BLACK,
@@ -21,20 +22,40 @@ import {getColorState} from './state';
 
 // #region Functions
 
-function getClampedValue(value: unknown, minimum: number, maximum: number): number {
-	return typeof value === 'number' ? clamp(value, minimum, maximum) : minimum;
+function getClampedValue(
+	value: unknown,
+	minimum: number,
+	maximum: number,
+	rounding?: boolean,
+): number {
+	return typeof value === 'number' && !Number.isNaN(value)
+		? clamp((rounding ?? false) ? round(value) : value, minimum, maximum)
+		: minimum;
 }
 
 /**
- * Get a foreground color _(usually text)_ based on a background color's luminance
+ * Get a foreground color _(usually text)_ based on a background color's luminance as an unprefixed hex color string
  *
- * - Values that can be parsed are: hex(a) color strings, _HSL(A)_ color objects, and _RGB(A)_ color objects
+ * - Values that can be parsed are: hex(a) color strings, as well as _HSL(A)_, _HWB(A)_, and _RGB(A)_ color objects
  * - If the value cannot be parsed, a white foreground color will be returned
  *
  * @param value Original value
  * @returns Foreground color
  */
-export function getForegroundColor(value: unknown): Color {
+export function getForegroundColor(value: unknown, hex: true): string;
+
+/**
+ * Get a foreground color _(usually text)_ based on a background color's luminance
+ *
+ * - Values that can be parsed are: hex(a) color strings, as well as _HSL(A)_, _HWB(A)_, and _RGB(A)_ color objects
+ * - If the value cannot be parsed, a white foreground color will be returned
+ *
+ * @param value Original value
+ * @returns Foreground color
+ */
+export function getForegroundColor(value: unknown): Color;
+
+export function getForegroundColor(value: unknown, hex?: unknown): string | Color {
 	const state = getColorState(value);
 	const {blue, green, red} = state.rgb;
 
@@ -58,13 +79,15 @@ export function getForegroundColor(value: unknown): Color {
 		SRGB_LUMINANCE_BLUE * values[0];
 
 	// Rudimentary and ureliable?; implement APCA for more reliable results?
-	return new Color(luminance > SRGB_LUMINANCE_THRESHOLD ? HEX_BLACK : HEX_WHITE);
+	const color = luminance > SRGB_LUMINANCE_THRESHOLD ? HEX_BLACK : HEX_WHITE;
+
+	return hex === true ? color : new Color(color);
 }
 
 /**
  * Get the hex color _(with alpha channel, i.e., opacity)_ from any kind of value
  *
- * - Values that can be parsed are: hex(a) color strings, _HSL(A)_ color objects, and _RGB(A)_ color objects
+ * - Values that can be parsed are: hex(a) color strings, as well as _HSL(A)_, _HWB(A)_, and _RGB(A)_ color objects
  * - If the value cannot be parsed, a black hex color will be returned
  *
  * @param value Original value
@@ -79,7 +102,7 @@ export function getHexaColor(value: unknown): string {
 /**
  * Get the hex color from any kind of value
  *
- * - Values that can be parsed are: hex(a) color strings, _HSL(A)_ color objects, and _RGB(A)_ color objects
+ * - Values that can be parsed are: hex(a) color strings, as well as _HSL(A)_, _HWB(A)_, and _RGB(A)_ color objects
  * - If the value cannot be parsed, a black hex color will be returned
  *
  * @param value Original value
@@ -90,7 +113,7 @@ export function getHexColor(value: unknown): string {
 }
 
 export function getHexValue(value: unknown): number {
-	return getClampedValue(value, 0, MAX_HEX);
+	return getClampedValue(value, 0, MAX_HEX, true);
 }
 
 export function getDegrees(value: unknown): number {
@@ -100,7 +123,7 @@ export function getDegrees(value: unknown): number {
 /**
  * Get the _HSLA_ color from any kind of value
  *
- * - Values that can be parsed are: hex(a) color strings, _HSL(A)_ color objects, and _RGB(A)_ color objects
+ * - Values that can be parsed are: hex(a) color strings, as well as _HSL(A)_, _HWB(A)_, and _RGB(A)_ color objects
  * - If the value cannot be parsed, a black _HSLA_ color will be returned
  *
  * @param value Original value
@@ -118,7 +141,7 @@ export function getHslaColor(value: unknown): HSLAColor {
 /**
  * Get the _HWB_ color from any kind of value
  *
- * - Values that can be parsed are: hex(a) color strings, _HSL(A)_ color objects, _HWB_ color objects, and _RGB(A)_ color objects
+ * - Values that can be parsed are: hex(a) color strings, as well as _HSL(A)_, _HWB(A)_, and _RGB(A)_ color objects
  * - If the value cannot be parsed, a black _HWB_ color will be returned
  *
  * @param value Original value
@@ -131,7 +154,7 @@ export function getHwbColor(value: unknown): HWBColor {
 /**
  * Get the _HWBA_ color from any kind of value
  *
- * - Values that can be parsed are: hex(a) color strings, _HSL(A)_ color objects, _HWB_ color objects, and _RGB(A)_ color objects
+ * - Values that can be parsed are: hex(a) color strings, as well as _HSL(A)_, _HWB(A)_, and _RGB(A)_ color objects
  * - If the value cannot be parsed, a black _HWBA_ color will be returned
  *
  * @param value Original value
@@ -149,7 +172,7 @@ export function getHwbaColor(value: unknown): HWBAColor {
 /**
  * Get the _HSL_ color from any kind of value
  *
- * - Values that can be parsed are: hex(a) color strings, _HSL(A)_ color objects, and _RGB(A)_ color objects
+ * - Values that can be parsed are: hex(a) color strings, as well as _HSL(A)_, _HWB(A)_, and _RGB(A)_ color objects
  * - If the value cannot be parsed, a black _HSL_ color will be returned
  *
  * @param value Original value
@@ -166,7 +189,7 @@ export function getPercentage(value: unknown): number {
 /**
  * Get the _RGBA_ color from any kind of value
  *
- * - Values that can be parsed are: hex(a) color strings, _HSL(A)_ color objects, and _RGB(A)_ color objects
+ * - Values that can be parsed are: hex(a) color strings, as well as _HSL(A)_, _HWB(A)_, and _RGB(A)_ color objects
  * - If the value cannot be parsed, a black _RGBA_ color will be returned
  *
  * @param value Original value
@@ -184,7 +207,7 @@ export function getRgbaColor(value: unknown): RGBAColor {
 /**
  * Get the _RGB_ color from any kind of value
  *
- * - Values that can be parsed are: hex(a) color strings, _HSL(A)_ color objects, and _RGB(A)_ color objects
+ * - Values that can be parsed are: hex(a) color strings, as well as _HSL(A)_, _HWB(A)_, and _RGB(A)_ color objects
  * - If the value cannot be parsed, a black _RGB_ color will be returned
  *
  * @param value Original value

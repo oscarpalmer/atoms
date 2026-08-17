@@ -1,5 +1,4 @@
 import {DEFAULT_HWB, MAX_PERCENT} from '../constants';
-import {getFixedColorValue} from '../misc';
 import {getAlphaValue} from '../misc/alpha';
 import {getDegrees, getPercentage} from '../misc/get';
 import {isHwbLike} from '../misc/is';
@@ -15,37 +14,42 @@ export function convertHwbToHsl(input: HWBAColor | HWBColor): HSLAColor {
 	blackness /= MAX_PERCENT;
 	whiteness /= MAX_PERCENT;
 
-	const value = 1 - blackness;
+	if (blackness + whiteness > 1) {
+		const total = blackness + whiteness;
 
-	let saturation = 0;
-
-	if (1 - blackness === 0) {
-		saturation = 0;
-	} else {
-		saturation = (1 - blackness - whiteness) / (1 - blackness);
+		blackness /= total;
+		whiteness /= total;
 	}
 
-	const lightness = blackness * (1 - saturation / 2);
+	const lightness = (1 - blackness + whiteness) / 2;
 
-	if (lightness === 0 || lightness === 1) {
-		saturation = 0;
-	} else {
-		saturation = (value - lightness) / Math.min(lightness, 1 - lightness);
-	}
+	const saturation = getHwbSaturation(blackness, whiteness, lightness);
 
 	return {
 		hue,
+		saturation: saturation * MAX_PERCENT,
+		lightness: lightness * MAX_PERCENT,
 		alpha: getAlphaValue((input as HWBAColor)?.alpha ?? MAX_PERCENT),
-		lightness: getFixedColorValue(lightness * MAX_PERCENT),
-		saturation: getFixedColorValue(saturation * MAX_PERCENT),
 	};
+}
+
+function getHwbSaturation(blackness: number, whiteness: number, lightness: number): number {
+	const value = 1 - blackness;
+
+	const hue = value - whiteness;
+
+	if (hue <= 0) {
+		return 0;
+	}
+
+	return hue / Math.min(2 * lightness, 2 - 2 * lightness);
 }
 
 export function getHwbValue(value: Record<keyof HWBColor, unknown>): HWBColor {
 	return {
-		blackness: getPercentage(value.blackness),
 		hue: getDegrees(value.hue),
 		whiteness: getPercentage(value.whiteness),
+		blackness: getPercentage(value.blackness),
 	};
 }
 

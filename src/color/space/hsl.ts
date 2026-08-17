@@ -1,6 +1,4 @@
-import {round} from '../../internal/math/misc';
 import {DEFAULT_HSL, MAX_DEGREE, MAX_HEX, MAX_PERCENT} from '../constants';
-import {getFixedColorValue} from '../misc';
 import {getAlphaValue} from '../misc/alpha';
 import {getDegrees, getHexValue, getPercentage} from '../misc/get';
 import {isHslLike} from '../misc/is';
@@ -30,8 +28,8 @@ function convertHslToHwba(input: unknown): HWBAColor {
 
 	return {
 		hue,
-		blackness: getFixedColorValue(blackness * MAX_PERCENT),
-		whiteness: getFixedColorValue(whiteness * MAX_PERCENT),
+		whiteness: whiteness * MAX_PERCENT,
+		blackness: blackness * MAX_PERCENT,
 		alpha: getAlphaValue((input as HSLAColor)?.alpha ?? MAX_PERCENT),
 	};
 }
@@ -45,9 +43,9 @@ function convertHslToRgba(input: unknown): RGBAColor {
 
 	return {
 		alpha: getAlphaValue((input as HSLAColor)?.alpha ?? MAX_PERCENT),
-		blue: getHexValue(round(getHexyValue(hue, lightness, saturation, 4))),
-		green: getHexValue(round(getHexyValue(hue, lightness, saturation, 8))),
-		red: getHexValue(round(getHexyValue(hue, lightness, saturation, 0))),
+		blue: getHexValue(getHexyValue(hue, lightness, saturation, 4)),
+		green: getHexValue(getHexyValue(hue, lightness, saturation, 8)),
+		red: getHexValue(getHexyValue(hue, lightness, saturation, 0)),
 	};
 }
 
@@ -61,8 +59,8 @@ function getHexyValue(hue: number, lightness: number, saturation: number, value:
 export function getHslValue(value: Record<keyof HSLColor, unknown>): HSLColor {
 	return {
 		hue: getDegrees(value.hue),
-		lightness: getPercentage(value.lightness),
 		saturation: getPercentage(value.saturation),
+		lightness: getPercentage(value.lightness),
 	};
 }
 
@@ -91,9 +89,9 @@ export function hslToHwb(hsl: HSLAColor | HSLColor): HWBColor {
 	const {blackness, hue, whiteness} = convertHslToHwba(hsl);
 
 	return {
-		blackness,
 		hue,
 		whiteness,
+		blackness,
 	};
 }
 
