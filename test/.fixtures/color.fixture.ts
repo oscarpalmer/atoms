@@ -140,6 +140,20 @@ const hwbas = hwbs.map((hwb, index) => ({...hwb, alpha: alphas[index]}));
 
 const instances = hexes.map(hex => getColor(hex));
 
+const is: [string, boolean | undefined, boolean][] = [
+	['aaa', undefined, true],
+	['aaaa', undefined, true],
+	['aaaa', false, false],
+	['aaaaaa', undefined, true],
+	['aaaaaaa', undefined, false],
+	['aaaaaaaa', undefined, true],
+	['aaaaaaaa', false, false],
+	['ööö', undefined, false],
+	['öööö', undefined, false],
+	['öööööö', undefined, false],
+	['öööööööö', undefined, false],
+];
+
 const rgbs = [
 	{
 		blue: 230,
@@ -206,6 +220,7 @@ export const colorFixture = {
 	hwbs,
 	hwbas,
 	instances,
+	is,
 	rgbs,
 	rgbas,
 	shorts,

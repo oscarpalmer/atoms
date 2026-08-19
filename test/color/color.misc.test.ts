@@ -23,7 +23,7 @@ import {getHwbaColor, getHwbColor} from '../../src/color/misc/get';
 import {colorFixture} from '../.fixtures/color.fixture';
 import {isHslaLike, isHwbaLike, isRgbaLike} from '../../src/color/misc/is';
 
-const {alphas, hexes, hsls, hslas, rgbs} = colorFixture;
+const {alphas, hexes, hsls, hslas, is, rgbs} = colorFixture;
 const {length} = hexes;
 
 test('formatting', () => {
@@ -75,17 +75,12 @@ test('is', () => {
 	const rgb = getRgbColor(hex);
 	const rgba = getRgbaColor(hex);
 
-	expect(isHexColor('aaa')).toBe(true);
-	expect(isHexColor('aaaa')).toBe(true);
-	expect(isHexColor('aaaa', false)).toBe(false);
-	expect(isHexColor('aaaaaa')).toBe(true);
-	expect(isHexColor('aaaaaaa')).toBe(false);
-	expect(isHexColor('aaaaaaaa')).toBe(true);
-	expect(isHexColor('aaaaaaaa', false)).toBe(false);
-	expect(isHexColor('ööö')).toBe(false);
-	expect(isHexColor('öööö')).toBe(false);
-	expect(isHexColor('öööööö')).toBe(false);
-	expect(isHexColor('öööööööö')).toBe(false);
+	for (const item of is) {
+		const [value, alpha, expected] = item;
+
+		expect(isHexColor(value, alpha)).toBe(expected);
+		expect(isHexColor(`#${value}`, alpha)).toBe(expected);
+	}
 
 	expect(isHexColor(hex)).toBe(true);
 	expect(isHexColor(hsl)).toBe(false);

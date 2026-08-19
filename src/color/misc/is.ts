@@ -4,6 +4,7 @@ import {
 	ALPHA_NONE_VALUE,
 	EXPRESSION_HEX_LONG,
 	EXPRESSION_HEX_SHORT,
+	EXPRESSION_PREFIX,
 	KEYS_HSL,
 	KEYS_HSLA,
 	KEYS_HWB,
@@ -109,7 +110,9 @@ export function isHexColor(value: unknown, alpha?: boolean): value is string {
 	}
 
 	if (alpha === false) {
-		return value.length === LENGTH_SHORT || value.length === LENGTH_LONG;
+		const unprefixed = value.replace(EXPRESSION_PREFIX, '');
+
+		return unprefixed.length === LENGTH_SHORT || unprefixed.length === LENGTH_LONG;
 	}
 
 	return true;
