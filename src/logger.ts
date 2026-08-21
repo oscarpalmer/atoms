@@ -65,67 +65,85 @@ type LoggerInstance = {
 /**
  * A named timer that can be used to log durations to the console
  */
-class TimedLogger {
-	#logger: typeof console.timeLog | undefined;
-	#stopper: typeof console.timeEnd | undefined;
-
-	readonly #state: TimeState;
-
+type TimedLogger = {
 	/**
 	 * Is the timer active? _(i.e. has it been started and not stopped, and is logging enabled?)_
 	 */
-	get active(): boolean {
-		return this.#state.started && !this.#state.stopped && enabled;
-	}
+	get active(): boolean;
 
 	/**
 	 * Log the current duration of the timer _(ignored if logging is disabled)_
 	 */
-	get log(): () => void {
-		return this.active ? this.#logger! : noop;
-	}
+	get log(): () => void;
 
 	/**
 	 * Stop the timer and logs the total duration
 	 *
 	 * _(Will always log the total duration, even if logging is disabled)_
 	 */
-	get stop(): () => void {
-		return this.active ? this.#stopTimer() : noop;
-	}
-
-	constructor(label: string) {
-		this.#logger = console.timeLog.bind(console, label);
-		this.#stopper = console.timeEnd.bind(console, label);
-
-		this.#state = {
-			label,
-			started: enabled,
-			stopped: false,
-		};
-
-		if (this.#state.started) {
-			console.time(label);
-		}
-	}
-
-	#stopTimer(): () => void {
-		const stopper = this.#stopper!;
-
-		this.#state.stopped = true;
-
-		this.#logger = undefined;
-		this.#stopper = undefined;
-
-		return stopper;
-	}
-}
+	get stop(): () => void;
+};
 
 type TimeState = {
 	label: string;
 	started: boolean;
 	stopped: boolean;
 };
+
+// #endregion
+
+// #region Functions
+
+function timedLogger(label: string): TimedLogger {
+	function stop() {
+		const fn = stopper;
+
+		state.stopped = true;
+
+		logger = undefined as never;
+		stopper = undefined as never;
+
+		return fn;
+	}
+
+	let logger = console.timeLog.bind(console, label);
+	let stopper = console.timeEnd.bind(console, label);
+
+	const state: TimeState = {
+		label,
+		started: enabled,
+		stopped: false,
+	};
+
+	const instance = {};
+
+	Object.defineProperties(instance, {
+		active: {
+			enumerable: true,
+			get() {
+				return state.started && !state.stopped && enabled;
+			},
+		},
+		log: {
+			enumerable: true,
+			get() {
+				return this.active ? logger : noop;
+			},
+		},
+		stop: {
+			enumerable: true,
+			get() {
+				return (instance as TimedLogger).active ? stop() : noop;
+			},
+		},
+	});
+
+	if (state.started) {
+		console.time(label);
+	}
+
+	return Object.freeze(instance) as TimedLogger;
+}
 
 // #endregion
 
@@ -143,6 +161,7 @@ const Logger = (() => {
 
 	Object.defineProperties(instance, {
 		enabled: {
+			enumerable: true,
 			get() {
 				return enabled;
 			},
@@ -151,14 +170,16 @@ const Logger = (() => {
 			},
 		},
 		time: {
+			enumerable: true,
 			value(label: string) {
-				return new TimedLogger(label);
+				return timedLogger(label);
 			},
 		},
 	});
 
 	for (const method of methods) {
 		Object.defineProperty(instance, method, {
+			enumerable: true,
 			get() {
 				return enabled ? console[method].bind(console) : noop;
 			},

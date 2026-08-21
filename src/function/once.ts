@@ -83,15 +83,19 @@ export function asyncOnce<Callback extends GenericAsyncCallback>(
 
 	Object.defineProperties(fn, {
 		called: {
+			enumerable: true,
 			get: (): boolean => state.called,
 		},
 		cleared: {
+			enumerable: true,
 			get: (): boolean => state.cleared,
 		},
 		error: {
+			enumerable: true,
 			get: (): boolean => state.error,
 		},
 		finished: {
+			enumerable: true,
 			get: (): boolean => state.finished,
 		},
 	});
