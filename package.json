@@ -259,7 +259,7 @@
 	"devDependencies": {
 		"@oxlint/plugins": "^1.78",
 		"@types/node": "^26.2",
-		"@vitest/coverage-istanbul": "^4.1",
+		"@vitest/coverage-istanbul": "4.1.10",
 		"eslint": "^10.8",
 		"jsdom": "^30",
 		"tsdown": "^0.22",

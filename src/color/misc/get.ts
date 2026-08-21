@@ -16,8 +16,8 @@ import {
 	SRGB_LUMINANCE_RED,
 	SRGB_LUMINANCE_THRESHOLD,
 } from '../constants';
-import {Color} from '../instance';
-import type {HSLAColor, HSLColor, HWBAColor, HWBColor, RGBAColor, RGBColor} from '../models';
+import {color} from '../instance';
+import type {Color, HSLAColor, HSLColor, HWBAColor, HWBColor, RGBAColor, RGBColor} from '../models';
 import {getColorState} from './state';
 
 // #region Functions
@@ -79,9 +79,9 @@ export function getForegroundColor(value: unknown, hex?: unknown): string | Colo
 		SRGB_LUMINANCE_BLUE * values[0];
 
 	// Rudimentary and ureliable?; implement APCA for more reliable results?
-	const color = luminance > SRGB_LUMINANCE_THRESHOLD ? HEX_BLACK : HEX_WHITE;
+	const foreground = luminance > SRGB_LUMINANCE_THRESHOLD ? HEX_BLACK : HEX_WHITE;
 
-	return hex === true ? color : new Color(color);
+	return hex === true ? foreground : color(foreground);
 }
 
 /**

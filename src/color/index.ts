@@ -1,6 +1,6 @@
-import {Color} from './instance';
+import {color} from './instance';
 import {isColor} from './misc/is';
-import type {HSLAColor, HSLColor, HWBColor, HWBAColor, RGBAColor, RGBColor} from './models';
+import type {Color, HSLAColor, HSLColor, HWBAColor, HWBColor, RGBAColor, RGBColor} from './models';
 
 // #region Functions
 
@@ -14,7 +14,7 @@ import type {HSLAColor, HSLColor, HWBColor, HWBAColor, RGBAColor, RGBColor} from
  * @returns _Color_ instance
  */
 export function getColor(value: unknown): Color {
-	return isColor(value) ? value : new Color(value);
+	return isColor(value) ? value : color(value);
 }
 
 // #endregion
@@ -27,8 +27,8 @@ export {
 	getHexColor,
 	getHslaColor,
 	getHslColor,
-	getHwbColor,
 	getHwbaColor,
+	getHwbColor,
 	getRgbaColor,
 	getRgbColor,
 } from './misc/get';
@@ -36,16 +36,16 @@ export {
 export {
 	isColor,
 	isHexColor,
+	isHslaColor,
 	isHslColor,
 	isHslLike,
-	isHslaColor,
-	isHwbColor,
-	isHwbLike,
 	isHwbaColor,
 	isHwbaLike,
+	isHwbColor,
+	isHwbLike,
+	isRgbaColor,
 	isRgbColor,
 	isRgbLike,
-	isRgbaColor,
 } from './misc/is';
 
 export {

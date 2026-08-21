@@ -5,6 +5,186 @@ export type Alpha = {
 	value: number;
 };
 
+/**
+ * A color that is represented in multiple color formats
+ */
+export type Color = {
+	/**
+	 * Get the alpha channel _(opacity)_ of the color as a percentage between `0` and `100`
+	 *
+	 * @returns Current alpha channel value
+	 */
+	get alpha(): number;
+
+	/**
+	 * Set the alpha channel _(opacity)_ of the color as a percentage between `0` and `100`
+	 *
+	 * @param value New alpha channel value
+	 */
+	set alpha(value: number);
+
+	/**
+	 * Get the color as a hex color string
+	 *
+	 * _Hex color string is returned with no `#`-prefix or alpha channel (opacity)_
+	 *
+	 * @returns Current color as a hex color string
+	 */
+	get hex(): string;
+
+	/**
+	 * Set the color from a hex color string
+	 *
+	 * - `#`-prefix is optional
+	 * - Alpha channel _(opacity)_ will be ignored
+	 *
+	 * @param value New hex color string
+	 */
+	set hex(value: string);
+
+	/**
+	 * Get the color as a hex color with an alpha channel _(opacity)_
+	 *
+	 * _Hex color string is returned with alpha channel (opacity), but without `#`-prefix_
+	 *
+	 * @returns Current color as a hex color string
+	 */
+	get hexa(): string;
+
+	/**
+	 * Set the color from a hex color string with an alpha channel _(opacity)_
+	 *
+	 * - `#`-prefix is optional
+	 * - Alpha channel _(opacity)_ will be respected
+	 *
+	 * @param value New hex color string
+	 */
+	set hexa(value: string);
+
+	/**
+	 * Get the color as an _HSL_ color
+	 *
+	 * @returns Current color as an _HSL_ color
+	 */
+	get hsl(): HSLColor;
+
+	/**
+	 * Set colors from an _HSL_ color
+	 *
+	 * @param value New _HSL_ color
+	 */
+	set hsl(value: HSLColor);
+
+	/**
+	 * Get the color as an _HSLA_ color
+	 *
+	 * @returns Current color as an _HSLA_ color
+	 */
+	get hsla(): HSLAColor;
+
+	/**
+	 * Set colors and alpha from an _HSLA_ color
+	 *
+	 * @param value New _HSLA_ color
+	 */
+	set hsla(value: HSLAColor);
+
+	/**
+	 * Get the color as an _HWB_ color
+	 *
+	 * @returns Current color as an _HWB_ color
+	 */
+	get hwb(): HWBColor;
+
+	/**
+	 * Set colors from an _HWB_ color
+	 *
+	 * @param value New _HWB_ color
+	 */
+	set hwb(value: HWBColor);
+
+	/**
+	 * Get the color as an _HWBA_ color
+	 *
+	 * @returns Current color as an _HWBA_ color
+	 */
+	get hwba(): HWBAColor;
+
+	/**
+	 * Set colors and alpha from an _HWBA_ color
+	 *
+	 * @param value New _HWBA_ color
+	 */
+	set hwba(value: HWBAColor);
+
+	/**
+	 * Get the color as an _RGB_ color
+	 *
+	 * @returns Current color as an _RGB_ color
+	 */
+	get rgb(): RGBColor;
+
+	/**
+	 * Set colors from an _RGB_ color
+	 *
+	 * @param value New _RGB_ color
+	 */
+	set rgb(value: RGBColor);
+
+	/**
+	 * Get the color as an _RGBA_ color
+	 *
+	 * @returns Current color as an _RGBA_ color
+	 */
+	get rgba(): RGBAColor;
+
+	/**
+	 * Set colors and alpha from an _RGBA_ color
+	 *
+	 * @param value New _RGBA_ color
+	 */
+	set rgba(value: RGBAColor);
+
+	/**
+	 * Get the color as a hex string
+	 *
+	 * @param alpha Include alpha channel _(opacity)_? _(defaults to `false`)_
+	 * @returns Hex color string
+	 */
+	toHexString(alpha?: boolean): string;
+
+	/**
+	 * Get the color as an _HSL(A)_ string
+	 *
+	 * @param alpha Include alpha channel _(opacity)_? _(defaults to `false`)_
+	 * @returns _HSL(A)_ color string
+	 */
+	toHslString(alpha?: boolean): string;
+
+	/**
+	 * Get the color as an _HWB(A)_ string
+	 *
+	 * @param alpha Include alpha channel _(opacity)_? _(defaults to `false`)_
+	 * @returns _HWB(A)_ color string
+	 */
+	toHwbString(alpha?: boolean): string;
+
+	/**
+	 * Get the color as an _RGB(A)_ string
+	 *
+	 * @param alpha Include alpha channel _(opacity)_? _(defaults to `false`)_
+	 * @returns _RGB(A)_ color string
+	 */
+	toRgbString(alpha?: boolean): string;
+
+	/**
+	 * Get the color as a hex color string
+	 *
+	 * @returns Hex color string
+	 */
+	toString(): string;
+};
+
 type ColorWithAlpha = {
 	/**
 	 * Alpha channel _(opacity)_ of the color _(in percentage; 0-100)_
@@ -76,8 +256,6 @@ export type RGBColor = {
 };
 
 export type ColorProperty = 'alpha' | keyof HSLColor | keyof HWBColor | keyof RGBColor;
-
-export type ColorSpace = 'hsl' | 'rgb';
 
 export type ColorState = {
 	alpha: Alpha;
