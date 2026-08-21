@@ -3,13 +3,7 @@ import type {GenericCallback} from './models';
 
 // #region Types
 
-class Events<Map extends Record<string, GenericCallback>> {
-	readonly #herald: Herald<Map>;
-
-	constructor(herald: Herald<Map>) {
-		this.#herald = herald;
-	}
-
+export type Events<Map extends Record<string, GenericCallback>> = {
 	/**
 	 * Subscribe to an event with a callback
 	 *
@@ -17,9 +11,7 @@ class Events<Map extends Record<string, GenericCallback>> {
 	 * @param callback Callback function
 	 * @returns Unsubscriber function
 	 */
-	subscribe<Event extends keyof Map>(event: Event, callback: Map[Event]): Unsubscriber {
-		return this.#herald.subscribe(event, callback);
-	}
+	subscribe<Event extends keyof Map>(event: Event, callback: Map[Event]): Unsubscriber;
 
 	/**
 	 * Unsubscribe from an event with a callback _(or all callbacks, if no callback is provided)_
@@ -28,38 +20,16 @@ class Events<Map extends Record<string, GenericCallback>> {
 	 * @param callback Callback function
 	 * @returns Unsubscriber function
 	 */
-	unsubscribe<Event extends keyof Map>(event: Event, callback?: Map[Event]): void {
-		return this.#herald.unsubscribe(event, callback);
-	}
-}
+	unsubscribe<Event extends keyof Map>(event: Event, callback?: Map[Event]): void;
+};
 
-/**
- * A _Herald_ is an announcer for named events, allowing emission, subscription, and unsubscription of events
- */
-class Herald<Map extends Record<string, GenericCallback>> {
-	readonly #names: Set<keyof Map>;
-
-	readonly #subscribers = new Map<keyof Map, Set<Map[keyof Map]>>();
-
-	/**
-	 * Events interface for subscribing to and unsubscribing from events
-	 */
-	declare readonly events: Events<Map>;
-
-	constructor(names: (keyof Map)[]) {
-		this.#names = new Set(names);
-
-		Object.defineProperty(this, 'events', {
-			value: new Events(this),
-		});
-	}
+export type Herald<Map extends Record<string, GenericCallback>> = {
+	readonly events: Events<Map>;
 
 	/**
 	 * Remove all event subscribers
 	 */
-	clear(): void {
-		this.#subscribers.clear();
-	}
+	clear(): void;
 
 	/**
 	 * Emit an event with parameters
@@ -67,17 +37,7 @@ class Herald<Map extends Record<string, GenericCallback>> {
 	 * @param event Event name
 	 * @param parameters Event parameters
 	 */
-	emit<Event extends keyof Map>(event: Event, ...parameters: Parameters<Map[Event]>) {
-		const subscribers = this.#subscribers.get(event);
-
-		if (subscribers == null) {
-			return;
-		}
-
-		for (const callback of subscribers) {
-			callback(...parameters);
-		}
-	}
+	emit<Event extends keyof Map>(event: Event, ...parameters: Parameters<Map[Event]>): void;
 
 	/**
 	 * Subscribe to an event with a callback
@@ -86,25 +46,7 @@ class Herald<Map extends Record<string, GenericCallback>> {
 	 * @param callback Callback function
 	 * @returns Unsubscriber function
 	 */
-	subscribe<Event extends keyof Map>(event: Event, callback: Map[Event]): Unsubscriber {
-		if (!this.#names.has(event) || typeof callback !== 'function') {
-			return noop;
-		}
-
-		let subscribers = this.#subscribers.get(event);
-
-		if (subscribers == null) {
-			subscribers = new Set();
-
-			this.#subscribers.set(event, subscribers);
-		}
-
-		subscribers.add(callback);
-
-		return () => {
-			subscribers?.delete(callback);
-		};
-	}
+	subscribe<Event extends keyof Map>(event: Event, callback: Map[Event]): Unsubscriber;
 
 	/**
 	 * Unsubscribe from an event with a callback _(or all callbacks, if no callback is provided)_
@@ -112,28 +54,8 @@ class Herald<Map extends Record<string, GenericCallback>> {
 	 * @param event Event name
 	 * @param callback Callback function
 	 */
-	unsubscribe<Event extends keyof Map>(event: Event, callback?: Map[Event]): void {
-		if (!this.#names.has(event) || (callback != null ? typeof callback !== 'function' : false)) {
-			return;
-		}
-
-		const subscribers = this.#subscribers.get(event);
-
-		if (subscribers == null) {
-			return;
-		}
-
-		if (callback == null) {
-			subscribers.clear();
-		} else {
-			subscribers.delete(callback);
-		}
-
-		if (callback == null || subscribers.size === 0) {
-			this.#subscribers.delete(event);
-		}
-	}
-}
+	unsubscribe<Event extends keyof Map>(event: Event, callback?: Map[Event]): void;
+};
 
 export type Unsubscriber = () => void;
 
@@ -158,7 +80,83 @@ export function herald<Events extends Record<string, GenericCallback>>(
 		throw new Error(MESSAGE);
 	}
 
-	return new Herald<Events>(names);
+	const set = new Set<keyof Events>(names);
+	const subscribers = new Map<keyof Events, Set<Events[keyof Events]>>();
+
+	const instance = {
+		clear() {
+			subscribers.clear();
+		},
+		emit<Event extends keyof Events>(event: Event, ...parameters: Parameters<Events[Event]>) {
+			const callbacks = subscribers.get(event);
+
+			if (callbacks == null) {
+				return;
+			}
+
+			for (const callback of callbacks) {
+				callback(...parameters);
+			}
+		},
+		subscribe<Event extends keyof Events>(event: Event, callback: Events[Event]): Unsubscriber {
+			if (!set.has(event) || typeof callback !== 'function') {
+				return noop;
+			}
+
+			let eventSubscribers = subscribers.get(event);
+
+			if (eventSubscribers == null) {
+				eventSubscribers = new Set();
+
+				subscribers.set(event, eventSubscribers);
+			}
+
+			eventSubscribers.add(callback);
+
+			return () => {
+				eventSubscribers?.delete(callback);
+			};
+		},
+		unsubscribe<Event extends keyof Events>(event: Event, callback?: Events[Event]): void {
+			if (!set.has(event) || (callback != null ? typeof callback !== 'function' : false)) {
+				return;
+			}
+
+			const eventSubscribers = subscribers.get(event);
+
+			if (eventSubscribers == null) {
+				return;
+			}
+
+			if (callback == null) {
+				eventSubscribers.clear();
+			} else {
+				eventSubscribers.delete(callback);
+			}
+
+			if (callback == null || eventSubscribers.size === 0) {
+				subscribers.delete(event);
+			}
+		},
+	};
+
+	const events = Object.freeze({
+		subscribe<Event extends keyof Events>(event: Event, callback: Events[Event]): Unsubscriber {
+			return instance.subscribe(event, callback);
+		},
+		unsubscribe<Event extends keyof Events>(event: Event, callback?: Events[Event]): void {
+			return instance.unsubscribe(event, callback);
+		},
+	});
+
+	Object.defineProperties(instance, {
+		events: {
+			enumerable: true,
+			value: events,
+		},
+	});
+
+	return Object.freeze(instance) as Herald<Events>;
 }
 
 // #endregion
@@ -166,11 +164,5 @@ export function herald<Events extends Record<string, GenericCallback>>(
 // #region Variables
 
 const MESSAGE = 'Herald requires an array of event names.';
-
-// #endregion
-
-// #region Exports
-
-export {type Events, type Herald};
 
 // #endregion
