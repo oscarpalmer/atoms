@@ -8,55 +8,25 @@ import {SizedMap} from '../sized/map';
 /**
  * A _Memoized_ function instance, caching and retrieving results based on the its parameters _(or a custom cache key)_
  */
-class Memoized<Callback extends GenericCallback> {
-	readonly #state: MemoizedState<Callback>;
-
+export type Memoized<Callback extends GenericCallback> = {
 	/**
 	 * Maximum cache size
 	 *
 	 * @returns Maximum cache size _(or `Number.NaN` if the instance has been destroyed)_
 	 */
-	get maximum(): number {
-		return this.#state.cache?.maximum ?? Number.NaN;
-	}
+	get maximum(): number;
 
 	/**
 	 * Current cache size
 	 *
 	 * @returns Current cache size _(or `Number.NaN` if the instance has been destroyed)_
 	 */
-	get size(): number {
-		return this.#state.cache?.size ?? Number.NaN;
-	}
-
-	constructor(callback: Callback, options: Options) {
-		const cache = new SizedMap<unknown, ReturnType<Callback>>(options.cacheSize);
-
-		const getter = (...parameters: Parameters<Callback>): ReturnType<Callback> => {
-			const key =
-				options.cacheKey?.(...parameters) ??
-				(parameters.length === 1 ? parameters[0] : join(parameters.map(getString), SEPARATOR));
-
-			if (cache.has(key)) {
-				return cache.get(key) as ReturnType<Callback>;
-			}
-
-			const value = callback(...parameters);
-
-			cache.set(key, value);
-
-			return value;
-		};
-
-		this.#state = {cache, getter};
-	}
+	get size(): number;
 
 	/**
 	 * Clear the cache
 	 */
-	clear(): void {
-		this.#state.cache?.clear();
-	}
+	clear(): void;
 
 	/**
 	 * Delete a result from the cache
@@ -64,21 +34,14 @@ class Memoized<Callback extends GenericCallback> {
 	 * @param key Key to delete
 	 * @returns `true` if the key existed and was removed, otherwise `false`
 	 */
-	delete(key: unknown): boolean {
-		return this.#state.cache?.delete(key) ?? false;
-	}
+	delete(key: unknown): boolean;
 
 	/**
 	 * Destroy the instance
 	 *
 	 * _(When a Memoized instance is destroyed, its cache and callback are removed, and calls to `run` will throw an error)_
 	 */
-	destroy(): void {
-		this.#state.cache?.clear();
-
-		this.#state.cache = undefined;
-		this.#state.getter = undefined;
-	}
+	destroy(): void;
 
 	/**
 	 * Get a result from the cache
@@ -86,9 +49,7 @@ class Memoized<Callback extends GenericCallback> {
 	 * @param key Key to get
 	 * @returns Cached result or `undefined` if it does not exist
 	 */
-	get(key: unknown): ReturnType<Callback> | undefined {
-		return this.#state.cache?.get(key);
-	}
+	get(key: unknown): ReturnType<Callback> | undefined;
 
 	/**
 	 * Does the result exist?
@@ -96,9 +57,7 @@ class Memoized<Callback extends GenericCallback> {
 	 * @param key Key to check
 	 * @returns `true` if the result exists, otherwise `false`
 	 */
-	has(key: unknown): boolean {
-		return this.#state.cache?.has(key) ?? false;
-	}
+	has(key: unknown): boolean;
 
 	/**
 	 * Run the callback with the provided parameters
@@ -106,14 +65,8 @@ class Memoized<Callback extends GenericCallback> {
 	 * @param parameters Parameters to pass to the callback
 	 * @returns Cached or computed _(then cached)_ result
 	 */
-	run(...parameters: Parameters<Callback>): ReturnType<Callback> {
-		if (this.#state.cache == null || this.#state.getter == null) {
-			throw new Error(MEMOIZED_ERROR_DESTROYED);
-		}
-
-		return this.#state.getter(...parameters);
-	}
-}
+	run(...parameters: Parameters<Callback>): ReturnType<Callback>;
+};
 
 /**
  * Options for a _Memoized_ function
@@ -132,6 +85,7 @@ type MemoizedOptions<Callback extends GenericCallback> = {
 type MemoizedState<Callback extends GenericCallback> = {
 	cache?: SizedMap<unknown, ReturnType<Callback>>;
 	getter?: (...parameters: Parameters<Callback>) => ReturnType<Callback>;
+	options: Options;
 };
 
 type Options = {
@@ -169,7 +123,68 @@ export function memoize<Callback extends GenericCallback>(
 		throw new TypeError(MEMOIZED_ERROR_CALLBACK);
 	}
 
-	return new Memoized(callback, getMemoizationOptions(options));
+	const state: MemoizedState<Callback> = {
+		options: getMemoizationOptions(options),
+	};
+
+	state.cache = new SizedMap<unknown, ReturnType<Callback>>(state.options.cacheSize);
+
+	state.getter = (...parameters: Parameters<Callback>): ReturnType<Callback> => {
+		const key =
+			state.options.cacheKey?.(...parameters) ??
+			(parameters.length === 1 ? parameters[0] : join(parameters.map(getString), SEPARATOR));
+
+		if (state.cache!.has(key)) {
+			return state.cache!.get(key) as ReturnType<Callback>;
+		}
+
+		const value = callback(...parameters);
+
+		state.cache?.set(key, value);
+
+		return value;
+	};
+
+	const instance = {
+		clear: () => {
+			state.cache?.clear();
+		},
+		delete: (key: unknown) => {
+			return state.cache?.delete(key) ?? false;
+		},
+		destroy: () => {
+			state.cache?.clear();
+
+			state.cache = undefined;
+			state.getter = undefined;
+		},
+		get: (key: unknown) => {
+			return state.cache?.get(key);
+		},
+		has: (key: unknown) => {
+			return state.cache?.has(key) ?? false;
+		},
+		run: (...parameters: Parameters<Callback>) => {
+			if (state.cache == null || state.getter == null) {
+				throw new Error(MEMOIZED_ERROR_DESTROYED);
+			}
+
+			return state.getter(...parameters);
+		},
+	};
+
+	Object.defineProperties(instance, {
+		maximum: {
+			enumerable: true,
+			get: () => state.cache?.maximum ?? Number.NaN,
+		},
+		size: {
+			enumerable: true,
+			get: () => state.cache?.size ?? Number.NaN,
+		},
+	});
+
+	return Object.freeze(instance) as Memoized<Callback>;
 }
 
 // #endregion
@@ -183,11 +198,5 @@ const MEMOIZED_ERROR_CALLBACK = 'Memoized requires a callback function';
 const MEMOIZED_ERROR_DESTROYED = 'The Memoized instance has been destroyed';
 
 const SEPARATOR = '_';
-
-// #endregion
-
-// #region Exports
-
-export type {Memoized, MemoizedOptions};
 
 // #endregion
