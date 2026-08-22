@@ -8,7 +8,7 @@ import {isNonPlainObject} from './is';
  * Is the _Result_ an extended error?
  *
  * @param result _Result_ to check
- * @returns `true` if the _Result_ is an extended error, `false` otherwise
+ * @returns `true` if the _Result_ is an extended error, otherwise `false`
  */
 export function isError<Value, E = Error>(
 	result: ExtendedErr<E> | Result<Value, E>,
@@ -19,7 +19,7 @@ export function isError<Value, E = Error>(
  * Is the _Result_ an error?
  *
  * @param result _Result_ to check
- * @returns `true` if the _Result_ is an error, `false` otherwise
+ * @returns `true` if the _Result_ is an error, otherwise `false`
  */
 export function isError<Value, E = Error>(result: Result<Value, E>): result is Err<E>;
 
@@ -27,7 +27,7 @@ export function isError<Value, E = Error>(result: Result<Value, E>): result is E
  * Is the value an error?
  *
  * @param value Value to check
- * @returns `true` if the value is an error, `false` otherwise
+ * @returns `true` if the value is an error, otherwise `false`
  */
 export function isError(value: unknown): value is Err<unknown> | ExtendedErr<unknown>;
 
@@ -45,7 +45,7 @@ export function isError(
  * Is the _Result_ ok?
  *
  * @param value _Result_ to check
- * @returns `true` if the _Result_ is ok, `false` otherwise
+ * @returns `true` if the _Result_ is ok, otherwise `false`
  */
 export function isOk<Value, E = Error>(value: Result<Value, E>): value is Ok<Value>;
 
@@ -53,7 +53,7 @@ export function isOk<Value, E = Error>(value: Result<Value, E>): value is Ok<Val
  * Is the value ok?
  *
  * @param value Value to check
- * @returns `true` if the value is ok, `false` otherwise
+ * @returns `true` if the value is ok, otherwise `false`
  */
 export function isOk(value: unknown): value is Ok<unknown>;
 
@@ -65,7 +65,7 @@ export function isOk(value: unknown): value is Ok<unknown> {
  * Is the value a _Result_?
  *
  * @param value Value to check
- * @returns `true` if the value is a _Result_, `false` otherwise
+ * @returns `true` if the value is a _Result_, otherwise `false`
  */
 export function isResult(value: unknown): value is ExtendedErr<unknown> | Result<unknown, unknown> {
 	return isResultValue(value, true) || isResultValue(value, false);

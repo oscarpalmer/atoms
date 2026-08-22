@@ -164,8 +164,10 @@ test('getIndex', () => {
 	let {length} = numbers;
 
 	for (let index = 0; index < length; index += 1) {
-		expect(sort.getIndex(numbers[index], 3)).toBe(result[index][0]);
-		expect(sort.getIndex(numbers[index], 3, true)).toBe(result[index][1]);
+		const value = numbers[index];
+
+		expect(sort.getIndex(value, 3)).toBe(result[index][0]);
+		expect(sort.getIndex(value, 3, true)).toBe(result[index][1]);
 	}
 
 	const {alice, aliceAgain, bob, charlie, david} = arrayFixture.people;
@@ -185,8 +187,10 @@ test('getIndex', () => {
 	let sorters: unknown[] = [{key: 'age'}, {key: 'name'}];
 
 	for (let index = 0; index < length; index += 1) {
-		expect(sort.getIndex(people[index], aliceAgain, sorters as never)).toBe(result[index][0]);
-		expect(sort.getIndex(people[index], aliceAgain, sorters as never, true)).toBe(result[index][1]);
+		const person = people[index];
+
+		expect(sort.getIndex(person, aliceAgain, sorters as never)).toBe(result[index][0]);
+		expect(sort.getIndex(person, aliceAgain, sorters as never, true)).toBe(result[index][1]);
 	}
 
 	result = [
@@ -198,8 +202,10 @@ test('getIndex', () => {
 	sorters = [{key: 'age'}, {direction: 'descending', key: 'name'}];
 
 	for (let index = 0; index < length; index += 1) {
-		expect(sort.getIndex(people[index], aliceAgain, sorters as never)).toBe(result[index][0]);
-		expect(sort.getIndex(people[index], aliceAgain, sorters as never, true)).toBe(result[index][1]);
+		const person = people[index];
+
+		expect(sort.getIndex(person, aliceAgain, sorters as never)).toBe(result[index][0]);
+		expect(sort.getIndex(person, aliceAgain, sorters as never, true)).toBe(result[index][1]);
 	}
 
 	expect(sort.getIndex('blah' as never, 3)).toBe(-1);
@@ -216,8 +222,10 @@ test('is', () => {
 	let {length} = numbers;
 
 	for (let index = 0; index < length; index += 1) {
-		expect(sort.is(numbers[index])).toBe(index === 0);
-		expect(sort.is(numbers[index], true)).toBe(index === length - 1);
+		const value = numbers[index];
+
+		expect(sort.is(value)).toBe(index === 0);
+		expect(sort.is(value, true)).toBe(index === length - 1);
 	}
 
 	const {alice, aliceAgain, bob, charlie, david} = arrayFixture.people;
@@ -236,8 +244,10 @@ test('is', () => {
 	length = people.length;
 
 	for (let index = 0; index < length; index += 1) {
-		expect(sort.is(people[index], sorters as never)).toBe(result[index]);
-		expect(sorter.is(people[index])).toBe(result[index]);
+		const person = people[index];
+
+		expect(sort.is(person, sorters as never)).toBe(result[index]);
+		expect(sorter.is(person)).toBe(result[index]);
 	}
 
 	result = [false, false, true];
@@ -245,8 +255,10 @@ test('is', () => {
 	sorter = sort.initialize(sorters as never, true);
 
 	for (let index = 0; index < length; index += 1) {
-		expect(sort.is(people[index], sorters as never, true)).toBe(result[index]);
-		expect(sorter.is(people[index])).toBe(result[index]);
+		const person = people[index];
+
+		expect(sort.is(person, sorters as never, true)).toBe(result[index]);
+		expect(sorter.is(person)).toBe(result[index]);
 	}
 
 	result = [false, true, false];
@@ -255,8 +267,10 @@ test('is', () => {
 	sorter = sort.initialize(sorters as never);
 
 	for (let index = 0; index < length; index += 1) {
-		expect(sort.is(people[index], sorters as never)).toBe(result[index]);
-		expect(sorter.is(people[index])).toBe(result[index]);
+		const person = people[index];
+
+		expect(sort.is(person, sorters as never)).toBe(result[index]);
+		expect(sorter.is(person)).toBe(result[index]);
 	}
 
 	const large = [times(200, index => index), times(200, index => 200 - index)];
@@ -264,8 +278,10 @@ test('is', () => {
 	length = large.length;
 
 	for (let index = 0; index < length; index += 1) {
-		expect(sort.is(large[index])).toBe(index === 0);
-		expect(sort.is(large[index], true)).toBe(index === length - 1);
+		const value = large[index];
+
+		expect(sort.is(value)).toBe(index === 0);
+		expect(sort.is(value, true)).toBe(index === length - 1);
 	}
 
 	const larger = [times(10_000, index => index), times(10_000, index => 10_000 - index)];
@@ -273,8 +289,10 @@ test('is', () => {
 	length = larger.length;
 
 	for (let index = 0; index < length; index += 1) {
-		expect(sort.is(larger[index])).toBe(index === 0);
-		expect(sort.is(larger[index], true)).toBe(index === length - 1);
+		const value = larger[index];
+
+		expect(sort.is(value)).toBe(index === 0);
+		expect(sort.is(value, true)).toBe(index === length - 1);
 	}
 
 	expect(sort.is([])).toBe(true);

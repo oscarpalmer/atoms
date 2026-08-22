@@ -2,7 +2,7 @@ import {noop} from './internal/function/misc';
 
 // #region Types
 
-type LoggerInstance = {
+type Logger = {
 	/**
 	 * Log any number of values at the "debug" log level
 	 */
@@ -94,6 +94,22 @@ type TimeState = {
 
 // #region Functions
 
+function isLogger(value: unknown): value is Logger {
+	return isLoggerInstance<Logger>(NAME_LOGGER, value);
+}
+
+function isLoggerInstance<Instance>(name: string, value: unknown): value is Instance {
+	return (
+		typeof value === 'object' &&
+		value !== null &&
+		(value as Record<string, unknown>)[KEY_LOGGER] === name
+	);
+}
+
+function isTimedLogger(value: unknown): value is TimedLogger {
+	return isLoggerInstance<TimedLogger>(NAME_TIMED, value);
+}
+
 function timedLogger(label: string): TimedLogger {
 	function stop() {
 		const fn = stopper;
@@ -118,6 +134,10 @@ function timedLogger(label: string): TimedLogger {
 	const instance = {};
 
 	Object.defineProperties(instance, {
+		[KEY_LOGGER]: {
+			enumerable: false,
+			value: NAME_TIMED,
+		},
 		active: {
 			enumerable: true,
 			get() {
@@ -149,6 +169,12 @@ function timedLogger(label: string): TimedLogger {
 
 // #region Variables
 
+const KEY_LOGGER = '$logger';
+
+const NAME_LOGGER = 'Logger';
+
+const NAME_TIMED = 'TimedLogger';
+
 const methods = ['debug', 'dir', 'error', 'info', 'log', 'table', 'trace', 'warn'] as const;
 
 /**
@@ -160,6 +186,10 @@ const Logger = (() => {
 	const instance = {};
 
 	Object.defineProperties(instance, {
+		[KEY_LOGGER]: {
+			enumerable: false,
+			value: NAME_LOGGER,
+		},
 		enabled: {
 			enumerable: true,
 			get() {
@@ -187,7 +217,7 @@ const Logger = (() => {
 	}
 
 	return Object.freeze(instance);
-})() as LoggerInstance;
+})() as Logger;
 
 let enabled = true;
 
@@ -195,6 +225,6 @@ let enabled = true;
 
 // #region Exports
 
-export {Logger, type TimedLogger};
+export {isLogger, isTimedLogger, Logger, type TimedLogger};
 
 // #endregion

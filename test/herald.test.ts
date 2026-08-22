@@ -1,5 +1,8 @@
 import {expect, test} from 'vitest';
-import {herald} from '../src';
+import {herald, isEvents, isHerald} from '../src';
+import {isFixture} from './.fixtures/is.fixture';
+
+const {length, values} = isFixture;
 
 type Events = {
 	foo: (id: number, name: string) => void;
@@ -10,6 +13,19 @@ type Events = {
 test('', () => {
 	const announcer = herald<Events>(['bar', 'baz', 'foo']);
 	const {events} = announcer;
+
+	expect(isHerald(announcer)).toBe(true);
+	expect(isHerald(events)).toBe(false);
+
+	expect(isEvents(announcer)).toBe(false);
+	expect(isEvents(events)).toBe(true);
+
+	for (let index = 0; index < length; index += 1) {
+		const value = values[index];
+
+		expect(isHerald(value)).toBe(false);
+		expect(isEvents(value)).toBe(false);
+	}
 
 	const count = {
 		bar: [0, 0],

@@ -9,7 +9,7 @@ import {getNestedValue} from './misc';
  *
  * @param data Object to check in
  * @param path Path for property, e.g., `foo.bar.baz`
- * @returns `true` if the property exists, `false` otherwise
+ * @returns `true` if the property exists, otherwise `false`
  *
  * @example
  * ```typescript
@@ -32,7 +32,7 @@ export function hasValue<Data extends PlainObject, Path extends NestedKeys<Data>
  * @param data Object to check in
  * @param path Path for property, e.g., `foo.bar.baz`
  * @param ignoreCase If `true`, the path matching is case-insensitive
- * @returns `true` if the property exists, `false` otherwise
+ * @returns `true` if the property exists, otherwise `false`
  *
  * @example
  * ```typescript

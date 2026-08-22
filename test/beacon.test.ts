@@ -1,9 +1,24 @@
 import {expect, test} from 'vitest';
-import {beacon, equal} from '../src';
+import {beacon, equal, isBeacon, isObservable, isSubscription} from '../src';
+import {isFixture} from './.fixtures/is.fixture';
+
+const {length, values} = isFixture;
 
 test('beacon', () =>
 	new Promise<void>(done => {
 		const value = beacon(0);
+
+		expect(isBeacon(value)).toBe(true);
+		expect(isObservable(value)).toBe(false);
+		expect(isSubscription(value)).toBe(false);
+
+		for (let index = 0; index < length; index += 1) {
+			const value = values[index];
+
+			expect(isBeacon(value)).toBe(false);
+			expect(isObservable(value)).toBe(false);
+			expect(isSubscription(value)).toBe(false);
+		}
 
 		expect(value.active).toBe(true);
 		expect(value.closed).toBe(false);
@@ -67,7 +82,13 @@ test('observable + subscription', () =>
 
 		const thirdObservable = third.observable;
 
+		expect(isObservable(thirdObservable)).toBe(true);
+
 		let three = thirdObservable.subscribe({});
+
+		expect(isSubscription(one)).toBe(true);
+		expect(isSubscription(two)).toBe(true);
+		expect(isSubscription(three)).toBe(true);
 
 		first.observable.subscribe('blah' as never);
 

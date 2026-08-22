@@ -404,6 +404,10 @@ function createQueue(
 	};
 
 	Object.defineProperties(instance, {
+		[KEY_QUEUE]: {
+			enumerable: false,
+			value: NAME_QUEUE,
+		},
 		active: {
 			enumerable: true,
 			get: () => state.runners > 0,
@@ -539,6 +543,34 @@ function identify(state: QueueState): number {
 	return state.id;
 }
 
+/**
+ * Is the value keyed queue?
+ *
+ * @param value Value to check
+ * @returns `true` if the value is a keyed queue, otherwise `false`
+ */
+export function isKeyedQueue(value: unknown): value is KeyedQueue<unknown[], unknown> {
+	return isQueueInstance(NAME_KEYED, value);
+}
+
+/**
+ * Is the value a queue?
+ *
+ * @param value Value to check
+ * @returns `true` if the value is a queue, otherwise `false`
+ */
+export function isQueue(value: unknown): value is Queue<unknown[], unknown> {
+	return isQueueInstance(NAME_QUEUE, value);
+}
+
+export function isQueueInstance<Instance>(name: string, value: unknown): value is Instance {
+	return (
+		typeof value === 'object' &&
+		value != null &&
+		(value as Record<string, unknown>)[KEY_QUEUE] === name
+	);
+}
+
 export function keyedQueue<Callback extends (key: string, ...parameters: any[]) => Promise<void>>(
 	callback: Callback,
 	options?: QueueOptions,
@@ -604,6 +636,10 @@ export function keyedQueue(
 	};
 
 	Object.defineProperties(instance, {
+		[KEY_QUEUE]: {
+			enumerable: false,
+			value: NAME_KEYED,
+		},
 		active: {
 			enumerable: true,
 			get: () => getStatus(state, STATUS_ACTIVE),
@@ -745,6 +781,8 @@ const EVENT_NAME = 'abort';
 
 const EVENT_OPTIONS = {once: true};
 
+const KEY_QUEUE = '$queue';
+
 const HANDLE_CLEAR: HandleType = 'clear';
 
 const HANDLE_PAUSE: HandleType = 'pause';
@@ -760,6 +798,10 @@ const MESSAGE_KEY = 'Key must be a non-empty string';
 const MESSAGE_MAXIMUM = 'Queue has reached its maximum size';
 
 const MESSAGE_REMOVE = 'Item removed from queue';
+
+const NAME_KEYED = 'keyedQueue';
+
+const NAME_QUEUE = 'queue';
 
 const STATUS_ACTIVE: StatusKey = 'active';
 

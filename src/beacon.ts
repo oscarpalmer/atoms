@@ -198,6 +198,10 @@ export function beacon<Value>(value: Value, options?: BeaconOptions<Value>): Bea
 	};
 
 	Object.defineProperties(instance, {
+		[KEY_BEACON]: {
+			enumerable: false,
+			value: NAME_BEACON,
+		},
 		active: {
 			enumerable: true,
 			get: () => state.active,
@@ -289,6 +293,40 @@ function getObserver<Value>(
 	return observer;
 }
 
+/**
+ * Is the value a beacon?
+ *
+ * @param value Value to check
+ * @returns `true` if the value is a beacon, otherwise `false`
+ */
+export function isBeacon<Value = unknown>(value: unknown): value is Beacon<Value> {
+	return isBeaconInstance<Beacon<Value>>(NAME_BEACON, value);
+}
+
+function isBeaconInstance<Instance>(name: string, value: unknown): value is Instance {
+	return isPlainObject(value) && (value as PlainObject)[KEY_BEACON] === name;
+}
+
+/**
+ * Is the value an observable?
+ *
+ * @param value Value to check
+ * @returns `true` if the value is an observable, otherwise `false`
+ */
+export function isObservable<Value = unknown>(value: unknown): value is Observable<Value> {
+	return isBeaconInstance<Observable<Value>>(NAME_OBSERVABLE, value);
+}
+
+/**
+ * Is the value a subscription?
+ *
+ * @param value Value to check
+ * @returns `true` if the value is a subscription, otherwise `false`
+ */
+export function isSubscription(value: unknown): value is Subscription {
+	return isBeaconInstance<Subscription>(NAME_SUBSCRIPTION, value);
+}
+
 function observe<Value>(beacon: BeaconState<Value>): Observable<Value> {
 	const state: ObservableState<Value> = {
 		beacon,
@@ -320,6 +358,10 @@ function observe<Value>(beacon: BeaconState<Value>): Observable<Value> {
 	};
 
 	Object.defineProperties(instance, {
+		[KEY_BEACON]: {
+			enumerable: false,
+			value: NAME_OBSERVABLE,
+		},
 		active: {
 			enumerable: true,
 			get: () => beacon.active && state.active,
@@ -354,6 +396,10 @@ function subscribe<Value>(observable: ObservableState<Value>): Subscription {
 	};
 
 	Object.defineProperties(instance, {
+		[KEY_BEACON]: {
+			enumerable: false,
+			value: NAME_SUBSCRIPTION,
+		},
 		active: {
 			enumerable: true,
 			get: () => observable.beacon.active && observable.active && active,
@@ -398,9 +444,17 @@ function update<Value>(
 
 // #region Variables
 
+const KEY_BEACON = '$beacon';
+
 const MESSAGE_BEACON = 'Cannot retrieve observable from a closed beacon';
 
 const MESSAGE_OBSERVABLE = 'Cannot subscribe to a closed observable';
+
+const NAME_BEACON = 'beacon';
+
+const NAME_OBSERVABLE = 'observable';
+
+const NAME_SUBSCRIPTION = 'subscription';
 
 const TYPE_ERROR = 'error';
 

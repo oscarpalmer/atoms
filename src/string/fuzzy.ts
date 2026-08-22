@@ -265,7 +265,7 @@ fuzzy.match = fuzzyMatch;
  *
  * @param haystack Haystack to search through
  * @param needle Needle to search for
- * @returns `true` if the needle matches the haystack in a fuzzy way, `false` otherwise
+ * @returns `true` if the needle matches the haystack in a fuzzy way, otherwise `false`
  */
 export function fuzzyMatch(haystack: string, needle: string): boolean {
 	if (typeof haystack !== 'string' || typeof needle !== 'string') {

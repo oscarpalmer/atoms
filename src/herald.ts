@@ -63,6 +63,22 @@ export type Unsubscriber = () => void;
 
 // #region Functions
 
+function getEvents<Map extends Record<string, GenericCallback>>(herald: Herald<Map>): Events<Map> {
+	const events = {
+		subscribe: (event: string, callback: GenericCallback) =>
+			herald.subscribe(event, callback as Map[keyof Map]),
+		unsubscribe: (event: string, callback?: GenericCallback) =>
+			herald.unsubscribe(event, callback as Map[keyof Map]),
+	};
+
+	Object.defineProperty(events, KEY_HERALD, {
+		enumerable: false,
+		value: NAME_EVENTS,
+	});
+
+	return Object.freeze(events) as Events<Map>;
+}
+
 /**
  * Create a _Herald_ for announcing named events
  *
@@ -140,29 +156,63 @@ export function herald<Events extends Record<string, GenericCallback>>(
 		},
 	};
 
-	const events = Object.freeze({
-		subscribe<Event extends keyof Events>(event: Event, callback: Events[Event]): Unsubscriber {
-			return instance.subscribe(event, callback);
-		},
-		unsubscribe<Event extends keyof Events>(event: Event, callback?: Events[Event]): void {
-			return instance.unsubscribe(event, callback);
-		},
-	});
-
 	Object.defineProperties(instance, {
+		[KEY_HERALD]: {
+			enumerable: false,
+			value: NAME_HERALD,
+		},
 		events: {
 			enumerable: true,
-			value: events,
+			value: getEvents<Events>(instance as Herald<Events>),
 		},
 	});
 
 	return Object.freeze(instance) as Herald<Events>;
 }
 
+/**
+ * Is the value events for a herald?
+ *
+ * @param value Value to check
+ * @returns `true` if the value is events for a herald, otherwise `false`
+ */
+export function isEvents<
+	Map extends Record<string, GenericCallback> = Record<string, GenericCallback>,
+>(value: unknown): value is Events<Map> {
+	return isHeraldInstance(NAME_EVENTS, value);
+}
+
+/**
+ * Is the value a herald?
+ *
+ * @param value Value to check
+ * @returns `true` if the value is a herald, otherwise `false`
+ */
+export function isHerald<
+	Events extends Record<string, GenericCallback> = Record<string, GenericCallback>,
+>(value: unknown): value is Herald<Events> {
+	return isHeraldInstance(NAME_HERALD, value);
+}
+
+function isHeraldInstance<Instance>(name: string, value: unknown): value is Instance {
+	return (
+		typeof value === 'object' &&
+		value != null &&
+		KEY_HERALD in value &&
+		(value as Record<string, unknown>)[KEY_HERALD] === name
+	);
+}
+
 // #endregion
 
 // #region Variables
 
+const KEY_HERALD = '$herald';
+
 const MESSAGE = 'Herald requires an array of event names.';
+
+const NAME_EVENTS = 'events';
+
+const NAME_HERALD = 'herald';
 
 // #endregion

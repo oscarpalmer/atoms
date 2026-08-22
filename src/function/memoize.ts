@@ -71,7 +71,7 @@ export type Memoized<Callback extends GenericCallback> = {
 /**
  * Options for a _Memoized_ function
  */
-type MemoizedOptions<Callback extends GenericCallback> = {
+export type MemoizedOptions<Callback extends GenericCallback> = {
 	/**
 	 * Callback for getting a cache key for the provided parameters
 	 */
