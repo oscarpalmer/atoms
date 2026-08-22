@@ -78,7 +78,9 @@ test('basic', () => {
 		similar: [],
 	});
 
-	fuzzyHello.items = 'blah' as never;
+	expect(() => {
+		fuzzyHello.items = 'blah' as never;
+	}).toThrow(TypeError);
 
 	expect(fuzzyHello.search('w')).toEqual({
 		exact: ['Howdy'],
@@ -103,15 +105,15 @@ test('complex', () => {
 		}).search(''),
 	);
 
-	expect(
-		fuzzy(complex, {
-			key: 'name',
-		}),
-	).toEqual(
-		fuzzy(complex, {
-			handler: item => item.name,
-		}),
-	);
+	const keyed = fuzzy(complex, {
+		key: 'name',
+	});
+
+	const handled = fuzzy(complex, {
+		handler: item => item.name,
+	});
+
+	expect(keyed.search('a')).toEqual(handled.search('a'));
 
 	expect(fuzzyItems.search(123 as never)).toEqual({
 		exact: complex,

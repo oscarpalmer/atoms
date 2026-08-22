@@ -9,42 +9,27 @@ import {includes} from './match';
 /**
  * Fuzzy searcher for an array of items
  */
-class Fuzzy<Item> {
-	#state: FuzzyState<Item>;
-
+export type Fuzzy<Item> = {
 	/**
 	 * Get items currently being searched through
 	 *
 	 * @returns Original items
 	 */
-	get items(): Item[] {
-		return this.#state.items.slice();
-	}
+	get items(): Item[];
 
 	/**
 	 * Set new items to search through
 	 *
 	 * @param items New items to search through
 	 */
-	set items(items: Item[]) {
-		if (Array.isArray(items)) {
-			this.#state.items = items.slice();
-			this.#state.strings = items.map(this.#state.handler);
-		}
-	}
+	set items(items: Item[]);
 
 	/**
 	 * Get strings currently being searched through _(the stringified version of `items`)_
 	 *
 	 * @returns Stringified items
 	 */
-	get strings(): string[] {
-		return this.#state.strings.slice();
-	}
-
-	constructor(state: FuzzyState<Item>) {
-		this.#state = state;
-	}
+	get strings(): string[];
 
 	/**
 	 * Search for items matching the given value
@@ -63,16 +48,7 @@ class Fuzzy<Item> {
 	 * @returns Search results, with exact matches _(ordered)_ and similar matches _(ordered by relevance)_
 	 */
 	search(value: string, limit: number): FuzzyResult<Item>;
-
-	search(value: string, options?: number | FuzzyOptions): FuzzyResult<Item> {
-		return search(
-			this.#state.items,
-			this.#state.strings,
-			value,
-			options == null ? this.#state : getFuzzyOptions(options, this.#state),
-		);
-	}
-}
+};
 
 export type FuzzyConfiguration<Item> = {
 	/**
@@ -250,7 +226,36 @@ export function fuzzy(items: unknown[], configuration?: unknown): Fuzzy<unknown>
 		throw new TypeError(MESSAGE_ARRAY);
 	}
 
-	return new Fuzzy(getFuzzyState(items, configuration));
+	const state = getFuzzyState(items, configuration);
+
+	const instance = {
+		search: (value: string, options?: number | FuzzyOptions) =>
+			search(
+				state.items,
+				state.strings,
+				value,
+				options == null ? state : getFuzzyOptions(options, state),
+			),
+	};
+
+	Object.defineProperties(instance, {
+		items: {
+			get: () => state.items.slice(),
+			set: (items: unknown[]) => {
+				if (!Array.isArray(items)) {
+					throw new TypeError(MESSAGE_ARRAY);
+				}
+
+				state.items = items.slice();
+				state.strings = items.map(state.handler);
+			},
+		},
+		strings: {
+			get: () => state.strings.slice(),
+		},
+	});
+
+	return Object.freeze(instance) as Fuzzy<unknown>;
 }
 
 fuzzy.match = fuzzyMatch;
