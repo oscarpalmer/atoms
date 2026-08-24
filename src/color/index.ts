@@ -1,6 +1,18 @@
 import {color} from './instance';
 import {isColor} from './misc/is';
-import type {Color, HSLAColor, HSLColor, HWBAColor, HWBColor, RGBAColor, RGBColor} from './models';
+import type {
+	Color,
+	ColorType,
+	ColorTypeExtended,
+	ColorValue,
+	ColorValueExtended,
+	HSLAColor,
+	HSLColor,
+	HWBAColor,
+	HWBColor,
+	RGBAColor,
+	RGBColor,
+} from './models';
 
 // #region Functions
 
@@ -32,22 +44,16 @@ export {
 	getRgbaColor,
 	getRgbColor,
 } from './misc/get';
-
 export {
 	isColor,
 	isHexColor,
 	isHslaColor,
 	isHslColor,
-	isHslLike,
 	isHwbaColor,
-	isHwbaLike,
 	isHwbColor,
-	isHwbLike,
 	isRgbaColor,
 	isRgbColor,
-	isRgbLike,
 } from './misc/is';
-
 export {
 	getNormalizedHex,
 	hexToHsl,
@@ -60,6 +66,18 @@ export {
 export {hslToHex, hslToHwb, hslToHwba, hslToRgb, hslToRgba} from './space/hsl';
 export {hwbToHex, hwbToHsl, hwbToHsla, hwbToRgb, hwbToRgba} from './space/hwb';
 export {rgbToHex, rgbToHsl, rgbToHsla, rgbToHwb, rgbToHwba} from './space/rgb';
-export type {Color, HSLAColor, HSLColor, HWBAColor, HWBColor, RGBAColor, RGBColor};
+export type {
+	Color,
+	ColorType,
+	ColorTypeExtended,
+	ColorValue,
+	ColorValueExtended,
+	HSLAColor,
+	HSLColor,
+	HWBAColor,
+	HWBColor,
+	RGBAColor,
+	RGBColor,
+};
 
 // #endregion

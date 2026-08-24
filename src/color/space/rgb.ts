@@ -1,9 +1,18 @@
 import {join} from '../../internal/string';
-import {DEFAULT_RGB, MAX_HEX, MAX_PERCENT} from '../constants';
+import {DEFAULT_RGB, MAX_HEX, MAX_PERCENT, TYPE_HEX, TYPE_HSL, TYPE_HWB} from '../constants';
 import {getAlpha, getAlphaValue} from '../misc/alpha';
 import {getHexValue} from '../misc/get';
 import {isRgbLike} from '../misc/is';
-import type {HSLAColor, HSLColor, HWBAColor, HWBColor, RGBAColor, RGBColor} from '../models';
+import type {
+	ColorState,
+	ColorType,
+	HSLAColor,
+	HSLColor,
+	HWBAColor,
+	HWBColor,
+	RGBAColor,
+	RGBColor,
+} from '../models';
 
 // #region Types
 
@@ -32,7 +41,7 @@ export function convertRgbToHex(rgb: RGBAColor | RGBColor, alpha: boolean): stri
 	let a = '';
 
 	if (typeof alpha === 'boolean' && alpha) {
-		a = getAlpha((rgb as RGBAColor).alpha).hex;
+		a = getAlpha((rgb as RGBAColor).alpha, false).hex;
 	}
 
 	return `${hex}${a}`;
@@ -85,6 +94,27 @@ export function convertRgbToHwba(value: unknown): HWBAColor {
 		blackness: (1 - max) * MAX_PERCENT,
 		alpha: getAlphaValue((value as RGBAColor)?.alpha ?? MAX_PERCENT),
 	};
+}
+
+export function getColorFromRgb<Type extends ColorType>(
+	state: ColorState,
+	type: Type,
+): NonNullable<ColorState[Type]> {
+	switch (type) {
+		case TYPE_HEX:
+			state.hex = rgbToHex(state.rgb!);
+			break;
+
+		case TYPE_HSL:
+			state.hsl = rgbToHsl(state.rgb!);
+			break;
+
+		case TYPE_HWB:
+			state.hwb = rgbToHwb(state.rgb!);
+			break;
+	}
+
+	return state[type]!;
 }
 
 function getRgbHue(values: RgbValues): number {

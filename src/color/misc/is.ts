@@ -16,6 +16,7 @@ import {
 	MAX_DEGREE,
 	MAX_HEX,
 	MAX_PERCENT,
+	PROPERTY_COLOR,
 } from '../constants';
 import type {Color} from '../index';
 import type {
@@ -49,7 +50,12 @@ function isBytey(value: unknown): value is number {
  * @returns `true` if the value is a _Color_, otherwise `false`
  */
 export function isColor(value: unknown): value is Color {
-	return typeof value === 'object' && value !== null && '$color' in value && value.$color === true;
+	return (
+		typeof value === 'object' &&
+		value !== null &&
+		PROPERTY_COLOR in value &&
+		value[PROPERTY_COLOR] === true
+	);
 }
 
 function isColorValue(obj: unknown, properties: ColorProperty[]): boolean {
@@ -128,12 +134,6 @@ export function isHslaColor(value: unknown): value is HSLAColor {
 	return isColorValue(value, KEYS_HSLA);
 }
 
-/**
- * Is the value like an _HSLA_ color?
- *
- * @param value Value to check
- * @returns `true` if the value is like an _HSLA_ color, otherwise `false`
- */
 export function isHslaLike(value: unknown): value is Record<keyof HSLAColor, unknown> {
 	return hasKeys(value, KEYS_HSLA);
 }
@@ -148,12 +148,6 @@ export function isHslColor(value: unknown): value is HSLColor {
 	return isColorValue(value, KEYS_HSLA) || isColorValue(value, KEYS_HSL);
 }
 
-/**
- * Is the value like an _HSL_ color?
- *
- * @param value Value to check
- * @returns `true` if the value is like an _HSL_ color, otherwise `false`
- */
 export function isHslLike(value: unknown): value is Record<keyof HSLColor, unknown> {
 	return hasKeys(value, KEYS_HSL);
 }
@@ -168,12 +162,6 @@ export function isHwbaColor(value: unknown): value is HWBAColor {
 	return isColorValue(value, KEYS_HWBA);
 }
 
-/**
- * Is the value like an _HWBA_ color?
- *
- * @param value Value to check
- * @returns `true` if the value is like an _HWBA_ color, otherwise `false`
- */
 export function isHwbaLike(value: unknown): value is Record<keyof HWBAColor, unknown> {
 	return hasKeys(value, KEYS_HWBA);
 }
@@ -188,12 +176,6 @@ export function isHwbColor(value: unknown): value is HWBColor {
 	return isColorValue(value, KEYS_HWB) || isColorValue(value, KEYS_HWBA);
 }
 
-/**
- * Is the value like an _HWB_ color?
- *
- * @param value Value to check
- * @returns `true` if the value is like an _HWB_ color, otherwise `false`
- */
 export function isHwbLike(value: unknown): value is Record<keyof HWBColor, unknown> {
 	return hasKeys(value, KEYS_HWB);
 }
@@ -208,12 +190,6 @@ export function isRgbaColor(value: unknown): value is RGBAColor {
 	return isColorValue(value, KEYS_RGBA);
 }
 
-/**
- * Is the value like an _RGBA_ color?
- *
- * @param value Value to check
- * @returns `true` if the value is like an _RGBA_ color, otherwise `false`
- */
 export function isRgbaLike(value: unknown): value is Record<keyof RGBAColor, unknown> {
 	return hasKeys(value, KEYS_RGBA);
 }
@@ -228,12 +204,6 @@ export function isRgbColor(value: unknown): value is RGBColor {
 	return isColorValue(value, KEYS_RGBA) || isColorValue(value, KEYS_RGB);
 }
 
-/**
- * Is the value like an _RGB_ color?
- *
- * @param value Value to check
- * @returns `true` if the value is like an _RGB_ color, otherwise `false`
- */
 export function isRgbLike(value: unknown): value is Record<keyof RGBColor, unknown> {
 	return hasKeys(value, KEYS_RGB);
 }

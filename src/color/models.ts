@@ -118,6 +118,13 @@ export type Color = {
 	set hwba(value: HWBAColor);
 
 	/**
+	 * Last color format that was set on the color
+	 *
+	 * @returns Color type
+	 */
+	get origin(): ColorType;
+
+	/**
 	 * Get the color as an _RGB_ color
 	 *
 	 * @returns Current color as an _RGB_ color
@@ -259,10 +266,31 @@ export type ColorProperty = 'alpha' | keyof HSLColor | keyof HWBColor | keyof RG
 
 export type ColorState = {
 	alpha: Alpha;
-	hex: string;
-	hsl: HSLColor;
-	hwb: HWBColor;
-	rgb: RGBColor;
+	hex?: string;
+	hsl?: HSLColor;
+	hwb?: HWBColor;
+	origin: ColorType;
+	rgb?: RGBColor;
 };
+
+/**
+ * Base color types
+ */
+export type ColorType = 'hex' | 'hsl' | 'hwb' | 'rgb';
+
+/**
+ * Extended color types
+ */
+export type ColorTypeExtended = ColorType | 'hsla' | 'hwba' | 'rgba';
+
+/**
+ * Base color values
+ */
+export type ColorValue = string | HSLColor | HWBColor | RGBColor;
+
+/**
+ * Extended color values
+ */
+export type ColorValueExtended = ColorValue | HSLAColor | HWBAColor | RGBAColor;
 
 // #endregion

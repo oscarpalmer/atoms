@@ -10,21 +10,58 @@ import {
 	isHexColor,
 	isHslaColor,
 	isHslColor,
-	isHslLike,
 	isHwbaColor,
 	isHwbColor,
-	isHwbLike,
 	isRgbaColor,
 	isRgbColor,
-	isRgbLike,
 } from '../../src';
 import {getAlphaHexadecimal} from '../../src/color/misc/alpha';
 import {getHwbaColor, getHwbColor} from '../../src/color/misc/get';
+import {
+	isHslaLike,
+	isHslLike,
+	isHwbaLike,
+	isHwbLike,
+	isRgbaLike,
+	isRgbLike,
+} from '../../src/color/misc/is';
 import {colorFixture} from '../.fixtures/color.fixture';
-import {isHslaLike, isHwbaLike, isRgbaLike} from '../../src/color/misc/is';
 
 const {alphas, hexes, hsls, hslas, is, rgbs} = colorFixture;
 const {length} = hexes;
+
+test('alpha', () => {
+	const rgb = {
+		red: 0,
+		green: 0,
+		blue: 0,
+	};
+
+	const a = getColor({
+		...rgb,
+		alpha: -100,
+	});
+
+	const b = getColor({
+		...rgb,
+		alpha: 1000,
+	});
+
+	const c = getColor({
+		...rgb,
+		alpha: '99',
+	});
+
+	const d = getColor({
+		...rgb,
+		alpha: 'hello, world!',
+	});
+
+	expect(a.alpha).toBe(0);
+	expect(b.alpha).toBe(100);
+	expect(c.alpha).toBe(99);
+	expect(d.alpha).toBe(100);
+});
 
 test('formatting', () => {
 	for (let index = 0; index < length; index += 1) {

@@ -1,8 +1,25 @@
-import {DEFAULT_HSL, MAX_DEGREE, MAX_HEX, MAX_PERCENT} from '../constants';
+import {
+	DEFAULT_HSL,
+	MAX_DEGREE,
+	MAX_HEX,
+	MAX_PERCENT,
+	TYPE_HEX,
+	TYPE_HWB,
+	TYPE_RGB,
+} from '../constants';
 import {getAlphaValue} from '../misc/alpha';
 import {getDegrees, getHexValue, getPercentage} from '../misc/get';
 import {isHslLike} from '../misc/is';
-import type {HSLAColor, HSLColor, HWBAColor, HWBColor, RGBAColor, RGBColor} from '../models';
+import type {
+	ColorState,
+	ColorType,
+	HSLAColor,
+	HSLColor,
+	HWBAColor,
+	HWBColor,
+	RGBAColor,
+	RGBColor,
+} from '../models';
 import {convertRgbToHex} from './rgb';
 
 // #region Functions
@@ -47,6 +64,27 @@ function convertHslToRgba(input: unknown): RGBAColor {
 		green: getHexValue(getHexyValue(hue, lightness, saturation, 8)),
 		red: getHexValue(getHexyValue(hue, lightness, saturation, 0)),
 	};
+}
+
+export function getColorFromHsl<Type extends ColorType>(
+	state: ColorState,
+	type: Type,
+): NonNullable<ColorState[Type]> {
+	switch (type) {
+		case TYPE_HEX:
+			state.hex = hslToHex(state.hsl!);
+			break;
+
+		case TYPE_HWB:
+			state.hwb = hslToHwb(state.hsl!);
+			break;
+
+		case TYPE_RGB:
+			state.rgb = hslToRgb(state.hsl!);
+			break;
+	}
+
+	return state[type]!;
 }
 
 function getHexyValue(hue: number, lightness: number, saturation: number, value: number): number {

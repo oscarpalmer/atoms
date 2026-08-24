@@ -8,10 +8,22 @@ import {
 	LENGTH_LONG,
 	LENGTH_SHORT,
 	MAX_HEX,
+	TYPE_HSL,
+	TYPE_HWB,
+	TYPE_RGB,
 } from '../constants';
 import {getHexValue, getPercentage} from '../misc/get';
 import {isHexColor} from '../misc/is';
-import type {HSLAColor, HSLColor, HWBAColor, HWBColor, RGBAColor, RGBColor} from '../models';
+import type {
+	ColorState,
+	ColorType,
+	HSLAColor,
+	HSLColor,
+	HWBAColor,
+	HWBColor,
+	RGBAColor,
+	RGBColor,
+} from '../models';
 import {convertRgbToHsla, convertRgbToHwba} from './rgb';
 
 // #region Functions
@@ -33,6 +45,27 @@ function convertHexToRgba(value: string): RGBAColor {
 		green: getHexValue(values[1]),
 		red: getHexValue(values[0]),
 	};
+}
+
+export function getColorFromHex<Type extends ColorType>(
+	state: ColorState,
+	type: Type,
+): NonNullable<ColorState[Type]> {
+	switch (type) {
+		case TYPE_HSL:
+			state.hsl ??= hexToHsl(state.hex!);
+			break;
+
+		case TYPE_HWB:
+			state.hwb ??= hexToHwb(state.hex!);
+			break;
+
+		case TYPE_RGB:
+			state.rgb ??= hexToRgb(state.hex!);
+			break;
+	}
+
+	return state[type]!;
 }
 
 /**

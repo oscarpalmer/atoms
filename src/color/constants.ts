@@ -33,6 +33,8 @@ export const DEFAULT_RGB: RGBColor = {
 	red: 0,
 };
 
+export const EXPRESSION_ALPHA_HEX = /^([a-f0-9]{1,2})$/i;
+
 export const EXPRESSION_HEX_LONG = /^#?([a-f0-9]{2})([a-f0-9]{2})([a-f0-9]{2})([a-f0-9]{2})?$/i;
 
 export const EXPRESSION_HEX_SHORT = /^#?([a-f0-9]{3,4})$/i;
@@ -64,6 +66,16 @@ export const MAX_DEGREE = 360;
 export const MAX_HEX = 255;
 
 export const MAX_PERCENT = 100;
+
+export const PROPERTY_COLOR = '$color';
+
+export const TYPE_HEX = 'hex';
+
+export const TYPE_HSL = 'hsl';
+
+export const TYPE_HWB = 'hwb';
+
+export const TYPE_RGB = 'rgb';
 
 // https://www.w3.org/TR/WCAG20/#relativeluminancedef
 

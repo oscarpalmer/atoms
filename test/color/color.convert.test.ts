@@ -40,15 +40,15 @@ function roundColors<Values extends Record<string, number>>(values: Values): Val
 	const keys = Object.keys(values) as (keyof Values)[];
 	const {length} = keys;
 
-	const cloned: Partial<Values> = {};
+	const copy: Partial<Values> = {};
 
 	for (let index = 0; index < length; index += 1) {
 		const key = keys[index];
 
-		cloned[key] = roundColor(values[key]) as never;
+		copy[key] = roundColor(values[key]) as never;
 	}
 
-	return cloned as Values;
+	return copy as Values;
 }
 
 test('hexToHsl(a)', () => {

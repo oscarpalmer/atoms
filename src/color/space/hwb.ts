@@ -1,8 +1,17 @@
-import {DEFAULT_HWB, MAX_PERCENT} from '../constants';
+import {DEFAULT_HWB, MAX_PERCENT, TYPE_HEX, TYPE_HSL, TYPE_RGB} from '../constants';
 import {getAlphaValue} from '../misc/alpha';
 import {getDegrees, getPercentage} from '../misc/get';
 import {isHwbLike} from '../misc/is';
-import type {HSLAColor, HSLColor, HWBAColor, HWBColor, RGBAColor, RGBColor} from '../models';
+import type {
+	ColorState,
+	ColorType,
+	HSLAColor,
+	HSLColor,
+	HWBAColor,
+	HWBColor,
+	RGBAColor,
+	RGBColor,
+} from '../models';
 import {hslToRgb, hslToRgba} from './hsl';
 import {rgbToHex} from './rgb';
 
@@ -31,6 +40,27 @@ export function convertHwbToHsl(input: HWBAColor | HWBColor): HSLAColor {
 		lightness: lightness * MAX_PERCENT,
 		alpha: getAlphaValue((input as HWBAColor)?.alpha ?? MAX_PERCENT),
 	};
+}
+
+export function getColorFromHwb<Type extends ColorType>(
+	state: ColorState,
+	type: Type,
+): NonNullable<ColorState[Type]> {
+	switch (type) {
+		case TYPE_HEX:
+			state.hex = hwbToHex(state.hwb!);
+			break;
+
+		case TYPE_HSL:
+			state.hsl = hwbToHsl(state.hwb!);
+			break;
+
+		case TYPE_RGB:
+			state.rgb = hwbToRgb(state.hwb!);
+			break;
+	}
+
+	return state[type]!;
 }
 
 function getHwbSaturation(blackness: number, whiteness: number, lightness: number): number {

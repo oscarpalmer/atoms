@@ -1,9 +1,11 @@
+import {clamp} from '../..';
 import {round} from '../../internal/math/misc';
 import {
 	ALPHA_FULL_HEX_LONG,
 	ALPHA_NONE_HEX,
 	ALPHA_NONE_VALUE,
 	DEFAULT_ALPHA,
+	EXPRESSION_ALPHA_HEX,
 	MAX_HEX,
 	MAX_PERCENT,
 } from '../constants';
@@ -11,19 +13,23 @@ import type {Alpha} from '../models';
 
 // #region Functions
 
-export function getAlpha(value: unknown): Alpha {
+export function getAlpha(value: unknown, hex: boolean): Alpha {
 	if (typeof value === 'number') {
 		return getAlphaFromValue(value);
 	}
 
-	if (typeof value === 'string' && value !== ALPHA_FULL_HEX_LONG) {
+	if (typeof value !== 'string' || value.toLowerCase() === ALPHA_FULL_HEX_LONG) {
+		return {...DEFAULT_ALPHA};
+	}
+
+	if (hex && EXPRESSION_ALPHA_HEX.test(value)) {
 		return {
 			hex: value,
 			value: Number.parseInt(value, 16) / MAX_HEX,
 		};
 	}
 
-	return {...DEFAULT_ALPHA};
+	return getAlphaFromValue(Number.parseFloat(value));
 }
 
 export function getAlphaHexadecimal(value: number): string {
@@ -35,7 +41,7 @@ export function getAlphaHexadecimal(value: number): string {
 		return ALPHA_FULL_HEX_LONG;
 	}
 
-	return round(value * MAX_HEX).toString(16);
+	return round((value / MAX_PERCENT) * MAX_HEX).toString(16);
 }
 
 function getAlphaFromValue(value: number): Alpha {
@@ -48,11 +54,11 @@ function getAlphaFromValue(value: number): Alpha {
 }
 
 export function getAlphaValue(original: number): number {
-	if (Number.isNaN(original) || original >= MAX_PERCENT) {
+	if (Number.isNaN(original)) {
 		return MAX_PERCENT;
 	}
 
-	return original <= ALPHA_NONE_VALUE ? ALPHA_NONE_VALUE : original;
+	return clamp(original, ALPHA_NONE_VALUE, MAX_PERCENT);
 }
 
 // #endregion

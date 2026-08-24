@@ -31,15 +31,15 @@ function roundColors<Values extends Record<string, number>>(values: Values): Val
 	const keys = Object.keys(values) as (keyof Values)[];
 	const {length} = keys;
 
-	const cloned: Partial<Values> = {};
+	const copy: Partial<Values> = {};
 
 	for (let index = 0; index < length; index += 1) {
 		const key = keys[index];
 
-		cloned[key] = roundColor(values[key]) as never;
+		copy[key] = roundColor(values[key]) as never;
 	}
 
-	return cloned as Values;
+	return copy as Values;
 }
 
 test('getColor + isColor', () => {
@@ -63,33 +63,67 @@ test('getColor + isColor', () => {
 		let next = getRandomItem(indices.filter(value => value !== index));
 
 		if (next != null) {
+			expect(color.origin).toBe('hex');
+
 			color.hex = hexes[next];
 
 			expect(color.hex).toEqual(hexes[next]);
+			expect(color.hex).toEqual(hexes[next]);
 			expect(roundColors(color.hsl)).toEqual(roundColors(hsls[next]));
 			expect(roundColors(color.hwb)).toEqual(roundColors(hwbs[next]));
+			expect(roundColors(color.hwb)).toEqual(roundColors(hwbs[next]));
+			expect(roundColors(color.hwb)).toEqual(roundColors(hwbs[next]));
+			expect(color.rgb).toEqual(rgbs[next]);
 			expect(color.rgb).toEqual(rgbs[next]);
 		}
 
 		next = getRandomItem(indices.filter(value => value !== index));
 
 		if (next != null) {
+			expect(color.origin).toBe('hex');
+
 			color.hsl = hsls[next];
 
 			expect(color.hex).toEqual(hexes[next]);
+			expect(color.hex).toEqual(hexes[next]);
+			expect(roundColors(color.hsl)).toEqual(roundColors(hsls[next]));
 			expect(roundColors(color.hsl)).toEqual(roundColors(hsls[next]));
 			expect(roundColors(color.hwb)).toEqual(roundColors(hwbs[next]));
+			expect(roundColors(color.hwb)).toEqual(roundColors(hwbs[next]));
+			expect(color.rgb).toEqual(rgbs[next]);
 			expect(color.rgb).toEqual(rgbs[next]);
 		}
 
 		next = getRandomItem(indices.filter(value => value !== index));
 
 		if (next != null) {
-			color.rgb = rgbs[next];
+			expect(color.origin).toBe('hsl');
+
+			color.hwb = hwbs[next];
 
 			expect(color.hex).toEqual(hexes[next]);
+			expect(color.hex).toEqual(hexes[next]);
+			expect(roundColors(color.hsl)).toEqual(roundColors(hsls[next]));
 			expect(roundColors(color.hsl)).toEqual(roundColors(hsls[next]));
 			expect(roundColors(color.hwb)).toEqual(roundColors(hwbs[next]));
+			expect(roundColors(color.hwb)).toEqual(roundColors(hwbs[next]));
+			expect(color.rgb).toEqual(rgbs[next]);
+			expect(color.rgb).toEqual(rgbs[next]);
+		}
+
+		if (next != null) {
+			expect(color.origin).toBe('hwb');
+
+			color.rgb = rgbs[next];
+
+			expect(color.origin).toBe('rgb');
+			expect(color.hex).toEqual(hexes[next]);
+			expect(color.hex).toEqual(hexes[next]);
+			expect(roundColors(color.hsl)).toEqual(roundColors(hsls[next]));
+			expect(roundColors(color.hsl)).toEqual(roundColors(hsls[next]));
+			expect(roundColors(color.hwb)).toEqual(roundColors(hwbs[next]));
+			expect(roundColors(color.hwb)).toEqual(roundColors(hwbs[next]));
+			expect(color.rgb).toEqual(rgbs[next]);
 			expect(color.rgb).toEqual(rgbs[next]);
 		}
 	}

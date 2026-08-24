@@ -15,10 +15,14 @@ import {
 	SRGB_LUMINANCE_OFFSET,
 	SRGB_LUMINANCE_RED,
 	SRGB_LUMINANCE_THRESHOLD,
+	TYPE_HEX,
+	TYPE_HSL,
+	TYPE_HWB,
+	TYPE_RGB,
 } from '../constants';
 import {color} from '../instance';
 import type {Color, HSLAColor, HSLColor, HWBAColor, HWBColor, RGBAColor, RGBColor} from '../models';
-import {getColorState} from './state';
+import {getColorFromState, getColorState} from './state';
 
 // #region Functions
 
@@ -56,8 +60,8 @@ export function getForegroundColor(value: unknown, hex: true): string;
 export function getForegroundColor(value: unknown): Color;
 
 export function getForegroundColor(value: unknown, hex?: unknown): string | Color {
-	const state = getColorState(value);
-	const {blue, green, red} = state.rgb;
+	const rgb = getColorFromState(getColorState(value), TYPE_RGB);
+	const {blue, green, red} = rgb;
 
 	const values = [blue / MAX_HEX, green / MAX_HEX, red / MAX_HEX];
 	const {length} = values;
@@ -109,7 +113,7 @@ export function getHexaColor(value: unknown): string {
  * @returns Hex color string
  */
 export function getHexColor(value: unknown): string {
-	return getColorState(value).hex;
+	return getColorFromState(getColorState(value), TYPE_HEX);
 }
 
 export function getHexValue(value: unknown): number {
@@ -130,11 +134,12 @@ export function getDegrees(value: unknown): number {
  * @returns _HSLA_ color
  */
 export function getHslaColor(value: unknown): HSLAColor {
-	const {alpha, hsl} = getColorState(value);
+	const state = getColorState(value);
+	const hsl = getColorFromState(state, TYPE_HSL);
 
 	return {
 		...hsl,
-		alpha: alpha.value,
+		alpha: state.alpha.value,
 	};
 }
 
@@ -148,7 +153,7 @@ export function getHslaColor(value: unknown): HSLAColor {
  * @returns _HWB_ color
  */
 export function getHwbColor(value: unknown): HWBColor {
-	return getColorState(value).hwb;
+	return getColorFromState(getColorState(value), TYPE_HWB);
 }
 
 /**
@@ -161,11 +166,12 @@ export function getHwbColor(value: unknown): HWBColor {
  * @returns _HWBA_ color
  */
 export function getHwbaColor(value: unknown): HWBAColor {
-	const {alpha, hwb} = getColorState(value);
+	const state = getColorState(value);
+	const hwb = getColorFromState(state, TYPE_HWB);
 
 	return {
 		...hwb,
-		alpha: alpha.value,
+		alpha: state.alpha.value,
 	};
 }
 
@@ -179,7 +185,7 @@ export function getHwbaColor(value: unknown): HWBAColor {
  * @returns _HSL_ color
  */
 export function getHslColor(value: unknown): HSLColor {
-	return getColorState(value).hsl;
+	return getColorFromState(getColorState(value), TYPE_HSL);
 }
 
 export function getPercentage(value: unknown): number {
@@ -196,11 +202,12 @@ export function getPercentage(value: unknown): number {
  * @returns _RGBA_ color
  */
 export function getRgbaColor(value: unknown): RGBAColor {
-	const {alpha, rgb} = getColorState(value);
+	const state = getColorState(value);
+	const rgb = getColorFromState(state, TYPE_RGB);
 
 	return {
 		...rgb,
-		alpha: alpha.value,
+		alpha: state.alpha.value,
 	};
 }
 
@@ -214,7 +221,7 @@ export function getRgbaColor(value: unknown): RGBAColor {
  * @returns _RGB_ color
  */
 export function getRgbColor(value: unknown): RGBColor {
-	return getColorState(value).rgb;
+	return getColorFromState(getColorState(value), TYPE_RGB);
 }
 
 // #endregion
