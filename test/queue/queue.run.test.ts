@@ -10,25 +10,21 @@ test('asynchronous', () =>
 
 		const now = Date.now();
 
-		const finished: boolean[] = [];
 		const values: number[] = [];
 
 		let last: number;
 
 		for (let index = 0; index < 5; index += 1) {
 			void queued.add([index]).promise.then(result => {
-				finished.push(result.finished);
-				values.push(result.value);
+				values.push(result);
 
 				last = Date.now();
 			});
 		}
 
-		expect(finished).toEqual([]);
 		expect(values).toEqual([]);
 
 		setTimeout(() => {
-			expect(finished).toEqual([false, false, false, false, true]);
 			expect(values).toEqual([0, 1, 2, 3, 4]);
 			expect(last - now).toBeGreaterThanOrEqual(450);
 			expect(last - now).toBeLessThan(550);
@@ -112,15 +108,13 @@ test('synchronous', () =>
 		const queued = queue(synchronous);
 
 		const now = Date.now();
-		const finished: boolean[] = [];
 		const values: number[] = [];
 
 		let last: number;
 
 		for (let index = 0; index < 5; index += 1) {
 			void queued.add([index]).promise.then(result => {
-				finished.push(result.finished);
-				values.push(result.value);
+				values.push(result);
 
 				last = Date.now();
 			});
@@ -130,7 +124,6 @@ test('synchronous', () =>
 		expect(values).toEqual([]);
 
 		setTimeout(() => {
-			expect(finished).toEqual([false, false, false, false, true]);
 			expect(values).toEqual([0, 1, 2, 3, 4]);
 			expect(last - now).toBeGreaterThanOrEqual(0);
 			expect(last - now).toBeLessThan(10);

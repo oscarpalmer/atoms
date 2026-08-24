@@ -9,8 +9,8 @@ type HandleType = 'clear' | 'pause' | 'resume';
  * A queue that can be used to manage (a)synchronous tasks with a specific key
  */
 export type KeyedQueue<
-	CallbackParameters extends Parameters<GenericAsyncCallback>,
-	CallbackResult,
+	Callback extends GenericCallback | GenericAsyncCallback,
+	CallbackParameters extends unknown[] = Parameters<Callback>,
 > = {
 	/**
 	 * Get keys of all active queues
@@ -74,7 +74,7 @@ export type KeyedQueue<
 		key: string,
 		parameters: Tail<CallbackParameters>,
 		signal?: AbortSignal,
-	): Queued<CallbackResult>;
+	): Queued<ReturnType<Callback>>;
 
 	/**
 	 * Clear all items for a specific key _(or all items for all keys, if no key is provided)_
@@ -89,7 +89,7 @@ export type KeyedQueue<
 	 * @param key Key to get the queue for
 	 * @returns Queue for the key, or `undefined` if it doesn't exist
 	 */
-	get(key: string): Queue<Tail<CallbackParameters>, CallbackResult> | undefined;
+	get(key: string): Queue<Callback, Tail<CallbackParameters>> | undefined;
 
 	/**
 	 * Pause the queue for a specific key _(or all queues, if no key is provided)_
@@ -129,15 +129,18 @@ export type KeyedQueue<
 };
 
 type KeyedQueueState = {
-	callback: GenericAsyncCallback;
+	callback: GenericCallback | GenericAsyncCallback;
 	options: Required<QueueOptions>;
-	queues: Map<string, Queue<Tail<unknown[]>, unknown>>;
+	queues: Map<string, Queue<GenericAsyncCallback, Tail<unknown[]>>>;
 };
 
 /**
  * A queue that can be used to manage (a)synchronous tasks
  */
-export type Queue<CallbackParameters extends Parameters<GenericAsyncCallback>, CallbackResult> = {
+export type Queue<
+	Callback extends GenericCallback | GenericAsyncCallback,
+	CallbackParameters extends unknown[] = Parameters<Callback>,
+> = {
 	/**
 	 * Is the queue active?
 	 */
@@ -185,7 +188,7 @@ export type Queue<CallbackParameters extends Parameters<GenericAsyncCallback>, C
 	 * @param signal Optional signal to abort the item
 	 * @returns Queued item
 	 */
-	add(parameters: CallbackParameters, signal?: AbortSignal): Queued<CallbackResult>;
+	add(parameters: CallbackParameters, signal?: AbortSignal): Queued<ReturnType<Callback>>;
 
 	/**
 	 * Remove and reject all items in the queue
@@ -261,7 +264,7 @@ export type Queued<Value> = {
 	/**
 	 * Queued promise
 	 */
-	readonly promise: Promise<QueuedResult<Value>>;
+	readonly promise: Promise<Value extends Promise<infer Result> ? Result : Value>;
 };
 
 type QueuedItem = {
@@ -269,21 +272,10 @@ type QueuedItem = {
 	id: number;
 	key?: string;
 	parameters: unknown[];
-	promise: Promise<QueuedResult<unknown>>;
+	promise: Promise<unknown>;
 	reject: (reason?: unknown) => void;
-	resolve: (value: QueuedResult<unknown>) => void;
+	resolve: (value: unknown) => void;
 	signal?: AbortSignal;
-};
-
-export type QueuedResult<Value> = {
-	/**
-	 * Has the queue finished processing all items?
-	 */
-	finished: boolean;
-	/**
-	 * Result for the queued promise
-	 */
-	value: Value extends Promise<infer Result> ? Result : Value;
 };
 
 type StatusKey = 'active' | 'empty' | 'full' | 'paused';
@@ -295,10 +287,10 @@ type Tail<Values extends any[]> = Values extends [infer _, ...infer Rest] ? Rest
 // #region Functions
 
 function createQueue(
-	callback: GenericCallback | GenericAsyncCallback,
+	callback: GenericAsyncCallback,
 	options?: QueueOptions,
 	key?: string,
-): Queue<unknown[], unknown> {
+): Queue<never, never> {
 	if (typeof callback !== 'function') {
 		throw new TypeError(MESSAGE_CALLBACK);
 	}
@@ -316,7 +308,7 @@ function createQueue(
 
 	const instance = {
 		add: (parameters: unknown[], signal?: AbortSignal) => {
-			if ((instance as Queue<unknown[], unknown>).full) {
+			if ((instance as Queue<GenericCallback>).full) {
 				throw new QueueError(MESSAGE_MAXIMUM);
 			}
 
@@ -329,9 +321,9 @@ function createQueue(
 			const id = identify(state);
 
 			let rejector: (reason?: unknown) => void;
-			let resolver: (value: QueuedResult<unknown>) => void;
+			let resolver: (value: unknown) => void;
 
-			const promise = new Promise<QueuedResult<unknown>>((resolve, reject) => {
+			const promise = new Promise<unknown>((resolve, reject) => {
 				rejector = reject;
 				resolver = resolve;
 			});
@@ -442,11 +434,23 @@ function createQueue(
 		},
 	});
 
-	return Object.freeze(instance) as Queue<unknown[], unknown>;
+	return Object.freeze(instance) as Queue<GenericCallback>;
 }
 
 function getBooleanOrDefault(value: unknown, defaultValue: boolean): boolean {
 	return typeof value === 'boolean' ? value : defaultValue;
+}
+
+function getItems(state: KeyedQueueState): Record<string, number> {
+	const size: Record<string, number> = {};
+
+	const queues = state.queues.entries();
+
+	for (const [key, queue] of queues) {
+		size[key] = queue.size;
+	}
+
+	return size;
 }
 
 function getOptions(input?: QueueOptions): Required<QueueOptions> {
@@ -459,15 +463,15 @@ function getOptions(input?: QueueOptions): Required<QueueOptions> {
 	};
 }
 
-function getQueue(state: KeyedQueueState, key: string, add: true): Queue<Tail<unknown[]>, unknown>;
+function getQueue(state: KeyedQueueState, key: string, add: true): Queue<GenericCallback>;
 
-function getQueue(state: KeyedQueueState, key: string): Queue<Tail<unknown[]>, unknown> | undefined;
+function getQueue(state: KeyedQueueState, key: string): Queue<GenericCallback> | undefined;
 
 function getQueue(
 	state: KeyedQueueState,
 	key: string,
 	add?: boolean,
-): Queue<Tail<unknown[]>, unknown> | undefined {
+): Queue<GenericCallback> | undefined {
 	if (typeof key !== 'string' || key.trim().length === 0) {
 		throw new TypeError(MESSAGE_KEY);
 	}
@@ -497,12 +501,7 @@ function getStatus(state: KeyedQueueState, status: StatusKey): string[] {
 	return result;
 }
 
-function handleQueuedResult(
-	item: QueuedItem,
-	error: boolean,
-	result: unknown,
-	finished: boolean,
-): void {
+function handleQueuedResult(item: QueuedItem, error: boolean, result: unknown): void {
 	item.signal?.removeEventListener(EVENT_NAME, item.abort!);
 
 	if (item.signal?.aborted ?? false) {
@@ -517,10 +516,7 @@ function handleQueuedResult(
 		return;
 	}
 
-	item.resolve({
-		finished,
-		value: result as never,
-	});
+	item.resolve(result);
 }
 
 function handleQueues(state: KeyedQueueState, type: HandleType, key?: string): void {
@@ -549,7 +545,7 @@ function identify(state: QueueState): number {
  * @param value Value to check
  * @returns `true` if the value is a keyed queue, otherwise `false`
  */
-export function isKeyedQueue(value: unknown): value is KeyedQueue<unknown[], unknown> {
+export function isKeyedQueue(value: unknown): value is KeyedQueue<GenericAsyncCallback> {
 	return isQueueInstance(NAME_KEYED, value);
 }
 
@@ -559,7 +555,7 @@ export function isKeyedQueue(value: unknown): value is KeyedQueue<unknown[], unk
  * @param value Value to check
  * @returns `true` if the value is a queue, otherwise `false`
  */
-export function isQueue(value: unknown): value is Queue<unknown[], unknown> {
+export function isQueue(value: unknown): value is Queue<GenericCallback | GenericAsyncCallback> {
 	return isQueueInstance(NAME_QUEUE, value);
 }
 
@@ -571,20 +567,32 @@ export function isQueueInstance<Instance>(name: string, value: unknown): value i
 	);
 }
 
+/**
+ * Create a keyed queue for an asynchronous callback function, where each key has its own queue
+ *
+ * @param callback Callback function for queued items
+ * @param options Queue options
+ */
 export function keyedQueue<Callback extends (key: string, ...parameters: any[]) => Promise<void>>(
 	callback: Callback,
 	options?: QueueOptions,
-): KeyedQueue<Parameters<Callback>, Awaited<ReturnType<Callback>>>;
+): KeyedQueue<Callback, Parameters<Callback>>;
 
+/**
+ * Create a keyed queue for an asynchronous callback function, where each key has its own queue
+ *
+ * @param callback Callback function for queued items
+ * @param options Queue options
+ */
 export function keyedQueue<Callback extends (key: string, ...parameters: any[]) => void>(
 	callback: Callback,
 	options?: QueueOptions,
-): KeyedQueue<Parameters<Callback>, ReturnType<Callback>>;
+): KeyedQueue<Callback, Parameters<Callback>>;
 
-export function keyedQueue(
-	callback: GenericCallback | GenericAsyncCallback,
+export function keyedQueue<Callback extends (key: string, ...parameters: any[]) => Promise<void>>(
+	callback: Callback,
 	options?: QueueOptions,
-): KeyedQueue<unknown[], unknown> {
+): KeyedQueue<Callback, Parameters<Callback>> {
 	if (typeof callback !== 'function') {
 		throw new TypeError(MESSAGE_CALLBACK);
 	}
@@ -605,31 +613,7 @@ export function keyedQueue(
 		pause: (key?: string): void => {
 			handleQueues(state, HANDLE_PAUSE, key);
 		},
-		remove: (key?: string, id?: number): void => {
-			if (key == null) {
-				handleQueues(state, HANDLE_CLEAR);
-
-				state.queues.clear();
-
-				return;
-			}
-
-			const queue = getQueue(state, key);
-
-			if (queue == null) {
-				return;
-			}
-
-			if (typeof id === 'number') {
-				queue.remove(id);
-
-				return;
-			}
-
-			queue.clear();
-
-			state.queues.delete(key);
-		},
+		remove: (key?: string, id?: number): void => removeQueue(state, key, id),
 		resume: (key?: string): void => {
 			handleQueues(state, HANDLE_RESUME, key);
 		},
@@ -662,17 +646,7 @@ export function keyedQueue(
 		},
 		items: {
 			enumerable: true,
-			get: () => {
-				const size: Record<string, number> = {};
-
-				const queues = state.queues.entries();
-
-				for (const [key, queue] of queues) {
-					size[key] = queue.size;
-				}
-
-				return size;
-			},
+			get: () => getItems(state),
 		},
 		keys: {
 			enumerable: true,
@@ -692,7 +666,7 @@ export function keyedQueue(
 		},
 	});
 
-	return Object.freeze(instance) as KeyedQueue<unknown[], unknown>;
+	return Object.freeze(instance) as unknown as KeyedQueue<Callback, Parameters<Callback>>;
 }
 
 /**
@@ -705,7 +679,7 @@ export function keyedQueue(
 export function queue<Callback extends GenericAsyncCallback>(
 	callback: Callback,
 	options?: QueueOptions,
-): Queue<Parameters<Callback>, Awaited<ReturnType<Callback>>>;
+): Queue<Callback, Parameters<Callback>>;
 
 /**
  * Create a queue for a synchronous callback function
@@ -717,16 +691,42 @@ export function queue<Callback extends GenericAsyncCallback>(
 export function queue<Callback extends GenericCallback>(
 	callback: Callback,
 	options?: QueueOptions,
-): Queue<Parameters<Callback>, ReturnType<Callback>>;
+): Queue<Callback, Parameters<Callback>>;
 
-export function queue(
-	callback: GenericCallback | GenericAsyncCallback,
+export function queue<Callback extends GenericCallback | GenericAsyncCallback>(
+	callback: Callback,
 	options?: QueueOptions,
-): Queue<unknown[], unknown> {
+): Queue<Callback, Parameters<Callback>> {
 	return createQueue(callback, options);
 }
 
 queue.keyed = keyedQueue;
+
+function removeQueue(state: KeyedQueueState, key?: string, id?: number): void {
+	if (key == null) {
+		handleQueues(state, HANDLE_CLEAR);
+
+		state.queues.clear();
+
+		return;
+	}
+
+	const queue = getQueue(state, key);
+
+	if (queue == null) {
+		return;
+	}
+
+	if (typeof id === 'number') {
+		queue.remove(id);
+
+		return;
+	}
+
+	queue.clear();
+
+	state.queues.delete(key);
+}
 
 async function run(state: QueueState): Promise<void> {
 	if (state.paused || state.runners >= state.options.concurrency) {
@@ -757,13 +757,13 @@ async function run(state: QueueState): Promise<void> {
 			const paused = item;
 
 			state.handled.push(() => {
-				handleQueuedResult(paused, error, result, state.items.length === 0);
+				handleQueuedResult(paused, error, result);
 			});
 
 			break;
 		}
 
-		handleQueuedResult(item, error, result, state.items.length === 0);
+		handleQueuedResult(item, error, result);
 
 		item = state.items.shift();
 	}
