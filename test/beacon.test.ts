@@ -21,15 +21,13 @@ test('beacon', () =>
 		}
 
 		expect(value.active).toBe(true);
-		expect(value.closed).toBe(false);
 		expect(value.observable).toBeDefined();
 		expect(value.value).toBe(0);
 
-		value.close();
+		value.deactivate();
 
 		setTimeout(() => {
 			expect(value.active).toBe(false);
-			expect(value.closed).toBe(true);
 
 			expect(() => value.observable).toThrow('Cannot retrieve observable from a closed beacon');
 
@@ -93,21 +91,14 @@ test('observable + subscription', () =>
 		first.observable.subscribe('blah' as never);
 
 		expect(first.active).toBe(true);
-		expect(first.closed).toBe(false);
 		expect(second.active).toBe(true);
-		expect(second.closed).toBe(false);
 		expect(third.active).toBe(true);
-		expect(third.closed).toBe(false);
 
 		expect(one.active).toBe(true);
-		expect(one.closed).toBe(false);
 		expect(two.active).toBe(true);
-		expect(two.closed).toBe(false);
 		expect(three.active).toBe(true);
-		expect(three.closed).toBe(false);
 
 		expect(thirdObservable.active).toBe(true);
-		expect(thirdObservable.closed).toBe(false);
 
 		expect(results.first.complete).toBe(false);
 		expect(results.first.count).toBe(1);
@@ -134,24 +125,19 @@ test('observable + subscription', () =>
 
 			three.unsubscribe();
 			three.unsubscribe();
-			three.close();
+			three.unsubscribe();
 		}, 25);
 
 		setTimeout(() => {
 			expect(first.active).toBe(false);
-			expect(first.closed).toBe(true);
 			expect(second.active).toBe(false);
-			expect(second.closed).toBe(true);
 
 			expect(() => first.observable).toThrow('Cannot retrieve observable from a closed beacon');
 			expect(() => second.observable).toThrow('Cannot retrieve observable from a closed beacon');
 
 			expect(one.active).toBe(false);
-			expect(one.closed).toBe(true);
 			expect(two.active).toBe(false);
-			expect(two.closed).toBe(true);
 			expect(three.active).toBe(false);
-			expect(three.closed).toBe(true);
 
 			expect(results.first.complete).toBe(true);
 			expect(results.first.count).toBe(3);
@@ -165,21 +151,18 @@ test('observable + subscription', () =>
 		setTimeout(() => {
 			three = thirdObservable.subscribe({});
 
-			third.close();
+			third.deactivate();
 		}, 75);
 
 		setTimeout(() => {
 			expect(third.active).toBe(false);
-			expect(third.closed).toBe(true);
 			expect(three.active).toBe(false);
-			expect(three.closed).toBe(true);
 
 			third.emit(1);
 			third.error(new Error('test'));
 			third.finish();
 
 			expect(thirdObservable.active).toBe(false);
-			expect(thirdObservable.closed).toBe(true);
 
 			expect(() => thirdObservable.subscribe({})).toThrow(
 				'Cannot subscribe to a closed observable',

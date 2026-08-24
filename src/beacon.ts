@@ -1,5 +1,13 @@
 import {noop} from './internal/function/misc';
 import {isPlainObject} from './internal/is';
+import {
+	clearSubscriptions,
+	getSubscription,
+	getSubscriptions,
+	type Subscription,
+	type SubscriptionProperty,
+	type Subscriptions,
+} from './internal/subscription';
 import type {PlainObject} from './models';
 
 // #region Types
@@ -14,11 +22,6 @@ export type Beacon<Value> = {
 	get active(): boolean;
 
 	/**
-	 * Is the beacon closed?
-	 */
-	get closed(): boolean;
-
-	/**
 	 * The observable that can be subscribed to
 	 */
 	get observable(): Observable<Value>;
@@ -29,9 +32,9 @@ export type Beacon<Value> = {
 	get value(): Value;
 
 	/**
-	 * Close the beacon
+	 * Deactivate the beacon
 	 */
-	close(): void;
+	deactivate(): void;
 
 	/**
 	 * Emit a new value
@@ -55,9 +58,6 @@ export type Beacon<Value> = {
 	finish(): void;
 };
 
-/**
- * Options for Beacon
- */
 export type BeaconOptions<Value> = {
 	/**
 	 * Method for comparing values for equality
@@ -73,8 +73,8 @@ export type BeaconOptions<Value> = {
 type BeaconState<Value> = {
 	active: boolean;
 	observable: Observable<Value>;
-	observers: Map<Subscription, Observer<Value>>;
 	options: Required<BeaconOptions<Value>>;
+	subscriptions: Subscriptions<Observer<unknown>>;
 	value: Value;
 };
 
@@ -85,14 +85,9 @@ export type Observable<Value> = {
 	get active(): boolean;
 
 	/**
-	 * Is the observable closed?
+	 * Deactivate the observable
 	 */
-	get closed(): boolean;
-
-	/**
-	 * Close the observable
-	 */
-	close(): void;
+	deactivate(): void;
 
 	/**
 	 * Subscribe to value changes
@@ -122,9 +117,6 @@ type ObservableState<Value> = {
 	beacon: BeaconState<Value>;
 };
 
-/**
- * An observer receives notifications from an observable
- */
 type Observer<Value> = {
 	/**
 	 * Callback for when the observable is completed
@@ -138,28 +130,6 @@ type Observer<Value> = {
 	 * Callback for when the observable receives a new value
 	 */
 	next?: (value: Value) => void;
-};
-
-export type Subscription = {
-	/**
-	 * Is the subscription active?
-	 */
-	get active(): boolean;
-
-	/**
-	 * Is the subscription closed?
-	 */
-	get closed(): boolean;
-
-	/**
-	 * Close the subscription
-	 */
-	close(): void;
-
-	/**
-	 * Unsubscribe from its observable
-	 */
-	unsubscribe(): void;
 };
 
 // #endregion
@@ -178,12 +148,12 @@ export function beacon<Value>(value: Value, options?: BeaconOptions<Value>): Bea
 		value,
 		active: true,
 		observable: undefined as never,
-		observers: new Map(),
 		options: getBeaconOptions(options),
+		subscriptions: getSubscriptions(),
 	};
 
 	const instance = {
-		close: (): void => {
+		deactivate: (): void => {
 			finishBeacon(state, false);
 		},
 		emit: (value: Value, finish?: boolean): void => {
@@ -205,10 +175,6 @@ export function beacon<Value>(value: Value, options?: BeaconOptions<Value>): Bea
 		active: {
 			enumerable: true,
 			get: () => state.active,
-		},
-		closed: {
-			enumerable: true,
-			get: () => !state.active,
 		},
 		observable: {
 			enumerable: true,
@@ -238,21 +204,15 @@ function finishBeacon<Value>(state: BeaconState<Value>, emit: boolean): void {
 
 	state.active = false;
 
-	const entries = [...state.observers.entries()];
-	const {length} = entries;
-
-	for (let index = 0; index < length; index += 1) {
-		const [subscription, observer] = entries[index];
-
+	for (const [, observer] of state.subscriptions.values.to.any) {
 		if (emit) {
 			observer.complete?.();
 		}
-
-		subscription.close();
 	}
 
-	state.observable?.close();
-	state.observers.clear();
+	clearSubscriptions(state.subscriptions);
+
+	state.observable?.deactivate();
 
 	state.observable = undefined as never;
 }
@@ -317,16 +277,6 @@ export function isObservable<Value = unknown>(value: unknown): value is Observab
 	return isBeaconInstance<Observable<Value>>(NAME_OBSERVABLE, value);
 }
 
-/**
- * Is the value a subscription?
- *
- * @param value Value to check
- * @returns `true` if the value is a subscription, otherwise `false`
- */
-export function isSubscription(value: unknown): value is Subscription {
-	return isBeaconInstance<Subscription>(NAME_SUBSCRIPTION, value);
-}
-
 function observe<Value>(beacon: BeaconState<Value>): Observable<Value> {
 	const state: ObservableState<Value> = {
 		beacon,
@@ -334,7 +284,7 @@ function observe<Value>(beacon: BeaconState<Value>): Observable<Value> {
 	};
 
 	const instance = {
-		close: (): void => {
+		deactivate: (): void => {
 			state.active = false;
 		},
 		subscribe(
@@ -347,9 +297,13 @@ function observe<Value>(beacon: BeaconState<Value>): Observable<Value> {
 			}
 
 			const observer = getObserver(first, second, third);
-			const subscription = subscribe(state);
 
-			beacon.observers.set(subscription, observer);
+			const subscription = getSubscription({
+				isActive: () => beacon.active && state.active,
+				property: beaconSubscription,
+				subscriptions: beacon.subscriptions,
+				value: observer,
+			});
 
 			observer.next?.(beacon.value);
 
@@ -366,51 +320,9 @@ function observe<Value>(beacon: BeaconState<Value>): Observable<Value> {
 			enumerable: true,
 			get: () => beacon.active && state.active,
 		},
-		closed: {
-			enumerable: true,
-			get: () => !beacon.active || !state.active,
-		},
 	});
 
 	return Object.freeze(instance) as Observable<Value>;
-}
-
-function subscribe<Value>(observable: ObservableState<Value>): Subscription {
-	function unsubscribe(): void {
-		if (active) {
-			active = false;
-
-			observable.beacon.observers.delete(instance as Subscription);
-		}
-	}
-
-	let active = true;
-
-	const instance = {
-		close: (): void => {
-			unsubscribe();
-		},
-		unsubscribe: (): void => {
-			unsubscribe();
-		},
-	};
-
-	Object.defineProperties(instance, {
-		[KEY_BEACON]: {
-			enumerable: false,
-			value: NAME_SUBSCRIPTION,
-		},
-		active: {
-			enumerable: true,
-			get: () => observable.beacon.active && observable.active && active,
-		},
-		closed: {
-			enumerable: true,
-			get: () => !observable.beacon.active || !observable.active || !active,
-		},
-	});
-
-	return Object.freeze(instance) as Subscription;
 }
 
 function update<Value>(
@@ -431,7 +343,7 @@ function update<Value>(
 		state.value = value as Value;
 	}
 
-	for (const [, observer] of state.observers) {
+	for (const [, observer] of state.subscriptions.values.to.any) {
 		observer[type]?.(value as never);
 	}
 
@@ -454,10 +366,13 @@ const NAME_BEACON = 'beacon';
 
 const NAME_OBSERVABLE = 'observable';
 
-const NAME_SUBSCRIPTION = 'subscription';
-
 const TYPE_ERROR = 'error';
 
 const TYPE_NEXT = 'next';
+
+const beaconSubscription: SubscriptionProperty = {
+	key: KEY_BEACON,
+	value: 'subscription',
+};
 
 // #endregion

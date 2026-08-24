@@ -1,5 +1,5 @@
 import {noop} from './internal/function/misc';
-import type {GenericCallback} from './models';
+import type {GenericCallback, Unsubscriber} from './models';
 
 // #region Types
 
@@ -56,8 +56,6 @@ export type Herald<Map extends Record<string, GenericCallback>> = {
 	 */
 	unsubscribe<Event extends keyof Map>(event: Event, callback?: Map[Event]): void;
 };
-
-export type Unsubscriber = () => void;
 
 // #endregion
 

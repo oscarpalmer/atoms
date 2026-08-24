@@ -1,5 +1,8 @@
 // #region Types
 
+import type {Subscription} from '../internal/subscription';
+import type {COLOR_ALPHA, COLOR_TYPE} from './constants';
+
 export type Alpha = {
 	hex: string;
 	value: number;
@@ -153,6 +156,85 @@ export type Color = {
 	set rgba(value: RGBAColor);
 
 	/**
+	 * Subscribe to alpha channel _(opacity)_ changes of the color
+	 *
+	 * @param key Color property to subscribe to
+	 * @param callback Callback function for changes
+	 */
+	subscribe(key: 'alpha', callback: (value: number) => void): Subscription;
+
+	/**
+	 * Subscribe to hex color changes of the color
+	 *
+	 * @param key Color type to subscribe to
+	 * @param callback Callback function for changes
+	 */
+	subscribe(key: typeof COLOR_TYPE.hex, callback: (value: string) => void): Subscription;
+
+	/**
+	 * Subscribe to hex color changes of the color with alpha channel _(opacity)_
+	 *
+	 * @param key Color type to subscribe to
+	 * @param callback Callback function for changes
+	 */
+	subscribe(key: typeof COLOR_TYPE.hexa, callback: (value: string) => void): Subscription;
+
+	/**
+	 * Subscribe to _HSL_ color changes of the color
+	 *
+	 * @param key Color type to subscribe to
+	 * @param callback Callback function for changes
+	 */
+	subscribe(key: typeof COLOR_TYPE.hsl, callback: (value: HSLColor) => void): Subscription;
+
+	/**
+	 * Subscribe to _HSL(A)_ color changes of the color
+	 *
+	 * @param key Color type to subscribe to
+	 * @param callback Callback function for changes
+	 */
+	subscribe(key: typeof COLOR_TYPE.hsla, callback: (value: HSLAColor) => void): Subscription;
+
+	/**
+	 * Subscribe to _HWB_ color changes of the color
+	 *
+	 * @param key Color type to subscribe to
+	 * @param callback Callback function for changes
+	 */
+	subscribe(key: typeof COLOR_TYPE.hwb, callback: (value: HWBColor) => void): Subscription;
+
+	/**
+	 * Subscribe to _HWB(A)_ color changes of the color
+	 *
+	 * @param key Color type to subscribe to
+	 * @param callback Callback function for changes
+	 */
+	subscribe(key: typeof COLOR_TYPE.hwba, callback: (value: HWBAColor) => void): Subscription;
+
+	/**
+	 * Subscribe to _RGB_ color changes of the color
+	 *
+	 * @param key Color type to subscribe to
+	 * @param callback Callback function for changes
+	 */
+	subscribe(key: typeof COLOR_TYPE.rgb, callback: (value: RGBColor) => void): Subscription;
+
+	/**
+	 * Subscribe to _RGBA_ color changes of the color
+	 *
+	 * @param key Color type to subscribe to
+	 * @param callback Callback function for changes
+	 */
+	subscribe(key: typeof COLOR_TYPE.rgba, callback: (value: RGBAColor) => void): Subscription;
+
+	/**
+	 * Subscribe to any color changes of the color
+	 *
+	 * @param callback Callback function for changes
+	 */
+	subscribe(callback: (value: Color) => void): Subscription;
+
+	/**
 	 * Get the color as a hex string
 	 *
 	 * @param alpha Include alpha channel _(opacity)_? _(defaults to `false`)_
@@ -190,6 +272,13 @@ export type Color = {
 	 * @returns Hex color string
 	 */
 	toString(): string;
+
+	/**
+	 * Unsubscribe from all color changes of the color
+	 *
+	 * _(To unsubscribe from a specific color change, use the `unsubscribe()` method on the `Subscription` returned by the individual `subscribe()` method)_
+	 */
+	unsubscribe(): void;
 };
 
 type ColorWithAlpha = {
@@ -262,7 +351,11 @@ export type RGBColor = {
 	red: number;
 };
 
-export type ColorProperty = 'alpha' | keyof HSLColor | keyof HWBColor | keyof RGBColor;
+export type ColorProperty =
+	| typeof COLOR_ALPHA.name
+	| keyof HSLColor
+	| keyof HWBColor
+	| keyof RGBColor;
 
 export type ColorState = {
 	alpha: Alpha;

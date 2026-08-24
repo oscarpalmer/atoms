@@ -278,4 +278,9 @@ export type UnionToIntersection<Union> = (
 	? Intersection & Union
 	: never;
 
+/**
+ * A function that unsubscribes from a subscription
+ */
+export type Unsubscriber = () => void;
+
 // #endregion

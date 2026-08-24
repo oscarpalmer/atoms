@@ -1,22 +1,13 @@
+import {isPlainObject} from '../../internal/is';
 import {between} from '../../internal/number';
 import type {PlainObject} from '../../models';
 import {
-	ALPHA_NONE_VALUE,
-	EXPRESSION_HEX_LONG,
-	EXPRESSION_HEX_SHORT,
-	EXPRESSION_PREFIX,
-	KEYS_HSL,
-	KEYS_HSLA,
-	KEYS_HWB,
-	KEYS_HWBA,
-	KEYS_RGB,
-	KEYS_RGBA,
-	LENGTH_LONG,
-	LENGTH_SHORT,
-	MAX_DEGREE,
-	MAX_HEX,
-	MAX_PERCENT,
-	PROPERTY_COLOR,
+	COLOR_ALPHA,
+	COLOR_EXPRESSION,
+	COLOR_KEYS,
+	COLOR_LENGTHS,
+	COLOR_MAX,
+	COLOR_PROPERTY,
 } from '../constants';
 import type {Color} from '../index';
 import type {
@@ -36,11 +27,11 @@ function hasKeys(value: unknown, keys: ColorProperty[]): boolean {
 }
 
 function isAlpha(value: unknown): value is number {
-	return typeof value === 'number' && between(value, ALPHA_NONE_VALUE, MAX_PERCENT);
+	return typeof value === 'number' && between(value, COLOR_ALPHA.noneValue, COLOR_MAX.percent);
 }
 
 function isBytey(value: unknown): value is number {
-	return typeof value === 'number' && between(value, 0, MAX_HEX);
+	return typeof value === 'number' && between(value, 0, COLOR_MAX.hex);
 }
 
 /**
@@ -51,10 +42,7 @@ function isBytey(value: unknown): value is number {
  */
 export function isColor(value: unknown): value is Color {
 	return (
-		typeof value === 'object' &&
-		value !== null &&
-		PROPERTY_COLOR in value &&
-		value[PROPERTY_COLOR] === true
+		isPlainObject(value) && COLOR_PROPERTY.name in value && value[COLOR_PROPERTY.name] === true
 	);
 }
 
@@ -87,7 +75,7 @@ function isColorValue(obj: unknown, properties: ColorProperty[]): boolean {
 }
 
 function isDegree(value: unknown): value is number {
-	return typeof value === 'number' && between(value, 0, MAX_DEGREE);
+	return typeof value === 'number' && between(value, 0, COLOR_MAX.degree);
 }
 
 /**
@@ -111,14 +99,16 @@ export function isHexColor(value: unknown, alpha?: boolean): value is string {
 		return false;
 	}
 
-	if (!(EXPRESSION_HEX_SHORT.test(value) || EXPRESSION_HEX_LONG.test(value))) {
+	if (!(COLOR_EXPRESSION.hexShort.test(value) || COLOR_EXPRESSION.hexLong.test(value))) {
 		return false;
 	}
 
 	if (alpha === false) {
-		const unprefixed = value.replace(EXPRESSION_PREFIX, '');
+		const unprefixed = value.replace(COLOR_EXPRESSION.prefix, '');
 
-		return unprefixed.length === LENGTH_SHORT || unprefixed.length === LENGTH_LONG;
+		return (
+			unprefixed.length === COLOR_LENGTHS.hexShort || unprefixed.length === COLOR_LENGTHS.hexLong
+		);
 	}
 
 	return true;
@@ -131,11 +121,11 @@ export function isHexColor(value: unknown, alpha?: boolean): value is string {
  * @returns `true` if the value is an _HSLA_ color, otherwise `false`
  */
 export function isHslaColor(value: unknown): value is HSLAColor {
-	return isColorValue(value, KEYS_HSLA);
+	return isColorValue(value, COLOR_KEYS.hsla);
 }
 
 export function isHslaLike(value: unknown): value is Record<keyof HSLAColor, unknown> {
-	return hasKeys(value, KEYS_HSLA);
+	return hasKeys(value, COLOR_KEYS.hsla);
 }
 
 /**
@@ -145,11 +135,11 @@ export function isHslaLike(value: unknown): value is Record<keyof HSLAColor, unk
  * @returns `true` if the value is an _HSL_ color, otherwise `false`
  */
 export function isHslColor(value: unknown): value is HSLColor {
-	return isColorValue(value, KEYS_HSLA) || isColorValue(value, KEYS_HSL);
+	return isColorValue(value, COLOR_KEYS.hsla) || isColorValue(value, COLOR_KEYS.hsl);
 }
 
 export function isHslLike(value: unknown): value is Record<keyof HSLColor, unknown> {
-	return hasKeys(value, KEYS_HSL);
+	return hasKeys(value, COLOR_KEYS.hsl);
 }
 
 /**
@@ -159,11 +149,11 @@ export function isHslLike(value: unknown): value is Record<keyof HSLColor, unkno
  * @returns `true` if the value is an _HWBA_ color, otherwise `false`
  */
 export function isHwbaColor(value: unknown): value is HWBAColor {
-	return isColorValue(value, KEYS_HWBA);
+	return isColorValue(value, COLOR_KEYS.hwba);
 }
 
 export function isHwbaLike(value: unknown): value is Record<keyof HWBAColor, unknown> {
-	return hasKeys(value, KEYS_HWBA);
+	return hasKeys(value, COLOR_KEYS.hwba);
 }
 
 /**
@@ -173,11 +163,11 @@ export function isHwbaLike(value: unknown): value is Record<keyof HWBAColor, unk
  * @returns `true` if the value is an _HWB_ color, otherwise `false`
  */
 export function isHwbColor(value: unknown): value is HWBColor {
-	return isColorValue(value, KEYS_HWB) || isColorValue(value, KEYS_HWBA);
+	return isColorValue(value, COLOR_KEYS.hwb) || isColorValue(value, COLOR_KEYS.hwba);
 }
 
 export function isHwbLike(value: unknown): value is Record<keyof HWBColor, unknown> {
-	return hasKeys(value, KEYS_HWB);
+	return hasKeys(value, COLOR_KEYS.hwb);
 }
 
 /**
@@ -187,11 +177,11 @@ export function isHwbLike(value: unknown): value is Record<keyof HWBColor, unkno
  * @returns `true` if the value is an _RGBA_ color, otherwise `false`
  */
 export function isRgbaColor(value: unknown): value is RGBAColor {
-	return isColorValue(value, KEYS_RGBA);
+	return isColorValue(value, COLOR_KEYS.rgba);
 }
 
 export function isRgbaLike(value: unknown): value is Record<keyof RGBAColor, unknown> {
-	return hasKeys(value, KEYS_RGBA);
+	return hasKeys(value, COLOR_KEYS.rgba);
 }
 
 /**
@@ -201,15 +191,15 @@ export function isRgbaLike(value: unknown): value is Record<keyof RGBAColor, unk
  * @returns `true` if the value is an _RGB_ color, otherwise `false`
  */
 export function isRgbColor(value: unknown): value is RGBColor {
-	return isColorValue(value, KEYS_RGBA) || isColorValue(value, KEYS_RGB);
+	return isColorValue(value, COLOR_KEYS.rgba) || isColorValue(value, COLOR_KEYS.rgb);
 }
 
 export function isRgbLike(value: unknown): value is Record<keyof RGBColor, unknown> {
-	return hasKeys(value, KEYS_RGB);
+	return hasKeys(value, COLOR_KEYS.rgb);
 }
 
 function isPercentage(value: unknown): value is number {
-	return typeof value === 'number' && between(value, 0, MAX_PERCENT);
+	return typeof value === 'number' && between(value, 0, COLOR_MAX.percent);
 }
 
 // #endregion

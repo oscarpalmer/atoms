@@ -1,6 +1,6 @@
 import {noop} from '../function';
-import {isPlainObject} from '../is';
-import type {ArrayOrPlainObject, GenericCallback, PlainObject} from '../models';
+import {isPlainObject} from '../internal/is';
+import type {PlainObject} from '../models';
 
 // #region Types
 

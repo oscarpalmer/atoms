@@ -1,19 +1,7 @@
-import {
-	DEFAULT_HSL,
-	DEFAULT_HWB,
-	DEFAULT_RGB,
-	HEX_BLACK,
-	KEYS_HSL,
-	KEYS_HWB,
-	KEYS_RGB,
-	LENGTH_LONG,
-	MAX_PERCENT,
-	TYPE_HEX,
-	TYPE_HSL,
-	TYPE_HWB,
-	TYPE_RGB,
-} from '../constants';
+import type {Subscriptions} from '../../internal/subscription';
+import {COLOR_DEFAULTS, COLOR_KEYS, COLOR_LENGTHS, COLOR_MAX, COLOR_TYPE} from '../constants';
 import type {
+	Color,
 	ColorState,
 	ColorType,
 	HSLAColor,
@@ -67,15 +55,15 @@ export function getColorState(value: unknown): ColorState {
 			origin: undefined as never,
 		};
 
-		if (KEYS_HSL.every(key => key in value)) {
+		if (COLOR_KEYS.hsl.every(key => key in value)) {
 			state.hsl = getHslValue(value as Record<keyof HSLColor, unknown>);
-			state.origin = TYPE_HSL;
-		} else if (KEYS_HWB.every(key => key in value)) {
+			state.origin = COLOR_TYPE.hsl;
+		} else if (COLOR_KEYS.hwb.every(key => key in value)) {
 			state.hwb = getHwbValue(value as Record<keyof HWBColor, unknown>);
-			state.origin = TYPE_HWB;
-		} else if (KEYS_RGB.every(key => key in value)) {
+			state.origin = COLOR_TYPE.hwb;
+		} else if (COLOR_KEYS.rgb.every(key => key in value)) {
 			state.rgb = getRgbValue(value as Record<keyof RGBColor, unknown>);
-			state.origin = TYPE_RGB;
+			state.origin = COLOR_TYPE.rgb;
 		}
 
 		if (state.origin != null) {
@@ -88,28 +76,30 @@ export function getColorState(value: unknown): ColorState {
 
 function getColorStateForHex(value: string): ColorState {
 	const normalized = getNormalizedHex(value, true);
-	const hex = normalized.slice(0, LENGTH_LONG);
+	const hex = normalized.slice(0, COLOR_LENGTHS.hexLong);
 
 	return {
 		hex,
-		alpha: getAlpha(normalized.slice(LENGTH_LONG), true),
-		origin: TYPE_HEX,
+		alpha: getAlpha(normalized.slice(COLOR_LENGTHS.hexLong), true),
+		origin: COLOR_TYPE.hex,
 	};
 }
 
 function getDefaultColorState(): ColorState {
 	return {
-		alpha: getAlpha(MAX_PERCENT, false),
-		hex: HEX_BLACK,
-		hsl: {...DEFAULT_HSL},
-		hwb: {...DEFAULT_HWB},
-		rgb: {...DEFAULT_RGB},
-		origin: TYPE_HEX,
+		alpha: getAlpha(COLOR_MAX.percent, false),
+		hex: COLOR_DEFAULTS.hexBlack,
+		hsl: {...COLOR_DEFAULTS.hsl},
+		hwb: {...COLOR_DEFAULTS.hwb},
+		rgb: {...COLOR_DEFAULTS.rgb},
+		origin: COLOR_TYPE.hex,
 	};
 }
 
 function setColorValue<Type extends ColorType>(
+	color: Color,
 	state: ColorState,
+	subscriptions: Subscriptions<Function>,
 	type: Type,
 	value: ColorState[Type],
 	alpha?: number | string,
@@ -123,11 +113,31 @@ function setColorValue<Type extends ColorType>(
 	state[type] = value;
 
 	if (alpha != null) {
-		state.alpha = getAlpha(alpha, type === TYPE_HEX);
+		state.alpha = getAlpha(alpha, type === COLOR_TYPE.hex);
+	}
+
+	for (const type of COLOR_TYPE.all) {
+		const callbacks = subscriptions.values.to.keyed?.get(type);
+
+		if (callbacks != null) {
+			for (const callback of callbacks.values()) {
+				callback(color[type]);
+			}
+		}
+	}
+
+	for (const callback of subscriptions.values.to.any.values()) {
+		callback(color);
 	}
 }
 
-export function setHexColor(state: ColorState, value: string, alpha: boolean): void {
+export function setHexColor(
+	color: Color,
+	state: ColorState,
+	subscriptions: Subscriptions<Function>,
+	value: string,
+	alpha: boolean,
+): void {
 	if (!isHexColor(value) || (!alpha && value === state.hex)) {
 		return;
 	}
@@ -135,21 +145,31 @@ export function setHexColor(state: ColorState, value: string, alpha: boolean): v
 	const normalized = getNormalizedHex(value, true);
 
 	setColorValue(
+		color,
 		state,
-		TYPE_HEX,
-		normalized.slice(0, LENGTH_LONG),
-		alpha ? normalized.slice(LENGTH_LONG) : undefined,
+		subscriptions,
+		COLOR_TYPE.hex,
+		normalized.slice(0, COLOR_LENGTHS.hexLong),
+		alpha ? normalized.slice(COLOR_LENGTHS.hexLong) : undefined,
 	);
 }
 
-export function setHSLColor(state: ColorState, value: unknown, alpha: boolean): void {
+export function setHSLColor(
+	color: Color,
+	state: ColorState,
+	subscriptions: Subscriptions<Function>,
+	value: unknown,
+	alpha: boolean,
+): void {
 	if (!isHslLike(value)) {
 		return;
 	}
 
 	setColorValue(
+		color,
 		state,
-		TYPE_HSL,
+		subscriptions,
+		COLOR_TYPE.hsl,
 		{
 			hue: getDegrees((value as HSLColor).hue),
 			saturation: getPercentage((value as HSLColor).saturation),
@@ -159,14 +179,22 @@ export function setHSLColor(state: ColorState, value: unknown, alpha: boolean): 
 	);
 }
 
-export function setHWBColor(state: ColorState, value: unknown, alpha: boolean): void {
+export function setHWBColor(
+	color: Color,
+	state: ColorState,
+	subscriptions: Subscriptions<Function>,
+	value: unknown,
+	alpha: boolean,
+): void {
 	if (!isHwbLike(value)) {
 		return;
 	}
 
 	setColorValue(
+		color,
 		state,
-		TYPE_HWB,
+		subscriptions,
+		COLOR_TYPE.hwb,
 		{
 			hue: getDegrees((value as HWBColor).hue),
 			whiteness: getPercentage((value as HWBColor).whiteness),
@@ -176,14 +204,22 @@ export function setHWBColor(state: ColorState, value: unknown, alpha: boolean): 
 	);
 }
 
-export function setRGBColor(state: ColorState, value: unknown, alpha: boolean): void {
+export function setRGBColor(
+	color: Color,
+	state: ColorState,
+	subscriptions: Subscriptions<Function>,
+	value: unknown,
+	alpha: boolean,
+): void {
 	if (!isRgbLike(value)) {
 		return;
 	}
 
 	setColorValue(
+		color,
 		state,
-		TYPE_RGB,
+		subscriptions,
+		COLOR_TYPE.rgb,
 		{
 			red: getHexValue((value as RGBColor).red),
 			green: getHexValue((value as RGBColor).green),

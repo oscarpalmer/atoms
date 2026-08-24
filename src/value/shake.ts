@@ -1,4 +1,4 @@
-import {isNonPlainObject} from '../is';
+import {isNonPlainObject} from '../internal/is';
 import type {PlainObject} from '../models';
 
 // #region Types

@@ -1,5 +1,5 @@
+import {isPlainObject} from '../internal/is';
 import {getString} from '../internal/string';
-import {isPlainObject} from '../is';
 import type {PlainObject, RequiredKeys} from '../models';
 import {lowerCase} from './case';
 import {includes} from './match';

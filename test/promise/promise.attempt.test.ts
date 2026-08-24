@@ -1,5 +1,5 @@
 import {expect, test} from 'vitest';
-import {attempt, attemptPromise} from '../../src';
+import {attemptPromise} from '../../src';
 
 test('asynchronous', () =>
 	new Promise<void>(done => {

@@ -1,12 +1,4 @@
-import {
-	DEFAULT_HSL,
-	MAX_DEGREE,
-	MAX_HEX,
-	MAX_PERCENT,
-	TYPE_HEX,
-	TYPE_HWB,
-	TYPE_RGB,
-} from '../constants';
+import {COLOR_DEFAULTS, COLOR_MAX, COLOR_TYPE} from '../constants';
 import {getAlphaValue} from '../misc/alpha';
 import {getDegrees, getHexValue, getPercentage} from '../misc/get';
 import {isHslLike} from '../misc/is';
@@ -25,12 +17,12 @@ import {convertRgbToHex} from './rgb';
 // #region Functions
 
 function convertHslToHwba(input: unknown): HWBAColor {
-	const hsl = isHslLike(input) ? getHslValue(input) : {...DEFAULT_HSL};
+	const hsl = isHslLike(input) ? getHslValue(input) : {...COLOR_DEFAULTS.hsl};
 
 	let {hue, lightness, saturation} = hsl;
 
-	lightness /= MAX_PERCENT;
-	saturation /= MAX_PERCENT;
+	lightness /= COLOR_MAX.percent;
+	saturation /= COLOR_MAX.percent;
 
 	const value = lightness + saturation * Math.min(lightness, 1 - lightness);
 
@@ -45,21 +37,21 @@ function convertHslToHwba(input: unknown): HWBAColor {
 
 	return {
 		hue,
-		whiteness: whiteness * MAX_PERCENT,
-		blackness: blackness * MAX_PERCENT,
-		alpha: getAlphaValue((input as HSLAColor)?.alpha ?? MAX_PERCENT),
+		whiteness: whiteness * COLOR_MAX.percent,
+		blackness: blackness * COLOR_MAX.percent,
+		alpha: getAlphaValue((input as HSLAColor)?.alpha ?? COLOR_MAX.percent),
 	};
 }
 
 function convertHslToRgba(input: unknown): RGBAColor {
-	const hsl = isHslLike(input) ? getHslValue(input) : {...DEFAULT_HSL};
+	const hsl = isHslLike(input) ? getHslValue(input) : {...COLOR_DEFAULTS.hsl};
 
-	const hue = hsl.hue % MAX_DEGREE;
-	const saturation = hsl.saturation / MAX_PERCENT;
-	const lightness = hsl.lightness / MAX_PERCENT;
+	const hue = hsl.hue % COLOR_MAX.degree;
+	const saturation = hsl.saturation / COLOR_MAX.percent;
+	const lightness = hsl.lightness / COLOR_MAX.percent;
 
 	return {
-		alpha: getAlphaValue((input as HSLAColor)?.alpha ?? MAX_PERCENT),
+		alpha: getAlphaValue((input as HSLAColor)?.alpha ?? COLOR_MAX.percent),
 		blue: getHexValue(getHexyValue(hue, lightness, saturation, 4)),
 		green: getHexValue(getHexyValue(hue, lightness, saturation, 8)),
 		red: getHexValue(getHexyValue(hue, lightness, saturation, 0)),
@@ -71,15 +63,15 @@ export function getColorFromHsl<Type extends ColorType>(
 	type: Type,
 ): NonNullable<ColorState[Type]> {
 	switch (type) {
-		case TYPE_HEX:
+		case COLOR_TYPE.hex:
 			state.hex = hslToHex(state.hsl!);
 			break;
 
-		case TYPE_HWB:
+		case COLOR_TYPE.hwb:
 			state.hwb = hslToHwb(state.hsl!);
 			break;
 
-		case TYPE_RGB:
+		case COLOR_TYPE.rgb:
 			state.rgb = hslToRgb(state.hsl!);
 			break;
 	}
@@ -91,7 +83,7 @@ function getHexyValue(hue: number, lightness: number, saturation: number, value:
 	const part = (value + hue / 30) % 12;
 	const mod = saturation * Math.min(lightness, 1 - lightness);
 
-	return (lightness - mod * Math.max(-1, Math.min(part - 3, 9 - part, 1))) * MAX_HEX;
+	return (lightness - mod * Math.max(-1, Math.min(part - 3, 9 - part, 1))) * COLOR_MAX.hex;
 }
 
 export function getHslValue(value: Record<keyof HSLColor, unknown>): HSLColor {

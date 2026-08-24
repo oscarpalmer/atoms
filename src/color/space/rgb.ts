@@ -1,5 +1,5 @@
 import {join} from '../../internal/string';
-import {DEFAULT_RGB, MAX_HEX, MAX_PERCENT, TYPE_HEX, TYPE_HSL, TYPE_HWB} from '../constants';
+import {COLOR_DEFAULTS, COLOR_MAX, COLOR_TYPE} from '../constants';
 import {getAlpha, getAlphaValue} from '../misc/alpha';
 import {getHexValue} from '../misc/get';
 import {isRgbLike} from '../misc/is';
@@ -48,7 +48,7 @@ export function convertRgbToHex(rgb: RGBAColor | RGBColor, alpha: boolean): stri
 }
 
 export function convertRgbToHsla(value: unknown): HSLAColor {
-	const rgb = isRgbLike(value) ? getRgbValue(value) : {...DEFAULT_RGB};
+	const rgb = isRgbLike(value) ? getRgbValue(value) : {...COLOR_DEFAULTS.rgb};
 	const values = getRgbValues(rgb);
 
 	const {delta, max, min} = values;
@@ -68,14 +68,14 @@ export function convertRgbToHsla(value: unknown): HSLAColor {
 
 	return {
 		hue,
-		saturation: saturation * MAX_PERCENT,
-		lightness: lightness * MAX_PERCENT,
-		alpha: getAlphaValue((value as RGBAColor)?.alpha ?? MAX_PERCENT),
+		saturation: saturation * COLOR_MAX.percent,
+		lightness: lightness * COLOR_MAX.percent,
+		alpha: getAlphaValue((value as RGBAColor)?.alpha ?? COLOR_MAX.percent),
 	};
 }
 
 export function convertRgbToHwba(value: unknown): HWBAColor {
-	const rgb = isRgbLike(value) ? getRgbValue(value) : {...DEFAULT_RGB};
+	const rgb = isRgbLike(value) ? getRgbValue(value) : {...COLOR_DEFAULTS.rgb};
 	const values = getRgbValues(rgb);
 
 	const {delta, max, min} = values;
@@ -90,9 +90,9 @@ export function convertRgbToHwba(value: unknown): HWBAColor {
 
 	return {
 		hue,
-		whiteness: min * MAX_PERCENT,
-		blackness: (1 - max) * MAX_PERCENT,
-		alpha: getAlphaValue((value as RGBAColor)?.alpha ?? MAX_PERCENT),
+		whiteness: min * COLOR_MAX.percent,
+		blackness: (1 - max) * COLOR_MAX.percent,
+		alpha: getAlphaValue((value as RGBAColor)?.alpha ?? COLOR_MAX.percent),
 	};
 }
 
@@ -101,15 +101,15 @@ export function getColorFromRgb<Type extends ColorType>(
 	type: Type,
 ): NonNullable<ColorState[Type]> {
 	switch (type) {
-		case TYPE_HEX:
+		case COLOR_TYPE.hex:
 			state.hex = rgbToHex(state.rgb!);
 			break;
 
-		case TYPE_HSL:
+		case COLOR_TYPE.hsl:
 			state.hsl = rgbToHsl(state.rgb!);
 			break;
 
-		case TYPE_HWB:
+		case COLOR_TYPE.hwb:
 			state.hwb = rgbToHwb(state.rgb!);
 			break;
 	}
@@ -141,9 +141,9 @@ export function getRgbValue(value: Record<keyof RGBColor, unknown>): RGBColor {
 }
 
 function getRgbValues(rgb: RGBColor): RgbValues {
-	const blue = rgb.blue / MAX_HEX;
-	const green = rgb.green / MAX_HEX;
-	const red = rgb.red / MAX_HEX;
+	const blue = rgb.blue / COLOR_MAX.hex;
+	const green = rgb.green / COLOR_MAX.hex;
+	const red = rgb.red / COLOR_MAX.hex;
 
 	const max = Math.max(blue, green, red);
 	const min = Math.min(blue, green, red);
@@ -163,7 +163,10 @@ function getRgbValues(rgb: RGBColor): RgbValues {
  * @returns Hex color string
  */
 export function rgbToHex(rgb: RGBAColor | RGBColor, alpha?: boolean): string {
-	return convertRgbToHex(isRgbLike(rgb) ? getRgbValue(rgb) : {...DEFAULT_RGB}, alpha ?? false);
+	return convertRgbToHex(
+		isRgbLike(rgb) ? getRgbValue(rgb) : {...COLOR_DEFAULTS.rgb},
+		alpha ?? false,
+	);
 }
 
 /**

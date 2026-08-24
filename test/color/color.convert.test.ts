@@ -21,7 +21,7 @@ import {
 	rgbToHwba,
 	round,
 } from '../../src';
-import {DEFAULT_HSL, DEFAULT_HWB, DEFAULT_RGB, HEX_BLACK} from '../../src/color/constants';
+import {COLOR_DEFAULTS} from '../../src/color/constants';
 import {hexToHwb, hexToHwba} from '../../src/color/space/hex';
 import {colorFixture} from '../.fixtures/color.fixture';
 
@@ -60,8 +60,8 @@ test('hexToHsl(a)', () => {
 		expect(roundColors(hexToHsla(hex))).toEqual({...roundColors(hsl), alpha: 100});
 	}
 
-	expect(hexToHsl('invalid')).toEqual(DEFAULT_HSL);
-	expect(hexToHsla('invalid')).toEqual({...DEFAULT_HSL, alpha: 100});
+	expect(hexToHsl('invalid')).toEqual(COLOR_DEFAULTS.hsl);
+	expect(hexToHsla('invalid')).toEqual({...COLOR_DEFAULTS.hsl, alpha: 100});
 });
 
 test('hexToHwb(a)', () => {
@@ -73,8 +73,8 @@ test('hexToHwb(a)', () => {
 		expect(roundColors(hexToHwba(hex))).toEqual({...roundColors(hwb), alpha: 100});
 	}
 
-	expect(hexToHwb('invalid')).toEqual(DEFAULT_HWB);
-	expect(hexToHwba('invalid')).toEqual({...DEFAULT_HWB, alpha: 100});
+	expect(hexToHwb('invalid')).toEqual(COLOR_DEFAULTS.hwb);
+	expect(hexToHwba('invalid')).toEqual({...COLOR_DEFAULTS.hwb, alpha: 100});
 });
 
 test('hexToRgb(a)', () => {
@@ -86,8 +86,8 @@ test('hexToRgb(a)', () => {
 		expect(hexToRgba(hex)).toEqual({...rgb, alpha: 100});
 	}
 
-	expect(hexToRgb('invalid')).toEqual(DEFAULT_RGB);
-	expect(hexToRgba('invalid')).toEqual({...DEFAULT_RGB, alpha: 100});
+	expect(hexToRgb('invalid')).toEqual(COLOR_DEFAULTS.rgb);
+	expect(hexToRgba('invalid')).toEqual({...COLOR_DEFAULTS.rgb, alpha: 100});
 });
 
 test('hslToHex(a)', () => {
@@ -99,8 +99,8 @@ test('hslToHex(a)', () => {
 		expect(hslToHex(hsl, true)).toEqual(`${hex}ff`);
 	}
 
-	expect(hslToHex(123 as never)).toEqual(HEX_BLACK);
-	expect(hslToHex(123 as never, true)).toEqual(`${HEX_BLACK}ff`);
+	expect(hslToHex(123 as never)).toEqual(COLOR_DEFAULTS.hexBlack);
+	expect(hslToHex(123 as never, true)).toEqual(`${COLOR_DEFAULTS.hexBlack}ff`);
 });
 
 test('hslToHwb(a)', () => {
@@ -112,8 +112,8 @@ test('hslToHwb(a)', () => {
 		expect(roundColors(hslToHwba(hsl))).toEqual({...roundColors(hwb), alpha: 100});
 	}
 
-	expect(hslToHwb(123 as never)).toEqual(DEFAULT_HWB);
-	expect(hslToHwba(123 as never)).toEqual({...DEFAULT_HWB, alpha: 100});
+	expect(hslToHwb(123 as never)).toEqual(COLOR_DEFAULTS.hwb);
+	expect(hslToHwba(123 as never)).toEqual({...COLOR_DEFAULTS.hwb, alpha: 100});
 });
 
 test('hslToRgb(a)', () => {
@@ -125,8 +125,8 @@ test('hslToRgb(a)', () => {
 		expect(roundColors(hslToRgba(hsl))).toEqual({...roundColors(rgb), alpha: 100});
 	}
 
-	expect(hslToRgb(123 as never)).toEqual(DEFAULT_RGB);
-	expect(hslToRgba(123 as never)).toEqual({...DEFAULT_RGB, alpha: 100});
+	expect(hslToRgb(123 as never)).toEqual(COLOR_DEFAULTS.rgb);
+	expect(hslToRgba(123 as never)).toEqual({...COLOR_DEFAULTS.rgb, alpha: 100});
 });
 
 test('hwbToHex(a)', () => {
@@ -138,8 +138,8 @@ test('hwbToHex(a)', () => {
 		expect(hwbToHex(hwb, true)).toEqual(`${hex}ff`);
 	}
 
-	expect(hwbToHex(123 as never)).toEqual(HEX_BLACK);
-	expect(hwbToHex(123 as never, true)).toEqual(`${HEX_BLACK}ff`);
+	expect(hwbToHex(123 as never)).toEqual(COLOR_DEFAULTS.hexBlack);
+	expect(hwbToHex(123 as never, true)).toEqual(`${COLOR_DEFAULTS.hexBlack}ff`);
 });
 
 test('hwbToHsl(a)', () => {
@@ -151,8 +151,8 @@ test('hwbToHsl(a)', () => {
 		expect(roundColors(hwbToHsla(hwb))).toEqual({...roundColors(hsl), alpha: 100});
 	}
 
-	expect(hwbToHsl(123 as never)).toEqual(DEFAULT_HSL);
-	expect(hwbToHsla(123 as never)).toEqual({...DEFAULT_HSL, alpha: 100});
+	expect(hwbToHsl(123 as never)).toEqual(COLOR_DEFAULTS.hsl);
+	expect(hwbToHsla(123 as never)).toEqual({...COLOR_DEFAULTS.hsl, alpha: 100});
 });
 
 test('hwbToRgb(a)', () => {
@@ -164,8 +164,8 @@ test('hwbToRgb(a)', () => {
 		expect(roundColors(hwbToRgba(hwb))).toEqual({...roundColors(rgb), alpha: 100});
 	}
 
-	expect(hwbToRgb(123 as never)).toEqual(DEFAULT_RGB);
-	expect(hwbToRgba(123 as never)).toEqual({...DEFAULT_RGB, alpha: 100});
+	expect(hwbToRgb(123 as never)).toEqual(COLOR_DEFAULTS.rgb);
+	expect(hwbToRgba(123 as never)).toEqual({...COLOR_DEFAULTS.rgb, alpha: 100});
 });
 
 test('rgbToHex(a)', () => {
@@ -177,8 +177,8 @@ test('rgbToHex(a)', () => {
 		expect(rgbToHex(rgb, true)).toEqual(`${hex}ff`);
 	}
 
-	expect(rgbToHex(123 as never)).toEqual(HEX_BLACK);
-	expect(rgbToHex(123 as never, true)).toEqual(`${HEX_BLACK}ff`);
+	expect(rgbToHex(123 as never)).toEqual(COLOR_DEFAULTS.hexBlack);
+	expect(rgbToHex(123 as never, true)).toEqual(`${COLOR_DEFAULTS.hexBlack}ff`);
 });
 
 test('rgbToHsl(a)', () => {
@@ -218,8 +218,8 @@ test('rgbToHsl(a)', () => {
 		saturation: 50.3937,
 	});
 
-	expect(rgbToHsl(123 as never)).toEqual(DEFAULT_HSL);
-	expect(rgbToHsla(123 as never)).toEqual({...DEFAULT_HSL, alpha: 100});
+	expect(rgbToHsl(123 as never)).toEqual(COLOR_DEFAULTS.hsl);
+	expect(rgbToHsla(123 as never)).toEqual({...COLOR_DEFAULTS.hsl, alpha: 100});
 });
 
 test('rgbToHwb(a)', () => {
@@ -259,6 +259,6 @@ test('rgbToHwb(a)', () => {
 		blackness: 24.7059,
 	});
 
-	expect(rgbToHwb(123 as never)).toEqual(DEFAULT_HWB);
-	expect(rgbToHwba(123 as never)).toEqual({...DEFAULT_HWB, alpha: 100});
+	expect(rgbToHwb(123 as never)).toEqual(COLOR_DEFAULTS.hwb);
+	expect(rgbToHwba(123 as never)).toEqual({...COLOR_DEFAULTS.hwb, alpha: 100});
 });

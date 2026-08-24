@@ -1,16 +1,11 @@
 import {join} from '../../internal/string';
 import {
-	ALPHA_FULL_HEX_LONG,
-	ALPHA_FULL_HEX_SHORT,
-	EXPRESSION_HEX_LONG,
-	EXPRESSION_PREFIX,
-	HEX_BLACK,
-	LENGTH_LONG,
-	LENGTH_SHORT,
-	MAX_HEX,
-	TYPE_HSL,
-	TYPE_HWB,
-	TYPE_RGB,
+	COLOR_ALPHA,
+	COLOR_DEFAULTS,
+	COLOR_EXPRESSION,
+	COLOR_LENGTHS,
+	COLOR_MAX,
+	COLOR_TYPE,
 } from '../constants';
 import {getHexValue, getPercentage} from '../misc/get';
 import {isHexColor} from '../misc/is';
@@ -30,7 +25,7 @@ import {convertRgbToHsla, convertRgbToHwba} from './rgb';
 
 function convertHexToRgba(value: string): RGBAColor {
 	const normalized = getNormalizedHex(value, true);
-	const pairs = EXPRESSION_HEX_LONG.exec(normalized) as RegExpExecArray;
+	const pairs = COLOR_EXPRESSION.hexLong.exec(normalized) as RegExpExecArray;
 	const values: number[] = [];
 
 	const {length} = pairs;
@@ -40,7 +35,7 @@ function convertHexToRgba(value: string): RGBAColor {
 	}
 
 	return {
-		alpha: getPercentage((values[3] / MAX_HEX) * 100),
+		alpha: getPercentage((values[3] / COLOR_MAX.hex) * 100),
 		blue: getHexValue(values[2]),
 		green: getHexValue(values[1]),
 		red: getHexValue(values[0]),
@@ -52,15 +47,15 @@ export function getColorFromHex<Type extends ColorType>(
 	type: Type,
 ): NonNullable<ColorState[Type]> {
 	switch (type) {
-		case TYPE_HSL:
+		case COLOR_TYPE.hsl:
 			state.hsl ??= hexToHsl(state.hex!);
 			break;
 
-		case TYPE_HWB:
+		case COLOR_TYPE.hwb:
 			state.hwb ??= hexToHwb(state.hex!);
 			break;
 
-		case TYPE_RGB:
+		case COLOR_TYPE.rgb:
 			state.rgb ??= hexToRgb(state.hex!);
 			break;
 	}
@@ -81,21 +76,21 @@ export function getNormalizedHex(value: unknown, alpha?: boolean): string {
 	const includeAlpha = alpha ?? false;
 
 	if (!isHexColor(value)) {
-		return `${HEX_BLACK}${includeAlpha ? ALPHA_FULL_HEX_LONG : ''}`;
+		return `${COLOR_DEFAULTS.hexBlack}${includeAlpha ? COLOR_ALPHA.fullHexLong : ''}`;
 	}
 
-	const normalized = value.replace(EXPRESSION_PREFIX, '');
+	const normalized = value.replace(COLOR_EXPRESSION.prefix, '');
 
-	if (normalized.length < LENGTH_LONG) {
-		const hex = normalized.slice(0, LENGTH_SHORT);
-		const a = includeAlpha ? (normalized[LENGTH_SHORT] ?? ALPHA_FULL_HEX_SHORT) : '';
+	if (normalized.length < COLOR_LENGTHS.hexLong) {
+		const hex = normalized.slice(0, COLOR_LENGTHS.hexShort);
+		const a = includeAlpha ? (normalized[COLOR_LENGTHS.hexShort] ?? COLOR_ALPHA.fullHexShort) : '';
 
 		return join(`${hex}${a}`.split('').map(character => character.repeat(2)));
 	}
 
-	const hex = normalized.slice(0, LENGTH_LONG);
+	const hex = normalized.slice(0, COLOR_LENGTHS.hexLong);
 
-	const a = includeAlpha ? normalized.slice(LENGTH_LONG) || ALPHA_FULL_HEX_LONG : '';
+	const a = includeAlpha ? normalized.slice(COLOR_LENGTHS.hexLong) || COLOR_ALPHA.fullHexLong : '';
 
 	return `${hex}${a}`;
 }

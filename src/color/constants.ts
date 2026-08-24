@@ -1,100 +1,137 @@
-import type {Alpha, HSLAColor, HSLColor, HWBAColor, HWBColor, RGBAColor, RGBColor} from './models';
+import type {
+	Alpha,
+	ColorTypeExtended,
+	HSLAColor,
+	HSLColor,
+	HWBAColor,
+	HWBColor,
+	RGBAColor,
+	RGBColor,
+} from './models';
+
+// #region Types
+
+type ColorTypes = {
+	all: Set<'alpha' | ColorTypeExtended>;
+	hex: 'hex';
+	hexa: 'hexa';
+	hsl: 'hsl';
+	hsla: 'hsla';
+	hwb: 'hwb';
+	hwba: 'hwba';
+	rgb: 'rgb';
+	rgba: 'rgba';
+};
+
+// #endregion
 
 // #region Variables
 
-export const ALPHA_FULL_HEX_SHORT = 'f';
-
-export const ALPHA_FULL_HEX_LONG = `${ALPHA_FULL_HEX_SHORT}${ALPHA_FULL_HEX_SHORT}`;
-
-export const ALPHA_NONE_HEX = '00';
-
-export const ALPHA_NONE_VALUE = 0;
-
-export const DEFAULT_ALPHA: Alpha = {
-	hex: ALPHA_FULL_HEX_LONG,
-	value: 100,
+export const COLOR_ALPHA = {
+	fullHexShort: 'f',
+	fullHexLong: 'ff',
+	name: 'alpha',
+	noneHex: '00',
+	noneValue: 0,
 };
 
-export const DEFAULT_HSL: HSLColor = {
-	hue: 0,
-	saturation: 0,
-	lightness: 0,
+export const COLOR_DEFAULTS = {
+	alpha: {
+		hex: COLOR_ALPHA.fullHexLong,
+		value: 100,
+	},
+	hexBlack: '000000',
+	hexWhite: 'ffffff',
+	hsl: {
+		hue: 0,
+		saturation: 0,
+		lightness: 0,
+	},
+	hwb: {
+		hue: 0,
+		whiteness: 0,
+		blackness: 100,
+	},
+	rgb: {
+		blue: 0,
+		green: 0,
+		red: 0,
+	},
 };
 
-export const DEFAULT_HWB: HWBColor = {
-	hue: 0,
-	whiteness: 0,
-	blackness: 100,
+export const COLOR_EXPRESSION = {
+	alphaHex: /^([a-f0-9]{1,2})$/i,
+	hexLong: /^#?([a-f0-9]{2})([a-f0-9]{2})([a-f0-9]{2})([a-f0-9]{2})?$/i,
+	hexShort: /^#?([a-f0-9]{3,4})$/i,
+	prefix: /^#/,
 };
 
-export const DEFAULT_RGB: RGBColor = {
-	blue: 0,
-	green: 0,
-	red: 0,
+export const COLOR_LENGTHS = {
+	hexLong: 6,
+	hexShort: 3,
 };
 
-export const EXPRESSION_ALPHA_HEX = /^([a-f0-9]{1,2})$/i;
+export const COLOR_KEYS = {
+	hsl: ['hue', 'saturation', 'lightness'] as Array<keyof HSLColor>,
+	hsla: [] as Array<keyof HSLAColor>,
+	hwb: ['hue', 'whiteness', 'blackness'] as Array<keyof HWBColor>,
+	hwba: [] as Array<keyof HWBAColor>,
+	rgb: ['red', 'green', 'blue'] as Array<keyof RGBColor>,
+	rgba: [] as Array<keyof RGBAColor>,
+};
 
-export const EXPRESSION_HEX_LONG = /^#?([a-f0-9]{2})([a-f0-9]{2})([a-f0-9]{2})([a-f0-9]{2})?$/i;
+COLOR_KEYS.hsla = [...COLOR_KEYS.hsl, COLOR_ALPHA.name as keyof Alpha] as Array<keyof HSLAColor>;
 
-export const EXPRESSION_HEX_SHORT = /^#?([a-f0-9]{3,4})$/i;
+COLOR_KEYS.hwba = [...COLOR_KEYS.hwb, COLOR_ALPHA.name as keyof Alpha] as Array<keyof HWBAColor>;
 
-export const EXPRESSION_PREFIX = /^#/;
+COLOR_KEYS.rgba = [...COLOR_KEYS.rgb, COLOR_ALPHA.name as keyof Alpha] as Array<keyof RGBAColor>;
 
-export const HEX_BLACK = '000000';
+export const COLOR_MAX = {
+	degree: 360,
+	hex: 255,
+	percent: 100,
+};
 
-export const HEX_WHITE = 'ffffff';
+export const COLOR_PROPERTY = {
+	name: '$color',
+	subscription: 'subscription',
+};
 
-export const LENGTH_LONG = 6;
+export const COLOR_TYPE: ColorTypes = {
+	all: undefined as unknown as Set<'alpha' | ColorTypeExtended>,
+	hex: 'hex',
+	hexa: 'hexa',
+	hsl: 'hsl',
+	hsla: 'hsla',
+	hwb: 'hwb',
+	hwba: 'hwba',
+	rgb: 'rgb',
+	rgba: 'rgba',
+};
 
-export const LENGTH_SHORT = 3;
-
-export const KEYS_HSL: Array<keyof HSLColor> = ['hue', 'saturation', 'lightness'];
-
-export const KEYS_HSLA: Array<keyof HSLAColor> = [...KEYS_HSL, 'alpha'];
-
-export const KEYS_HWB: Array<keyof HWBColor> = ['hue', 'whiteness', 'blackness'];
-
-export const KEYS_HWBA: Array<keyof HWBAColor> = [...KEYS_HWB, 'alpha'];
-
-export const KEYS_RGB: Array<keyof RGBColor> = ['red', 'green', 'blue'];
-
-export const KEYS_RGBA: Array<keyof RGBAColor> = [...KEYS_RGB, 'alpha'];
-
-export const MAX_DEGREE = 360;
-
-export const MAX_HEX = 255;
-
-export const MAX_PERCENT = 100;
-
-export const PROPERTY_COLOR = '$color';
-
-export const TYPE_HEX = 'hex';
-
-export const TYPE_HSL = 'hsl';
-
-export const TYPE_HWB = 'hwb';
-
-export const TYPE_RGB = 'rgb';
+COLOR_TYPE.all = new Set([
+	COLOR_ALPHA.name as 'alpha',
+	COLOR_TYPE.hex,
+	COLOR_TYPE.hexa,
+	COLOR_TYPE.hsl,
+	COLOR_TYPE.hsla,
+	COLOR_TYPE.hwb,
+	COLOR_TYPE.hwba,
+	COLOR_TYPE.rgb,
+	COLOR_TYPE.rgba,
+] as Array<'alpha' | ColorTypeExtended>);
 
 // https://www.w3.org/TR/WCAG20/#relativeluminancedef
-
-export const SRGB_LUMINANCE_BLUE = 0.0722;
-
-export const SRGB_LUMINANCE_EXPONENT = 2.4;
-
-export const SRGB_LUMINANCE_GREEN = 0.7152;
-
-export const SRGB_LUMINANCE_MINIMUM = 0.03928;
-
-export const SRGB_LUMINANCE_MODIFIER = 1.055;
-
-export const SRGB_LUMINANCE_MULTIPLIER = 12.92;
-
-export const SRGB_LUMINANCE_OFFSET = 0.055;
-
-export const SRGB_LUMINANCE_RED = 0.2126;
-
-export const SRGB_LUMINANCE_THRESHOLD = 0.625;
+export const COLOR_SRGB = {
+	luminanceBlue: 0.0722,
+	luminanceExponent: 2.4,
+	luminanceGreen: 0.7152,
+	luminanceMinimum: 0.03928,
+	luminanceModifier: 1.055,
+	luminanceMultiplier: 12.92,
+	luminanceOffset: 0.055,
+	luminanceRed: 0.2126,
+	luminanceThreshold: 0.625,
+};
 
 // #endregion

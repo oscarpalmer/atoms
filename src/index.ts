@@ -21,6 +21,7 @@ export * from './herald';
 
 export * from './internal/function/misc';
 export * from './internal/string';
+export {isSubscription, type Subscription} from './internal/subscription';
 export * from './internal/value/compare';
 export * from './internal/value/equal';
 export * from './internal/value/get';

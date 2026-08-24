@@ -1,14 +1,6 @@
-import {clamp} from '../..';
 import {round} from '../../internal/math/misc';
-import {
-	ALPHA_FULL_HEX_LONG,
-	ALPHA_NONE_HEX,
-	ALPHA_NONE_VALUE,
-	DEFAULT_ALPHA,
-	EXPRESSION_ALPHA_HEX,
-	MAX_HEX,
-	MAX_PERCENT,
-} from '../constants';
+import {clamp} from '../../internal/number';
+import {COLOR_ALPHA, COLOR_DEFAULTS, COLOR_EXPRESSION, COLOR_MAX} from '../constants';
 import type {Alpha} from '../models';
 
 // #region Functions
@@ -18,14 +10,14 @@ export function getAlpha(value: unknown, hex: boolean): Alpha {
 		return getAlphaFromValue(value);
 	}
 
-	if (typeof value !== 'string' || value.toLowerCase() === ALPHA_FULL_HEX_LONG) {
-		return {...DEFAULT_ALPHA};
+	if (typeof value !== 'string' || value.toLowerCase() === COLOR_ALPHA.fullHexLong) {
+		return {...COLOR_DEFAULTS.alpha};
 	}
 
-	if (hex && EXPRESSION_ALPHA_HEX.test(value)) {
+	if (hex && COLOR_EXPRESSION.alphaHex.test(value)) {
 		return {
 			hex: value,
-			value: Number.parseInt(value, 16) / MAX_HEX,
+			value: Number.parseInt(value, 16) / COLOR_MAX.hex,
 		};
 	}
 
@@ -33,15 +25,15 @@ export function getAlpha(value: unknown, hex: boolean): Alpha {
 }
 
 export function getAlphaHexadecimal(value: number): string {
-	if (value === ALPHA_NONE_VALUE) {
-		return ALPHA_NONE_HEX;
+	if (value === COLOR_ALPHA.noneValue) {
+		return COLOR_ALPHA.noneHex;
 	}
 
-	if (value === MAX_PERCENT) {
-		return ALPHA_FULL_HEX_LONG;
+	if (value === COLOR_MAX.percent) {
+		return COLOR_ALPHA.fullHexLong;
 	}
 
-	return round((value / MAX_PERCENT) * MAX_HEX).toString(16);
+	return round((value / COLOR_MAX.percent) * COLOR_MAX.hex).toString(16);
 }
 
 function getAlphaFromValue(value: number): Alpha {
@@ -55,10 +47,10 @@ function getAlphaFromValue(value: number): Alpha {
 
 export function getAlphaValue(original: number): number {
 	if (Number.isNaN(original)) {
-		return MAX_PERCENT;
+		return COLOR_MAX.percent;
 	}
 
-	return clamp(original, ALPHA_NONE_VALUE, MAX_PERCENT);
+	return clamp(original, COLOR_ALPHA.noneValue, COLOR_MAX.percent);
 }
 
 // #endregion

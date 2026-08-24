@@ -1,4 +1,4 @@
-import {DEFAULT_HWB, MAX_PERCENT, TYPE_HEX, TYPE_HSL, TYPE_RGB} from '../constants';
+import {COLOR_DEFAULTS, COLOR_MAX, COLOR_TYPE} from '../constants';
 import {getAlphaValue} from '../misc/alpha';
 import {getDegrees, getPercentage} from '../misc/get';
 import {isHwbLike} from '../misc/is';
@@ -18,10 +18,10 @@ import {rgbToHex} from './rgb';
 // #region Functions
 
 export function convertHwbToHsl(input: HWBAColor | HWBColor): HSLAColor {
-	let {blackness, hue, whiteness} = isHwbLike(input) ? getHwbValue(input) : DEFAULT_HWB;
+	let {blackness, hue, whiteness} = isHwbLike(input) ? getHwbValue(input) : COLOR_DEFAULTS.hwb;
 
-	blackness /= MAX_PERCENT;
-	whiteness /= MAX_PERCENT;
+	blackness /= COLOR_MAX.percent;
+	whiteness /= COLOR_MAX.percent;
 
 	if (blackness + whiteness > 1) {
 		const total = blackness + whiteness;
@@ -36,9 +36,9 @@ export function convertHwbToHsl(input: HWBAColor | HWBColor): HSLAColor {
 
 	return {
 		hue,
-		saturation: saturation * MAX_PERCENT,
-		lightness: lightness * MAX_PERCENT,
-		alpha: getAlphaValue((input as HWBAColor)?.alpha ?? MAX_PERCENT),
+		saturation: saturation * COLOR_MAX.percent,
+		lightness: lightness * COLOR_MAX.percent,
+		alpha: getAlphaValue((input as HWBAColor)?.alpha ?? COLOR_MAX.percent),
 	};
 }
 
@@ -47,15 +47,15 @@ export function getColorFromHwb<Type extends ColorType>(
 	type: Type,
 ): NonNullable<ColorState[Type]> {
 	switch (type) {
-		case TYPE_HEX:
+		case COLOR_TYPE.hex:
 			state.hex = hwbToHex(state.hwb!);
 			break;
 
-		case TYPE_HSL:
+		case COLOR_TYPE.hsl:
 			state.hsl = hwbToHsl(state.hwb!);
 			break;
 
-		case TYPE_RGB:
+		case COLOR_TYPE.rgb:
 			state.rgb = hwbToRgb(state.hwb!);
 			break;
 	}
