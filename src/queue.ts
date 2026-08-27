@@ -307,7 +307,7 @@ function createQueue(
 	};
 
 	const instance = {
-		add: (parameters: unknown[], signal?: AbortSignal) => {
+		add: (parameters: never[], signal?: unknown) => {
 			if ((instance as Queue<GenericCallback>).full) {
 				throw new QueueError(MESSAGE_MAXIMUM);
 			}
@@ -330,7 +330,7 @@ function createQueue(
 
 			const aborter = abortSignal == null ? undefined : () => rejector(abortSignal.reason);
 
-			signal?.addEventListener(EVENT_NAME, aborter!, EVENT_OPTIONS);
+			abortSignal?.addEventListener(EVENT_NAME, aborter!, EVENT_OPTIONS);
 
 			state.items.push({
 				id,
@@ -364,7 +364,7 @@ function createQueue(
 		pause: () => {
 			state.paused = true;
 		},
-		remove: (id: number) => {
+		remove: (id: never) => {
 			const index = state.items.findIndex(item => item.id === id);
 
 			if (index > -1) {
@@ -604,19 +604,13 @@ export function keyedQueue<Callback extends (key: string, ...parameters: any[]) 
 	};
 
 	const instance = {
-		add: (key: string, parameters: Tail<unknown[]>, signal?: AbortSignal) =>
+		add: (key: never, parameters: never, signal?: never) =>
 			getQueue(state, key, true).add(parameters, signal),
-		clear: (key?: string) => {
-			handleQueues(state, HANDLE_CLEAR, key);
-		},
-		get: (key: string) => getQueue(state, key),
-		pause: (key?: string): void => {
-			handleQueues(state, HANDLE_PAUSE, key);
-		},
-		remove: (key?: string, id?: number): void => removeQueue(state, key, id),
-		resume: (key?: string): void => {
-			handleQueues(state, HANDLE_RESUME, key);
-		},
+		clear: (key?: never) => handleQueues(state, HANDLE_CLEAR, key),
+		get: (key: never) => getQueue(state, key),
+		pause: (key?: never): void => handleQueues(state, HANDLE_PAUSE, key),
+		remove: (key?: never, id?: never): void => removeQueue(state, key, id),
+		resume: (key?: never): void => handleQueues(state, HANDLE_RESUME, key),
 	};
 
 	Object.defineProperties(instance, {

@@ -41,14 +41,13 @@ export function color(value: unknown): Color {
 	const subscriptions = getSubscriptions<Function>(COLOR_TYPE.all);
 
 	const instance = {
-		subscribe: (first?: unknown, second?: unknown) =>
-			subscribeToColor(subscriptions, first, second),
-		toHexString: (alpha?: boolean) =>
-			`#${alpha === true ? (instance as Color).hexa : (instance as Color).hex}`,
-		toHslString: (alpha?: boolean) => formatHslColor(state, alpha),
-		toHwbString: (alpha?: boolean) => formatHwbColor(state, alpha),
-		toRgbString: (alpha?: boolean) => formatRgbColor(state, alpha),
-		toString: () => (instance as Color).toHexString(),
+		subscribe: (first?: never, second?: never, third?: never) =>
+			subscribeToColor(subscriptions, first, second, third),
+		toHexString: (alpha?: boolean) => `#${alpha === true ? instance.hexa : instance.hex}`,
+		toHslString: (alpha?: never) => formatHslColor(state, alpha),
+		toHwbString: (alpha?: never) => formatHwbColor(state, alpha),
+		toRgbString: (alpha?: never) => formatRgbColor(state, alpha),
+		toString: () => instance.toHexString(),
 		unsubscribe: () => clearSubscriptions(subscriptions),
 	};
 
@@ -62,21 +61,21 @@ export function color(value: unknown): Color {
 			get: () => state.alpha.value,
 			set: (value: unknown) => setAlphaValue(state, value),
 		},
-		hex: getProperty(COLOR_TYPE.hex, instance as Color, state, subscriptions, false),
-		hexa: getProperty(COLOR_TYPE.hex, instance as Color, state, subscriptions, true),
-		hsl: getProperty(COLOR_TYPE.hsl, instance as Color, state, subscriptions, false),
-		hsla: getProperty(COLOR_TYPE.hsl, instance as Color, state, subscriptions, true),
-		hwb: getProperty(COLOR_TYPE.hwb, instance as Color, state, subscriptions, false),
-		hwba: getProperty(COLOR_TYPE.hwb, instance as Color, state, subscriptions, true),
+		hex: getProperty(COLOR_TYPE.hex, instance, state, subscriptions, false),
+		hexa: getProperty(COLOR_TYPE.hex, instance, state, subscriptions, true),
+		hsl: getProperty(COLOR_TYPE.hsl, instance, state, subscriptions, false),
+		hsla: getProperty(COLOR_TYPE.hsl, instance, state, subscriptions, true),
+		hwb: getProperty(COLOR_TYPE.hwb, instance, state, subscriptions, false),
+		hwba: getProperty(COLOR_TYPE.hwb, instance, state, subscriptions, true),
 		origin: {
 			enumerable: true,
 			get: () => state.origin,
 		},
-		rgb: getProperty(COLOR_TYPE.rgb, instance as Color, state, subscriptions, false),
-		rgba: getProperty(COLOR_TYPE.rgb, instance as Color, state, subscriptions, true),
+		rgb: getProperty(COLOR_TYPE.rgb, instance, state, subscriptions, false),
+		rgba: getProperty(COLOR_TYPE.rgb, instance, state, subscriptions, true),
 	});
 
-	return Object.freeze(instance) as Color;
+	return Object.freeze(instance);
 }
 
 function getProperty(
@@ -120,14 +119,18 @@ function subscribeToColor(
 	subscriptions: Subscriptions,
 	first: unknown,
 	second?: unknown,
+	third?: unknown,
 ): Subscription {
 	let key: string | undefined;
+	let signal: unknown | undefined;
 	let value: Function | undefined;
 
 	if (typeof first === 'string') {
 		key = first;
+		signal = third;
 		value = second as Function;
 	} else if (typeof first === 'function') {
+		signal = second;
 		value = first;
 	}
 
@@ -140,6 +143,7 @@ function subscribeToColor(
 		subscriptions,
 		value,
 		property: colorSubscription,
+		signal: signal instanceof AbortSignal ? signal : undefined,
 	});
 }
 
@@ -149,7 +153,6 @@ function subscribeToColor(
 
 const colorSubscription: SubscriptionProperty = {
 	key: COLOR_PROPERTY.name,
-	value: COLOR_PROPERTY.subscription,
 };
 
 const setters: SetValues = {

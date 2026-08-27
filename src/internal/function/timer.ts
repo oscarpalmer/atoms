@@ -58,7 +58,7 @@ export function getAsyncTimer<Callback extends GenericAsyncCallback | GenericCal
 	const throttle = type === TIMER_THROTTLE;
 
 	let id: number;
-	let last: AsyncItem;
+	let last: AsyncItem | undefined;
 	let start: number | undefined;
 
 	const timer = (...parameters: Parameters<Callback>): Promise<unknown> => {
@@ -92,6 +92,8 @@ export function getAsyncTimer<Callback extends GenericAsyncCallback | GenericCal
 
 		if (last != null && !last.running) {
 			last.reject();
+
+			last = undefined;
 		}
 	};
 

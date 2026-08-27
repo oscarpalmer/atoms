@@ -94,7 +94,6 @@ export const COLOR_MAX = {
 
 export const COLOR_PROPERTY = {
 	name: '$color',
-	subscription: 'subscription',
 };
 
 export const COLOR_TYPE: ColorTypes = {

@@ -229,7 +229,7 @@ export function fuzzy(items: unknown[], configuration?: unknown): Fuzzy<unknown>
 	const state = getFuzzyState(items, configuration);
 
 	const instance = {
-		search: (value: string, options?: number | FuzzyOptions) =>
+		search: (value: never, options?: never) =>
 			search(
 				state.items,
 				state.strings,
@@ -240,6 +240,7 @@ export function fuzzy(items: unknown[], configuration?: unknown): Fuzzy<unknown>
 
 	Object.defineProperties(instance, {
 		items: {
+			enumerable: true,
 			get: () => state.items.slice(),
 			set: (items: unknown[]) => {
 				if (!Array.isArray(items)) {
@@ -251,6 +252,7 @@ export function fuzzy(items: unknown[], configuration?: unknown): Fuzzy<unknown>
 			},
 		},
 		strings: {
+			enumerable: true,
 			get: () => state.strings.slice(),
 		},
 	});

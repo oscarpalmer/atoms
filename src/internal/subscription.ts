@@ -19,13 +19,14 @@ export type SubscriptionParameters = {
 	isActive?: () => boolean;
 	key?: Key;
 	property: SubscriptionProperty;
+	signal?: AbortSignal;
 	subscriptions: Subscriptions;
 	value: unknown;
 };
 
 export type SubscriptionProperty = {
 	key: string;
-	value: unknown;
+	value?: unknown;
 };
 
 type SubscriptionState = {
@@ -131,6 +132,10 @@ function getExistingSubscription(state: SubscriptionState): Subscription | undef
 }
 
 export function getSubscription(parameters: SubscriptionParameters): Subscription {
+	if (parameters.signal?.aborted ?? false) {
+		throw new Error(parameters.signal!.reason);
+	}
+
 	const state: SubscriptionState = {
 		parameters,
 		active: true,
@@ -151,9 +156,7 @@ export function getSubscription(parameters: SubscriptionParameters): Subscriptio
 	}
 
 	const instance = {
-		unsubscribe: () => {
-			removeSubscription(instance as Subscription, state);
-		},
+		unsubscribe: () => unsubscribe(instance as Subscription, state),
 	};
 
 	Object.defineProperties(instance, {
@@ -163,7 +166,7 @@ export function getSubscription(parameters: SubscriptionParameters): Subscriptio
 		},
 		[parameters.property.key]: {
 			enumerable: false,
-			value: parameters.property.value,
+			value: parameters.property.value ?? NAME,
 		},
 		active: {
 			enumerable: true,
@@ -231,6 +234,10 @@ function removeSubscription(subscription: Subscription, state: SubscriptionState
 
 	state.active = false;
 
+	state.parameters.isActive = undefined;
+	state.parameters.signal = undefined;
+	state.parameters.subscriptions = undefined as never;
+
 	const {key, subscriptions, value} = state.parameters;
 	const {items, values} = subscriptions;
 
@@ -255,9 +262,21 @@ function removeSubscription(subscription: Subscription, state: SubscriptionState
 	}
 }
 
+function unsubscribe(subscription: Subscription, state: SubscriptionState): void {
+	if (state.parameters.signal == null) {
+		removeSubscription(subscription, state);
+	} else if (!state.parameters.signal.aborted) {
+		state.parameters.signal.dispatchEvent(new Event(EVENT));
+	}
+}
+
 // #endregion
 
 // #region Variables
+
+const EVENT = 'abort';
+
+const NAME = 'subscription';
 
 const PROPERTY = '$subscription';
 

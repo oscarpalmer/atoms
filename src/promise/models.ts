@@ -7,7 +7,7 @@ import type {Result} from '../result/models';
  * A _Promise_ that can be canceled
  */
 export class CancelablePromise<Value = void> extends Promise<Value> {
-	#rejector!: (reason: unknown) => void;
+	#rejector: ((reason: unknown) => void) | undefined;
 
 	constructor(
 		executor: (resolve: (value: Value) => void, reject: (reason: unknown) => void) => void,
@@ -29,7 +29,9 @@ export class CancelablePromise<Value = void> extends Promise<Value> {
 	 * @param reason Optional reason for canceling the _Promise_
 	 */
 	cancel(reason?: unknown): void {
-		this.#rejector(reason);
+		this.#rejector?.(reason);
+
+		this.#rejector = undefined;
 	}
 }
 

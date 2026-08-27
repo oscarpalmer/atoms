@@ -82,9 +82,9 @@ export type MemoizedOptions<Callback extends GenericCallback> = {
 	cacheSize?: number;
 };
 
-type MemoizedState<Callback extends GenericCallback> = {
-	cache?: SizedMap<unknown, ReturnType<Callback>>;
-	getter?: (...parameters: Parameters<Callback>) => ReturnType<Callback>;
+type MemoizedState = {
+	cache?: SizedMap<unknown, unknown>;
+	getter?: GenericCallback;
 	options: Options;
 };
 
@@ -123,13 +123,13 @@ export function memoize<Callback extends GenericCallback>(
 		throw new TypeError(MEMOIZED_ERROR_CALLBACK);
 	}
 
-	const state: MemoizedState<Callback> = {
+	const state: MemoizedState = {
 		options: getMemoizationOptions(options),
 	};
 
-	state.cache = new SizedMap<unknown, ReturnType<Callback>>(state.options.cacheSize);
+	state.cache = new SizedMap(state.options.cacheSize);
 
-	state.getter = (...parameters: Parameters<Callback>): ReturnType<Callback> => {
+	state.getter = (...parameters: never[]) => {
 		const key =
 			state.options.cacheKey?.(...parameters) ??
 			(parameters.length === 1 ? parameters[0] : join(parameters.map(getString), SEPARATOR));
@@ -149,21 +149,15 @@ export function memoize<Callback extends GenericCallback>(
 		clear: () => {
 			state.cache?.clear();
 		},
-		delete: (key: unknown) => {
-			return state.cache?.delete(key) ?? false;
-		},
+		delete: (key: never) => state.cache?.delete(key) ?? false,
 		destroy: () => {
 			state.cache?.clear();
 
 			state.cache = undefined;
 			state.getter = undefined;
 		},
-		get: (key: unknown) => {
-			return state.cache?.get(key);
-		},
-		has: (key: unknown) => {
-			return state.cache?.has(key) ?? false;
-		},
+		get: (key: never) => state.cache?.get(key),
+		has: (key: never) => state.cache?.has(key) ?? false,
 		run: (...parameters: Parameters<Callback>) => {
 			if (state.cache == null || state.getter == null) {
 				throw new Error(MEMOIZED_ERROR_DESTROYED);

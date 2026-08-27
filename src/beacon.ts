@@ -156,10 +156,10 @@ export function beacon<Value>(value: Value, options?: BeaconOptions<Value>): Bea
 		deactivate: (): void => {
 			finishBeacon(state, false);
 		},
-		emit: (value: Value, finish?: boolean): void => {
+		emit: (value: never, finish?: never): void => {
 			update(TYPE_NEXT, state, value, finish);
 		},
-		error: (value: Error, finish?: boolean): void => {
+		error: (value: never, finish?: never): void => {
 			update(TYPE_ERROR, state, value, finish);
 		},
 		finish: (): void => {
@@ -287,11 +287,7 @@ function observe<Value>(beacon: BeaconState<Value>): Observable<Value> {
 		deactivate: (): void => {
 			state.active = false;
 		},
-		subscribe(
-			first: Observer<Value> | ((value: Value) => void),
-			second?: (error: Error) => void,
-			third?: () => void,
-		): Subscription {
+		subscribe(first: never, second?: never, third?: never): Subscription {
 			if (!beacon.active || !state.active) {
 				throw new Error(MESSAGE_OBSERVABLE);
 			}
@@ -372,7 +368,6 @@ const TYPE_NEXT = 'next';
 
 const beaconSubscription: SubscriptionProperty = {
 	key: KEY_BEACON,
-	value: 'subscription',
 };
 
 // #endregion
