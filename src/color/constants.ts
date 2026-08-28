@@ -21,6 +21,7 @@ type ColorTypes = {
 	hwba: 'hwba';
 	rgb: 'rgb';
 	rgba: 'rgba';
+	wildcard: '*';
 };
 
 // #endregion
@@ -106,6 +107,7 @@ export const COLOR_TYPE: ColorTypes = {
 	hwba: 'hwba',
 	rgb: 'rgb',
 	rgba: 'rgba',
+	wildcard: '*',
 };
 
 COLOR_TYPE.all = new Set([

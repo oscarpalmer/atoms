@@ -123,7 +123,7 @@ function setColorValue<Type extends ColorType>(
 		}
 	}
 
-	changes.emit('all', color);
+	changes.emit(COLOR_TYPE.wildcard, color);
 }
 
 export function setHexColor(

@@ -1,4 +1,5 @@
-import type {Herald} from '../herald';
+import type {HeraldEvents} from '../herald';
+import type {Subscription} from '../internal/subscription';
 import type {COLOR_ALPHA} from './constants';
 
 // #region Types
@@ -15,7 +16,7 @@ export type Color = {
 	/**
 	 *
 	 */
-	readonly changes: Herald<ColorChanges>;
+	readonly changes: HeraldEvents<ColorChanges>;
 
 	/**
 	 * Get the alpha channel _(opacity)_ of the color as a percentage between `0` and `100`
@@ -161,6 +162,14 @@ export type Color = {
 	set rgba(value: RGBAColor);
 
 	/**
+	 * Subscribe to value changes for the color
+	 *
+	 * @param callback Callback function
+	 * @param signal Optional abort signal to cancel the subscription
+	 */
+	subscribe(callback: (value: Color) => void, signal?: AbortSignal): Subscription;
+
+	/**
 	 * Get the color as a hex string
 	 *
 	 * @param alpha Include alpha channel _(opacity)_? _(defaults to `false`)_
@@ -208,7 +217,7 @@ export type Color = {
 };
 
 export type ColorChanges = {
-	all: (value: Color) => void;
+	'*': (value: Color) => void;
 	alpha: (value: number) => void;
 	hex: (value: string) => void;
 	hexa: (value: string) => void;

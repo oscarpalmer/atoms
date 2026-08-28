@@ -420,18 +420,6 @@ function getBooleanOrDefault(value: unknown, defaultValue: boolean): boolean {
 	return typeof value === 'boolean' ? value : defaultValue;
 }
 
-function getItems(state: KeyedQueueState): Record<string, number> {
-	const size: Record<string, number> = {};
-
-	const queues = state.queues.entries();
-
-	for (const [key, queue] of queues) {
-		size[key] = queue.size;
-	}
-
-	return size;
-}
-
 function getOptions(input?: QueueOptions): Required<QueueOptions> {
 	const options = typeof input === 'object' && input != null ? input : {};
 
@@ -464,6 +452,18 @@ function getQueue(
 	}
 
 	return queue;
+}
+
+function getQueueItems(state: KeyedQueueState): Record<string, number> {
+	const size: Record<string, number> = {};
+
+	const queues = state.queues.entries();
+
+	for (const [key, queue] of queues) {
+		size[key] = queue.size;
+	}
+
+	return size;
 }
 
 function getStatus(state: KeyedQueueState, status: StatusKey): string[] {
@@ -618,7 +618,7 @@ export function keyedQueue<Callback extends (key: string, ...parameters: any[]) 
 		},
 		items: {
 			enumerable: true,
-			get: () => getItems(state),
+			get: () => getQueueItems(state),
 		},
 		keys: {
 			enumerable: true,

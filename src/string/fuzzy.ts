@@ -145,7 +145,7 @@ function getHandler<Item>(input: unknown): (item: Item) => string {
 	}
 }
 
-function getItems<Item>(items: FuzzyItem<Item>[]): Item[] {
+function getFuzzyItems<Item>(items: FuzzyItem<Item>[]): Item[] {
 	return items
 		.sort((first, second) => first.haystack.localeCompare(second.haystack))
 		.map(({item}) => item);
@@ -409,11 +409,11 @@ function search<Item>(
 				break;
 			}
 
-			similar.push(...getItems(scored[key]));
+			similar.push(...getFuzzyItems(scored[key]));
 		}
 	}
 
-	result.exact = getItems(options.limit == null ? exact : exact.slice(0, options.limit));
+	result.exact = getFuzzyItems(options.limit == null ? exact : exact.slice(0, options.limit));
 
 	if (options.limit == null) {
 		result.similar = similar;

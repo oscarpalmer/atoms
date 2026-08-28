@@ -156,8 +156,8 @@ export function beacon<Value>(value: Value, options?: BeaconOptions<Value>): Bea
 
 	const instance: unknown = {
 		deactivate: (): void => finishBeacon(state, false),
-		emit: (value: never, finish?: never): void => update(BEACON_TYPE_NEXT, state, value, finish),
-		error: (value: never, finish?: never): void => update(BEACON_TYPE_ERROR, state, value, finish),
+		emit: (value: never, finish?: never): void => updateBeacon(BEACON_TYPE_NEXT, state, value, finish),
+		error: (value: never, finish?: never): void => updateBeacon(BEACON_TYPE_ERROR, state, value, finish),
 		finish: (): void => finishBeacon(state, true),
 	};
 
@@ -215,7 +215,7 @@ function getObservable<Value>(state: BeaconState<Value>): Observable<Value> {
 		throw new Error(BEACON_MESSAGE_RETRIEVE);
 	}
 
-	state.observable ??= observe(state);
+	state.observable ??= observeBeacon(state);
 
 	return state.observable;
 }
@@ -282,7 +282,7 @@ export function isObservable<Value = unknown>(value: unknown): value is Observab
 	return isBeaconInstance<Observable<Value>>(BEACON_OBSERVABLE, value);
 }
 
-function observe<Value>(beacon: BeaconState<Value>): Observable<Value> {
+function observeBeacon<Value>(beacon: BeaconState<Value>): Observable<Value> {
 	const state: ObservableState<Value> = {
 		beacon,
 		active: beacon.active,
@@ -331,7 +331,7 @@ function subscribeToObservable<Value>(
 	return subscription;
 }
 
-function update<Value>(
+function updateBeacon<Value>(
 	type: typeof BEACON_TYPE_NEXT | typeof BEACON_TYPE_ERROR,
 	state: BeaconState<Value>,
 	value: Error | Value,

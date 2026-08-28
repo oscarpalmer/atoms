@@ -31,14 +31,16 @@ type SetValues = Record<ColorType, SetValue>;
 
 export function color(value: unknown): Color {
 	const changes = herald<ColorChanges>({
-		names: ['all', ...COLOR_TYPE.all],
+		names: [COLOR_TYPE.wildcard, ...COLOR_TYPE.all],
 		property: colorSubscription,
-		onCreate: (event, callback) => callback(event === 'all' ? color : (instance as Color)[event]),
+		onCreate: (event, callback) => onCreateSubscription(instance as Color, event, callback),
 	});
 
 	const state = getColorState(value);
 
 	const instance: unknown = {
+		subscribe: (callback: never, signal?: AbortSignal) =>
+			changes.subscribe(COLOR_TYPE.wildcard, callback, signal),
 		toHexString: (alpha?: never) => formatHexColor(instance as Color, alpha),
 		toHslString: (alpha?: never) => formatHslColor(state, alpha),
 		toHwbString: (alpha?: never) => formatHwbColor(state, alpha),
@@ -60,24 +62,24 @@ export function color(value: unknown): Color {
 			enumerable: true,
 			value: changes.events,
 		},
-		hex: getProperty(COLOR_TYPE.hex, instance as Color, state, changes, false),
-		hexa: getProperty(COLOR_TYPE.hex, instance as Color, state, changes, true),
-		hsl: getProperty(COLOR_TYPE.hsl, instance as Color, state, changes, false),
-		hsla: getProperty(COLOR_TYPE.hsl, instance as Color, state, changes, true),
-		hwb: getProperty(COLOR_TYPE.hwb, instance as Color, state, changes, false),
-		hwba: getProperty(COLOR_TYPE.hwb, instance as Color, state, changes, true),
+		hex: getColorProperty(COLOR_TYPE.hex, instance as Color, state, changes, false),
+		hexa: getColorProperty(COLOR_TYPE.hex, instance as Color, state, changes, true),
+		hsl: getColorProperty(COLOR_TYPE.hsl, instance as Color, state, changes, false),
+		hsla: getColorProperty(COLOR_TYPE.hsl, instance as Color, state, changes, true),
+		hwb: getColorProperty(COLOR_TYPE.hwb, instance as Color, state, changes, false),
+		hwba: getColorProperty(COLOR_TYPE.hwb, instance as Color, state, changes, true),
 		origin: {
 			enumerable: true,
 			get: () => state.origin,
 		},
-		rgb: getProperty(COLOR_TYPE.rgb, instance as Color, state, changes, false),
-		rgba: getProperty(COLOR_TYPE.rgb, instance as Color, state, changes, true),
+		rgb: getColorProperty(COLOR_TYPE.rgb, instance as Color, state, changes, false),
+		rgba: getColorProperty(COLOR_TYPE.rgb, instance as Color, state, changes, true),
 	});
 
 	return Object.freeze(instance) as Color;
 }
 
-function getProperty(
+function getColorProperty(
 	space: keyof typeof setters,
 	color: Color,
 	state: ColorState,
@@ -88,12 +90,12 @@ function getProperty(
 
 	return {
 		enumerable: true,
-		get: () => getValue(space, state, alpha),
+		get: () => getColorValue(space, state, alpha),
 		set: (value: unknown) => setValue(color, state, changes, value, alpha),
 	};
 }
 
-function getValue(space: keyof typeof setters, state: ColorState, alpha: boolean) {
+function getColorValue(space: keyof typeof setters, state: ColorState, alpha: boolean) {
 	const value = getColorFromState(state, space);
 
 	if (typeof value === 'string') {
@@ -106,6 +108,22 @@ function getValue(space: keyof typeof setters, state: ColorState, alpha: boolean
 				alpha: state.alpha.value,
 			}
 		: {...value};
+}
+
+function onCreateSubscription(
+	instance: Color,
+	event: string,
+	callback: (value: never) => void,
+): void {
+	let value: unknown;
+
+	if (event === COLOR_TYPE.wildcard) {
+		value = instance as Color;
+	} else {
+		value = (instance as Color)[event as keyof Color];
+	}
+
+	callback(value as never);
 }
 
 function setAlphaValue(state: ColorState, value: unknown): void {

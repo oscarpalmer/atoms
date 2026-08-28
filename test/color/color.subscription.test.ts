@@ -29,14 +29,12 @@ test('', () => {
 	expect(values.instance).toBeUndefined();
 	expect(values.hexes).toEqual([]);
 
-	color.changes.subscribe('all', instance => {
-		console.log('all', instance);
-
+	color.subscribe(instance => {
 		values.instance = instance;
 	});
 
-	const hexOne = color.changes.subscribe('hex', onHex);
-	const hexTwo = color.changes.subscribe('hex', onHex);
+	const hexOne = color.changes.hex(onHex);
+	const hexTwo = color.changes.hex(onHex);
 
 	expect(hexOne).toBe(hexTwo);
 
@@ -50,51 +48,47 @@ test('', () => {
 
 	const controller = new AbortController();
 
-	color.changes.subscribe(
-		'hex',
-		hex => {
-			values.signaled.push(hex);
-		},
-		controller.signal,
-	);
+	color.changes.hex(hex => {
+		values.signaled.push(hex);
+	}, controller.signal);
 
 	expect(() => {
-		color.changes.subscribe('hex', () => {}, AbortSignal.abort());
+		color.changes.hex(() => {}, AbortSignal.abort());
 	}).toThrow();
 
-	color.changes.subscribe('hex', hex => {
+	color.changes.hex(hex => {
 		expect(isHexColor(hex)).toBe(true);
 	});
 
-	color.changes.subscribe('hexa', hexa => {
+	color.changes.hexa(hexa => {
 		expect(isHexColor(hexa, true)).toBe(true);
 	});
 
-	color.changes.subscribe('hsl', hsl => {
+	color.changes.hsl(hsl => {
 		expect(isHslColor(hsl)).toBe(true);
 	});
 
-	color.changes.subscribe('hsla', hsla => {
+	color.changes.hsla(hsla => {
 		expect(isHslaColor(hsla)).toBe(true);
 	});
 
-	color.changes.subscribe('hwb', hwb => {
+	color.changes.hwb(hwb => {
 		expect(isHwbColor(hwb)).toBe(true);
 	});
 
-	color.changes.subscribe('hwba', hwba => {
+	color.changes.hwba(hwba => {
 		expect(isHwbaColor(hwba)).toBe(true);
 	});
 
-	color.changes.subscribe('rgb', rgb => {
+	color.changes.rgb(rgb => {
 		expect(isRgbColor(rgb)).toBe(true);
 	});
 
-	color.changes.subscribe('rgba', rgba => {
+	color.changes.rgba(rgba => {
 		expect(isRgbaColor(rgba)).toBe(true);
 	});
 
-	// expect(values.instance).toBe(color);
+	expect(values.instance).toBe(color);
 	expect(values.hexes).toEqual(['ff0000']);
 	expect(values.signaled).toEqual(['ff0000']);
 
@@ -102,7 +96,7 @@ test('', () => {
 
 	color.hex = '#0f0';
 
-	// expect(values.instance).toBe(color);
+	expect(values.instance).toBe(color);
 	expect(values.hexes).toEqual(['ff0000', '00ff00']);
 	expect(values.signaled).toEqual(['ff0000']);
 
@@ -110,7 +104,7 @@ test('', () => {
 
 	color.hex = '#00f';
 
-	// expect(values.instance).toBe(color);
+	expect(values.instance).toBe(color);
 	expect(values.hexes).toEqual(['ff0000', '00ff00']);
 	expect(values.signaled).toEqual(['ff0000']);
 });
