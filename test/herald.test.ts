@@ -23,7 +23,9 @@ test('', () => {
 		sig: [] as number[],
 	};
 
-	const harold = herald<Events>(['bar', 'baz', 'foo', 'sig']);
+	const harold = herald<Events>({
+		names: ['bar', 'baz', 'foo', 'sig'],
+	});
 
 	expect(isHerald(harold)).toBe(true);
 	expect(isHerald(harold.events)).toBe(false);

@@ -1,7 +1,8 @@
-import type {Subscriptions} from '../../internal/subscription';
+import type {Herald} from '../../herald';
 import {COLOR_DEFAULTS, COLOR_KEYS, COLOR_LENGTHS, COLOR_MAX, COLOR_TYPE} from '../constants';
 import type {
 	Color,
+	ColorChanges,
 	ColorState,
 	ColorType,
 	HSLAColor,
@@ -99,7 +100,7 @@ function getDefaultColorState(): ColorState {
 function setColorValue<Type extends ColorType>(
 	color: Color,
 	state: ColorState,
-	subscriptions: Subscriptions<Function>,
+	changes: Herald<ColorChanges>,
 	type: Type,
 	value: ColorState[Type],
 	alpha?: number | string,
@@ -117,24 +118,18 @@ function setColorValue<Type extends ColorType>(
 	}
 
 	for (const type of COLOR_TYPE.all) {
-		const callbacks = subscriptions.state.values.to.keyed?.get(type);
-
-		if (callbacks != null) {
-			for (const callback of callbacks.values()) {
-				callback(color[type]);
-			}
+		if (changes.observed(type)) {
+			changes.emit(type, color[type as keyof Color] as never);
 		}
 	}
 
-	for (const callback of subscriptions.state.values.to.any.values()) {
-		callback(color);
-	}
+	changes.emit('all', color);
 }
 
 export function setHexColor(
 	color: Color,
 	state: ColorState,
-	subscriptions: Subscriptions<Function>,
+	changes: Herald<ColorChanges>,
 	value: string,
 	alpha: boolean,
 ): void {
@@ -147,7 +142,7 @@ export function setHexColor(
 	setColorValue(
 		color,
 		state,
-		subscriptions,
+		changes,
 		COLOR_TYPE.hex,
 		normalized.slice(0, COLOR_LENGTHS.hexLong),
 		alpha ? normalized.slice(COLOR_LENGTHS.hexLong) : undefined,
@@ -157,7 +152,7 @@ export function setHexColor(
 export function setHSLColor(
 	color: Color,
 	state: ColorState,
-	subscriptions: Subscriptions<Function>,
+	changes: Herald<ColorChanges>,
 	value: unknown,
 	alpha: boolean,
 ): void {
@@ -168,7 +163,7 @@ export function setHSLColor(
 	setColorValue(
 		color,
 		state,
-		subscriptions,
+		changes,
 		COLOR_TYPE.hsl,
 		{
 			hue: getDegrees((value as HSLColor).hue),
@@ -182,7 +177,7 @@ export function setHSLColor(
 export function setHWBColor(
 	color: Color,
 	state: ColorState,
-	subscriptions: Subscriptions<Function>,
+	changes: Herald<ColorChanges>,
 	value: unknown,
 	alpha: boolean,
 ): void {
@@ -193,7 +188,7 @@ export function setHWBColor(
 	setColorValue(
 		color,
 		state,
-		subscriptions,
+		changes,
 		COLOR_TYPE.hwb,
 		{
 			hue: getDegrees((value as HWBColor).hue),
@@ -207,7 +202,7 @@ export function setHWBColor(
 export function setRGBColor(
 	color: Color,
 	state: ColorState,
-	subscriptions: Subscriptions<Function>,
+	changes: Herald<ColorChanges>,
 	value: unknown,
 	alpha: boolean,
 ): void {
@@ -218,7 +213,7 @@ export function setRGBColor(
 	setColorValue(
 		color,
 		state,
-		subscriptions,
+		changes,
 		COLOR_TYPE.rgb,
 		{
 			red: getHexValue((value as RGBColor).red),

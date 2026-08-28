@@ -149,7 +149,9 @@ export function beacon<Value>(value: Value, options?: BeaconOptions<Value>): Bea
 		active: true,
 		observable: undefined as never,
 		options: getBeaconOptions(options),
-		subscriptions: createSubscriptions(),
+		subscriptions: createSubscriptions({
+			property: beaconSubscription,
+		}),
 	};
 
 	const instance: unknown = {
@@ -321,7 +323,6 @@ function subscribeToObservable<Value>(
 
 	const [subscription] = state.beacon.subscriptions.create({
 		isActive: () => state.beacon.active && state.active,
-		property: beaconSubscription,
 		value: observer,
 	});
 

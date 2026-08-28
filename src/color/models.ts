@@ -1,5 +1,5 @@
-import type {Subscription} from '../internal/subscription';
-import type {COLOR_ALPHA, COLOR_TYPE} from './constants';
+import type {Herald} from '../herald';
+import type {COLOR_ALPHA} from './constants';
 
 // #region Types
 
@@ -12,6 +12,11 @@ export type Alpha = {
  * A color that is represented in multiple color formats
  */
 export type Color = {
+	/**
+	 *
+	 */
+	readonly changes: Herald<ColorChanges>;
+
 	/**
 	 * Get the alpha channel _(opacity)_ of the color as a percentage between `0` and `100`
 	 *
@@ -156,127 +161,6 @@ export type Color = {
 	set rgba(value: RGBAColor);
 
 	/**
-	 * Subscribe to alpha channel _(opacity)_ changes of the color
-	 *
-	 * @param key Color property to subscribe to
-	 * @param callback Callback function for changes
-	 * @param signal Optional abort signal to cancel the subscription
-	 */
-	subscribe(key: 'alpha', callback: (value: number) => void, signal?: AbortSignal): Subscription;
-
-	/**
-	 * Subscribe to hex color changes of the color
-	 *
-	 * @param key Color type to subscribe to
-	 * @param callback Callback function for changes
-	 * @param signal Optional abort signal to cancel the subscription
-	 */
-	subscribe(
-		key: typeof COLOR_TYPE.hex,
-		callback: (value: string) => void,
-		signal?: AbortSignal,
-	): Subscription;
-
-	/**
-	 * Subscribe to hex color changes of the color with alpha channel _(opacity)_
-	 *
-	 * @param key Color type to subscribe to
-	 * @param callback Callback function for changes
-	 * @param signal Optional abort signal to cancel the subscription
-	 */
-	subscribe(
-		key: typeof COLOR_TYPE.hexa,
-		callback: (value: string) => void,
-		signal?: AbortSignal,
-	): Subscription;
-
-	/**
-	 * Subscribe to _HSL_ color changes of the color
-	 *
-	 * @param key Color type to subscribe to
-	 * @param callback Callback function for changes
-	 * @param signal Optional abort signal to cancel the subscription
-	 */
-	subscribe(
-		key: typeof COLOR_TYPE.hsl,
-		callback: (value: HSLColor) => void,
-		signal?: AbortSignal,
-	): Subscription;
-
-	/**
-	 * Subscribe to _HSL(A)_ color changes of the color
-	 *
-	 * @param key Color type to subscribe to
-	 * @param callback Callback function for changes
-	 * @param signal Optional abort signal to cancel the subscription
-	 */
-	subscribe(
-		key: typeof COLOR_TYPE.hsla,
-		callback: (value: HSLAColor) => void,
-		signal?: AbortSignal,
-	): Subscription;
-
-	/**
-	 * Subscribe to _HWB_ color changes of the color
-	 *
-	 * @param key Color type to subscribe to
-	 * @param callback Callback function for changes
-	 * @param signal Optional abort signal to cancel the subscription
-	 */
-	subscribe(
-		key: typeof COLOR_TYPE.hwb,
-		callback: (value: HWBColor) => void,
-		signal?: AbortSignal,
-	): Subscription;
-
-	/**
-	 * Subscribe to _HWB(A)_ color changes of the color
-	 *
-	 * @param key Color type to subscribe to
-	 * @param callback Callback function for changes
-	 * @param signal Optional abort signal to cancel the subscription
-	 */
-	subscribe(
-		key: typeof COLOR_TYPE.hwba,
-		callback: (value: HWBAColor) => void,
-		signal?: AbortSignal,
-	): Subscription;
-
-	/**
-	 * Subscribe to _RGB_ color changes of the color
-	 *
-	 * @param key Color type to subscribe to
-	 * @param callback Callback function for changes
-	 * @param signal Optional abort signal to cancel the subscription
-	 */
-	subscribe(
-		key: typeof COLOR_TYPE.rgb,
-		callback: (value: RGBColor) => void,
-		signal?: AbortSignal,
-	): Subscription;
-
-	/**
-	 * Subscribe to _RGBA_ color changes of the color
-	 *
-	 * @param key Color type to subscribe to
-	 * @param callback Callback function for changes
-	 * @param signal Optional abort signal to cancel the subscription
-	 */
-	subscribe(
-		key: typeof COLOR_TYPE.rgba,
-		callback: (value: RGBAColor) => void,
-		signal?: AbortSignal,
-	): Subscription;
-
-	/**
-	 * Subscribe to any color changes of the color
-	 *
-	 * @param callback Callback function for changes
-	 * @param signal Optional abort signal to cancel the subscription
-	 */
-	subscribe(callback: (value: Color) => void, signal?: AbortSignal): Subscription;
-
-	/**
 	 * Get the color as a hex string
 	 *
 	 * @param alpha Include alpha channel _(opacity)_? _(defaults to `false`)_
@@ -321,6 +205,19 @@ export type Color = {
 	 * _(To unsubscribe from a specific color change, use the `unsubscribe()` method on the `Subscription` returned by the individual `subscribe()` method)_
 	 */
 	unsubscribe(): void;
+};
+
+export type ColorChanges = {
+	all: (value: Color) => void;
+	alpha: (value: number) => void;
+	hex: (value: string) => void;
+	hexa: (value: string) => void;
+	hsl: (value: HSLColor) => void;
+	hsla: (value: HSLAColor) => void;
+	hwb: (value: HWBColor) => void;
+	hwba: (value: HWBAColor) => void;
+	rgb: (value: RGBColor) => void;
+	rgba: (value: RGBAColor) => void;
 };
 
 type ColorWithAlpha = {

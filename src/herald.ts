@@ -28,6 +28,14 @@ export type Herald<Events extends Record<string, GenericCallback>> = {
 	emit<Event extends keyof Events>(event: Event, ...parameters: Parameters<Events[Event]>): void;
 
 	/**
+	 * Is the event observed by any subscribers?
+	 *
+	 * @param event Event name
+	 * @returns `true` if the event is observed, otherwise `false`
+	 */
+	observed<Event extends keyof Events>(event: Event): boolean;
+
+	/**
 	 * Subscribe to an event with a callback
 	 *
 	 * @param event Event name
@@ -58,16 +66,30 @@ export type HeraldEvents<Events extends Record<string, GenericCallback>> = {
 	): Subscription;
 };
 
+type HeraldOnCreate<Events extends Record<string, GenericCallback>> = <Event extends keyof Events>(
+	event: Event,
+	callback: Events[Event],
+	subscription: Subscription,
+) => void;
+
+export type HeraldOptions<Events extends Record<string, GenericCallback>> = {
+	names: Array<keyof Events>;
+	property?: SubscriptionProperty;
+	onCreate?: HeraldOnCreate<Events>;
+};
+
+type HeraldState = {
+	keys: Set<string>;
+	subscriptions: Subscriptions<GenericCallback>;
+	onCreate?: HeraldOnCreate<Record<string, GenericCallback>>;
+};
+
 // #endregion
 
 // #region Functions
 
-function emit(
-	subscriptions: Subscriptions<GenericCallback>,
-	event: string,
-	...parameters: unknown[]
-): void {
-	const items = subscriptions.state.values.from.keyed?.get(event);
+function emit(state: HeraldState, event: string, ...parameters: unknown[]): void {
+	const items = state.subscriptions.state.values.from.keyed?.get(event);
 
 	if (items == null || items.size === 0) {
 		return;
@@ -93,31 +115,74 @@ function getEvents<Events extends Record<string, GenericCallback>>(
 	return Object.freeze(events) as HeraldEvents<Events>;
 }
 
-/**
- * Create a _Herald_ for announcing named events
- *
- * @param names Event names
- * @returns _Herald_ instance
- */
-export function herald<Events extends Record<string, GenericCallback>>(
-	names: (keyof Events)[],
-): Herald<Events> {
+function getProperty(input: unknown): SubscriptionProperty {
+	if (input == null) {
+		return heraldSubscription;
+	}
+
+	const property = isPlainObject(input) ? input : {};
+
 	if (
-		!Array.isArray(names) ||
-		names.length === 0 ||
-		!names.every(name => typeof name === 'string')
+		typeof property.key !== 'string' ||
+		(property.value != null && typeof property.value !== 'string')
+	) {
+		throw new Error(HERALD_MESSAGE_PROPERTY);
+	}
+
+	return {
+		key: property.key,
+		value: property.value,
+	};
+}
+
+function getState(input: unknown): HeraldState {
+	const options = isPlainObject(input) ? input : {};
+
+	if (
+		!Array.isArray(options.names) ||
+		options.names.length === 0 ||
+		!options.names.every(name => typeof name === 'string')
 	) {
 		throw new Error(HERALD_MESSAGE_ARRAY);
 	}
 
-	const keys = new Set(names);
-	const subscriptions = createSubscriptions<GenericCallback>(keys);
+	if (options.onCreate != null && typeof options.onCreate !== 'function') {
+		throw new Error(HERALD_MESSAGE_ONCREATE);
+	}
+
+	const keys = new Set(options.names);
+	const property = getProperty(options.property);
+
+	const subscriptions = createSubscriptions<GenericCallback>({
+		keys,
+		property,
+	});
+
+	return {
+		keys,
+		subscriptions,
+		onCreate: options.onCreate as HeraldOnCreate<Record<string, GenericCallback>>,
+	};
+}
+
+/**
+ * Create a _Herald_ for announcing named events
+ *
+ * @param names Event names
+ * @param property Optional property for subscription identification _(defaults to `$herald`)_
+ * @returns _Herald_ instance
+ */
+export function herald<Events extends Record<string, GenericCallback>>(
+	options: HeraldOptions<Events>,
+): Herald<Events> {
+	const state = getState(options);
 
 	const instance: unknown = {
-		clear: () => subscriptions.clear(),
-		emit: (event: never, ...parameters: never[]) => emit(subscriptions, event, ...parameters),
+		clear: () => state.subscriptions.clear(),
+		emit: (event: never, ...parameters: never[]) => emit(state, event, ...parameters),
+		observed: (event: never) => (state.subscriptions.state.items.keyed?.get(event)?.size ?? 0) > 0,
 		subscribe: (key: never, callback: never, signal: never) =>
-			subscribeToHerald(subscriptions, keys, key, callback, signal),
+			subscribeToHerald(state, key, callback, signal),
 	};
 
 	Object.defineProperties(instance, {
@@ -170,22 +235,24 @@ export function isHeraldSubscription(value: unknown): value is Subscription {
 }
 
 function subscribeToHerald(
-	subscriptions: Subscriptions<GenericCallback>,
-	keys: Set<string>,
+	state: HeraldState,
 	key: never,
 	callback: never,
 	signal?: AbortSignal,
 ): Subscription {
-	if (!keys.has(key)) {
+	if (!state.keys.has(key)) {
 		throw new Error(HERALD_MESSAGE_EVENT.replace(HERALD_TEMPLATE, String(key)));
 	}
 
-	const [subscription] = subscriptions.create({
+	const [subscription, existing] = state.subscriptions.create({
 		key,
 		signal,
-		property: heraldSubscription,
 		value: callback,
 	});
+
+	if (!existing) {
+		state.onCreate?.(key, callback, subscription);
+	}
 
 	return subscription;
 }
@@ -199,6 +266,10 @@ const HERALD_PROPERTY = '$herald';
 const HERALD_MESSAGE_ARRAY = 'Herald requires an array of event names.';
 
 const HERALD_MESSAGE_EVENT = `'<>' is not a registered event name`;
+
+const HERALD_MESSAGE_ONCREATE = `Herald requires a valid onCreate callback for subscription creation`;
+
+const HERALD_MESSAGE_PROPERTY = `Herald requires valid property information for subscription identification`;
 
 const HERALD_NAME_EVENTS = 'events';
 

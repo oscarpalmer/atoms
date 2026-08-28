@@ -19,13 +19,21 @@ export type Subscription = {
 export type SubscriptionParameters = {
 	isActive?: () => boolean;
 	key?: unknown;
-	property: SubscriptionProperty;
 	signal?: AbortSignal;
 	value: unknown;
 };
 
+/**
+ * Property information for subscription identification
+ */
 export type SubscriptionProperty = {
+	/**
+	 * Name of the property used to identify a subscription
+	 */
 	key: string;
+	/**
+	 * Value of the property used to identify a subscription _(defaults to `subscription`)_
+	 */
 	value?: unknown;
 };
 
@@ -39,6 +47,11 @@ export type Subscriptions<Value = unknown> = {
 	state: SubscriptionsState<Value>;
 	clear: () => void;
 	create: (parameters: SubscriptionParameters) => [Subscription, boolean];
+};
+
+type SubscriptionsParameters = {
+	keys?: Set<Key>;
+	property: SubscriptionProperty;
 };
 
 type SubscriptionsState<Value = unknown> = {
@@ -136,6 +149,7 @@ function clearSubscriptions<Value>(store: SubscriptionsState<Value>): void {
 
 function createSubscription(
 	subscriptions: Subscriptions,
+	property: SubscriptionProperty,
 	parameters: SubscriptionParameters,
 ): [Subscription, boolean] {
 	if (parameters.signal?.aborted ?? false) {
@@ -173,8 +187,8 @@ function createSubscription(
 		[SUBSCRIPTION_PROPERTY]: {
 			value: true,
 		},
-		[parameters.property.key]: {
-			value: parameters.property.value ?? SUBSCRIPTION_NAME,
+		[property.key]: {
+			value: property.value ?? SUBSCRIPTION_NAME,
 		},
 		active: {
 			enumerable: true,
@@ -187,7 +201,11 @@ function createSubscription(
 	return [Object.freeze(instance) as Subscription, false];
 }
 
-export function createSubscriptions<Value = unknown>(keys?: Set<Key>): Subscriptions<Value> {
+export function createSubscriptions<Value = unknown>(
+	parameters: SubscriptionsParameters,
+): Subscriptions<Value> {
+	const {keys, property} = parameters;
+
 	const state: SubscriptionsState<Value> = {
 		keys,
 		items: {
@@ -209,7 +227,8 @@ export function createSubscriptions<Value = unknown>(keys?: Set<Key>): Subscript
 	const instance: unknown = {
 		state,
 		clear: () => clearSubscriptions(state),
-		create: (parameters: never) => createSubscription(instance as Subscriptions, parameters),
+		create: (parameters: never) =>
+			createSubscription(instance as Subscriptions, property, parameters),
 	};
 
 	return instance as Subscriptions<Value>;
