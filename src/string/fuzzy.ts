@@ -242,14 +242,7 @@ export function fuzzy(items: unknown[], configuration?: unknown): Fuzzy<unknown>
 		items: {
 			enumerable: true,
 			get: () => state.items.slice(),
-			set: (items: unknown[]) => {
-				if (!Array.isArray(items)) {
-					throw new TypeError(FUZZY_MESSAGE_ARRAY);
-				}
-
-				state.items = items.slice();
-				state.strings = items.map(state.handler);
-			},
+			set: (value: never) => setItems(state, value),
 		},
 		strings: {
 			enumerable: true,
@@ -429,6 +422,15 @@ function search<Item>(
 	}
 
 	return result;
+}
+
+function setItems(state: FuzzyState<unknown>, value: unknown): void {
+	if (!Array.isArray(value)) {
+		throw new TypeError(FUZZY_MESSAGE_ARRAY);
+	}
+
+	state.items = value.slice();
+	state.strings = value.map(state.handler);
 }
 
 // #endregion

@@ -1,7 +1,7 @@
-import {flow} from '../../function/work';
+import {asyncFlow, flow} from '../../function/work';
 import {isError, isOk} from '../../internal/result';
 import type {GenericCallback} from '../../models';
-import {attempt} from '../index';
+import {asyncAttempt, attempt} from '../index';
 import type {Result, UnwrapValue} from '../models';
 
 // #region Types
@@ -255,8 +255,8 @@ export function attemptAsyncFlow(
 	let Flow: GenericCallback;
 
 	return (...args: unknown[]) =>
-		attempt.async(() => {
-			Flow ??= flow.async(...fns);
+		asyncAttempt(() => {
+			Flow ??= asyncFlow(...fns);
 
 			return Flow(
 				...args.map(value => {
@@ -481,8 +481,14 @@ export function attemptFlow(...fns: GenericCallback[]): (...args: unknown[]) => 
 		});
 }
 
-attemptFlow.async = attemptAsyncFlow;
+// #endregion
 
 // #endregion
+
+// #region Initialization
+
+Object.defineProperty(attemptFlow, 'async', {
+	value: attemptAsyncFlow,
+});
 
 // #endregion

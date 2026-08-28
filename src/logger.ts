@@ -1,4 +1,5 @@
 import {noop} from './internal/function/misc';
+import {getString} from './internal/string';
 
 // #region Types
 
@@ -135,26 +136,17 @@ function timedLogger(label: string): TimedLogger {
 
 	Object.defineProperties(instance, {
 		[LOGGER_PROPERTY]: {
-			enumerable: false,
 			value: LOGGER_NAME_TIMED,
 		},
 		active: {
 			enumerable: true,
-			get() {
-				return state.started && !state.stopped && enabled;
-			},
+			get: () => state.started && !state.stopped && enabled,
 		},
 		log: {
-			enumerable: true,
-			get() {
-				return this.active ? logger : noop;
-			},
+			get: () => ((instance as TimedLogger).active ? logger : noop),
 		},
 		stop: {
-			enumerable: true,
-			get() {
-				return (instance as TimedLogger).active ? stop() : noop;
-			},
+			get: () => ((instance as TimedLogger).active ? stop() : noop),
 		},
 	});
 
@@ -187,23 +179,17 @@ const Logger = (() => {
 
 	Object.defineProperties(instance, {
 		[LOGGER_PROPERTY]: {
-			enumerable: false,
 			value: LOGGER_NAME,
 		},
 		enabled: {
 			enumerable: true,
-			get() {
-				return enabled;
-			},
-			set(value: boolean) {
+			get: () => enabled,
+			set: (value: never) => {
 				enabled = typeof value === 'boolean' ? value : enabled;
 			},
 		},
 		time: {
-			enumerable: true,
-			value(label: string) {
-				return timedLogger(label);
-			},
+			value: (label: never) => timedLogger(getString(label)),
 		},
 	});
 

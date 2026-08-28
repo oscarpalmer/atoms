@@ -156,8 +156,6 @@ export function retry<Callback extends GenericCallback>(
 	throw new RetryError(RETRY_MESSAGE_FAILED, last);
 }
 
-retry.async = asyncRetry;
-
 function shouldRetry(): boolean {
 	return true;
 }
@@ -171,5 +169,13 @@ const RETRY_ERROR_NAME = 'RetryError';
 const RETRY_MESSAGE_EXPECTATION = 'Retry expected a function';
 
 const RETRY_MESSAGE_FAILED = 'Retry failed';
+
+// #endregion
+
+// #region Initialization
+
+Object.defineProperty(retry, 'async', {
+	value: asyncRetry,
+});
 
 // #endregion

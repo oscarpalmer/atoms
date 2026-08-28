@@ -86,6 +86,9 @@ export function asyncOnce<Callback extends GenericAsyncCallback>(
 			enumerable: true,
 			get: (): boolean => state.called,
 		},
+		clear: {
+			value: () => clearState(state),
+		},
 		cleared: {
 			enumerable: true,
 			get: (): boolean => state.cleared,
@@ -100,16 +103,16 @@ export function asyncOnce<Callback extends GenericAsyncCallback>(
 		},
 	});
 
-	fn.clear = (): void => {
-		if (!state.called || !state.finished || state.cleared) {
-			return;
-		}
-
-		state.cleared = true;
-		state.value = undefined as never;
-	};
-
 	return fn as OnceAsyncCallback<Callback>;
+}
+
+function clearState<Value>(state: OnceState<Value>): void {
+	if (!state.called || state.cleared) {
+		return;
+	}
+
+	state.cleared = true;
+	state.value = undefined as never;
 }
 
 function handleOnceResult<Value>(
@@ -168,26 +171,20 @@ export function once<Callback extends GenericCallback>(callback: Callback): Once
 
 	Object.defineProperties(fn, {
 		called: {
+			enumerable: true,
 			get: (): boolean => state.called,
 		},
+		clear: {
+			value: () => clearState(state),
+		},
 		cleared: {
+			enumerable: true,
 			get: (): boolean => state.cleared,
 		},
 	});
 
-	fn.clear = (): void => {
-		if (!state.called || state.cleared) {
-			return;
-		}
-
-		state.cleared = true;
-		state.value = undefined as never;
-	};
-
 	return fn as OnceCallback<Callback>;
 }
-
-once.async = asyncOnce;
 
 // #endregion
 
@@ -196,5 +193,13 @@ once.async = asyncOnce;
 const ONCE_MESSAGE_CLEARED = 'Once has been cleared';
 
 const ONCE_MESSAGE_EXPECTATION = 'Once expected a function';
+
+// #endregion
+
+// #region Initialization
+
+Object.defineProperty(once, 'async', {
+	value: asyncOnce,
+});
 
 // #endregion

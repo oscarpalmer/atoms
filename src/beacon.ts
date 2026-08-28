@@ -161,7 +161,6 @@ export function beacon<Value>(value: Value, options?: BeaconOptions<Value>): Bea
 
 	Object.defineProperties(instance, {
 		[BEACON_PROPERTY]: {
-			enumerable: false,
 			value: BEACON_NAME,
 		},
 		active: {
@@ -288,7 +287,7 @@ function observe<Value>(beacon: BeaconState<Value>): Observable<Value> {
 	};
 
 	const instance: unknown = {
-		deactivate: (): void => {
+		deactivate: () => {
 			state.active = false;
 		},
 		subscribe: (first: never, second?: never, third?: never) =>
@@ -297,7 +296,6 @@ function observe<Value>(beacon: BeaconState<Value>): Observable<Value> {
 
 	Object.defineProperties(instance, {
 		[BEACON_PROPERTY]: {
-			enumerable: false,
 			value: BEACON_OBSERVABLE,
 		},
 		active: {

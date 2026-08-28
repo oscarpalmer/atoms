@@ -62,8 +62,6 @@ export function debounce<Callback extends GenericCallback>(
 	return getTimer(TIMER_DEBOUNCE, callback, time);
 }
 
-debounce.async = asyncDebounce;
-
 /**
  * Throttle a function, ensuring it is only called once every `time` milliseconds
  *
@@ -78,6 +76,16 @@ export function throttle<Callback extends GenericCallback>(
 	return getTimer(TIMER_THROTTLE, callback, time);
 }
 
-throttle.async = asyncThrottle;
+// #endregion
+
+// #region Initialization
+
+Object.defineProperty(debounce, 'async', {
+	value: asyncDebounce,
+});
+
+Object.defineProperty(throttle, 'async', {
+	value: asyncThrottle,
+});
 
 // #endregion

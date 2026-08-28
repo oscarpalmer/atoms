@@ -171,11 +171,9 @@ function createSubscription(
 
 	Object.defineProperties(instance, {
 		[SUBSCRIPTION_PROPERTY]: {
-			enumerable: false,
 			value: true,
 		},
 		[parameters.property.key]: {
-			enumerable: false,
 			value: parameters.property.value ?? SUBSCRIPTION_NAME,
 		},
 		active: {

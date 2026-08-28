@@ -46,7 +46,7 @@ type ArrayKeySorters<Item extends PlainObject> = {
 /**
  * Sorter to use for sorting
  */
-type ArraySorter<Item> = Item extends PlainObject
+export type ArraySorter<Item> = Item extends PlainObject
 	?
 			| keyof Item
 			| ArrayComparisonSorter<Item>
@@ -54,6 +54,11 @@ type ArraySorter<Item> = Item extends PlainObject
 			| ArrayValueSorter<Item>
 			| ComparisonSorter<Item>
 	: ArrayComparisonSorter<Item> | ArrayValueSorter<Item> | ComparisonSorter<Item>;
+
+/**
+ * Sorters to use for sorting
+ */
+export type ArraySorters<Item> = Array<ArraySorter<Item>>;
 
 /**
  * Sorting information for arrays _(using a value callback and built-in comparison)_
@@ -413,8 +418,14 @@ export function initializeSorter(first?: unknown, second?: unknown): Sorter<unkn
 
 	const sorter = (array: unknown[]) => sortArray(array, sorters);
 
-	sorter.index = (array: unknown[], item: unknown) => getIndex(array, item, sorters);
-	sorter.is = (array: unknown[]) => isSortedArray(array, sorters);
+	Object.defineProperties(sorter, {
+		index: {
+			value: (array: never, item: never) => getIndex(array, item, sorters),
+		},
+		is: {
+			value: (array: never) => isSortedArray(array, sorters),
+		},
+	});
 
 	return sorter as unknown as Sorter<unknown>;
 }

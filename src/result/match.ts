@@ -113,12 +113,18 @@ export function matchResult<Value, Returned, E = Error>(
 	return errorHandler!(value.error, (value as ExtendedErr<E>).original);
 }
 
-matchResult.async = asyncMatchResult;
-
 // #endregion
 
 // #region Variables
 
 const MATCH_MESSAGE = '`result.match` expected a Result or a function that returns a Result';
+
+// #endregion
+
+// #region Initialization
+
+Object.defineProperty(matchResult, 'async', {
+	value: asyncMatchResult,
+});
 
 // #endregion

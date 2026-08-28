@@ -87,7 +87,6 @@ function getEvents<Events extends Record<string, GenericCallback>>(
 	};
 
 	Object.defineProperty(events, HERALD_PROPERTY, {
-		enumerable: false,
 		value: HERALD_NAME_EVENTS,
 	});
 
@@ -123,7 +122,6 @@ export function herald<Events extends Record<string, GenericCallback>>(
 
 	Object.defineProperties(instance, {
 		[HERALD_PROPERTY]: {
-			enumerable: false,
 			value: HERALD_NAME_HERALD,
 		},
 		events: {

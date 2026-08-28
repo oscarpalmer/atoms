@@ -26,6 +26,16 @@ export function getAsyncTimer<Callback extends GenericAsyncCallback | GenericCal
 	callback: Callback,
 	time?: number,
 ): AsyncCancelableCallback<Callback> {
+	function cancel(): void {
+		clearTimer(id);
+
+		if (last != null && !last.running) {
+			last.reject();
+
+			last = undefined;
+		}
+	}
+
 	async function run(item: AsyncItem): Promise<void> {
 		const now = performance.now();
 
@@ -62,7 +72,7 @@ export function getAsyncTimer<Callback extends GenericAsyncCallback | GenericCal
 	let start: number | undefined;
 
 	const timer = (...parameters: Parameters<Callback>): Promise<unknown> => {
-		timer.cancel();
+		cancel();
 
 		const next: AsyncItem = {
 			parameters,
@@ -79,23 +89,15 @@ export function getAsyncTimer<Callback extends GenericAsyncCallback | GenericCal
 		if (throttle) {
 			void run(next);
 		} else {
-			id = startTimer(() => {
-				void run(next);
-			});
+			id = startTimer(() => run(next));
 		}
 
 		return next.promise;
 	};
 
-	timer.cancel = (): void => {
-		clearTimer(id);
-
-		if (last != null && !last.running) {
-			last.reject();
-
-			last = undefined;
-		}
-	};
+	Object.defineProperty(timer, TIMER_CANCEL, {
+		value: () => cancel(),
+	});
 
 	return timer as AsyncCancelableCallback<Callback>;
 }
@@ -109,6 +111,10 @@ export function getTimer<Callback extends GenericCallback>(
 	callback: Callback,
 	time?: number,
 ): CancelableCallback<Callback> {
+	function cancel(): void {
+		clearTimer(id);
+	}
+
 	function run(): void {
 		const now = performance.now();
 
@@ -131,7 +137,7 @@ export function getTimer<Callback extends GenericCallback>(
 	let start: number | undefined;
 
 	const timer = (...parameters: Parameters<Callback>): void => {
-		timer.cancel();
+		cancel();
 
 		args = parameters;
 
@@ -142,9 +148,9 @@ export function getTimer<Callback extends GenericCallback>(
 		}
 	};
 
-	timer.cancel = (): void => {
-		clearTimer(id);
-	};
+	Object.defineProperty(timer, TIMER_CANCEL, {
+		value: () => cancel(),
+	});
 
 	return timer as CancelableCallback<Callback>;
 }
@@ -152,6 +158,8 @@ export function getTimer<Callback extends GenericCallback>(
 // #endregion
 
 // #region Variables
+
+const TIMER_CANCEL = 'cancel';
 
 export const TIMER_DEBOUNCE: TimerType = 'debounce';
 

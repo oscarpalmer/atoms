@@ -291,7 +291,7 @@ function addToQueue(
 	state: QueueState,
 	parameters: unknown[],
 	signal?: unknown,
-): {id: number; promise: Promise<unknown>} {
+): Queued<unknown> {
 	if ((instance as Queue<GenericCallback>).full) {
 		throw new QueueError(QUEUE_MESSAGE_MAXIMUM);
 	}
@@ -377,7 +377,6 @@ function createQueue(
 
 	Object.defineProperties(instance, {
 		[QUEUE_PROPERTY]: {
-			enumerable: false,
 			value: QUEUE_NAME_QUEUE,
 		},
 		active: {
@@ -595,7 +594,6 @@ export function keyedQueue<Callback extends (key: string, ...parameters: any[]) 
 
 	Object.defineProperties(instance, {
 		[QUEUE_PROPERTY]: {
-			enumerable: false,
 			value: QUEUE_NAME_KEYED,
 		},
 		active: {
@@ -761,9 +759,7 @@ async function run(state: QueueState): Promise<void> {
 		if (state.paused) {
 			const paused = item;
 
-			state.handled.push(() => {
-				handleQueuedResult(paused, error, result);
-			});
+			state.handled.push(() => handleQueuedResult(paused, error, result));
 
 			break;
 		}

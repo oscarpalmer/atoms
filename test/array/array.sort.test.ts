@@ -1,6 +1,6 @@
 import {expect, test} from 'vitest';
-import {diff, getRandomInteger, shuffle, sort, times} from '../../src';
-import {arrayFixture} from '../.fixtures/array.fixture';
+import {ArraySorters, diff, getRandomInteger, shuffle, sort, times} from '../../src';
+import {arrayFixture, TestArrayItem} from '../.fixtures/array.fixture';
 
 test('basic', () => {
 	expect(sort([1])).toEqual([1]);
@@ -184,12 +184,14 @@ test('getIndex', () => {
 		[0, 4],
 	];
 
-	let sorters: unknown[] = [{key: 'age'}, {key: 'name'}];
+	let sorters: ArraySorters<TestArrayItem> = [{key: 'age'}, {key: 'name'}];
+
+	let sorter = sort.initialize(sorters);
 
 	for (let index = 0; index < length; index += 1) {
 		const person = people[index];
 
-		expect(sort.getIndex(person, aliceAgain, sorters as never)).toBe(result[index][0]);
+		expect(sorter.index(person, aliceAgain)).toBe(result[index][0]);
 		expect(sort.getIndex(person, aliceAgain, sorters as never, true)).toBe(result[index][1]);
 	}
 
@@ -200,11 +202,12 @@ test('getIndex', () => {
 	];
 
 	sorters = [{key: 'age'}, {direction: 'descending', key: 'name'}];
+	sorter = sort.initialize(sorters);
 
 	for (let index = 0; index < length; index += 1) {
 		const person = people[index];
 
-		expect(sort.getIndex(person, aliceAgain, sorters as never)).toBe(result[index][0]);
+		expect(sorter.index(person, aliceAgain)).toBe(result[index][0]);
 		expect(sort.getIndex(person, aliceAgain, sorters as never, true)).toBe(result[index][1]);
 	}
 

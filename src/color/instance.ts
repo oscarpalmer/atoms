@@ -52,7 +52,6 @@ export function color(value: unknown): Color {
 
 	Object.defineProperties(instance, {
 		[COLOR_PROPERTY.name]: {
-			enumerable: false,
 			value: true,
 		},
 		alpha: {

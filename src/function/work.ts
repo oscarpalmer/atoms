@@ -457,8 +457,6 @@ export function flow(...fns: GenericCallback[]): (...args: unknown[]) => unknown
 		);
 }
 
-flow.async = asyncFlow;
-
 // #endregion
 
 // #endregion
@@ -906,8 +904,6 @@ export function pipe(value: unknown, ...pipes: GenericCallback[]): unknown {
 	return work(value, pipes, false);
 }
 
-pipe.async = asyncPipe;
-
 // #endregion
 
 // #endregion
@@ -1003,5 +999,20 @@ const assertPipeFunctions: Asserter<Function[]> = assert.condition(
 	WORK_MESSAGE_PIPE_ARRAY,
 	TypeError,
 );
+
+// #endregion
+
+// #region Initialization
+
+flow.async = asyncFlow;
+pipe.async = asyncPipe;
+
+Object.defineProperty(flow, 'async', {
+	value: asyncFlow,
+});
+
+Object.defineProperty(pipe, 'async', {
+	value: asyncPipe,
+});
 
 // #endregion
