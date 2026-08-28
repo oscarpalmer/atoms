@@ -1,4 +1,4 @@
-import {COMPARE_SETS_DIFFERENCE, compareSets} from '../internal/array/sets';
+import {SETS_COMPARE_DIFFERENCE, compareSets} from '../internal/array/sets';
 import type {PlainObject} from '../models';
 
 // #region Functions
@@ -67,7 +67,7 @@ export function difference<
 export function difference<First, Second>(first: First[], second: Second[]): First[];
 
 export function difference(first: unknown[], second: unknown[], key?: unknown): unknown[] {
-	return compareSets(COMPARE_SETS_DIFFERENCE, first, second, key);
+	return compareSets(SETS_COMPARE_DIFFERENCE, first, second, key);
 }
 
 // #endregion

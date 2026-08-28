@@ -95,19 +95,19 @@ type TimeState = {
 // #region Functions
 
 function isLogger(value: unknown): value is Logger {
-	return isLoggerInstance<Logger>(NAME_LOGGER, value);
+	return isLoggerInstance<Logger>(LOGGER_NAME, value);
 }
 
 function isLoggerInstance<Instance>(name: string, value: unknown): value is Instance {
 	return (
 		typeof value === 'object' &&
 		value !== null &&
-		(value as Record<string, unknown>)[KEY_LOGGER] === name
+		(value as Record<string, unknown>)[LOGGER_PROPERTY] === name
 	);
 }
 
 function isTimedLogger(value: unknown): value is TimedLogger {
-	return isLoggerInstance<TimedLogger>(NAME_TIMED, value);
+	return isLoggerInstance<TimedLogger>(LOGGER_NAME_TIMED, value);
 }
 
 function timedLogger(label: string): TimedLogger {
@@ -131,12 +131,12 @@ function timedLogger(label: string): TimedLogger {
 		stopped: false,
 	};
 
-	const instance = {};
+	const instance: unknown = {};
 
 	Object.defineProperties(instance, {
-		[KEY_LOGGER]: {
+		[LOGGER_PROPERTY]: {
 			enumerable: false,
-			value: NAME_TIMED,
+			value: LOGGER_NAME_TIMED,
 		},
 		active: {
 			enumerable: true,
@@ -169,11 +169,11 @@ function timedLogger(label: string): TimedLogger {
 
 // #region Variables
 
-const KEY_LOGGER = '$logger';
+const LOGGER_NAME = 'Logger';
 
-const NAME_LOGGER = 'Logger';
+const LOGGER_NAME_TIMED = 'TimedLogger';
 
-const NAME_TIMED = 'TimedLogger';
+const LOGGER_PROPERTY = '$logger';
 
 const methods = ['debug', 'dir', 'error', 'info', 'log', 'table', 'trace', 'warn'] as const;
 
@@ -183,12 +183,12 @@ const methods = ['debug', 'dir', 'error', 'info', 'log', 'table', 'trace', 'warn
  * _(Logging can be enabled or disabled by setting the `enabled` property)_
  */
 const Logger = (() => {
-	const instance = {};
+	const instance: unknown = {};
 
 	Object.defineProperties(instance, {
-		[KEY_LOGGER]: {
+		[LOGGER_PROPERTY]: {
 			enumerable: false,
-			value: NAME_LOGGER,
+			value: LOGGER_NAME,
 		},
 		enabled: {
 			enumerable: true,

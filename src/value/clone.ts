@@ -44,7 +44,7 @@ function cloneArrayBuffer(
 	depth?: number,
 	references?: WeakMap<WeakKey, unknown>,
 ): ArrayBuffer {
-	if (typeof depth === 'number' && depth >= MAX_CLONE_DEPTH) {
+	if (typeof depth === 'number' && depth >= CLONE_MAX_DEPTH) {
 		return value;
 	}
 
@@ -62,7 +62,7 @@ function cloneDataView(
 	depth: number,
 	references: WeakMap<WeakKey, unknown>,
 ): DataView {
-	if (depth >= MAX_CLONE_DEPTH) {
+	if (depth >= CLONE_MAX_DEPTH) {
 		return value;
 	}
 
@@ -81,7 +81,7 @@ function cloneMap(
 	references: WeakMap<WeakKey, unknown>,
 	flat: boolean,
 ): Map<unknown, unknown> {
-	if (depth >= MAX_CLONE_DEPTH) {
+	if (depth >= CLONE_MAX_DEPTH) {
 		return map;
 	}
 
@@ -101,7 +101,7 @@ function cloneMap(
 }
 
 function cloneNode(node: Node, depth: number, references: WeakMap<WeakKey, unknown>): Node {
-	if (depth >= MAX_CLONE_DEPTH) {
+	if (depth >= CLONE_MAX_DEPTH) {
 		return node;
 	}
 
@@ -118,7 +118,7 @@ function cloneObject(
 	references: WeakMap<WeakKey, unknown>,
 	flat: boolean,
 ): ArrayOrPlainObject {
-	if (flat || depth >= MAX_CLONE_DEPTH) {
+	if (flat || depth >= CLONE_MAX_DEPTH) {
 		return Array.isArray(value) ? value.slice() : {...value};
 	}
 
@@ -142,7 +142,7 @@ function cloneRegularExpression(
 	depth: number,
 	references: WeakMap<WeakKey, unknown>,
 ): RegExp {
-	if (depth >= MAX_CLONE_DEPTH) {
+	if (depth >= CLONE_MAX_DEPTH) {
 		return value;
 	}
 
@@ -161,7 +161,7 @@ function cloneSet(
 	references: WeakMap<WeakKey, unknown>,
 	flat: boolean,
 ): Set<unknown> {
-	if (depth >= MAX_CLONE_DEPTH) {
+	if (depth >= CLONE_MAX_DEPTH) {
 		return set;
 	}
 
@@ -183,7 +183,7 @@ function cloneTypedArray(
 	depth: number,
 	references: WeakMap<WeakKey, unknown>,
 ): TypedArray {
-	if (depth >= MAX_CLONE_DEPTH) {
+	if (depth >= CLONE_MAX_DEPTH) {
 		return value;
 	}
 
@@ -293,7 +293,7 @@ function tryStructuredClone(
 	depth: number,
 	references: WeakMap<WeakKey, unknown>,
 ): unknown {
-	if (depth >= MAX_CLONE_DEPTH) {
+	if (depth >= CLONE_MAX_DEPTH) {
 		return value;
 	}
 
@@ -314,6 +314,6 @@ function tryStructuredClone(
 
 // #region Variables
 
-const MAX_CLONE_DEPTH = 100;
+const CLONE_MAX_DEPTH = 100;
 
 // #endregion

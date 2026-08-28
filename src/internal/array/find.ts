@@ -129,7 +129,7 @@ export function findValues(
 	const {bool, key, value} = getFindParameters(parameters);
 	const callbacks = getArrayCallbacks(bool, key);
 
-	if (type === FIND_VALUES_UNIQUE && callbacks?.keyed == null && length >= UNIQUE_THRESHOLD) {
+	if (type === FIND_VALUES_UNIQUE && callbacks?.keyed == null && length >= FIND_UNIQUE_THRESHOLD) {
 		result.matched = [...new Set(array)];
 
 		return result;
@@ -195,6 +195,6 @@ export const FIND_VALUES_ALL: FindValuesType = 'all';
 
 export const FIND_VALUES_UNIQUE: FindValuesType = 'unique';
 
-const UNIQUE_THRESHOLD = 100;
+const FIND_UNIQUE_THRESHOLD = 100;
 
 // #endregion

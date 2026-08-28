@@ -1,7 +1,8 @@
+import {createAborter} from '../internal/abort';
 import {getTimer, TIMER_WAIT} from '../internal/function/timer';
 import {getPromiseOptions} from './helpers';
 import {settlePromise} from './misc';
-import {PROMISE_ABORT_OPTIONS, PROMISE_ABORT_EVENT, type PromiseOptions} from './models';
+import {type PromiseOptions} from './models';
 
 // #region Functions
 
@@ -25,24 +26,16 @@ export function delay(options?: unknown): Promise<void> {
 	const {signal, time} = getPromiseOptions(options);
 
 	if (signal?.aborted ?? false) {
-		return Promise.reject(signal!.reason);
+		return Promise.reject(signal?.reason);
 	}
 
-	function abort(): void {
+	const aborter = createAborter(signal, () => {
 		timer.cancel();
 
-		rejector(signal!.reason);
-	}
+		rejector(signal?.reason);
+	});
 
-	const timer = getTimer(
-		TIMER_WAIT,
-		() => {
-			settlePromise(abort, resolver, undefined, signal);
-		},
-		time,
-	);
-
-	signal?.addEventListener(PROMISE_ABORT_EVENT, abort, PROMISE_ABORT_OPTIONS);
+	const timer = getTimer(TIMER_WAIT, () => settlePromise(resolver, undefined, aborter), time);
 
 	let rejector: (reason: unknown) => void;
 	let resolver: () => void;
@@ -52,7 +45,7 @@ export function delay(options?: unknown): Promise<void> {
 		resolver = resolve;
 
 		if (time === 0) {
-			settlePromise(abort, resolve, undefined, signal);
+			settlePromise(resolver, undefined, aborter);
 		} else {
 			timer();
 		}

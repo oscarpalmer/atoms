@@ -19,11 +19,11 @@ export function getNestedValue(
 	ignoreCase: boolean,
 ): Result<unknown, string> {
 	if (typeof data !== 'object' || data === null) {
-		return error(NESTED_MESSAGE_INPUT);
+		return error(MISC_NESTED_MESSAGE_INPUT);
 	}
 
 	if (typeof path !== 'string' || path.trim().length === 0) {
-		return error(NESTED_MESSAGE_PATH);
+		return error(MISC_NESTED_MESSAGE_PATH);
 	}
 
 	const shouldIgnoreCase = ignoreCase === true;
@@ -55,11 +55,14 @@ export function getNestedValue(
 export function getPaths(path: string, lowercase: boolean): string | string[] {
 	const normalized = lowercase ? path.toLowerCase() : path;
 
-	if (!EXPRESSION_NESTED.test(normalized)) {
+	if (!MISC_EXPRESSION_NESTED.test(normalized)) {
 		return normalized;
 	}
 
-	return normalized.replace(EXPRESSION_BRACKET, '.$1').replace(EXPRESSION_DOTS, '').split('.');
+	return normalized
+		.replace(MISC_EXPRESSION_BRACKET, '.$1')
+		.replace(MISC_EXPRESSION_DOTS, '')
+		.split('.');
 }
 
 export function handleValue(
@@ -87,20 +90,20 @@ export function handleValue(
 ): Result<unknown, string> | void {
 	if (typeof data === 'object' && data !== null) {
 		if (ignoreKey(path)) {
-			return error(NESTED_MESSAGE_UNSAFE);
+			return error(MISC_NESTED_MESSAGE_UNSAFE);
 		}
 
 		const key = ignoreCase ? findKey(path, data) : path;
 
 		if (get) {
-			return key in data ? ok(data[key as never]) : error(NESTED_MESSAGE_MISSING);
+			return key in data ? ok(data[key as never]) : error(MISC_NESTED_MESSAGE_MISSING);
 		}
 
 		(data as PlainObject)[key] = typeof value === 'function' ? value(data[key as never]) : value;
 	}
 
 	if (get) {
-		return error(NESTED_MESSAGE_MISSING);
+		return error(MISC_NESTED_MESSAGE_MISSING);
 	}
 }
 
@@ -108,18 +111,18 @@ export function handleValue(
 
 // #region Variables
 
-const EXPRESSION_BRACKET = /\[(\w+)\]/g;
+const MISC_EXPRESSION_BRACKET = /\[(\w+)\]/g;
 
-const EXPRESSION_DOTS = /^\.|\.$/g;
+const MISC_EXPRESSION_DOTS = /^\.|\.$/g;
 
-const EXPRESSION_NESTED = /\.|\[\w+\]/;
+const MISC_EXPRESSION_NESTED = /\.|\[\w+\]/;
 
-const NESTED_MESSAGE_INPUT = 'Expected data to be an object';
+const MISC_NESTED_MESSAGE_INPUT = 'Expected data to be an object';
 
-const NESTED_MESSAGE_MISSING = 'Expected property to exist in object';
+const MISC_NESTED_MESSAGE_MISSING = 'Expected property to exist in object';
 
-const NESTED_MESSAGE_PATH = 'Expected path to be a string';
+const MISC_NESTED_MESSAGE_PATH = 'Expected path to be a string';
 
-const NESTED_MESSAGE_UNSAFE = 'Access to this property is not allowed';
+const MISC_NESTED_MESSAGE_UNSAFE = 'Access to this property is not allowed';
 
 // #endregion

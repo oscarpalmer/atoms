@@ -7,6 +7,8 @@ import {
 	PROMISE_STRATEGY_DEFAULT,
 	PROMISE_TYPE_FULFILLED,
 	PROMISE_TYPE_REJECTED,
+} from './constants';
+import {
 	type FulfilledPromise,
 	type PromiseOptions,
 	type PromisesOptions,

@@ -42,14 +42,6 @@ test('', () => {
 	expect(memoized.get(2)).toBeUndefined();
 	expect(memoized.get(3)).toBeUndefined();
 
-	memoized.destroy();
-
-	expect(memoized.maximum).toBeNaN();
-	expect(memoized.size).toBeNaN();
-	expect(memoized.has(2)).toBe(false);
-	expect(memoized.get(2)).toBeUndefined();
-	expect(memoized.delete(2)).toBe(false);
-
 	const keyed = memoize((_: string, value: number) => value * 3);
 
 	expect(keyed.run('a', 2)).toBe(6);
@@ -122,13 +114,6 @@ test('', () => {
 	expect(memoize(noop, {cacheSize: -1}).maximum).toBe(1024);
 	expect(memoize(noop, {cacheSize: 'blah' as never}).maximum).toBe(1024);
 	expect(memoize(noop, {}).maximum).toBe(1024);
-
-	try {
-		memoized.run(2);
-	} catch (error) {
-		expect(error).toBeInstanceOf(Error);
-		expect((error as Error).message).toBe('The Memoized instance has been destroyed');
-	}
 
 	// Error
 

@@ -940,14 +940,14 @@ async function asyncWork(
 function unwrapValue(value: unknown, flow?: boolean, nested?: boolean): unknown {
 	if (typeof value === 'function') {
 		if (nested != null) {
-			throw new TypeError(MESSAGE_NESTING);
+			throw new TypeError(WORK_MESSAGE_NESTING);
 		}
 
 		return unwrapValue(value(), flow, true);
 	}
 
 	if (flow != null && value instanceof Promise) {
-		throw new TypeError(flow ? MESSAGE_FLOW_PROMISE : MESSAGE_PIPE_PROMISE);
+		throw new TypeError(flow ? WORK_MESSAGE_FLOW_PROMISE : WORK_MESSAGE_PIPE_PROMISE);
 	}
 
 	if (isError(value)) {
@@ -982,25 +982,25 @@ function work(initial: unknown, functions: GenericCallback[], flow: boolean): un
 
 // #region Variables
 
-const MESSAGE_FLOW_ARRAY = 'Flow expected to receive an array of functions';
+const WORK_MESSAGE_FLOW_ARRAY = 'Flow expected to receive an array of functions';
 
-const MESSAGE_FLOW_PROMISE = 'Synchronous Flow received a promise. Use `flow.async` instead.';
+const WORK_MESSAGE_FLOW_PROMISE = 'Synchronous Flow received a promise. Use `flow.async` instead.';
 
-const MESSAGE_NESTING = 'Return values are too deeply nested.';
+const WORK_MESSAGE_NESTING = 'Return values are too deeply nested.';
 
-const MESSAGE_PIPE_ARRAY = 'Pipe expected to receive an array of functions';
+const WORK_MESSAGE_PIPE_ARRAY = 'Pipe expected to receive an array of functions';
 
-const MESSAGE_PIPE_PROMISE = 'Synchronous Pipe received a promise. Use `pipe.async` instead.';
+const WORK_MESSAGE_PIPE_PROMISE = 'Synchronous Pipe received a promise. Use `pipe.async` instead.';
 
 const assertFlowFunctions: Asserter<Function[]> = assert.condition(
 	value => Array.isArray(value) && value.every(item => typeof item === 'function'),
-	MESSAGE_FLOW_ARRAY,
+	WORK_MESSAGE_FLOW_ARRAY,
 	TypeError,
 );
 
 const assertPipeFunctions: Asserter<Function[]> = assert.condition(
 	value => Array.isArray(value) && value.every(item => typeof item === 'function'),
-	MESSAGE_PIPE_ARRAY,
+	WORK_MESSAGE_PIPE_ARRAY,
 	TypeError,
 );
 

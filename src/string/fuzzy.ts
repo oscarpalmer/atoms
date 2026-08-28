@@ -140,7 +140,7 @@ function getHandler<Item>(input: unknown): (item: Item) => string {
 				);
 			}
 
-			throw new TypeError(MESSAGE_HANDLER);
+			throw new TypeError(FUZZY_MESSAGE_HANDLER);
 		}
 	}
 }
@@ -188,7 +188,7 @@ function getTolerance<Item>(input: unknown, state?: FuzzyState<Item>): number {
 		return input < 0 ? 0 : Math.floor(input);
 	}
 
-	return state?.tolerance ?? PROXIMITY_THRESHOLD;
+	return state?.tolerance ?? FUZZY_PROXIMITY_THRESHOLD;
 }
 
 /**
@@ -223,12 +223,12 @@ export function fuzzy<Item>(items: Item[], configuration?: FuzzyConfiguration<It
 
 export function fuzzy(items: unknown[], configuration?: unknown): Fuzzy<unknown> {
 	if (!Array.isArray(items)) {
-		throw new TypeError(MESSAGE_ARRAY);
+		throw new TypeError(FUZZY_MESSAGE_ARRAY);
 	}
 
 	const state = getFuzzyState(items, configuration);
 
-	const instance = {
+	const instance: unknown = {
 		search: (value: never, options?: never) =>
 			search(
 				state.items,
@@ -244,7 +244,7 @@ export function fuzzy(items: unknown[], configuration?: unknown): Fuzzy<unknown>
 			get: () => state.items.slice(),
 			set: (items: unknown[]) => {
 				if (!Array.isArray(items)) {
-					throw new TypeError(MESSAGE_ARRAY);
+					throw new TypeError(FUZZY_MESSAGE_ARRAY);
 				}
 
 				state.items = items.slice();
@@ -335,7 +335,7 @@ function getScore(haystack: string, needle: string): number {
 			if (previousMatchIndex !== -1) {
 				const gap = haystackIndex - previousMatchIndex - 1;
 
-				score += Math.max(0, PROXIMITY_THRESHOLD - gap);
+				score += Math.max(0, FUZZY_PROXIMITY_THRESHOLD - gap);
 			}
 
 			previousMatchIndex = haystackIndex;
@@ -350,7 +350,7 @@ function getScore(haystack: string, needle: string): number {
 	}
 
 	// Penalty for longer strings to favour tighter matches
-	score -= Math.floor(lowerCaseHaystack.length / LENGTH_DIVISOR);
+	score -= Math.floor(lowerCaseHaystack.length / FUZZY_LENGTH_DIVISOR);
 
 	return Math.max(0, score);
 }
@@ -435,12 +435,12 @@ function search<Item>(
 
 // #region Variables
 
-const LENGTH_DIVISOR = 3;
+const FUZZY_LENGTH_DIVISOR = 3;
 
-const MESSAGE_ARRAY = 'Fuzzy requires an array of items';
+const FUZZY_MESSAGE_ARRAY = 'Fuzzy requires an array of items';
 
-const MESSAGE_HANDLER = 'Fuzzy requires a key or function to stringify items';
+const FUZZY_MESSAGE_HANDLER = 'Fuzzy requires a key or function to stringify items';
 
-const PROXIMITY_THRESHOLD = 5;
+const FUZZY_PROXIMITY_THRESHOLD = 5;
 
 // #endregion

@@ -1,3 +1,4 @@
+import {createAborter, type Aborter} from './internal/abort';
 import {getNumberOrDefault} from './internal/number';
 import type {GenericAsyncCallback, GenericCallback} from './models';
 
@@ -234,7 +235,7 @@ export class QueueError extends Error {
 	constructor(message: string) {
 		super(message);
 
-		this.name = ERROR_NAME;
+		this.name = QUEUE_ERROR_NAME;
 	}
 }
 
@@ -268,14 +269,13 @@ export type Queued<Value> = {
 };
 
 type QueuedItem = {
-	abort?: () => void;
+	aborter?: Aborter;
 	id: number;
 	key?: string;
 	parameters: unknown[];
 	promise: Promise<unknown>;
 	reject: (reason?: unknown) => void;
 	resolve: (value: unknown) => void;
-	signal?: AbortSignal;
 };
 
 type StatusKey = 'active' | 'empty' | 'full' | 'paused';
@@ -286,13 +286,71 @@ type Tail<Values extends any[]> = Values extends [infer _, ...infer Rest] ? Rest
 
 // #region Functions
 
+function addToQueue(
+	instance: Queue<GenericCallback>,
+	state: QueueState,
+	parameters: unknown[],
+	signal?: unknown,
+): {id: number; promise: Promise<unknown>} {
+	if ((instance as Queue<GenericCallback>).full) {
+		throw new QueueError(QUEUE_MESSAGE_MAXIMUM);
+	}
+
+	const abortSignal = signal instanceof AbortSignal ? signal : undefined;
+
+	if (abortSignal?.aborted ?? false) {
+		throw new Error(abortSignal?.reason);
+	}
+
+	const id = identify(state);
+
+	let rejector: (reason?: unknown) => void;
+	let resolver: (value: unknown) => void;
+
+	const promise = new Promise<unknown>((resolve, reject) => {
+		rejector = reject;
+		resolver = resolve;
+	});
+
+	const aborter = createAborter(abortSignal, () => rejector(abortSignal?.reason));
+
+	state.items.push({
+		aborter,
+		id,
+		parameters,
+		promise,
+		key: state.key,
+		reject: rejector!,
+		resolve: resolver!,
+	});
+
+	if (state.options.autostart) {
+		void run(state);
+	}
+
+	return {id, promise};
+}
+
+function clearQueue(state: QueueState): void {
+	const items = state.items.splice(0);
+	const {length} = items;
+
+	for (let index = 0; index < length; index += 1) {
+		const {aborter, reject} = items[index];
+
+		aborter?.cancel();
+
+		reject(new QueueError(QUEUE_MESSAGE_CLEAR));
+	}
+}
+
 function createQueue(
 	callback: GenericAsyncCallback,
 	options?: QueueOptions,
 	key?: string,
 ): Queue<never, never> {
 	if (typeof callback !== 'function') {
-		throw new TypeError(MESSAGE_CALLBACK);
+		throw new TypeError(QUEUE_MESSAGE_CALLBACK);
 	}
 
 	const state: QueueState = {
@@ -306,99 +364,21 @@ function createQueue(
 		runners: 0,
 	};
 
-	const instance = {
-		add: (parameters: never[], signal?: unknown) => {
-			if ((instance as Queue<GenericCallback>).full) {
-				throw new QueueError(MESSAGE_MAXIMUM);
-			}
-
-			const abortSignal = signal instanceof AbortSignal ? signal : undefined;
-
-			if (abortSignal?.aborted ?? false) {
-				throw new Error(abortSignal!.reason);
-			}
-
-			const id = identify(state);
-
-			let rejector: (reason?: unknown) => void;
-			let resolver: (value: unknown) => void;
-
-			const promise = new Promise<unknown>((resolve, reject) => {
-				rejector = reject;
-				resolver = resolve;
-			});
-
-			const aborter = abortSignal == null ? undefined : () => rejector(abortSignal.reason);
-
-			abortSignal?.addEventListener(EVENT_NAME, aborter!, EVENT_OPTIONS);
-
-			state.items.push({
-				id,
-				parameters,
-				promise,
-				abort: aborter,
-				key: state.key,
-				reject: rejector!,
-				resolve: resolver!,
-				signal: abortSignal,
-			});
-
-			if (state.options.autostart) {
-				void run(state);
-			}
-
-			return {id, promise};
-		},
-		clear: () => {
-			const items = state.items.splice(0);
-			const {length} = items;
-
-			for (let index = 0; index < length; index += 1) {
-				const {abort, reject, signal} = items[index];
-
-				reject(new QueueError(MESSAGE_CLEAR));
-
-				signal?.removeEventListener(EVENT_NAME, abort!);
-			}
-		},
+	const instance: unknown = {
+		add: (parameters: never[], signal?: unknown) =>
+			addToQueue(instance as Queue<GenericCallback>, state, parameters, signal),
+		clear: () => clearQueue(state),
 		pause: () => {
 			state.paused = true;
 		},
-		remove: (id: never) => {
-			const index = state.items.findIndex(item => item.id === id);
-
-			if (index > -1) {
-				const {abort, reject, signal} = state.items.splice(index, 1)[0];
-
-				reject(new QueueError(MESSAGE_REMOVE));
-
-				signal?.removeEventListener(EVENT_NAME, abort!);
-			}
-		},
-		resume: () => {
-			if (state.paused) {
-				const handled = state.handled.splice(0);
-				const {length} = handled;
-
-				for (let index = 0; index < length; index += 1) {
-					handled[index]();
-				}
-			}
-
-			state.paused = false;
-
-			const length = Math.min(state.options.concurrency, state.items.length);
-
-			for (let index = 0; index < length; index += 1) {
-				void run(state);
-			}
-		},
+		remove: (id: never) => removeQueued(state, id),
+		resume: () => resumeQueue(state),
 	};
 
 	Object.defineProperties(instance, {
-		[KEY_QUEUE]: {
+		[QUEUE_PROPERTY]: {
 			enumerable: false,
-			value: NAME_QUEUE,
+			value: QUEUE_NAME_QUEUE,
 		},
 		active: {
 			enumerable: true,
@@ -473,7 +453,7 @@ function getQueue(
 	add?: boolean,
 ): Queue<GenericCallback> | undefined {
 	if (typeof key !== 'string' || key.trim().length === 0) {
-		throw new TypeError(MESSAGE_KEY);
+		throw new TypeError(QUEUE_MESSAGE_KEY);
 	}
 
 	let queue = state.queues.get(key);
@@ -502,9 +482,9 @@ function getStatus(state: KeyedQueueState, status: StatusKey): string[] {
 }
 
 function handleQueuedResult(item: QueuedItem, error: boolean, result: unknown): void {
-	item.signal?.removeEventListener(EVENT_NAME, item.abort!);
+	item.aborter?.cancel();
 
-	if (item.signal?.aborted ?? false) {
+	if (item.aborter?.signal?.aborted ?? false) {
 		item.reject();
 
 		return;
@@ -546,7 +526,7 @@ function identify(state: QueueState): number {
  * @returns `true` if the value is a keyed queue, otherwise `false`
  */
 export function isKeyedQueue(value: unknown): value is KeyedQueue<GenericAsyncCallback> {
-	return isQueueInstance(NAME_KEYED, value);
+	return isQueueInstance(QUEUE_NAME_KEYED, value);
 }
 
 /**
@@ -556,14 +536,14 @@ export function isKeyedQueue(value: unknown): value is KeyedQueue<GenericAsyncCa
  * @returns `true` if the value is a queue, otherwise `false`
  */
 export function isQueue(value: unknown): value is Queue<GenericCallback | GenericAsyncCallback> {
-	return isQueueInstance(NAME_QUEUE, value);
+	return isQueueInstance(QUEUE_NAME_QUEUE, value);
 }
 
 export function isQueueInstance<Instance>(name: string, value: unknown): value is Instance {
 	return (
 		typeof value === 'object' &&
 		value != null &&
-		(value as Record<string, unknown>)[KEY_QUEUE] === name
+		(value as Record<string, unknown>)[QUEUE_PROPERTY] === name
 	);
 }
 
@@ -594,7 +574,7 @@ export function keyedQueue<Callback extends (key: string, ...parameters: any[]) 
 	options?: QueueOptions,
 ): KeyedQueue<Callback, Parameters<Callback>> {
 	if (typeof callback !== 'function') {
-		throw new TypeError(MESSAGE_CALLBACK);
+		throw new TypeError(QUEUE_MESSAGE_CALLBACK);
 	}
 
 	const state: KeyedQueueState = {
@@ -603,24 +583,24 @@ export function keyedQueue<Callback extends (key: string, ...parameters: any[]) 
 		queues: new Map(),
 	};
 
-	const instance = {
+	const instance: unknown = {
 		add: (key: never, parameters: never, signal?: never) =>
 			getQueue(state, key, true).add(parameters, signal),
-		clear: (key?: never) => handleQueues(state, HANDLE_CLEAR, key),
+		clear: (key?: never) => handleQueues(state, QUEUE_HANDLE_CLEAR, key),
 		get: (key: never) => getQueue(state, key),
-		pause: (key?: never): void => handleQueues(state, HANDLE_PAUSE, key),
+		pause: (key?: never): void => handleQueues(state, QUEUE_HANDLE_PAUSE, key),
 		remove: (key?: never, id?: never): void => removeQueue(state, key, id),
-		resume: (key?: never): void => handleQueues(state, HANDLE_RESUME, key),
+		resume: (key?: never): void => handleQueues(state, QUEUE_HANDLE_RESUME, key),
 	};
 
 	Object.defineProperties(instance, {
-		[KEY_QUEUE]: {
+		[QUEUE_PROPERTY]: {
 			enumerable: false,
-			value: NAME_KEYED,
+			value: QUEUE_NAME_KEYED,
 		},
 		active: {
 			enumerable: true,
-			get: () => getStatus(state, STATUS_ACTIVE),
+			get: () => getStatus(state, QUEUE_STATUS_ACTIVE),
 		},
 		autostart: {
 			enumerable: true,
@@ -632,11 +612,11 @@ export function keyedQueue<Callback extends (key: string, ...parameters: any[]) 
 		},
 		empty: {
 			enumerable: true,
-			get: () => getStatus(state, STATUS_EMPTY),
+			get: () => getStatus(state, QUEUE_STATUS_EMPTY),
 		},
 		full: {
 			enumerable: true,
-			get: () => getStatus(state, STATUS_FULL),
+			get: () => getStatus(state, QUEUE_STATUS_FULL),
 		},
 		items: {
 			enumerable: true,
@@ -652,7 +632,7 @@ export function keyedQueue<Callback extends (key: string, ...parameters: any[]) 
 		},
 		paused: {
 			enumerable: true,
-			get: () => getStatus(state, STATUS_PAUSED),
+			get: () => getStatus(state, QUEUE_STATUS_PAUSED),
 		},
 		queues: {
 			enumerable: true,
@@ -698,7 +678,7 @@ queue.keyed = keyedQueue;
 
 function removeQueue(state: KeyedQueueState, key?: string, id?: number): void {
 	if (key == null) {
-		handleQueues(state, HANDLE_CLEAR);
+		handleQueues(state, QUEUE_HANDLE_CLEAR);
 
 		state.queues.clear();
 
@@ -722,6 +702,37 @@ function removeQueue(state: KeyedQueueState, key?: string, id?: number): void {
 	state.queues.delete(key);
 }
 
+function removeQueued(state: QueueState, id: number): void {
+	const index = state.items.findIndex(item => item.id === id);
+
+	if (index > -1) {
+		const {aborter, reject} = state.items.splice(index, 1)[0];
+
+		aborter?.cancel();
+
+		reject(new QueueError(QUEUE_MESSAGE_REMOVE));
+	}
+}
+
+function resumeQueue(state: QueueState): void {
+	if (state.paused) {
+		const handled = state.handled.splice(0);
+		const {length} = handled;
+
+		for (let index = 0; index < length; index += 1) {
+			handled[index]();
+		}
+	}
+
+	state.paused = false;
+
+	const length = Math.min(state.options.concurrency, state.items.length);
+
+	for (let index = 0; index < length; index += 1) {
+		void run(state);
+	}
+}
+
 async function run(state: QueueState): Promise<void> {
 	if (state.paused || state.runners >= state.options.concurrency) {
 		return;
@@ -737,7 +748,7 @@ async function run(state: QueueState): Promise<void> {
 		let result: unknown;
 
 		try {
-			if (!(item.signal?.aborted ?? false)) {
+			if (!(item.aborter?.signal?.aborted ?? false)) {
 				const parameters = item.key == null ? item.parameters : [item.key, ...item.parameters];
 
 				result = await state.callback(...parameters);
@@ -769,40 +780,40 @@ async function run(state: QueueState): Promise<void> {
 
 // #region Variables
 
-const ERROR_NAME = 'QueueError';
+const QUEUE_ERROR_NAME = 'QueueError';
 
-const EVENT_NAME = 'abort';
+const QUEUE_EVENT_NAME = 'abort';
 
-const EVENT_OPTIONS = {once: true};
+const QUEUE_EVENT_OPTIONS = {once: true};
 
-const KEY_QUEUE = '$queue';
+const QUEUE_PROPERTY = '$queue';
 
-const HANDLE_CLEAR: HandleType = 'clear';
+const QUEUE_HANDLE_CLEAR: HandleType = 'clear';
 
-const HANDLE_PAUSE: HandleType = 'pause';
+const QUEUE_HANDLE_PAUSE: HandleType = 'pause';
 
-const HANDLE_RESUME: HandleType = 'resume';
+const QUEUE_HANDLE_RESUME: HandleType = 'resume';
 
-const MESSAGE_CALLBACK = 'A Queue requires a callback function';
+const QUEUE_MESSAGE_CALLBACK = 'A Queue requires a callback function';
 
-const MESSAGE_CLEAR = 'Queue was cleared';
+const QUEUE_MESSAGE_CLEAR = 'Queue was cleared';
 
-const MESSAGE_KEY = 'Key must be a non-empty string';
+const QUEUE_MESSAGE_KEY = 'Key must be a non-empty string';
 
-const MESSAGE_MAXIMUM = 'Queue has reached its maximum size';
+const QUEUE_MESSAGE_MAXIMUM = 'Queue has reached its maximum size';
 
-const MESSAGE_REMOVE = 'Item removed from queue';
+const QUEUE_MESSAGE_REMOVE = 'Item removed from queue';
 
-const NAME_KEYED = 'keyedQueue';
+const QUEUE_NAME_KEYED = 'keyedQueue';
 
-const NAME_QUEUE = 'queue';
+const QUEUE_NAME_QUEUE = 'queue';
 
-const STATUS_ACTIVE: StatusKey = 'active';
+const QUEUE_STATUS_ACTIVE: StatusKey = 'active';
 
-const STATUS_EMPTY: StatusKey = 'empty';
+const QUEUE_STATUS_EMPTY: StatusKey = 'empty';
 
-const STATUS_FULL: StatusKey = 'full';
+const QUEUE_STATUS_FULL: StatusKey = 'full';
 
-const STATUS_PAUSED: StatusKey = 'paused';
+const QUEUE_STATUS_PAUSED: StatusKey = 'paused';
 
 // #endregion

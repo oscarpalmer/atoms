@@ -1,8 +1,12 @@
 import {COLOR_TYPE} from '../constants';
-import type {ColorState} from '../models';
+import type {Color, ColorState} from '../models';
 import {getColorFromState} from './state';
 
 // #region Functions
+
+export function formatHexColor(color: Color, alpha?: boolean): string {
+	return `#${alpha === true ? color.hexa : color.hex}`;
+}
 
 export function formatHslColor(state: ColorState, alpha?: boolean): string {
 	const {hue, lightness, saturation} = getColorFromState(state, COLOR_TYPE.hsl);

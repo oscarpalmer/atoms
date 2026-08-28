@@ -49,7 +49,7 @@ export async function asyncMatchResult<Value, Returned, E = Error>(
 	}
 
 	if (!isResult(value)) {
-		throw new Error(MESSAGE_RESULT);
+		throw new Error(MATCH_MESSAGE);
 	}
 
 	const hasObj = typeof first === 'object' && first !== null;
@@ -98,7 +98,7 @@ export function matchResult<Value, Returned, E = Error>(
 	const value = typeof result === 'function' ? result() : result;
 
 	if (!isResult(value)) {
-		throw new Error(MESSAGE_RESULT);
+		throw new Error(MATCH_MESSAGE);
 	}
 
 	const hasObj = typeof first === 'object' && first !== null;
@@ -119,6 +119,6 @@ matchResult.async = asyncMatchResult;
 
 // #region Variables
 
-const MESSAGE_RESULT = '`result.match` expected a Result or a function that returns a Result';
+const MATCH_MESSAGE = '`result.match` expected a Result or a function that returns a Result';
 
 // #endregion

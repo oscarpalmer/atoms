@@ -28,7 +28,7 @@ function flattenObject(
 	smushed: WeakMap<WeakKey, PlainObject>,
 	prefix?: string,
 ): PlainObject {
-	if (depth >= MAX_DEPTH) {
+	if (depth >= SMUSH_MAX_DEPTH) {
 		return {};
 	}
 
@@ -84,6 +84,6 @@ export function smush<Value extends PlainObject>(value: Value): Smushed<Value> {
 
 // #region Variables
 
-const MAX_DEPTH = 100;
+const SMUSH_MAX_DEPTH = 100;
 
 // #endregion

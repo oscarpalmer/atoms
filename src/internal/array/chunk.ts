@@ -23,7 +23,8 @@ export function chunk<Item>(array: Item[], size?: number): Item[][] {
 
 	const {length} = array;
 
-	const actualSize = typeof size === 'number' && size > 0 && size <= MAX_SIZE ? size : MAX_SIZE;
+	const actualSize =
+		typeof size === 'number' && size > 0 && size <= CHUNK_MAX_SIZE ? size : CHUNK_MAX_SIZE;
 
 	if (length <= actualSize) {
 		return [array];
@@ -46,6 +47,6 @@ export function chunk<Item>(array: Item[], size?: number): Item[][] {
 
 // #region Variables
 
-const MAX_SIZE = 5_000;
+const CHUNK_MAX_SIZE = 5_000;
 
 // #endregion

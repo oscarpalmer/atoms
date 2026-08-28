@@ -1,22 +1,23 @@
+import {createAborter} from '../internal/abort';
 import type {Result} from '../result/models';
-import {getPromiseOptions, getPromisesOptions, getResultsFromPromises} from './helpers';
-import {handleResult, settlePromise} from './misc';
 import {
-	PROMISE_ABORT_OPTIONS,
-	PROMISE_ABORT_EVENT,
 	PROMISE_MESSAGE_EXPECTATION_ATTEMPT,
 	PROMISE_STRATEGY_DEFAULT,
 	PROMISE_TYPE_FULFILLED,
 	PROMISE_TYPE_REJECTED,
+} from './constants';
+import {getPromiseOptions, getPromisesOptions, getResultsFromPromises} from './helpers';
+import {handleResult, settlePromise} from './misc';
+import {
 	type PromiseData,
 	type PromiseHandlers,
 	type PromiseOptions,
 	type PromisesItems,
 	type PromisesOptions,
 	type PromisesResult,
+	type PromisesUnwrapped,
 	type PromisesValue,
 	type PromisesValues,
-	type PromisesUnwrapped,
 } from './models';
 import {getTimedPromise} from './timed';
 
@@ -71,12 +72,12 @@ export async function attemptPromise<Value>(
 	const {signal, time} = getPromiseOptions(options);
 
 	if (signal?.aborted ?? false) {
-		return Promise.reject(signal!.reason);
+		return Promise.reject(signal?.reason);
 	}
 
-	function abort(): void {
-		rejector(signal!.reason);
-	}
+	const aborter = createAborter(signal, () => {
+		rejector(signal?.reason);
+	});
 
 	async function handler(
 		resolve: (value: Value) => void,
@@ -89,15 +90,13 @@ export async function attemptPromise<Value>(
 				result = await result;
 			}
 
-			settlePromise(abort, resolve, result, signal);
+			settlePromise(resolve, result, aborter);
 		} catch (error) {
-			settlePromise(abort, reject, error, signal);
+			settlePromise(reject, error, aborter);
 		}
 	}
 
 	let rejector: (reason: unknown) => void;
-
-	signal?.addEventListener(PROMISE_ABORT_EVENT, abort, PROMISE_ABORT_OPTIONS);
 
 	const promise = new Promise<Value>((resolve, reject) => {
 		rejector = reject;
@@ -193,7 +192,7 @@ export async function promises(items: unknown[], options?: unknown): Promise<unk
 	const {signal, strategy} = getPromisesOptions(options);
 
 	if (signal?.aborted ?? false) {
-		return Promise.reject(signal!.reason);
+		return Promise.reject(signal?.reason);
 	}
 
 	if (!Array.isArray(items)) {
@@ -212,11 +211,9 @@ export async function promises(items: unknown[], options?: unknown): Promise<unk
 
 	const complete = strategy === PROMISE_STRATEGY_DEFAULT;
 
-	function abort(): void {
-		handlers.reject(signal!.reason);
-	}
-
-	signal?.addEventListener(PROMISE_ABORT_EVENT, abort, PROMISE_ABORT_OPTIONS);
+	const aborter = createAborter(signal, () => {
+		handlers.reject(signal?.reason);
+	});
 
 	const data: PromiseData = {
 		last: length - 1,
@@ -232,23 +229,21 @@ export async function promises(items: unknown[], options?: unknown): Promise<unk
 			void actual[index]
 				.then(value =>
 					handleResult(PROMISE_TYPE_FULFILLED, {
-						abort,
+						aborter,
 						complete,
 						data,
 						handlers,
 						index,
-						signal,
 						value,
 					}),
 				)
 				.catch(reason =>
 					handleResult(PROMISE_TYPE_REJECTED, {
-						abort,
+						aborter,
 						complete,
 						data,
 						handlers,
 						index,
-						signal,
 						value: reason,
 					}),
 				);

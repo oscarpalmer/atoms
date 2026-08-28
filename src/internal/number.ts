@@ -95,14 +95,14 @@ export function getNumber(value: unknown): number {
 		return Number.NaN;
 	}
 
-	if (EXPRESSION_ZEROISH.test(parsed)) {
+	if (NUMBER_EXPRESSION_ZEROISH.test(parsed)) {
 		return 0;
 	}
 
-	const isBinary = EXPRESSION_BINARY.test(trimmed);
+	const isBinary = NUMBER_EXPRESSION_BINARY.test(trimmed);
 
-	if (isBinary || EXPRESSION_OCTAL.test(trimmed)) {
-		return Number.parseInt(trimmed.slice(2), isBinary ? 2 : OCTAL_VALUE);
+	if (isBinary || NUMBER_EXPRESSION_OCTAL.test(trimmed)) {
+		return Number.parseInt(trimmed.slice(2), isBinary ? 2 : NUMBER_OCTAL_VALUE);
 	}
 
 	return Number(trimmed);
@@ -118,12 +118,12 @@ export function getNumberOrDefault(value: unknown, defaultValue: number, minimum
 
 // #region Variables
 
-const EXPRESSION_BINARY = /^0b[01]+$/i;
+const NUMBER_EXPRESSION_BINARY = /^0b[01]+$/i;
 
-const EXPRESSION_OCTAL = /^0o[0-7]+$/i;
+const NUMBER_EXPRESSION_OCTAL = /^0o[0-7]+$/i;
 
-const EXPRESSION_ZEROISH = /^\s*0+\s*$/;
+const NUMBER_EXPRESSION_ZEROISH = /^\s*0+\s*$/;
 
-const OCTAL_VALUE = 8;
+const NUMBER_OCTAL_VALUE = 8;
 
 // #endregion

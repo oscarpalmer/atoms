@@ -1,5 +1,6 @@
 import {isPlainObject} from '../../internal/is';
 import {between} from '../../internal/number';
+import {isSubscription, SUBSCRIPTION_NAME, type Subscription} from '../../internal/subscription';
 import type {PlainObject} from '../../models';
 import {
 	COLOR_ALPHA,
@@ -44,6 +45,16 @@ export function isColor(value: unknown): value is Color {
 	return (
 		isPlainObject(value) && COLOR_PROPERTY.name in value && value[COLOR_PROPERTY.name] === true
 	);
+}
+
+/**
+ * Is the value a color subscription?
+ *
+ * @param value Value to check
+ * @returns `true` if the value is a color subscription, otherwise `false`
+ */
+export function isColorSubscription(value: unknown): value is Subscription {
+	return isSubscription(value) && (value as PlainObject)[COLOR_PROPERTY.name] === SUBSCRIPTION_NAME;
 }
 
 function isColorValue(obj: unknown, properties: ColorProperty[]): boolean {

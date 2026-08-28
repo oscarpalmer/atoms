@@ -101,11 +101,11 @@ export function getUuid(html?: unknown): string {
 
 		bytes[8] = (bytes[8] & 0x3f) | 0x80;
 
-		const hex = Array.from(bytes, byte => byte.toString(16).padStart(2, ZERO)).join('');
+		const hex = Array.from(bytes, byte => byte.toString(16).padStart(2, STRING_ZERO)).join('');
 
 		const first = hex.substring(0, 8);
 
-		if (forHTML && NUMERICAL_PREFIX_PATTERN.test(first)) {
+		if (forHTML && STRING_NUMERICAL_PREFIX_PATTERN.test(first)) {
 			continue;
 		}
 
@@ -115,7 +115,7 @@ export function getUuid(html?: unknown): string {
 			hex.substring(12, 16),
 			hex.substring(16, 20),
 			hex.substring(20, 32),
-		].join(forHTML ? DELIMITER_UUID_HTML : DELIMITER_UUID_DEFAULT);
+		].join(forHTML ? STRING_DELIMITER_UUID_HTML : STRING_DELIMITER_UUID_DEFAULT);
 	}
 }
 
@@ -180,13 +180,13 @@ export function truncate(value: string, length: number, suffix?: string): string
 
 // #region Variables
 
-const DELIMITER_UUID_DEFAULT = '-';
+const STRING_DELIMITER_UUID_DEFAULT = '-';
 
-const DELIMITER_UUID_HTML = '_';
+const STRING_DELIMITER_UUID_HTML = '_';
 
-const NUMERICAL_PREFIX_PATTERN = /^\d/;
+const STRING_NUMERICAL_PREFIX_PATTERN = /^\d/;
 
-const ZERO = '0';
+const STRING_ZERO = '0';
 
 // #endregion
 

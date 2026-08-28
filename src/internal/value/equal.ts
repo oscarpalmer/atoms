@@ -229,7 +229,7 @@ function equalPlainObject(
 		secondKeys = secondKeys.filter(key => filterKey(key, options));
 	}
 
-	const useSet = secondKeys.length >= MINIMUM_LENGTH_FOR_SET;
+	const useSet = secondKeys.length >= EQUAL_MINIMUM_LENGTH_FOR_SET;
 	const secondSet = useSet ? new Set(secondKeys) : undefined;
 
 	const {length} = firstKeys;
@@ -344,13 +344,13 @@ function equalValue(first: unknown, second: unknown, options: Options): boolean 
 			return equalDataView(first, second, options);
 
 		case first instanceof Error && second instanceof Error:
-			return equalProperties(first, second, ERROR_PROPERTIES, options);
+			return equalProperties(first, second, EQUAL_ERROR_PROPERTIES, options);
 
 		case first instanceof Map && second instanceof Map:
 			return equalMap(first, second, options);
 
 		case first instanceof RegExp && second instanceof RegExp:
-			return equalProperties(first, second, EXPRESSION_PROPERTIES, options);
+			return equalProperties(first, second, EQUAL_EXPRESSION_PROPERTIES, options);
 
 		case first instanceof Set && second instanceof Set:
 			return equalSet(first, second, options);
@@ -456,10 +456,10 @@ const EQUAL_ARRAY_PEEK_PERCENTAGE = 10;
 
 const EQUAL_ARRAY_THRESHOLD = 100;
 
-const ERROR_PROPERTIES: string[] = ['name', 'message'];
+const EQUAL_ERROR_PROPERTIES: string[] = ['name', 'message'];
 
-const EXPRESSION_PROPERTIES: string[] = ['source', 'flags'];
+const EQUAL_EXPRESSION_PROPERTIES: string[] = ['source', 'flags'];
 
-const MINIMUM_LENGTH_FOR_SET = 16;
+const EQUAL_MINIMUM_LENGTH_FOR_SET = 16;
 
 // #endregion

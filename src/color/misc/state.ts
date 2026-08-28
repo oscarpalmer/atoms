@@ -117,7 +117,7 @@ function setColorValue<Type extends ColorType>(
 	}
 
 	for (const type of COLOR_TYPE.all) {
-		const callbacks = subscriptions.values.to.keyed?.get(type);
+		const callbacks = subscriptions.state.values.to.keyed?.get(type);
 
 		if (callbacks != null) {
 			for (const callback of callbacks.values()) {
@@ -126,7 +126,7 @@ function setColorValue<Type extends ColorType>(
 		}
 	}
 
-	for (const callback of subscriptions.values.to.any.values()) {
+	for (const callback of subscriptions.state.values.to.any.values()) {
 		callback(color);
 	}
 }

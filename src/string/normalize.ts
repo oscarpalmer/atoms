@@ -63,11 +63,14 @@ export function deburr(value: string): string {
 	}
 
 	deburrMemoizer ??= memoize(value => {
-		let deburred = value.normalize(DEBURR_NORMALIZATION).replace(DEBURR_PATTERN_SIMPLE, '');
+		let deburred = value
+			.normalize(NORMALIZE_DEBURR_NORMALIZATION)
+			.replace(NORMALIZE_DEBURR_PATTERN_SIMPLE, '');
 
 		deburred = deburred.replace(
-			DEBURR_PATTERN_CHARACTERS,
-			(_, character) => DEBURR_CHARACTERS[character as keyof typeof DEBURR_CHARACTERS],
+			NORMALIZE_DEBURR_PATTERN_CHARACTERS,
+			(_, character) =>
+				NORMALIZE_DEBURR_CHARACTERS[character as keyof typeof NORMALIZE_DEBURR_CHARACTERS],
 		);
 
 		return deburred;
@@ -129,7 +132,7 @@ function normalizeString(value: string, options: Options): string {
 	}
 
 	if (options.whitespace) {
-		result = result.replace(WHITESPACE_PATTERN, WHITESPACE_REPLACEMENT);
+		result = result.replace(NORMALIZE_WHITESPACE_PATTERN, NORMALIZE_WHITESPACE_REPLACEMENT);
 	}
 
 	if (options.deburr) {
@@ -141,17 +144,17 @@ function normalizeString(value: string, options: Options): string {
 	}
 
 	if (options.special) {
-		result = result.replace(SPECIAL_PATTERN, SPECIAL_REPLACEMENT);
+		result = result.replace(NORMALIZE_SPECIAL_PATTERN, NORMALIZE_SPECIAL_REPLACEMENT);
 	}
 
-	return result.normalize(NORMALIZATION_NORMALIZATION);
+	return result.normalize(NORMALIZE_NORMALIZATION_NORMALIZATION);
 }
 
 // #endregion
 
 // #region Variables
 
-const DEBURR_CHARACTERS = {
+const NORMALIZE_DEBURR_CHARACTERS = {
 	Æ: 'AE',
 	æ: 'ae',
 	Ð: 'D',
@@ -184,21 +187,24 @@ const DEBURR_CHARACTERS = {
 	ŧ: 't',
 };
 
-const DEBURR_NORMALIZATION = 'NFD';
+const NORMALIZE_DEBURR_NORMALIZATION = 'NFD';
 
-const DEBURR_PATTERN_CHARACTERS = new RegExp(`(${Object.keys(DEBURR_CHARACTERS).join('|')})`, 'g');
+const NORMALIZE_DEBURR_PATTERN_CHARACTERS = new RegExp(
+	`(${Object.keys(NORMALIZE_DEBURR_CHARACTERS).join('|')})`,
+	'g',
+);
 
-const DEBURR_PATTERN_SIMPLE = /[\u0300-\u036f]/g;
+const NORMALIZE_DEBURR_PATTERN_SIMPLE = /[\u0300-\u036f]/g;
 
-const NORMALIZATION_NORMALIZATION = 'NFC';
+const NORMALIZE_NORMALIZATION_NORMALIZATION = 'NFC';
 
-const SPECIAL_PATTERN = /[\p{P}\p{S}]/gu;
+const NORMALIZE_SPECIAL_PATTERN = /[\p{P}\p{S}]/gu;
 
-const SPECIAL_REPLACEMENT = '';
+const NORMALIZE_SPECIAL_REPLACEMENT = '';
 
-const WHITESPACE_PATTERN = /\s+/g;
+const NORMALIZE_WHITESPACE_PATTERN = /\s+/g;
 
-const WHITESPACE_REPLACEMENT = ' ';
+const NORMALIZE_WHITESPACE_REPLACEMENT = ' ';
 
 let deburrMemoizer: Memoized<typeof deburr>;
 

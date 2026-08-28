@@ -146,10 +146,10 @@ export function getArrayComparison(
 
 function getName(start: number, haystack: number, needle: number): ArrayComparison {
 	if (start === 0) {
-		return haystack === needle ? COMPARISON_SAME : COMPARISON_START;
+		return haystack === needle ? MATCH_COMPARISON_SAME : MATCH_COMPARISON_START;
 	}
 
-	return start + needle === haystack ? COMPARISON_END : COMPARISON_INSIDE;
+	return start + needle === haystack ? MATCH_COMPARISON_END : MATCH_COMPARISON_INSIDE;
 }
 
 function getPosition(
@@ -411,26 +411,26 @@ export function startsWithArray(haystack: unknown[], needle: unknown[], key?: un
 
 // #region Variables
 
-const COMPARISON_END: ArrayComparison = 'end';
+const MATCH_COMPARISON_END: ArrayComparison = 'end';
 
-const COMPARISON_INSIDE: ArrayComparison = 'inside';
+const MATCH_COMPARISON_INSIDE: ArrayComparison = 'inside';
 
-const COMPARISON_INVALID: ArrayComparison = 'invalid';
+const MATCH_COMPARISON_INVALID: ArrayComparison = 'invalid';
 
-const COMPARISON_OUTSIDE: ArrayComparison = 'outside';
+const MATCH_COMPARISON_OUTSIDE: ArrayComparison = 'outside';
 
-const COMPARISON_SAME: ArrayComparison = 'same';
+const MATCH_COMPARISON_SAME: ArrayComparison = 'same';
 
-const COMPARISON_START: ArrayComparison = 'start';
+const MATCH_COMPARISON_START: ArrayComparison = 'start';
 
-const endings = new Set<ArrayComparison>([COMPARISON_END, COMPARISON_SAME]);
+const endings = new Set<ArrayComparison>([MATCH_COMPARISON_END, MATCH_COMPARISON_SAME]);
 
-const invalid = [-1, COMPARISON_INVALID] as const;
+const invalid = [-1, MATCH_COMPARISON_INVALID] as const;
 
-const outside = [-1, COMPARISON_OUTSIDE] as const;
+const outside = [-1, MATCH_COMPARISON_OUTSIDE] as const;
 
-const outsides = new Set<ArrayComparison>([COMPARISON_INVALID, COMPARISON_OUTSIDE]);
+const outsides = new Set<ArrayComparison>([MATCH_COMPARISON_INVALID, MATCH_COMPARISON_OUTSIDE]);
 
-const starts = new Set<ArrayComparison>([COMPARISON_START, COMPARISON_SAME]);
+const starts = new Set<ArrayComparison>([MATCH_COMPARISON_START, MATCH_COMPARISON_SAME]);
 
 // #endregion

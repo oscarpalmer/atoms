@@ -10,7 +10,7 @@ import {join} from './internal/string';
  * @returns Random boolean
  */
 export function getRandomBoolean(): boolean {
-	return Math.random() > BOOLEAN_MODIFIER;
+	return Math.random() > RANDOM_BOOLEAN_MODIFIER;
 }
 
 /**
@@ -25,7 +25,8 @@ export function getRandomCharacters(length: number, selection?: string): string 
 		return '';
 	}
 
-	const actual = typeof selection === 'string' && selection.length > 0 ? selection : ALPHABET;
+	const actual =
+		typeof selection === 'string' && selection.length > 0 ? selection : RANDOM_ALPHABET;
 
 	let characters = '';
 
@@ -52,7 +53,7 @@ export function getRandomColor(prefix?: boolean): string {
  * @returns Random hexadecimal character from `0-9` and `A-F`
  */
 export function getRandomHex(): string {
-	return HEX_CHARACTERS[getRandomInteger(0, HEX_MAXIMUM)];
+	return RANDOM_HEX_CHARACTERS[getRandomInteger(0, RANDOM_HEX_MAXIMUM)];
 }
 
 /**
@@ -108,13 +109,13 @@ export function getRandomItems<Value>(array: Value[], amount?: number): Value[] 
 
 // #region Variables
 
-const ALPHABET = 'abcdefghijklmnopqrstuvwxyz';
+const RANDOM_ALPHABET = 'abcdefghijklmnopqrstuvwxyz';
 
-const BOOLEAN_MODIFIER = 0.5;
+const RANDOM_BOOLEAN_MODIFIER = 0.5;
 
-const HEX_CHARACTERS = '0123456789ABCDEF';
+const RANDOM_HEX_CHARACTERS = '0123456789ABCDEF';
 
-const HEX_MAXIMUM = 15;
+const RANDOM_HEX_MAXIMUM = 15;
 
 // #endregion
 

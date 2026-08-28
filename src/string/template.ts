@@ -66,7 +66,7 @@ function getTemplateOptions(input?: Partial<TemplateOptions>): Required<Template
 
 	return {
 		ignoreCase: options.ignoreCase === true,
-		pattern: options.pattern instanceof RegExp ? options.pattern : EXPRESSION_VARIABLE,
+		pattern: options.pattern instanceof RegExp ? options.pattern : TEMPLATE_EXPRESSION_VARIABLE,
 	};
 }
 
@@ -156,6 +156,6 @@ template.initialize = initializeTemplater;
 
 // #region Variables
 
-const EXPRESSION_VARIABLE = /{{([\s\S]+?)}}/g;
+const TEMPLATE_EXPRESSION_VARIABLE = /{{([\s\S]+?)}}/g;
 
 // #endregion

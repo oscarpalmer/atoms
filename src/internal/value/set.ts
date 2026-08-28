@@ -108,7 +108,7 @@ export function setValue(data: object, path: string, value: unknown, ignoreCase?
 		if (typeof next !== 'object' || next === null) {
 			const nextPath = paths[index + 1];
 
-			if (EXPRESSION_INDEX.test(nextPath)) {
+			if (SET_EXPRESSION_INDEX.test(nextPath)) {
 				next = Array.from({length: Number(nextPath) + 1}, () => undefined);
 			} else {
 				next = {};
@@ -127,6 +127,6 @@ export function setValue(data: object, path: string, value: unknown, ignoreCase?
 
 // #region Variables
 
-const EXPRESSION_INDEX = /^\d+$/;
+const SET_EXPRESSION_INDEX = /^\d+$/;
 
 // #endregion

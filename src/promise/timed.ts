@@ -1,14 +1,10 @@
+import {createAborter} from '../internal/abort';
 import {getTimer, TIMER_WAIT} from '../internal/function/timer';
 import type {RequiredKeys} from '../models';
+import {PROMISE_MESSAGE_EXPECTATION_TIMED} from './constants';
 import {getPromiseOptions} from './helpers';
 import {settlePromise} from './misc';
-import {
-	PROMISE_ABORT_OPTIONS,
-	PROMISE_ABORT_EVENT,
-	PROMISE_MESSAGE_EXPECTATION_TIMED,
-	PromiseTimeoutError,
-	type PromiseOptions,
-} from './models';
+import {PromiseTimeoutError, type PromiseOptions} from './models';
 
 // #region Functions
 
@@ -17,19 +13,15 @@ export async function getTimedPromise<Value>(
 	time: number,
 	signal?: AbortSignal,
 ): Promise<Value> {
-	function abort(): void {
+	const aborter = createAborter(signal, () => {
 		timer.cancel();
 
-		rejector(signal!.reason);
-	}
-
-	signal?.addEventListener(PROMISE_ABORT_EVENT, abort, PROMISE_ABORT_OPTIONS);
+		rejector(signal?.reason);
+	});
 
 	const timer = getTimer(
 		TIMER_WAIT,
-		() => {
-			settlePromise(abort, rejector, new PromiseTimeoutError(), signal);
-		},
+		() => settlePromise(rejector, new PromiseTimeoutError(), aborter),
 		time,
 	);
 
@@ -43,11 +35,10 @@ export async function getTimedPromise<Value>(
 			timer();
 		}),
 	]).then(value => {
+		aborter?.cancel();
 		timer.cancel();
 
 		rejector(undefined);
-
-		signal?.removeEventListener(PROMISE_ABORT_EVENT, abort);
 
 		return value;
 	});
@@ -82,7 +73,7 @@ export async function timed<Value>(promise: Promise<Value>, options: unknown): P
 	const {signal, time} = getPromiseOptions(options);
 
 	if (signal?.aborted ?? false) {
-		return Promise.reject(signal!.reason);
+		return Promise.reject(signal?.reason);
 	}
 
 	return time > 0 ? getTimedPromise(promise, time, signal) : promise;

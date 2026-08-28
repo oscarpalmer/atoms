@@ -18,9 +18,9 @@ export function compareSets(
 		return [];
 	}
 
-	const isDifference = type === COMPARE_SETS_DIFFERENCE;
-	const isIntersection = type === COMPARE_SETS_INTERSECTION;
-	const isUnion = type === COMPARE_SETS_UNION;
+	const isDifference = type === SETS_COMPARE_DIFFERENCE;
+	const isIntersection = type === SETS_COMPARE_INTERSECTION;
+	const isUnion = type === SETS_COMPARE_UNION;
 
 	if (first.length === 0) {
 		return isDifference ? first.slice() : isIntersection ? [] : second.slice();
@@ -65,10 +65,10 @@ export function compareSets(
 
 // #region Variables
 
-export const COMPARE_SETS_DIFFERENCE: CompareSetsType = 'difference';
+export const SETS_COMPARE_DIFFERENCE: CompareSetsType = 'difference';
 
-export const COMPARE_SETS_INTERSECTION: CompareSetsType = 'intersection';
+export const SETS_COMPARE_INTERSECTION: CompareSetsType = 'intersection';
 
-export const COMPARE_SETS_UNION: CompareSetsType = 'union';
+export const SETS_COMPARE_UNION: CompareSetsType = 'union';
 
 // #endregion

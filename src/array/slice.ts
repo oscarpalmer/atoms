@@ -91,7 +91,7 @@ export function drop<Item extends PlainObject>(
 export function drop(array: unknown[], count: number): unknown[];
 
 export function drop(array: unknown[], first?: unknown, second?: unknown): unknown[] {
-	return extract(EXTRACT_DROP, array, first, second);
+	return extract(SLICE_DROP, array, first, second);
 }
 
 function extract(
@@ -110,7 +110,7 @@ function extract(
 		return [];
 	}
 
-	const isTake = type === EXTRACT_TAKE;
+	const isTake = type === SLICE_TAKE;
 
 	if (typeof first === 'number') {
 		if (Math.abs(first) >= length) {
@@ -321,15 +321,15 @@ export function take<Item extends PlainObject>(
 export function take(array: unknown[], count: number): unknown[];
 
 export function take(array: unknown[], first?: unknown, second?: unknown): unknown[] {
-	return extract(EXTRACT_TAKE, array, first, second);
+	return extract(SLICE_TAKE, array, first, second);
 }
 
 // #endregion
 
 // #region Variables
 
-const EXTRACT_DROP: ExtractType = 'drop';
+const SLICE_DROP: ExtractType = 'drop';
 
-const EXTRACT_TAKE: ExtractType = 'take';
+const SLICE_TAKE: ExtractType = 'take';
 
 // #endregion

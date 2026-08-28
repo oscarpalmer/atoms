@@ -88,7 +88,7 @@ export function assertDefined<Value>(
 	message?: string,
 	error?: ErrorConstructor,
 ): asserts value is Exclude<Value, null | undefined> {
-	assert(() => value != null, message ?? MESSAGE_VALUE_DEFINED, error);
+	assert(() => value != null, message ?? ASSERT_MESSAGE_VALUE_DEFINED, error);
 }
 
 /**
@@ -169,6 +169,6 @@ export function assertProperty<
 
 // #region Variables
 
-const MESSAGE_VALUE_DEFINED = 'Expected value to be defined';
+const ASSERT_MESSAGE_VALUE_DEFINED = 'Expected value to be defined';
 
 // #endregion

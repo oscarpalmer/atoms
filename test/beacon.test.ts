@@ -1,5 +1,5 @@
 import {expect, test} from 'vitest';
-import {beacon, equal, isBeacon, isObservable, isSubscription} from '../src';
+import {beacon, equal, isBeacon, isBeaconSubscription, isObservable, isSubscription} from '../src';
 import {isFixture} from './.fixtures/is.fixture';
 
 const {length, values} = isFixture;
@@ -45,12 +45,12 @@ test('observable + subscription', () =>
 			first: {
 				complete: false,
 				count: 0,
-				error: null,
+				error: undefined,
 			},
 			second: {
 				complete: false,
 				count: 0,
-				error: null,
+				error: undefined,
 			},
 		};
 
@@ -87,6 +87,14 @@ test('observable + subscription', () =>
 		expect(isSubscription(one)).toBe(true);
 		expect(isSubscription(two)).toBe(true);
 		expect(isSubscription(three)).toBe(true);
+		expect(isSubscription(first)).toBe(false);
+		expect(isSubscription(first.observable)).toBe(false);
+
+		expect(isBeaconSubscription(one)).toBe(true);
+		expect(isBeaconSubscription(two)).toBe(true);
+		expect(isBeaconSubscription(three)).toBe(true);
+		expect(isBeaconSubscription(first)).toBe(false);
+		expect(isBeaconSubscription(first.observable)).toBe(false);
 
 		first.observable.subscribe('blah' as never);
 
@@ -102,11 +110,11 @@ test('observable + subscription', () =>
 
 		expect(results.first.complete).toBe(false);
 		expect(results.first.count).toBe(1);
-		expect(results.first.error).toBe(null);
+		expect(results.first.error).toBe(undefined);
 
 		expect(results.second.complete).toBe(false);
 		expect(results.second.count).toBe(1);
-		expect(results.second.error).toBe(null);
+		expect(results.second.error).toBe(undefined);
 
 		first.emit(1);
 		second.error(new Error('test'));
@@ -114,7 +122,7 @@ test('observable + subscription', () =>
 		setTimeout(() => {
 			expect(results.first.complete).toBe(false);
 			expect(results.first.count).toBe(2);
-			expect(results.first.error).toBe(null);
+			expect(results.first.error).toBe(undefined);
 
 			expect(results.second.complete).toBe(false);
 			expect(results.second.count).toBe(1);
@@ -141,7 +149,7 @@ test('observable + subscription', () =>
 
 			expect(results.first.complete).toBe(true);
 			expect(results.first.count).toBe(3);
-			expect(results.first.error).toBe(null);
+			expect(results.first.error).toBe(undefined);
 
 			expect(results.second.complete).toBe(true);
 			expect(results.second.count).toBe(1);

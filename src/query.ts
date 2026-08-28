@@ -18,8 +18,8 @@ export function fromQuery(query: string): PlainObject {
 	}
 
 	const parts = query
-		.split(AMPERSAND)
-		.map(part => part.split(EQUAL).map(tryDecode))
+		.split(QUERY_AMPERSAND)
+		.map(part => part.split(QUERY_EQUAL).map(tryDecode))
 		.sort(([first], [second]) => first.localeCompare(second));
 
 	const {length} = parts;
@@ -32,8 +32,8 @@ export function fromQuery(query: string): PlainObject {
 	for (let index = 0; index < length; index += 1) {
 		const [key, value] = parts[index];
 
-		if (EXPRESSION_ARRAY_SUFFIX.test(key)) {
-			const named = key.replace(EXPRESSION_ARRAY_SUFFIX, '');
+		if (QUERY_EXPRESSION_ARRAY_SUFFIX.test(key)) {
+			const named = key.replace(QUERY_EXPRESSION_ARRAY_SUFFIX, '');
 
 			if (named !== array) {
 				array = named;
@@ -66,10 +66,10 @@ function getParts(value: ArrayOrPlainObject, fromArray: boolean, prefix?: string
 		const key = keys[index];
 		const val = value[key as never];
 
-		const fullKey = join([prefix, fromArray ? undefined : key], DOT);
+		const fullKey = join([prefix, fromArray ? undefined : key], QUERY_DOT);
 
 		const encodedKey = getString(tryEncode(fullKey));
-		const prefixedKey = fromArray ? join([encodedKey, index], DOT) : encodedKey;
+		const prefixedKey = fromArray ? join([encodedKey, index], QUERY_DOT) : encodedKey;
 
 		if (Array.isArray(val)) {
 			parts.push(...getParts(val, true, fullKey));
@@ -86,8 +86,8 @@ function getParts(value: ArrayOrPlainObject, fromArray: boolean, prefix?: string
 }
 
 function getQueryValue(value: string): unknown {
-	if (EXPRESSION_BOOLEAN.test(value)) {
-		return value === TRUE;
+	if (QUERY_EXPRESSION_BOOLEAN.test(value)) {
+		return value === QUERY_TRUE;
 	}
 
 	const asNumber = getNumber(value);
@@ -108,7 +108,7 @@ function getQueryValue(value: string): unknown {
 }
 
 function isDecodable(value: unknown): value is boolean | number | string {
-	return TYPES.has(typeof value);
+	return QUERY_TYPES.has(typeof value);
 }
 
 /**
@@ -121,7 +121,7 @@ export function toQuery(parameters: PlainObject): string {
 	return isPlainObject(parameters)
 		? join(
 				getParts(parameters, false).filter(part => part.length > 0),
-				AMPERSAND,
+				QUERY_AMPERSAND,
 			)
 		: '';
 }
@@ -130,18 +130,18 @@ export function toQuery(parameters: PlainObject): string {
 
 // #region Variables
 
-const AMPERSAND = '&';
+const QUERY_AMPERSAND = '&';
 
-const DOT = '.';
+const QUERY_DOT = '.';
 
-const EQUAL = '=';
+const QUERY_EQUAL = '=';
 
-const EXPRESSION_ARRAY_SUFFIX = /\[\]$/;
+const QUERY_EXPRESSION_ARRAY_SUFFIX = /\[\]$/;
 
-const EXPRESSION_BOOLEAN = /^(false|true)$/;
+const QUERY_EXPRESSION_BOOLEAN = /^(false|true)$/;
 
-const TRUE = 'true';
+const QUERY_TRUE = 'true';
 
-const TYPES = new Set(['boolean', 'number', 'string']);
+const QUERY_TYPES = new Set(['boolean', 'number', 'string']);
 
 // #endregion

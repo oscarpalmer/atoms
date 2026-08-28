@@ -31,7 +31,7 @@ export function getAsyncTimer<Callback extends GenericAsyncCallback | GenericCal
 
 		start ??= now;
 
-		if (interval === 0 || now - start >= interval - OFFSET) {
+		if (interval === 0 || now - start >= interval - TIMER_OFFSET) {
 			start = throttle ? now : undefined;
 
 			item.running = true;
@@ -114,7 +114,7 @@ export function getTimer<Callback extends GenericCallback>(
 
 		start ??= now;
 
-		if (interval === 0 || now - start >= interval - OFFSET) {
+		if (interval === 0 || now - start >= interval - TIMER_OFFSET) {
 			start = throttle ? now : undefined;
 
 			callback(...args);
@@ -153,9 +153,9 @@ export function getTimer<Callback extends GenericCallback>(
 
 // #region Variables
 
-const OFFSET = 5;
-
 export const TIMER_DEBOUNCE: TimerType = 'debounce';
+
+const TIMER_OFFSET = 5;
 
 export const TIMER_THROTTLE: TimerType = 'throttle';
 

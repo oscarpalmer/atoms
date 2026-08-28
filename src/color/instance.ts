@@ -1,14 +1,13 @@
 import {
-	clearSubscriptions,
-	getSubscription,
-	getSubscriptions,
+	createSubscriptions,
 	type Subscription,
 	type SubscriptionProperty,
 	type Subscriptions,
 } from '../internal/subscription';
+import type {GenericCallback, Key} from '../models';
 import {COLOR_PROPERTY, COLOR_TYPE} from './constants';
 import {getAlpha} from './misc/alpha';
-import {formatHslColor, formatHwbColor, formatRgbColor} from './misc/format';
+import {formatHexColor, formatHslColor, formatHwbColor, formatRgbColor} from './misc/format';
 import {
 	getColorFromState,
 	getColorState,
@@ -38,17 +37,17 @@ type SetValues = Record<ColorType, SetValue>;
 export function color(value: unknown): Color {
 	const state = getColorState(value);
 
-	const subscriptions = getSubscriptions<Function>(COLOR_TYPE.all);
+	const subscriptions = createSubscriptions<Function>(COLOR_TYPE.all);
 
-	const instance = {
+	const instance: unknown = {
 		subscribe: (first?: never, second?: never, third?: never) =>
-			subscribeToColor(subscriptions, first, second, third),
-		toHexString: (alpha?: boolean) => `#${alpha === true ? instance.hexa : instance.hex}`,
+			subscribeToColor(instance as Color, subscriptions, first, second, third),
+		toHexString: (alpha?: never) => formatHexColor(instance as Color, alpha),
 		toHslString: (alpha?: never) => formatHslColor(state, alpha),
 		toHwbString: (alpha?: never) => formatHwbColor(state, alpha),
 		toRgbString: (alpha?: never) => formatRgbColor(state, alpha),
-		toString: () => instance.toHexString(),
-		unsubscribe: () => clearSubscriptions(subscriptions),
+		toString: () => (instance as Color).toHexString(),
+		unsubscribe: () => subscriptions.clear(),
 	};
 
 	Object.defineProperties(instance, {
@@ -59,23 +58,23 @@ export function color(value: unknown): Color {
 		alpha: {
 			enumerable: true,
 			get: () => state.alpha.value,
-			set: (value: unknown) => setAlphaValue(state, value),
+			set: (value: never) => setAlphaValue(state, value),
 		},
-		hex: getProperty(COLOR_TYPE.hex, instance, state, subscriptions, false),
-		hexa: getProperty(COLOR_TYPE.hex, instance, state, subscriptions, true),
-		hsl: getProperty(COLOR_TYPE.hsl, instance, state, subscriptions, false),
-		hsla: getProperty(COLOR_TYPE.hsl, instance, state, subscriptions, true),
-		hwb: getProperty(COLOR_TYPE.hwb, instance, state, subscriptions, false),
-		hwba: getProperty(COLOR_TYPE.hwb, instance, state, subscriptions, true),
+		hex: getProperty(COLOR_TYPE.hex, instance as Color, state, subscriptions, false),
+		hexa: getProperty(COLOR_TYPE.hex, instance as Color, state, subscriptions, true),
+		hsl: getProperty(COLOR_TYPE.hsl, instance as Color, state, subscriptions, false),
+		hsla: getProperty(COLOR_TYPE.hsl, instance as Color, state, subscriptions, true),
+		hwb: getProperty(COLOR_TYPE.hwb, instance as Color, state, subscriptions, false),
+		hwba: getProperty(COLOR_TYPE.hwb, instance as Color, state, subscriptions, true),
 		origin: {
 			enumerable: true,
 			get: () => state.origin,
 		},
-		rgb: getProperty(COLOR_TYPE.rgb, instance, state, subscriptions, false),
-		rgba: getProperty(COLOR_TYPE.rgb, instance, state, subscriptions, true),
+		rgb: getProperty(COLOR_TYPE.rgb, instance as Color, state, subscriptions, false),
+		rgba: getProperty(COLOR_TYPE.rgb, instance as Color, state, subscriptions, true),
 	});
 
-	return Object.freeze(instance);
+	return Object.freeze(instance) as Color;
 }
 
 function getProperty(
@@ -116,35 +115,42 @@ function setAlphaValue(state: ColorState, value: unknown): void {
 }
 
 function subscribeToColor(
+	color: Color,
 	subscriptions: Subscriptions,
 	first: unknown,
 	second?: unknown,
 	third?: unknown,
 ): Subscription {
-	let key: string | undefined;
-	let signal: unknown | undefined;
-	let value: Function | undefined;
+	const signal = third ?? second;
 
-	if (typeof first === 'string') {
-		key = first;
-		signal = third;
-		value = second as Function;
-	} else if (typeof first === 'function') {
-		signal = second;
-		value = first;
+	let key: Key | undefined;
+	let callback: GenericCallback;
+
+	if (second == null) {
+		callback = first as GenericCallback;
+	} else {
+		key = first as Key;
+		callback = second as GenericCallback;
 	}
 
-	if (typeof value !== 'function') {
-		throw new Error();
-	}
-
-	return getSubscription({
+	const [subscription, existing] = subscriptions.create({
 		key,
-		subscriptions,
-		value,
 		property: colorSubscription,
 		signal: signal instanceof AbortSignal ? signal : undefined,
+		value: callback,
 	});
+
+	if (existing) {
+		return subscription;
+	}
+
+	if (key == null) {
+		callback(color);
+	} else {
+		callback(color[key as keyof Color]);
+	}
+
+	return subscription;
 }
 
 // #endregion

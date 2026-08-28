@@ -77,7 +77,8 @@ function isResultValue(value: unknown, okValue: boolean): value is Result<unknow
 	}
 
 	return (
-		(value as PlainObject).ok === okValue && (okValue ? PROPERTY_VALUE : PROPERTY_ERROR) in value
+		(value as PlainObject).ok === okValue &&
+		(okValue ? RESULT_PROPERTY_VALUE : RESULT_PROPERTY_ERROR) in value
 	);
 }
 
@@ -85,8 +86,8 @@ function isResultValue(value: unknown, okValue: boolean): value is Result<unknow
 
 // #region Variable
 
-const PROPERTY_ERROR = 'error';
+const RESULT_PROPERTY_ERROR = 'error';
 
-const PROPERTY_VALUE = 'value';
+const RESULT_PROPERTY_VALUE = 'value';
 
 // #endregion

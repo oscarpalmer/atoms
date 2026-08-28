@@ -1,13 +1,12 @@
+import type {Aborter} from '../internal/abort';
 import {error, ok} from '../result/misc';
 import type {Result} from '../result/models';
 import {
-	CancelablePromise,
-	PROMISE_ABORT_EVENT,
 	PROMISE_MESSAGE_EXPECTATION_RESULT,
 	PROMISE_TYPE_FULFILLED,
 	PROMISE_TYPE_REJECTED,
-	type PromiseParameters,
-} from './models';
+} from './constants';
+import {CancelablePromise, type PromiseParameters} from './models';
 
 // #region Functions
 
@@ -24,14 +23,14 @@ export function cancelable<Value>(
 }
 
 export function handleResult(status: string, parameters: PromiseParameters): void {
-	const {abort, complete, data, handlers, index, signal, value} = parameters;
+	const {aborter, complete, data, handlers, index, value} = parameters;
 
-	if (signal?.aborted ?? false) {
+	if (aborter?.signal.aborted ?? false) {
 		return;
 	}
 
 	if (!complete && status === PROMISE_TYPE_REJECTED) {
-		settlePromise(abort, handlers.reject, value, signal);
+		settlePromise(handlers.reject, value, aborter);
 
 		return;
 	}
@@ -43,17 +42,16 @@ export function handleResult(status: string, parameters: PromiseParameters): voi
 			: {status, reason: value};
 
 	if (index === data.last) {
-		settlePromise(abort, handlers.resolve, data.result, signal);
+		settlePromise(handlers.resolve, data.result, aborter);
 	}
 }
 
 export function settlePromise(
-	aborter: () => void,
 	settler: (value: any) => void,
 	value: unknown,
-	signal?: AbortSignal,
+	aborter?: Aborter,
 ): void {
-	signal?.removeEventListener(PROMISE_ABORT_EVENT, aborter);
+	aborter?.cancel();
 
 	settler(value);
 }

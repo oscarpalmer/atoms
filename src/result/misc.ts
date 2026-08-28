@@ -86,7 +86,7 @@ export async function toPromise<Value, E = Error>(
 	const actual = typeof result === 'function' ? result() : result;
 
 	if (!isResult(actual)) {
-		return Promise.reject(new Error(MESSAGE_PROMISE_RESULT));
+		return Promise.reject(new Error(RESULT_MESSAGE_PROMISE));
 	}
 
 	return isOk(actual) ? Promise.resolve(actual.value) : Promise.reject(actual.error);
@@ -118,7 +118,7 @@ export function unwrap(value: unknown, defaultValue: unknown): unknown {
 
 // #region Variables
 
-const MESSAGE_PROMISE_RESULT = 'toPromise expected to receive a Result';
+const RESULT_MESSAGE_PROMISE = 'toPromise expected to receive a Result';
 
 // #endregion
 
