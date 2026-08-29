@@ -1,5 +1,5 @@
 import {isTemplateStringsArray} from '../internal/is';
-import {interpolate} from '../internal/string';
+import {interpolate} from '../internal/string/misc';
 
 // #region Functions
 
@@ -194,6 +194,6 @@ const STRING_ZERO = '0';
 
 // #region Exports
 
-export {getString, join, words} from '../internal/string';
+export {getString, join, words} from '../internal/string/misc';
 
 // #endregion

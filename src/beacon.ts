@@ -156,8 +156,10 @@ export function beacon<Value>(value: Value, options?: BeaconOptions<Value>): Bea
 
 	const instance: unknown = {
 		deactivate: (): void => finishBeacon(state, false),
-		emit: (value: never, finish?: never): void => updateBeacon(BEACON_TYPE_NEXT, state, value, finish),
-		error: (value: never, finish?: never): void => updateBeacon(BEACON_TYPE_ERROR, state, value, finish),
+		emit: (value: never, finish?: never): void =>
+			updateBeacon(BEACON_TYPE_NEXT, state, value, finish),
+		error: (value: never, finish?: never): void =>
+			updateBeacon(BEACON_TYPE_ERROR, state, value, finish),
 		finish: (): void => finishBeacon(state, true),
 	};
 

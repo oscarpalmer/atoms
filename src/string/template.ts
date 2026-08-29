@@ -1,5 +1,5 @@
 import {isPlainObject, isTemplateStringsArray} from '../internal/is';
-import {getString, interpolate} from '../internal/string';
+import {getString, interpolate} from '../internal/string/misc';
 import {getValue} from '../internal/value/get';
 import type {PlainObject} from '../models';
 

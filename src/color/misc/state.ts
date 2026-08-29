@@ -1,4 +1,4 @@
-import type {Herald} from '../../herald';
+import type {Herald} from '../../internal/herald';
 import {COLOR_DEFAULTS, COLOR_KEYS, COLOR_LENGTHS, COLOR_MAX, COLOR_TYPE} from '../constants';
 import type {
 	Color,

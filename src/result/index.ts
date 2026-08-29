@@ -1,5 +1,5 @@
-import {getError, ok} from './misc';
-import type {ExtendedErr, ExtendedResult, Result} from './models';
+import {getError, ok} from '../internal/result/misc';
+import type {ExtendedErr, ExtendedResult, Result} from '../internal/result/models';
 
 // #region Functions
 

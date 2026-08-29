@@ -1,7 +1,7 @@
-import {isPlainObject} from '../internal/is';
-import {getString, join} from '../internal/string';
-import type {GenericCallback} from '../models';
+import type {GenericCallback} from '../../models';
+import {isPlainObject} from '../is';
 import {SizedMap} from '../sized/map';
+import {getString, join} from '../string/misc';
 
 // #region Types
 

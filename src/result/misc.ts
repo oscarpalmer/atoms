@@ -1,54 +1,7 @@
-import {isOk, isResult} from '../internal/result';
-import type {AnyResult, Err, ExtendedErr, Ok, Result} from './models';
+import {isOk, isResult} from '../internal/result/misc';
+import type {AnyResult} from '../internal/result/models';
 
 // #region Functions
-
-/**
- * Creates an extended error result
- *
- * @param value Error value
- * @param original Original error
- * @returns Error result
- */
-export function error<E>(value: E, original: Error): ExtendedErr<E>;
-
-/**
- * Creates an error result
- *
- * @param value Error value
- * @returns Error result
- */
-export function error<E>(value: E): Err<E>;
-
-export function error<E>(value: E, original?: Error): Err<E> | ExtendedErr<E> {
-	return getError(value, original);
-}
-
-export function getError<E>(value: E, original?: Error): Err<E> | ExtendedErr<E> {
-	const errorResult: Err<E> | ExtendedErr<E> = {
-		error: value,
-		ok: false,
-	};
-
-	if (original instanceof Error) {
-		(errorResult as ExtendedErr<E>).original = original;
-	}
-
-	return errorResult;
-}
-
-/**
- * Creates an ok result
- *
- * @param value Value
- * @returns Ok result
- */
-export function ok<Value>(value: Value): Ok<Value> {
-	return {
-		ok: true,
-		value,
-	};
-}
 
 /**
  * Converts a result to a _Promise_
@@ -92,28 +45,6 @@ export async function toPromise<Value, E = Error>(
 	return isOk(actual) ? Promise.resolve(actual.value) : Promise.reject(actual.error);
 }
 
-/**
- * Gets the value of an ok result _(or a default value)_
- *
- * @param value _Result_ to unwrap
- * @param defaultValue Default value
- * @returns Value of the _Result_ _(or the default value)_
- */
-export function unwrap<Value, E = Error>(value: Result<Value, E>, defaultValue: Value): Value;
-
-/**
- * Gets the value of an ok result _(or a default value)_
- *
- * @param value _Result_ to unwrap
- * @param defaultValue Default value
- * @returns Value of the _Result_ _(or the default value)_
- */
-export function unwrap(value: unknown, defaultValue: unknown): unknown;
-
-export function unwrap(value: unknown, defaultValue: unknown): unknown {
-	return isOk(value) ? value.value : defaultValue;
-}
-
 // #endregion
 
 // #region Variables
@@ -124,6 +55,6 @@ const RESULT_MESSAGE_PROMISE = 'toPromise expected to receive a Result';
 
 // #region Exports
 
-export {isError, isOk, isResult} from '../internal/result';
+export {error, isError, isOk, isResult, ok, unwrap} from '../internal/result/misc';
 
 // #endregion

@@ -1,7 +1,7 @@
+import {error, ok} from '../../internal/result/misc';
 import type {PlainObject} from '../../models';
-import {error, ok} from '../../result/misc';
-import type {Result} from '../../result/models';
-import {ignoreKey} from '../string';
+import type {Result} from '../result/models';
+import {ignoreKey} from '../string/misc';
 
 // #region Functions
 

@@ -1,5 +1,5 @@
 import {noop} from './internal/function/misc';
-import {getString} from './internal/string';
+import {getString} from './internal/string/misc';
 
 // #region Types
 

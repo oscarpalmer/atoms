@@ -1,7 +1,7 @@
 import {isPlainObject} from '../internal/is';
-import {getString} from '../internal/string';
+import {lowerCase} from '../internal/string/case';
+import {getString} from '../internal/string/misc';
 import type {PlainObject, RequiredKeys} from '../models';
-import {lowerCase} from './case';
 import {includes} from './match';
 
 // #region Types

@@ -1,5 +1,5 @@
 import {createAborter} from '../internal/abort';
-import type {Result} from '../result/models';
+import type {Result} from '../internal/result/models';
 import {
 	PROMISE_MESSAGE_EXPECTATION_ATTEMPT,
 	PROMISE_STRATEGY_DEFAULT,

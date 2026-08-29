@@ -1,4 +1,4 @@
-import {memoize, type Memoized} from '../function/memoize';
+import {memoize, type Memoized} from '../internal/function/memoize';
 
 // #region Types
 

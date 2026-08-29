@@ -1,5 +1,5 @@
-import {hasValueResult} from '../internal/value/has';
-import type {Constructor, NestedKeys, NestedValue, PlainObject} from '../models';
+import type {Constructor, NestedKeys, NestedValue, PlainObject} from '../../models';
+import {hasValueResult} from '../value/has';
 
 // #region Types
 

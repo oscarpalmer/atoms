@@ -1,5 +1,5 @@
-import {isError, isOk} from '../internal/result';
-import type {GenericCallback} from '../models';
+import type {GenericCallback} from '../../models';
+import {isError, isOk} from '../result/misc';
 import type {UnwrapValue} from '../result/models';
 import {assert, type Asserter} from './assert';
 

@@ -1,6 +1,6 @@
 import type {Aborter} from '../internal/abort';
+import type {Result} from '../internal/result/models';
 import type {GenericCallback} from '../models';
-import type {Result} from '../result/models';
 import {
 	PROMISE_ERROR_NAME,
 	PROMISE_MESSAGE_TIMEOUT,

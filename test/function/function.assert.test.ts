@@ -1,5 +1,5 @@
 import {expect, test} from 'vitest';
-import {assert, AssertProperty} from '../../src/function/assert';
+import {assert, AssertProperty} from '../../src/internal/function/assert';
 import {TestFunctionItem, testIsString} from '../.fixtures/function.fixture';
 
 test('assert', () => {

@@ -1,7 +1,7 @@
-import {getNumberOrDefault} from '../internal/number';
+import {getNumberOrDefault} from '../internal/defaults';
+import {error, ok} from '../internal/result/misc';
+import type {Result} from '../internal/result/models';
 import type {RequiredKeys} from '../models';
-import {error, ok} from '../result/misc';
-import type {Result} from '../result/models';
 import {
 	PROMISE_STRATEGY_ALL,
 	PROMISE_STRATEGY_DEFAULT,

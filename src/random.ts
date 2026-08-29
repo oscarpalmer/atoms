@@ -1,6 +1,6 @@
 import {shuffle} from './internal/array/shuffle';
 import {getRandomInteger} from './internal/random';
-import {join} from './internal/string';
+import {join} from './internal/string/misc';
 
 // #region Functions
 

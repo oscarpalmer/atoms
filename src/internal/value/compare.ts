@@ -1,6 +1,6 @@
 import type {Constructor} from '../../models';
 import {max} from '../math/aggregate';
-import {getString, words} from '../string';
+import {getString, words} from '../string/misc';
 import {getCompareHandlers} from './handlers';
 
 // #region Types

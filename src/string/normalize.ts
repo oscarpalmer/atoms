@@ -1,6 +1,6 @@
-import {memoize, type Memoized} from '../function/memoize';
+import {memoize, type Memoized} from '../internal/function/memoize';
 import {isPlainObject} from '../internal/is';
-import {lowerCase} from './case';
+import {lowerCase} from '../internal/string/case';
 
 // #region Types
 

@@ -1,6 +1,6 @@
 {
 	"name": "@oscarpalmer/atoms",
-	"version": "0.194.0",
+	"version": "0.195.0",
 	"description": "Atomic utilities for making your JavaScript better.",
 	"keywords": [
 		"array",
@@ -90,12 +90,16 @@
 			"default": "./dist/function/index.mjs"
 		},
 		"./function/assert": {
-			"types": "./dist/function/assert.d.mts",
-			"default": "./dist/function/assert.mjs"
+			"types": "./dist/internal/function/assert.d.mts",
+			"default": "./dist/internal/function/assert.mjs"
 		},
 		"./function/limit": {
 			"types": "./dist/function/limit.d.mts",
 			"default": "./dist/function/limit.mjs"
+		},
+		"./function/memoize": {
+			"types": "./dist/internal/function/memoize.d.mts",
+			"default": "./dist/internal/function/memoize.mjs"
 		},
 		"./function/once": {
 			"types": "./dist/function/once.d.mts",
@@ -106,8 +110,8 @@
 			"default": "./dist/function/retry.mjs"
 		},
 		"./function/work": {
-			"types": "./dist/function/work.d.mts",
-			"default": "./dist/function/work.mjs"
+			"types": "./dist/internal/function/work.d.mts",
+			"default": "./dist/internal/function/work.mjs"
 		},
 		"./herald": {
 			"types": "./dist/herald.d.mts",
@@ -181,16 +185,16 @@
 			"default": "./dist/result/misc.mjs"
 		},
 		"./result/models": {
-			"types": "./dist/result/models.d.mts",
-			"default": "./dist/result/models.mjs"
+			"types": "./dist/internal/result/models.d.mts",
+			"default": "./dist/internal/result/models.mjs"
 		},
 		"./result/pipe": {
 			"types": "./dist/result/work/pipe.d.mts",
 			"default": "./dist/result/work/pipe.mjs"
 		},
 		"./sized/map": {
-			"types": "./dist/sized/map.d.mts",
-			"default": "./dist/sized/map.mjs"
+			"types": "./dist/internal/sized/map.d.mts",
+			"default": "./dist/internal/sized/map.mjs"
 		},
 		"./sized/set": {
 			"types": "./dist/sized/set.d.mts",
@@ -201,8 +205,8 @@
 			"default": "./dist/string/index.mjs"
 		},
 		"./string/case": {
-			"types": "./dist/string/case.d.mts",
-			"default": "./dist/string/case.mjs"
+			"types": "./dist/internal/string/case.d.mts",
+			"default": "./dist/internal/string/case.mjs"
 		},
 		"./string/fuzzy": {
 			"types": "./dist/string/fuzzy.d.mts",
@@ -219,6 +223,10 @@
 		"./string/template": {
 			"types": "./dist/string/template.d.mts",
 			"default": "./dist/string/template.mjs"
+		},
+		"./subscription": {
+			"types": "./dist/subscription.d.mts",
+			"default": "./dist/subscription.mjs"
 		},
 		"./value": {
 			"types": "./dist/value/index.d.mts",
@@ -255,6 +263,10 @@
 		"./value/merge": {
 			"types": "./dist/value/merge.d.mts",
 			"default": "./dist/value/merge.mjs"
+		},
+		"./value/transform": {
+			"types": "./dist/value/transform.d.mts",
+			"default": "./dist/value/transform.mjs"
 		}
 	},
 	"scripts": {

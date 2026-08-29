@@ -1,4 +1,4 @@
-import {noop} from '../function';
+import {noop} from '../internal/function/misc';
 import {isPlainObject} from '../internal/is';
 import type {PlainObject} from '../models';
 

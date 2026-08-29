@@ -1,6 +1,6 @@
-import {getArray} from './array/get';
+import {getArray} from './internal/array/get';
 import {isNumber} from './internal/is';
-import {getString} from './internal/string';
+import {getString} from './internal/string/misc';
 
 // #region Functions
 

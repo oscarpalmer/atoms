@@ -1,4 +1,4 @@
-import {getSizedMaximum} from '../internal/sized';
+import {getSizedMaximum} from './misc';
 
 // #region Types and classes
 

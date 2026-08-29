@@ -1,5 +1,5 @@
 import type {NestedKeys, NestedValue, PlainObject, ToString} from '../../models';
-import type {Result} from '../../result/models';
+import type {Result} from '../result/models';
 import {getNestedValue} from './misc';
 
 // #region Functions

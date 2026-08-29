@@ -1,4 +1,4 @@
-import {join} from '../../internal/string';
+import {join} from '../../internal/string/misc';
 import {COLOR_DEFAULTS, COLOR_MAX, COLOR_TYPE} from '../constants';
 import {getAlpha, getAlphaValue} from '../misc/alpha';
 import {getHexValue} from '../misc/get';

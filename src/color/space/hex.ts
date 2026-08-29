@@ -1,4 +1,4 @@
-import {join} from '../../internal/string';
+import {join} from '../../internal/string/misc';
 import {
 	COLOR_ALPHA,
 	COLOR_DEFAULTS,

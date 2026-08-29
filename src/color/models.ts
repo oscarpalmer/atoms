@@ -1,4 +1,4 @@
-import type {HeraldEvents} from '../herald';
+import type {HeraldEvents} from '../internal/herald';
 import type {Subscription} from '../internal/subscription';
 import type {COLOR_ALPHA} from './constants';
 

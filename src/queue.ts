@@ -1,5 +1,5 @@
 import {createAborter, type Aborter} from './internal/abort';
-import {getNumberOrDefault} from './internal/number';
+import {getBooleanOrDefault, getNumberOrDefault} from './internal/defaults';
 import type {GenericAsyncCallback, GenericCallback} from './models';
 
 // #region Types
@@ -414,10 +414,6 @@ function createQueue(
 	});
 
 	return Object.freeze(instance) as Queue<GenericCallback>;
-}
-
-function getBooleanOrDefault(value: unknown, defaultValue: boolean): boolean {
-	return typeof value === 'boolean' ? value : defaultValue;
 }
 
 function getOptions(input?: QueueOptions): Required<QueueOptions> {

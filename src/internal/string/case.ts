@@ -1,5 +1,5 @@
 import {memoize, type Memoized} from '../function/memoize';
-import {join, words} from '../internal/string';
+import {join, words} from './misc';
 
 // #region Types
 

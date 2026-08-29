@@ -1,8 +1,8 @@
-import {asyncFlow, flow} from '../../function/work';
-import {isError, isOk} from '../../internal/result';
+import {asyncFlow, flow} from '../../internal/function/work';
+import {isError, isOk} from '../../internal/result/misc';
+import type {Result, UnwrapValue} from '../../internal/result/models';
 import type {GenericCallback} from '../../models';
 import {asyncAttempt, attempt} from '../index';
-import type {Result, UnwrapValue} from '../models';
 
 // #region Types
 

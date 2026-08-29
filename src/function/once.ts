@@ -1,10 +1,10 @@
+import {assert} from '../internal/function/assert';
 import type {
 	GenericAsyncCallback,
 	GenericCallback,
 	OnceAsyncCallback,
 	OnceCallback,
 } from '../models';
-import {assert} from './assert';
 
 // #region Types
 

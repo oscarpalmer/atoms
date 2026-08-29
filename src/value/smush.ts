@@ -1,5 +1,5 @@
 import {isArrayOrPlainObject} from '../internal/is';
-import {join} from '../internal/string';
+import {join} from '../internal/string/misc';
 import type {
 	ArrayOrPlainObject,
 	NestedKeys,

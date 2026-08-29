@@ -1,4 +1,4 @@
-import type {GenericCallback} from '../models';
+import type {GenericCallback} from '../../models';
 
 // #region Types
 

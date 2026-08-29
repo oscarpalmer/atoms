@@ -1,6 +1,6 @@
-// #region Functions
+import {clamp} from '../number';
 
-import {clamp} from './number';
+// #region Functions
 
 export function getSizedMaximum(first?: unknown, second?: unknown): number {
 	let actual: number;

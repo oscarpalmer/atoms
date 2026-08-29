@@ -1,8 +1,42 @@
-import type {PlainObject} from '../models';
-import type {Err, ExtendedErr, Ok, Result} from '../result/models';
-import {isNonPlainObject} from './is';
+import type {PlainObject} from '../../models';
+import {isNonPlainObject} from '../is';
+import type {Err, ExtendedErr, Ok, Result} from './models';
 
 // #region Functions
+
+/**
+ * Creates an extended error result
+ *
+ * @param value Error value
+ * @param original Original error
+ * @returns Error result
+ */
+export function error<E>(value: E, original: Error): ExtendedErr<E>;
+
+/**
+ * Creates an error result
+ *
+ * @param value Error value
+ * @returns Error result
+ */
+export function error<E>(value: E): Err<E>;
+
+export function error<E>(value: E, original?: Error): Err<E> | ExtendedErr<E> {
+	return getError(value, original);
+}
+
+export function getError<E>(value: E, original?: Error): Err<E> | ExtendedErr<E> {
+	const errorResult: Err<E> | ExtendedErr<E> = {
+		error: value,
+		ok: false,
+	};
+
+	if (original instanceof Error) {
+		(errorResult as ExtendedErr<E>).original = original;
+	}
+
+	return errorResult;
+}
 
 /**
  * Is the _Result_ an extended error?
@@ -80,6 +114,41 @@ function isResultValue(value: unknown, okValue: boolean): value is Result<unknow
 		(value as PlainObject).ok === okValue &&
 		(okValue ? RESULT_PROPERTY_VALUE : RESULT_PROPERTY_ERROR) in value
 	);
+}
+
+/**
+ * Creates an ok result
+ *
+ * @param value Value
+ * @returns Ok result
+ */
+export function ok<Value>(value: Value): Ok<Value> {
+	return {
+		ok: true,
+		value,
+	};
+}
+
+/**
+ * Gets the value of an ok result _(or a default value)_
+ *
+ * @param value _Result_ to unwrap
+ * @param defaultValue Default value
+ * @returns Value of the _Result_ _(or the default value)_
+ */
+export function unwrap<Value, E = Error>(value: Result<Value, E>, defaultValue: Value): Value;
+
+/**
+ * Gets the value of an ok result _(or a default value)_
+ *
+ * @param value _Result_ to unwrap
+ * @param defaultValue Default value
+ * @returns Value of the _Result_ _(or the default value)_
+ */
+export function unwrap(value: unknown, defaultValue: unknown): unknown;
+
+export function unwrap(value: unknown, defaultValue: unknown): unknown {
+	return isOk(value) ? value.value : defaultValue;
 }
 
 // #endregion
