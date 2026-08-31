@@ -205,13 +205,13 @@ export function median(array: unknown[], key?: unknown): number {
  * @param items List of items
  * @param callback Callback to get an item's value
  * @param first Return only the first item with the minimum value
- * @returns Items with the minimum value
+ * @returns First item with the minimum value, or `undefined` if no minimum can be found
  */
 export function min<Item>(
 	items: Item[],
 	callback: (item: Item, index: number, array: Item[]) => number,
 	first: true,
-): Item[];
+): Item | undefined;
 
 /**
  * Get the minimum value from a list of items
@@ -219,13 +219,13 @@ export function min<Item>(
  * @param items List of items
  * @param key Key to use for value
  * @param first Return only the first item with the minimum value
- * @returns Items with the minimum value
+ * @returns First item with the minimum value, or `undefined` if no minimum can be found
  */
 export function min<Item extends PlainObject>(
 	items: Item[],
 	key: keyof NumericalValues<Item>,
 	first: true,
-): Item[];
+): Item | undefined;
 
 /**
  * Get the minimum value from a list of items
