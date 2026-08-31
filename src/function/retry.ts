@@ -174,6 +174,8 @@ const RETRY_MESSAGE_FAILED = 'Retry failed';
 
 // #region Initialization
 
+retry.async = asyncRetry;
+
 Object.defineProperty(retry, 'async', {
 	value: asyncRetry,
 });

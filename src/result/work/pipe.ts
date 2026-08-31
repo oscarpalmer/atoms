@@ -495,6 +495,8 @@ export function attemptPipe(
 
 // #region Initialization
 
+attemptPipe.async = attemptAsyncPipe;
+
 Object.defineProperty(attemptPipe, 'async', {
 	value: attemptAsyncPipe,
 });

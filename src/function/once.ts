@@ -198,6 +198,8 @@ const ONCE_MESSAGE_EXPECTATION = 'Once expected a function';
 
 // #region Initialization
 
+once.async = asyncOnce;
+
 Object.defineProperty(once, 'async', {
 	value: asyncOnce,
 });
