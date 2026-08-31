@@ -23,17 +23,21 @@ const array = {
 		five: [1011, 789, 456, 123, 1213],
 		people: [
 			{
-				age: 25,
+				age: 26,
 				name: 'Alice',
 			},
 			{
-				age: 35,
+				age: 32,
 				name: 'Bob',
 			},
 			{
 				age: 'blah',
 				name: 'Charlie',
 			},
+			{
+				age: 32,
+				name: 'Dahlia',
+			}
 		] as TestMathPerson[],
 		items: [new TestMathItem(123), new TestMathItem('blah' as never), new TestMathItem(456)],
 	},

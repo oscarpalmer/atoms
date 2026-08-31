@@ -36,8 +36,8 @@ test('count', () => {
 	expect(count(array.valid.four)).toBe(4);
 	expect(count(array.valid.five)).toBe(5);
 
-	expect(count(array.valid.people, 'age', 25)).toBe(1);
-	expect(count(array.valid.people, 'age', 35)).toBe(1);
+	expect(count(array.valid.people, 'age', 26)).toBe(1);
+	expect(count(array.valid.people, 'age', 32)).toBe(2);
 	expect(count(array.valid.people, 'age', 'blah' as never)).toBe(1);
 	expect(count(array.valid.people, 'age', 123)).toBe(0);
 
@@ -69,8 +69,12 @@ test('max', () => {
 	expect(max(array.valid.four)).toBe(1011);
 	expect(max(array.valid.five)).toBe(1213);
 
-	expect(max(array.valid.people, 'age')).toBe(35);
-	expect(max(array.valid.items, item => item.value)).toBe(456);
+	expect(max(array.valid.people, 'age', true)).toEqual(array.valid.people[1]);
+	expect(max(array.valid.people, 'age')).toEqual([array.valid.people[1], array.valid.people[3]]);
+	expect(max(array.valid.items, item => item.value)).toEqual([array.valid.items[2]]);
+
+	expect(max(array.valid.people, 'blah' as never, true)).toBe(undefined);
+	expect(max(array.valid.people, 'blah' as never)).toEqual([]);
 
 	expect(max(array.invalid.empty)).toBeNaN();
 
@@ -86,7 +90,7 @@ test('median', () => {
 	expect(median(array.valid.four)).toBe(622.5);
 	expect(median(array.valid.five)).toBe(789);
 
-	expect(median(array.valid.people, 'age')).toBe(30);
+	expect(median(array.valid.people, 'age')).toBe(32);
 	expect(median(array.valid.items, item => item.value)).toBe(289.5);
 
 	expect(median(array.invalid.empty)).toBeNaN();
@@ -106,8 +110,12 @@ test('min', () => {
 	expect(min(array.valid.four)).toBe(123);
 	expect(min(array.valid.five)).toBe(123);
 
-	expect(min(array.valid.people, 'age')).toBe(25);
-	expect(min(array.valid.items, item => item.value)).toBe(123);
+	expect(min(array.valid.people, 'age', true)).toEqual(array.valid.people[0]);
+	expect(min(array.valid.people, 'age')).toEqual([array.valid.people[0]]);
+	expect(min(array.valid.items, item => item.value)).toEqual([array.valid.items[0]]);
+
+	expect(min(array.valid.people, 'blah' as never, true)).toBe(undefined);
+	expect(min(array.valid.people, 'blah' as never)).toEqual([]);
 
 	expect(min(array.invalid.empty)).toBeNaN();
 
@@ -133,7 +141,7 @@ test('sum', () => {
 	expect(sum(array.valid.four)).toBe(2379);
 	expect(sum(array.valid.five)).toBe(3592);
 
-	expect(sum(array.valid.people, 'age')).toBe(60);
+	expect(sum(array.valid.people, 'age')).toBe(90);
 	expect(sum(array.valid.items, item => item.value)).toBe(579);
 
 	expect(sum(array.invalid.empty)).toBeNaN();

@@ -4,11 +4,19 @@ import {isNonNumber} from '../is';
 // #region Types
 
 type Aggregation = {
+	array: boolean;
 	count: number;
+	first: boolean;
+	items?: Record<number, unknown[]>;
 	value: number;
 };
 
-type AggregationCallback = (current: number, value: number, notNumber: boolean) => number;
+type AggregationCallback = (
+	aggregation: Aggregation,
+	value: number,
+	notNumber: boolean,
+	item?: unknown,
+) => number;
 
 export type AggregationType = 'average' | 'max' | 'min' | 'sum';
 
@@ -18,21 +26,30 @@ type NonAverageAggregationType = 'max' | 'min' | 'sum';
 
 // #region Functions
 
-export function aggregate(type: AggregationType, array: unknown[], key: unknown): Aggregation {
+export function aggregate(
+	type: AggregationType,
+	array: unknown[],
+	key: unknown,
+	first?: unknown,
+): Aggregation {
 	const length = Array.isArray(array) ? array.length : 0;
 
+	const aggregation: Aggregation = {
+		array: false,
+		count: 0,
+		first: first === true,
+		value: Number.NaN,
+	};
+
 	if (length === 0) {
-		return {
-			count: 0,
-			value: Number.NaN,
-		};
+		return aggregation;
 	}
 
 	const aggregator = aggregators[type];
 	const callback = getAggregateCallback(key);
 
-	let counted = 0;
-	let aggregated = Number.NaN;
+	aggregation.array = callback != null && (type === AGGREGATION_MAX || type === AGGREGATION_MIN);
+
 	let notNumber = true;
 
 	for (let index = 0; index < length; index += 1) {
@@ -44,16 +61,38 @@ export function aggregate(type: AggregationType, array: unknown[], key: unknown)
 			continue;
 		}
 
-		aggregated = aggregator(aggregated, value, notNumber);
+		aggregation.value = aggregator(aggregation, value, notNumber, item);
 
-		counted += 1;
+		aggregation.count += 1;
 		notNumber = false;
 	}
 
-	return {
-		count: counted,
-		value: aggregated,
-	};
+	return aggregation;
+}
+
+function calculateSum(aggregation: Aggregation, value: number, notNumber: boolean): number {
+	return notNumber ? value : aggregation.value + value;
+}
+
+function getAbsoluteValue(
+	condition: (aggregation: Aggregation, value: number) => boolean,
+	aggregation: Aggregation,
+	value: number,
+	notNumber: boolean,
+	item?: unknown,
+): number {
+	if (notNumber || condition(aggregation, value)) {
+		if (aggregation.array) {
+			aggregation.items ??= {};
+			aggregation.items[value] ??= [];
+
+			aggregation.items[value].push(item);
+		}
+
+		return value;
+	}
+
+	return aggregation.value;
 }
 
 export function getAggregateCallback(key: unknown): Function | undefined {
@@ -64,6 +103,35 @@ export function getAggregateCallback(key: unknown): Function | undefined {
 	return typeof key === 'function' ? key : (item: PlainObject): unknown => item[key as never];
 }
 
+export function getAggregated(
+	type: NonAverageAggregationType,
+	array: unknown[],
+	key?: unknown,
+	first?: unknown,
+): unknown {
+	const aggregation = aggregate(type, array, key, first);
+
+	if (aggregation.count === 0) {
+		return aggregation.array ? (aggregation.first ? undefined : []) : Number.NaN;
+	}
+
+	if (aggregation.array) {
+		const array = aggregation.items![aggregation.value];
+
+		return aggregation.first ? array[0] : array;
+	}
+
+	return aggregation.value;
+}
+
+function isMaxValue(aggregation: Aggregation, value: number): boolean {
+	return aggregation.array ? value >= aggregation.value : value > aggregation.value;
+}
+
+function isMinValue(aggregation: Aggregation, value: number): boolean {
+	return aggregation.array ? value <= aggregation.value : value < aggregation.value;
+}
+
 /**
  * Get the maximum value from a list of items
  *
@@ -72,19 +140,21 @@ export function getAggregateCallback(key: unknown): Function | undefined {
  * max(
  *   [{id: 1, value: 10}, {id: 2, value: 20}],
  *   item => item.value,
- * ); // => 20
+ * ); // => [{id: 2, value: 20}]
  *
- * max([], item => item.value); // => Number.NaN
+ * max([], item => item.value); // => []
  * ```
  *
  * @param items List of items
  * @param callback Callback to get an item's value
- * @returns Maximum value, or `Number.NaN` if no maximum can be found
+ * @param first Return only the first item with the maximum value
+ * @returns Item with the maximum value, or `undefined` if no maximum can be found
  */
 export function max<Item>(
 	items: Item[],
 	callback: (item: Item, index: number, array: Item[]) => number,
-): number;
+	first: true,
+): Item | undefined;
 
 /**
  * Get the maximum value from a list of items
@@ -94,19 +164,65 @@ export function max<Item>(
  * max(
  *   [{id: 1, value: 10}, {id: 2, value: 20}],
  *   'value',
- * ); // => 20
+ * ); // => [{id: 2, value: 20}]
  *
- * max([], 'value'); // => Number.NaN
+ * max([], 'value'); // => []
  * ```
  *
  * @param items List of items
  * @param key Key to use for value
- * @returns Maximum value, or `Number.NaN` if no maximum can be found
+ * @param first Return only the first item with the maximum value
+ * @returns Item with the maximum value, or `undefined` if no maximum can be found
  */
 export function max<Item extends PlainObject, ItemKey extends keyof NumericalValues<Item>>(
 	items: Item[],
 	key: ItemKey,
-): number;
+	first: true,
+): Item | undefined;
+
+/**
+ * Get the maximum value from a list of items
+ *
+ * @example
+ * ```typescript
+ * max(
+ *   [{id: 1, value: 10}, {id: 2, value: 20}],
+ *   item => item.value,
+ * ); // => [{id: 2, value: 20}]
+ *
+ * max([], item => item.value); // => []
+ * ```
+ *
+ * @param items List of items
+ * @param callback Callback to get an item's value
+ * @returns Items with the maximum value
+ */
+export function max<Item>(
+	items: Item[],
+	callback: (item: Item, index: number, array: Item[]) => number,
+): Item[];
+
+/**
+ * Get the maximum value from a list of items
+ *
+ * @example
+ * ```typescript
+ * max(
+ *   [{id: 1, value: 10}, {id: 2, value: 20}],
+ *   'value',
+ * ); // => [{id: 2, value: 20}]
+ *
+ * max([], 'value'); // => []
+ * ```
+ *
+ * @param items List of items
+ * @param key Key to use for value
+ * @returns Items with the maximum value
+ */
+export function max<Item extends PlainObject, ItemKey extends keyof NumericalValues<Item>>(
+	items: Item[],
+	key: ItemKey,
+): Item[];
 
 /**
  * Get the maximum value from a list of numbers
@@ -122,22 +238,8 @@ export function max<Item extends PlainObject, ItemKey extends keyof NumericalVal
  */
 export function max(values: number[]): number;
 
-export function max(array: unknown[], key?: unknown): number {
-	return getAggregated(AGGREGATION_MAX as NonAverageAggregationType, array, key);
-}
-
-function calculateSum(current: number, value: number, notNumber: boolean): number {
-	return notNumber ? value : current + value;
-}
-
-export function getAggregated(
-	type: NonAverageAggregationType,
-	array: unknown[],
-	key?: unknown,
-): number {
-	const aggregated = aggregate(type, array, key);
-
-	return aggregated.count > 0 ? aggregated.value : Number.NaN;
+export function max(array: unknown[], key?: unknown, first?: unknown): unknown {
+	return getAggregated(AGGREGATION_MAX as NonAverageAggregationType, array, key, first);
 }
 
 // #endregion
@@ -154,10 +256,8 @@ export const AGGREGATION_SUM = 'sum';
 
 const aggregators: Record<AggregationType, AggregationCallback> = {
 	average: calculateSum,
-	max: (current: number, value: number, notNumber: boolean) =>
-		notNumber || value > current ? value : current,
-	min: (current: number, value: number, notNumber: boolean) =>
-		notNumber || value < current ? value : current,
+	max: getAbsoluteValue.bind(undefined, isMaxValue),
+	min: getAbsoluteValue.bind(undefined, isMinValue),
 	sum: calculateSum,
 };
 

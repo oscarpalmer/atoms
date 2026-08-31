@@ -41,14 +41,6 @@ export type CancelableCallback<Callback extends GenericCallback> = Callback & {
 export type Constructor<Instance = unknown> = new (...args: any[]) => Instance;
 
 /**
- * Position of an event
- */
-export type EventPosition = {
-	x: number;
-	y: number;
-};
-
-/**
  * A generic async callback function
  */
 export type GenericAsyncCallback = (...args: any[]) => Promise<any>;

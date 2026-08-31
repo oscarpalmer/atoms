@@ -204,24 +204,52 @@ export function median(array: unknown[], key?: unknown): number {
  *
  * @param items List of items
  * @param callback Callback to get an item's value
- * @returns Minimum value, or `Number.NaN` if no minimum can be found
+ * @param first Return only the first item with the minimum value
+ * @returns Items with the minimum value
  */
 export function min<Item>(
 	items: Item[],
 	callback: (item: Item, index: number, array: Item[]) => number,
-): number;
+	first: true,
+): Item[];
 
 /**
  * Get the minimum value from a list of items
  *
  * @param items List of items
  * @param key Key to use for value
- * @returns Minimum value, or `Number.NaN` if no minimum can be found
+ * @param first Return only the first item with the minimum value
+ * @returns Items with the minimum value
  */
 export function min<Item extends PlainObject>(
 	items: Item[],
 	key: keyof NumericalValues<Item>,
-): number;
+	first: true,
+): Item[];
+
+/**
+ * Get the minimum value from a list of items
+ *
+ * @param items List of items
+ * @param callback Callback to get an item's value
+ * @returns Items with the minimum value
+ */
+export function min<Item>(
+	items: Item[],
+	callback: (item: Item, index: number, array: Item[]) => number,
+): Item[];
+
+/**
+ * Get the minimum value from a list of items
+ *
+ * @param items List of items
+ * @param key Key to use for value
+ * @returns Items with the minimum value
+ */
+export function min<Item extends PlainObject>(
+	items: Item[],
+	key: keyof NumericalValues<Item>,
+): Item[];
 
 /**
  * Get the minimum value from a list of numbers
@@ -231,8 +259,8 @@ export function min<Item extends PlainObject>(
  */
 export function min(values: number[]): number;
 
-export function min(array: unknown[], key?: unknown): number {
-	return getAggregated(AGGREGATION_MIN, array, key);
+export function min(array: unknown[], key?: unknown, first?: unknown): unknown {
+	return getAggregated(AGGREGATION_MIN, array, key, first);
 }
 
 /**
@@ -267,7 +295,7 @@ export function sum<Item extends PlainObject>(
  */
 export function sum(values: number[]): number;
 
-export function sum(array: unknown[], key?: unknown): number {
+export function sum(array: unknown[], key?: unknown): unknown {
 	return getAggregated(AGGREGATION_SUM, array, key);
 }
 
