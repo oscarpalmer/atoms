@@ -48,12 +48,6 @@ export function assert<Condition extends () => boolean>(
 	}
 }
 
-assert.condition = assertCondition;
-assert.defined = assertDefined;
-assert.instanceOf = assertInstanceOf;
-assert.is = assertIs;
-assert.property = assertProperty;
-
 /**
  * Creates an _Asserter_ that asserts a condition is true, throwing an error if it is not
  *
@@ -170,5 +164,33 @@ export function assertProperty<
 // #region Variables
 
 const ASSERT_MESSAGE_VALUE_DEFINED = 'Expected value to be defined';
+
+// #endregion
+
+// #region Initialization
+
+assert.condition = assertCondition;
+assert.defined = assertDefined;
+assert.instanceOf = assertInstanceOf;
+assert.is = assertIs;
+assert.property = assertProperty;
+
+Object.defineProperties(assert, {
+	condition: {
+		value: assertCondition,
+	},
+	defined: {
+		value: assertDefined,
+	},
+	instanceOf: {
+		value: assertInstanceOf,
+	},
+	is: {
+		value: assertIs,
+	},
+	property: {
+		value: assertProperty,
+	},
+});
 
 // #endregion

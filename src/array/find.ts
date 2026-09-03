@@ -87,8 +87,6 @@ export function find(array: unknown[], ...parameters: unknown[]): unknown {
 	return findValue(FIND_VALUE_ITEM, array, parameters, false);
 }
 
-find.last = findLast;
-
 /**
  * Get the last item matching the given value
  *
@@ -179,5 +177,15 @@ export function findLast<Item>(array: Item[], value: Item): Item | undefined;
 export function findLast(array: unknown[], ...parameters: unknown[]): unknown {
 	return findValue(FIND_VALUE_ITEM, array, parameters, true);
 }
+
+// #endregion
+
+// #region Initialization
+
+find.last = findLast;
+
+Object.defineProperty(find, 'last', {
+	value: findLast,
+});
 
 // #endregion

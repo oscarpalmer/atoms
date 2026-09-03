@@ -54,8 +54,6 @@ export function hasValue(data: PlainObject, path: string, ignoreCase?: boolean):
 	return getNestedValue(data, path, ignoreCase === true).ok;
 }
 
-hasValue.get = hasValueResult;
-
 /**
  * Check if a property is defined in an object, and get its value if it is
  *
@@ -114,5 +112,15 @@ export function hasValueResult(
 ): Result<unknown, string> {
 	return getNestedValue(data, path, ignoreCase === true);
 }
+
+// #endregion
+
+// #region Initialization
+
+hasValue.get = hasValueResult;
+
+Object.defineProperty(hasValue, 'get', {
+	value: hasValueResult,
+});
 
 // #endregion

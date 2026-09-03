@@ -78,13 +78,15 @@ export class SizedMap<SizedKey = unknown, SizedValue = unknown> extends Map<Size
 	 * @inheritdoc
 	 */
 	override get(key: SizedKey): SizedValue | undefined {
+		let value: SizedValue | undefined;
+
 		if (super.has(key)) {
-			const value = super.get(key) as SizedValue;
+			value = super.get(key) as SizedValue;
 
 			this.#setValue(key, value, true);
-
-			return value;
 		}
+
+		return value;
 	}
 
 	/**

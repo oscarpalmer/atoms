@@ -69,18 +69,6 @@ export function compare(first: unknown, second: unknown): number {
 	return 0;
 }
 
-compare.handlers = getCompareHandlers<number>(compare, {
-	callback: (first, second, compareStrings) => {
-		if (compareStrings) {
-			return getString(first).localeCompare(getString(second));
-		}
-	},
-	method: COMPARE_NAME,
-});
-
-compare.deregister = deregisterComparator;
-compare.register = registerComparator;
-
 function compareNumbers(first: bigint | number, second: bigint | number): number {
 	if (Object.is(first, second)) {
 		return 0;
@@ -166,5 +154,31 @@ const comparators: Record<string, Comparator> = {
 	number: compareNumbers,
 	symbol: compareSymbols,
 };
+
+const compareHandlers = getCompareHandlers<number>(compare, {
+	callback: (first: unknown, second: unknown, compareStrings: boolean): unknown =>
+		compareStrings ? getString(first).localeCompare(getString(second)) : undefined,
+	method: COMPARE_NAME,
+});
+
+// #endregion
+
+// #region Initialization
+
+compare.deregister = deregisterComparator;
+compare.handlers = compareHandlers;
+compare.register = registerComparator;
+
+Object.defineProperties(compare, {
+	deregister: {
+		value: deregisterComparator,
+	},
+	handlers: {
+		value: compareHandlers,
+	},
+	register: {
+		value: registerComparator,
+	},
+});
 
 // #endregion

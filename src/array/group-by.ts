@@ -182,8 +182,6 @@ export function groupBy(array: unknown[], first?: unknown, second?: unknown): un
 	return groupValues(array, first, second, false);
 }
 
-groupBy.arrays = groupArraysBy;
-
 /**
  * Create a record from an array of items using a specific key and value, grouping values into arrays
  *
@@ -365,5 +363,15 @@ export function groupArraysBy<Item extends PlainObject, ItemKey extends keyof It
 export function groupArraysBy(array: unknown[], first?: unknown, second?: unknown): unknown {
 	return groupValues(array, first, second, true);
 }
+
+// #endregion
+
+// #region Initialization
+
+groupBy.arrays = groupArraysBy;
+
+Object.defineProperty(groupBy, 'arrays', {
+	value: groupArraysBy,
+});
 
 // #endregion

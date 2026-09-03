@@ -86,8 +86,6 @@ export function indexOf(array: unknown[], ...parameters: unknown[]): number {
 	return findValue(FIND_VALUE_INDEX, array, parameters, false);
 }
 
-indexOf.last = lastIndexOf;
-
 /**
  * Get the index of the last matching item by callback
  *
@@ -178,5 +176,15 @@ export function lastIndexOf<Item>(array: Item[], item: Item): number;
 export function lastIndexOf(array: unknown[], ...parameters: unknown[]): number {
 	return findValue(FIND_VALUE_INDEX, array, parameters, true);
 }
+
+// #endregion
+
+// #region Initialization
+
+indexOf.last = lastIndexOf;
+
+Object.defineProperty(indexOf, 'last', {
+	value: lastIndexOf,
+});
 
 // #endregion

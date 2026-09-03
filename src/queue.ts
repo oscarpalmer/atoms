@@ -668,8 +668,6 @@ export function queue<Callback extends GenericCallback | GenericAsyncCallback>(
 	return createQueue(callback, options);
 }
 
-queue.keyed = keyedQueue;
-
 function removeQueue(state: KeyedQueueState, key?: string, id?: number): void {
 	if (key == null) {
 		handleQueues(state, QUEUE_HANDLE_CLEAR);
@@ -774,10 +772,6 @@ async function run(state: QueueState): Promise<void> {
 
 const QUEUE_ERROR_NAME = 'QueueError';
 
-const QUEUE_EVENT_NAME = 'abort';
-
-const QUEUE_EVENT_OPTIONS = {once: true};
-
 const QUEUE_PROPERTY = '$queue';
 
 const QUEUE_HANDLE_CLEAR: HandleType = 'clear';
@@ -807,5 +801,15 @@ const QUEUE_STATUS_EMPTY: StatusKey = 'empty';
 const QUEUE_STATUS_FULL: StatusKey = 'full';
 
 const QUEUE_STATUS_PAUSED: StatusKey = 'paused';
+
+// #endregion
+
+// #region Initialization
+
+queue.keyed = keyedQueue;
+
+Object.defineProperty(queue, 'keyed', {
+	value: keyedQueue,
+});
 
 // #endregion

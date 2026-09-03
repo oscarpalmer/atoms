@@ -119,8 +119,6 @@ export function transform<Value extends PlainObject>(value: Value, transform: un
 	return transformValue(value, getTransformer(transform));
 }
 
-transform.initialize = initializeTransformer;
-
 function transformValue<Value extends PlainObject, Key extends keyof Value>(
 	value: Value,
 	transformer?: TransformCallback<Value, Key> | TransformCallbacks<Value>,
@@ -149,5 +147,15 @@ function transformValue<Value extends PlainObject, Key extends keyof Value>(
 
 	return value;
 }
+
+// #endregion
+
+// #region Initialization
+
+transform.initialize = initializeTransformer;
+
+Object.defineProperty(transform, 'initialize', {
+	value: initializeTransformer,
+});
 
 // #endregion

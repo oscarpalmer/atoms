@@ -107,8 +107,6 @@ export function assign<To extends PlainObject, From extends PlainObject[]>(
 	return mergeValues([to, ...from], actual) as To & UnionToIntersection<From[number]>;
 }
 
-assign.initialize = initializeAssigner;
-
 function getMergeOptions(options?: MergeOptions): Options {
 	const actual: Options = {
 		assignValues: false,
@@ -186,8 +184,6 @@ export function merge<Values extends ArrayOrPlainObject[]>(
 ): UnionToIntersection<Values[number]> {
 	return mergeValues(values, getMergeOptions(options)) as UnionToIntersection<Values[number]>;
 }
-
-merge.initialize = initializeMerger;
 
 function mergeObjects(
 	values: ArrayOrPlainObject[],
@@ -274,5 +270,20 @@ function mergeValues(
 			? actual[0].slice()
 			: {...actual[0]};
 }
+
+// #endregion
+
+// #region Initialization
+
+assign.initialize = initializeAssigner;
+merge.initialize = initializeMerger;
+
+Object.defineProperty(assign, 'initialize', {
+	value: initializeAssigner,
+});
+
+Object.defineProperty(merge, 'initialize', {
+	value: initializeMerger,
+});
 
 // #endregion

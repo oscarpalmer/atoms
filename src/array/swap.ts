@@ -219,8 +219,6 @@ export function swap(
 	return swapValues(array, first, second, third);
 }
 
-swap.indices = swapIndices;
-
 function swapArrays(array: unknown[], from: unknown[], to: unknown[], key: unknown): unknown[] {
 	if (from.length === 0 || to.length === 0) {
 		return array;
@@ -318,5 +316,15 @@ function swapValues(array: unknown[], from: unknown, to: unknown, key?: unknown)
 
 	return swapIndices(array, first, second);
 }
+
+// #endregion
+
+// #region Initialization
+
+swap.indices = swapIndices;
+
+Object.defineProperty(swap, 'indices', {
+	value: swapIndices,
+});
 
 // #endregion

@@ -173,9 +173,6 @@ export function freeze(value: unknown, flat?: unknown): unknown {
 	return freezeValue(value, new WeakSet(), flat === true);
 }
 
-freeze.flat = flatFreeze;
-freeze.is = isFrozen;
-
 function freezeArray(array: unknown[], references: WeakSet<any>, flat: boolean): Frozen<unknown[]> {
 	if (flat) {
 		return Object.freeze(array) as Frozen<unknown[]>;
@@ -318,5 +315,21 @@ export function isFrozen(value: unknown): boolean {
 // #region Variables
 
 const frozenValues = new WeakSet();
+
+// #endregion
+
+// #region Initialization
+
+freeze.flat = flatFreeze;
+freeze.is = isFrozen;
+
+Object.defineProperties(freeze, {
+	flat: {
+		value: flatFreeze,
+	},
+	is: {
+		value: isFrozen,
+	},
+});
 
 // #endregion

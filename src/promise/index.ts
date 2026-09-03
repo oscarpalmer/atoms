@@ -251,8 +251,6 @@ export async function promises(items: unknown[], options?: unknown): Promise<unk
 	});
 }
 
-promises.result = resultPromises;
-
 /**
  * Handle a list of _Promises_, returning their results in an ordered array of results _({@link Result})_
  *
@@ -291,5 +289,15 @@ export async function resultPromises(
 ): Promise<Result<unknown>[]> {
 	return promises(items, signal).then(getResultsFromPromises);
 }
+
+// #endregion
+
+// #region Initialization
+
+promises.result = resultPromises;
+
+Object.defineProperty(promises, 'result', {
+	value: resultPromises,
+});
 
 // #endregion

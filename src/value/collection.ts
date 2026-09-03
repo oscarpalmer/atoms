@@ -30,11 +30,15 @@ export function inMap<Key, Value>(map: Map<Key, Value>, value: Value, key?: unkn
 		return inSet(new Set(map.values()), value);
 	}
 
+	let found: Key | undefined;
+
 	for (const [key, item] of map) {
 		if (equal(item, value)) {
-			return key;
+			found = key;
 		}
 	}
+
+	return found;
 }
 
 /**

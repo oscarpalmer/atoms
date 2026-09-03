@@ -29,17 +29,22 @@ test('clone: shallow', () => {
 });
 
 test('copy', () => {
-	const values = [null, undefined, true, 123, 'Hello, world!'];
+	const values = [
+		null,
+		undefined,
+		true,
+		123,
+		123n,
+		'Hello, world!',
+		Symbol('Hello, world!'),
+		() => {},
+	];
 
 	for (const value of values) {
 		expect(copy(value)).toBe(value);
 	}
 
-	const sym = Symbol('Hello, world!');
 	const reg = new RegExp('xyz', 'g');
-
-	expect(copy(sym)).not.toBe(sym);
-	expect(copy(sym).description).toBe(sym.description);
 
 	expect(copy(reg)).not.toBe(reg);
 	expect(copy(reg).source).toBe(reg.source);

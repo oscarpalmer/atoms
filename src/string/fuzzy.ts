@@ -253,8 +253,6 @@ export function fuzzy(items: unknown[], configuration?: unknown): Fuzzy<unknown>
 	return Object.freeze(instance) as Fuzzy<unknown>;
 }
 
-fuzzy.match = fuzzyMatch;
-
 /**
  * Does the needle match the haystack in a fuzzy way?
  *
@@ -444,5 +442,15 @@ const FUZZY_MESSAGE_ARRAY = 'Fuzzy requires an array of items';
 const FUZZY_MESSAGE_HANDLER = 'Fuzzy requires a key or function to stringify items';
 
 const FUZZY_PROXIMITY_THRESHOLD = 5;
+
+// #endregion
+
+// #region Initialization
+
+fuzzy.match = fuzzyMatch;
+
+Object.defineProperty(fuzzy, 'match', {
+	value: fuzzyMatch,
+});
 
 // #endregion

@@ -37,7 +37,7 @@ const array = {
 			{
 				age: 32,
 				name: 'Dahlia',
-			}
+			},
 		] as TestMathPerson[],
 		items: [new TestMathItem(123), new TestMathItem('blah' as never), new TestMathItem(456)],
 	},

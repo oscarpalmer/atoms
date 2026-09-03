@@ -177,6 +177,14 @@ export function filter(array: unknown[], ...parameters: unknown[]): unknown[] {
 	return findValues(FIND_VALUES_ALL, array, parameters).matched;
 }
 
+// #endregion
+
+// #region Initialization
+
 filter.remove = exclude;
+
+Object.defineProperty(filter, 'remove', {
+	value: exclude,
+});
 
 // #endregion

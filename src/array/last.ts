@@ -86,8 +86,6 @@ export function last(array: unknown[], ...parameters: unknown[]): unknown {
 	return findAbsoluteValueOrDefault(array, parameters, undefined, false, true);
 }
 
-last.default = lastOrDefault;
-
 /**
  * Get the last item matching the given value
  *
@@ -190,5 +188,15 @@ export function lastOrDefault(
 ): unknown {
 	return findAbsoluteValueOrDefault(array, parameters, defaultValue, true, true);
 }
+
+// #endregion
+
+// #region Initialization
+
+last.default = lastOrDefault;
+
+Object.defineProperty(last, 'default', {
+	value: lastOrDefault,
+});
 
 // #endregion

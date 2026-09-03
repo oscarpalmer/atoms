@@ -118,8 +118,6 @@ export function normalize(value: string, options?: NormalizeOptions): string {
 	return normalizeString(value, getNormalizeOptions(options));
 }
 
-normalize.initialize = initializeNormalizer;
-
 function normalizeString(value: string, options: Options): string {
 	if (typeof value !== 'string') {
 		return '';
@@ -207,5 +205,15 @@ const NORMALIZE_WHITESPACE_PATTERN = /\s+/g;
 const NORMALIZE_WHITESPACE_REPLACEMENT = ' ';
 
 let deburrMemoizer: Memoized<typeof deburr>;
+
+// #endregion
+
+// #region Initialization
+
+normalize.initialize = initializeNormalizer;
+
+Object.defineProperty(normalize, 'initialize', {
+	value: initializeNormalizer,
+});
 
 // #endregion

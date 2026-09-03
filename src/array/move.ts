@@ -137,9 +137,6 @@ export function move(array: unknown[], from: unknown, to: unknown, key?: unknown
 	return array;
 }
 
-move.indices = moveIndices;
-move.toIndex = moveToIndex;
-
 /**
  * Move an item from one index to another within an array
  *
@@ -311,5 +308,21 @@ export function moveToIndex(
 
 	return array;
 }
+
+// #endregion
+
+// #region Initialization
+
+move.indices = moveIndices;
+move.toIndex = moveToIndex;
+
+Object.defineProperties(move, {
+	indices: {
+		value: moveIndices,
+	},
+	toIndex: {
+		value: moveToIndex,
+	},
+});
 
 // #endregion

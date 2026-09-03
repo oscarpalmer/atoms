@@ -23,6 +23,7 @@ test('date', () => {
 	const cloned = clone(data);
 
 	expect(cloned).not.toBe(data);
+	expect(cloned.getTime()).toBe(data.getTime());
 
 	cloned.setFullYear(2000);
 
@@ -34,6 +35,43 @@ test('function', () => {
 	const cloned = clone(data);
 
 	expect(cloned).toBe(undefined);
+});
+
+test('nested', () => {
+	const data = {
+		bigint: 123n,
+		boolean: true,
+		null: null,
+		date: new Date(),
+		number: 123,
+		string: 'hello, world',
+		undefined: undefined,
+	};
+
+	const cloned = clone(data);
+
+	expect(cloned).not.toBe(data);
+
+	expect(cloned.bigint).toBe(data.bigint);
+	expect(cloned.boolean).toBe(data.boolean);
+	expect(cloned.date).not.toBe(data.date);
+	expect(cloned.date.getTime()).toBe(data.date.getTime());
+	expect(cloned.null).toBe(data.null);
+	expect(cloned.number).toBe(data.number);
+	expect(cloned.string).toBe(data.string);
+	expect(cloned.undefined).toBe(data.undefined);
+
+	data.bigint = 456n;
+	data.boolean = false;
+	data.date.setFullYear(2000);
+	data.number = 456;
+	data.string = 'goodbye, world';
+
+	expect(cloned.bigint).not.toBe(data.bigint);
+	expect(cloned.boolean).not.toBe(data.boolean);
+	expect(cloned.date.getFullYear()).not.toBe(data.date.getFullYear());
+	expect(cloned.number).not.toBe(data.number);
+	expect(cloned.string).not.toBe(data.string);
 });
 
 test('node', () => {

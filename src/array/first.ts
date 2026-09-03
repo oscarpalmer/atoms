@@ -88,8 +88,6 @@ export function first(array: unknown[], ...parameters: unknown[]): unknown {
 	return findAbsoluteValueOrDefault(array, parameters, undefined, false, false);
 }
 
-first.default = firstOrDefault;
-
 /**
  * Get the first item matching the given value, or a default value if no match is found
  *
@@ -192,5 +190,15 @@ export function firstOrDefault(
 ): unknown {
 	return findAbsoluteValueOrDefault(array, parameters, defaultValue, true, false);
 }
+
+// #endregion
+
+// #region Initialization
+
+first.default = firstOrDefault;
+
+Object.defineProperty(first, 'default', {
+	value: firstOrDefault,
+});
 
 // #endregion

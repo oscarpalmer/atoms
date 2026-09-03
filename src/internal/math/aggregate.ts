@@ -174,9 +174,9 @@ export function max<Item>(
  * @param first Return only the first item with the maximum value
  * @returns Item with the maximum value, or `undefined` if no maximum can be found
  */
-export function max<Item extends PlainObject, ItemKey extends keyof NumericalValues<Item>>(
+export function max<Item extends PlainObject>(
 	items: Item[],
-	key: ItemKey,
+	key: keyof NumericalValues<Item>,
 	first: true,
 ): Item | undefined;
 
@@ -219,9 +219,9 @@ export function max<Item>(
  * @param key Key to use for value
  * @returns Items with the maximum value
  */
-export function max<Item extends PlainObject, ItemKey extends keyof NumericalValues<Item>>(
+export function max<Item extends PlainObject>(
 	items: Item[],
-	key: ItemKey,
+	key: keyof NumericalValues<Item>,
 ): Item[];
 
 /**

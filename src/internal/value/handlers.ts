@@ -10,7 +10,7 @@ export function getCompareHandlers<Value>(owner: GenericCallback, options: Optio
 	const handlers = getHandlers(owner, options);
 
 	return {
-		deregister(constructor: Constructor) {
+		deregister(constructor: Constructor): void {
 			handlers.deregister(constructor);
 		},
 		handle(first: unknown, second: unknown, ...parameters: unknown[]): Value {
@@ -24,7 +24,7 @@ export function getCompareHandlers<Value>(owner: GenericCallback, options: Optio
 				? handler(first, second)
 				: (first as any)[handler](second);
 		},
-		register(constructor: Constructor, handler?: string | GenericCallback) {
+		register(constructor: Constructor, handler?: string | GenericCallback): void {
 			handlers.register(constructor, handler);
 		},
 	};
@@ -34,7 +34,7 @@ function getHandlers(owner: GenericCallback, options: Options) {
 	const handlers = new WeakMap<Constructor, string | GenericCallback>();
 
 	return {
-		deregister(constructor: Constructor) {
+		deregister(constructor: Constructor): void {
 			handlers.delete(constructor);
 		},
 		get(first: unknown, second: unknown): string | GenericCallback | undefined {
@@ -46,7 +46,7 @@ function getHandlers(owner: GenericCallback, options: Options) {
 				return handlers.get((first as object).constructor as Constructor);
 			}
 		},
-		register(constructor: Constructor, handler?: string | GenericCallback) {
+		register(constructor: Constructor, handler?: string | GenericCallback): void {
 			if (isNonConstructor(constructor) || handler === owner) {
 				return;
 			}
@@ -72,10 +72,10 @@ export function getSelfHandlers(owner: GenericCallback, options: Options) {
 	const handlers = getHandlers(owner, options);
 
 	return {
-		deregister(constructor: Constructor) {
+		deregister(constructor: Constructor): void {
 			handlers.deregister(constructor);
 		},
-		handle(value: unknown, ...parameters: unknown[]) {
+		handle(value: unknown, ...parameters: unknown[]): unknown {
 			const handler = handlers.get(value, value);
 
 			if (handler == null) {
@@ -84,7 +84,7 @@ export function getSelfHandlers(owner: GenericCallback, options: Options) {
 
 			return typeof handler === 'function' ? handler(value) : (value as any)[handler]();
 		},
-		register(constructor: Constructor, handler?: string | GenericCallback) {
+		register(constructor: Constructor, handler?: string | GenericCallback): void {
 			handlers.register(constructor, handler);
 		},
 	};

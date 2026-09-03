@@ -206,8 +206,6 @@ export function toMap(array: unknown[], first?: unknown, second?: unknown): unkn
 	return getMapValues(array, first, second, false);
 }
 
-toMap.arrays = toMapArrays;
-
 /**
  * Create a _Map_ from an array of items using callbacks, grouping values into arrays
  *
@@ -367,5 +365,15 @@ export function toMapArrays<Item extends PlainObject, ItemKey extends keyof Item
 export function toMapArrays(array: unknown[], first?: unknown, second?: unknown): unknown {
 	return getMapValues(array, first, second, true);
 }
+
+// #endregion
+
+// #region Initialization
+
+toMap.arrays = toMapArrays;
+
+Object.defineProperty(toMap, 'arrays', {
+	value: toMapArrays,
+});
 
 // #endregion

@@ -2,6 +2,30 @@ import {isArrayOrPlainObject, isTypedArray} from '../internal/is';
 import {getSelfHandlers} from '../internal/value/handlers';
 import type {ArrayOrPlainObject, Constructor, PlainObject, TypedArray} from '../models';
 
+// #region Types
+
+export type CloneOptions = {
+	/**
+	 * Copy functions instead of returning `undefined`? _(defaults to `false`)_
+	 */
+	copyFunctions?: boolean;
+	/**
+	 * Copy symbols instead of returning `Symbol(description)`? _(defaults to `false`)_
+	 */
+	copySymbols?: boolean;
+	/**
+	 * Clone only the value itself, without cloning nested values? _(defaults to `false`)_
+	 */
+	flat?: boolean;
+};
+
+type CloneParameters = {
+	options: Required<CloneOptions>;
+	references: WeakMap<WeakKey, unknown>;
+};
+
+// #endregion
+
 // #region Special variables
 
 const CLONE_NAME = 'clone';
@@ -23,12 +47,27 @@ export function clone<Value>(value: Value, flat: true): Value;
  * Clone any kind of value _(deeply, if needed)_
  *
  * @param value Value to clone
+ * @param options Clone options
  * @returns Cloned value
  */
-export function clone<Value>(value: Value): Value;
+export function clone<Value>(value: Value, options?: CloneOptions): Value;
 
-export function clone(value: unknown, flat?: boolean): unknown {
-	return flat === true ? copy(value) : cloneValue(value, 0, new WeakMap(), false);
+export function clone(value: unknown, options?: unknown): unknown {
+	switch (true) {
+		case value === null:
+		case value === undefined:
+		case typeof value === 'bigint':
+		case typeof value === 'boolean':
+		case typeof value === 'number':
+		case typeof value === 'string':
+			return value;
+
+		case value instanceof Date:
+			return new Date(value.getTime());
+
+		default:
+			return cloneAny(value, getCloneParameters(options), 0);
+	}
 }
 
 clone.handlers = getSelfHandlers(clone, {
@@ -39,12 +78,62 @@ clone.handlers = getSelfHandlers(clone, {
 clone.deregister = deregisterCloner;
 clone.register = registerCloner;
 
+function cloneAny(value: unknown, parameters: CloneParameters, depth: number): unknown {
+	switch (true) {
+		case value == null:
+		case typeof value === 'bigint':
+		case typeof value === 'boolean':
+		case typeof value === 'number':
+		case typeof value === 'string':
+			return value;
+
+		case value instanceof Date:
+			return new Date(value.getTime());
+
+		case typeof value === 'function':
+			return parameters.options?.copyFunctions ? value : undefined;
+
+		case typeof value === 'symbol':
+			return parameters.options?.copySymbols ? value : Symbol(value.description);
+
+		case parameters.references.has(value as object):
+			return parameters.references!.get(value);
+
+		case value instanceof ArrayBuffer:
+			return cloneArrayBuffer(value, parameters, depth);
+
+		case value instanceof DataView:
+			return cloneDataView(value, parameters, depth);
+
+		case value instanceof RegExp:
+			return cloneRegularExpression(value, parameters, depth);
+
+		case value instanceof Map:
+			return cloneMap(value, parameters, depth);
+
+		case typeof Node !== 'undefined' && value instanceof Node:
+			return cloneNode(value, parameters, depth);
+
+		case value instanceof Set:
+			return cloneSet(value, parameters, depth);
+
+		case isArrayOrPlainObject(value):
+			return cloneObject(value, parameters, depth);
+
+		case isTypedArray(value):
+			return cloneTypedArray(value, parameters, depth);
+
+		default:
+			return clone.handlers.handle(value, parameters, depth);
+	}
+}
+
 function cloneArrayBuffer(
 	value: ArrayBuffer,
-	depth?: number,
-	references?: WeakMap<WeakKey, unknown>,
+	parameters: CloneParameters,
+	depth: number,
 ): ArrayBuffer {
-	if (typeof depth === 'number' && depth >= CLONE_MAX_DEPTH) {
+	if (depth >= CLONE_MAX_DEPTH) {
 		return value;
 	}
 
@@ -52,96 +141,90 @@ function cloneArrayBuffer(
 
 	new Uint8Array(cloned).set(new Uint8Array(value));
 
-	references?.set(value, cloned);
+	parameters.references.set(value, cloned);
 
 	return cloned;
 }
 
-function cloneDataView(
-	value: DataView,
-	depth: number,
-	references: WeakMap<WeakKey, unknown>,
-): DataView {
+function cloneDataView(value: DataView, parameters: CloneParameters, depth: number): DataView {
 	if (depth >= CLONE_MAX_DEPTH) {
 		return value;
 	}
 
-	const buffer = cloneArrayBuffer(value.buffer as ArrayBuffer);
+	const buffer = cloneArrayBuffer(value.buffer as ArrayBuffer, parameters, depth);
 
 	const cloned = new DataView(buffer, value.byteOffset, value.byteLength);
 
-	references.set(value, cloned);
+	parameters.references.set(value, cloned);
 
 	return cloned;
 }
 
 function cloneMap(
 	map: Map<unknown, unknown>,
+	parameters: CloneParameters,
 	depth: number,
-	references: WeakMap<WeakKey, unknown>,
-	flat: boolean,
 ): Map<unknown, unknown> {
 	if (depth >= CLONE_MAX_DEPTH) {
 		return map;
 	}
+
+	const flat = parameters.options?.flat;
 
 	const cloned = new Map<unknown, unknown>();
 	const entries = map.entries();
 
 	for (const entry of entries) {
 		cloned.set(
-			flat ? entry[0] : cloneValue(entry[0], depth + 1, references, false),
-			flat ? entry[1] : cloneValue(entry[1], depth + 1, references, false),
+			flat ? entry[0] : cloneAny(entry[0], parameters, depth + 1),
+			flat ? entry[1] : cloneAny(entry[1], parameters, depth + 1),
 		);
 	}
 
-	references.set(map, cloned);
+	parameters.references.set(map, cloned);
 
 	return cloned;
 }
 
-function cloneNode(node: Node, depth: number, references: WeakMap<WeakKey, unknown>): Node {
+function cloneNode(node: Node, parameters: CloneParameters, depth: number): Node {
 	if (depth >= CLONE_MAX_DEPTH) {
 		return node;
 	}
 
 	const cloned = node.cloneNode(true);
 
-	references.set(node, cloned);
+	parameters.references.set(node, cloned);
 
 	return cloned;
 }
 
 function cloneObject(
 	value: ArrayOrPlainObject,
+	parameters: CloneParameters,
 	depth: number,
-	references: WeakMap<WeakKey, unknown>,
-	flat: boolean,
 ): ArrayOrPlainObject {
-	if (flat || depth >= CLONE_MAX_DEPTH) {
-		return Array.isArray(value) ? value.slice() : {...value};
+	const isArray = Array.isArray(value);
+
+	if (parameters.options?.flat || depth >= CLONE_MAX_DEPTH) {
+		return isArray ? value.slice() : {...value};
 	}
 
-	const cloned = (Array.isArray(value) ? [] : {}) as PlainObject;
-	const keys = [...Object.keys(value), ...Object.getOwnPropertySymbols(value)];
-	const {length} = keys;
+	const cloned = (isArray ? [] : {}) as PlainObject;
+	const keys = isArray ? undefined : Object.keys(value);
+	const {length} = keys ?? (value as unknown[]);
 
 	for (let index = 0; index < length; index += 1) {
-		const key = keys[index];
+		const key = keys?.[index] ?? index;
 
-		cloned[key] = cloneValue((value as PlainObject)[key], depth + 1, references, false);
+		cloned[key] = cloneAny((value as PlainObject)[key], parameters, depth + 1);
 	}
 
-	references.set(value, cloned);
+	parameters.references.set(value, cloned);
 
 	return cloned;
 }
 
-function cloneRegularExpression(
-	value: RegExp,
-	depth: number,
-	references: WeakMap<WeakKey, unknown>,
-): RegExp {
+function cloneRegularExpression(value: RegExp, parameters: CloneParameters, depth: number): RegExp {
 	if (depth >= CLONE_MAX_DEPTH) {
 		return value;
 	}
@@ -150,17 +233,12 @@ function cloneRegularExpression(
 
 	cloned.lastIndex = value.lastIndex;
 
-	references.set(value, cloned);
+	parameters.references.set(value, cloned);
 
 	return cloned;
 }
 
-function cloneSet(
-	set: Set<unknown>,
-	depth: number,
-	references: WeakMap<WeakKey, unknown>,
-	flat: boolean,
-): Set<unknown> {
+function cloneSet(set: Set<unknown>, parameters: CloneParameters, depth: number): Set<unknown> {
 	if (depth >= CLONE_MAX_DEPTH) {
 		return set;
 	}
@@ -170,18 +248,20 @@ function cloneSet(
 	const {length} = values;
 
 	for (let index = 0; index < length; index += 1) {
-		cloned.add(flat ? values[index] : cloneValue(values[index], depth + 1, references, false));
+		cloned.add(
+			parameters.options?.flat ? values[index] : cloneAny(values[index], parameters, depth + 1),
+		);
 	}
 
-	references.set(set, cloned);
+	parameters.references.set(set, cloned);
 
 	return cloned;
 }
 
 function cloneTypedArray(
 	value: TypedArray,
+	parameters: CloneParameters,
 	depth: number,
-	references: WeakMap<WeakKey, unknown>,
 ): TypedArray {
 	if (depth >= CLONE_MAX_DEPTH) {
 		return value;
@@ -189,64 +269,9 @@ function cloneTypedArray(
 
 	const cloned = new (value.constructor as new (...args: unknown[]) => TypedArray)(value);
 
-	references.set(value, cloned);
+	parameters.references.set(value, cloned);
 
 	return cloned as TypedArray;
-}
-
-function cloneValue(
-	value: unknown,
-	depth: number,
-	references: WeakMap<WeakKey, unknown>,
-	flat: boolean,
-): unknown {
-	switch (true) {
-		case value == null:
-		case typeof value === 'bigint':
-		case typeof value === 'boolean':
-		case typeof value === 'number':
-		case typeof value === 'string':
-			return value;
-
-		case typeof value === 'function':
-			return;
-
-		case typeof value === 'symbol':
-			return Symbol(value.description);
-
-		case references.has(value as object):
-			return references.get(value);
-
-		case value instanceof ArrayBuffer:
-			return cloneArrayBuffer(value, depth, references);
-
-		case value instanceof DataView:
-			return cloneDataView(value, depth, references);
-
-		case value instanceof Date:
-			return new Date(value.getTime());
-
-		case value instanceof RegExp:
-			return cloneRegularExpression(value, depth, references);
-
-		case value instanceof Map:
-			return cloneMap(value, depth, references, flat);
-
-		case typeof Node !== 'undefined' && value instanceof Node:
-			return cloneNode(value, depth, references);
-
-		case value instanceof Set:
-			return cloneSet(value, depth, references, flat);
-
-		case isArrayOrPlainObject(value):
-			return cloneObject(value, depth, references, flat);
-
-		case isTypedArray(value):
-			return cloneTypedArray(value, depth, references);
-
-		default:
-			return clone.handlers.handle(value, depth, references);
-	}
 }
 
 /**
@@ -259,7 +284,7 @@ function cloneValue(
  * @returns Copied value
  */
 export function copy<Value>(value: Value): Value {
-	return cloneValue(value, 0, new WeakMap(), true) as Value;
+	return clone(value, CLONE_COPY_OPTIONS) as Value;
 }
 
 /**
@@ -271,6 +296,33 @@ export function copy<Value>(value: Value): Value {
  */
 export function deregisterCloner<Instance>(constructor: Constructor<Instance>): void {
 	clone.handlers.deregister(constructor);
+}
+
+function getCloneOptions(input?: unknown): Required<CloneOptions> {
+	if (typeof input === 'boolean') {
+		return {
+			copyFunctions: false,
+			copySymbols: false,
+			flat: input === true,
+		};
+	}
+
+	if (typeof input !== 'object' || input === null) {
+		return CLONE_DEFAULT_OPTIONS;
+	}
+
+	return {
+		copyFunctions: (input as PlainObject).copyFunctions === true,
+		copySymbols: (input as PlainObject).copySymbols === true,
+		flat: (input as PlainObject).flat === true,
+	};
+}
+
+function getCloneParameters(input?: unknown): CloneParameters {
+	return {
+		options: getCloneOptions(input),
+		references: new WeakMap(),
+	};
 }
 
 /**
@@ -288,11 +340,7 @@ export function registerCloner<Instance>(
 	clone.handlers.register(constructor, handler);
 }
 
-function tryStructuredClone(
-	value: object,
-	depth: number,
-	references: WeakMap<WeakKey, unknown>,
-): unknown {
+function tryStructuredClone(value: object, parameters: CloneParameters, depth: number): unknown {
 	if (depth >= CLONE_MAX_DEPTH) {
 		return value;
 	}
@@ -300,11 +348,11 @@ function tryStructuredClone(
 	try {
 		const cloned = structuredClone(value);
 
-		references.set(value, cloned);
+		parameters.references?.set(value, cloned);
 
 		return cloned;
 	} catch {
-		references.set(value, value);
+		parameters.references?.set(value, value);
 
 		return value;
 	}
@@ -313,6 +361,18 @@ function tryStructuredClone(
 // #endregion
 
 // #region Variables
+
+const CLONE_COPY_OPTIONS: Required<CloneOptions> = {
+	copyFunctions: true,
+	copySymbols: true,
+	flat: true,
+};
+
+const CLONE_DEFAULT_OPTIONS: Required<CloneOptions> = {
+	copyFunctions: false,
+	copySymbols: false,
+	flat: false,
+};
 
 const CLONE_MAX_DEPTH = 100;
 

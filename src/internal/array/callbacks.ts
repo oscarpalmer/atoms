@@ -24,7 +24,7 @@ export function getArrayCallback(value: unknown): GenericCallback | undefined {
 				: (obj: PlainObject) => obj[value];
 
 		default:
-			break;
+			return;
 	}
 }
 

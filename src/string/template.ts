@@ -150,12 +150,20 @@ export function template(
 	return handleTemplate(value, pattern, ignoreCase, parameters[0] as PlainObject);
 }
 
-template.initialize = initializeTemplater;
-
 // #endregion
 
 // #region Variables
 
 const TEMPLATE_EXPRESSION_VARIABLE = /{{([\s\S]+?)}}/g;
+
+// #endregion
+
+// #region Initialization
+
+template.initialize = initializeTemplater;
+
+Object.defineProperty(template, 'initialize', {
+	value: initializeTemplater,
+});
 
 // #endregion

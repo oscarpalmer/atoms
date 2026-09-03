@@ -594,10 +594,6 @@ function sortArray(array: unknown[], sorters: InternalSorter[]): unknown[] {
 		: array;
 }
 
-sort.getIndex = getSortedIndex;
-sort.initialize = initializeSorter;
-sort.is = isSorted;
-
 // #endregion
 
 // #region Variables
@@ -614,5 +610,25 @@ const modifiers: Record<SortDirection, number> = {
 	[SORT_DIRECTION_ASCENDING]: 1,
 	[SORT_DIRECTION_DESCENDING]: -1,
 };
+
+// #endregion
+
+// #region Initialization
+
+sort.getIndex = getSortedIndex;
+sort.initialize = initializeSorter;
+sort.is = isSorted;
+
+Object.defineProperties(sort, {
+	getIndex: {
+		value: getSortedIndex,
+	},
+	initialize: {
+		value: initializeSorter,
+	},
+	is: {
+		value: isSorted,
+	},
+});
 
 // #endregion

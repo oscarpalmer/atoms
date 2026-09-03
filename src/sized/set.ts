@@ -92,15 +92,17 @@ export class SizedSet<Value = unknown> extends Set<Value> {
 	 * @returns Found value if it exists, otherwise `undefined`
 	 */
 	get(value: Value, update?: boolean): Value | undefined {
-		if (super.has(value)) {
-			if (update ?? false) {
-				super.delete(value);
-
-				this.add(value);
-			}
-
-			return value;
+		if (!super.has(value)) {
+			return undefined;
 		}
+
+		if (update ?? false) {
+			super.delete(value);
+
+			this.add(value);
+		}
+
+		return value;
 	}
 }
 

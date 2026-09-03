@@ -182,8 +182,6 @@ export function toRecord(array: unknown[], first?: unknown, second?: unknown): u
 	return groupValues(array, first, second, false);
 }
 
-toRecord.arrays = toRecordArrays;
-
 /**
  * Create a record from an array of items using callbacks, grouping values into arrays
  *
@@ -347,5 +345,15 @@ export function toRecordArrays<Item extends PlainObject, ItemKey extends keyof I
 export function toRecordArrays(array: unknown[], first?: unknown, second?: unknown): unknown {
 	return groupValues(array, first, second, true);
 }
+
+// #endregion
+
+// #region Initialization
+
+toRecord.arrays = toRecordArrays;
+
+Object.defineProperty(toRecord, 'arrays', {
+	value: toRecordArrays,
+});
 
 // #endregion
