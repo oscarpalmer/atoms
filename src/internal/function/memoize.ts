@@ -1,4 +1,5 @@
 import type {GenericCallback} from '../../models';
+import {getNumberOrDefault} from '../defaults';
 import {isPlainObject} from '../is';
 import {SizedMap} from '../sized/map';
 import {getString, join} from '../string/misc';
@@ -97,15 +98,14 @@ type Options = {
 
 // #region Functions
 
-function getMemoizationOptions<Callback extends GenericCallback>(
+function createMemoizationOptions<Callback extends GenericCallback>(
 	input?: MemoizedOptions<Callback>,
 ): Options {
 	const {cacheKey, cacheSize} = isPlainObject(input) ? (input as MemoizedOptions<Callback>) : {};
 
 	return {
 		cacheKey: typeof cacheKey === 'function' ? cacheKey : undefined,
-		cacheSize:
-			typeof cacheSize === 'number' && cacheSize > 0 ? cacheSize : MEMOIZED_CACHE_SIZE_DEFAULT,
+		cacheSize: getNumberOrDefault(cacheSize, MEMOIZED_CACHE_SIZE_DEFAULT),
 	};
 }
 
@@ -127,7 +127,7 @@ export function memoize<Callback extends GenericCallback>(
 	const state: MemoizedState = {
 		cache: undefined as never,
 		getter: undefined as never,
-		options: getMemoizationOptions(options),
+		options: createMemoizationOptions(options),
 	};
 
 	state.cache = new SizedMap(state.options.cacheSize);

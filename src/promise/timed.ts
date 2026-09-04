@@ -2,7 +2,7 @@ import {createAborter} from '../internal/abort';
 import {getTimer, TIMER_WAIT} from '../internal/function/timer';
 import type {RequiredKeys} from '../models';
 import {PROMISE_MESSAGE_EXPECTATION_TIMED} from './constants';
-import {getPromiseOptions} from './helpers';
+import {createPromiseOptions} from './helpers';
 import {settlePromise} from './misc';
 import {PromiseTimeoutError, type PromiseOptions} from './models';
 
@@ -70,7 +70,7 @@ export async function timed<Value>(promise: Promise<Value>, options: unknown): P
 		return Promise.reject(new TypeError(PROMISE_MESSAGE_EXPECTATION_TIMED));
 	}
 
-	const {signal, time} = getPromiseOptions(options);
+	const {signal, time} = createPromiseOptions(options);
 
 	if (signal?.aborted ?? false) {
 		return Promise.reject(signal?.reason);

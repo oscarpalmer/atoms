@@ -19,7 +19,7 @@ import {
 
 // #region Functions
 
-export function getPromiseOptions(input: unknown): RequiredKeys<PromiseOptions, 'time'> {
+export function createPromiseOptions(input: unknown): RequiredKeys<PromiseOptions, 'time'> {
 	if (typeof input === 'number') {
 		return {
 			time: getNumberOrDefault(input, 0),
@@ -38,7 +38,7 @@ export function getPromiseOptions(input: unknown): RequiredKeys<PromiseOptions, 
 	};
 }
 
-export function getPromisesOptions(input: unknown): RequiredKeys<PromisesOptions, 'strategy'> {
+export function createPromisesOptions(input: unknown): RequiredKeys<PromisesOptions, 'strategy'> {
 	if (typeof input === 'string') {
 		return {
 			strategy: getStrategyOrDefault(input),

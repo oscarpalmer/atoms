@@ -1,7 +1,7 @@
 import type {Constructor} from '../../models';
 import {max} from '../math/aggregate';
 import {getString, words} from '../string/misc';
-import {getCompareHandlers} from './handlers';
+import {createCompareHandlers} from './handlers';
 
 // #region Types
 
@@ -155,7 +155,7 @@ const comparators: Record<string, Comparator> = {
 	symbol: compareSymbols,
 };
 
-const compareHandlers = getCompareHandlers<number>(compare, {
+const compareHandlers = createCompareHandlers<number>(compare, {
 	callback: (first: unknown, second: unknown, compareStrings: boolean): unknown =>
 		compareStrings ? getString(first).localeCompare(getString(second)) : undefined,
 	method: COMPARE_NAME,

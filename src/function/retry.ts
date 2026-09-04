@@ -1,3 +1,4 @@
+import {getNumberOrDefault} from '../internal/defaults';
 import {getTimer, TIMER_WAIT} from '../internal/function/timer';
 import {isPlainObject} from '../internal/is';
 import type {GenericAsyncCallback, GenericCallback} from '../models';
@@ -89,7 +90,7 @@ async function asyncRetry<Callback extends GenericCallback>(
 		}
 	}
 
-	const {delay, times, when} = getRetryOptions(options);
+	const {delay, times, when} = createRetryOptions(options);
 
 	const timer = getTimer(TIMER_WAIT, handle, delay);
 
@@ -106,16 +107,12 @@ async function asyncRetry<Callback extends GenericCallback>(
 	});
 }
 
-function getRetryNumber(value?: unknown): number {
-	return typeof value === 'number' && value > 0 ? value : 0;
-}
-
-function getRetryOptions(input?: RetryOptions): Required<RetryOptions> {
+function createRetryOptions(input?: RetryOptions): Required<RetryOptions> {
 	const options = isPlainObject(input) ? input : {};
 
 	return {
-		delay: getRetryNumber(options.delay),
-		times: getRetryNumber(options.times),
+		delay: getNumberOrDefault(options.delay, 0),
+		times: getNumberOrDefault(options.times, 0),
 		when: typeof options.when === 'function' ? options.when : shouldRetry,
 	};
 }
@@ -135,7 +132,7 @@ export function retry<Callback extends GenericCallback>(
 		throw new TypeError(RETRY_MESSAGE_EXPECTATION);
 	}
 
-	const {times, when} = getRetryOptions(options);
+	const {times, when} = createRetryOptions(options);
 
 	let last: unknown;
 

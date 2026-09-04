@@ -1,9 +1,9 @@
 import type {GenericCallback, PlainObject} from '../models';
 import {isPlainObject} from './is';
 import {
-	createSubscriptions,
 	isSubscription,
 	SUBSCRIPTION_NAME,
+	subscriptions,
 	type Subscription,
 	type SubscriptionProperty,
 	type Subscriptions,
@@ -70,7 +70,7 @@ export type HeraldOptions<Events extends Record<string, GenericCallback>> = {
 
 type HeraldState = {
 	keys: Set<string>;
-	subscriptions: Subscriptions<GenericCallback>;
+	store: Subscriptions;
 	onCreate?: HeraldOnCreate<Record<string, GenericCallback>>;
 };
 
@@ -96,19 +96,37 @@ function createEvents<Events extends Record<string, GenericCallback>>(
 	return Object.freeze(events) as HeraldEvents<Events>;
 }
 
-function emitForHerald(state: HeraldState, event: string, ...parameters: unknown[]): void {
-	const items = state.subscriptions.state.values.from.keyed?.get(event);
+function createHeraldState(input: unknown): HeraldState {
+	const options = isPlainObject(input) ? input : {};
 
-	if (items == null || items.size === 0) {
-		return;
+	if (
+		!Array.isArray(options.names) ||
+		options.names.length === 0 ||
+		!options.names.every(name => typeof name === 'string')
+	) {
+		throw new Error(HERALD_MESSAGE_ARRAY);
 	}
 
-	for (const [callback] of items) {
-		callback(...parameters);
+	if (options.onCreate != null && typeof options.onCreate !== 'function') {
+		throw new Error(HERALD_MESSAGE_ONCREATE);
 	}
+
+	const keys = new Set(options.names);
+	const property = createHeraldSubscriptionProperty(options.property);
+
+	const store = subscriptions({
+		keys,
+		property,
+	});
+
+	return {
+		keys,
+		store,
+		onCreate: options.onCreate as HeraldOnCreate<Record<string, GenericCallback>>,
+	};
 }
 
-function getHeraldSubscriptionProperty(input: unknown): SubscriptionProperty {
+function createHeraldSubscriptionProperty(input: unknown): SubscriptionProperty {
 	if (input == null) {
 		return heraldSubscription;
 	}
@@ -128,34 +146,16 @@ function getHeraldSubscriptionProperty(input: unknown): SubscriptionProperty {
 	};
 }
 
-function getHeraldState(input: unknown): HeraldState {
-	const options = isPlainObject(input) ? input : {};
+function emitForHerald(state: HeraldState, event: string, ...parameters: unknown[]): void {
+	const items = state.store.values.from.keyed?.get(event);
 
-	if (
-		!Array.isArray(options.names) ||
-		options.names.length === 0 ||
-		!options.names.every(name => typeof name === 'string')
-	) {
-		throw new Error(HERALD_MESSAGE_ARRAY);
+	if (items == null || items.size === 0) {
+		return;
 	}
 
-	if (options.onCreate != null && typeof options.onCreate !== 'function') {
-		throw new Error(HERALD_MESSAGE_ONCREATE);
+	for (const [callback] of items) {
+		(callback as GenericCallback)(...parameters);
 	}
-
-	const keys = new Set(options.names);
-	const property = getHeraldSubscriptionProperty(options.property);
-
-	const subscriptions = createSubscriptions<GenericCallback>({
-		keys,
-		property,
-	});
-
-	return {
-		keys,
-		subscriptions,
-		onCreate: options.onCreate as HeraldOnCreate<Record<string, GenericCallback>>,
-	};
 }
 
 /**
@@ -168,12 +168,12 @@ function getHeraldState(input: unknown): HeraldState {
 export function herald<Events extends Record<string, GenericCallback>>(
 	options: HeraldOptions<Events>,
 ): Herald<Events> {
-	const state = getHeraldState(options);
+	const state = createHeraldState(options);
 
 	const instance: unknown = {
-		clear: () => state.subscriptions.clear(),
+		clear: () => state.store.clear(),
 		emit: (event: never, ...parameters: never[]) => emitForHerald(state, event, ...parameters),
-		observed: (event: never) => (state.subscriptions.state.items.keyed?.get(event)?.size ?? 0) > 0,
+		observed: (event: never) => (state.store.items.keyed?.get(event)?.size ?? 0) > 0,
 		subscribe: (key: never, callback: never, signal: never) =>
 			subscribeToHerald(state, key, callback, signal),
 	};
@@ -239,7 +239,7 @@ function subscribeToHerald(
 	callback: never,
 	signal?: AbortSignal,
 ): Subscription {
-	const [subscription, existing] = state.subscriptions.create({
+	const [subscription, existing] = state.store.create({
 		key,
 		signal,
 		value: callback,
@@ -270,6 +270,7 @@ const HERALD_NAME_HERALD = 'herald';
 
 const heraldSubscription: SubscriptionProperty = {
 	key: HERALD_PROPERTY,
+	value: SUBSCRIPTION_NAME,
 };
 
 // #endregion

@@ -1,6 +1,6 @@
 import {createAborter} from '../internal/abort';
 import {getTimer, TIMER_WAIT} from '../internal/function/timer';
-import {getPromiseOptions} from './helpers';
+import {createPromiseOptions} from './helpers';
 import {settlePromise} from './misc';
 import {type PromiseOptions} from './models';
 
@@ -23,7 +23,7 @@ export function delay(options?: PromiseOptions): Promise<void>;
 export function delay(time?: number): Promise<void>;
 
 export function delay(options?: unknown): Promise<void> {
-	const {signal, time} = getPromiseOptions(options);
+	const {signal, time} = createPromiseOptions(options);
 
 	if (signal?.aborted ?? false) {
 		return Promise.reject(signal?.reason);

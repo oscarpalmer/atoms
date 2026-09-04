@@ -1,6 +1,6 @@
 import type {ArrayOrPlainObject, Constructor, PlainObject, TypedArray} from '../../models';
 import {isNonPlainObject, isPlainObject, isPrimitive, isTypedArray} from '../is';
-import {getCompareHandlers} from './handlers';
+import {createCompareHandlers} from './handlers';
 
 // #region Types
 
@@ -82,6 +82,51 @@ type OptionsKeys<Values> = {
 
 // #region Functions
 
+function createEqualOptions(input?: boolean | EqualOptions): Options {
+	const options: Options = {
+		ignoreCase: false,
+		ignoreExpressions: {
+			enabled: false,
+			values: [],
+		},
+		ignoreKeys: {
+			enabled: false,
+			values: new Set(),
+		},
+		relaxedNullish: false,
+	};
+
+	if (typeof input === 'boolean') {
+		options.ignoreCase = input;
+
+		return options;
+	}
+
+	if (isNonPlainObject(input)) {
+		return options;
+	}
+
+	options.ignoreCase = typeof input.ignoreCase === 'boolean' ? input.ignoreCase : false;
+
+	options.ignoreExpressions.values = (
+		Array.isArray(input.ignoreKeys) ? input.ignoreKeys : [input.ignoreKeys]
+	).filter(key => key instanceof RegExp);
+
+	options.ignoreKeys.values = new Set(
+		(Array.isArray(input.ignoreKeys) ? input.ignoreKeys : [input.ignoreKeys]).filter(
+			key => typeof key === 'string',
+		),
+	);
+
+	options.ignoreExpressions.enabled = options.ignoreExpressions.values.length > 0;
+
+	options.ignoreKeys.enabled = options.ignoreKeys.values.size > 0;
+
+	options.relaxedNullish = input.relaxedNullish === true;
+
+	return options;
+}
+
 /**
  * Deregister a equality comparison handler for a specific class
  *
@@ -133,10 +178,10 @@ export function equal(first: string, second: string, ignoreCase?: boolean): bool
 export function equal(first: unknown, second: unknown, options?: EqualOptions): boolean;
 
 export function equal(first: unknown, second: unknown, options?: boolean | EqualOptions): boolean {
-	return equalValue(first, second, getEqualOptions(options));
+	return equalValue(first, second, createEqualOptions(options));
 }
 
-equal.handlers = getCompareHandlers<boolean>(equal, {
+equal.handlers = createCompareHandlers<boolean>(equal, {
 	callback: Object.is,
 });
 
@@ -369,51 +414,6 @@ function equalValue(first: unknown, second: unknown, options: Options): boolean 
 	}
 }
 
-function getEqualOptions(input?: boolean | EqualOptions): Options {
-	const options: Options = {
-		ignoreCase: false,
-		ignoreExpressions: {
-			enabled: false,
-			values: [],
-		},
-		ignoreKeys: {
-			enabled: false,
-			values: new Set(),
-		},
-		relaxedNullish: false,
-	};
-
-	if (typeof input === 'boolean') {
-		options.ignoreCase = input;
-
-		return options;
-	}
-
-	if (isNonPlainObject(input)) {
-		return options;
-	}
-
-	options.ignoreCase = typeof input.ignoreCase === 'boolean' ? input.ignoreCase : false;
-
-	options.ignoreExpressions.values = (
-		Array.isArray(input.ignoreKeys) ? input.ignoreKeys : [input.ignoreKeys]
-	).filter(key => key instanceof RegExp);
-
-	options.ignoreKeys.values = new Set(
-		(Array.isArray(input.ignoreKeys) ? input.ignoreKeys : [input.ignoreKeys]).filter(
-			key => typeof key === 'string',
-		),
-	);
-
-	options.ignoreExpressions.enabled = options.ignoreExpressions.values.length > 0;
-
-	options.ignoreKeys.enabled = options.ignoreKeys.values.size > 0;
-
-	options.relaxedNullish = input.relaxedNullish === true;
-
-	return options;
-}
-
 /**
  * Create an equalizer with predefined options
  *
@@ -423,7 +423,7 @@ function getEqualOptions(input?: boolean | EqualOptions): Options {
  * @returns Equalizer function
  */
 export function initializeEqualizer(options?: EqualOptions): Equalizer {
-	const actual = getEqualOptions(options);
+	const actual = createEqualOptions(options);
 
 	const equalizer = (first: unknown, second: unknown): boolean => equalValue(first, second, actual);
 

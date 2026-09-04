@@ -51,6 +51,18 @@ type Options = Required<NormalizeOptions>;
 
 // #region Functions
 
+function createNormalizeOptions(input?: NormalizeOptions): Options {
+	const options = isPlainObject(input) ? input : {};
+
+	return {
+		deburr: options.deburr !== false,
+		lowerCase: options.lowerCase !== false,
+		special: options.special === true,
+		trim: options.trim !== false,
+		whitespace: options.whitespace !== false,
+	};
+}
+
 /**
  * Deburr a string, removing diacritical marks
  *
@@ -79,18 +91,6 @@ export function deburr(value: string): string {
 	return deburrMemoizer.run(value);
 }
 
-function getNormalizeOptions(input?: NormalizeOptions): Options {
-	const options = isPlainObject(input) ? input : {};
-
-	return {
-		deburr: options.deburr !== false,
-		lowerCase: options.lowerCase !== false,
-		special: options.special === true,
-		trim: options.trim !== false,
-		whitespace: options.whitespace !== false,
-	};
-}
-
 /**
  * Initialize a string normalizer
  *
@@ -100,7 +100,7 @@ function getNormalizeOptions(input?: NormalizeOptions): Options {
  * @returns Normalizer function
  */
 export function initializeNormalizer(options?: NormalizeOptions): Normalizer {
-	const normalization = getNormalizeOptions(options);
+	const normalization = createNormalizeOptions(options);
 
 	return (value: string) => normalizeString(value, normalization);
 }
@@ -115,7 +115,7 @@ export function initializeNormalizer(options?: NormalizeOptions): Normalizer {
  * @returns Normalized string
  */
 export function normalize(value: string, options?: NormalizeOptions): string {
-	return normalizeString(value, getNormalizeOptions(options));
+	return normalizeString(value, createNormalizeOptions(options));
 }
 
 function normalizeString(value: string, options: Options): string {

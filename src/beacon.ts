@@ -1,9 +1,9 @@
 import {noop} from './internal/function/misc';
 import {isPlainObject} from './internal/is';
 import {
-	createSubscriptions,
 	isSubscription,
 	SUBSCRIPTION_NAME,
+	subscriptions,
 	type Subscription,
 	type SubscriptionProperty,
 	type Subscriptions,
@@ -74,7 +74,7 @@ type BeaconState<Value> = {
 	active: boolean;
 	observable: Observable<Value>;
 	options: Required<BeaconOptions<Value>>;
-	subscriptions: Subscriptions<Observer<unknown>>;
+	subscriptions: Subscriptions;
 	value: Value;
 };
 
@@ -148,8 +148,8 @@ export function beacon<Value>(value: Value, options?: BeaconOptions<Value>): Bea
 		value,
 		active: true,
 		observable: undefined as never,
-		options: getBeaconOptions(options),
-		subscriptions: createSubscriptions({
+		options: createBeaconOptions(options),
+		subscriptions: subscriptions({
 			property: beaconSubscription,
 		}),
 	};
@@ -184,27 +184,7 @@ export function beacon<Value>(value: Value, options?: BeaconOptions<Value>): Bea
 	return Object.freeze(instance) as Beacon<Value>;
 }
 
-function finishBeacon<Value>(state: BeaconState<Value>, emit: boolean): void {
-	if (!state.active) {
-		return;
-	}
-
-	state.active = false;
-
-	for (const [, observer] of state.subscriptions.state.values.to.any) {
-		if (emit) {
-			observer.complete?.();
-		}
-	}
-
-	state.subscriptions.clear();
-
-	state.observable?.deactivate();
-
-	state.observable = undefined as never;
-}
-
-function getBeaconOptions<Value>(input?: BeaconOptions<Value>): Required<BeaconOptions<Value>> {
+function createBeaconOptions<Value>(input?: BeaconOptions<Value>): Required<BeaconOptions<Value>> {
 	const options: BeaconOptions<Value> = isPlainObject(input) ? (input as PlainObject) : {};
 
 	options.equal = typeof options.equal === 'function' ? options.equal : Object.is;
@@ -212,21 +192,34 @@ function getBeaconOptions<Value>(input?: BeaconOptions<Value>): Required<BeaconO
 	return options as Required<BeaconOptions<Value>>;
 }
 
-function getObservable<Value>(state: BeaconState<Value>): Observable<Value> {
-	if (!state.active) {
-		throw new Error(BEACON_MESSAGE_RETRIEVE);
-	}
+function createObservable<Value>(beacon: BeaconState<Value>): Observable<Value> {
+	const state: ObservableState<Value> = {
+		beacon,
+		active: beacon.active,
+	};
 
-	state.observable ??= observeBeacon(state);
+	const instance: unknown = {
+		deactivate: () => {
+			state.active = false;
+		},
+		subscribe: (first: never, second?: never, third?: never) =>
+			subscribeToObservable(state, first, second, third),
+	};
 
-	return state.observable;
+	Object.defineProperties(instance, {
+		[BEACON_PROPERTY]: {
+			value: BEACON_OBSERVABLE,
+		},
+		active: {
+			enumerable: true,
+			get: () => beacon.active && state.active,
+		},
+	});
+
+	return Object.freeze(instance) as Observable<Value>;
 }
 
-function getObservableCallback<Callback>(value: Callback): Callback {
-	return typeof value === 'function' ? value : (noop as Callback);
-}
-
-function getObserver<Value>(
+function createObserver<Value>(
 	first: Observer<Value> | ((value: Value) => void),
 	second?: (error: Error) => void,
 	third?: () => void,
@@ -248,6 +241,40 @@ function getObserver<Value>(
 	}
 
 	return observer;
+}
+
+function finishBeacon<Value>(state: BeaconState<Value>, emit: boolean): void {
+	if (!state.active) {
+		return;
+	}
+
+	state.active = false;
+
+	for (const [, observer] of state.subscriptions.values.to.any) {
+		if (emit) {
+			(observer as Observer<Value>).complete?.();
+		}
+	}
+
+	state.subscriptions.clear();
+
+	state.observable?.deactivate();
+
+	state.observable = undefined as never;
+}
+
+function getObservable<Value>(state: BeaconState<Value>): Observable<Value> {
+	if (!state.active) {
+		throw new Error(BEACON_MESSAGE_RETRIEVE);
+	}
+
+	state.observable ??= createObservable(state);
+
+	return state.observable;
+}
+
+function getObservableCallback<Callback>(value: Callback): Callback {
+	return typeof value === 'function' ? value : (noop as Callback);
 }
 
 /**
@@ -284,33 +311,6 @@ export function isObservable<Value = unknown>(value: unknown): value is Observab
 	return isBeaconInstance<Observable<Value>>(BEACON_OBSERVABLE, value);
 }
 
-function observeBeacon<Value>(beacon: BeaconState<Value>): Observable<Value> {
-	const state: ObservableState<Value> = {
-		beacon,
-		active: beacon.active,
-	};
-
-	const instance: unknown = {
-		deactivate: () => {
-			state.active = false;
-		},
-		subscribe: (first: never, second?: never, third?: never) =>
-			subscribeToObservable(state, first, second, third),
-	};
-
-	Object.defineProperties(instance, {
-		[BEACON_PROPERTY]: {
-			value: BEACON_OBSERVABLE,
-		},
-		active: {
-			enumerable: true,
-			get: () => beacon.active && state.active,
-		},
-	});
-
-	return Object.freeze(instance) as Observable<Value>;
-}
-
 function subscribeToObservable<Value>(
 	state: ObservableState<Value>,
 	first: never,
@@ -321,7 +321,7 @@ function subscribeToObservable<Value>(
 		throw new Error(BEACON_MESSAGE_SUBSCRIBE);
 	}
 
-	const observer = getObserver(first, second, third);
+	const observer = createObserver(first, second, third);
 
 	const [subscription] = state.beacon.subscriptions.create({
 		isActive: () => state.beacon.active && state.active,
@@ -351,8 +351,8 @@ function updateBeacon<Value>(
 		state.value = value as Value;
 	}
 
-	for (const [, observer] of state.subscriptions.state.values.to.any) {
-		observer[type]?.(value as never);
+	for (const [, observer] of state.subscriptions.values.to.any) {
+		(observer as Observer<Value>)[type]?.(value as never);
 	}
 
 	if (finish === true) {
@@ -380,6 +380,7 @@ const BEACON_TYPE_NEXT = 'next';
 
 const beaconSubscription: SubscriptionProperty = {
 	key: BEACON_PROPERTY,
+	value: SUBSCRIPTION_NAME,
 };
 
 // #endregion

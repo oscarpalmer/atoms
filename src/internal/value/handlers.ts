@@ -6,8 +6,8 @@ type Options = {
 	method?: string;
 };
 
-export function getCompareHandlers<Value>(owner: GenericCallback, options: Options) {
-	const handlers = getHandlers(owner, options);
+export function createCompareHandlers<Value>(owner: GenericCallback, options: Options) {
+	const handlers = createHandlers(owner, options);
 
 	return {
 		deregister(constructor: Constructor): void {
@@ -30,7 +30,7 @@ export function getCompareHandlers<Value>(owner: GenericCallback, options: Optio
 	};
 }
 
-function getHandlers(owner: GenericCallback, options: Options) {
+function createHandlers(owner: GenericCallback, options: Options) {
 	const handlers = new WeakMap<Constructor, string | GenericCallback>();
 
 	return {
@@ -68,8 +68,8 @@ function getHandlers(owner: GenericCallback, options: Options) {
 	};
 }
 
-export function getSelfHandlers(owner: GenericCallback, options: Options) {
-	const handlers = getHandlers(owner, options);
+export function createSelfHandlers(owner: GenericCallback, options: Options) {
+	const handlers = createHandlers(owner, options);
 
 	return {
 		deregister(constructor: Constructor): void {

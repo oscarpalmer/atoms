@@ -100,14 +100,14 @@ export function assign<To extends PlainObject, From extends PlainObject[]>(
 	from: [...From],
 	options?: AssignOptions,
 ): To & UnionToIntersection<From[number]> {
-	const actual = getMergeOptions(options);
+	const actual = createMergeOptions(options);
 
 	actual.assignValues = true;
 
 	return mergeValues([to, ...from], actual) as To & UnionToIntersection<From[number]>;
 }
 
-function getMergeOptions(options?: MergeOptions): Options {
+function createMergeOptions(options?: MergeOptions): Options {
 	const actual: Options = {
 		assignValues: false,
 		replaceableObjects: undefined,
@@ -148,7 +148,7 @@ function getReplaceableObjects(value: unknown): ReplaceableObjectsCallback | und
  * @returns Assigner function
  */
 export function initializeAssigner(options?: AssignOptions): Assigner {
-	const actual = getMergeOptions(options);
+	const actual = createMergeOptions(options);
 
 	actual.assignValues = true;
 
@@ -165,7 +165,7 @@ export function initializeAssigner(options?: AssignOptions): Assigner {
  * @returns Merger function
  */
 export function initializeMerger(options?: MergeOptions): Merger {
-	const actual = getMergeOptions(options);
+	const actual = createMergeOptions(options);
 
 	return ((values: NestedPartial<ArrayOrPlainObject>[]): ArrayOrPlainObject =>
 		mergeValues(values, actual)) as Merger;
@@ -182,7 +182,7 @@ export function merge<Values extends ArrayOrPlainObject[]>(
 	values: [...Values],
 	options?: MergeOptions,
 ): UnionToIntersection<Values[number]> {
-	return mergeValues(values, getMergeOptions(options)) as UnionToIntersection<Values[number]>;
+	return mergeValues(values, createMergeOptions(options)) as UnionToIntersection<Values[number]>;
 }
 
 function mergeObjects(

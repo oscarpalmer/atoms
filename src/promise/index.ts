@@ -6,7 +6,7 @@ import {
 	PROMISE_TYPE_FULFILLED,
 	PROMISE_TYPE_REJECTED,
 } from './constants';
-import {getPromiseOptions, getPromisesOptions, getResultsFromPromises} from './helpers';
+import {createPromiseOptions, createPromisesOptions, getResultsFromPromises} from './helpers';
 import {handleResult, settlePromise} from './misc';
 import {
 	type PromiseData,
@@ -69,7 +69,7 @@ export async function attemptPromise<Value>(
 		return Promise.reject(new TypeError(PROMISE_MESSAGE_EXPECTATION_ATTEMPT));
 	}
 
-	const {signal, time} = getPromiseOptions(options);
+	const {signal, time} = createPromiseOptions(options);
 
 	if (signal?.aborted ?? false) {
 		return Promise.reject(signal?.reason);
@@ -189,7 +189,7 @@ export async function promises<Value>(
 ): Promise<PromisesValue<Value>[]>;
 
 export async function promises(items: unknown[], options?: unknown): Promise<unknown[]> {
-	const {signal, strategy} = getPromisesOptions(options);
+	const {signal, strategy} = createPromisesOptions(options);
 
 	if (signal?.aborted ?? false) {
 		return Promise.reject(signal?.reason);

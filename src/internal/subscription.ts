@@ -16,10 +16,25 @@ export type Subscription = {
 	unsubscribe(): void;
 };
 
+/**
+ * Parameters for creating a subscription
+ */
 export type SubscriptionParameters = {
+	/**
+	 * Is the owner of the subscription alive? _(defaults to `true`)_
+	 */
 	isActive?: () => boolean;
+	/**
+	 * Key used to identify a subscription _(defaults to `undefined`)_
+	 */
 	key?: unknown;
+	/**
+	 * Signal used to abort the subscription _(defaults to `undefined`)_
+	 */
 	signal?: AbortSignal;
+	/**
+	 * Value used to identify a subscription
+	 */
 	value: unknown;
 };
 
@@ -32,9 +47,9 @@ export type SubscriptionProperty = {
 	 */
 	key: string;
 	/**
-	 * Value of the property used to identify a subscription _(defaults to `subscription`)_
+	 * Value of the property used to identify a subscription
 	 */
-	value?: unknown;
+	value: unknown;
 };
 
 type SubscriptionState = {
@@ -43,21 +58,57 @@ type SubscriptionState = {
 	parameters: SubscriptionParameters;
 };
 
-export type Subscriptions<Value = unknown> = {
-	state: SubscriptionsState<Value>;
+export type Subscriptions = {
+	/**
+	 * Items of the subscriptions store
+	 *
+	 * - `any` - Set of subscriptions _(for unkeyed subscriptions)_
+	 * - `keyed` - Map of keys to sets of subscriptions _(for keyed subscriptions)_
+	 */
+	readonly items: Readonly<SubscriptionsItems>;
+
+	/**
+	 * Values of the subscriptions store
+	 *
+	 * - `from.any` - Map of values to subscriptions _(for unkeyed subscriptions)_
+	 * - `from.keyed` - Map of keys to maps of values to subscriptions _(for keyed subscriptions)_
+	 * - `to.any` - Map of subscriptions to values _(for unkeyed subscriptions)_
+	 * - `to.keyed` - Map of keys to maps of subscriptions to values _(for keyed subscriptions)_
+	 */
+	readonly values: Readonly<SubscriptionsValues>;
+
+	/**
+	 * Clear all subscriptions
+	 */
 	clear: () => void;
+
+	/**
+	 * Create _(or retrieve)_ a subscription
+	 *
+	 * @param parameters Subscription parameters
+	 * @returns Tuple holding subsccription and existing boolean
+	 */
 	create: (parameters: SubscriptionParameters) => [Subscription, boolean];
 };
 
-type SubscriptionsParameters = {
-	keys?: Set<Key>;
-	property: SubscriptionProperty;
+/**
+ * Parameters for creating a subscription store
+ */
+export type SubscriptionsParameters = {
+	/**
+	 * Allow any or specific keys for subscriptions? _(defaults to `false`, which prevents keyed subscriptions)_
+	 */
+	keys?: boolean | Set<Key>;
+	/**
+	 * Property information for subscription identification
+	 */
+	property?: SubscriptionProperty;
 };
 
-type SubscriptionsState<Value = unknown> = {
+type SubscriptionsState = {
 	items: SubscriptionsItems;
-	keys?: Set<Key>;
-	values: SubscriptionsValues<Value>;
+	keys: boolean | Set<Key>;
+	values: SubscriptionsValues;
 };
 
 type SubscriptionsItems = {
@@ -65,9 +116,9 @@ type SubscriptionsItems = {
 	keyed?: Map<Key, Set<Subscription>>;
 };
 
-type SubscriptionsValues<Value = unknown> = {
-	from: SubscriptionsValuesItem<Value, Subscription>;
-	to: SubscriptionsValuesItem<Subscription, Value>;
+type SubscriptionsValues = {
+	from: SubscriptionsValuesItem<unknown, Subscription>;
+	to: SubscriptionsValuesItem<Subscription, unknown>;
 };
 
 type SubscriptionsValuesItem<MapKey, MapValue> = {
@@ -80,12 +131,12 @@ type SubscriptionsValuesItem<MapKey, MapValue> = {
 // #region Functions
 
 function addSubscription(
-	subscriptions: Subscriptions,
+	subscriptions: SubscriptionsState,
 	subscription: Subscription,
 	state: SubscriptionState,
 ): void {
+	const {items, values} = subscriptions;
 	const {key, value} = state.parameters;
-	const {items, values} = subscriptions.state;
 
 	if (!isKey(key)) {
 		items.any.add(subscription);
@@ -133,7 +184,7 @@ function addSubscription(
 	keyedTo.set(subscription, value);
 }
 
-function clearSubscriptions<Value>(store: SubscriptionsState<Value>): void {
+function clearSubscriptions(store: SubscriptionsState): void {
 	for (const susbcription of store.values.to.any.keys()) {
 		susbcription.unsubscribe();
 	}
@@ -148,10 +199,12 @@ function clearSubscriptions<Value>(store: SubscriptionsState<Value>): void {
 }
 
 function createSubscription(
-	subscriptions: Subscriptions,
+	subscriptions: SubscriptionsState,
 	property: SubscriptionProperty,
-	parameters: SubscriptionParameters,
+	params: SubscriptionParameters,
 ): [Subscription, boolean] {
+	const parameters = createSubscriptionParameters(params);
+
 	if (parameters.signal?.aborted ?? false) {
 		throw new Error(parameters.signal?.reason);
 	}
@@ -167,12 +220,12 @@ function createSubscription(
 		return [existing, true];
 	}
 
-	if (
-		subscriptions.state.keys != null &&
-		isKey(parameters.key) &&
-		!subscriptions.state.keys.has(parameters.key)
-	) {
-		throw new Error(SUBSCRIPTION_INVALID_KEY);
+	if (subscriptions.keys != null && isKey(parameters.key)) {
+		if (subscriptions.keys === false) {
+			throw new Error(SUBSCRIPTION_DISALLOWED_KEY);
+		} else if (subscriptions.keys !== true && !subscriptions.keys.has(parameters.key)) {
+			throw new Error(SUBSCRIPTION_INVALID_KEY);
+		}
 	}
 
 	state.aborter = createAborter(parameters.signal, () =>
@@ -185,10 +238,10 @@ function createSubscription(
 
 	Object.defineProperties(instance, {
 		[SUBSCRIPTION_PROPERTY]: {
-			value: true,
+			value: SUBSCRIPTION_NAME,
 		},
 		[property.key]: {
-			value: property.value ?? SUBSCRIPTION_NAME,
+			value: property.value,
 		},
 		active: {
 			enumerable: true,
@@ -201,49 +254,77 @@ function createSubscription(
 	return [Object.freeze(instance) as Subscription, false];
 }
 
-export function createSubscriptions<Value = unknown>(
-	parameters: SubscriptionsParameters,
-): Subscriptions<Value> {
-	const {keys, property} = parameters;
-
-	const state: SubscriptionsState<Value> = {
-		keys,
-		items: {
-			any: new Set(),
-			keyed: keys == null ? undefined : new Map(),
-		},
-		values: {
-			from: {
-				any: new Map(),
-				keyed: keys == null ? undefined : new Map(),
-			},
-			to: {
-				any: new Map(),
-				keyed: keys == null ? undefined : new Map(),
-			},
-		},
-	};
-
-	const instance: unknown = {
-		state,
-		clear: () => clearSubscriptions(state),
-		create: (parameters: never) =>
-			createSubscription(instance as Subscriptions, property, parameters),
-	};
-
-	return instance as Subscriptions<Value>;
-}
-
 function getExistingSubscription(
-	subscriptions: Subscriptions,
+	subscriptions: SubscriptionsState,
 	state: SubscriptionState,
 ): Subscription | undefined {
+	const {values} = subscriptions;
 	const {parameters} = state;
-	const {values} = subscriptions.state;
 
 	return isKey(parameters.key)
 		? values.from.keyed?.get(parameters.key)?.get(parameters.value)
 		: values.from.any.get(parameters.value);
+}
+
+function createSubscriptionParameters(input: unknown): SubscriptionParameters {
+	const values = (isPlainObject(input) ? input : {}) as Partial<SubscriptionParameters>;
+
+	if (values.value == null) {
+		throw new Error(SUBSCRIPTION_INVALID_VALUE);
+	}
+
+	return {
+		isActive: typeof values.isActive === 'function' ? values.isActive : undefined,
+		key: isKey(values.key) ? values.key : undefined,
+		signal: values.signal instanceof AbortSignal ? values.signal : undefined,
+		value: values.value,
+	};
+}
+
+function createSubscriptionsParameters(input: unknown): Required<SubscriptionsParameters> {
+	const values = (isPlainObject(input) ? input : {}) as Partial<SubscriptionsParameters>;
+
+	let keys: boolean | Set<Key>;
+
+	if (values.keys instanceof Set) {
+		keys = values.keys;
+	} else {
+		keys = typeof values.keys === 'boolean' ? values.keys : false;
+	}
+
+	return {
+		keys,
+		property: createSubscriptionsProperty(values.property),
+	};
+}
+
+function createSubscriptionsProperty(input: unknown): Required<SubscriptionProperty> {
+	const values = (isPlainObject(input) ? input : {}) as Partial<SubscriptionProperty>;
+
+	return {
+		key: typeof values.key === 'string' ? values.key : SUBSCRIPTION_PROPERTY,
+		value: values.value == null ? SUBSCRIPTION_NAME : values.value,
+	};
+}
+
+function createSubscriptionsState(keys: boolean | Set<Key>): SubscriptionsState {
+	return {
+		keys: keys,
+		items: {
+			any: new Set(),
+			keyed: keys === false ? undefined : new Map(),
+		},
+		values: {
+			from: {
+				any: new Map(),
+				keyed: keys === false ? undefined : new Map(),
+			},
+			to: {
+				any: new Map(),
+				keyed: keys === false ? undefined : new Map(),
+			},
+		},
+	};
 }
 
 /**
@@ -253,9 +334,23 @@ function getExistingSubscription(
  * @returns `true` if the value is a subscription, otherwise `false`
  */
 export function isSubscription(value: unknown): value is Subscription {
+	return isSubscriptionInstance(value, SUBSCRIPTION_NAME);
+}
+
+function isSubscriptionInstance(value: unknown, name: string): boolean {
 	return (
-		isPlainObject(value) && SUBSCRIPTION_PROPERTY in value && value[SUBSCRIPTION_PROPERTY] === true
+		isPlainObject(value) && SUBSCRIPTION_PROPERTY in value && value[SUBSCRIPTION_PROPERTY] === name
 	);
+}
+
+/**
+ * Is the value a subscriptions store?
+ *
+ * @param value Value to check
+ * @returns `true` if the value is a subscriptions store, otherwise `false`
+ */
+export function isSubscriptions(value: unknown): value is Subscriptions {
+	return isSubscriptionInstance(value, SUBSCRIPTION_STORE);
 }
 
 function removeFromStore(
@@ -277,7 +372,7 @@ function removeFromStore(
 }
 
 function removeSubscription(
-	subscriptions: Subscriptions,
+	subscriptionsState: SubscriptionsState,
 	subscription: Subscription,
 	state: SubscriptionState,
 ): void {
@@ -291,8 +386,8 @@ function removeSubscription(
 	state.parameters.isActive = undefined;
 	state.parameters.signal = undefined;
 
+	const {items, values} = subscriptionsState;
 	const {key, value} = state.parameters;
-	const {items, values} = subscriptions.state;
 
 	if (!isKey(key)) {
 		removeFromStore(items.any, values, subscription, value);
@@ -316,24 +411,63 @@ function removeSubscription(
 	}
 }
 
+/**
+ * Create a subscription store
+ *
+ * @param parameters Store parameters
+ * @returns Subscription store
+ */
+export function subscriptions(parameters?: SubscriptionsParameters): Subscriptions {
+	const {keys, property} = createSubscriptionsParameters(parameters);
+
+	const state = createSubscriptionsState(keys);
+
+	const instance: unknown = {
+		clear: () => clearSubscriptions(state),
+		create: (parameters: never) => createSubscription(state, property, parameters),
+	};
+
+	Object.defineProperties(instance, {
+		[SUBSCRIPTION_PROPERTY]: {
+			value: SUBSCRIPTION_STORE,
+		},
+		items: {
+			enumerable: true,
+			value: state.items,
+		},
+		values: {
+			enumerable: true,
+			value: state.values,
+		},
+	});
+
+	return Object.freeze(instance) as Subscriptions;
+}
+
 function unsubscribe(
-	subscriptions: Subscriptions,
+	subscriptionsState: SubscriptionsState,
 	subscription: Subscription,
 	state: SubscriptionState,
 ): void {
 	state.aborter?.cancel();
 
-	removeSubscription(subscriptions, subscription, state);
+	removeSubscription(subscriptionsState, subscription, state);
 }
 
 // #endregion
 
 // #region Variables
 
+const SUBSCRIPTION_DISALLOWED_KEY = 'Disallowed key for subscription';
+
 const SUBSCRIPTION_INVALID_KEY = 'Invalid key for subscription';
+
+const SUBSCRIPTION_INVALID_VALUE = 'A subscription requires a non-null value to identify it';
 
 export const SUBSCRIPTION_NAME = 'subscription';
 
-const SUBSCRIPTION_PROPERTY = '$subscription';
+const SUBSCRIPTION_PROPERTY = '$subscriptions';
+
+const SUBSCRIPTION_STORE = 'subscriptions';
 
 // #endregion

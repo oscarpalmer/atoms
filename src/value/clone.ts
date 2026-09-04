@@ -1,5 +1,5 @@
 import {isArrayOrPlainObject, isTypedArray} from '../internal/is';
-import {getSelfHandlers} from '../internal/value/handlers';
+import {createSelfHandlers} from '../internal/value/handlers';
 import type {ArrayOrPlainObject, Constructor, PlainObject, TypedArray} from '../models';
 
 // #region Types
@@ -90,13 +90,13 @@ function cloneAny(
 			return new Date(value.getTime());
 
 		case typeof value === 'function': {
-			parameters.options ??= getCloneOptions(options);
+			parameters.options ??= createCloneOptions(options);
 
 			return parameters.options.copyFunctions ? value : undefined;
 		}
 
 		case typeof value === 'symbol': {
-			parameters.options ??= getCloneOptions(options);
+			parameters.options ??= createCloneOptions(options);
 
 			return parameters.options.copySymbols ? value : Symbol(value.description);
 		}
@@ -105,7 +105,7 @@ function cloneAny(
 			break;
 	}
 
-	parameters.options ??= getCloneOptions(options);
+	parameters.options ??= createCloneOptions(options);
 	parameters.references ??= new WeakMap();
 
 	switch (true) {
@@ -312,18 +312,7 @@ export function copy(value: unknown): unknown {
 	);
 }
 
-/**
- * Deregister a clone handler for a specific class
- *
- * _Available as `deregisterCloner` and `template.deregister`_
- *
- * @param constructor Class constructor
- */
-export function deregisterCloner<Instance>(constructor: Constructor<Instance>): void {
-	clone.handlers.deregister(constructor);
-}
-
-function getCloneOptions(input?: unknown): Required<CloneOptions> {
+function createCloneOptions(input?: unknown): Required<CloneOptions> {
 	if (typeof input !== 'object' || input === null) {
 		return CLONE_DEFAULT_OPTIONS;
 	}
@@ -335,6 +324,17 @@ function getCloneOptions(input?: unknown): Required<CloneOptions> {
 }
 
 /**
+ * Deregister a clone handler for a specific class
+ *
+ * _Available as `deregisterCloner` and `template.deregister`_
+ *
+ * @param constructor Class constructor
+ */
+export function deregisterCloner<Instance>(constructor: Constructor<Instance>): void {
+	clone.handlers.deregister(constructor);
+}
+
+/**
  * Create a cloner with predefined options
  *
  * _Available as `initializeCloner` and `clone.initialize`_
@@ -343,7 +343,7 @@ function getCloneOptions(input?: unknown): Required<CloneOptions> {
  * @returns Cloner function
  */
 export function initializeCloner(options?: CloneOptions): Cloner {
-	const opts = getCloneOptions(options);
+	const opts = createCloneOptions(options);
 
 	function cloner(value: unknown): unknown {
 		return cloneAny(
@@ -420,7 +420,7 @@ const CLONE_DEFAULT_OPTIONS: Required<CloneOptions> = {
 
 const CLONE_MAX_DEPTH = 100;
 
-const cloneHandlers = getSelfHandlers(clone, {
+const cloneHandlers = createSelfHandlers(clone, {
 	callback: tryStructuredClone,
 	method: CLONE_NAME,
 });

@@ -359,7 +359,7 @@ function createQueue(
 		handled: [],
 		id: 0,
 		items: [],
-		options: getOptions(options),
+		options: createQueueOptions(options),
 		paused: !getBooleanOrDefault(options?.autostart, true),
 		runners: 0,
 	};
@@ -416,7 +416,7 @@ function createQueue(
 	return Object.freeze(instance) as Queue<GenericCallback>;
 }
 
-function getOptions(input?: QueueOptions): Required<QueueOptions> {
+function createQueueOptions(input?: QueueOptions): Required<QueueOptions> {
 	const options = typeof input === 'object' && input != null ? input : {};
 
 	return {
@@ -574,7 +574,7 @@ export function keyedQueue<Callback extends (key: string, ...parameters: any[]) 
 
 	const state: KeyedQueueState = {
 		callback,
-		options: getOptions(options),
+		options: createQueueOptions(options),
 		queues: new Map(),
 	};
 

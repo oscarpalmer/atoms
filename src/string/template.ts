@@ -55,18 +55,18 @@ type TemplaterRenderer = (variables?: PlainObject) => string;
 
 // #region Functions
 
-function getRenderer(strings: TemplateStringsArray, values: unknown[]): Renderer {
-	return (variables?: PlainObject, options?: Partial<TemplateOptions>) => {
-		return template(interpolate(strings, values), variables, options);
-	};
-}
-
-function getTemplateOptions(input?: Partial<TemplateOptions>): Required<TemplateOptions> {
+function createTemplateOptions(input?: Partial<TemplateOptions>): Required<TemplateOptions> {
 	const options = isPlainObject(input) ? (input as TemplateOptions) : {};
 
 	return {
 		ignoreCase: options.ignoreCase === true,
 		pattern: options.pattern instanceof RegExp ? options.pattern : TEMPLATE_EXPRESSION_VARIABLE,
+	};
+}
+
+function getRenderer(strings: TemplateStringsArray, values: unknown[]): Renderer {
+	return (variables?: PlainObject, options?: Partial<TemplateOptions>) => {
+		return template(interpolate(strings, values), variables, options);
 	};
 }
 
@@ -106,7 +106,7 @@ function handleTemplate(
  * @returns _Templater_ function
  */
 export function initializeTemplater(options?: Partial<TemplateOptions>): Templater {
-	const {ignoreCase, pattern} = getTemplateOptions(options);
+	const {ignoreCase, pattern} = createTemplateOptions(options);
 
 	return ((value: string | TemplateStringsArray, ...parameters: unknown[]) => {
 		return isTemplateStringsArray(value)
@@ -145,7 +145,7 @@ export function template(
 		return getRenderer(value, parameters);
 	}
 
-	const {ignoreCase, pattern} = getTemplateOptions(parameters[1] as Partial<TemplateOptions>);
+	const {ignoreCase, pattern} = createTemplateOptions(parameters[1] as Partial<TemplateOptions>);
 
 	return handleTemplate(value, pattern, ignoreCase, parameters[0] as PlainObject);
 }

@@ -120,6 +120,38 @@ type FuzzyState<Item> = {
 
 // #region Functions
 
+function createFuzzyOptions<Item>(
+	input: unknown,
+	state?: FuzzyState<Item>,
+): RequiredKeys<FuzzyOptions, 'tolerance'> {
+	const options: FuzzyOptions = isPlainObject(input) ? input : {};
+
+	const limit = typeof input === 'number' ? input : options.limit;
+
+	if (typeof limit === 'number' && !Number.isNaN(limit) && limit >= 1) {
+		options.limit = Math.floor(limit);
+	} else {
+		options.limit = state?.limit;
+	}
+
+	options.tolerance = getTolerance(options.tolerance, state);
+
+	return options as RequiredKeys<FuzzyOptions, 'tolerance'>;
+}
+
+function createFuzzyState<Item>(items: Item[], input: unknown): FuzzyState<Item> {
+	const handler = getHandler(input);
+	const options = createFuzzyOptions(input);
+
+	return {
+		handler,
+		items: items.slice(),
+		limit: options.limit,
+		strings: items.map(handler),
+		tolerance: options.tolerance,
+	};
+}
+
 function getHandler<Item>(input: unknown): (item: Item) => string {
 	if (input == null || input === getString) {
 		return getString;
@@ -149,38 +181,6 @@ function getFuzzyItems<Item>(items: FuzzyItem<Item>[]): Item[] {
 	return items
 		.sort((first, second) => first.haystack.localeCompare(second.haystack))
 		.map(({item}) => item);
-}
-
-function getFuzzyOptions<Item>(
-	input: unknown,
-	state?: FuzzyState<Item>,
-): RequiredKeys<FuzzyOptions, 'tolerance'> {
-	const options: FuzzyOptions = isPlainObject(input) ? input : {};
-
-	const limit = typeof input === 'number' ? input : options.limit;
-
-	if (typeof limit === 'number' && !Number.isNaN(limit) && limit >= 1) {
-		options.limit = Math.floor(limit);
-	} else {
-		options.limit = state?.limit;
-	}
-
-	options.tolerance = getTolerance(options.tolerance, state);
-
-	return options as RequiredKeys<FuzzyOptions, 'tolerance'>;
-}
-
-function getFuzzyState<Item>(items: Item[], input: unknown): FuzzyState<Item> {
-	const handler = getHandler(input);
-	const options = getFuzzyOptions(input);
-
-	return {
-		handler,
-		items: items.slice(),
-		limit: options.limit,
-		strings: items.map(handler),
-		tolerance: options.tolerance,
-	};
 }
 
 function getTolerance<Item>(input: unknown, state?: FuzzyState<Item>): number {
@@ -226,7 +226,7 @@ export function fuzzy(items: unknown[], configuration?: unknown): Fuzzy<unknown>
 		throw new TypeError(FUZZY_MESSAGE_ARRAY);
 	}
 
-	const state = getFuzzyState(items, configuration);
+	const state = createFuzzyState(items, configuration);
 
 	const instance: unknown = {
 		search: (value: never, options?: never) =>
@@ -234,7 +234,7 @@ export function fuzzy(items: unknown[], configuration?: unknown): Fuzzy<unknown>
 				state.items,
 				state.strings,
 				value,
-				options == null ? state : getFuzzyOptions(options, state),
+				options == null ? state : createFuzzyOptions(options, state),
 			),
 	};
 

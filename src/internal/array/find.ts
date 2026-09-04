@@ -21,6 +21,16 @@ type Parameters = {
 
 // #region Functions
 
+export function createFindParameters(original: unknown[]): Parameters {
+	const {length} = original;
+
+	return {
+		bool: length === 1 && typeof original[0] === 'function' ? original[0] : undefined,
+		key: length === 2 ? original[0] : undefined,
+		value: length === 1 && typeof original[0] !== 'function' ? original[0] : original[1],
+	};
+}
+
 export function findValue(
 	type: Exclude<FindValueType, 'item'>,
 	array: unknown[],
@@ -47,7 +57,7 @@ export function findValue(
 		return findIndex ? -1 : undefined;
 	}
 
-	const {bool, key, value} = getFindParameters(parameters);
+	const {bool, key, value} = createFindParameters(parameters);
 
 	const callbacks = getArrayCallbacks(bool, key);
 
@@ -126,7 +136,7 @@ export function findValues(
 	}
 
 	const {length} = array;
-	const {bool, key, value} = getFindParameters(parameters);
+	const {bool, key, value} = createFindParameters(parameters);
 	const callbacks = getArrayCallbacks(bool, key);
 
 	if (type === FIND_VALUES_UNIQUE && callbacks?.keyed == null && length >= FIND_UNIQUE_THRESHOLD) {
@@ -171,16 +181,6 @@ export function findValues(
 	}
 
 	return result;
-}
-
-export function getFindParameters(original: unknown[]): Parameters {
-	const {length} = original;
-
-	return {
-		bool: length === 1 && typeof original[0] === 'function' ? original[0] : undefined,
-		key: length === 2 ? original[0] : undefined,
-		value: length === 1 && typeof original[0] !== 'function' ? original[0] : original[1],
-	};
 }
 
 // #endregion

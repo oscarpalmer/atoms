@@ -4,6 +4,7 @@ import type {
 	GenericAsyncCallback,
 	GenericCallback,
 } from '../../models';
+import {getNumberOrDefault} from '../defaults';
 
 // #region Types
 
@@ -64,7 +65,7 @@ export function getAsyncTimer<Callback extends GenericAsyncCallback | GenericCal
 		}
 	}
 
-	const interval = getInterval(time);
+	const interval = getNumberOrDefault(time, 0);
 	const throttle = type === TIMER_THROTTLE;
 
 	let id: number;
@@ -102,10 +103,6 @@ export function getAsyncTimer<Callback extends GenericAsyncCallback | GenericCal
 	return timer as AsyncCancelableCallback<Callback>;
 }
 
-function getInterval(value: unknown): number {
-	return typeof value === 'number' && value > 0 ? value : 0;
-}
-
 export function getTimer<Callback extends GenericCallback>(
 	type: TimerType,
 	callback: Callback,
@@ -129,7 +126,7 @@ export function getTimer<Callback extends GenericCallback>(
 		}
 	}
 
-	const interval = getInterval(time);
+	const interval = getNumberOrDefault(time, 0);
 	const throttle = type === TIMER_THROTTLE;
 
 	let args: Parameters<Callback>;

@@ -1,5 +1,5 @@
 import {herald, type Herald} from '../internal/herald';
-import {type SubscriptionProperty} from '../internal/subscription';
+import {SUBSCRIPTION_NAME, type SubscriptionProperty} from '../internal/subscription';
 import {COLOR_PROPERTY, COLOR_TYPE} from './constants';
 import {getAlpha} from './misc/alpha';
 import {formatHexColor, formatHslColor, formatHwbColor, formatRgbColor} from './misc/format';
@@ -62,24 +62,24 @@ export function color(value: unknown): Color {
 			enumerable: true,
 			value: changes.events,
 		},
-		hex: getColorProperty(COLOR_TYPE.hex, instance as Color, state, changes, false),
-		hexa: getColorProperty(COLOR_TYPE.hex, instance as Color, state, changes, true),
-		hsl: getColorProperty(COLOR_TYPE.hsl, instance as Color, state, changes, false),
-		hsla: getColorProperty(COLOR_TYPE.hsl, instance as Color, state, changes, true),
-		hwb: getColorProperty(COLOR_TYPE.hwb, instance as Color, state, changes, false),
-		hwba: getColorProperty(COLOR_TYPE.hwb, instance as Color, state, changes, true),
+		hex: createColorProperty(COLOR_TYPE.hex, instance as Color, state, changes, false),
+		hexa: createColorProperty(COLOR_TYPE.hex, instance as Color, state, changes, true),
+		hsl: createColorProperty(COLOR_TYPE.hsl, instance as Color, state, changes, false),
+		hsla: createColorProperty(COLOR_TYPE.hsl, instance as Color, state, changes, true),
+		hwb: createColorProperty(COLOR_TYPE.hwb, instance as Color, state, changes, false),
+		hwba: createColorProperty(COLOR_TYPE.hwb, instance as Color, state, changes, true),
 		origin: {
 			enumerable: true,
 			get: () => state.origin,
 		},
-		rgb: getColorProperty(COLOR_TYPE.rgb, instance as Color, state, changes, false),
-		rgba: getColorProperty(COLOR_TYPE.rgb, instance as Color, state, changes, true),
+		rgb: createColorProperty(COLOR_TYPE.rgb, instance as Color, state, changes, false),
+		rgba: createColorProperty(COLOR_TYPE.rgb, instance as Color, state, changes, true),
 	});
 
 	return Object.freeze(instance) as Color;
 }
 
-function getColorProperty(
+function createColorProperty(
 	space: keyof typeof setters,
 	color: Color,
 	state: ColorState,
@@ -138,6 +138,7 @@ function setAlphaValue(state: ColorState, value: unknown): void {
 
 const colorSubscription: SubscriptionProperty = {
 	key: COLOR_PROPERTY.name,
+	value: SUBSCRIPTION_NAME,
 };
 
 const setters: SetValues = {
