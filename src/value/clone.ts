@@ -13,15 +13,44 @@ export type CloneOptions = {
 	 * Copy symbols instead of returning `Symbol(description)`? _(defaults to `false`)_
 	 */
 	copySymbols?: boolean;
-	/**
-	 * Clone only the value itself, without cloning nested values? _(defaults to `false`)_
-	 */
-	flat?: boolean;
 };
 
 type CloneParameters = {
+	copy: boolean;
 	options: Required<CloneOptions>;
 	references: WeakMap<WeakKey, unknown>;
+};
+
+/**
+ * A cloning function with predefined options
+ */
+export type Cloner = {
+	/**
+	 * Clone any kind of value
+	 *
+	 * @param value Value to clone
+	 * @returns Cloned value
+	 */
+	<Value>(value: Value): Value;
+
+	/**
+	 * Deregister a clone handler for a specific class
+	 *
+	 * _Available as `deregisterCloner` and `template.deregister`_
+	 *
+	 * @param constructor Class constructor
+	 */
+	deregister: typeof deregisterCloner;
+
+	/**
+	 * Register a clone handler for a specific class
+	 *
+	 * _Available as `registerCloner` and `template.register`_
+	 *
+	 * @param constructor Class constructor
+	 * @param handler Method name or clone function _(defaults to method name `clone`)_
+	 */
+	register: typeof registerCloner;
 };
 
 // #endregion
@@ -35,15 +64,6 @@ const CLONE_NAME = 'clone';
 // #region Functions
 
 /**
- * Clone any kind of value _(shallowly)_
- *
- * @param value Value to clone
- * @param flat Clone only the value itself, without cloning nested values
- * @returns Cloned value
- */
-export function clone<Value>(value: Value, flat: true): Value;
-
-/**
  * Clone any kind of value _(deeply, if needed)_
  *
  * @param value Value to clone
@@ -53,51 +73,44 @@ export function clone<Value>(value: Value, flat: true): Value;
 export function clone<Value>(value: Value, options?: CloneOptions): Value;
 
 export function clone(value: unknown, options?: unknown): unknown {
-	switch (true) {
-		case value === null:
-		case value === undefined:
-		case typeof value === 'bigint':
-		case typeof value === 'boolean':
-		case typeof value === 'number':
-		case typeof value === 'string':
-			return value;
-
-		case value instanceof Date:
-			return new Date(value.getTime());
-
-		default:
-			return cloneAny(value, getCloneParameters(options), 0);
-	}
+	return cloneAny(value, {copy: false} as CloneParameters, 0, options);
 }
 
-clone.handlers = getSelfHandlers(clone, {
-	callback: tryStructuredClone,
-	method: CLONE_NAME,
-});
-
-clone.deregister = deregisterCloner;
-clone.register = registerCloner;
-
-function cloneAny(value: unknown, parameters: CloneParameters, depth: number): unknown {
+function cloneAny(
+	value: unknown,
+	parameters: CloneParameters,
+	depth: number,
+	options?: unknown,
+): unknown {
 	switch (true) {
-		case value == null:
-		case typeof value === 'bigint':
-		case typeof value === 'boolean':
-		case typeof value === 'number':
-		case typeof value === 'string':
+		case value === null || CLONE_PRIMITIVES[typeof value as string]:
 			return value;
 
 		case value instanceof Date:
 			return new Date(value.getTime());
 
-		case typeof value === 'function':
-			return parameters.options?.copyFunctions ? value : undefined;
+		case typeof value === 'function': {
+			parameters.options ??= getCloneOptions(options);
 
-		case typeof value === 'symbol':
-			return parameters.options?.copySymbols ? value : Symbol(value.description);
+			return parameters.options.copyFunctions ? value : undefined;
+		}
 
+		case typeof value === 'symbol': {
+			parameters.options ??= getCloneOptions(options);
+
+			return parameters.options.copySymbols ? value : Symbol(value.description);
+		}
+
+		default:
+			break;
+	}
+
+	parameters.options ??= getCloneOptions(options);
+	parameters.references ??= new WeakMap();
+
+	switch (true) {
 		case parameters.references.has(value as object):
-			return parameters.references!.get(value);
+			return parameters.references!.get(value as object);
 
 		case value instanceof ArrayBuffer:
 			return cloneArrayBuffer(value, parameters, depth);
@@ -124,7 +137,7 @@ function cloneAny(value: unknown, parameters: CloneParameters, depth: number): u
 			return cloneTypedArray(value, parameters, depth);
 
 		default:
-			return clone.handlers.handle(value, parameters, depth);
+			return parameters.copy ? value : clone.handlers.handle(value, parameters, depth);
 	}
 }
 
@@ -133,7 +146,7 @@ function cloneArrayBuffer(
 	parameters: CloneParameters,
 	depth: number,
 ): ArrayBuffer {
-	if (depth >= CLONE_MAX_DEPTH) {
+	if (parameters.copy || depth >= CLONE_MAX_DEPTH) {
 		return value;
 	}
 
@@ -147,7 +160,7 @@ function cloneArrayBuffer(
 }
 
 function cloneDataView(value: DataView, parameters: CloneParameters, depth: number): DataView {
-	if (depth >= CLONE_MAX_DEPTH) {
+	if (parameters.copy || depth >= CLONE_MAX_DEPTH) {
 		return value;
 	}
 
@@ -169,16 +182,14 @@ function cloneMap(
 		return map;
 	}
 
-	const flat = parameters.options?.flat;
+	if (parameters.copy) {
+		return new Map(map);
+	}
 
 	const cloned = new Map<unknown, unknown>();
-	const entries = map.entries();
 
-	for (const entry of entries) {
-		cloned.set(
-			flat ? entry[0] : cloneAny(entry[0], parameters, depth + 1),
-			flat ? entry[1] : cloneAny(entry[1], parameters, depth + 1),
-		);
+	for (const [key, value] of map.entries()) {
+		cloned.set(cloneAny(key, parameters, depth + 1), cloneAny(value, parameters, depth + 1));
 	}
 
 	parameters.references.set(map, cloned);
@@ -187,7 +198,7 @@ function cloneMap(
 }
 
 function cloneNode(node: Node, parameters: CloneParameters, depth: number): Node {
-	if (depth >= CLONE_MAX_DEPTH) {
+	if (parameters.copy || depth >= CLONE_MAX_DEPTH) {
 		return node;
 	}
 
@@ -203,9 +214,13 @@ function cloneObject(
 	parameters: CloneParameters,
 	depth: number,
 ): ArrayOrPlainObject {
+	if (depth >= CLONE_MAX_DEPTH) {
+		return value;
+	}
+
 	const isArray = Array.isArray(value);
 
-	if (parameters.options?.flat || depth >= CLONE_MAX_DEPTH) {
+	if (parameters.copy) {
 		return isArray ? value.slice() : {...value};
 	}
 
@@ -225,7 +240,7 @@ function cloneObject(
 }
 
 function cloneRegularExpression(value: RegExp, parameters: CloneParameters, depth: number): RegExp {
-	if (depth >= CLONE_MAX_DEPTH) {
+	if (parameters.copy || depth >= CLONE_MAX_DEPTH) {
 		return value;
 	}
 
@@ -243,14 +258,14 @@ function cloneSet(set: Set<unknown>, parameters: CloneParameters, depth: number)
 		return set;
 	}
 
-	const cloned = new Set<unknown>();
-	const values = [...set.values()];
-	const {length} = values;
+	if (parameters.copy) {
+		return new Set(set);
+	}
 
-	for (let index = 0; index < length; index += 1) {
-		cloned.add(
-			parameters.options?.flat ? values[index] : cloneAny(values[index], parameters, depth + 1),
-		);
+	const cloned = new Set<unknown>();
+
+	for (const value of set.values()) {
+		cloned.add(cloneAny(value, parameters, depth + 1));
 	}
 
 	parameters.references.set(set, cloned);
@@ -263,7 +278,7 @@ function cloneTypedArray(
 	parameters: CloneParameters,
 	depth: number,
 ): TypedArray {
-	if (depth >= CLONE_MAX_DEPTH) {
+	if (parameters.copy || depth >= CLONE_MAX_DEPTH) {
 		return value;
 	}
 
@@ -277,14 +292,24 @@ function cloneTypedArray(
 /**
  * Copy any kind of value
  *
- * - Clones the value shallowly, without cloning nested values
+ * - Copies the value shallowly _(if possible)_, without copying or cloning nested values
  * - To copy a value deeply, use `clone` instead
  *
  * @param value Value to copy
  * @returns Copied value
  */
-export function copy<Value>(value: Value): Value {
-	return clone(value, CLONE_COPY_OPTIONS) as Value;
+export function copy<Value>(value: Value): Value;
+
+export function copy(value: unknown): unknown {
+	return cloneAny(
+		value,
+		{
+			copy: true,
+			options: CLONE_COPY_OPTIONS,
+			references: undefined as never,
+		},
+		0,
+	);
 }
 
 /**
@@ -299,14 +324,6 @@ export function deregisterCloner<Instance>(constructor: Constructor<Instance>): 
 }
 
 function getCloneOptions(input?: unknown): Required<CloneOptions> {
-	if (typeof input === 'boolean') {
-		return {
-			copyFunctions: false,
-			copySymbols: false,
-			flat: input === true,
-		};
-	}
-
 	if (typeof input !== 'object' || input === null) {
 		return CLONE_DEFAULT_OPTIONS;
 	}
@@ -314,15 +331,44 @@ function getCloneOptions(input?: unknown): Required<CloneOptions> {
 	return {
 		copyFunctions: (input as PlainObject).copyFunctions === true,
 		copySymbols: (input as PlainObject).copySymbols === true,
-		flat: (input as PlainObject).flat === true,
 	};
 }
 
-function getCloneParameters(input?: unknown): CloneParameters {
-	return {
-		options: getCloneOptions(input),
-		references: new WeakMap(),
-	};
+/**
+ * Create a cloner with predefined options
+ *
+ * _Available as `initializeCloner` and `clone.initialize`_
+ *
+ * @param options Clone options
+ * @returns Cloner function
+ */
+export function initializeCloner(options?: CloneOptions): Cloner {
+	const opts = getCloneOptions(options);
+
+	function cloner(value: unknown): unknown {
+		return cloneAny(
+			value,
+			{
+				copy: false,
+				options: opts,
+			} as CloneParameters,
+			0,
+		);
+	}
+
+	cloner.deregister = deregisterCloner;
+	cloner.register = registerCloner;
+
+	Object.defineProperties(cloner, {
+		deregister: {
+			value: deregisterCloner,
+		},
+		register: {
+			value: registerCloner,
+		},
+	});
+
+	return cloner as Cloner;
 }
 
 /**
@@ -348,11 +394,11 @@ function tryStructuredClone(value: object, parameters: CloneParameters, depth: n
 	try {
 		const cloned = structuredClone(value);
 
-		parameters.references?.set(value, cloned);
+		parameters.references.set(value, cloned);
 
 		return cloned;
 	} catch {
-		parameters.references?.set(value, value);
+		parameters.references.set(value, value);
 
 		return value;
 	}
@@ -365,15 +411,53 @@ function tryStructuredClone(value: object, parameters: CloneParameters, depth: n
 const CLONE_COPY_OPTIONS: Required<CloneOptions> = {
 	copyFunctions: true,
 	copySymbols: true,
-	flat: true,
 };
 
 const CLONE_DEFAULT_OPTIONS: Required<CloneOptions> = {
 	copyFunctions: false,
 	copySymbols: false,
-	flat: false,
 };
 
 const CLONE_MAX_DEPTH = 100;
+
+const cloneHandlers = getSelfHandlers(clone, {
+	callback: tryStructuredClone,
+	method: CLONE_NAME,
+});
+
+const CLONE_PRIMITIVES: Record<string, boolean> = {
+	bigint: true,
+	boolean: true,
+	function: false,
+	number: true,
+	object: false,
+	string: true,
+	symbol: false,
+	undefined: true,
+};
+
+// #endregion
+
+// #Initialization
+
+clone.deregister = deregisterCloner;
+clone.handlers = cloneHandlers;
+clone.initialize = initializeCloner;
+clone.register = registerCloner;
+
+Object.defineProperties(clone, {
+	deregister: {
+		value: deregisterCloner,
+	},
+	handlers: {
+		value: cloneHandlers,
+	},
+	initialize: {
+		value: initializeCloner,
+	},
+	register: {
+		value: registerCloner,
+	},
+});
 
 // #endregion

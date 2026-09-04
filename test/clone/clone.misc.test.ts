@@ -161,11 +161,7 @@ test('depth', () => {
 
 		const last = getValue(cloned, key) as PlainObject;
 
-		if (index < 2) {
-			expect(last).toEqual(value);
-		} else {
-			expect(last).toBe(value);
-		}
+		expect(last).toBe(value);
 	}
 });
 
