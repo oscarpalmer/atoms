@@ -1,5 +1,5 @@
 import {expect, test} from 'vitest';
-import {promises} from '../../src';
+import {FulfilledPromise, promises, RejectedPromise} from '../../src';
 
 test('abort', () =>
 	new Promise<void>(done => {
@@ -135,21 +135,51 @@ test('abort: results', () =>
 		setTimeout(done, 300);
 	}));
 
-test('error', () => {
-	const values = [undefined, null, true, 1, 'string', {}, () => {}, new Map(), new Set()];
+test('error', () =>
+	new Promise<void>(done => {
+		const values = [undefined, null, true, 1, 'string', () => {}, new Map(), new Set()];
 
-	const {length} = values;
+		const {length} = values;
 
-	for (let index = 0; index < length; index += 1) {
-		promises(values[index] as never).then(result => {
-			expect(result).toEqual([]);
-		});
+		const empty = {
+			errors: 0,
+			successes: 0,
+		};
 
-		promises([values[index]] as never).then(result => {
-			expect(result).toEqual([]);
-		});
-	}
-});
+		const type = {
+			errors: 0,
+			successes: 0,
+		};
+
+		for (let index = 0; index < length; index += 1) {
+			expect(
+				promises(values[index] as never)
+					.then(() => {
+						type.successes += 1;
+					})
+					.catch(() => {
+						type.errors += 1;
+					}),
+			);
+
+			expect(
+				promises([values[index]] as never)
+					.then(() => {
+						empty.successes += 1;
+					})
+					.catch(() => {
+						empty.errors += 1;
+					}),
+			);
+		}
+
+		setTimeout(() => {
+			expect(empty).toEqual({errors: length, successes: 0});
+			expect(type).toEqual({errors: length, successes: 0});
+
+			done();
+		}, 25);
+	}));
 
 test('first', () =>
 	new Promise<void>(done => {
@@ -199,6 +229,32 @@ test('first', () =>
 
 			done();
 		}, 500);
+	}));
+
+test('keyed', () =>
+	new Promise<void>(done => {
+		const keyed = {
+			one: new Promise<number>(resolve => resolve(1)),
+			two: new Promise<string>(resolve => resolve('2')),
+			three: new Promise<boolean>((_, reject) => reject(new Error('Nope!'))),
+		};
+
+		void promises(keyed).then(results => {
+			const {one, two, three} = results;
+
+			expect(one.status).toBe('fulfilled');
+			expect((one as FulfilledPromise<unknown>).value).toBe(1);
+
+			expect(two.status).toBe('fulfilled');
+			expect((two as FulfilledPromise<unknown>).value).toBe('2');
+
+			expect(three.status).toBe('rejected');
+			expect((three as RejectedPromise).reason).toEqual(new Error('Nope!'));
+		});
+
+		setTimeout(() => {
+			done();
+		}, 25);
 	}));
 
 test('relaxed', () =>
@@ -255,7 +311,7 @@ test('relaxed', () =>
 		}, 500);
 	}));
 
-test('relaxed: results', () =>
+test('relaxed: results, array', () =>
 	new Promise<void>(done => {
 		const errors: unknown[] = [undefined, undefined];
 		const values: unknown[] = [undefined, undefined];
@@ -306,6 +362,62 @@ test('relaxed: results', () =>
 				{ok: false, error: new Error('Nope!')},
 				{ok: true, value: [1n, 2n]},
 			]);
+
+			done();
+		}, 500);
+	}));
+
+test('relaxed: results, keyed', () =>
+	new Promise<void>(done => {
+		const errors: unknown[] = [undefined, undefined];
+		const values: unknown[] = [undefined, undefined];
+
+		void promises
+			.result({
+				one: new Promise<number>(resolve => resolve(1)),
+				two: new Promise<string>(resolve => resolve('2')),
+				three: new Promise<boolean>((_, reject) => reject(new Error('Nope!'))),
+			})
+			.then(results => {
+				values[0] = results;
+			})
+			.catch(error => {
+				errors[0] = error;
+			});
+
+		void promises
+			.result({
+				one: new Promise<number>(resolve => resolve(1)),
+				two: new Promise<string>(resolve => resolve('2')),
+				three: new Promise<boolean>((_, reject) => reject(new Error('Nope!'))),
+				four: new Promise<bigint[]>(resolve => resolve([1n, 2n])),
+			})
+			.then(results => {
+				values[1] = results;
+			})
+			.catch(error => {
+				errors[1] = error;
+			});
+
+		setTimeout(() => {
+			expect(errors.length).toBe(2);
+			expect(values.length).toBe(2);
+
+			expect(errors[0]).toBeUndefined();
+			expect(errors[1]).toBeUndefined();
+
+			expect(values[0]).toEqual({
+				one: {ok: true, value: 1},
+				two: {ok: true, value: '2'},
+				three: {ok: false, error: new Error('Nope!')},
+			});
+
+			expect(values[1]).toEqual({
+				one: {ok: true, value: 1},
+				two: {ok: true, value: '2'},
+				three: {ok: false, error: new Error('Nope!')},
+				four: {ok: true, value: [1n, 2n]},
+			});
 
 			done();
 		}, 500);

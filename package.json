@@ -1,6 +1,6 @@
 {
 	"name": "@oscarpalmer/atoms",
-	"version": "0.199.0",
+	"version": "0.200.0",
 	"description": "Atomic utilities for making your JavaScript better.",
 	"keywords": [
 		"array",
@@ -278,10 +278,10 @@
 		"watch": "npx vite build --watch"
 	},
 	"devDependencies": {
-		"@oxlint/plugins": "^1.81",
-		"@types/node": "^26.4",
+		"@oxlint/plugins": "^1.82",
+		"@types/node": "^26.5",
 		"@vitest/coverage-istanbul": "^4.1",
-		"eslint": "^10.9",
+		"eslint": "^10.10",
 		"jsdom": "^30",
 		"tsdown": "^0.23",
 		"typescript": "^6",

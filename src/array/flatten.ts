@@ -13,8 +13,8 @@ import type {NestedArray} from '../models';
  * flatten([1, [2, [3, 4], 5], 6]); // => [1, 2, 3, 4, 5, 6]
  * ```
  */
-export function flatten<Item>(array: Item[]): NestedArray<Item>[] {
-	return (Array.isArray(array) ? array.flat(Number.POSITIVE_INFINITY) : []) as NestedArray<Item>[];
+export function flatten<Item>(array: Item[]): Array<NestedArray<Item>> {
+	return (Array.isArray(array) ? array.flat(Number.POSITIVE_INFINITY) : []) as Array<NestedArray<Item>>;
 }
 
 // #endregion

@@ -1,6 +1,7 @@
 import type {Aborter} from '../internal/abort';
 import {error, ok} from '../internal/result/misc';
 import type {Result} from '../internal/result/models';
+import type {PlainObject} from '../models';
 import {
 	PROMISE_MESSAGE_EXPECTATION_RESULT,
 	PROMISE_TYPE_FULFILLED,
@@ -23,7 +24,7 @@ export function cancelable<Value>(
 }
 
 export function handleResult(status: string, parameters: PromiseParameters): void {
-	const {aborter, complete, data, handlers, index, value} = parameters;
+	const {aborter, complete, data, handlers, index, key, value} = parameters;
 
 	if (aborter?.signal.aborted ?? false) {
 		return;
@@ -35,7 +36,7 @@ export function handleResult(status: string, parameters: PromiseParameters): voi
 		return;
 	}
 
-	(data.result as unknown[])[index] = !complete
+	(data.result as PlainObject)[key] = !complete
 		? value
 		: status === PROMISE_TYPE_FULFILLED
 			? {status, value}

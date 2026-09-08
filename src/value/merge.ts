@@ -70,7 +70,7 @@ export type Merger = {
 	 * @returns Merged value
 	 */
 	<Values extends ArrayOrPlainObject[]>(
-		values: NestedPartial<Values[number]>[],
+		values: Array<NestedPartial<Values[number]>>,
 	): UnionToIntersection<Values[number]>;
 };
 
@@ -133,10 +133,12 @@ function getReplaceableObjects(value: unknown): ReplaceableObjectsCallback | und
 		item => typeof item === 'string' || item instanceof RegExp,
 	);
 
-	if (items.length > 0) {
-		return (name: string) =>
-			items.some(item => (typeof item === 'string' ? item === name : item.test(name)));
+	if (items.length === 0) {
+		return undefined;
 	}
+
+	return (name: string) =>
+		items.some(item => (typeof item === 'string' ? item === name : item.test(name)));
 }
 
 /**
@@ -167,7 +169,7 @@ export function initializeAssigner(options?: AssignOptions): Assigner {
 export function initializeMerger(options?: MergeOptions): Merger {
 	const actual = createMergeOptions(options);
 
-	return ((values: NestedPartial<ArrayOrPlainObject>[]): ArrayOrPlainObject =>
+	return ((values: Array<NestedPartial<ArrayOrPlainObject>>): ArrayOrPlainObject =>
 		mergeValues(values, actual)) as Merger;
 }
 

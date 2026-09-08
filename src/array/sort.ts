@@ -432,6 +432,8 @@ export function initializeSorter(first?: unknown, second?: unknown): Sorter<unkn
 
 /**
  * Is the array sorted according to the sorters _(and the optional default direction)_?
+ * 
+ * _Available as `isSorted` and `sort.is`_
  *
  * @param array Array to check
  * @param sorters Sorters to determine sorting
@@ -446,6 +448,8 @@ export function isSorted<Item>(
 
 /**
  * Is the array sorted according to the sorter _(and the optional default direction)_?
+ * 
+ * _Available as `isSorted` and `sort.is`_
  *
  * @param array Array to check
  * @param sorter Sorter to determine sorting

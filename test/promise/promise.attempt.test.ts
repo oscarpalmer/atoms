@@ -154,7 +154,7 @@ test('timed', () =>
 
 		const start = performance.now();
 
-		attemptPromise(() => 0, 250).then(result => {
+		void attemptPromise(() => 0, 250).then(result => {
 			results.push(result);
 			times.push(performance.now() - start);
 		});

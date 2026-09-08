@@ -212,7 +212,7 @@ export function groupArraysBy<
 	array: Item[],
 	key: KeyCallback,
 	value: ValueCallback,
-): Record<ReturnType<KeyCallback>, ReturnType<ValueCallback>[]>;
+): Record<ReturnType<KeyCallback>, Array<ReturnType<ValueCallback>>>;
 
 /**
  * Create a record from an array of items using a specific key and value, grouping values into arrays
@@ -276,7 +276,7 @@ export function groupArraysBy<
 	array: Item[],
 	key: ItemKey,
 	value: ValueCallback,
-): Simplify<Record<KeyedValue<Item, ItemKey>, ReturnType<ValueCallback>[]>>;
+): Simplify<Record<KeyedValue<Item, ItemKey>, Array<ReturnType<ValueCallback>>>>;
 
 /**
  * Create a record from an array of items using a specific key and value, grouping values into arrays

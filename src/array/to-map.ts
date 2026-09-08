@@ -233,7 +233,7 @@ export function toMapArrays<
 	array: Item[],
 	key: KeyCallback,
 	value: ValueCallback,
-): Map<ReturnType<KeyCallback>, ReturnType<ValueCallback>[]>;
+): Map<ReturnType<KeyCallback>, Array<ReturnType<ValueCallback>>>;
 
 /**
  * Create a _Map_ from an array of items using a callback and value, grouping values into arrays
@@ -291,7 +291,7 @@ export function toMapArrays<
 	array: Item[],
 	key: ItemKey,
 	value: ValueCallback,
-): Map<Item[ItemKey], ReturnType<ValueCallback>[]>;
+): Map<Item[ItemKey], Array<ReturnType<ValueCallback>>>;
 
 /**
  * Create a _Map_ from an array of items using a key and value, grouping values into arrays

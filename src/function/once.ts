@@ -16,7 +16,7 @@ type OnceAsyncItem<Value> = {
 type OnceAsyncState<Value> = {
 	error: boolean;
 	finished: boolean;
-	items: OnceAsyncItem<Value>[];
+	items: Array<OnceAsyncItem<Value>>;
 } & OnceState<Value>;
 
 type OnceState<Value> = {

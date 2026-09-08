@@ -544,6 +544,8 @@ export function isQueueInstance<Instance>(name: string, value: unknown): value i
 
 /**
  * Create a keyed queue for an asynchronous callback function, where each key has its own queue
+ * 
+ * _Available as `keyedQueue` and `queue.keyed`_
  *
  * @param callback Callback function for queued items
  * @param options Queue options
@@ -555,6 +557,8 @@ export function keyedQueue<Callback extends (key: string, ...parameters: any[]) 
 
 /**
  * Create a keyed queue for an asynchronous callback function, where each key has its own queue
+ * 
+ * _Available as `keyedQueue` and `queue.keyed`_
  *
  * @param callback Callback function for queued items
  * @param options Queue options

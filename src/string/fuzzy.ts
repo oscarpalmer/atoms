@@ -177,7 +177,7 @@ function getHandler<Item>(input: unknown): (item: Item) => string {
 	}
 }
 
-function getFuzzyItems<Item>(items: FuzzyItem<Item>[]): Item[] {
+function getFuzzyItems<Item>(items: Array<FuzzyItem<Item>>): Item[] {
 	return items
 		.sort((first, second) => first.haystack.localeCompare(second.haystack))
 		.map(({item}) => item);
@@ -255,6 +255,8 @@ export function fuzzy(items: unknown[], configuration?: unknown): Fuzzy<unknown>
 
 /**
  * Does the needle match the haystack in a fuzzy way?
+ * 
+ * _Available as `fuzzyMatch` and `fuzzy.match`_
  *
  * @param haystack Haystack to search through
  * @param needle Needle to search for

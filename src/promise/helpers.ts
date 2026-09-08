@@ -1,7 +1,6 @@
 import {getNumberOrDefault} from '../internal/defaults';
 import {error, ok} from '../internal/result/misc';
-import type {Result} from '../internal/result/models';
-import type {RequiredKeys} from '../models';
+import type {PlainObject, RequiredKeys} from '../models';
 import {
 	PROMISE_STRATEGY_ALL,
 	PROMISE_STRATEGY_DEFAULT,
@@ -57,10 +56,26 @@ export function createPromisesOptions(input: unknown): RequiredKeys<PromisesOpti
 	};
 }
 
-export function getResultsFromPromises<Value>(promised: PromisesValue<Value>[]): Result<Value>[] {
-	return promised.map(result =>
-		isFulfilled(result) ? ok(result.value) : error(result.reason),
-	) as Result<Value>[];
+export function getResultsFromPromises(
+	promised: Array<PromisesValue<unknown>> | Record<string, PromisesValue<unknown>>,
+): unknown {
+	const isArray = Array.isArray(promised);
+
+	const entries = isArray
+		? promised.map((value, index) => [index, value] as const)
+		: Object.entries(promised);
+
+	const {length} = entries;
+
+	const results = isArray ? [] : {};
+
+	for (let index = 0; index < length; index += 1) {
+		const [key, value] = entries[index];
+
+		(results as PlainObject)[key] = isFulfilled(value) ? ok(value.value) : error(value.reason);
+	}
+
+	return results;
 }
 
 export function getStrategyOrDefault(value: unknown): PromiseStrategy {

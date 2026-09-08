@@ -209,7 +209,7 @@ export function toRecordArrays<
 	array: Item[],
 	key: KeyCallback,
 	value: ValueCallback,
-): Record<ReturnType<KeyCallback>, ReturnType<ValueCallback>[]>;
+): Record<ReturnType<KeyCallback>, Array<ReturnType<ValueCallback>>>;
 
 /**
  * Create a record from an array of items using a callback and value, grouping values into arrays
@@ -267,7 +267,7 @@ export function toRecordArrays<
 	array: Item[],
 	key: ItemKey,
 	callback: Callback,
-): Simplify<Record<KeyedValue<Item, ItemKey>, ReturnType<Callback>[]>>;
+): Simplify<Record<KeyedValue<Item, ItemKey>, Array<ReturnType<Callback>>>>;
 
 /**
  * Create a record from an array of items using a key and value, grouping values into arrays

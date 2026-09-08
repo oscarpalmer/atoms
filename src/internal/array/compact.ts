@@ -15,7 +15,7 @@
 export function compact<Item>(
 	array: Item[],
 	strict: true,
-): Exclude<Item, 0 | '' | false | null | undefined>[];
+): Array<Exclude<Item, 0 | '' | false | null | undefined>>;
 
 /**
  * Compact an array _(removing all `null` and `undefined` values)_
@@ -28,7 +28,7 @@ export function compact<Item>(
  * compact([0, 1, '', 'hello', false, true, null, undefined]); // => [0, 1, '', 'hello', false, true]
  * ```
  */
-export function compact<Item>(array: Item[]): Exclude<Item, null | undefined>[];
+export function compact<Item>(array: Item[]): Array<Exclude<Item, null | undefined>>;
 
 export function compact<Item>(array: Item[], strict?: unknown): Item[] {
 	if (!Array.isArray(array)) {

@@ -1,6 +1,6 @@
 import type {Aborter} from '../internal/abort';
 import type {Result} from '../internal/result/models';
-import type {GenericCallback} from '../models';
+import type {ArrayOrPlainObject, GenericCallback, Key} from '../models';
 import {
 	PROMISE_ERROR_NAME,
 	PROMISE_MESSAGE_TIMEOUT,
@@ -58,7 +58,7 @@ export type FulfilledPromise<Value> = {
 
 export type PromiseData = {
 	last: number;
-	result: unknown[];
+	result: ArrayOrPlainObject;
 };
 
 export type PromiseHandlers = {
@@ -86,6 +86,7 @@ export type PromiseParameters = {
 	data: PromiseData;
 	handlers: PromiseHandlers;
 	index: number;
+	key: Key;
 	value?: unknown;
 };
 
@@ -108,7 +109,7 @@ export class PromiseTimeoutError extends Error {
 	}
 }
 
-export type PromisesItems<Items extends unknown[]> = {
+export type PromisesItems<Items extends ArrayOrPlainObject> = {
 	[ItemsKey in keyof Items]: Items[ItemsKey] extends GenericCallback
 		? ReturnType<Items[ItemsKey]> extends Promise<infer Value>
 			? Promise<Value>
@@ -132,13 +133,13 @@ export type PromisesOptions = {
 	strategy?: PromiseStrategy;
 };
 
-export type PromisesResult<Items extends unknown[]> = {
+export type PromisesResult<Items extends ArrayOrPlainObject> = {
 	[ItemsKey in keyof Items]: Items[ItemsKey] extends Promise<infer Value>
 		? Result<Awaited<Value>>
 		: never;
 };
 
-export type PromisesUnwrapped<Items extends unknown[]> = {
+export type PromisesUnwrapped<Items extends ArrayOrPlainObject> = {
 	[ItemsKey in keyof Items]: Items[ItemsKey] extends GenericCallback
 		? ReturnType<Items[ItemsKey]> extends Promise<infer Value>
 			? Awaited<Value>
@@ -150,14 +151,10 @@ export type PromisesUnwrapped<Items extends unknown[]> = {
 
 export type PromisesValue<Value> = FulfilledPromise<Value> | RejectedPromise;
 
-export type PromisesValues<Items extends unknown[]> = {
-	[ItemsKey in keyof Items]: Items[ItemsKey] extends GenericCallback
-		? ReturnType<Items[ItemsKey]> extends Promise<infer Value>
-			? PromisesValue<Awaited<Value>>
-			: never
-		: Items[ItemsKey] extends Promise<infer Value>
-			? PromisesValue<Awaited<Value>>
-			: never;
+export type PromisesValues<Items extends ArrayOrPlainObject> = {
+	[ItemsKey in keyof Items]: Items[ItemsKey] extends Promise<infer Value>
+		? PromisesValue<Awaited<Value>>
+		: never;
 };
 
 /**

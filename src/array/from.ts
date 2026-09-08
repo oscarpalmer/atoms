@@ -94,7 +94,7 @@ export function times(length: number): number[];
 export function times<Callback extends (index: number) => unknown>(
 	length: number,
 	callback: Callback,
-): ReturnType<Callback>[];
+): Array<ReturnType<Callback>>;
 
 /**
  * Get an array with a specified length, filled with a specified value
