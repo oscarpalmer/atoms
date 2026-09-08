@@ -97,6 +97,6 @@ test('', () => {
 	expect(keyToValues).toEqual(valueToKeys);
 	expect(valueToValues).toEqual(valueToKeys);
 
-	expect(groupBy('blah' as never, 'x')).toEqual({});
-	expect(groupBy([], 'x')).toEqual({});
+	expect(groupBy('blah' as never, 'x' as never)).toEqual({});
+	expect(groupBy([], 'x' as never)).toEqual({});
 });

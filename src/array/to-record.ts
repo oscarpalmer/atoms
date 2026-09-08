@@ -1,16 +1,16 @@
 import {groupValues} from '../internal/array/group';
-import type {Key, KeyedValue, PlainObject, Simplify} from '../models';
+import type {Key, KeyOrCallback, KeyOrCallbackKey, KeyOrCallbackValue, Simplify} from '../models';
 
 // #region Functions
 
 /**
- * Create a record from an array of items using callbacks
+ * Create a record from an array of items using a specific key
  *
  * If multiple items have the same key, the latest item will be used
  *
  * @param array Array to convert
- * @param key Callback to get an item's grouping key
- * @param value Callback to get an item's value
+ * @param key Callback or key to use for grouping
+ * @param value Callback or key to use for value, defaulting to the item itself
  * @returns Record of keyed values
  *
  * @example
@@ -24,108 +24,21 @@ import type {Key, KeyedValue, PlainObject, Simplify} from '../models';
  */
 export function toRecord<
 	Item,
-	KeyCallback extends (item: Item, index: number, array: Item[]) => Key,
-	ValueCallback extends (item: Item, index: number, array: Item[]) => unknown,
+	KeyArg extends KeyOrCallback<Item, Key>,
+	ValueArg extends KeyOrCallback<Item>,
 >(
 	array: Item[],
-	key: KeyCallback,
-	value: ValueCallback,
-): Record<ReturnType<KeyCallback>, ReturnType<ValueCallback>>;
+	key: KeyArg,
+	value: ValueArg,
+): Simplify<Record<KeyOrCallbackKey<Item, KeyArg>, KeyOrCallbackValue<Item, ValueArg>>>;
 
 /**
- * Create a record from an array of items using a callback and value
+ * Create a record from an array of items using a specific key
  *
  * If multiple items have the same key, the latest item will be used
  *
  * @param array Array to convert
- * @param callback Callback to get an item's grouping key
- * @param value Key to use for value
- * @returns Record with keys
- *
- * @example
- * ```typescript
- * toRecord(
- *   [{id: 1, value: 10}, {id: 2, value: 20}, {id: 3, value: 10}],
- *   item => item.value,
- *   'id',
- * ); // => { 10: 3, 20: 2 }
- * ```
- */
-export function toRecord<
-	Item extends PlainObject,
-	Callback extends (item: Item, index: number, array: Item[]) => Key,
-	ItemValue extends keyof Item,
->(
-	array: Item[],
-	callback: Callback,
-	value: ItemValue,
-): Record<ReturnType<Callback>, Item[ItemValue]>;
-
-/**
- * Create a record from an array of items using a key and callback
- *
- * If multiple items have the same key, the latest item will be used
- *
- * @param array Array to convert
- * @param key Key to use for grouping
- * @param callback Callback to get an item's value
- * @returns Record with keys
- *
- * @example
- * ```typescript
- * toRecord(
- *   [{id: 1, value: 10}, {id: 2, value: 20}, {id: 3, value: 10}],
- *   'value',
- *   item => item.id,
- * ); // => { 10: 3, 20: 2 }
- * ```
- */
-export function toRecord<
-	Item extends PlainObject,
-	ItemKey extends keyof Item,
-	Callback extends (item: Item, index: number, array: Item[]) => unknown,
->(
-	array: Item[],
-	key: ItemKey,
-	callback: Callback,
-): Simplify<Record<KeyedValue<Item, ItemKey>, ReturnType<Callback>>>;
-
-/**
- * Create a record from an array of items using a key and value
- *
- * If multiple items have the same key, the latest item will be used
- *
- * @param array Array to convert
- * @param key Key to use for grouping
- * @param value Key to use for value
- * @returns Record of keyed values
- *
- * @example
- * ```typescript
- * toRecord(
- *   [{id: 1, value: 10}, {id: 2, value: 20}, {id: 3, value: 10}],
- *   'value',
- *   'id',
- * ); // => { 10: 3, 20: 2 }
- * ```
- */
-export function toRecord<
-	Item extends PlainObject,
-	ItemKey extends keyof Item,
-	ItemValue extends keyof Item,
->(
-	array: Item[],
-	key: ItemKey,
-	value: ItemValue,
-): Simplify<Record<KeyedValue<Item, ItemKey>, Item[ItemValue]>>;
-
-/**
- * Create a record from an array of items using a callback
- *
- * If multiple items have the same key, the latest item will be used
- *
- * @param array Array to convert
- * @param callback Callback to get an item's grouping key
+ * @param key Callback or key to use for grouping
  * @returns Record of keyed values
  *
  * @example
@@ -136,32 +49,10 @@ export function toRecord<
  * ); // => { 10: {id: 3, value: 10}, 20: {id: 2, value: 20} }
  * ```
  */
-export function toRecord<Item, Callback extends (item: Item, index: number, array: Item[]) => Key>(
+export function toRecord<Item, KeyArg extends KeyOrCallback<Item, Key>>(
 	array: Item[],
-	callback: Callback,
-): Record<ReturnType<Callback>, Item>;
-
-/**
- * Create a record from an array of items using a key
- *
- * If multiple items have the same key, the latest item will be used
- *
- * @param array Array to convert
- * @param key Key to use for grouping
- * @returns Record of keyed values
- *
- * @example
- * ```typescript
- * toRecord(
- *   [{id: 1, value: 10}, {id: 2, value: 20}, {id: 3, value: 10}],
- *   'value',
- * ); // => { 10: {id: 3, value: 10}, 20: {id: 2, value: 20} }
- * ```
- */
-export function toRecord<Item extends PlainObject, ItemKey extends keyof Item>(
-	array: Item[],
-	key: ItemKey,
-): Simplify<Record<KeyedValue<Item, ItemKey>, Item>>;
+	key: KeyArg,
+): Simplify<Record<KeyOrCallbackKey<Item, KeyArg>, Item>>;
 
 /**
  * Create a record from an array of items _(using indices as keys)_
@@ -183,13 +74,13 @@ export function toRecord(array: unknown[], first?: unknown, second?: unknown): u
 }
 
 /**
- * Create a record from an array of items using callbacks, grouping values into arrays
+ * Create a record from an array of items using a specific key, grouping values into arrays
  *
  * _Available as `toRecordArrays` and `toRecord.arrays`_
  *
  * @param array Array to convert
- * @param key Callback to get an item's grouping key
- * @param value Callback to get an item's value
+ * @param key Callback or key to use for grouping
+ * @param value Callback or key to use for value, defaulting to the item itself
  * @returns Record of keyed arrays of values
  *
  * @example
@@ -203,108 +94,21 @@ export function toRecord(array: unknown[], first?: unknown, second?: unknown): u
  */
 export function toRecordArrays<
 	Item,
-	KeyCallback extends (item: Item, index: number, array: Item[]) => Key,
-	ValueCallback extends (item: Item, index: number, array: Item[]) => unknown,
+	KeyArg extends KeyOrCallback<Item, Key>,
+	ValueArg extends KeyOrCallback<Item>,
 >(
 	array: Item[],
-	key: KeyCallback,
-	value: ValueCallback,
-): Record<ReturnType<KeyCallback>, Array<ReturnType<ValueCallback>>>;
+	key: KeyArg,
+	value: ValueArg,
+): Simplify<Record<KeyOrCallbackKey<Item, KeyArg>, Array<KeyOrCallbackValue<Item, ValueArg>>>>;
 
 /**
- * Create a record from an array of items using a callback and value, grouping values into arrays
+ * Create a record from an array of items using a specific key, grouping items into arrays
  *
  * _Available as `toRecordArrays` and `toRecord.arrays`_
  *
  * @param array Array to convert
- * @param callback Callback to get an item's grouping key
- * @param value Key to use for value
- * @returns Record of keyed arrays of values
- *
- * @example
- * ```typescript
- * toRecordArrays(
- *   [{id: 1, value: 10}, {id: 2, value: 20}, {id: 3, value: 10}],
- *   item => item.value,
- *   'id',
- * ); // => { 10: [1, 3], 20: [2] }
- * ```
- */
-export function toRecordArrays<
-	Item extends PlainObject,
-	Callback extends (item: Item, index: number, array: Item[]) => Key,
-	ItemValue extends keyof Item,
->(
-	array: Item[],
-	callback: Callback,
-	value: ItemValue,
-): Record<ReturnType<Callback>, Item[ItemValue][]>;
-
-/**
- * Create a record from an array of items using a key and callback, grouping values into arrays
- *
- * _Available as `toRecordArrays` and `toRecord.arrays`_
- *
- * @param array Array to convert
- * @param key Key to use for grouping
- * @param callback Callback to get an item's value
- * @returns Record of keyed arrays of values
- *
- * @example
- * ```typescript
- * toRecordArrays(
- *   [{id: 1, value: 10}, {id: 2, value: 20}, {id: 3, value: 10}],
- *   'value',
- *   item => item.id,
- * ); // => { 10: [1, 3], 20: [2] }
- * ```
- */
-export function toRecordArrays<
-	Item extends PlainObject,
-	ItemKey extends keyof Item,
-	Callback extends (item: Item, index: number, array: Item[]) => unknown,
->(
-	array: Item[],
-	key: ItemKey,
-	callback: Callback,
-): Simplify<Record<KeyedValue<Item, ItemKey>, Array<ReturnType<Callback>>>>;
-
-/**
- * Create a record from an array of items using a key and value, grouping values into arrays
- *
- * _Available as `toRecordArrays` and `toRecord.arrays`_
- *
- * @param array Array to convert
- * @param key Key to use for grouping
- * @param value Key to use for value
- * @returns Record of keyed arrays of values
- *
- * @example
- * ```typescript
- * toRecordArrays(
- *   [{id: 1, value: 10}, {id: 2, value: 20}, {id: 3, value: 10}],
- *   'value',
- *   'id',
- * ); // => { 10: [1, 3], 20: [2] }
- * ```
- */
-export function toRecordArrays<
-	Item extends PlainObject,
-	ItemKey extends keyof Item,
-	ItemValue extends keyof Item,
->(
-	array: Item[],
-	key: ItemKey,
-	value: ItemValue,
-): Simplify<Record<KeyedValue<Item, ItemKey>, Item[ItemValue][]>>;
-
-/**
- * Create a record from an array of items using a callback, grouping items into arrays
- *
- * _Available as `toRecordArrays` and `toRecord.arrays`_
- *
- * @param array Array to convert
- * @param callback Callback to get an item's grouping key
+ * @param key Callback or key to use for grouping
  * @returns Record of keyed arrays of items
  *
  * @example
@@ -315,32 +119,10 @@ export function toRecordArrays<
  * ); // => { 10: [{id: 1, value: 10}, {id: 3, value: 10}], 20: [{id: 2, value: 20}] }
  * ```
  */
-export function toRecordArrays<
-	Item,
-	Callback extends (item: Item, index: number, array: Item[]) => Key,
->(array: Item[], callback: Callback): Record<ReturnType<Callback>, Item[]>;
-
-/**
- * Create a record from an array of items using a key, grouping items into arrays
- *
- * _Available as `toRecordArrays` and `toRecord.arrays`_
- *
- * @param array Array to convert
- * @param key Key to use for grouping
- * @returns Record of keyed arrays of items
- *
- * @example
- * ```typescript
- * toRecordArrays(
- *   [{id: 1, value: 10}, {id: 2, value: 20}, {id: 3, value: 10}],
- *   'value',
- * ); // => { 10: [{id: 1, value: 10}, {id: 3, value: 10}], 20: [{id: 2, value: 20}] }
- * ```
- */
-export function toRecordArrays<Item extends PlainObject, ItemKey extends keyof Item>(
+export function toRecordArrays<Item, KeyArg extends KeyOrCallback<Item, Key>>(
 	array: Item[],
-	key: ItemKey,
-): Simplify<Record<KeyedValue<Item, ItemKey>, Item[]>>;
+	key: KeyArg,
+): Simplify<Record<KeyOrCallbackKey<Item, KeyArg>, Item[]>>;
 
 export function toRecordArrays(array: unknown[], first?: unknown, second?: unknown): unknown {
 	return groupValues(array, first, second, true);

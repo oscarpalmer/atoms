@@ -58,7 +58,7 @@ type SubscriptionState = {
 	parameters: SubscriptionParameters;
 };
 
-export type Subscriptions = {
+export type Subscriptions<Value = unknown> = {
 	/**
 	 * Items of the subscriptions store
 	 *
@@ -75,7 +75,7 @@ export type Subscriptions = {
 	 * - `to.any` - Map of subscriptions to values _(for unkeyed subscriptions)_
 	 * - `to.keyed` - Map of keys to maps of subscriptions to values _(for keyed subscriptions)_
 	 */
-	readonly values: Readonly<SubscriptionsValues>;
+	readonly values: Readonly<SubscriptionsValues<Value>>;
 
 	/**
 	 * Clear all subscriptions
@@ -116,9 +116,9 @@ type SubscriptionsItems = {
 	keyed?: Map<Key, Set<Subscription>>;
 };
 
-type SubscriptionsValues = {
-	from: SubscriptionsValuesItem<unknown, Subscription>;
-	to: SubscriptionsValuesItem<Subscription, unknown>;
+type SubscriptionsValues<Value = unknown> = {
+	from: SubscriptionsValuesItem<Value, Subscription>;
+	to: SubscriptionsValuesItem<Subscription, Value>;
 };
 
 type SubscriptionsValuesItem<MapKey, MapValue> = {
@@ -417,7 +417,9 @@ function removeSubscription(
  * @param parameters Store parameters
  * @returns Subscription store
  */
-export function subscriptions(parameters?: SubscriptionsParameters): Subscriptions {
+export function subscriptions<Value = unknown>(
+	parameters?: SubscriptionsParameters,
+): Subscriptions<Value> {
 	const {keys, property} = createSubscriptionsParameters(parameters);
 
 	const state = createSubscriptionsState(keys);
@@ -441,7 +443,7 @@ export function subscriptions(parameters?: SubscriptionsParameters): Subscriptio
 		},
 	});
 
-	return Object.freeze(instance) as Subscriptions;
+	return Object.freeze(instance) as Subscriptions<Value>;
 }
 
 function unsubscribe(

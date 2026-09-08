@@ -1,5 +1,5 @@
 import {getArrayCallbacks} from '../internal/array/callbacks';
-import type {Key, PlainObject} from '../models';
+import type {Key, KeyOrCallback, KeyOrCallbackKey, KeyOrCallbackValue} from '../models';
 
 // #region Functions
 
@@ -40,13 +40,13 @@ function getMapValues(
 }
 
 /**
- * Create a _Map_ from an array of items using callbacks
+ * Create a _Map_ from an array of items using a specific key
  *
  * If multiple items have the same key, the latest item's value will be used
  *
  * @param array Array to convert
- * @param key Callback to get an item's grouping key
- * @param value Callback to get an item's value
+ * @param key Callback or key to use for grouping
+ * @param value Callback or key to use for value, defaulting to the item itself
  * @returns _Map_ of keyed values
  *
  * @example
@@ -60,96 +60,21 @@ function getMapValues(
  */
 export function toMap<
 	Item,
-	KeyCallback extends (item: Item, index: number, array: Item[]) => Key,
-	ValueCallback extends (item: Item, index: number, array: Item[]) => unknown,
+	KeyArg extends KeyOrCallback<Item, Key>,
+	ValueArg extends KeyOrCallback<Item>,
 >(
 	array: Item[],
-	key: KeyCallback,
-	value: ValueCallback,
-): Map<ReturnType<KeyCallback>, ReturnType<ValueCallback>>;
+	key: KeyArg,
+	value: ValueArg,
+): Map<KeyOrCallbackKey<Item, KeyArg>, KeyOrCallbackValue<Item, ValueArg>>;
 
 /**
- * Create a _Map_ from an array of items using a callback and value
- *
- * If multiple items have the same key, the latest item's value will be used
- *
- * @param array Array to convert
- * @param key Callback to get an item's grouping key
- * @param value Key to use for value
- * @returns _Map_ of keyed values
- *
- * @example
- * ```typescript
- * toMap(
- *   [{id: 1, value: 10}, {id: 2, value: 20}, {id: 3, value: 10}],
- *   item => item.value,
- *   'id',
- * ); // => Map { 10 => 3, 20 => 2 }
- * ```
- */
-export function toMap<
-	Item extends PlainObject,
-	KeyCallback extends (item: Item, index: number, array: Item[]) => Key,
-	ItemValue extends keyof Item,
->(array: Item[], key: KeyCallback, value: ItemValue): Map<ReturnType<KeyCallback>, Item[ItemValue]>;
-
-/**
- * Create a _Map_ from an array of items using a key and callback
- *
- * If multiple items have the same key, the latest item's value will be used
- *
- * @param array Array to convert
- * @param key Key to use for grouping
- * @param value Callback to get an item's value
- * @returns _Map_ of keyed values
- *
- * @example
- * ```typescript
- * toMap(
- *   [{id: 1, value: 10}, {id: 2, value: 20}, {id: 3, value: 10}],
- *   'value',
- *   item => item.id,
- * ); // => Map { 10 => 3, 20 => 2 }
- * ```
- */
-export function toMap<
-	Item extends PlainObject,
-	ItemKey extends keyof Item,
-	ValueCallback extends (item: Item, index: number, array: Item[]) => unknown,
->(array: Item[], key: ItemKey, value: ValueCallback): Map<Item[ItemKey], ReturnType<ValueCallback>>;
-
-/**
- * Create a _Map_ from an array of items using a key and value
- *
- * If multiple items have the same key, the latest item's value will be used
- *
- * @param array Array to convert
- * @param key Key to use for grouping
- * @param value Key to use for value
- * @returns _Map_ of keyed values
- *
- * @example
- * ```typescript
- * toMap(
- *   [{id: 1, value: 10}, {id: 2, value: 20}, {id: 3, value: 10}],
- *   'value',
- *   'id',
- * ); // => Map { 10 => 3, 20 => 2 }
- * ```
- */
-export function toMap<
-	Item extends PlainObject,
-	ItemKey extends keyof Item,
-	ItemValue extends keyof Item,
->(array: Item[], key: ItemKey, value: ItemValue): Map<Item[ItemKey], Item[ItemValue]>;
-
-/**
- * Create a _Map_ from an array of items using a callback
+ * Create a _Map_ from an array of items using a specific key
  *
  * If multiple items have the same key, the latest item will be used
  *
  * @param array Array to convert
- * @param callback Callback to get an item's grouping key
+ * @param key Callback or key to use for grouping
  * @returns _Map_ of keyed items
  *
  * @example
@@ -160,32 +85,10 @@ export function toMap<
  * ); // => Map { 10 => {id: 3, value: 10}, 20 => {id: 2, value: 20} }
  * ```
  */
-export function toMap<Item, Callback extends (item: Item, index: number, array: Item[]) => Key>(
+export function toMap<Item, KeyArg extends KeyOrCallback<Item, Key>>(
 	array: Item[],
-	callback: Callback,
-): Map<ReturnType<Callback>, Item>;
-
-/**
- * Create a _Map_ from an array of items using a key
- *
- * If multiple items have the same key, the latest item will be used
- *
- * @param array Array to convert
- * @param key Key to use for grouping
- * @returns _Map_ of keyed items
- *
- * @example
- * ```typescript
- * toMap(
- *   [{id: 1, value: 10}, {id: 2, value: 20}, {id: 3, value: 10}],
- *   'value',
- * ); // => Map { 10 => {id: 3, value: 10}, 20 => {id: 2, value: 20} }
- * ```
- */
-export function toMap<Item extends PlainObject, ItemKey extends keyof Item>(
-	array: Item[],
-	key: ItemKey,
-): Map<Item[ItemKey], Item>;
+	key: KeyArg,
+): Map<KeyOrCallbackKey<Item, KeyArg>, Item>;
 
 /**
  * Create a _Map_ from an array of items _(using indices as keys)_
@@ -207,13 +110,13 @@ export function toMap(array: unknown[], first?: unknown, second?: unknown): unkn
 }
 
 /**
- * Create a _Map_ from an array of items using callbacks, grouping values into arrays
+ * Create a _Map_ from an array of items using a specific key, grouping values into arrays
  *
  * _Available as `toMapArrays` and `toMap.arrays`_
  *
  * @param array Array to convert
- * @param key Callback to get an item's grouping key
- * @param value Callback to get an item's value
+ * @param key Callback or key to use for grouping
+ * @param value Callback or key to use for value, defaulting to the item itself
  * @returns _Map_ of keyed arrays of values
  *
  * @example
@@ -227,104 +130,21 @@ export function toMap(array: unknown[], first?: unknown, second?: unknown): unkn
  */
 export function toMapArrays<
 	Item,
-	KeyCallback extends (item: Item, index: number, array: Item[]) => Key,
-	ValueCallback extends (item: Item, index: number, array: Item[]) => unknown,
+	KeyArg extends KeyOrCallback<Item, Key>,
+	ValueArg extends KeyOrCallback<Item>,
 >(
 	array: Item[],
-	key: KeyCallback,
-	value: ValueCallback,
-): Map<ReturnType<KeyCallback>, Array<ReturnType<ValueCallback>>>;
+	key: KeyArg,
+	value: ValueArg,
+): Map<KeyOrCallbackKey<Item, KeyArg>, Array<KeyOrCallbackValue<Item, ValueArg>>>;
 
 /**
- * Create a _Map_ from an array of items using a callback and value, grouping values into arrays
+ * Create a _Map_ from an array of items using a specific key, grouping items into arrays
  *
  * _Available as `toMapArrays` and `toMap.arrays`_
  *
  * @param array Array to convert
- * @param key Callback to get an item's grouping key
- * @param value Key to use for value
- * @returns _Map_ of keyed arrays of values
- *
- * @example
- * ```typescript
- * toMapArrays(
- *   [{id: 1, value: 10}, {id: 2, value: 20}, {id: 3, value: 10}],
- *   item => item.value,
- *   'id',
- * ); // => Map { 10 => [1, 3], 20 => [2] }
- * ```
- */
-export function toMapArrays<
-	Item extends PlainObject,
-	KeyCallback extends (item: Item, index: number, array: Item[]) => Key,
-	ItemValue extends keyof Item,
->(
-	array: Item[],
-	key: KeyCallback,
-	value: ItemValue,
-): Map<ReturnType<KeyCallback>, Item[ItemValue][]>;
-
-/**
- * Create a _Map_ from an array of items using a key and callback, grouping values into arrays
- *
- * _Available as `toMapArrays` and `toMap.arrays`_
- *
- * @param array Array to convert
- * @param key Key to use for grouping
- * @param value Callback to get an item's value
- * @returns _Map_ of keyed arrays of values
- *
- * @example
- * ```typescript
- * toMapArrays(
- *   [{id: 1, value: 10}, {id: 2, value: 20}, {id: 3, value: 10}],
- *   'value',
- *   item => item.id,
- * ); // => Map { 10 => [1, 3], 20 => [2] }
- * ```
- */
-export function toMapArrays<
-	Item extends PlainObject,
-	ItemKey extends keyof Item,
-	ValueCallback extends (item: Item, index: number, array: Item[]) => unknown,
->(
-	array: Item[],
-	key: ItemKey,
-	value: ValueCallback,
-): Map<Item[ItemKey], Array<ReturnType<ValueCallback>>>;
-
-/**
- * Create a _Map_ from an array of items using a key and value, grouping values into arrays
- *
- * _Available as `toMapArrays` and `toMap.arrays`_
- *
- * @param array Array to convert
- * @param key Key to use for grouping
- * @param value Key to use for value
- * @returns _Map_ of keyed arrays of values
- *
- * @example
- * ```typescript
- * toMapArrays(
- *   [{id: 1, value: 10}, {id: 2, value: 20}, {id: 3, value: 10}],
- *   'value',
- *   'id',
- * ); // => Map { 10 => [1, 3], 20 => [2] }
- * ```
- */
-export function toMapArrays<
-	Item extends PlainObject,
-	ItemKey extends keyof Item,
-	ItemValue extends keyof Item,
->(array: Item[], key: ItemKey, value: ItemValue): Map<Item[ItemKey], Item[ItemValue][]>;
-
-/**
- * Create a _Map_ from an array of items using a callback, grouping items into arrays
- *
- * _Available as `toMapArrays` and `toMap.arrays`_
- *
- * @param array Array to convert
- * @param callback Callback to get an item's grouping key
+ * @param key Callback or key to use for grouping
  * @returns _Map_ of keyed arrays of items
  *
  * @example
@@ -335,32 +155,10 @@ export function toMapArrays<
  * ); // => Map { 10 => [{id: 1, value: 10}, {id: 3, value: 10}], 20 => [{id: 2, value: 20}] }
  * ```
  */
-export function toMapArrays<
-	Item,
-	Callback extends (item: Item, index: number, array: Item[]) => Key,
->(array: Item[], callback: Callback): Map<ReturnType<Callback>, Item[]>;
-
-/**
- * Create a _Map_ from an array of items using a key, grouping items into arrays
- *
- * _Available as `toMapArrays` and `toMap.arrays`_
- *
- * @param array Array to convert
- * @param key Key to use for grouping
- * @returns _Map_ of keyed arrays of items
- *
- * @example
- * ```typescript
- * toMapArrays(
- *   [{id: 1, value: 10}, {id: 2, value: 20}, {id: 3, value: 10}],
- *   'value',
- * ); // => Map { 10 => [{id: 1, value: 10}, {id: 3, value: 10}], 20 => [{id: 2, value: 20}] }
- * ```
- */
-export function toMapArrays<Item extends PlainObject, ItemKey extends keyof Item>(
+export function toMapArrays<Item, KeyArg extends KeyOrCallback<Item, Key>>(
 	array: Item[],
-	key: ItemKey,
-): Map<Item[ItemKey], Item[]>;
+	key: KeyArg,
+): Map<KeyOrCallbackKey<Item, KeyArg>, Item[]>;
 
 export function toMapArrays(array: unknown[], first?: unknown, second?: unknown): unknown {
 	return getMapValues(array, first, second, true);

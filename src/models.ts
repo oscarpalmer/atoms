@@ -55,9 +55,46 @@ export type GenericCallback = (...args: any[]) => any;
  */
 export type Key = number | string;
 
+/**
+ * The `PropertyKey`-safe value of `Item`'s `ItemKey` property
+ */
 export type KeyedValue<Item, ItemKey extends keyof Item> = Item[ItemKey] extends PropertyKey
 	? Item[ItemKey]
 	: never;
+
+/**
+ * A key of `Item`, or a callback returning `Return`, used to derive a value from an item
+ */
+export type KeyOrCallback<Item, Return = unknown> =
+	| ((item: Item, index: number, array: Item[]) => Return)
+	| (Item extends PlainObject ? keyof Item : never);
+
+/**
+ * The `PropertyKey`-safe value resolved from a `KeyOrCallback<Item, Key>` argument, for use as a
+ * `Record` or `Map` key
+ */
+export type KeyOrCallbackKey<Item, Arg extends KeyOrCallback<Item, Key>> = Arg extends (
+	item: Item,
+	index: number,
+	array: Item[],
+) => Key
+	? ReturnType<Arg>
+	: Arg extends keyof Item
+		? KeyedValue<Item, Arg>
+		: never;
+
+/**
+ * The value resolved from a `KeyOrCallback` argument against `Item`
+ */
+export type KeyOrCallbackValue<Item, Arg extends KeyOrCallback<Item>> = Arg extends (
+	item: Item,
+	index: number,
+	array: Item[],
+) => unknown
+	? ReturnType<Arg>
+	: Arg extends keyof Item
+		? Item[Arg]
+		: never;
 
 /**
  * A nested array
