@@ -2,6 +2,11 @@ import {getArrayCallback, getArrayCallbacks} from './callbacks';
 
 // #region Types
 
+type FindMapper = {
+	callback: unknown;
+	reverse: boolean;
+};
+
 type FindValueType = 'index' | 'item';
 
 type FindValuesResult = {
@@ -124,7 +129,7 @@ export function findValues(
 	type: FindValuesType,
 	array: unknown[],
 	parameters: unknown[],
-	mapper?: unknown,
+	mapper?: FindMapper,
 ): FindValuesResult {
 	const result: FindValuesResult = {
 		matched: [],
@@ -145,16 +150,21 @@ export function findValues(
 		return result;
 	}
 
-	const mapCallback = getArrayCallback(mapper);
+	const mapCallback = getArrayCallback(mapper?.callback);
+	const mapReverse = mapper?.reverse ?? false;
+
+	const mapAfter = mapCallback == null ? undefined : mapReverse ? undefined : mapCallback;
+	const mapBefore = mapCallback == null ? undefined : mapReverse ? mapCallback : undefined;
 
 	if (callbacks?.bool != null || (type === FIND_VALUES_ALL && key == null)) {
 		const callback = callbacks?.bool ?? (item => Object.is(item, value));
 
 		for (let index = 0; index < length; index += 1) {
 			const item = array[index];
+			const transformed = mapBefore?.(item, index, array) ?? item;
 
-			if (callback(item, index, array)) {
-				result.matched.push(mapCallback?.(item, index, array) ?? item);
+			if (callback(transformed, index, array)) {
+				result.matched.push(mapAfter?.(item, index, array) ?? transformed);
 			} else {
 				result.notMatched.push(item);
 			}
@@ -167,14 +177,24 @@ export function findValues(
 
 	for (let index = 0; index < length; index += 1) {
 		const item = array[index];
-		const keyed = callbacks?.keyed?.(item, index, array) ?? item;
+
+		let keyed: unknown;
+		let transformed: unknown;
+
+		if (mapBefore == null) {
+			keyed = callbacks?.keyed?.(item, index, array) ?? item;
+			transformed = item;
+		} else {
+			transformed = mapBefore(item, index, array);
+			keyed = callbacks?.keyed?.(transformed, index, array) ?? transformed;
+		}
 
 		if (
 			(type === FIND_VALUES_ALL && Object.is(keyed, value)) ||
 			(type === FIND_VALUES_UNIQUE && !keys.has(keyed))
 		) {
 			keys.add(keyed);
-			result.matched.push(mapCallback?.(item, index, array) ?? item);
+			result.matched.push(mapAfter?.(item, index, array) ?? transformed);
 		} else {
 			result.notMatched.push(item);
 		}
