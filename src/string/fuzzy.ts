@@ -133,14 +133,15 @@ type InternalFuzzy<Item = unknown> = {
 // #region Instances
 
 function Fuzzy(this: any, state: FuzzyState<unknown>) {
-	this[FUZZY_SYMBOL] = state;
+	Object.defineProperty(this, FUZZY_SYMBOL, {
+		value: state,
+	});
 }
 
-Fuzzy.prototype[FUZZY_PROPERTY] = true;
-
-Fuzzy.prototype.search = search;
-
 Object.defineProperties(Fuzzy.prototype, {
+	[FUZZY_PROPERTY]: {
+		value: true,
+	},
 	items: {
 		enumerable: true,
 		get(): unknown[] {
@@ -149,6 +150,9 @@ Object.defineProperties(Fuzzy.prototype, {
 		set(value: unknown): void {
 			setItems((this as InternalFuzzy)[FUZZY_SYMBOL], value);
 		},
+	},
+	search: {
+		value: search,
 	},
 	strings: {
 		enumerable: true,

@@ -29,7 +29,7 @@ test('any', () => {
 
 			expect(equal(outer, inner)).toBe(outerIndex === innerIndex);
 
-			expect(equalizer(outer, inner)).toBe(
+			expect(equalizer.compare(outer, inner)).toBe(
 				(outerIndex < 2 && innerIndex < 2) || outerIndex === innerIndex,
 			);
 		}

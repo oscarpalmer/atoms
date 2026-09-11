@@ -1,5 +1,5 @@
 import {createAborter} from '../internal/abort';
-import {getTimer, TIMER_WAIT} from '../internal/function/timer';
+import {getLimiter, LIMITER_WAIT} from '../internal/function/limit';
 import {createPromiseOptions} from './helpers';
 import {settlePromise} from './misc';
 import {type PromiseOptions} from './models';
@@ -30,12 +30,12 @@ export function delay(options?: unknown): Promise<void> {
 	}
 
 	const aborter = createAborter(signal, () => {
-		timer.cancel();
+		limiter.cancel();
 
 		rejector(signal?.reason);
 	});
 
-	const timer = getTimer(TIMER_WAIT, () => settlePromise(resolver, undefined, aborter), time);
+	const limiter = getLimiter(LIMITER_WAIT, () => settlePromise(resolver, undefined, aborter), time);
 
 	let rejector: (reason: unknown) => void;
 	let resolver: () => void;
@@ -47,7 +47,7 @@ export function delay(options?: unknown): Promise<void> {
 		if (time === 0) {
 			settlePromise(resolver, undefined, aborter);
 		} else {
-			timer();
+			limiter.run();
 		}
 	});
 }

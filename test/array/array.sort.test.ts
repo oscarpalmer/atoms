@@ -343,7 +343,7 @@ test('large (with intializer)', () =>
 			(first, second) => first.name.first.localeCompare(second.name.first),
 		]);
 
-		const atomic = sorter(large);
+		const atomic = sorter.sort(large);
 
 		setTimeout(() => {
 			const diffed = diff(native, atomic);

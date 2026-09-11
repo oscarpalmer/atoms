@@ -5,6 +5,10 @@ import type {PlainObject} from '../models';
 
 // #region Types
 
+type InternalTemplater = {
+	[TEMPLATE_SYMBOL]: Required<TemplateOptions>;
+} & Templater;
+
 /**
  * Renderer for a string template with variables
  *
@@ -34,7 +38,7 @@ type Templater = {
 	 *
 	 * @returns Templated string
 	 */
-	(strings: TemplateStringsArray, ...values: unknown[]): TemplaterRenderer;
+	render(strings: TemplateStringsArray, ...values: unknown[]): TemplaterRenderer;
 
 	/**
 	 * Render a string from a template with variables
@@ -43,13 +47,29 @@ type Templater = {
 	 * @param variables Variables to use
 	 * @returns Templated string
 	 */
-	(value: string, variables?: PlainObject): string;
+	render(value: string, variables?: PlainObject): string;
 };
 
 /**
  * Render a template string with variables
  */
 type TemplaterRenderer = (variables?: PlainObject) => string;
+
+// #endregion
+
+// #region Instances
+
+function Templater(this: any, options: Required<TemplateOptions>) {
+	Object.defineProperty(this, TEMPLATE_SYMBOL, {
+		value: options,
+	});
+}
+
+Object.defineProperties(Templater.prototype, {
+	render: {
+		value: render,
+	},
+});
 
 // #endregion
 
@@ -106,14 +126,23 @@ function handleTemplate(
  * @returns _Templater_ function
  */
 export function initializeTemplater(options?: Partial<TemplateOptions>): Templater {
-	const {ignoreCase, pattern} = createTemplateOptions(options);
+	// @ts-expect-error All good, no worries :-)
+	return new Templater(createTemplateOptions(options));
+}
 
-	return ((value: string | TemplateStringsArray, ...parameters: unknown[]) => {
-		return isTemplateStringsArray(value)
-			? (variables?: PlainObject) =>
-					handleTemplate(interpolate(value, parameters), pattern, ignoreCase, variables)
-			: handleTemplate(value, pattern, ignoreCase, parameters[0] as PlainObject);
-	}) as Templater;
+function render(
+	this: InternalTemplater,
+	value: string | TemplateStringsArray,
+	...parameters: unknown[]
+): string | TemplaterRenderer {
+	const {ignoreCase, pattern} = this[TEMPLATE_SYMBOL];
+
+	if (isTemplateStringsArray(value)) {
+		return (variables?: PlainObject) =>
+			handleTemplate(interpolate(value, parameters), pattern, ignoreCase, variables);
+	}
+
+	return handleTemplate(value, pattern, ignoreCase, parameters[0] as PlainObject);
 }
 
 /**
@@ -155,6 +184,8 @@ export function template(
 // #region Variables
 
 const TEMPLATE_EXPRESSION_VARIABLE = /{{([\s\S]+?)}}/g;
+
+const TEMPLATE_SYMBOL = Symbol('template');
 
 // #endregion
 

@@ -6,34 +6,11 @@
 export type ArrayOrPlainObject = unknown[] | Record<PropertyKey, unknown>;
 
 /**
- * An asynchronous callback that can be canceled
- */
-export type AsyncCancelableCallback<Callback extends GenericAsyncCallback | GenericCallback> =
-	(ReturnType<Callback> extends Promise<any>
-		? (...args: Parameters<Callback>) => Promise<Awaited<ReturnType<Callback>>>
-		: (...args: Parameters<Callback>) => Promise<ReturnType<Callback>>) & {
-		/**
-		 * Cancel the callback
-		 */
-		cancel: () => void;
-	};
-
-/**
  * For matching any `void`, `Date`, primitive, or `RegExp` values
  *
  * _(Thanks, type-fest!)_
  */
 export type BuiltIns = void | Date | Primitive | RegExp;
-
-/**
- * A synchronous callback that can be canceled
- */
-export type CancelableCallback<Callback extends GenericCallback> = Callback & {
-	/**
-	 * Cancel the callback
-	 */
-	cancel: () => void;
-};
 
 /**
  * A generic class constructor
@@ -195,7 +172,7 @@ export type NumericalValues<Item extends PlainObject> = {
 /**
  * An asynchronous function that can only be called once, returning the same value on subsequent calls
  */
-export type OnceAsyncCallback<Callback extends GenericAsyncCallback> = {
+export type OnceAsync<Callback extends GenericAsyncCallback> = {
 	/**
 	 * Did the callback's promise reject?
 	 */
@@ -204,15 +181,29 @@ export type OnceAsyncCallback<Callback extends GenericAsyncCallback> = {
 	 * Has the callback finished?
 	 */
 	readonly finished: boolean;
-} & Callback &
-	OnceCallbackProperties;
+	/**
+	 * Run the callback
+	 *
+	 * @param parameters Callback parameters
+	 * @returns Call result
+	 */
+	run: (...parameters: Parameters<Callback>) => ReturnType<Callback>;
+} & OnceProperties;
 
 /**
  * A callback function that can only be called once, returning the same value on subsequent calls
  */
-export type OnceCallback<Callback extends GenericCallback> = Callback & OnceCallbackProperties;
+export type Once<Callback extends GenericCallback> = {
+	/**
+	 * Run the callback
+	 *
+	 * @param parameters Callback parameters
+	 * @returns Call result
+	 */
+	run: (...parameters: Parameters<Callback>) => ReturnType<Callback>;
+} & OnceProperties;
 
-type OnceCallbackProperties = {
+type OnceProperties = {
 	/**
 	 * Has the callback been called?
 	 */

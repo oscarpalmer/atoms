@@ -21,7 +21,7 @@ test('template: string', () => {
 	};
 
 	expect(template(basic, variables)).toBe(', !');
-	expect(templater(custom, variables)).toBe('<a.0.b.1.c>, <a.0.b.1.c>!');
+	expect(templater.render(custom, variables)).toBe('<a.0.b.1.c>, <a.0.b.1.c>!');
 
 	expect(
 		template(basic, variables, {
@@ -60,9 +60,11 @@ test('template: tagged', () => {
 	});
 
 	const custom =
-		templater`Array: ${array}; boolean: ${true}; object: ${{foo: 'bar'}}; variable: <VaRiAbLe>`({
-			variable: 'Hello, world!',
-		});
+		templater.render`Array: ${array}; boolean: ${true}; object: ${{foo: 'bar'}}; variable: <VaRiAbLe>`(
+			{
+				variable: 'Hello, world!',
+			},
+		);
 
 	expect(custom).toBe('Array: 123; boolean: true; object: {"foo":"bar"}; variable: Hello, world!');
 });

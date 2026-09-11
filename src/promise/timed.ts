@@ -1,5 +1,5 @@
 import {createAborter} from '../internal/abort';
-import {getTimer, TIMER_WAIT} from '../internal/function/timer';
+import {getLimiter, LIMITER_WAIT} from '../internal/function/limit';
 import type {RequiredKeys} from '../models';
 import {PROMISE_MESSAGE_EXPECTATION_TIMED} from './constants';
 import {createPromiseOptions} from './helpers';
@@ -14,13 +14,13 @@ export async function getTimedPromise<Value>(
 	signal?: AbortSignal,
 ): Promise<Value> {
 	const aborter = createAborter(signal, () => {
-		timer.cancel();
+		limiter.cancel();
 
 		rejector(signal?.reason);
 	});
 
-	const timer = getTimer(
-		TIMER_WAIT,
+	const limiter = getLimiter(
+		LIMITER_WAIT,
 		() => settlePromise(rejector, new PromiseTimeoutError(), aborter),
 		time,
 	);
@@ -32,11 +32,11 @@ export async function getTimedPromise<Value>(
 		new Promise((_, reject) => {
 			rejector = reject;
 
-			timer();
+			limiter.run();
 		}),
 	]).then(value => {
 		aborter?.cancel();
-		timer.cancel();
+		limiter.cancel();
 
 		rejector(undefined);
 

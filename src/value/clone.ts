@@ -1,6 +1,12 @@
 import {isArrayOrPlainObject, isTypedArray} from '../internal/is';
-import {createSelfHandlers} from '../internal/value/handlers';
+import {createValueHandler} from '../internal/value/handlers';
 import type {ArrayOrPlainObject, Constructor, PlainObject, TypedArray} from '../models';
+
+// #region Special variables
+
+const CLONE_NAME = 'clone';
+
+// #endregion
 
 // #region Types
 
@@ -31,7 +37,7 @@ export type Cloner = {
 	 * @param value Value to clone
 	 * @returns Cloned value
 	 */
-	<Value>(value: Value): Value;
+	clone<Value>(value: Value): Value;
 
 	/**
 	 * Deregister a clone handler for a specific class
@@ -53,11 +59,31 @@ export type Cloner = {
 	register: typeof registerCloner;
 };
 
+type InternalCloner = {
+	[CLONE_SYMBOL]: Required<CloneOptions>;
+} & Cloner;
+
 // #endregion
 
-// #region Special variables
+// #region Instances
 
-const CLONE_NAME = 'clone';
+function Cloner(this: any, options: Required<CloneOptions>) {
+	Object.defineProperty(this, CLONE_SYMBOL, {
+		value: options,
+	});
+}
+
+Object.defineProperties(Cloner.prototype, {
+	clone: {
+		value: cloneFromCloner,
+	},
+	deregister: {
+		value: deregisterCloner,
+	},
+	register: {
+		value: registerCloner,
+	},
+});
 
 // #endregion
 
@@ -171,6 +197,17 @@ function cloneDataView(value: DataView, parameters: CloneParameters, depth: numb
 	parameters.references.set(value, cloned);
 
 	return cloned;
+}
+
+function cloneFromCloner(this: Cloner, value: unknown): unknown {
+	return cloneAny(
+		value,
+		{
+			copy: false,
+			options: (this as InternalCloner)[CLONE_SYMBOL],
+		} as CloneParameters,
+		0,
+	);
 }
 
 function cloneMap(
@@ -331,7 +368,7 @@ function createCloneOptions(input?: unknown): Required<CloneOptions> {
  * @param constructor Class constructor
  */
 export function deregisterCloner<Instance>(constructor: Constructor<Instance>): void {
-	clone.handlers.deregister(constructor);
+	cloneHandler.base.deregister(constructor);
 }
 
 /**
@@ -343,32 +380,8 @@ export function deregisterCloner<Instance>(constructor: Constructor<Instance>): 
  * @returns Cloner function
  */
 export function initializeCloner(options?: CloneOptions): Cloner {
-	const opts = createCloneOptions(options);
-
-	function cloner(value: unknown): unknown {
-		return cloneAny(
-			value,
-			{
-				copy: false,
-				options: opts,
-			} as CloneParameters,
-			0,
-		);
-	}
-
-	cloner.deregister = deregisterCloner;
-	cloner.register = registerCloner;
-
-	Object.defineProperties(cloner, {
-		deregister: {
-			value: deregisterCloner,
-		},
-		register: {
-			value: registerCloner,
-		},
-	});
-
-	return cloner as Cloner;
+	// @ts-expect-error All good, no worries :-)
+	return new Cloner(createCloneOptions(options));
 }
 
 /**
@@ -383,7 +396,7 @@ export function registerCloner<Instance>(
 	constructor: Constructor<Instance>,
 	handler?: string | ((value: Instance) => Instance),
 ): void {
-	clone.handlers.register(constructor, handler);
+	cloneHandler.base.register(constructor, handler);
 }
 
 function tryStructuredClone(value: object, parameters: CloneParameters, depth: number): unknown {
@@ -420,7 +433,7 @@ const CLONE_DEFAULT_OPTIONS: Required<CloneOptions> = {
 
 const CLONE_MAX_DEPTH = 100;
 
-const cloneHandlers = createSelfHandlers(clone, {
+const cloneHandler = createValueHandler(clone, {
 	callback: tryStructuredClone,
 	method: CLONE_NAME,
 });
@@ -436,12 +449,14 @@ const CLONE_PRIMITIVES: Record<string, boolean> = {
 	undefined: true,
 };
 
+const CLONE_SYMBOL = Symbol(CLONE_NAME);
+
 // #endregion
 
 // #Initialization
 
 clone.deregister = deregisterCloner;
-clone.handlers = cloneHandlers;
+clone.handlers = cloneHandler;
 clone.initialize = initializeCloner;
 clone.register = registerCloner;
 
@@ -449,8 +464,8 @@ Object.defineProperties(clone, {
 	deregister: {
 		value: deregisterCloner,
 	},
-	handlers: {
-		value: cloneHandlers,
+	handler: {
+		value: cloneHandler,
 	},
 	initialize: {
 		value: initializeCloner,

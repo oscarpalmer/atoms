@@ -111,7 +111,7 @@ test('normalize', () => {
 
 	// Initializer
 
-	expect(normalize.initialize()(modified)).toBe(
+	expect(normalize.initialize().normalize(modified)).toBe(
 		"ae ae d d d d h h ij ij i i k l l l l n n 'n oe oe o o s ss th th t t",
 	);
 

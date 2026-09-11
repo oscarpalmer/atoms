@@ -6,14 +6,15 @@ test('', () => {
 		copyFunctions: true,
 	});
 
-	expect(cloner).toBeTypeOf('function');
+	expect(cloner).toBeTypeOf('object');
+	expect(cloner.clone).toBeTypeOf('function');
 	expect(cloner.deregister).toBeTypeOf('function');
 	expect((cloner as any).initialize).toBeUndefined();
 	expect(cloner.register).toBeTypeOf('function');
 
 	const fn = () => {};
 
-	expect(cloner(fn)).toBe(fn);
+	expect(cloner.clone(fn)).toBe(fn);
 
-	expect(clone.initialize()(fn)).not.toBe(fn);
+	expect(clone.initialize().clone(fn)).not.toBe(fn);
 });

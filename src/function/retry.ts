@@ -1,5 +1,5 @@
 import {getNumberOrDefault} from '../internal/defaults';
-import {getTimer, TIMER_WAIT} from '../internal/function/timer';
+import {getLimiter, LIMITER_WAIT} from '../internal/function/limit';
 import {isPlainObject} from '../internal/is';
 import type {GenericAsyncCallback, GenericCallback} from '../models';
 
@@ -85,14 +85,14 @@ async function asyncRetry<Callback extends GenericCallback>(
 			} else {
 				attempts += 1;
 
-				void timer();
+				void limiter.run();
 			}
 		}
 	}
 
 	const {delay, times, when} = createRetryOptions(options);
 
-	const timer = getTimer(TIMER_WAIT, handle, delay);
+	const limiter = getLimiter(LIMITER_WAIT, handle, delay);
 
 	let attempts = 0;
 

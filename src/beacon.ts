@@ -155,26 +155,36 @@ type Observer<Value> = {
 // #region Instances
 
 function Beacon(this: any, value: unknown, options?: BeaconOptions<unknown>) {
-	this[BEACON_SYMBOL] = {
-		value,
-		active: true,
-		options: createBeaconOptions(options),
-	} satisfies BeaconState<unknown>;
+	Object.defineProperty(this, BEACON_SYMBOL, {
+		value: {
+			value,
+			active: true,
+			options: createBeaconOptions(options),
+		} satisfies BeaconState<unknown>,
+	});
 }
 
-Beacon.prototype[BEACON_PROPERTY] = BEACON_NAME;
-
-Beacon.prototype.deactivate = deactivateBeacon;
-Beacon.prototype.emit = emitBeaconValue;
-Beacon.prototype.error = emitBeaconError;
-Beacon.prototype.finish = finishBeacon;
-
 Object.defineProperties(Beacon.prototype, {
+	[BEACON_PROPERTY]: {
+		value: BEACON_NAME,
+	},
 	active: {
 		enumerable: true,
 		get(): boolean {
 			return (this as InternalBeacon)[BEACON_SYMBOL].active;
 		},
+	},
+	deactivate: {
+		value: deactivateBeacon,
+	},
+	emit: {
+		value: emitBeaconValue,
+	},
+	error: {
+		value: emitBeaconError,
+	},
+	finish: {
+		value: finishBeacon,
 	},
 	observable: {
 		enumerable: true,
@@ -191,23 +201,31 @@ Object.defineProperties(Beacon.prototype, {
 });
 
 function Observable(this: any, beacon: BeaconState<unknown>) {
-	this[BEACON_SYMBOL] = {
-		beacon,
-		active: beacon.active,
-	} satisfies ObservableState<unknown>;
+	Object.defineProperty(this, BEACON_SYMBOL, {
+		value: {
+			beacon,
+			active: beacon.active,
+		} satisfies ObservableState<unknown>,
+	});
 }
 
-Observable.prototype[BEACON_PROPERTY] = BEACON_OBSERVABLE;
+Object.defineProperties(Observable.prototype, {
+	[BEACON_PROPERTY]: {
+		value: BEACON_OBSERVABLE,
+	},
+	active: {
+		enumerable: true,
+		get(): boolean {
+			const state = (this as InternalObservable)[BEACON_SYMBOL];
 
-Observable.prototype.deactivate = deactiveateObservable;
-Observable.prototype.subscribe = subscribeToObservable;
-
-Object.defineProperty(Observable.prototype, 'active', {
-	enumerable: true,
-	get(): boolean {
-		const state = (this as InternalObservable)[BEACON_SYMBOL];
-
-		return state.beacon.active && state.active;
+			return state.beacon.active && state.active;
+		},
+	},
+	deactivate: {
+		value: deactiveateObservable,
+	},
+	subscribe: {
+		value: subscribeToObservable,
 	},
 });
 

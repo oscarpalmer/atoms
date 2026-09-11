@@ -1,95 +1,170 @@
 import type {Constructor, GenericCallback} from '../../models';
 import {isNonConstructor} from '../is';
 
-type Options = {
+// #region Types
+
+type BaseHandler = {
+	handlers: WeakMap<Constructor, string | GenericCallback>;
+	options: BaseHandlerOptions;
+	owner: GenericCallback;
+	deregister: (constructor: Constructor) => void;
+	get: (first: unknown, second: unknown) => string | GenericCallback | undefined;
+	register: (constructor: Constructor, handler?: string | GenericCallback) => void;
+};
+
+type BaseHandlerOptions = {
 	callback: GenericCallback;
 	method?: string;
 };
 
-export function createCompareHandlers<Value>(owner: GenericCallback, options: Options) {
-	const handlers = createHandlers(owner, options);
+type CompareHandler<Value> = {
+	base: BaseHandler;
+	handle(first: unknown, second: unknown, ...parameters: unknown[]): Value;
+};
 
-	return {
-		deregister(constructor: Constructor): void {
-			handlers.deregister(constructor);
-		},
-		handle(first: unknown, second: unknown, ...parameters: unknown[]): Value {
-			const handler = handlers.get(first, second);
+type ValueHandler = {
+	base: BaseHandler;
+	handle(value: unknown, ...parameters: unknown[]): unknown;
+};
 
-			if (handler == null) {
-				return options.callback(first, second, ...parameters);
-			}
+// #endregion
 
-			return typeof handler === 'function'
-				? handler(first, second)
-				: (first as any)[handler](second);
-		},
-		register(constructor: Constructor, handler?: string | GenericCallback): void {
-			handlers.register(constructor, handler);
-		},
-	};
+// #region Instances
+
+function BaseHandler(this: any, owner: GenericCallback, options: BaseHandlerOptions) {
+	this.handlers = new WeakMap<Constructor, string | GenericCallback>();
+	this.owner = owner;
+	this.options = options;
 }
 
-function createHandlers(owner: GenericCallback, options: Options) {
-	const handlers = new WeakMap<Constructor, string | GenericCallback>();
+Object.defineProperties(BaseHandler.prototype, {
+	deregister: {
+		value: deregisterHandler,
+	},
+	get: {
+		value: getHandler,
+	},
+	register: {
+		value: registerHandler,
+	},
+});
 
-	return {
-		deregister(constructor: Constructor): void {
-			handlers.delete(constructor);
-		},
-		get(first: unknown, second: unknown): string | GenericCallback | undefined {
-			if (
-				isConstructable(first) &&
-				isConstructable(second) &&
-				(first as object).constructor === (second as object).constructor
-			) {
-				return handlers.get((first as object).constructor as Constructor);
-			}
-		},
-		register(constructor: Constructor, handler?: string | GenericCallback): void {
-			if (isNonConstructor(constructor) || handler === owner) {
-				return;
-			}
-
-			let actual: string | GenericCallback | undefined = handler ?? options.method;
-
-			if (typeof actual !== 'function' && typeof actual !== 'string') {
-				return;
-			}
-
-			if (typeof actual === 'string') {
-				actual = typeof constructor.prototype[actual] === 'function' ? actual : undefined;
-			}
-
-			if (actual != null) {
-				handlers.set(constructor, actual);
-			}
-		},
-	};
+function CompareHandler(this: any, base: BaseHandler) {
+	this.base = base;
 }
 
-export function createSelfHandlers(owner: GenericCallback, options: Options) {
-	const handlers = createHandlers(owner, options);
+Object.defineProperties(CompareHandler.prototype, {
+	handle: {
+		value: handleComparison,
+	},
+});
 
-	return {
-		deregister(constructor: Constructor): void {
-			handlers.deregister(constructor);
-		},
-		handle(value: unknown, ...parameters: unknown[]): unknown {
-			const handler = handlers.get(value, value);
+function ValueHandler(this: any, value: BaseHandler) {
+	this.base = value;
+}
 
-			if (handler == null) {
-				return options.callback(value, ...parameters);
-			}
+Object.defineProperties(ValueHandler.prototype, {
+	handle: {
+		value: handleValue,
+	},
+});
 
-			return typeof handler === 'function' ? handler(value) : (value as any)[handler]();
-		},
-		register(constructor: Constructor, handler?: string | GenericCallback): void {
-			handlers.register(constructor, handler);
-		},
-	};
+// #endregion
+
+// #region Functions
+
+function createBaseHandler(owner: GenericCallback, options: BaseHandlerOptions) {
+	// @ts-expect-error All good, no worries :-)
+	return new BaseHandler(owner, options);
+}
+
+export function createCompareHandler<Value>(
+	owner: GenericCallback,
+	options: BaseHandlerOptions,
+): CompareHandler<Value> {
+	// @ts-expect-error All good, no worries :-)
+	return new CompareHandler(createBaseHandler(owner, options));
+}
+
+export function createValueHandler(
+	owner: GenericCallback,
+	options: BaseHandlerOptions,
+): ValueHandler {
+	// @ts-expect-error All good, no worries :-)
+	return new ValueHandler(createBaseHandler(owner, options));
+}
+
+function deregisterHandler(this: BaseHandler, value: unknown) {
+	this.handlers.delete(value as never);
+}
+
+function getHandler(
+	this: BaseHandler,
+	first: unknown,
+	second: unknown,
+): string | GenericCallback | undefined {
+	if (
+		isConstructable(first) &&
+		isConstructable(second) &&
+		(first as object).constructor === (second as object).constructor
+	) {
+		return this.handlers.get((first as object).constructor as Constructor);
+	}
+
+	return undefined;
+}
+
+function handleComparison(
+	this: CompareHandler<unknown>,
+	first: unknown,
+	second: unknown,
+	...parameters: unknown[]
+): unknown {
+	const handler = this.base.get(first, second);
+
+	if (handler == null) {
+		return this.base.options.callback(first, second, ...parameters);
+	}
+
+	return typeof handler === 'function' ? handler(first, second) : (first as any)[handler](second);
 }
 
 function isConstructable(value: unknown): boolean {
 	return typeof value === 'object' && value !== null;
 }
+
+function registerHandler(
+	this: BaseHandler,
+	constructor: Constructor,
+	handler?: string | GenericCallback,
+) {
+	if (isNonConstructor(constructor) || handler === this.owner) {
+		return;
+	}
+
+	let actual: string | GenericCallback | undefined = handler ?? this.options.method;
+
+	if (typeof actual !== 'function' && typeof actual !== 'string') {
+		return;
+	}
+
+	if (typeof actual === 'string') {
+		actual = typeof constructor.prototype[actual] === 'function' ? actual : undefined;
+	}
+
+	if (actual != null) {
+		this.handlers.set(constructor, actual);
+	}
+}
+
+function handleValue(this: ValueHandler, value: unknown, ...parameters: unknown[]): unknown {
+	const handler = this.base.get(value, value);
+
+	if (handler == null) {
+		return this.base.options.callback(value, ...parameters);
+	}
+
+	return typeof handler === 'function' ? handler(value) : (value as any)[handler]();
+}
+
+// #endregion

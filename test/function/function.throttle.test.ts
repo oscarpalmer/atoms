@@ -33,7 +33,8 @@ test('asynchronous', () =>
 		}, 25);
 
 		for (let index = 0; index < size; index += 1) {
-			void first()
+			void first
+				.run()
 				.then(() => {
 					result.first.succeeded += 1;
 				})
@@ -53,7 +54,8 @@ test('asynchronous', () =>
 		);
 
 		for (let index = 0; index < size; index += 1) {
-			void second()
+			void second
+				.run()
 				.then(() => {
 					result.second.succeeded += 1;
 				})
@@ -66,7 +68,8 @@ test('asynchronous', () =>
 			result.third.count += 1;
 		}, 25);
 
-		void third()
+		void third
+			.run()
 			.then(() => {
 				result.third.succeeded += 1;
 			})
@@ -80,7 +83,8 @@ test('asynchronous', () =>
 			throw new Error('Error for throttle.async');
 		}, 25);
 
-		void fourth()
+		void fourth
+			.run()
 			.then(() => {
 				result.fourth.succeeded += 1;
 			})
@@ -131,10 +135,10 @@ test('synchronous', () =>
 		const interval = setInterval(() => {
 			count += 1;
 
-			throttled();
+			throttled.run();
 
-			defaultsInvalid();
-			defaultsZero();
+			defaultsInvalid.run();
+			defaultsZero.run();
 		}, 16);
 
 		const cancelleable = throttle(() => {
@@ -149,7 +153,7 @@ test('synchronous', () =>
 			defaults.zero += 1;
 		}, 0);
 
-		cancelleable();
+		cancelleable.run();
 
 		setTimeout(() => {
 			cancelleable.cancel();
@@ -158,9 +162,9 @@ test('synchronous', () =>
 				last += 1;
 			}, 25);
 
-			lastThrottled();
-			lastThrottled();
-			lastThrottled();
+			lastThrottled.run();
+			lastThrottled.run();
+			lastThrottled.run();
 		}, 250);
 
 		setTimeout(() => {

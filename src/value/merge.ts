@@ -19,11 +19,19 @@ export type Assigner = {
 	 * @param from Values to assign
 	 * @returns Assigned value
 	 */
-	<To extends PlainObject, From extends PlainObject[]>(
+	assign<To extends PlainObject, From extends PlainObject[]>(
 		to: To,
 		from: [...From],
 	): To & UnionToIntersection<From[number]>;
 };
+
+type InternalAssigner = {
+	[MERGE_SYMBOL_ASSIGN]: Options;
+} & Assigner;
+
+type InternalMerger = {
+	[MERGE_SYMBOL_MERGE]: Options;
+} & Merger;
 
 /**
  * Options for merging values
@@ -69,7 +77,7 @@ export type Merger = {
 	 * @param values Values to merge
 	 * @returns Merged value
 	 */
-	<Values extends ArrayOrPlainObject[]>(
+	merge<Values extends ArrayOrPlainObject[]>(
 		values: Array<NestedPartial<Values[number]>>,
 	): UnionToIntersection<Values[number]>;
 };
@@ -82,6 +90,32 @@ type Options = {
 };
 
 type ReplaceableObjectsCallback = (name: string) => boolean;
+
+// #endregion
+
+// #region Instances
+
+function Assigner(this: any, options: Options) {
+	options.assignValues = true;
+
+	this[MERGE_SYMBOL_ASSIGN] = options;
+}
+
+Object.defineProperties(Assigner.prototype, {
+	assign: {
+		value: assignFromAssigner,
+	},
+});
+
+function Merger(this: any, options: Options) {
+	this[MERGE_SYMBOL_MERGE] = options;
+}
+
+Object.defineProperties(Merger.prototype, {
+	merge: {
+		value: mergeFromMerger,
+	},
+});
 
 // #endregion
 
@@ -105,6 +139,10 @@ export function assign<To extends PlainObject, From extends PlainObject[]>(
 	actual.assignValues = true;
 
 	return mergeValues([to, ...from], actual) as To & UnionToIntersection<From[number]>;
+}
+
+function assignFromAssigner(this: InternalAssigner, to: PlainObject, from: PlainObject[]) {
+	return mergeValues([to, ...from], this[MERGE_SYMBOL_ASSIGN]);
 }
 
 function createMergeOptions(options?: MergeOptions): Options {
@@ -150,12 +188,8 @@ function getReplaceableObjects(value: unknown): ReplaceableObjectsCallback | und
  * @returns Assigner function
  */
 export function initializeAssigner(options?: AssignOptions): Assigner {
-	const actual = createMergeOptions(options);
-
-	actual.assignValues = true;
-
-	return ((to: PlainObject, from: PlainObject[]): PlainObject =>
-		mergeValues([to, ...from], actual) as PlainObject) as Assigner;
+	// @ts-expect-error All good, no worries :-)
+	return new Assigner(createMergeOptions(options));
 }
 
 /**
@@ -167,10 +201,8 @@ export function initializeAssigner(options?: AssignOptions): Assigner {
  * @returns Merger function
  */
 export function initializeMerger(options?: MergeOptions): Merger {
-	const actual = createMergeOptions(options);
-
-	return ((values: Array<NestedPartial<ArrayOrPlainObject>>): ArrayOrPlainObject =>
-		mergeValues(values, actual)) as Merger;
+	// @ts-expect-error All good, no worries :-)
+	return new Merger(createMergeOptions(options));
 }
 
 /**
@@ -185,6 +217,10 @@ export function merge<Values extends ArrayOrPlainObject[]>(
 	options?: MergeOptions,
 ): UnionToIntersection<Values[number]> {
 	return mergeValues(values, createMergeOptions(options)) as UnionToIntersection<Values[number]>;
+}
+
+function mergeFromMerger(this: InternalMerger, values: ArrayOrPlainObject[]): ArrayOrPlainObject {
+	return mergeValues(values, this[MERGE_SYMBOL_MERGE]);
 }
 
 function mergeObjects(
@@ -272,6 +308,14 @@ function mergeValues(
 			? actual[0].slice()
 			: {...actual[0]};
 }
+
+// #endregion
+
+// #region Variables
+
+const MERGE_SYMBOL_ASSIGN = Symbol('assign');
+
+const MERGE_SYMBOL_MERGE = Symbol('merge');
 
 // #endregion
 

@@ -4,6 +4,10 @@ import {lowerCase} from '../internal/string/case';
 
 // #region Types
 
+type InternalNormalizer = {
+	[NORMALIZE_SYMBOL]: Required<NormalizeOptions>;
+} & Normalizer;
+
 /**
  * Options for normalizing a string
  */
@@ -42,10 +46,26 @@ export type Normalizer = {
 	 * @param value String to normalize
 	 * @returns Normalized string
 	 */
-	(value: string): string;
+	normalize(value: string): string;
 };
 
 type Options = Required<NormalizeOptions>;
+
+// #endregion
+
+// #region Instances
+
+function Normalizer(this: any, options: Required<NormalizeOptions>) {
+	Object.defineProperty(this, NORMALIZE_SYMBOL, {
+		value: options,
+	});
+}
+
+Object.defineProperties(Normalizer.prototype, {
+	normalize: {
+		value: normalizeString,
+	},
+});
 
 // #endregion
 
@@ -100,9 +120,8 @@ export function deburr(value: string): string {
  * @returns Normalizer function
  */
 export function initializeNormalizer(options?: NormalizeOptions): Normalizer {
-	const normalization = createNormalizeOptions(options);
-
-	return (value: string) => normalizeString(value, normalization);
+	// @ts-expect-error All good, no worries :-)
+	return new Normalizer(createNormalizeOptions(options));
 }
 
 /**
@@ -115,13 +134,18 @@ export function initializeNormalizer(options?: NormalizeOptions): Normalizer {
  * @returns Normalized string
  */
 export function normalize(value: string, options?: NormalizeOptions): string {
-	return normalizeString(value, createNormalizeOptions(options));
+	return normalizeString.call(createNormalizeOptions(options), value);
 }
 
-function normalizeString(value: string, options: Options): string {
+function normalizeString(
+	this: InternalNormalizer | Required<NormalizeOptions>,
+	value: string,
+): string {
 	if (typeof value !== 'string') {
 		return '';
 	}
+
+	const options = NORMALIZE_SYMBOL in this ? this[NORMALIZE_SYMBOL] : this;
 
 	let result = value;
 
@@ -199,6 +223,8 @@ const NORMALIZE_NORMALIZATION_NORMALIZATION = 'NFC';
 const NORMALIZE_SPECIAL_PATTERN = /[\p{P}\p{S}]/gu;
 
 const NORMALIZE_SPECIAL_REPLACEMENT = '';
+
+const NORMALIZE_SYMBOL = Symbol('normalize');
 
 const NORMALIZE_WHITESPACE_PATTERN = /\s+/g;
 

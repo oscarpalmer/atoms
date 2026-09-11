@@ -25,7 +25,7 @@ test('assign', () => {
 
 	const assigner = assign.initialize();
 
-	assigned = assigner(first, [
+	assigned = assigner.assign(first, [
 		{
 			b: {
 				e: 4,
@@ -44,7 +44,7 @@ test('assign', () => {
 
 	expect(assigned).toBe(first);
 
-	assigned = assigner(assigned, []);
+	assigned = assigner.assign(assigned, []);
 
 	expect(assigned).toEqual({
 		a: 1,
@@ -96,7 +96,7 @@ test('merge', () => {
 		replaceableObjects: 'cars',
 	});
 
-	const merged = merger([first, second, third, fourth]);
+	const merged = merger.merge([first, second, third, fourth]);
 
 	expect(merged).toEqual({
 		age: 99,

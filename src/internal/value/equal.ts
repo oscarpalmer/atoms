@@ -1,6 +1,6 @@
 import type {ArrayOrPlainObject, Constructor, PlainObject, TypedArray} from '../../models';
 import {isNonPlainObject, isPlainObject, isPrimitive, isTypedArray} from '../is';
-import {createCompareHandlers} from './handlers';
+import {createCompareHandler} from './handlers';
 
 // #region Types
 
@@ -36,7 +36,7 @@ type Equalizer = {
 	 * @param ignoreCase If `true`, comparison will be case-insensitive
 	 * @returns `true` if the strings are equal, otherwise `false`
 	 */
-	(first: string, second: string, ignoreCase?: boolean): boolean;
+	compare(first: string, second: string, ignoreCase?: boolean): boolean;
 
 	/**
 	 * Are two values equal?
@@ -45,7 +45,7 @@ type Equalizer = {
 	 * @param second Second value
 	 * @returns `true` if the values are equal, otherwise `false`
 	 */
-	(first: unknown, second: unknown): boolean;
+	compare(first: unknown, second: unknown): boolean;
 
 	/**
 	 * Deregister a equality comparison handler for a specific class
@@ -66,6 +66,10 @@ type Equalizer = {
 	) => void;
 };
 
+type InternalEqualizer = {
+	[EQUAL_SYMBOL]: Options;
+} & Equalizer;
+
 type Options = {
 	ignoreCase: boolean;
 	ignoreExpressions: OptionsKeys<RegExp[]>;
@@ -80,7 +84,31 @@ type OptionsKeys<Values> = {
 
 // #endregion
 
+// #region Instances
+
+function Equalizer(this: any, options: Options) {
+	this[EQUAL_SYMBOL] = options;
+}
+
+Object.defineProperties(Equalizer.prototype, {
+	compare: {
+		value: compare,
+	},
+	deregister: {
+		value: deregisterEqualizer,
+	},
+	register: {
+		value: registerEqualizer,
+	},
+});
+
+// #endregion
+
 // #region Functions
+
+function compare(this: InternalEqualizer, first: unknown, second: unknown): boolean {
+	return equalValue(first, second, this[EQUAL_SYMBOL]);
+}
 
 function createEqualOptions(input?: boolean | EqualOptions): Options {
 	const options: Options = {
@@ -135,7 +163,7 @@ function createEqualOptions(input?: boolean | EqualOptions): Options {
  * @param constructor Class constructor
  */
 export function deregisterEqualizer<Instance>(constructor: Constructor<Instance>): void {
-	equal.handlers.deregister(constructor);
+	equalHandler.base.deregister(constructor);
 }
 
 function filterKey(key: string | symbol, options: Options): boolean {
@@ -180,14 +208,6 @@ export function equal(first: unknown, second: unknown, options?: EqualOptions): 
 export function equal(first: unknown, second: unknown, options?: boolean | EqualOptions): boolean {
 	return equalValue(first, second, createEqualOptions(options));
 }
-
-equal.handlers = createCompareHandlers<boolean>(equal, {
-	callback: Object.is,
-});
-
-equal.deregister = deregisterEqualizer;
-equal.initialize = initializeEqualizer;
-equal.register = registerEqualizer;
 
 function equalArray(first: unknown[], second: unknown[], options: Options): boolean {
 	const {length} = first;
@@ -410,7 +430,7 @@ function equalValue(first: unknown, second: unknown, options: Options): boolean 
 			return equalTypedArray(first as TypedArray, second as TypedArray);
 
 		default:
-			return equal.handlers.handle(first, second, options);
+			return equalHandler.handle(first, second, options);
 	}
 }
 
@@ -423,14 +443,8 @@ function equalValue(first: unknown, second: unknown, options: Options): boolean 
  * @returns Equalizer function
  */
 export function initializeEqualizer(options?: EqualOptions): Equalizer {
-	const actual = createEqualOptions(options);
-
-	const equalizer = (first: unknown, second: unknown): boolean => equalValue(first, second, actual);
-
-	equalizer.deregister = deregisterEqualizer;
-	equalizer.register = registerEqualizer;
-
-	return equalizer;
+	// @ts-expect-error All good, no worries :-)
+	return new Equalizer(createEqualOptions(options));
 }
 
 /**
@@ -445,7 +459,7 @@ export function registerEqualizer<Instance>(
 	constructor: Constructor<Instance>,
 	handler: (first: Instance, second: Instance) => boolean,
 ): void {
-	equal.handlers.register(constructor, handler);
+	equalHandler.base.register(constructor, handler);
 }
 
 // #endregion
@@ -461,5 +475,35 @@ const EQUAL_ERROR_PROPERTIES: string[] = ['name', 'message'];
 const EQUAL_EXPRESSION_PROPERTIES: string[] = ['source', 'flags'];
 
 const EQUAL_MINIMUM_LENGTH_FOR_SET = 16;
+
+const EQUAL_SYMBOL = Symbol('equal');
+
+const equalHandler = createCompareHandler<boolean>(equal, {
+	callback: Object.is,
+});
+
+// #endregion
+
+// #region Initialization
+
+equal.deregister = deregisterEqualizer;
+equal.handler = equalHandler;
+equal.initialize = initializeEqualizer;
+equal.register = registerEqualizer;
+
+Object.defineProperties(equal, {
+	deregister: {
+		value: deregisterEqualizer,
+	},
+	handler: {
+		value: equalHandler,
+	},
+	initialize: {
+		value: initializeEqualizer,
+	},
+	register: {
+		value: registerEqualizer,
+	},
+});
 
 // #endregion

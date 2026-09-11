@@ -1,6 +1,7 @@
 import {expect, test} from 'vitest';
-import {delay, once} from '../../src';
+import {asyncOnce, delay, once} from '../../src';
 import {TestFunctionItem} from '../.fixtures/function.fixture';
+import {isFixture} from '../.fixtures/is.fixture';
 
 test('asynchronous: reject', async () => {
 	const errors: unknown[] = [];
@@ -16,12 +17,12 @@ test('asynchronous: reject', async () => {
 			}),
 	);
 
-	void fn().catch(result => {
+	void fn.run().catch(result => {
 		error = result;
 	});
 
 	for (let index = 0; index < 10; index += 1) {
-		void fn().catch(result => {
+		void fn.run().catch(result => {
 			errors.push(result);
 		});
 	}
@@ -34,7 +35,7 @@ test('asynchronous: reject', async () => {
 		expect(errors[index]).toBe(error);
 	}
 
-	void fn().catch(result => {
+	void fn.run().catch(result => {
 		expect(result).toBe(error);
 	});
 
@@ -73,12 +74,12 @@ test('asynchronous: resolve', async () => {
 	expect(fn.error).toBe(false);
 	expect(fn.finished).toBe(false);
 
-	void fn().then(result => {
+	void fn.run().then(result => {
 		value = result;
 	});
 
 	for (let index = 0; index < 10; index += 1) {
-		void fn().then(result => {
+		void fn.run().then(result => {
 			values.push(result);
 		});
 	}
@@ -99,7 +100,7 @@ test('asynchronous: resolve', async () => {
 	}
 
 	for (let index = 0; index < 10; index += 1) {
-		void fn().then(result => {
+		void fn.run().then(result => {
 			expect(result).toBe(value);
 		});
 	}
@@ -112,7 +113,7 @@ test('asynchronous: resolve', async () => {
 	expect(fn.error).toBe(false);
 	expect(fn.finished).toBe(true);
 
-	await expect(() => fn()).rejects.toThrow('Once has been cleared');
+	await expect(() => fn.run()).rejects.toThrow('Once has been cleared');
 
 	expect(value).toBeInstanceOf(TestFunctionItem);
 	expect(values.length).toBe(10);
@@ -128,6 +129,30 @@ test('asynchronous: resolve', async () => {
 	expect(fn.finished).toBe(true);
 
 	expect(() => once.async('not a function' as never)).toThrow('Once expected a function');
+});
+
+test('is', () => {
+	const {length, values} = isFixture;
+
+	for (let index = 0; index < length; index += 1) {
+		expect(once.is(values[index])).toBe(false);
+		expect(once.isAsync(values[index])).toBe(false);
+		expect(asyncOnce.is(values[index])).toBe(false);
+		expect(once.async.is(values[index])).toBe(false);
+	}
+
+	const sync = once(() => {});
+	const async = once.async(() => new Promise<void>(resolve => resolve()));
+
+	expect(once.is(sync)).toBe(true);
+	expect(once.isAsync(sync)).toBe(false);
+	expect(asyncOnce.is(sync)).toBe(false);
+	expect(once.async.is(sync)).toBe(false);
+
+	expect(once.is(async)).toBe(false);
+	expect(once.isAsync(async)).toBe(true);
+	expect(asyncOnce.is(async)).toBe(true);
+	expect(once.async.is(async)).toBe(true);
 });
 
 test('synchronous', () => {
@@ -149,19 +174,19 @@ test('synchronous', () => {
 	expect(fn.called).toBe(false);
 	expect(fn.cleared).toBe(false);
 
-	const first = fn();
+	const first = fn.run();
 
 	expect(count).toBe(1);
 	expect(fn.called).toBe(true);
 	expect(fn.cleared).toBe(false);
 
-	const second = fn();
+	const second = fn.run();
 
 	expect(count).toBe(1);
 	expect(fn.called).toBe(true);
 	expect(fn.cleared).toBe(false);
 
-	const third = fn();
+	const third = fn.run();
 
 	expect(count).toBe(1);
 	expect(fn.called).toBe(true);
@@ -177,7 +202,7 @@ test('synchronous', () => {
 	expect(fn.called).toBe(true);
 	expect(fn.cleared).toBe(true);
 
-	expect(() => fn()).toThrow('Once has been cleared');
+	expect(() => fn.run()).toThrow('Once has been cleared');
 
 	expect(count).toBe(1);
 	expect(fn.called).toBe(true);

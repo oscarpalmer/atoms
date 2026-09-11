@@ -24,27 +24,22 @@ import type {
 // #region Instances
 
 function Color(this: any, value: unknown) {
-	this[COLOR_SYMBOL] = {
-		changes: herald<ColorChanges>({
-			names: [COLOR_TYPE.wildcard, ...COLOR_TYPE.all],
-			property: colorSubscription,
-			onCreate: (event, callback) => onCreateSubscription(this, event, callback),
-		}),
-		values: getColorState(value),
-	} satisfies InternalColorState;
+	Object.defineProperty(this, COLOR_SYMBOL, {
+		value: {
+			changes: herald<ColorChanges>({
+				names: [COLOR_TYPE.wildcard, ...COLOR_TYPE.all],
+				property: colorSubscription,
+				onCreate: (event, callback) => onCreateSubscription(this, event, callback),
+			}),
+			values: getColorState(value),
+		} satisfies InternalColorState,
+	});
 }
 
-Color.prototype[COLOR_PROPERTY] = COLOR_NAME;
-
-Color.prototype.subscribe = subscribeToColor;
-Color.prototype.toHexString = formatHexColor;
-Color.prototype.toHslString = formatHslColor;
-Color.prototype.toHwbString = formatHwbColor;
-Color.prototype.toRgbString = formatRgbColor;
-Color.prototype.toString = formatHexColor;
-Color.prototype.unsubscribe = unsubscribeFromColor;
-
 Object.defineProperties(Color.prototype, {
+	[COLOR_PROPERTY]: {
+		value: COLOR_NAME,
+	},
 	alpha: {
 		enumerable: true,
 		get(): number {
@@ -137,6 +132,27 @@ Object.defineProperties(Color.prototype, {
 		set(value: string) {
 			setRGBColor(this, value, true);
 		},
+	},
+	subscribe: {
+		value: subscribeToColor,
+	},
+	toHexString: {
+		value: formatHexColor,
+	},
+	toHslString: {
+		value: formatHslColor,
+	},
+	toHwbString: {
+		value: formatHwbColor,
+	},
+	toRgbString: {
+		value: formatRgbColor,
+	},
+	toString: {
+		value: formatHexColor,
+	},
+	unsubscribe: {
+		value: unsubscribeFromColor,
 	},
 });
 

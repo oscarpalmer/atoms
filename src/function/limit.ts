@@ -1,10 +1,12 @@
-import {getAsyncTimer, getTimer, TIMER_DEBOUNCE, TIMER_THROTTLE} from '../internal/function/timer';
-import type {
-	AsyncCancelableCallback,
-	CancelableCallback,
-	GenericAsyncCallback,
-	GenericCallback,
-} from '../models';
+import {
+	getAsyncLimiter,
+	getLimiter,
+	LIMITER_DEBOUNCE,
+	LIMITER_THROTTLE,
+	type AsyncLimiter,
+	type Limiter,
+} from '../internal/function/limit';
+import type {GenericAsyncCallback, GenericCallback} from '../models';
 
 // #region Functions
 
@@ -23,8 +25,8 @@ import type {
 export function asyncDebounce<Callback extends GenericAsyncCallback | GenericCallback>(
 	callback: Callback,
 	time?: number,
-): AsyncCancelableCallback<Callback> {
-	return getAsyncTimer(TIMER_DEBOUNCE, callback, time);
+): AsyncLimiter<Callback> {
+	return getAsyncLimiter(LIMITER_DEBOUNCE, callback, time);
 }
 
 /**
@@ -42,8 +44,8 @@ export function asyncDebounce<Callback extends GenericAsyncCallback | GenericCal
 export function asyncThrottle<Callback extends GenericAsyncCallback | GenericCallback>(
 	callback: Callback,
 	time?: number,
-): AsyncCancelableCallback<Callback> {
-	return getAsyncTimer(TIMER_THROTTLE, callback, time);
+): AsyncLimiter<Callback> {
+	return getAsyncLimiter(LIMITER_THROTTLE, callback, time);
 }
 
 /**
@@ -58,8 +60,8 @@ export function asyncThrottle<Callback extends GenericAsyncCallback | GenericCal
 export function debounce<Callback extends GenericCallback>(
 	callback: Callback,
 	time?: number,
-): CancelableCallback<Callback> {
-	return getTimer(TIMER_DEBOUNCE, callback, time);
+): Limiter<Callback> {
+	return getLimiter(LIMITER_DEBOUNCE, callback, time);
 }
 
 /**
@@ -72,8 +74,8 @@ export function debounce<Callback extends GenericCallback>(
 export function throttle<Callback extends GenericCallback>(
 	callback: Callback,
 	time?: number,
-): CancelableCallback<Callback> {
-	return getTimer(TIMER_THROTTLE, callback, time);
+): Limiter<Callback> {
+	return getLimiter(LIMITER_THROTTLE, callback, time);
 }
 
 // #endregion
@@ -90,5 +92,11 @@ Object.defineProperty(debounce, 'async', {
 Object.defineProperty(throttle, 'async', {
 	value: asyncThrottle,
 });
+
+// #endregion
+
+// #region Exports
+
+export type {AsyncLimiter, Limiter};
 
 // #endregion

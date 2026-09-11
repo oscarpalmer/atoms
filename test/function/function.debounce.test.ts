@@ -31,7 +31,8 @@ test('asynchronous', () =>
 		}, 25);
 
 		for (let index = 0; index < 100; index += 1) {
-			void first()
+			void first
+				.run()
 				.then(() => {
 					result.first.succeeded += 1;
 				})
@@ -53,7 +54,8 @@ test('asynchronous', () =>
 		);
 
 		for (let index = 0; index < 100; index += 1) {
-			void second()
+			void second
+				.run()
 				.then(() => {
 					result.second.succeeded += 1;
 				})
@@ -66,7 +68,8 @@ test('asynchronous', () =>
 			result.third.count += 1;
 		}, 25);
 
-		third()
+		third
+			.run()
 			.then(() => {
 				result.third.succeeded += 1;
 			})
@@ -80,7 +83,8 @@ test('asynchronous', () =>
 			throw new Error('Error for debounce.async');
 		}, 25);
 
-		fourth()
+		fourth
+			.run()
 			.then(() => {
 				result.fourth.succeeded += 1;
 			})
@@ -130,10 +134,10 @@ test('synchronous', () =>
 
 		debounce(() => {
 			diff = performance.now() - start;
-		}, 160)();
+		}, 160).run();
 
 		for (let index = 0; index < 100; index += 1) {
-			debounced();
+			debounced.run();
 		}
 
 		const defaultedInvalid = debounce(() => {
@@ -144,8 +148,8 @@ test('synchronous', () =>
 			defaulted.zero = (performance.now() - start) as never;
 		}, 0);
 
-		defaultedInvalid();
-		defaultedZero();
+		defaultedInvalid.run();
+		defaultedZero.run();
 
 		setTimeout(() => {
 			expect(defaulted.invalid).toBeGreaterThan(0);
@@ -156,7 +160,7 @@ test('synchronous', () =>
 
 			expect(value).toBe(1);
 
-			debounced();
+			debounced.run();
 
 			debounced.cancel();
 

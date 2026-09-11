@@ -1,7 +1,7 @@
 import type {Constructor} from '../../models';
 import {max} from '../math/aggregate';
 import {getString, words} from '../string/misc';
-import {createCompareHandlers} from './handlers';
+import {createCompareHandler} from './handlers';
 
 // #region Types
 
@@ -107,7 +107,7 @@ function compareValue(
 		return compareNumbers(first.getTime(), second.getTime());
 	}
 
-	return compare.handlers.handle(first, second, compareStrings);
+	return compare.handler.handle(first, second, compareStrings);
 }
 
 /**
@@ -118,7 +118,7 @@ function compareValue(
  * @param constructor Class constructor
  */
 export function deregisterComparator<Instance>(constructor: Constructor<Instance>): void {
-	compare.handlers.deregister(constructor);
+	compare.handler.base.deregister(constructor);
 }
 
 function getComparisonParts(value: unknown): unknown[] {
@@ -141,7 +141,7 @@ export function registerComparator<Instance>(
 	constructor: Constructor<Instance>,
 	handler?: string | Comparator<Instance>,
 ): void {
-	compare.handlers.register(constructor, handler);
+	compare.handler.base.register(constructor, handler);
 }
 
 // #endregion
@@ -155,7 +155,7 @@ const comparators: Record<string, Comparator> = {
 	symbol: compareSymbols,
 };
 
-const compareHandlers = createCompareHandlers<number>(compare, {
+const compareHandler = createCompareHandler<number>(compare, {
 	callback: (first: unknown, second: unknown, compareStrings: boolean): unknown =>
 		compareStrings ? getString(first).localeCompare(getString(second)) : undefined,
 	method: COMPARE_NAME,
@@ -166,15 +166,15 @@ const compareHandlers = createCompareHandlers<number>(compare, {
 // #region Initialization
 
 compare.deregister = deregisterComparator;
-compare.handlers = compareHandlers;
+compare.handler = compareHandler;
 compare.register = registerComparator;
 
 Object.defineProperties(compare, {
 	deregister: {
 		value: deregisterComparator,
 	},
-	handlers: {
-		value: compareHandlers,
+	handler: {
+		value: compareHandler,
 	},
 	register: {
 		value: registerComparator,

@@ -2,6 +2,12 @@ import {isPlainObject} from '../internal/is';
 import {compare} from '../internal/value/compare';
 import type {PlainObject, Primitive} from '../models';
 
+// #region Special variables
+
+const SORTER_PROPERTY = '$sorter';
+
+// #endregion
+
 // #region Types
 
 /**
@@ -92,16 +98,7 @@ type CompareCallbackValue<Item> = Item extends Primitive ? Item : unknown;
 type ComparisonSorter<Item> = (first: Item, second: Item) => number;
 
 type InternalSorter = {
-	compare?: InternalSorterCompare;
-	get: boolean;
-	identifier: string;
-	modifier: number;
-	value?: Function;
-};
-
-type InternalSorterCompare = {
-	complex?: Function;
-	simple?: Function;
+	[SORTER_SYMBOL]: SortHandler[];
 };
 
 /**
@@ -109,20 +106,25 @@ type InternalSorterCompare = {
  */
 export type SortDirection = 'ascending' | 'descending';
 
+type SortHandler = {
+	comparison?: SortHandlerComparison;
+	get: boolean;
+	identifier: string;
+	modifier: number;
+	value?: Function;
+};
+
+type SortHandlerComparison = {
+	complex?: Function;
+	simple?: Function;
+};
+
 /**
  * Sorter for an array with predefined sorters
  *
  * Can be used to sort an array, get the predicted index for an item, and check if an array is sorted
  */
 export type Sorter<Item> = {
-	/**
-	 * Sort an array of items
-	 *
-	 * @param array Array to sort
-	 * @returns Sorted array
-	 */
-	(array: Item[]): Item[];
-
 	/**
 	 * Get the index for an item _(to be inserted into an array of items)_
 	 *
@@ -141,16 +143,49 @@ export type Sorter<Item> = {
 	 * @returns `true` if sorted, otherwise `false`
 	 */
 	is(array: Item[]): boolean;
+
+	/**
+	 * Sort an array of items
+	 *
+	 * @param array Array to sort
+	 * @returns Sorted array
+	 */
+	sort(array: Item[]): Item[];
 };
+
+// #endregion
+
+// #region Instances
+
+function Sorter(this: any, sorters: SortHandler[]) {
+	Object.defineProperty(this, SORTER_SYMBOL, {
+		value: sorters,
+	});
+}
+
+Object.defineProperties(Sorter.prototype, {
+	[SORTER_PROPERTY]: {
+		value: true,
+	},
+	index: {
+		value: getSortedArrayIndex,
+	},
+	is: {
+		value: isSortedArray,
+	},
+	sort: {
+		value: sortArray,
+	},
+});
 
 // #endregion
 
 // #region Functions
 
-function getComparisonSorter(callback: Function, modifier: number): InternalSorter {
+function getComparisonSorter(callback: Function, modifier: number): SortHandler {
 	return {
 		modifier,
-		compare: {
+		comparison: {
 			simple: callback,
 		},
 		get: false,
@@ -161,7 +196,7 @@ function getComparisonSorter(callback: Function, modifier: number): InternalSort
 function getComparisonValue(
 	first: unknown,
 	second: unknown,
-	sorters: InternalSorter[],
+	sorters: SortHandler[],
 	length: number,
 ): number {
 	for (let index = 0; index < length; index += 1) {
@@ -173,8 +208,8 @@ function getComparisonValue(
 		];
 
 		const comparison =
-			(sorter.compare?.complex?.(first, values[0], second, values[1]) ??
-				sorter.compare?.simple?.(values[0], values[1]) ??
+			(sorter.comparison?.complex?.(first, values[0], second, values[1]) ??
+				sorter.comparison?.simple?.(values[0], values[1]) ??
 				compare(values[0], values[1])) * sorter.modifier;
 
 		if (comparison !== 0) {
@@ -185,7 +220,42 @@ function getComparisonValue(
 	return 0;
 }
 
-function getIndex(array: unknown[], item: unknown, sorters: InternalSorter[]): number {
+function getModifier(first: unknown, second: unknown): number {
+	const direction =
+		first === true || second === true ? SORT_DIRECTION_DESCENDING : SORT_DIRECTION_ASCENDING;
+
+	return modifiers[direction];
+}
+
+function getObjectSorter(obj: PlainObject, modifier: number): SortHandler | undefined {
+	let sorter: SortHandler | undefined;
+
+	if (typeof obj.comparison === 'function') {
+		sorter = getComparisonSorter(obj.comparison, modifier);
+	} else if (typeof obj.key === 'string') {
+		sorter = getValueSortHandlers(obj.key, modifier);
+
+		if (typeof obj.compare === 'function') {
+			sorter.comparison = {
+				complex: obj.compare,
+			};
+		}
+	} else if (typeof obj.value === 'function') {
+		sorter = getValueSortHandlers(obj.value, modifier);
+	}
+
+	if (sorter != null && typeof obj.direction === 'string') {
+		sorter.modifier = modifiers[obj.direction as SortDirection] ?? modifier;
+	}
+
+	return sorter;
+}
+
+function getSortedArrayIndex(
+	this: InternalSorter | SortHandler[],
+	array: unknown[],
+	item: unknown,
+): number {
 	if (!Array.isArray(array)) {
 		return -1;
 	}
@@ -195,6 +265,8 @@ function getIndex(array: unknown[], item: unknown, sorters: InternalSorter[]): n
 	if (length === 0) {
 		return 0;
 	}
+
+	const sorters = Array.isArray(this) ? this : this[SORTER_SYMBOL];
 
 	const sortersLength = sorters.length;
 
@@ -220,37 +292,6 @@ function getIndex(array: unknown[], item: unknown, sorters: InternalSorter[]): n
 	}
 
 	return low;
-}
-
-function getModifier(first: unknown, second: unknown): number {
-	const direction =
-		first === true || second === true ? SORT_DIRECTION_DESCENDING : SORT_DIRECTION_ASCENDING;
-
-	return modifiers[direction];
-}
-
-function getObjectSorter(obj: PlainObject, modifier: number): InternalSorter | undefined {
-	let sorter: InternalSorter | undefined;
-
-	if (typeof obj.comparison === 'function') {
-		sorter = getComparisonSorter(obj.comparison, modifier);
-	} else if (typeof obj.key === 'string') {
-		sorter = getValueSorter(obj.key, modifier);
-
-		if (typeof obj.compare === 'function') {
-			sorter.compare = {
-				complex: obj.compare,
-			};
-		}
-	} else if (typeof obj.value === 'function') {
-		sorter = getValueSorter(obj.value, modifier);
-	}
-
-	if (sorter != null && typeof obj.direction === 'string') {
-		sorter.modifier = modifiers[obj.direction as SortDirection] ?? modifier;
-	}
-
-	return sorter;
 }
 
 /**
@@ -313,35 +354,37 @@ export function getSortedIndex(
 	first?: unknown,
 	second?: unknown,
 ): number {
-	return getIndex(array, item, getSorters(first, getModifier(first, second)));
+	return getSortedArrayIndex.call(getSortHandlers(first, getModifier(first, second)), array, item);
 }
 
-function getSorter(value: unknown, modifier: number): InternalSorter | undefined {
+function getSortHandler(value: unknown, modifier: number): SortHandler | undefined {
 	switch (true) {
 		case typeof value === 'function':
 			return getComparisonSorter(value, modifier);
 
 		case typeof value === 'string':
-			return getValueSorter(value, modifier);
+			return getValueSortHandlers(value, modifier);
 
 		case isPlainObject(value):
 			return getObjectSorter(value, modifier);
 
-		default:
+		case true:
 			break;
 	}
+
+	return undefined;
 }
 
-function getSorters(value: unknown, modifier: number): InternalSorter[] {
+function getSortHandlers(value: unknown, modifier: number): SortHandler[] {
 	const array = Array.isArray(value) ? value : [value];
 	const {length} = array;
 
-	const sorters: InternalSorter[] = [];
+	const sorters: SortHandler[] = [];
 
 	for (let index = 0; index < length; index += 1) {
 		const item = array[index];
 
-		const sorter = getSorter(item, modifier);
+		const sorter = getSortHandler(item, modifier);
 
 		if (sorter != null) {
 			sorters.push(sorter);
@@ -364,7 +407,7 @@ function getSorters(value: unknown, modifier: number): InternalSorter[] {
 	);
 }
 
-function getValueSorter(value: string | Function, modifier: number): InternalSorter {
+function getValueSortHandlers(value: string | Function, modifier: number): SortHandler {
 	const isFunction = typeof value === 'function';
 
 	return {
@@ -414,20 +457,8 @@ export function initializeSorter<Item>(
 export function initializeSorter<Item>(descending?: boolean): Sorter<Item>;
 
 export function initializeSorter(first?: unknown, second?: unknown): Sorter<unknown> {
-	const sorters = getSorters(first, getModifier(first, second));
-
-	const sorter = (array: unknown[]) => sortArray(array, sorters);
-
-	Object.defineProperties(sorter, {
-		index: {
-			value: (array: never, item: never) => getIndex(array, item, sorters),
-		},
-		is: {
-			value: (array: never) => isSortedArray(array, sorters),
-		},
-	});
-
-	return sorter as unknown as Sorter<unknown>;
+	// @ts-expect-error All good, no worries :-)
+	return new Sorter(getSortHandlers(first, getModifier(first, second)));
 }
 
 /**
@@ -474,10 +505,10 @@ export function isSorted<Item>(
 export function isSorted<Item>(array: Item[], descending?: boolean): boolean;
 
 export function isSorted(array: unknown[], first?: unknown, second?: unknown): boolean {
-	return isSortedArray(array, getSorters(first, getModifier(first, second)));
+	return isSortedArray.call(getSortHandlers(first, getModifier(first, second)), array);
 }
 
-function isSortedArray(array: unknown[], sorters: InternalSorter[]): boolean {
+function isSortedArray(this: InternalSorter | SortHandler[], array: unknown[]): boolean {
 	if (!Array.isArray(array)) {
 		return false;
 	}
@@ -487,6 +518,8 @@ function isSortedArray(array: unknown[], sorters: InternalSorter[]): boolean {
 	if (length < 2) {
 		return true;
 	}
+
+	const sorters = Array.isArray(this) ? this : this[SORTER_SYMBOL];
 
 	const sortersLength = sorters.length;
 
@@ -583,14 +616,15 @@ export function sort<Item>(array: Item[], sorter: ArraySorter<Item>, descending?
 export function sort<Item>(array: Item[], descending?: boolean): Item[];
 
 export function sort(array: unknown[], first?: unknown, second?: unknown): unknown[] {
-	return sortArray(array, getSorters(first, getModifier(first, second)));
+	return sortArray.call(getSortHandlers(first, getModifier(first, second)), array);
 }
 
-function sortArray(array: unknown[], sorters: InternalSorter[]): unknown[] {
+function sortArray(this: InternalSorter | SortHandler[], array: unknown[]): unknown[] {
 	if (!Array.isArray(array)) {
 		return [];
 	}
 
+	const sorters = Array.isArray(this) ? this : this[SORTER_SYMBOL];
 	const {length} = sorters;
 
 	return array.length > 1
@@ -609,6 +643,8 @@ const SORT_THRESHOLD = 100;
 export const SORT_DIRECTION_ASCENDING: SortDirection = 'ascending';
 
 export const SORT_DIRECTION_DESCENDING: SortDirection = 'descending';
+
+const SORTER_SYMBOL = Symbol(SORTER_PROPERTY);
 
 const modifiers: Record<SortDirection, number> = {
 	[SORT_DIRECTION_ASCENDING]: 1,

@@ -305,34 +305,36 @@ type Tail<Values extends any[]> = Values extends [infer _, ...infer Rest] ? Rest
 // #region Instances
 
 function KeyedQueue(this: any, callback: GenericAsyncCallback, options: Required<QueueOptions>) {
-	this[QUEUE_SYMBOL] = {
-		callback,
-		options: createQueueOptions(options),
-		queues: new Map(),
-	} satisfies KeyedQueueState;
+	Object.defineProperty(this, QUEUE_SYMBOL, {
+		value: {
+			callback,
+			options: createQueueOptions(options),
+			queues: new Map(),
+		} satisfies KeyedQueueState,
+	});
 }
 
-KeyedQueue.prototype[QUEUE_PROPERTY] = QUEUE_NAME_KEYED;
-
-KeyedQueue.prototype.add = addKeyedQueue;
-KeyedQueue.prototype.clear = clearQueues;
-KeyedQueue.prototype.get = getQueue;
-KeyedQueue.prototype.pause = pauseQueues;
-KeyedQueue.prototype.remove = removeQueue;
-KeyedQueue.prototype.resume = resumeQueues;
-
 Object.defineProperties(KeyedQueue.prototype, {
+	[QUEUE_PROPERTY]: {
+		value: QUEUE_NAME_KEYED,
+	},
 	active: {
 		enumerable: true,
 		get(): string[] {
 			return getStatus((this as InternalKeyedQueue)[QUEUE_SYMBOL], QUEUE_STATUS_ACTIVE);
 		},
 	},
+	add: {
+		value: addKeyedQueue,
+	},
 	autostart: {
 		enumerable: true,
 		get(): boolean {
 			return (this as InternalKeyedQueue)[QUEUE_SYMBOL].options.autostart;
 		},
+	},
+	clear: {
+		value: clearQueues,
 	},
 	concurrency: {
 		enumerable: true,
@@ -352,6 +354,9 @@ Object.defineProperties(KeyedQueue.prototype, {
 			return getStatus((this as InternalKeyedQueue)[QUEUE_SYMBOL], QUEUE_STATUS_FULL);
 		},
 	},
+	get: {
+		value: getQueue,
+	},
 	items: {
 		enumerable: true,
 		get(): Record<string, number> {
@@ -370,6 +375,9 @@ Object.defineProperties(KeyedQueue.prototype, {
 			return (this as InternalKeyedQueue)[QUEUE_SYMBOL].options.maximum;
 		},
 	},
+	pause: {
+		value: pauseQueues,
+	},
 	paused: {
 		enumerable: true,
 		get(): string[] {
@@ -382,6 +390,12 @@ Object.defineProperties(KeyedQueue.prototype, {
 			return (this as InternalKeyedQueue)[QUEUE_SYMBOL].queues.size;
 		},
 	},
+	remove: {
+		value: removeQueue,
+	},
+	resume: {
+		value: resumeQueues,
+	},
 });
 
 function Queue(
@@ -390,38 +404,41 @@ function Queue(
 	options: Required<QueueOptions>,
 	key?: string,
 ) {
-	this[QUEUE_SYMBOL] = {
-		callback,
-		key,
-		options,
-		handled: [],
-		id: 0,
-		items: [],
-		paused: !options.autostart,
-		runners: 0,
-	} satisfies QueueState;
+	Object.defineProperty(this, QUEUE_SYMBOL, {
+		value: {
+			callback,
+			key,
+			options,
+			handled: [],
+			id: 0,
+			items: [],
+			paused: !options.autostart,
+			runners: 0,
+		} satisfies QueueState,
+	});
 }
 
-Queue.prototype[QUEUE_PROPERTY] = QUEUE_NAME_QUEUE;
-
-Queue.prototype.add = addToQueue;
-Queue.prototype.clear = clearQueue;
-Queue.prototype.pause = pauseQueue;
-Queue.prototype.remove = removeQueued;
-Queue.prototype.resume = resumeQueue;
-
 Object.defineProperties(Queue.prototype, {
+	[QUEUE_PROPERTY]: {
+		value: QUEUE_NAME_QUEUE,
+	},
 	active: {
 		enumerable: true,
 		get(): boolean {
 			return (this as InternalQueue)[QUEUE_SYMBOL].runners > 0;
 		},
 	},
+	add: {
+		value: addToQueue,
+	},
 	autostart: {
 		enumerable: true,
 		get(): boolean {
 			return (this as InternalQueue)[QUEUE_SYMBOL].options.autostart;
 		},
+	},
+	clear: {
+		value: clearQueue,
 	},
 	concurrency: {
 		enumerable: true,
@@ -449,11 +466,20 @@ Object.defineProperties(Queue.prototype, {
 			return (this as InternalQueue)[QUEUE_SYMBOL].options.maximum;
 		},
 	},
+	pause: {
+		value: pauseQueue,
+	},
 	paused: {
 		enumerable: true,
 		get(): boolean {
 			return (this as InternalQueue)[QUEUE_SYMBOL].paused;
 		},
+	},
+	remove: {
+		value: removeQueued,
+	},
+	resume: {
+		value: resumeQueue,
 	},
 	size: {
 		enumerable: true,

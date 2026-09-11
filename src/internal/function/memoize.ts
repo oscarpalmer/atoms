@@ -109,11 +109,13 @@ type Options = {
 // #region Instances
 
 function Memoized(this: any, callback: GenericCallback, options: Options) {
-	this[MEMOIZED_SYMBOL] = {
-		options,
-		cache: new SizedMap(options.cacheSize),
-		getter: undefined as never,
-	} satisfies MemoizedState;
+	Object.defineProperty(this, MEMOIZED_SYMBOL, {
+		value: {
+			options,
+			cache: new SizedMap(options.cacheSize),
+			getter: undefined as never,
+		} satisfies MemoizedState,
+	});
 
 	this[MEMOIZED_SYMBOL].getter = createGetter(this[MEMOIZED_SYMBOL], callback);
 
@@ -129,14 +131,26 @@ function Memoized(this: any, callback: GenericCallback, options: Options) {
 	});
 }
 
-Memoized.prototype[MEMOIZED_PROPERTY] = true;
-
-Memoized.prototype.clear = clearMemoized;
-Memoized.prototype.delete = deleteMemoizedValue;
-Memoized.prototype.get = getMemoizedValue;
-Memoized.prototype.has = hasMemoizedValue;
-Memoized.prototype.has = hasMemoizedValue;
-Memoized.prototype.run = runMemoized;
+Object.defineProperties(Memoized.prototype, {
+	[MEMOIZED_PROPERTY]: {
+		value: true,
+	},
+	clear: {
+		value: clearMemoized,
+	},
+	delete: {
+		value: deleteMemoizedValue,
+	},
+	get: {
+		value: getMemoizedValue,
+	},
+	has: {
+		value: hasMemoizedValue,
+	},
+	run: {
+		value: runMemoized,
+	},
+});
 
 // #endregion
 

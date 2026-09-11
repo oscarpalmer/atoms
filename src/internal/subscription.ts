@@ -156,7 +156,9 @@ function Subscription(
 	property: SubscriptionProperty,
 	parameters: SubscriptionParameters,
 ) {
-	this[SUBSCRIPTION_SYMBOL] = state;
+	Object.defineProperty(this, SUBSCRIPTION_SYMBOL, {
+		value: state,
+	});
 
 	state.aborter = createAborter(parameters.signal, () =>
 		this.unsubscribe(subscriptions, this, state),
@@ -175,22 +177,33 @@ function Subscription(
 	addSubscription(this);
 }
 
-Subscription.prototype[SUBSCRIPTION_PROPERTY] = SUBSCRIPTION_NAME;
-
-Subscription.prototype.unsubscribe = removeSubscription;
+Object.defineProperties(Subscription.prototype, {
+	[SUBSCRIPTION_PROPERTY]: {
+		value: SUBSCRIPTION_NAME,
+	},
+	unsubscribe: {
+		value: removeSubscription,
+	},
+});
 
 function Subscriptions(this: any, parameters?: SubscriptionsParameters) {
 	const {keys, property} = createSubscriptionsParameters(parameters);
 
-	this[SUBSCRIPTION_SYMBOL] = createSubscriptionsState(property, keys);
+	Object.defineProperty(this, SUBSCRIPTION_SYMBOL, {
+		value: createSubscriptionsState(property, keys),
+	});
 }
 
-Subscriptions.prototype[SUBSCRIPTION_PROPERTY] = SUBSCRIPTION_STORE;
-
-Subscriptions.prototype.clear = clearSubscriptions;
-Subscriptions.prototype.create = createSubscription;
-
 Object.defineProperties(Subscriptions.prototype, {
+	[SUBSCRIPTION_PROPERTY]: {
+		value: SUBSCRIPTION_STORE,
+	},
+	clear: {
+		value: clearSubscriptions,
+	},
+	create: {
+		value: createSubscription,
+	},
 	items: {
 		enumerable: true,
 		get(): SubscriptionsItems {

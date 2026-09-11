@@ -141,11 +141,13 @@ Object.defineProperties(Lumberjack.prototype, {
 });
 
 function TimeLogger(this: any, label: string) {
-	this[LOGGER_SYMBOL] = {
-		label,
-		started: enabled,
-		stopped: false,
-	};
+	Object.defineProperty(this, LOGGER_SYMBOL, {
+		value: {
+			label,
+			started: enabled,
+			stopped: false,
+		},
+	});
 
 	this[LOGGER_SYMBOL].isActive = (): boolean => {
 		return this[LOGGER_SYMBOL].started && !this[LOGGER_SYMBOL].stopped && enabled;

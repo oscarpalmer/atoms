@@ -106,24 +106,36 @@ function Events(this: any, herald: InternalHerald, state: HeraldState) {
 Events.prototype[HERALD_PROPERTY] = HERALD_NAME_EVENTS;
 
 function Herald(this: any, state: HeraldState) {
-	this[HERALD_SYMBOL] = {
-		state,
-		// @ts-expect-error All good, no worries :-)
-		events: new Events(this, state),
-	};
+	Object.defineProperty(this, HERALD_SYMBOL, {
+		value: {
+			state,
+			// @ts-expect-error All good, no worries :-)
+			events: new Events(this, state),
+		},
+	});
 }
 
-Herald.prototype[HERALD_PROPERTY] = HERALD_NAME_HERALD;
-
-Herald.prototype.clear = clearHerald;
-Herald.prototype.emit = emitForHerald;
-Herald.prototype.observed = eventIsObserved;
-Herald.prototype.subscribe = subscribeToHerald;
-
-Object.defineProperty(Herald.prototype, 'events', {
-	enumerable: true,
-	get(): HeraldEvents<Record<string, GenericCallback>> {
-		return (this as InternalHerald)[HERALD_SYMBOL].events;
+Object.defineProperties(Herald.prototype, {
+	[HERALD_PROPERTY]: {
+		value: HERALD_NAME_HERALD,
+	},
+	clear: {
+		value: clearHerald,
+	},
+	emit: {
+		value: emitForHerald,
+	},
+	events: {
+		enumerable: true,
+		get(): HeraldEvents<Record<string, GenericCallback>> {
+			return (this as InternalHerald)[HERALD_SYMBOL].events;
+		},
+	},
+	observed: {
+		value: eventIsObserved,
+	},
+	subscribe: {
+		value: subscribeToHerald,
 	},
 });
 
