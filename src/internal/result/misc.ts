@@ -41,6 +41,8 @@ export function getError<E>(value: E, original?: Error): Err<E> | ExtendedErr<E>
 /**
  * Is the _Result_ an extended error?
  *
+ * _Available as `isError` and `error.is`_
+ *
  * @param result _Result_ to check
  * @returns `true` if the _Result_ is an extended error, otherwise `false`
  */
@@ -52,6 +54,8 @@ export function isError<Value, E = Error>(
 /**
  * Is the _Result_ an error?
  *
+ * _Available as `isError` and `error.is`_
+ *
  * @param result _Result_ to check
  * @returns `true` if the _Result_ is an error, otherwise `false`
  */
@@ -59,6 +63,8 @@ export function isError<Value, E = Error>(result: Result<Value, E>): result is E
 
 /**
  * Is the value an error?
+ *
+ * _Available as `isError` and `error.is`_
  *
  * @param value Value to check
  * @returns `true` if the value is an error, otherwise `false`
@@ -78,6 +84,8 @@ export function isError(
 /**
  * Is the _Result_ ok?
  *
+ * _Available as `isOk` and `ok.is`_
+ *
  * @param value _Result_ to check
  * @returns `true` if the _Result_ is ok, otherwise `false`
  */
@@ -85,6 +93,8 @@ export function isOk<Value, E = Error>(value: Result<Value, E>): value is Ok<Val
 
 /**
  * Is the value ok?
+ *
+ * _Available as `isOk` and `ok.is`_
  *
  * @param value Value to check
  * @returns `true` if the value is ok, otherwise `false`
@@ -158,5 +168,20 @@ export function unwrap(value: unknown, defaultValue: unknown): unknown {
 const RESULT_PROPERTY_ERROR = 'error';
 
 const RESULT_PROPERTY_VALUE = 'value';
+
+// #endregion
+
+// #region Initialization
+
+error.is = isError;
+ok.is = isOk;
+
+Object.defineProperty(error, 'is', {
+	value: isError,
+});
+
+Object.defineProperty(ok, 'is', {
+	value: isOk,
+});
 
 // #endregion

@@ -1,6 +1,7 @@
 import {expect, test} from 'vitest';
-import {fuzzy, fuzzyMatch} from '../../src';
+import {fuzzy, fuzzyMatch, isFuzzy} from '../../src';
 import {arrayFixture} from '../.fixtures/array.fixture';
+import {isFixture} from '../.fixtures/is.fixture';
 
 const {complex, people} = arrayFixture;
 
@@ -171,6 +172,16 @@ test('complex', () => {
 		exact: [people.alice, people.aliceAgain],
 		similar: [],
 	});
+});
+
+test('is', () => {
+	const {length, values} = isFixture;
+
+	for (let index = 0; index < length; index += 1) {
+		expect(isFuzzy(values[index])).toBe(false);
+	}
+
+	expect(fuzzy.is(fuzzy(greek))).toBe(true);
 });
 
 test('match', () => {

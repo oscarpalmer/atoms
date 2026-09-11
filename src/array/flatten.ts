@@ -14,7 +14,9 @@ import type {NestedArray} from '../models';
  * ```
  */
 export function flatten<Item>(array: Item[]): Array<NestedArray<Item>> {
-	return (Array.isArray(array) ? array.flat(Number.POSITIVE_INFINITY) : []) as Array<NestedArray<Item>>;
+	return (Array.isArray(array) ? array.flat(Number.POSITIVE_INFINITY) : []) as Array<
+		NestedArray<Item>
+	>;
 }
 
 // #endregion

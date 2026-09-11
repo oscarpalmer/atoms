@@ -1,3 +1,5 @@
+import {SUBSCRIPTION_NAME} from '../internal/subscription';
+import type {SubscriptionProperty} from '../subscription';
 import type {
 	Alpha,
 	ColorTypeExtended,
@@ -93,9 +95,11 @@ export const COLOR_MAX = {
 	percent: 100,
 };
 
-export const COLOR_PROPERTY = {
-	name: '$color',
-};
+export const COLOR_NAME = 'color';
+
+export const COLOR_PROPERTY = '$color';
+
+export const COLOR_SYMBOL = Symbol(COLOR_PROPERTY);
 
 export const COLOR_TYPE: ColorTypes = {
 	all: undefined as unknown as Set<'alpha' | ColorTypeExtended>,
@@ -133,6 +137,11 @@ export const COLOR_SRGB = {
 	luminanceOffset: 0.055,
 	luminanceRed: 0.2126,
 	luminanceThreshold: 0.625,
+};
+
+export const colorSubscription: SubscriptionProperty = {
+	key: COLOR_PROPERTY,
+	value: SUBSCRIPTION_NAME,
 };
 
 // #endregion

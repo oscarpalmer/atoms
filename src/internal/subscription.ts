@@ -2,7 +2,25 @@ import type {Key} from '../models';
 import {createAborter, type Aborter} from './abort';
 import {isKey, isPlainObject} from './is';
 
+// #region Special variables
+
+export const SUBSCRIPTION_NAME = 'subscription';
+
+const SUBSCRIPTION_PROPERTY = '$subscription';
+
+const SUBSCRIPTION_STORE = 'subscriptions';
+
+// #endregion
+
 // #region Types
+
+type InternalSubscription = {
+	[SUBSCRIPTION_SYMBOL]: SubscriptionState;
+} & Subscription;
+
+type InternalSubscriptions = {
+	[SUBSCRIPTION_SYMBOL]: SubscriptionsState;
+} & Subscriptions;
 
 export type Subscription = {
 	/**
@@ -56,6 +74,7 @@ type SubscriptionState = {
 	aborter?: Aborter;
 	active: boolean;
 	parameters: SubscriptionParameters;
+	subscriptions: SubscriptionsState;
 };
 
 export type Subscriptions<Value = unknown> = {
@@ -108,6 +127,7 @@ export type SubscriptionsParameters = {
 type SubscriptionsState = {
 	items: SubscriptionsItems;
 	keys: boolean | Set<Key>;
+	property: SubscriptionProperty;
 	values: SubscriptionsValues;
 };
 
@@ -128,20 +148,77 @@ type SubscriptionsValuesItem<MapKey, MapValue> = {
 
 // #endregion
 
+// #region Instances
+
+function Subscription(
+	this: any,
+	state: SubscriptionState,
+	property: SubscriptionProperty,
+	parameters: SubscriptionParameters,
+) {
+	this[SUBSCRIPTION_SYMBOL] = state;
+
+	state.aborter = createAborter(parameters.signal, () =>
+		this.unsubscribe(subscriptions, this, state),
+	);
+
+	Object.defineProperties(this, {
+		[property.key]: {
+			value: property.value,
+		},
+		active: {
+			enumerable: true,
+			get: () => (state.parameters?.isActive?.() ?? true) && state.active,
+		},
+	});
+
+	addSubscription(this);
+}
+
+Subscription.prototype[SUBSCRIPTION_PROPERTY] = SUBSCRIPTION_NAME;
+
+Subscription.prototype.unsubscribe = removeSubscription;
+
+function Subscriptions(this: any, parameters?: SubscriptionsParameters) {
+	const {keys, property} = createSubscriptionsParameters(parameters);
+
+	this[SUBSCRIPTION_SYMBOL] = createSubscriptionsState(property, keys);
+}
+
+Subscriptions.prototype[SUBSCRIPTION_PROPERTY] = SUBSCRIPTION_STORE;
+
+Subscriptions.prototype.clear = clearSubscriptions;
+Subscriptions.prototype.create = createSubscription;
+
+Object.defineProperties(Subscriptions.prototype, {
+	items: {
+		enumerable: true,
+		get(): SubscriptionsItems {
+			return (this as InternalSubscriptions)[SUBSCRIPTION_SYMBOL].items;
+		},
+	},
+	values: {
+		enumerable: true,
+		get(): SubscriptionsValues {
+			return (this as InternalSubscriptions)[SUBSCRIPTION_SYMBOL].values;
+		},
+	},
+});
+
+// #endregion
+
 // #region Functions
 
-function addSubscription(
-	subscriptions: SubscriptionsState,
-	subscription: Subscription,
-	state: SubscriptionState,
-): void {
-	const {items, values} = subscriptions;
+function addSubscription(instance: InternalSubscription): void {
+	const state = instance[SUBSCRIPTION_SYMBOL];
+
 	const {key, value} = state.parameters;
+	const {items, values} = state.subscriptions;
 
 	if (!isKey(key)) {
-		items.any.add(subscription);
-		values.from.any.set(value, subscription);
-		values.to.any.set(subscription, value);
+		items.any.add(instance);
+		values.from.any.set(value, instance);
+		values.to.any.set(instance, value);
 
 		return;
 	}
@@ -161,7 +238,7 @@ function addSubscription(
 		items.keyed.set(key, keyedItems);
 	}
 
-	keyedItems.add(subscription);
+	keyedItems.add(instance);
 
 	let keyedFrom = values.from.keyed.get(key);
 
@@ -171,7 +248,7 @@ function addSubscription(
 		values.from.keyed.set(key, keyedFrom);
 	}
 
-	keyedFrom.set(value, subscription);
+	keyedFrom.set(value, instance);
 
 	let keyedTo = values.to.keyed.get(key);
 
@@ -181,16 +258,18 @@ function addSubscription(
 		values.to.keyed.set(key, keyedTo);
 	}
 
-	keyedTo.set(subscription, value);
+	keyedTo.set(instance, value);
 }
 
-function clearSubscriptions(store: SubscriptionsState): void {
-	for (const susbcription of store.values.to.any.keys()) {
+function clearSubscriptions(this: InternalSubscriptions): void {
+	const state = this[SUBSCRIPTION_SYMBOL];
+
+	for (const susbcription of state.values.to.any.keys()) {
 		susbcription.unsubscribe();
 	}
 
-	if (store.values.to.keyed != null) {
-		for (const values of store.values.to.keyed.values()) {
+	if (state.values.to.keyed != null && state.values.to.keyed.size > 0) {
+		for (const values of state.values.to.keyed.values()) {
 			for (const susbcription of values.keys()) {
 				susbcription.unsubscribe();
 			}
@@ -199,8 +278,7 @@ function clearSubscriptions(store: SubscriptionsState): void {
 }
 
 function createSubscription(
-	subscriptions: SubscriptionsState,
-	property: SubscriptionProperty,
+	this: InternalSubscriptions,
 	params: SubscriptionParameters,
 ): [Subscription, boolean] {
 	const parameters = createSubscriptionParameters(params);
@@ -209,8 +287,11 @@ function createSubscription(
 		throw new Error(parameters.signal?.reason);
 	}
 
+	const subscriptions = this[SUBSCRIPTION_SYMBOL];
+
 	const state: SubscriptionState = {
 		parameters,
+		subscriptions,
 		active: true,
 	};
 
@@ -228,30 +309,8 @@ function createSubscription(
 		}
 	}
 
-	state.aborter = createAborter(parameters.signal, () =>
-		unsubscribe(subscriptions, instance as Subscription, state),
-	);
-
-	const instance: unknown = {
-		unsubscribe: () => unsubscribe(subscriptions, instance as Subscription, state),
-	};
-
-	Object.defineProperties(instance, {
-		[SUBSCRIPTION_PROPERTY]: {
-			value: SUBSCRIPTION_NAME,
-		},
-		[property.key]: {
-			value: property.value,
-		},
-		active: {
-			enumerable: true,
-			get: () => (parameters.isActive?.() ?? true) && state.active,
-		},
-	});
-
-	addSubscription(subscriptions, instance as Subscription, state);
-
-	return [Object.freeze(instance) as Subscription, false];
+	// @ts-expect-error All good, no worries :-)
+	return [new Subscription(state, subscriptions.property, parameters), false];
 }
 
 function getExistingSubscription(
@@ -307,9 +366,13 @@ function createSubscriptionsProperty(input: unknown): Required<SubscriptionPrope
 	};
 }
 
-function createSubscriptionsState(keys: boolean | Set<Key>): SubscriptionsState {
+function createSubscriptionsState(
+	property: SubscriptionProperty,
+	keys: boolean | Set<Key>,
+): SubscriptionsState {
 	return {
-		keys: keys,
+		keys,
+		property,
 		items: {
 			any: new Set(),
 			keyed: keys === false ? undefined : new Map(),
@@ -339,7 +402,10 @@ export function isSubscription(value: unknown): value is Subscription {
 
 function isSubscriptionInstance(value: unknown, name: string): boolean {
 	return (
-		isPlainObject(value) && SUBSCRIPTION_PROPERTY in value && value[SUBSCRIPTION_PROPERTY] === name
+		typeof value === 'object' &&
+		value !== null &&
+		SUBSCRIPTION_PROPERTY in value &&
+		value[SUBSCRIPTION_PROPERTY] === name
 	);
 }
 
@@ -371,11 +437,9 @@ function removeFromStore(
 	}
 }
 
-function removeSubscription(
-	subscriptionsState: SubscriptionsState,
-	subscription: Subscription,
-	state: SubscriptionState,
-): void {
+function removeSubscription(this: InternalSubscription): void {
+	const state = this[SUBSCRIPTION_SYMBOL];
+
 	if (!state.active) {
 		return;
 	}
@@ -383,14 +447,14 @@ function removeSubscription(
 	state.aborter = undefined;
 	state.active = false;
 
-	state.parameters.isActive = undefined;
-	state.parameters.signal = undefined;
-
-	const {items, values} = subscriptionsState;
+	const {items, values} = state.subscriptions;
 	const {key, value} = state.parameters;
 
+	state.parameters = undefined as never;
+	state.subscriptions = undefined as never;
+
 	if (!isKey(key)) {
-		removeFromStore(items.any, values, subscription, value);
+		removeFromStore(items.any, values, this, value);
 
 		return;
 	}
@@ -404,7 +468,7 @@ function removeSubscription(
 		return;
 	}
 
-	removeFromStore(keyed, values, subscription, value, key);
+	removeFromStore(keyed, values, this, value, key);
 
 	if (keyed.size === 0) {
 		items.keyed.delete(key);
@@ -420,40 +484,8 @@ function removeSubscription(
 export function subscriptions<Value = unknown>(
 	parameters?: SubscriptionsParameters,
 ): Subscriptions<Value> {
-	const {keys, property} = createSubscriptionsParameters(parameters);
-
-	const state = createSubscriptionsState(keys);
-
-	const instance: unknown = {
-		clear: () => clearSubscriptions(state),
-		create: (parameters: never) => createSubscription(state, property, parameters),
-	};
-
-	Object.defineProperties(instance, {
-		[SUBSCRIPTION_PROPERTY]: {
-			value: SUBSCRIPTION_STORE,
-		},
-		items: {
-			enumerable: true,
-			value: state.items,
-		},
-		values: {
-			enumerable: true,
-			value: state.values,
-		},
-	});
-
-	return Object.freeze(instance) as Subscriptions<Value>;
-}
-
-function unsubscribe(
-	subscriptionsState: SubscriptionsState,
-	subscription: Subscription,
-	state: SubscriptionState,
-): void {
-	state.aborter?.cancel();
-
-	removeSubscription(subscriptionsState, subscription, state);
+	// @ts-expect-error All good, no worries :-)
+	return new Subscriptions(parameters);
 }
 
 // #endregion
@@ -466,10 +498,6 @@ const SUBSCRIPTION_INVALID_KEY = 'Invalid key for subscription';
 
 const SUBSCRIPTION_INVALID_VALUE = 'A subscription requires a non-null value to identify it';
 
-export const SUBSCRIPTION_NAME = 'subscription';
-
-const SUBSCRIPTION_PROPERTY = '$subscriptions';
-
-const SUBSCRIPTION_STORE = 'subscriptions';
+const SUBSCRIPTION_SYMBOL = Symbol(SUBSCRIPTION_PROPERTY);
 
 // #endregion

@@ -1,4 +1,3 @@
-import {isPlainObject} from '../../internal/is';
 import {between} from '../../internal/number';
 import {isSubscription, SUBSCRIPTION_NAME, type Subscription} from '../../internal/subscription';
 import type {PlainObject} from '../../models';
@@ -8,6 +7,7 @@ import {
 	COLOR_KEYS,
 	COLOR_LENGTHS,
 	COLOR_MAX,
+	COLOR_NAME,
 	COLOR_PROPERTY,
 } from '../constants';
 import type {Color} from '../index';
@@ -43,7 +43,10 @@ function isBytey(value: unknown): value is number {
  */
 export function isColor(value: unknown): value is Color {
 	return (
-		isPlainObject(value) && COLOR_PROPERTY.name in value && value[COLOR_PROPERTY.name] === true
+		typeof value === 'object' &&
+		value !== null &&
+		COLOR_PROPERTY in value &&
+		value[COLOR_PROPERTY] === COLOR_NAME
 	);
 }
 
@@ -54,7 +57,7 @@ export function isColor(value: unknown): value is Color {
  * @returns `true` if the value is a color subscription, otherwise `false`
  */
 export function isColorSubscription(value: unknown): value is Subscription {
-	return isSubscription(value) && (value as PlainObject)[COLOR_PROPERTY.name] === SUBSCRIPTION_NAME;
+	return isSubscription(value) && (value as PlainObject)[COLOR_PROPERTY] === SUBSCRIPTION_NAME;
 }
 
 function isColorValue(obj: unknown, properties: ColorProperty[]): boolean {

@@ -298,7 +298,7 @@ function freezeValue(value: unknown, references: WeakSet<any>, flat: boolean): u
 
 /**
  * Is the value frozen?
- * 
+ *
  * _Available as `isFrozen` and `freeze.is`_
  *
  * @param value Value to check

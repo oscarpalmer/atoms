@@ -54,6 +54,9 @@ test('observable + subscription', () =>
 			},
 		};
 
+		first.emit(-1);
+		first.emit(0);
+
 		const one = first.observable.subscribe({
 			complete() {
 				results.first.complete = true;

@@ -1,29 +1,35 @@
-import {COLOR_TYPE} from '../constants';
-import type {Color, ColorState} from '../models';
+import {COLOR_SYMBOL, COLOR_TYPE} from '../constants';
+import type {ColorState, InternalColor} from '../models';
 import {getColorFromState} from './state';
 
 // #region Functions
 
-export function formatHexColor(color: Color, alpha?: boolean): string {
-	return `#${alpha === true ? color.hexa : color.hex}`;
+export function formatHexColor(this: InternalColor, alpha?: boolean): string {
+	return `#${alpha === true ? this.hexa : this.hex}`;
 }
 
-export function formatHslColor(state: ColorState, alpha?: boolean): string {
-	const {hue, lightness, saturation} = getColorFromState(state, COLOR_TYPE.hsl);
+export function formatHslColor(this: InternalColor, alpha?: boolean): string {
+	const {values} = this[COLOR_SYMBOL];
 
-	return `hsl(${hue}deg ${saturation}% ${lightness}%${getSuffix(state, alpha)})`;
+	const {hue, lightness, saturation} = getColorFromState(values, COLOR_TYPE.hsl);
+
+	return `hsl(${hue}deg ${saturation}% ${lightness}%${getSuffix(values, alpha)})`;
 }
 
-export function formatHwbColor(state: ColorState, alpha?: boolean): string {
-	const {blackness, hue, whiteness} = getColorFromState(state, COLOR_TYPE.hwb);
+export function formatHwbColor(this: InternalColor, alpha?: boolean): string {
+	const {values} = this[COLOR_SYMBOL];
 
-	return `hwb(${hue}deg ${whiteness}% ${blackness}%${getSuffix(state, alpha)})`;
+	const {blackness, hue, whiteness} = getColorFromState(values, COLOR_TYPE.hwb);
+
+	return `hwb(${hue}deg ${whiteness}% ${blackness}%${getSuffix(values, alpha)})`;
 }
 
-export function formatRgbColor(state: ColorState, alpha?: boolean): string {
-	const {blue, green, red} = getColorFromState(state, COLOR_TYPE.rgb);
+export function formatRgbColor(this: InternalColor, alpha?: boolean): string {
+	const {values} = this[COLOR_SYMBOL];
 
-	return `rgb(${red} ${green} ${blue}${getSuffix(state, alpha)})`;
+	const {blue, green, red} = getColorFromState(values, COLOR_TYPE.rgb);
+
+	return `rgb(${red} ${green} ${blue}${getSuffix(values, alpha)})`;
 }
 
 function getSuffix(state: ColorState, alpha?: boolean): string {

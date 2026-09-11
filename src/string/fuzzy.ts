@@ -4,6 +4,14 @@ import {getString} from '../internal/string/misc';
 import type {PlainObject, RequiredKeys} from '../models';
 import {includes} from './match';
 
+// #region Special variables
+
+const FUZZY_PROPERTY = '$fuzzy';
+
+const FUZZY_SYMBOL = Symbol(FUZZY_PROPERTY);
+
+// #endregion
+
 // #region Types
 
 /**
@@ -116,6 +124,40 @@ type FuzzyState<Item> = {
 	tolerance: number;
 };
 
+type InternalFuzzy<Item = unknown> = {
+	[FUZZY_SYMBOL]: FuzzyState<Item>;
+} & Fuzzy<Item>;
+
+// #endregion
+
+// #region Instances
+
+function Fuzzy(this: any, state: FuzzyState<unknown>) {
+	this[FUZZY_SYMBOL] = state;
+}
+
+Fuzzy.prototype[FUZZY_PROPERTY] = true;
+
+Fuzzy.prototype.search = search;
+
+Object.defineProperties(Fuzzy.prototype, {
+	items: {
+		enumerable: true,
+		get(): unknown[] {
+			return (this as InternalFuzzy)[FUZZY_SYMBOL].items.slice();
+		},
+		set(value: unknown): void {
+			setItems((this as InternalFuzzy)[FUZZY_SYMBOL], value);
+		},
+	},
+	strings: {
+		enumerable: true,
+		get(): string[] {
+			return (this as InternalFuzzy)[FUZZY_SYMBOL].strings.slice();
+		},
+	},
+});
+
 // #endregion
 
 // #region Functions
@@ -150,45 +192,6 @@ function createFuzzyState<Item>(items: Item[], input: unknown): FuzzyState<Item>
 		strings: items.map(handler),
 		tolerance: options.tolerance,
 	};
-}
-
-function getHandler<Item>(input: unknown): (item: Item) => string {
-	if (input == null || input === getString) {
-		return getString;
-	}
-
-	switch (typeof input) {
-		case 'function':
-			return input as (item: Item) => string;
-
-		case 'string':
-			return (item: Item) => (item as PlainObject)[input] as string;
-
-		default: {
-			if (isPlainObject(input)) {
-				return getHandler(
-					(input as FuzzyConfiguration<PlainObject>).key ??
-						(input as FuzzyConfiguration<Item>).handler,
-				);
-			}
-
-			throw new TypeError(FUZZY_MESSAGE_HANDLER);
-		}
-	}
-}
-
-function getFuzzyItems<Item>(items: Array<FuzzyItem<Item>>): Item[] {
-	return items
-		.sort((first, second) => first.haystack.localeCompare(second.haystack))
-		.map(({item}) => item);
-}
-
-function getTolerance<Item>(input: unknown, state?: FuzzyState<Item>): number {
-	if (typeof input === 'number' && !Number.isNaN(input)) {
-		return input < 0 ? 0 : Math.floor(input);
-	}
-
-	return state?.tolerance ?? FUZZY_PROXIMITY_THRESHOLD;
 }
 
 /**
@@ -226,36 +229,13 @@ export function fuzzy(items: unknown[], configuration?: unknown): Fuzzy<unknown>
 		throw new TypeError(FUZZY_MESSAGE_ARRAY);
 	}
 
-	const state = createFuzzyState(items, configuration);
-
-	const instance: unknown = {
-		search: (value: never, options?: never) =>
-			search(
-				state.items,
-				state.strings,
-				value,
-				options == null ? state : createFuzzyOptions(options, state),
-			),
-	};
-
-	Object.defineProperties(instance, {
-		items: {
-			enumerable: true,
-			get: () => state.items.slice(),
-			set: (value: never) => setItems(state, value),
-		},
-		strings: {
-			enumerable: true,
-			get: () => state.strings.slice(),
-		},
-	});
-
-	return Object.freeze(instance) as Fuzzy<unknown>;
+	// @ts-expect-error All good, no worries :-)
+	return new Fuzzy(createFuzzyState(items, configuration));
 }
 
 /**
  * Does the needle match the haystack in a fuzzy way?
- * 
+ *
  * _Available as `fuzzyMatch` and `fuzzy.match`_
  *
  * @param haystack Haystack to search through
@@ -276,28 +256,35 @@ export function fuzzyMatch(haystack: string, needle: string): boolean {
 	return getScore(haystack, trimmed) > -1;
 }
 
-function isSubsequence(haystack: string, needle: string): boolean {
-	const lowerCaseHaystack = lowerCase(haystack);
-	const lowerCaseNeedle = lowerCase(needle);
-
-	const haystackLength = lowerCaseHaystack.length;
-	const needleLength = lowerCaseNeedle.length;
-
-	let needleIndex = 0;
-
-	for (let haystackIndex = 0; haystackIndex < haystackLength; haystackIndex += 1) {
-		// Advance needle pointer only on a matching character
-		if (lowerCaseHaystack[haystackIndex] === lowerCaseNeedle[needleIndex]) {
-			needleIndex += 1;
-		}
-
-		// All needle characters matched in order
-		if (needleIndex === needleLength) {
-			return true;
-		}
+function getHandler<Item>(input: unknown): (item: Item) => string {
+	if (input == null || input === getString) {
+		return getString;
 	}
 
-	return false;
+	switch (typeof input) {
+		case 'function':
+			return input as (item: Item) => string;
+
+		case 'string':
+			return (item: Item) => (item as PlainObject)[input] as string;
+
+		default: {
+			if (isPlainObject(input)) {
+				return getHandler(
+					(input as FuzzyConfiguration<PlainObject>).key ??
+						(input as FuzzyConfiguration<Item>).handler,
+				);
+			}
+
+			throw new TypeError(FUZZY_MESSAGE_HANDLER);
+		}
+	}
+}
+
+function getFuzzyItems<Item>(items: Array<FuzzyItem<Item>>): Item[] {
+	return items
+		.sort((first, second) => first.haystack.localeCompare(second.haystack))
+		.map(({item}) => item);
 }
 
 function getScore(haystack: string, needle: string): number {
@@ -348,12 +335,64 @@ function getScore(haystack: string, needle: string): number {
 	return Math.max(0, score);
 }
 
+function getTolerance<Item>(input: unknown, state?: FuzzyState<Item>): number {
+	if (typeof input === 'number' && !Number.isNaN(input)) {
+		return input < 0 ? 0 : Math.floor(input);
+	}
+
+	return state?.tolerance ?? FUZZY_PROXIMITY_THRESHOLD;
+}
+
+/**
+ * Is the value a fuzzy searcher?
+ *
+ * _Available as `isFuzzy` and `fuzzy.is`_
+ *
+ * @param value Value to check
+ * @returns `true` if the value is a fuzzy searcher, otherwise `false`
+ */
+export function isFuzzy<Item = unknown>(value: unknown): value is Fuzzy<Item> {
+	return (
+		typeof value === 'object' &&
+		value !== null &&
+		FUZZY_PROPERTY in value &&
+		value[FUZZY_PROPERTY] === true
+	);
+}
+
+function isSubsequence(haystack: string, needle: string): boolean {
+	const lowerCaseHaystack = lowerCase(haystack);
+	const lowerCaseNeedle = lowerCase(needle);
+
+	const haystackLength = lowerCaseHaystack.length;
+	const needleLength = lowerCaseNeedle.length;
+
+	let needleIndex = 0;
+
+	for (let haystackIndex = 0; haystackIndex < haystackLength; haystackIndex += 1) {
+		// Advance needle pointer only on a matching character
+		if (lowerCaseHaystack[haystackIndex] === lowerCaseNeedle[needleIndex]) {
+			needleIndex += 1;
+		}
+
+		// All needle characters matched in order
+		if (needleIndex === needleLength) {
+			return true;
+		}
+	}
+
+	return false;
+}
+
 function search<Item>(
-	items: Item[],
-	strings: string[],
+	this: InternalFuzzy<Item>,
 	input: string,
-	options: RequiredKeys<FuzzyOptions, 'tolerance'>,
-) {
+	option?: number | FuzzyOptions,
+): FuzzyResult<Item> {
+	const state = this[FUZZY_SYMBOL];
+
+	const options = option == null ? state : createFuzzyOptions(option, state);
+
 	const result: FuzzyResult<Item> = {
 		exact: [],
 		similar: [],
@@ -362,12 +401,12 @@ function search<Item>(
 	const value = typeof input === 'string' ? input.trim() : '';
 
 	if (value.length === 0) {
-		result.exact = items.slice(0, options.limit);
+		result.exact = state.items.slice(0, options.limit);
 
 		return result;
 	}
 
-	let {length} = items;
+	let {length} = state.items;
 
 	const exact: Array<FuzzyItem<Item>> = [];
 	const similar: Array<Item> = [];
@@ -375,8 +414,8 @@ function search<Item>(
 	const scored: Record<number, Array<FuzzyItem<Item>>> = {};
 
 	for (let index = 0; index < length; index += 1) {
-		const item = items[index];
-		const haystack = strings[index];
+		const item = state.items[index];
+		const haystack = state.strings[index];
 
 		if (includes(haystack, value, true)) {
 			exact.push({item, haystack});
@@ -449,10 +488,16 @@ const FUZZY_PROXIMITY_THRESHOLD = 5;
 
 // #region Initialization
 
+fuzzy.is = isFuzzy;
 fuzzy.match = fuzzyMatch;
 
-Object.defineProperty(fuzzy, 'match', {
-	value: fuzzyMatch,
+Object.defineProperties(fuzzy, {
+	is: {
+		value: isFuzzy,
+	},
+	match: {
+		value: fuzzyMatch,
+	},
 });
 
 // #endregion

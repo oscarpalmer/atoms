@@ -1,6 +1,7 @@
-import {herald, type Herald} from '../internal/herald';
-import {SUBSCRIPTION_NAME, type SubscriptionProperty} from '../internal/subscription';
-import {COLOR_PROPERTY, COLOR_TYPE} from './constants';
+import {herald} from '../internal/herald';
+import {type Subscription} from '../internal/subscription';
+import type {GenericCallback} from '../models';
+import {COLOR_NAME, COLOR_PROPERTY, COLOR_SYMBOL, COLOR_TYPE, colorSubscription} from './constants';
 import {getAlpha} from './misc/alpha';
 import {formatHexColor, formatHslColor, formatHwbColor, formatRgbColor} from './misc/format';
 import {
@@ -11,101 +12,156 @@ import {
 	setHWBColor,
 	setRGBColor,
 } from './misc/state';
-import type {Color, ColorChanges, ColorState, ColorType} from './models';
+import type {
+	Color,
+	ColorChanges,
+	ColorState,
+	ColorType,
+	InternalColor,
+	InternalColorState,
+} from './models';
 
-// #region Types
+// #region Instances
 
-type SetValue = (
-	color: Color,
-	state: ColorState,
-	changes: Herald<ColorChanges>,
-	value: any,
-	alpha: boolean,
-) => void;
+function Color(this: any, value: unknown) {
+	this[COLOR_SYMBOL] = {
+		changes: herald<ColorChanges>({
+			names: [COLOR_TYPE.wildcard, ...COLOR_TYPE.all],
+			property: colorSubscription,
+			onCreate: (event, callback) => onCreateSubscription(this, event, callback),
+		}),
+		values: getColorState(value),
+	} satisfies InternalColorState;
+}
 
-type SetValues = Record<ColorType, SetValue>;
+Color.prototype[COLOR_PROPERTY] = COLOR_NAME;
+
+Color.prototype.subscribe = subscribeToColor;
+Color.prototype.toHexString = formatHexColor;
+Color.prototype.toHslString = formatHslColor;
+Color.prototype.toHwbString = formatHwbColor;
+Color.prototype.toRgbString = formatRgbColor;
+Color.prototype.toString = formatHexColor;
+Color.prototype.unsubscribe = unsubscribeFromColor;
+
+Object.defineProperties(Color.prototype, {
+	alpha: {
+		enumerable: true,
+		get(): number {
+			return (this as InternalColor)[COLOR_SYMBOL].values.alpha.value;
+		},
+		set(value: never) {
+			setAlphaValue((this as InternalColor)[COLOR_SYMBOL].values, value);
+		},
+	},
+	changes: {
+		enumerable: true,
+		get(): Record<string, GenericCallback> {
+			return (this as InternalColor)[COLOR_SYMBOL].changes.events;
+		},
+	},
+	hex: {
+		enumerable: true,
+		get(): unknown {
+			return getColorValue(this, COLOR_TYPE.hex, false);
+		},
+		set(value: string) {
+			setHexColor(this, value, false);
+		},
+	},
+	hexa: {
+		enumerable: true,
+		get(): unknown {
+			return getColorValue(this, COLOR_TYPE.hex, true);
+		},
+		set(value: string) {
+			setHexColor(this, value, true);
+		},
+	},
+	hsl: {
+		enumerable: true,
+		get(): unknown {
+			return getColorValue(this, COLOR_TYPE.hsl, false);
+		},
+		set(value: string) {
+			setHSLColor(this, value, false);
+		},
+	},
+	hsla: {
+		enumerable: true,
+		get(): unknown {
+			return getColorValue(this, COLOR_TYPE.hsl, true);
+		},
+		set(value: string) {
+			setHSLColor(this, value, true);
+		},
+	},
+	hwb: {
+		enumerable: true,
+		get(): unknown {
+			return getColorValue(this, COLOR_TYPE.hwb, false);
+		},
+		set(value: string) {
+			setHWBColor(this, value, false);
+		},
+	},
+	hwba: {
+		enumerable: true,
+		get(): unknown {
+			return getColorValue(this, COLOR_TYPE.hwb, true);
+		},
+		set(value: string) {
+			setHWBColor(this, value, true);
+		},
+	},
+	origin: {
+		enumerable: true,
+		get(): ColorType {
+			return (this as InternalColor)[COLOR_SYMBOL].values.origin;
+		},
+	},
+	rgb: {
+		enumerable: true,
+		get(): unknown {
+			return getColorValue(this, COLOR_TYPE.rgb, false);
+		},
+		set(value: string) {
+			setRGBColor(this, value, false);
+		},
+	},
+	rgba: {
+		enumerable: true,
+		get(): unknown {
+			return getColorValue(this, COLOR_TYPE.rgb, true);
+		},
+		set(value: string) {
+			setRGBColor(this, value, true);
+		},
+	},
+});
 
 // #endregion
 
 // #region Functions
 
 export function color(value: unknown): Color {
-	const changes = herald<ColorChanges>({
-		names: [COLOR_TYPE.wildcard, ...COLOR_TYPE.all],
-		property: colorSubscription,
-		onCreate: (event, callback) => onCreateSubscription(instance as Color, event, callback),
-	});
-
-	const state = getColorState(value);
-
-	const instance: unknown = {
-		subscribe: (callback: never, signal?: AbortSignal) =>
-			changes.subscribe(COLOR_TYPE.wildcard, callback, signal),
-		toHexString: (alpha?: never) => formatHexColor(instance as Color, alpha),
-		toHslString: (alpha?: never) => formatHslColor(state, alpha),
-		toHwbString: (alpha?: never) => formatHwbColor(state, alpha),
-		toRgbString: (alpha?: never) => formatRgbColor(state, alpha),
-		toString: () => (instance as Color).toHexString(),
-		unsubscribe: () => changes.clear(),
-	};
-
-	Object.defineProperties(instance, {
-		[COLOR_PROPERTY.name]: {
-			value: true,
-		},
-		alpha: {
-			enumerable: true,
-			get: () => state.alpha.value,
-			set: (value: never) => setAlphaValue(state, value),
-		},
-		changes: {
-			enumerable: true,
-			value: changes.events,
-		},
-		hex: createColorProperty(COLOR_TYPE.hex, instance as Color, state, changes, false),
-		hexa: createColorProperty(COLOR_TYPE.hex, instance as Color, state, changes, true),
-		hsl: createColorProperty(COLOR_TYPE.hsl, instance as Color, state, changes, false),
-		hsla: createColorProperty(COLOR_TYPE.hsl, instance as Color, state, changes, true),
-		hwb: createColorProperty(COLOR_TYPE.hwb, instance as Color, state, changes, false),
-		hwba: createColorProperty(COLOR_TYPE.hwb, instance as Color, state, changes, true),
-		origin: {
-			enumerable: true,
-			get: () => state.origin,
-		},
-		rgb: createColorProperty(COLOR_TYPE.rgb, instance as Color, state, changes, false),
-		rgba: createColorProperty(COLOR_TYPE.rgb, instance as Color, state, changes, true),
-	});
-
-	return Object.freeze(instance) as Color;
+	// @ts-expect-error All good, no worries :-)
+	return new Color(value);
 }
 
-function createColorProperty(
-	space: keyof typeof setters,
-	color: Color,
-	state: ColorState,
-	changes: Herald<ColorChanges>,
-	alpha: boolean,
-): PropertyDescriptor {
-	const setValue = setters[space];
+function getColorValue(instance: InternalColor, type: ColorType, alpha: boolean) {
+	const {values} = instance[COLOR_SYMBOL];
 
-	return {
-		enumerable: true,
-		get: () => getColorValue(space, state, alpha),
-		set: (value: unknown) => setValue(color, state, changes, value, alpha),
-	};
-}
-
-function getColorValue(space: keyof typeof setters, state: ColorState, alpha: boolean) {
-	const value = getColorFromState(state, space);
+	const value = getColorFromState(values, type);
 
 	if (typeof value === 'string') {
-		return alpha ? `${value}${state.alpha.hex}` : value;
+		return alpha ? `${value}${values.alpha.hex}` : value;
 	}
 
 	return alpha
 		? {
 				...value,
-				alpha: state.alpha.value,
+				alpha: values.alpha.value,
 			}
 		: {...value};
 }
@@ -132,20 +188,18 @@ function setAlphaValue(state: ColorState, value: unknown): void {
 	}
 }
 
-// #endregion
+function subscribeToColor(
+	this: InternalColor,
+	callback: GenericCallback,
+	signal?: AbortSignal,
+): Subscription {
+	const {changes} = this[COLOR_SYMBOL];
 
-// #region Variables
+	return changes.subscribe(COLOR_TYPE.wildcard, callback, signal);
+}
 
-const colorSubscription: SubscriptionProperty = {
-	key: COLOR_PROPERTY.name,
-	value: SUBSCRIPTION_NAME,
-};
-
-const setters: SetValues = {
-	hex: setHexColor,
-	hsl: setHSLColor,
-	hwb: setHWBColor,
-	rgb: setRGBColor,
-};
+function unsubscribeFromColor(this: InternalColor): void {
+	this[COLOR_SYMBOL].changes.clear();
+}
 
 // #endregion

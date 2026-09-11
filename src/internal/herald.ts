@@ -9,6 +9,16 @@ import {
 	type Subscriptions,
 } from './subscription';
 
+// #region Special variables
+
+const HERALD_NAME_EVENTS = 'events';
+
+const HERALD_NAME_HERALD = 'herald';
+
+const HERALD_PROPERTY = '$herald';
+
+// #endregion
+
 // #region Types
 
 export type Herald<Events extends Record<string, GenericCallback>> = {
@@ -74,26 +84,55 @@ type HeraldState = {
 	onCreate?: HeraldOnCreate<Record<string, GenericCallback>>;
 };
 
+type InternalHerald = {
+	[HERALD_SYMBOL]: {
+		events: HeraldEvents<Record<string, GenericCallback>>;
+		state: HeraldState;
+	};
+} & Herald<Record<string, GenericCallback>>;
+
+// #endregion
+
+// #region Instances
+
+function Events(this: any, herald: InternalHerald, state: HeraldState) {
+	for (const key of state.keys) {
+		Object.defineProperty(this, key, {
+			value: (callback: never, signal?: AbortSignal) => herald.subscribe(key, callback, signal),
+		});
+	}
+}
+
+Events.prototype[HERALD_PROPERTY] = HERALD_NAME_EVENTS;
+
+function Herald(this: any, state: HeraldState) {
+	this[HERALD_SYMBOL] = {
+		state,
+		// @ts-expect-error All good, no worries :-)
+		events: new Events(this, state),
+	};
+}
+
+Herald.prototype[HERALD_PROPERTY] = HERALD_NAME_HERALD;
+
+Herald.prototype.clear = clearHerald;
+Herald.prototype.emit = emitForHerald;
+Herald.prototype.observed = eventIsObserved;
+Herald.prototype.subscribe = subscribeToHerald;
+
+Object.defineProperty(Herald.prototype, 'events', {
+	enumerable: true,
+	get(): HeraldEvents<Record<string, GenericCallback>> {
+		return (this as InternalHerald)[HERALD_SYMBOL].events;
+	},
+});
+
 // #endregion
 
 // #region Functions
 
-function createEvents<Events extends Record<string, GenericCallback>>(
-	herald: Herald<Events>,
-	state: HeraldState,
-): HeraldEvents<Events> {
-	const events: PlainObject = {};
-
-	Object.defineProperty(events, HERALD_PROPERTY, {
-		value: HERALD_NAME_EVENTS,
-	});
-
-	for (const key of state.keys) {
-		events[key] = (callback: never, signal?: AbortSignal) =>
-			herald.subscribe(key, callback, signal);
-	}
-
-	return Object.freeze(events) as HeraldEvents<Events>;
+function clearHerald(this: InternalHerald): void {
+	this[HERALD_SYMBOL].state.store.clear();
 }
 
 function createHeraldState(input: unknown): HeraldState {
@@ -146,7 +185,9 @@ function createHeraldSubscriptionProperty(input: unknown): SubscriptionProperty 
 	};
 }
 
-function emitForHerald(state: HeraldState, event: string, ...parameters: unknown[]): void {
+function emitForHerald(this: InternalHerald, event: string, ...parameters: unknown[]): void {
+	const {state} = this[HERALD_SYMBOL];
+
 	const items = state.store.values.from.keyed?.get(event);
 
 	if (items == null || items.size === 0) {
@@ -156,6 +197,10 @@ function emitForHerald(state: HeraldState, event: string, ...parameters: unknown
 	for (const [callback] of items) {
 		(callback as GenericCallback)(...parameters);
 	}
+}
+
+function eventIsObserved(this: InternalHerald, event: string): boolean {
+	return (this[HERALD_SYMBOL].state.store.items.keyed?.get(event)?.size ?? 0) > 0;
 }
 
 /**
@@ -168,27 +213,8 @@ function emitForHerald(state: HeraldState, event: string, ...parameters: unknown
 export function herald<Events extends Record<string, GenericCallback>>(
 	options: HeraldOptions<Events>,
 ): Herald<Events> {
-	const state = createHeraldState(options);
-
-	const instance: unknown = {
-		clear: () => state.store.clear(),
-		emit: (event: never, ...parameters: never[]) => emitForHerald(state, event, ...parameters),
-		observed: (event: never) => (state.store.items.keyed?.get(event)?.size ?? 0) > 0,
-		subscribe: (key: never, callback: never, signal: never) =>
-			subscribeToHerald(state, key, callback, signal),
-	};
-
-	Object.defineProperties(instance, {
-		[HERALD_PROPERTY]: {
-			value: HERALD_NAME_HERALD,
-		},
-		events: {
-			enumerable: true,
-			value: createEvents(instance as never, state),
-		},
-	});
-
-	return Object.freeze(instance) as unknown as Herald<Events>;
+	// @ts-expect-error All good, no worries :-)
+	return new Herald(createHeraldState(options));
 }
 
 /**
@@ -217,7 +243,8 @@ export function isHeraldEvents<
 
 function isHeraldInstance<Instance>(name: string, value: unknown): value is Instance {
 	return (
-		isPlainObject(value) &&
+		typeof value === 'object' &&
+		value !== null &&
 		HERALD_PROPERTY in value &&
 		(value as Record<string, unknown>)[HERALD_PROPERTY] === name
 	);
@@ -234,11 +261,13 @@ export function isHeraldSubscription(value: unknown): value is Subscription {
 }
 
 function subscribeToHerald(
-	state: HeraldState,
-	key: never,
-	callback: never,
+	this: InternalHerald,
+	key: string,
+	callback: GenericCallback,
 	signal?: AbortSignal,
 ): Subscription {
+	const {state} = this[HERALD_SYMBOL];
+
 	const [subscription, existing] = state.store.create({
 		key,
 		signal,
@@ -256,17 +285,13 @@ function subscribeToHerald(
 
 // #region Variables
 
-const HERALD_PROPERTY = '$herald';
-
 const HERALD_MESSAGE_ARRAY = 'Herald requires an array of event names.';
 
 const HERALD_MESSAGE_ONCREATE = `Herald requires a valid onCreate callback for subscription creation`;
 
 const HERALD_MESSAGE_PROPERTY = `Herald requires valid property information for subscription identification`;
 
-const HERALD_NAME_EVENTS = 'events';
-
-const HERALD_NAME_HERALD = 'herald';
+const HERALD_SYMBOL = Symbol(HERALD_PROPERTY);
 
 const heraldSubscription: SubscriptionProperty = {
 	key: HERALD_PROPERTY,

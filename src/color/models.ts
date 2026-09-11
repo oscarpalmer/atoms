@@ -1,6 +1,6 @@
-import type {HeraldEvents} from '../internal/herald';
+import type {Herald, HeraldEvents} from '../internal/herald';
 import type {Subscription} from '../internal/subscription';
-import type {COLOR_ALPHA} from './constants';
+import type {COLOR_SYMBOL} from './constants';
 
 // #region Types
 
@@ -276,6 +276,15 @@ export type HWBColor = {
 
 export type HWBAColor = HWBColor & ColorWithAlpha;
 
+export type InternalColor = {
+	[COLOR_SYMBOL]: InternalColorState;
+} & Color;
+
+export type InternalColorState = {
+	changes: Herald<ColorChanges>;
+	values: ColorState;
+};
+
 /**
  * An _RGB_ color with an alpha channel _(opacity)_
  */
@@ -299,11 +308,7 @@ export type RGBColor = {
 	red: number;
 };
 
-export type ColorProperty =
-	| typeof COLOR_ALPHA.name
-	| keyof HSLColor
-	| keyof HWBColor
-	| keyof RGBColor;
+export type ColorProperty = 'alpha' | keyof HSLColor | keyof HWBColor | keyof RGBColor;
 
 export type ColorState = {
 	alpha: Alpha;

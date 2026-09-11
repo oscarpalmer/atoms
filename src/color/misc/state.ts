@@ -1,14 +1,20 @@
-import type {Herald} from '../../internal/herald';
-import {COLOR_DEFAULTS, COLOR_KEYS, COLOR_LENGTHS, COLOR_MAX, COLOR_TYPE} from '../constants';
+import {
+	COLOR_DEFAULTS,
+	COLOR_KEYS,
+	COLOR_LENGTHS,
+	COLOR_MAX,
+	COLOR_SYMBOL,
+	COLOR_TYPE,
+} from '../constants';
 import type {
 	Color,
-	ColorChanges,
 	ColorState,
 	ColorType,
 	HSLAColor,
 	HSLColor,
 	HWBAColor,
 	HWBColor,
+	InternalColor,
 	RGBAColor,
 	RGBColor,
 } from '../models';
@@ -98,72 +104,58 @@ function getDefaultColorState(): ColorState {
 }
 
 function setColorValue<Type extends ColorType>(
-	color: Color,
-	state: ColorState,
-	changes: Herald<ColorChanges>,
+	instance: InternalColor,
 	type: Type,
 	value: ColorState[Type],
 	alpha?: number | string,
 ): void {
-	state.hex = undefined;
-	state.hsl = undefined;
-	state.hwb = undefined;
-	state.rgb = undefined;
+	const {changes, values} = instance[COLOR_SYMBOL];
 
-	state.origin = type;
-	state[type] = value;
+	values.hex = undefined;
+	values.hsl = undefined;
+	values.hwb = undefined;
+	values.rgb = undefined;
+
+	values.origin = type;
+	values[type] = value;
 
 	if (alpha != null) {
-		state.alpha = getAlpha(alpha, type === COLOR_TYPE.hex);
+		values.alpha = getAlpha(alpha, type === COLOR_TYPE.hex);
 	}
 
 	for (const type of COLOR_TYPE.all) {
 		if (changes.observed(type)) {
-			changes.emit(type, color[type as keyof Color] as never);
+			changes.emit(type, instance[type as keyof Color] as never);
 		}
 	}
 
-	changes.emit(COLOR_TYPE.wildcard, color);
+	changes.emit(COLOR_TYPE.wildcard, instance);
 }
 
-export function setHexColor(
-	color: Color,
-	state: ColorState,
-	changes: Herald<ColorChanges>,
-	value: string,
-	alpha: boolean,
-): void {
-	if (!isHexColor(value) || (!alpha && value === state.hex)) {
+export function setHexColor(instance: InternalColor, value: string, alpha: boolean): void {
+	const {values} = instance[COLOR_SYMBOL];
+
+	if (!isHexColor(value) || (!alpha && value === values.hex)) {
 		return;
 	}
 
 	const normalized = getNormalizedHex(value, true);
 
 	setColorValue(
-		color,
-		state,
-		changes,
+		instance,
 		COLOR_TYPE.hex,
 		normalized.slice(0, COLOR_LENGTHS.hexLong),
 		alpha ? normalized.slice(COLOR_LENGTHS.hexLong) : undefined,
 	);
 }
 
-export function setHSLColor(
-	color: Color,
-	state: ColorState,
-	changes: Herald<ColorChanges>,
-	value: unknown,
-	alpha: boolean,
-): void {
+export function setHSLColor(instance: InternalColor, value: unknown, alpha: boolean): void {
 	if (!isHslLike(value)) {
 		return;
 	}
 
 	setColorValue(
-		color,
-		state,
-		changes,
+		instance,
 		COLOR_TYPE.hsl,
 		{
 			hue: getDegrees((value as HSLColor).hue),
@@ -174,21 +166,13 @@ export function setHSLColor(
 	);
 }
 
-export function setHWBColor(
-	color: Color,
-	state: ColorState,
-	changes: Herald<ColorChanges>,
-	value: unknown,
-	alpha: boolean,
-): void {
+export function setHWBColor(instance: InternalColor, value: unknown, alpha: boolean): void {
 	if (!isHwbLike(value)) {
 		return;
 	}
 
 	setColorValue(
-		color,
-		state,
-		changes,
+		instance,
 		COLOR_TYPE.hwb,
 		{
 			hue: getDegrees((value as HWBColor).hue),
@@ -199,21 +183,13 @@ export function setHWBColor(
 	);
 }
 
-export function setRGBColor(
-	color: Color,
-	state: ColorState,
-	changes: Herald<ColorChanges>,
-	value: unknown,
-	alpha: boolean,
-): void {
+export function setRGBColor(instance: InternalColor, value: unknown, alpha: boolean): void {
 	if (!isRgbLike(value)) {
 		return;
 	}
 
 	setColorValue(
-		color,
-		state,
-		changes,
+		instance,
 		COLOR_TYPE.rgb,
 		{
 			red: getHexValue((value as RGBColor).red),

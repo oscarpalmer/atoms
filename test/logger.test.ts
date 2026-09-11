@@ -1,5 +1,5 @@
 import {expect, test} from 'vitest';
-import {isLogger, isTimedLogger, Logger, noop} from '../src';
+import {isLogger, isTimeLogger, Logger, noop} from '../src';
 import {isFixture} from './.fixtures/is.fixture';
 
 const {length, values} = isFixture;
@@ -8,8 +8,8 @@ test('is', () => {
 	expect(isLogger(Logger)).toBe(true);
 	expect(isLogger(Logger.time('test'))).toBe(false);
 
-	expect(isTimedLogger(Logger)).toBe(false);
-	expect(isTimedLogger(Logger.time('test'))).toBe(true);
+	expect(isTimeLogger(Logger)).toBe(false);
+	expect(isTimeLogger(Logger.time('test'))).toBe(true);
 
 	for (let index = 0; index < length; index += 1) {
 		expect(isLogger(values[index])).toBe(false);
