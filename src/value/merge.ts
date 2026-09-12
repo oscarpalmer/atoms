@@ -96,9 +96,12 @@ type ReplaceableObjectsCallback = (name: string) => boolean;
 // #region Instances
 
 function Assigner(this: any, options: Options) {
-	options.assignValues = true;
-
-	this[MERGE_SYMBOL_ASSIGN] = options;
+	Object.defineProperty(this, MERGE_SYMBOL_ASSIGN, {
+		value: {
+			...options,
+			assignValues: true,
+		},
+	});
 }
 
 Object.defineProperties(Assigner.prototype, {
@@ -108,7 +111,9 @@ Object.defineProperties(Assigner.prototype, {
 });
 
 function Merger(this: any, options: Options) {
-	this[MERGE_SYMBOL_MERGE] = options;
+	Object.defineProperty(this, MERGE_SYMBOL_MERGE, {
+		value: options,
+	});
 }
 
 Object.defineProperties(Merger.prototype, {

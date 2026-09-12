@@ -1,7 +1,11 @@
 import {isNonPlainObject} from '../internal/is';
-import type {GenericCallback, PlainObject} from '../models';
+import type {PlainObject} from '../models';
 
 // #region Types
+
+type InternalTransformer<Value extends PlainObject> = {
+	[TRANSFORM_SYMBOL]: TransformHandler<Value>;
+} & Transformer<Value>;
 
 /**
  * A callback transform an object's properties
@@ -18,22 +22,48 @@ type TransformCallbacks<Value extends PlainObject> = Partial<{
 	[Key in keyof Value]: (value: Value[Key]) => Value[Key];
 }>;
 
+type TransformHandler<Value extends PlainObject> =
+	| TransformCallback<Value, keyof Value>
+	| TransformCallbacks<Value>;
+
 /**
- * A transformer function for an object, with predefined callbacks for transforming its properties
+ * A transformer for an object, with predefined callbacks for transforming its properties
  */
 export type Transformer<Value extends PlainObject> = {
-	(value: Value): Value;
+	/**
+	 * Transform an object's properties
+	 *
+	 * @param value Object to transform
+	 * @returns Transformed object
+	 */
+	transform(value: Value): Value;
 };
+
+// #endregion
+
+// #region Instances
+
+function Transformer(this: any, transformer: ReturnType<typeof getTransformHandler>) {
+	Object.defineProperty(this, TRANSFORM_SYMBOL, {
+		value: transformer,
+	});
+}
+
+Object.defineProperties(Transformer.prototype, {
+	transform: {
+		value: transformValue,
+	},
+});
 
 // #endregion
 
 // #region Functions
 
-function getTransformer<Value extends PlainObject, Key extends keyof Value>(
+function getTransformHandler<Value extends PlainObject, Key extends keyof Value>(
 	input: unknown,
-): TransformCallback<Value, Key> | TransformCallbacks<Value> | undefined {
+): TransformHandler<Value> | undefined {
 	if (typeof input === 'function') {
-		return input as GenericCallback;
+		return input as TransformHandler<Value>;
 	}
 
 	if (isNonPlainObject(input)) {
@@ -54,9 +84,7 @@ function getTransformer<Value extends PlainObject, Key extends keyof Value>(
 		}
 	}
 
-	if (Object.keys(transformer).length > 0) {
-		return transformer;
-	}
+	return Object.keys(transformer).length > 0 ? transformer : undefined;
 }
 
 /**
@@ -86,9 +114,8 @@ export function initializeTransformer<Value extends PlainObject>(
 export function initializeTransformer<Value extends PlainObject>(
 	transform: unknown,
 ): Transformer<Value> {
-	const transformer = getTransformer<Value, keyof Value>(transform);
-
-	return value => transformValue(value, transformer);
+	// @ts-expect-error All good, no worries :-)
+	return new Transformer(getTransformHandler<Value>(transform));
 }
 
 /**
@@ -116,20 +143,23 @@ export function transform<Value extends PlainObject>(
 ): Value;
 
 export function transform<Value extends PlainObject>(value: Value, transform: unknown): Value {
-	return transformValue(value, getTransformer(transform));
+	return transformValue.call(getTransformHandler(transform), value) as Value;
 }
 
 function transformValue<Value extends PlainObject, Key extends keyof Value>(
+	this: InternalTransformer<Value> | TransformHandler<Value> | undefined,
 	value: Value,
-	transformer?: TransformCallback<Value, Key> | TransformCallbacks<Value>,
 ): Value {
 	if (isNonPlainObject(value)) {
 		return {} as Value;
 	}
 
-	if (transformer == null) {
+	if (this == null) {
 		return value;
 	}
+
+	const transformer =
+		TRANSFORM_SYMBOL in this ? (this as InternalTransformer<Value>)[TRANSFORM_SYMBOL] : this;
 
 	const keys = Object.keys(value) as Key[];
 	const {length} = keys;
@@ -147,6 +177,12 @@ function transformValue<Value extends PlainObject, Key extends keyof Value>(
 
 	return value;
 }
+
+// #endregion
+
+// #region Variables
+
+const TRANSFORM_SYMBOL = Symbol('transform');
 
 // #endregion
 

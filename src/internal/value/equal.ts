@@ -87,7 +87,9 @@ type OptionsKeys<Values> = {
 // #region Instances
 
 function Equalizer(this: any, options: Options) {
-	this[EQUAL_SYMBOL] = options;
+	Object.defineProperty(this, EQUAL_SYMBOL, {
+		value: options,
+	});
 }
 
 Object.defineProperties(Equalizer.prototype, {

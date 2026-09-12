@@ -197,7 +197,7 @@ test('transform', () => {
 	});
 
 	expect(
-		transform.initialize(() => 'blah' as never)({
+		transform.initialize(() => 'blah' as never).transform({
 			a: 123,
 			b: 'abc',
 			c: true,
