@@ -3,6 +3,7 @@ import {COLOR_DEFAULTS, COLOR_MAX, COLOR_TYPE} from '../constants';
 import {getAlpha, getAlphaValue} from '../misc/alpha';
 import {getHexValue} from '../misc/get';
 import {isRgbLike} from '../misc/is';
+import {getStateValue, setStateValue} from '../misc/state';
 import type {
 	ColorState,
 	ColorType,
@@ -10,6 +11,7 @@ import type {
 	HSLColor,
 	HWBAColor,
 	HWBColor,
+	InternalColor,
 	RGBAColor,
 	RGBColor,
 } from '../models';
@@ -48,8 +50,8 @@ export function convertRgbToHex(rgb: RGBAColor | RGBColor, alpha: boolean): stri
 }
 
 export function convertRgbToHsla(value: unknown): HSLAColor {
-	const rgb = isRgbLike(value) ? getRgbValue(value) : {...COLOR_DEFAULTS.rgb};
-	const values = getRgbValues(rgb);
+	const rgb = isRgbLike(value) ? getRgbValues(value) : {...COLOR_DEFAULTS.rgb};
+	const values = getRgbCalculationValues(rgb);
 
 	const {delta, max, min} = values;
 
@@ -75,8 +77,8 @@ export function convertRgbToHsla(value: unknown): HSLAColor {
 }
 
 export function convertRgbToHwba(value: unknown): HWBAColor {
-	const rgb = isRgbLike(value) ? getRgbValue(value) : {...COLOR_DEFAULTS.rgb};
-	const values = getRgbValues(rgb);
+	const rgb = isRgbLike(value) ? getRgbValues(value) : {...COLOR_DEFAULTS.rgb};
+	const values = getRgbCalculationValues(rgb);
 
 	const {delta, max, min} = values;
 
@@ -117,6 +119,27 @@ export function getColorFromRgb<Type extends ColorType>(
 	return state[type]!;
 }
 
+function getRgbCalculationValues(rgb: RGBColor): RgbValues {
+	const blue = rgb.blue / COLOR_MAX.hex;
+	const green = rgb.green / COLOR_MAX.hex;
+	const red = rgb.red / COLOR_MAX.hex;
+
+	const max = Math.max(blue, green, red);
+	const min = Math.min(blue, green, red);
+
+	const delta = max - min;
+
+	return {blue, delta, green, max, min, red};
+}
+
+export function getRgbColor(this: InternalColor): RGBColor {
+	return getStateValue(this, COLOR_TYPE.rgb, false) as RGBColor;
+}
+
+export function getRgbaColor(this: InternalColor): RGBAColor {
+	return getStateValue(this, COLOR_TYPE.rgb, true) as RGBAColor;
+}
+
 function getRgbHue(values: RgbValues): number {
 	const {blue, delta, green, max, red} = values;
 
@@ -132,25 +155,12 @@ function getRgbHue(values: RgbValues): number {
 	}
 }
 
-export function getRgbValue(value: Record<keyof RGBColor, unknown>): RGBColor {
+export function getRgbValues(value: Record<keyof RGBColor, unknown>): RGBColor {
 	return {
-		blue: getHexValue((value as RGBColor).blue),
-		green: getHexValue((value as RGBColor).green),
-		red: getHexValue((value as RGBColor).red),
+		blue: getHexValue(value.blue),
+		green: getHexValue(value.green),
+		red: getHexValue(value.red),
 	};
-}
-
-function getRgbValues(rgb: RGBColor): RgbValues {
-	const blue = rgb.blue / COLOR_MAX.hex;
-	const green = rgb.green / COLOR_MAX.hex;
-	const red = rgb.red / COLOR_MAX.hex;
-
-	const max = Math.max(blue, green, red);
-	const min = Math.min(blue, green, red);
-
-	const delta = max - min;
-
-	return {blue, delta, green, max, min, red};
 }
 
 /**
@@ -164,7 +174,7 @@ function getRgbValues(rgb: RGBColor): RgbValues {
  */
 export function rgbToHex(rgb: RGBAColor | RGBColor, alpha?: boolean): string {
 	return convertRgbToHex(
-		isRgbLike(rgb) ? getRgbValue(rgb) : {...COLOR_DEFAULTS.rgb},
+		isRgbLike(rgb) ? getRgbValues(rgb) : {...COLOR_DEFAULTS.rgb},
 		alpha ?? false,
 	);
 }
@@ -235,6 +245,31 @@ export function rgbToHwb(rgb: RGBAColor | RGBColor): HWBColor {
  */
 export function rgbToHwba(rgb: RGBAColor | RGBColor): HWBAColor {
 	return convertRgbToHwba(rgb);
+}
+
+export function setRgbValue(this: InternalColor, value: unknown): void {
+	setRgbColorValueInState(this, value, false);
+}
+
+function setRgbColorValueInState(instance: InternalColor, value: unknown, alpha: boolean): void {
+	if (!isRgbLike(value)) {
+		return;
+	}
+
+	setStateValue(
+		instance,
+		COLOR_TYPE.rgb,
+		{
+			red: getHexValue(value.red),
+			green: getHexValue(value.green),
+			blue: getHexValue(value.blue),
+		},
+		alpha ? (value as RGBAColor).alpha : undefined,
+	);
+}
+
+export function setRgbaValue(this: InternalColor, value: unknown): void {
+	setRgbColorValueInState(this, value, true);
 }
 
 // #endregion

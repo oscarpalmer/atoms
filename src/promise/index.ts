@@ -1,4 +1,4 @@
-import {createAborter} from '../internal/abort';
+import {createAborter} from '../internal/aborter';
 import {isArrayOrPlainObject} from '../internal/is';
 import type {ArrayOrPlainObject, Key, PlainObject} from '../models';
 import {
@@ -315,9 +315,5 @@ export async function resultPromises(
 // #region Initialization
 
 promises.result = resultPromises;
-
-Object.defineProperty(promises, 'result', {
-	value: resultPromises,
-});
 
 // #endregion

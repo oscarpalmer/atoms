@@ -4,12 +4,6 @@ import {isPlainObject} from '../is';
 import {SizedMap} from '../sized/map';
 import {getString, join} from '../string/misc';
 
-// #region Special variables
-
-const MEMOIZED_PROPERTY = '$memoized';
-
-// #endregion
-
 // #region Types
 
 type InternalMemoized = {
@@ -109,46 +103,29 @@ type Options = {
 // #region Instances
 
 function Memoized(this: any, callback: GenericCallback, options: Options) {
-	Object.defineProperty(this, MEMOIZED_SYMBOL, {
-		value: {
-			options,
-			cache: new SizedMap(options.cacheSize),
-			getter: undefined as never,
-		} satisfies MemoizedState,
-	});
+	this[MEMOIZED_SYMBOL] = {
+		options,
+		cache: new SizedMap(options.cacheSize),
+		getter: undefined,
+	};
 
 	this[MEMOIZED_SYMBOL].getter = createGetter(this[MEMOIZED_SYMBOL], callback);
-
-	Object.defineProperties(this, {
-		maximum: {
-			enumerable: true,
-			get: () => this[MEMOIZED_SYMBOL].cache.maximum,
-		},
-		size: {
-			enumerable: true,
-			get: () => this[MEMOIZED_SYMBOL].cache.size,
-		},
-	});
 }
 
+Memoized.prototype.clear = clearMemoized;
+Memoized.prototype.delete = deleteMemoizedValue;
+Memoized.prototype.get = getMemoizedValue;
+Memoized.prototype.has = hasMemoizedValue;
+Memoized.prototype.run = runMemoized;
+
 Object.defineProperties(Memoized.prototype, {
-	[MEMOIZED_PROPERTY]: {
-		value: true,
+	maximum: {
+		enumerable: true,
+		get: getMemoizedMaximum,
 	},
-	clear: {
-		value: clearMemoized,
-	},
-	delete: {
-		value: deleteMemoizedValue,
-	},
-	get: {
-		value: getMemoizedValue,
-	},
-	has: {
-		value: hasMemoizedValue,
-	},
-	run: {
-		value: runMemoized,
+	size: {
+		enumerable: true,
+		get: getMemoizedSize,
 	},
 });
 
@@ -187,12 +164,20 @@ function createGetter(state: MemoizedState, callback: GenericCallback): GenericC
 function createMemoizationOptions<Callback extends GenericCallback>(
 	input?: MemoizedOptions<Callback>,
 ): Options {
-	const {cacheKey, cacheSize} = isPlainObject(input) ? (input as MemoizedOptions<Callback>) : {};
+	const {cacheKey, cacheSize} = isPlainObject(input) ? input : {};
 
 	return {
 		cacheKey: typeof cacheKey === 'function' ? cacheKey : undefined,
 		cacheSize: getNumberOrDefault(cacheSize, MEMOIZED_CACHE_SIZE_DEFAULT),
 	};
+}
+
+function getMemoizedMaximum(this: InternalMemoized): number {
+	return (this[MEMOIZED_SYMBOL] as MemoizedState).cache.maximum;
+}
+
+function getMemoizedSize(this: InternalMemoized): number {
+	return (this[MEMOIZED_SYMBOL] as MemoizedState).cache.size;
 }
 
 function getMemoizedValue(this: InternalMemoized, key: unknown): unknown {
@@ -236,6 +221,6 @@ const MEMOIZED_CALLBACK = 'Memoized requires a callback function';
 
 const MEMOIZED_KEY_SEPARATOR = '_';
 
-const MEMOIZED_SYMBOL = Symbol(MEMOIZED_PROPERTY);
+const MEMOIZED_SYMBOL = Symbol('memoized');
 
 // #endregion

@@ -46,7 +46,7 @@ export function getNestedValue(
 			return handled;
 		}
 
-		current = handled.value as object;
+		current = handled.value;
 	}
 
 	return ok(current);
@@ -71,7 +71,7 @@ export function handleValue(
 	value: unknown,
 	get: true,
 	ignoreCase: boolean,
-): Result<unknown, string>;
+): Result<object, string>;
 
 export function handleValue(
 	data: object,
@@ -93,13 +93,14 @@ export function handleValue(
 			return error(MISC_NESTED_MESSAGE_UNSAFE);
 		}
 
-		const key = ignoreCase ? findKey(path, data) : path;
+		const dataObject = data as PlainObject;
+		const key = ignoreCase ? findKey(path, dataObject) : path;
 
 		if (get) {
-			return key in data ? ok(data[key as never]) : error(MISC_NESTED_MESSAGE_MISSING);
+			return key in dataObject ? ok(dataObject[key]) : error(MISC_NESTED_MESSAGE_MISSING);
 		}
 
-		(data as PlainObject)[key] = typeof value === 'function' ? value(data[key as never]) : value;
+		dataObject[key] = typeof value === 'function' ? value(dataObject[key]) : value;
 	}
 
 	if (get) {

@@ -1,4 +1,4 @@
-import type {ArrayOrPlainObject, Constructor, PlainObject, TypedArray} from '../../models';
+import type {ArrayOrPlainObject, Constructor, TypedArray} from '../../models';
 import {isNonPlainObject, isPlainObject, isPrimitive, isTypedArray} from '../is';
 import {createCompareHandler} from './handlers';
 
@@ -87,22 +87,12 @@ type OptionsKeys<Values> = {
 // #region Instances
 
 function Equalizer(this: any, options: Options) {
-	Object.defineProperty(this, EQUAL_SYMBOL, {
-		value: options,
-	});
+	this[EQUAL_SYMBOL] = options;
 }
 
-Object.defineProperties(Equalizer.prototype, {
-	compare: {
-		value: compare,
-	},
-	deregister: {
-		value: deregisterEqualizer,
-	},
-	register: {
-		value: registerEqualizer,
-	},
-});
+Equalizer.prototype.compare = compare;
+Equalizer.prototype.deregister = deregisterEqualizer;
+Equalizer.prototype.register = registerEqualizer;
 
 // #endregion
 
@@ -330,7 +320,13 @@ function equalProperties(
 	for (let index = 0; index < length; index += 1) {
 		const property = properties[index];
 
-		if (!equalValue((first as PlainObject)[property], (second as PlainObject)[property], options)) {
+		if (
+			!equalValue(
+				(first as keyof typeof first)[property],
+				(second as keyof typeof second)[property],
+				options,
+			)
+		) {
 			return false;
 		}
 	}
@@ -429,7 +425,7 @@ function equalValue(first: unknown, second: unknown, options: Options): boolean 
 			return equalPlainObject(first, second, options);
 
 		case isTypedArray(first) && isTypedArray(second):
-			return equalTypedArray(first as TypedArray, second as TypedArray);
+			return equalTypedArray(first, second);
 
 		default:
 			return equalHandler.handle(first, second, options);
@@ -492,20 +488,5 @@ equal.deregister = deregisterEqualizer;
 equal.handler = equalHandler;
 equal.initialize = initializeEqualizer;
 equal.register = registerEqualizer;
-
-Object.defineProperties(equal, {
-	deregister: {
-		value: deregisterEqualizer,
-	},
-	handler: {
-		value: equalHandler,
-	},
-	initialize: {
-		value: initializeEqualizer,
-	},
-	register: {
-		value: registerEqualizer,
-	},
-});
 
 // #endregion

@@ -257,7 +257,7 @@ export async function attemptAsyncPipe(
 
 		const value =
 			typeof initial === 'function'
-				? (initial as Function)()
+				? (initial as GenericCallback)()
 				: isOk(initial)
 					? initial.value
 					: initial;
@@ -476,7 +476,7 @@ export function attemptPipe(
 
 		const value =
 			typeof initial === 'function'
-				? (initial as Function)()
+				? (initial as GenericCallback)()
 				: isOk(initial)
 					? initial.value
 					: initial;
@@ -496,9 +496,5 @@ export function attemptPipe(
 // #region Initialization
 
 attemptPipe.async = attemptAsyncPipe;
-
-Object.defineProperty(attemptPipe, 'async', {
-	value: attemptAsyncPipe,
-});
 
 // #endregion

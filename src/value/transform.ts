@@ -44,9 +44,7 @@ export type Transformer<Value extends PlainObject> = {
 // #region Instances
 
 function Transformer(this: any, transformer: ReturnType<typeof getTransformHandler>) {
-	Object.defineProperty(this, TRANSFORM_SYMBOL, {
-		value: transformer,
-	});
+	this[TRANSFORM_SYMBOL] = transformer;
 }
 
 Object.defineProperties(Transformer.prototype, {
@@ -189,9 +187,5 @@ const TRANSFORM_SYMBOL = Symbol('transform');
 // #region Initialization
 
 transform.initialize = initializeTransformer;
-
-Object.defineProperty(transform, 'initialize', {
-	value: initializeTransformer,
-});
 
 // #endregion

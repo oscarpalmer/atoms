@@ -197,8 +197,4 @@ export function firstOrDefault(
 
 first.default = firstOrDefault;
 
-Object.defineProperty(first, 'default', {
-	value: firstOrDefault,
-});
-
 // #endregion

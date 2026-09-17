@@ -1,6 +1,6 @@
 import {noop} from './internal/function/misc';
 import {getString} from './internal/string/misc';
-import type {GenericCallback, PlainObject} from './models';
+import type {GenericCallback} from './models';
 
 // #region Special variables
 
@@ -111,46 +111,53 @@ type TimeLoggerState = {
 
 // #region Instances
 
-function Lumberjack(this: any) {
-	for (const method of methods) {
-		const bound = console[method].bind(console);
-
-		Object.defineProperty(this, method, {
-			enumerable: true,
-			get() {
-				return enabled ? bound : noop;
-			},
-		});
-	}
-}
+function Lumberjack(this: any) {}
 
 Lumberjack.prototype[LOGGER_PROPERTY] = LOGGER_NAME;
 
+Lumberjack.prototype.time = getTimeLogger;
+
 Object.defineProperties(Lumberjack.prototype, {
+	debug: {
+		get: getLoggerCallback.bind('debug'),
+	},
+	dir: {
+		get: getLoggerCallback.bind('dir'),
+	},
+	error: {
+		get: getLoggerCallback.bind('error'),
+	},
 	enabled: {
 		enumerable: true,
-		get: (): boolean => enabled,
-		set: (value: unknown): void => {
-			enabled = typeof value === 'boolean' ? value : enabled;
-		},
+		get: getLoggerEnabled,
+		set: setLoggerEnabled,
 	},
-	time: {
-		// @ts-expect-error All good, no worries :-)
-		value: (label: unknown): TimeLogger => new TimeLogger(getString(label)),
+	info: {
+		get: getLoggerCallback.bind('info'),
+	},
+	log: {
+		get: getLoggerCallback.bind('log'),
+	},
+	table: {
+		get: getLoggerCallback.bind('table'),
+	},
+	trace: {
+		get: getLoggerCallback.bind('trace'),
+	},
+	warn: {
+		get: getLoggerCallback.bind('warn'),
 	},
 });
 
 function TimeLogger(this: any, label: string) {
-	Object.defineProperty(this, LOGGER_SYMBOL, {
-		value: {
-			label,
-			started: enabled,
-			stopped: false,
-		},
-	});
+	this[LOGGER_SYMBOL] = {
+		label,
+		started: enabled,
+		stopped: false,
+	};
 
 	this[LOGGER_SYMBOL].isActive = (): boolean => {
-		return this[LOGGER_SYMBOL].started && !this[LOGGER_SYMBOL].stopped && enabled;
+		return enabled && this[LOGGER_SYMBOL].started && !this[LOGGER_SYMBOL].stopped;
 	};
 
 	if (this[LOGGER_SYMBOL].started) {
@@ -163,29 +170,13 @@ TimeLogger.prototype[LOGGER_PROPERTY] = LOGGER_NAME_TIMED;
 Object.defineProperties(TimeLogger.prototype, {
 	active: {
 		enumerable: true,
-		get(): boolean {
-			return (this as InternalTimeLogger)[LOGGER_SYMBOL].isActive();
-		},
+		get: getTimeLoggerActive,
 	},
 	log: {
-		get(): GenericCallback {
-			const state = (this as InternalTimeLogger)[LOGGER_SYMBOL];
-
-			return state.isActive() ? console.timeLog.bind(console, state.label) : noop;
-		},
+		get: getTimerLoggerLog,
 	},
 	stop: {
-		get(): GenericCallback {
-			const state = (this as InternalTimeLogger)[LOGGER_SYMBOL];
-
-			if (state.isActive()) {
-				state.stopped = true;
-
-				return console.timeEnd.bind(console, state.label);
-			}
-
-			return noop;
-		},
+		get: getTimeLoggerStop,
 	},
 });
 
@@ -193,13 +184,51 @@ Object.defineProperties(TimeLogger.prototype, {
 
 // #region Functions
 
+function getLoggerCallback(this: keyof typeof console): GenericCallback {
+	return enabled ? console[this].bind(console) : noop;
+}
+
+function getLoggerEnabled(): boolean {
+	return enabled;
+}
+
+function getTimeLogger(label: unknown): TimeLogger {
+	// @ts-expect-error All good, no worries :-)
+	return new TimeLogger(getString(label));
+}
+
+function getTimeLoggerActive(this: InternalTimeLogger): boolean {
+	return this[LOGGER_SYMBOL].isActive();
+}
+
+function getTimerLoggerLog(this: InternalTimeLogger): GenericCallback {
+	const state = this[LOGGER_SYMBOL];
+
+	return state.isActive() ? console.timeLog.bind(console, state.label) : noop;
+}
+
+function getTimeLoggerStop(this: InternalTimeLogger): GenericCallback {
+	const state = this[LOGGER_SYMBOL];
+
+	if (state.isActive()) {
+		state.stopped = true;
+
+		return console.timeEnd.bind(console, state.label);
+	}
+
+	return noop;
+}
+
 function isLogger(value: unknown): value is Logger {
 	return isLoggerInstance<Logger>(LOGGER_NAME, value);
 }
 
 function isLoggerInstance<Instance>(name: string, value: unknown): value is Instance {
 	return (
-		typeof value === 'object' && value !== null && (value as PlainObject)[LOGGER_PROPERTY] === name
+		typeof value === 'object' &&
+		value !== null &&
+		LOGGER_PROPERTY in value &&
+		value[LOGGER_PROPERTY] === name
 	);
 }
 
@@ -207,13 +236,15 @@ function isTimeLogger(value: unknown): value is TimeLogger {
 	return isLoggerInstance<TimeLogger>(LOGGER_NAME_TIMED, value);
 }
 
+function setLoggerEnabled(value: unknown): void {
+	enabled = typeof value === 'boolean' ? value : enabled;
+}
+
 // #endregion
 
 // #region Variables
 
 const LOGGER_SYMBOL = Symbol(LOGGER_PROPERTY);
-
-const methods = ['debug', 'dir', 'error', 'info', 'log', 'table', 'trace', 'warn'] as const;
 
 /**
  * A logger that can be used to log messages to the console

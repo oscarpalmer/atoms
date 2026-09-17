@@ -1,5 +1,4 @@
-import type {PlainObject} from '../../models';
-import {isNonPlainObject} from '../is';
+import {isPlainObject} from '../is';
 import type {Err, ExtendedErr, Ok, Result} from './models';
 
 // #region Functions
@@ -116,12 +115,9 @@ export function isResult(value: unknown): value is ExtendedErr<unknown> | Result
 }
 
 function isResultValue(value: unknown, okValue: boolean): value is Result<unknown, unknown> {
-	if (isNonPlainObject(value)) {
-		return false;
-	}
-
 	return (
-		(value as PlainObject).ok === okValue &&
+		isPlainObject(value) &&
+		value.ok === okValue &&
 		(okValue ? RESULT_PROPERTY_VALUE : RESULT_PROPERTY_ERROR) in value
 	);
 }
@@ -175,13 +171,5 @@ const RESULT_PROPERTY_VALUE = 'value';
 
 error.is = isError;
 ok.is = isOk;
-
-Object.defineProperty(error, 'is', {
-	value: isError,
-});
-
-Object.defineProperty(ok, 'is', {
-	value: isOk,
-});
 
 // #endregion

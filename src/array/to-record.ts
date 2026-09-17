@@ -134,8 +134,4 @@ export function toRecordArrays(array: unknown[], first?: unknown, second?: unkno
 
 toRecord.arrays = toRecordArrays;
 
-Object.defineProperty(toRecord, 'arrays', {
-	value: toRecordArrays,
-});
-
 // #endregion

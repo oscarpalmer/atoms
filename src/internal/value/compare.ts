@@ -100,7 +100,7 @@ function compareValue(
 	const secondType = typeof second;
 
 	if (firstType === secondType && firstType in comparators) {
-		return comparators[firstType as keyof typeof comparators](first as never, second as never);
+		return comparators[firstType](first, second);
 	}
 
 	if (first instanceof Date && second instanceof Date) {
@@ -168,17 +168,5 @@ const compareHandler = createCompareHandler<number>(compare, {
 compare.deregister = deregisterComparator;
 compare.handler = compareHandler;
 compare.register = registerComparator;
-
-Object.defineProperties(compare, {
-	deregister: {
-		value: deregisterComparator,
-	},
-	handler: {
-		value: compareHandler,
-	},
-	register: {
-		value: registerComparator,
-	},
-});
 
 // #endregion

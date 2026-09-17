@@ -184,8 +184,4 @@ export function findLast(array: unknown[], ...parameters: unknown[]): unknown {
 
 find.last = findLast;
 
-Object.defineProperty(find, 'last', {
-	value: findLast,
-});
-
 // #endregion

@@ -140,8 +140,4 @@ export function groupArraysBy(array: unknown[], first?: unknown, second?: unknow
 
 groupBy.arrays = groupArraysBy;
 
-Object.defineProperty(groupBy, 'arrays', {
-	value: groupArraysBy,
-});
-
 // #endregion

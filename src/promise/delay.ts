@@ -1,4 +1,4 @@
-import {createAborter} from '../internal/abort';
+import {createAborter} from '../internal/aborter';
 import {getLimiter, LIMITER_WAIT} from '../internal/function/limit';
 import {createPromiseOptions} from './helpers';
 import {settlePromise} from './misc';

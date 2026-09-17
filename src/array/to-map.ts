@@ -170,8 +170,4 @@ export function toMapArrays(array: unknown[], first?: unknown, second?: unknown)
 
 toMap.arrays = toMapArrays;
 
-Object.defineProperty(toMap, 'arrays', {
-	value: toMapArrays,
-});
-
 // #endregion

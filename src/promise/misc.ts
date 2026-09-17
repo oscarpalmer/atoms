@@ -1,7 +1,6 @@
-import type {Aborter} from '../internal/abort';
+import type {Aborter} from '../internal/aborter';
 import {error, ok} from '../internal/result/misc';
 import type {Result} from '../internal/result/models';
-import type {PlainObject} from '../models';
 import {
 	PROMISE_MESSAGE_EXPECTATION_RESULT,
 	PROMISE_TYPE_FULFILLED,
@@ -36,7 +35,7 @@ export function handleResult(status: string, parameters: PromiseParameters): voi
 		return;
 	}
 
-	(data.result as PlainObject)[key] = !complete
+	data.result[key as never] = !complete
 		? value
 		: status === PROMISE_TYPE_FULFILLED
 			? {status, value}

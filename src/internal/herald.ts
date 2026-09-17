@@ -1,4 +1,4 @@
-import type {GenericCallback, PlainObject} from '../models';
+import type {GenericCallback} from '../models';
 import {isPlainObject} from './is';
 import {
 	isSubscription,
@@ -80,7 +80,7 @@ export type HeraldOptions<Events extends Record<string, GenericCallback>> = {
 
 type HeraldState = {
 	keys: Set<string>;
-	store: Subscriptions;
+	store: Subscriptions<GenericCallback>;
 	onCreate?: HeraldOnCreate<Record<string, GenericCallback>>;
 };
 
@@ -106,37 +106,23 @@ function Events(this: any, herald: InternalHerald, state: HeraldState) {
 Events.prototype[HERALD_PROPERTY] = HERALD_NAME_EVENTS;
 
 function Herald(this: any, state: HeraldState) {
-	Object.defineProperty(this, HERALD_SYMBOL, {
-		value: {
-			state,
-			// @ts-expect-error All good, no worries :-)
-			events: new Events(this, state),
-		},
-	});
+	this[HERALD_SYMBOL] = {
+		state,
+		// @ts-expect-error All good, no worries :-)
+		events: new Events(this, state),
+	};
 }
 
-Object.defineProperties(Herald.prototype, {
-	[HERALD_PROPERTY]: {
-		value: HERALD_NAME_HERALD,
-	},
-	clear: {
-		value: clearHerald,
-	},
-	emit: {
-		value: emitForHerald,
-	},
-	events: {
-		enumerable: true,
-		get(): HeraldEvents<Record<string, GenericCallback>> {
-			return (this as InternalHerald)[HERALD_SYMBOL].events;
-		},
-	},
-	observed: {
-		value: eventIsObserved,
-	},
-	subscribe: {
-		value: subscribeToHerald,
-	},
+Herald.prototype[HERALD_PROPERTY] = HERALD_NAME_HERALD;
+
+Herald.prototype.clear = clearHerald;
+Herald.prototype.emit = emitForHerald;
+Herald.prototype.observed = eventIsObserved;
+Herald.prototype.subscribe = subscribeToHerald;
+
+Object.defineProperty(Herald.prototype, 'events', {
+	enumerable: true,
+	get: getHeraldEvents,
 });
 
 // #endregion
@@ -165,7 +151,7 @@ function createHeraldState(input: unknown): HeraldState {
 	const keys = new Set(options.names);
 	const property = createHeraldSubscriptionProperty(options.property);
 
-	const store = subscriptions({
+	const store = subscriptions<GenericCallback>({
 		keys,
 		property,
 	});
@@ -207,12 +193,16 @@ function emitForHerald(this: InternalHerald, event: string, ...parameters: unkno
 	}
 
 	for (const [callback] of items) {
-		(callback as GenericCallback)(...parameters);
+		callback(...parameters);
 	}
 }
 
 function eventIsObserved(this: InternalHerald, event: string): boolean {
 	return (this[HERALD_SYMBOL].state.store.items.keyed?.get(event)?.size ?? 0) > 0;
+}
+
+function getHeraldEvents(this: InternalHerald): HeraldEvents<Record<string, GenericCallback>> {
+	return this[HERALD_SYMBOL].events;
 }
 
 /**
@@ -258,7 +248,7 @@ function isHeraldInstance<Instance>(name: string, value: unknown): value is Inst
 		typeof value === 'object' &&
 		value !== null &&
 		HERALD_PROPERTY in value &&
-		(value as Record<string, unknown>)[HERALD_PROPERTY] === name
+		value[HERALD_PROPERTY] === name
 	);
 }
 
@@ -269,7 +259,11 @@ function isHeraldInstance<Instance>(name: string, value: unknown): value is Inst
  * @returns `true` if the value is a herald subscription, otherwise `false`
  */
 export function isHeraldSubscription(value: unknown): value is Subscription {
-	return isSubscription(value) && (value as PlainObject)[HERALD_PROPERTY] === SUBSCRIPTION_NAME;
+	return (
+		isSubscription(value) &&
+		HERALD_PROPERTY in value &&
+		value[HERALD_PROPERTY] === SUBSCRIPTION_NAME
+	);
 }
 
 function subscribeToHerald(

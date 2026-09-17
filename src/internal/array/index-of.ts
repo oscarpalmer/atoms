@@ -1,5 +1,5 @@
-import {FIND_VALUE_INDEX, findValue} from './find';
 import type {PlainObject} from '../../models';
+import {FIND_VALUE_INDEX, findValue} from './find';
 
 // #region Functions
 
@@ -182,9 +182,5 @@ export function lastIndexOf(array: unknown[], ...parameters: unknown[]): number 
 // #region Initialization
 
 indexOf.last = lastIndexOf;
-
-Object.defineProperty(indexOf, 'last', {
-	value: lastIndexOf,
-});
 
 // #endregion

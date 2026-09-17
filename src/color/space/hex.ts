@@ -5,10 +5,12 @@ import {
 	COLOR_EXPRESSION,
 	COLOR_LENGTHS,
 	COLOR_MAX,
+	COLOR_SYMBOL,
 	COLOR_TYPE,
 } from '../constants';
 import {getHexValue, getPercentage} from '../misc/get';
 import {isHexColor} from '../misc/is';
+import {getStateValue, setStateValue} from '../misc/state';
 import type {
 	ColorState,
 	ColorType,
@@ -16,6 +18,7 @@ import type {
 	HSLColor,
 	HWBAColor,
 	HWBColor,
+	InternalColor,
 	RGBAColor,
 	RGBColor,
 } from '../models';
@@ -61,6 +64,14 @@ export function getColorFromHex<Type extends ColorType>(
 	}
 
 	return state[type]!;
+}
+
+export function getHexColor(this: InternalColor): string {
+	return getStateValue(this, COLOR_TYPE.hex, false) as string;
+}
+
+export function getHexaColor(this: InternalColor): string {
+	return getStateValue(this, COLOR_TYPE.hex, true) as string;
 }
 
 /**
@@ -179,6 +190,31 @@ export function hexToRgb(value: string): RGBColor {
  */
 export function hexToRgba(value: string): RGBAColor {
 	return convertHexToRgba(value);
+}
+
+export function setHexValue(this: InternalColor, value: string): void {
+	setHexValueInState(this, value, false);
+}
+
+function setHexValueInState(instance: InternalColor, value: string, alpha: boolean): void {
+	const {values} = instance[COLOR_SYMBOL];
+
+	if (!isHexColor(value) || (!alpha && value === values.hex)) {
+		return;
+	}
+
+	const normalized = getNormalizedHex(value, true);
+
+	setStateValue(
+		instance,
+		COLOR_TYPE.hex,
+		normalized.slice(0, COLOR_LENGTHS.hexLong),
+		alpha ? normalized.slice(COLOR_LENGTHS.hexLong) : undefined,
+	);
+}
+
+export function setHexaValue(this: InternalColor, value: string): void {
+	setHexValueInState(this, value, true);
 }
 
 // #endregion

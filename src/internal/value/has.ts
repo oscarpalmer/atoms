@@ -119,8 +119,4 @@ export function hasValueResult(
 
 hasValue.get = hasValueResult;
 
-Object.defineProperty(hasValue, 'get', {
-	value: hasValueResult,
-});
-
 // #endregion

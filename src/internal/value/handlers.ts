@@ -4,7 +4,7 @@ import {isNonConstructor} from '../is';
 // #region Types
 
 type BaseHandler = {
-	handlers: WeakMap<Constructor, string | GenericCallback>;
+	handlers: WeakMap<WeakKey, string | GenericCallback>;
 	options: BaseHandlerOptions;
 	owner: GenericCallback;
 	deregister: (constructor: Constructor) => void;
@@ -22,6 +22,12 @@ type CompareHandler<Value> = {
 	handle(first: unknown, second: unknown, ...parameters: unknown[]): Value;
 };
 
+type Constructable = {
+	constructor: Constructor;
+};
+
+type Handleable = Record<string, GenericCallback>;
+
 type ValueHandler = {
 	base: BaseHandler;
 	handle(value: unknown, ...parameters: unknown[]): unknown;
@@ -37,37 +43,21 @@ function BaseHandler(this: any, owner: GenericCallback, options: BaseHandlerOpti
 	this.options = options;
 }
 
-Object.defineProperties(BaseHandler.prototype, {
-	deregister: {
-		value: deregisterHandler,
-	},
-	get: {
-		value: getHandler,
-	},
-	register: {
-		value: registerHandler,
-	},
-});
+BaseHandler.prototype.deregister = deregisterHandler;
+BaseHandler.prototype.get = getHandler;
+BaseHandler.prototype.register = registerHandler;
 
 function CompareHandler(this: any, base: BaseHandler) {
 	this.base = base;
 }
 
-Object.defineProperties(CompareHandler.prototype, {
-	handle: {
-		value: handleComparison,
-	},
-});
+CompareHandler.prototype.handle = handleComparison;
 
 function ValueHandler(this: any, value: BaseHandler) {
 	this.base = value;
 }
 
-Object.defineProperties(ValueHandler.prototype, {
-	handle: {
-		value: handleValue,
-	},
-});
+ValueHandler.prototype.handle = handleValue;
 
 // #endregion
 
@@ -94,8 +84,8 @@ export function createValueHandler(
 	return new ValueHandler(createBaseHandler(owner, options));
 }
 
-function deregisterHandler(this: BaseHandler, value: unknown) {
-	this.handlers.delete(value as never);
+function deregisterHandler(this: BaseHandler, value: WeakKey) {
+	this.handlers.delete(value);
 }
 
 function getHandler(
@@ -106,9 +96,9 @@ function getHandler(
 	if (
 		isConstructable(first) &&
 		isConstructable(second) &&
-		(first as object).constructor === (second as object).constructor
+		first.constructor === second.constructor
 	) {
-		return this.handlers.get((first as object).constructor as Constructor);
+		return this.handlers.get(first.constructor);
 	}
 
 	return undefined;
@@ -126,10 +116,12 @@ function handleComparison(
 		return this.base.options.callback(first, second, ...parameters);
 	}
 
-	return typeof handler === 'function' ? handler(first, second) : (first as any)[handler](second);
+	return typeof handler === 'function'
+		? handler(first, second)
+		: (first as Handleable)[handler](second);
 }
 
-function isConstructable(value: unknown): boolean {
+function isConstructable(value: unknown): value is Constructable {
 	return typeof value === 'object' && value !== null;
 }
 

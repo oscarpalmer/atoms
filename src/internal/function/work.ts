@@ -923,9 +923,7 @@ async function asyncWork(
 		const fn = functions[index];
 
 		const value =
-			flow && index === 0 && Array.isArray(initial)
-				? await fn(...(initial as unknown[]))
-				: await fn(transformed);
+			flow && index === 0 && Array.isArray(initial) ? await fn(...initial) : await fn(transformed);
 
 		transformed = unwrapValue(value);
 	}
@@ -961,10 +959,7 @@ function work(initial: unknown, functions: GenericCallback[], flow: boolean): un
 	for (let index = 0; index < length; index += 1) {
 		const fn = functions[index];
 
-		const value =
-			flow && index === 0 && Array.isArray(initial)
-				? fn(...(initial as unknown[]))
-				: fn(transformed);
+		const value = flow && index === 0 && Array.isArray(initial) ? fn(...initial) : fn(transformed);
 
 		transformed = unwrapValue(value, flow);
 	}
@@ -1006,13 +1001,5 @@ const assertPipeFunctions: Asserter<Function[]> = assert.condition(
 
 flow.async = asyncFlow;
 pipe.async = asyncPipe;
-
-Object.defineProperty(flow, 'async', {
-	value: asyncFlow,
-});
-
-Object.defineProperty(pipe, 'async', {
-	value: asyncPipe,
-});
 
 // #endregion

@@ -34,7 +34,9 @@ export function getArrayCallbacks(
 	value?: unknown,
 ): Callbacks | undefined {
 	if (typeof bool === 'function') {
-		return {bool: bool as GenericCallback};
+		return {
+			bool: bool as GenericCallback,
+		};
 	}
 
 	return {

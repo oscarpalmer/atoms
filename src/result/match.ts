@@ -125,8 +125,4 @@ const MATCH_MESSAGE = '`result.match` expected a Result or a function that retur
 
 matchResult.async = asyncMatchResult;
 
-Object.defineProperty(matchResult, 'async', {
-	value: asyncMatchResult,
-});
-
 // #endregion

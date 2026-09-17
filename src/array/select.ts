@@ -295,8 +295,4 @@ function selectValues(array: unknown[], parameters: unknown[]): unknown[] {
 
 select.reverse = reverseSelect;
 
-Object.defineProperty(select, 'reverse', {
-	value: reverseSelect,
-});
-
 // #endregion

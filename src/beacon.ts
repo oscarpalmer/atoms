@@ -84,7 +84,7 @@ type BeaconState<Value> = {
 	active: boolean;
 	observable?: Observable<Value>;
 	options: Required<BeaconOptions<Value>>;
-	subscriptions?: Subscriptions;
+	subscriptions?: Subscriptions<Observer<unknown>>;
 	value: Value;
 };
 
@@ -155,78 +155,50 @@ type Observer<Value> = {
 // #region Instances
 
 function Beacon(this: any, value: unknown, options?: BeaconOptions<unknown>) {
-	Object.defineProperty(this, BEACON_SYMBOL, {
-		value: {
-			value,
-			active: true,
-			options: createBeaconOptions(options),
-		} satisfies BeaconState<unknown>,
-	});
+	this[BEACON_SYMBOL] = {
+		value,
+		active: true,
+		options: createBeaconOptions(options),
+	};
 }
 
+Beacon.prototype[BEACON_PROPERTY] = BEACON_NAME;
+
+Beacon.prototype.deactivate = deactivateBeacon;
+Beacon.prototype.emit = emitBeaconValue;
+Beacon.prototype.error = emitBeaconError;
+Beacon.prototype.finish = finishBeacon;
+
 Object.defineProperties(Beacon.prototype, {
-	[BEACON_PROPERTY]: {
-		value: BEACON_NAME,
-	},
 	active: {
 		enumerable: true,
-		get(): boolean {
-			return (this as InternalBeacon)[BEACON_SYMBOL].active;
-		},
-	},
-	deactivate: {
-		value: deactivateBeacon,
-	},
-	emit: {
-		value: emitBeaconValue,
-	},
-	error: {
-		value: emitBeaconError,
-	},
-	finish: {
-		value: finishBeacon,
+		get: getBeaconActive,
 	},
 	observable: {
 		enumerable: true,
-		get(): Observable<unknown> {
-			return getObservable((this as InternalBeacon)[BEACON_SYMBOL]);
-		},
+		get: getBeaconObservable,
 	},
 	value: {
 		enumerable: true,
-		get(): unknown {
-			return (this as InternalBeacon)[BEACON_SYMBOL].value;
-		},
+		get: getBeaconValue,
 	},
 });
 
 function Observable(this: any, beacon: BeaconState<unknown>) {
-	Object.defineProperty(this, BEACON_SYMBOL, {
-		value: {
-			beacon,
-			active: beacon.active,
-		} satisfies ObservableState<unknown>,
-	});
+	this[BEACON_SYMBOL] = {
+		beacon,
+		active: beacon.active,
+	};
 }
 
-Object.defineProperties(Observable.prototype, {
-	[BEACON_PROPERTY]: {
-		value: BEACON_OBSERVABLE,
-	},
-	active: {
-		enumerable: true,
-		get(): boolean {
-			const state = (this as InternalObservable)[BEACON_SYMBOL];
+Observable.prototype[BEACON_PROPERTY] = BEACON_OBSERVABLE;
 
-			return state.beacon.active && state.active;
-		},
-	},
-	deactivate: {
-		value: deactiveateObservable,
-	},
-	subscribe: {
-		value: subscribeToObservable,
-	},
+Observable.prototype.deactivate = deactiveateObservable;
+Observable.prototype.subscribe = subscribeToObservable;
+
+Object.defineProperty(Observable.prototype, 'active', {
+	enumerable: true,
+	get: getObservableActive,
 });
 
 // #endregion
@@ -257,7 +229,7 @@ function closeBeacon<Value>(state: BeaconState<Value>, emit: boolean): void {
 	if (subscriptions != null && subscriptions.size > 0) {
 		for (const [, observer] of subscriptions) {
 			if (emit) {
-				(observer as Observer<Value>).complete?.();
+				observer.complete?.();
 			}
 		}
 	}
@@ -266,15 +238,15 @@ function closeBeacon<Value>(state: BeaconState<Value>, emit: boolean): void {
 
 	state.observable?.deactivate();
 
-	state.observable = undefined as never;
+	state.observable = undefined;
 }
 
 function createBeaconOptions<Value>(input?: BeaconOptions<Value>): Required<BeaconOptions<Value>> {
-	const options: BeaconOptions<Value> = isPlainObject(input) ? (input as PlainObject) : {};
+	const options: BeaconOptions<Value> = isPlainObject(input) ? input : {};
 
-	options.equal = typeof options.equal === 'function' ? options.equal : Object.is;
-
-	return options as Required<BeaconOptions<Value>>;
+	return {
+		equal: typeof options.equal === 'function' ? options.equal : Object.is,
+	};
 }
 
 function createObserver<Value>(first: unknown, second?: unknown, third?: unknown): Observer<Value> {
@@ -289,9 +261,11 @@ function createObserver<Value>(first: unknown, second?: unknown, third?: unknown
 			complete: getObservableCallback(third),
 		};
 	} else if (typeof first === 'object') {
-		observer.complete = getObservableCallback((first as Record<string, unknown>)?.complete);
-		observer.error = getObservableCallback((first as Record<string, unknown>)?.error);
-		observer.next = getObservableCallback((first as Record<string, unknown>)?.next);
+		const object = first as Record<string, unknown>;
+
+		observer.complete = getObservableCallback(object?.complete);
+		observer.error = getObservableCallback(object?.error);
+		observer.next = getObservableCallback(object?.next);
 	}
 
 	return observer;
@@ -317,7 +291,13 @@ function finishBeacon(this: InternalBeacon): void {
 	closeBeacon(this[BEACON_SYMBOL], true);
 }
 
-function getObservable<Value>(state: BeaconState<Value>): Observable<Value> {
+function getBeaconActive(this: InternalBeacon): boolean {
+	return this[BEACON_SYMBOL].active;
+}
+
+function getBeaconObservable(this: InternalBeacon): Observable<unknown> {
+	const state = this[BEACON_SYMBOL];
+
 	if (!state.active) {
 		throw new Error(BEACON_MESSAGE_RETRIEVE);
 	}
@@ -326,6 +306,16 @@ function getObservable<Value>(state: BeaconState<Value>): Observable<Value> {
 	state.observable ??= new Observable(state);
 
 	return state.observable!;
+}
+
+function getBeaconValue(this: InternalBeacon): unknown {
+	return this[BEACON_SYMBOL].value;
+}
+
+function getObservableActive(this: InternalObservable): boolean {
+	const state = this[BEACON_SYMBOL];
+
+	return state.beacon.active && state.active;
 }
 
 function getObservableCallback(value: unknown): GenericCallback {
@@ -344,7 +334,10 @@ export function isBeacon<Value = unknown>(value: unknown): value is Beacon<Value
 
 function isBeaconInstance<Instance>(name: string, value: unknown): value is Instance {
 	return (
-		typeof value === 'object' && value !== null && (value as PlainObject)[BEACON_PROPERTY] === name
+		typeof value === 'object' &&
+		value !== null &&
+		BEACON_PROPERTY in value &&
+		value[BEACON_PROPERTY] === name
 	);
 }
 
@@ -420,7 +413,7 @@ function updateBeacon(
 
 	if (subscriptions != null && subscriptions.size > 0) {
 		for (const [, observer] of subscriptions) {
-			(observer as Observer<unknown>)[type]?.(value as never);
+			observer[type]?.(value as never);
 		}
 	}
 

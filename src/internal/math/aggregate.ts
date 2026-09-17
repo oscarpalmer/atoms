@@ -55,7 +55,7 @@ export function aggregate(
 	for (let index = 0; index < length; index += 1) {
 		const item = array[index];
 
-		const value = callback == null ? item : callback(item as never, index, array);
+		const value = callback == null ? item : callback(item, index, array);
 
 		if (isNonNumber(value)) {
 			continue;
@@ -239,7 +239,7 @@ export function max<Item extends PlainObject>(
 export function max(values: number[]): number;
 
 export function max(array: unknown[], key?: unknown, first?: unknown): unknown {
-	return getAggregated(AGGREGATION_MAX as NonAverageAggregationType, array, key, first);
+	return getAggregated(AGGREGATION_MAX, array, key, first);
 }
 
 // #endregion

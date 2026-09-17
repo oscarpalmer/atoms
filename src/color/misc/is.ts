@@ -57,30 +57,29 @@ export function isColor(value: unknown): value is Color {
  * @returns `true` if the value is a color subscription, otherwise `false`
  */
 export function isColorSubscription(value: unknown): value is Subscription {
-	return isSubscription(value) && (value as PlainObject)[COLOR_PROPERTY] === SUBSCRIPTION_NAME;
+	return (
+		isSubscription(value) && COLOR_PROPERTY in value && value[COLOR_PROPERTY] === SUBSCRIPTION_NAME
+	);
 }
 
-function isColorValue(obj: unknown, properties: ColorProperty[]): boolean {
-	if (typeof obj !== 'object' || obj === null) {
+function isColorValue(value: unknown, properties: ColorProperty[]): boolean {
+	if (typeof value !== 'object' || value === null) {
 		return false;
 	}
 
-	const keys = Object.keys(obj);
+	const keys = Object.keys(value);
 	const {length} = keys;
 
 	if (length !== properties.length) {
 		return false;
 	}
 
-	for (let index = 0; index < length; index += 1) {
-		const key = keys[index];
+	const obj = value as PlainObject;
 
-		if (
-			!(
-				properties.includes(key as never) &&
-				validators[key as ColorProperty]((obj as PlainObject)[key])
-			)
-		) {
+	for (let index = 0; index < length; index += 1) {
+		const key = keys[index] as ColorProperty;
+
+		if (!(properties.includes(key) && validators[key](obj[key]))) {
 			return false;
 		}
 	}

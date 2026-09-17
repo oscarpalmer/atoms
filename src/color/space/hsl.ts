@@ -2,6 +2,7 @@ import {COLOR_DEFAULTS, COLOR_MAX, COLOR_TYPE} from '../constants';
 import {getAlphaValue} from '../misc/alpha';
 import {getDegrees, getHexValue, getPercentage} from '../misc/get';
 import {isHslLike} from '../misc/is';
+import {getStateValue, setStateValue} from '../misc/state';
 import type {
 	ColorState,
 	ColorType,
@@ -9,6 +10,7 @@ import type {
 	HSLColor,
 	HWBAColor,
 	HWBColor,
+	InternalColor,
 	RGBAColor,
 	RGBColor,
 } from '../models';
@@ -17,7 +19,7 @@ import {convertRgbToHex} from './rgb';
 // #region Functions
 
 function convertHslToHwba(input: unknown): HWBAColor {
-	const hsl = isHslLike(input) ? getHslValue(input) : {...COLOR_DEFAULTS.hsl};
+	const hsl = isHslLike(input) ? getHslValues(input) : {...COLOR_DEFAULTS.hsl};
 
 	let {hue, lightness, saturation} = hsl;
 
@@ -44,7 +46,7 @@ function convertHslToHwba(input: unknown): HWBAColor {
 }
 
 function convertHslToRgba(input: unknown): RGBAColor {
-	const hsl = isHslLike(input) ? getHslValue(input) : {...COLOR_DEFAULTS.hsl};
+	const hsl = isHslLike(input) ? getHslValues(input) : {...COLOR_DEFAULTS.hsl};
 
 	const hue = hsl.hue % COLOR_MAX.degree;
 	const saturation = hsl.saturation / COLOR_MAX.percent;
@@ -86,7 +88,15 @@ function getHexyValue(hue: number, lightness: number, saturation: number, value:
 	return (lightness - mod * Math.max(-1, Math.min(part - 3, 9 - part, 1))) * COLOR_MAX.hex;
 }
 
-export function getHslValue(value: Record<keyof HSLColor, unknown>): HSLColor {
+export function getHslValue(this: InternalColor): HSLColor {
+	return getStateValue(this, COLOR_TYPE.hsl, false) as HSLColor;
+}
+
+export function getHslaValue(this: InternalColor): HSLAColor {
+	return getStateValue(this, COLOR_TYPE.hsl, true) as HSLAColor;
+}
+
+export function getHslValues(value: Record<keyof HSLColor, unknown>): HSLColor {
 	return {
 		hue: getDegrees(value.hue),
 		saturation: getPercentage(value.saturation),
@@ -169,6 +179,31 @@ export function hslToRgb(hsl: HSLAColor | HSLColor): RGBColor {
  */
 export function hslToRgba(hsl: HSLAColor | HSLColor): RGBAColor {
 	return convertHslToRgba(hsl);
+}
+
+export function setHslValue(this: InternalColor, value: unknown): void {
+	setHSLValueInState(this, value, false);
+}
+
+function setHSLValueInState(instance: InternalColor, value: unknown, alpha: boolean): void {
+	if (!isHslLike(value)) {
+		return;
+	}
+
+	setStateValue(
+		instance,
+		COLOR_TYPE.hsl,
+		{
+			hue: getDegrees(value.hue),
+			saturation: getPercentage(value.saturation),
+			lightness: getPercentage(value.lightness),
+		},
+		alpha ? (value as HSLAColor).alpha : undefined,
+	);
+}
+
+export function setHslaValue(this: InternalColor, value: unknown): void {
+	setHSLValueInState(this, value, true);
 }
 
 // #endregion

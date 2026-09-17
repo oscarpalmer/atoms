@@ -489,8 +489,4 @@ export function attemptFlow(...fns: GenericCallback[]): (...args: unknown[]) => 
 
 attemptFlow.async = attemptAsyncFlow;
 
-Object.defineProperty(attemptFlow, 'async', {
-	value: attemptAsyncFlow,
-});
-
 // #endregion

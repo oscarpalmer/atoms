@@ -1,4 +1,5 @@
 import {getNumberOrDefault} from '../internal/defaults';
+import {isPlainObject} from '../internal/is';
 import {error, ok} from '../internal/result/misc';
 import type {PlainObject, RequiredKeys} from '../models';
 import {
@@ -29,7 +30,7 @@ export function createPromiseOptions(input: unknown): RequiredKeys<PromiseOption
 		return {signal: input, time: 0};
 	}
 
-	const options = typeof input === 'object' && input !== null ? (input as PromiseOptions) : {};
+	const options = isPlainObject(input) ? input : {};
 
 	return {
 		signal: options.signal instanceof AbortSignal ? options.signal : undefined,
@@ -48,7 +49,7 @@ export function createPromisesOptions(input: unknown): RequiredKeys<PromisesOpti
 		return {signal: input, strategy: PROMISE_STRATEGY_DEFAULT};
 	}
 
-	const options = typeof input === 'object' && input !== null ? (input as PromisesOptions) : {};
+	const options = isPlainObject(input) ? input : {};
 
 	return {
 		signal: options.signal instanceof AbortSignal ? options.signal : undefined,
@@ -79,9 +80,7 @@ export function getResultsFromPromises(
 }
 
 export function getStrategyOrDefault(value: unknown): PromiseStrategy {
-	return PROMISE_STRATEGY_ALL.has(value as PromiseStrategy)
-		? (value as PromiseStrategy)
-		: PROMISE_STRATEGY_DEFAULT;
+	return PROMISE_STRATEGY_ALL.has(value as never) ? (value as never) : PROMISE_STRATEGY_DEFAULT;
 }
 
 /**
@@ -105,9 +104,7 @@ export function isRejected(value: unknown): value is RejectedPromise {
 }
 
 function isType(value: unknown, type: string): boolean {
-	return (
-		typeof value === 'object' && value !== null && (value as PromisesValue<unknown>).status === type
-	);
+	return isPlainObject(value) && 'status' in value && value.status === type;
 }
 
 // #endregion

@@ -2,12 +2,6 @@ import {isPlainObject} from '../internal/is';
 import {compare} from '../internal/value/compare';
 import type {PlainObject, Primitive} from '../models';
 
-// #region Special variables
-
-const SORTER_PROPERTY = '$sorter';
-
-// #endregion
-
 // #region Types
 
 /**
@@ -158,25 +152,12 @@ export type Sorter<Item> = {
 // #region Instances
 
 function Sorter(this: any, sorters: SortHandler[]) {
-	Object.defineProperty(this, SORTER_SYMBOL, {
-		value: sorters,
-	});
+	this[SORTER_SYMBOL] = sorters;
 }
 
-Object.defineProperties(Sorter.prototype, {
-	[SORTER_PROPERTY]: {
-		value: true,
-	},
-	index: {
-		value: getSortedArrayIndex,
-	},
-	is: {
-		value: isSortedArray,
-	},
-	sort: {
-		value: sortArray,
-	},
-});
+Sorter.prototype.index = getSortedArrayIndex;
+Sorter.prototype.is = isSortedArray;
+Sorter.prototype.sort = sortArray;
 
 // #endregion
 
@@ -203,8 +184,8 @@ function getComparisonValue(
 		const sorter = sorters[index];
 
 		const values = [
-			sorter.get ? sorter.value!(first as PlainObject) : first,
-			sorter.get ? sorter.value!(second as PlainObject) : second,
+			sorter.get ? sorter.value?.(first) : first,
+			sorter.get ? sorter.value?.(second) : second,
 		];
 
 		const comparison =
@@ -245,7 +226,7 @@ function getObjectSorter(obj: PlainObject, modifier: number): SortHandler | unde
 	}
 
 	if (sorter != null && typeof obj.direction === 'string') {
-		sorter.modifier = modifiers[obj.direction as SortDirection] ?? modifier;
+		sorter.modifier = modifiers[obj.direction] ?? modifier;
 	}
 
 	return sorter;
@@ -644,9 +625,9 @@ export const SORT_DIRECTION_ASCENDING: SortDirection = 'ascending';
 
 export const SORT_DIRECTION_DESCENDING: SortDirection = 'descending';
 
-const SORTER_SYMBOL = Symbol(SORTER_PROPERTY);
+const SORTER_SYMBOL = Symbol('sorter');
 
-const modifiers: Record<SortDirection, number> = {
+const modifiers: Record<string, number> = {
 	[SORT_DIRECTION_ASCENDING]: 1,
 	[SORT_DIRECTION_DESCENDING]: -1,
 };
@@ -658,17 +639,5 @@ const modifiers: Record<SortDirection, number> = {
 sort.getIndex = getSortedIndex;
 sort.initialize = initializeSorter;
 sort.is = isSorted;
-
-Object.defineProperties(sort, {
-	getIndex: {
-		value: getSortedIndex,
-	},
-	initialize: {
-		value: initializeSorter,
-	},
-	is: {
-		value: isSorted,
-	},
-});
 
 // #endregion

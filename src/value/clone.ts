@@ -68,22 +68,12 @@ type InternalCloner = {
 // #region Instances
 
 function Cloner(this: any, options: Required<CloneOptions>) {
-	Object.defineProperty(this, CLONE_SYMBOL, {
-		value: options,
-	});
+	this[CLONE_SYMBOL] = options;
 }
 
-Object.defineProperties(Cloner.prototype, {
-	clone: {
-		value: cloneFromCloner,
-	},
-	deregister: {
-		value: deregisterCloner,
-	},
-	register: {
-		value: registerCloner,
-	},
-});
+Cloner.prototype.clone = cloneFromCloner;
+Cloner.prototype.deregister = deregisterCloner;
+Cloner.prototype.register = registerCloner;
 
 // #endregion
 
@@ -459,20 +449,5 @@ clone.deregister = deregisterCloner;
 clone.handlers = cloneHandler;
 clone.initialize = initializeCloner;
 clone.register = registerCloner;
-
-Object.defineProperties(clone, {
-	deregister: {
-		value: deregisterCloner,
-	},
-	handler: {
-		value: cloneHandler,
-	},
-	initialize: {
-		value: initializeCloner,
-	},
-	register: {
-		value: registerCloner,
-	},
-});
 
 // #endregion

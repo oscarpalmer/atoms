@@ -115,7 +115,7 @@ export function count(array: unknown[], key?: unknown, value?: unknown): number 
 	for (let index = 0; index < length; index += 1) {
 		const item = array[index];
 
-		if (Object.is(callback(item as never, index, array), value)) {
+		if (Object.is(callback(item, index, array), value)) {
 			counted += 1;
 		}
 	}
@@ -178,7 +178,7 @@ export function median(array: unknown[], key?: unknown): number {
 	const callback = getAggregateCallback(key);
 
 	if (callback != null) {
-		values = array.map((item, index) => callback(item as never, index, array));
+		values = array.map((item, index) => callback(item, index, array));
 	}
 
 	const numbers = values.filter(isNumber).sort((first, second) => first - second);

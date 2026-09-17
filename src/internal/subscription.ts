@@ -1,5 +1,5 @@
 import type {Key} from '../models';
-import {createAborter, type Aborter} from './abort';
+import {createAborter, type Aborter} from './aborter';
 import {isKey, isPlainObject} from './is';
 
 // #region Special variables
@@ -156,65 +156,44 @@ function Subscription(
 	property: SubscriptionProperty,
 	parameters: SubscriptionParameters,
 ) {
-	Object.defineProperty(this, SUBSCRIPTION_SYMBOL, {
-		value: state,
-	});
+	this[SUBSCRIPTION_SYMBOL] = state;
+	this[property.key] = property.value;
 
 	state.aborter = createAborter(parameters.signal, () =>
 		this.unsubscribe(subscriptions, this, state),
 	);
 
-	Object.defineProperties(this, {
-		[property.key]: {
-			value: property.value,
-		},
-		active: {
-			enumerable: true,
-			get: () => (state.parameters?.isActive?.() ?? true) && state.active,
-		},
-	});
-
 	addSubscription(this);
 }
 
-Object.defineProperties(Subscription.prototype, {
-	[SUBSCRIPTION_PROPERTY]: {
-		value: SUBSCRIPTION_NAME,
-	},
-	unsubscribe: {
-		value: removeSubscription,
-	},
+Subscription.prototype[SUBSCRIPTION_PROPERTY] = SUBSCRIPTION_NAME;
+
+Subscription.prototype.unsubscribe = removeSubscription;
+
+Object.defineProperty(Subscription.prototype, 'active', {
+	enumerable: true,
+	get: getSubscriptionActive,
 });
 
 function Subscriptions(this: any, parameters?: SubscriptionsParameters) {
 	const {keys, property} = createSubscriptionsParameters(parameters);
 
-	Object.defineProperty(this, SUBSCRIPTION_SYMBOL, {
-		value: createSubscriptionsState(property, keys),
-	});
+	this[SUBSCRIPTION_SYMBOL] = createSubscriptionsState(property, keys);
 }
 
+Subscriptions.prototype[SUBSCRIPTION_PROPERTY] = SUBSCRIPTION_STORE;
+
+Subscriptions.prototype.clear = clearSubscriptions;
+Subscriptions.prototype.create = createSubscription;
+
 Object.defineProperties(Subscriptions.prototype, {
-	[SUBSCRIPTION_PROPERTY]: {
-		value: SUBSCRIPTION_STORE,
-	},
-	clear: {
-		value: clearSubscriptions,
-	},
-	create: {
-		value: createSubscription,
-	},
 	items: {
 		enumerable: true,
-		get(): SubscriptionsItems {
-			return (this as InternalSubscriptions)[SUBSCRIPTION_SYMBOL].items;
-		},
+		get: getSubscriptionsItems,
 	},
 	values: {
 		enumerable: true,
-		get(): SubscriptionsValues {
-			return (this as InternalSubscriptions)[SUBSCRIPTION_SYMBOL].values;
-		},
+		get: getSubscriptionsValues,
 	},
 });
 
@@ -336,6 +315,20 @@ function getExistingSubscription(
 	return isKey(parameters.key)
 		? values.from.keyed?.get(parameters.key)?.get(parameters.value)
 		: values.from.any.get(parameters.value);
+}
+
+function getSubscriptionActive(this: InternalSubscription): boolean {
+	const state = this[SUBSCRIPTION_SYMBOL];
+
+	return (state.parameters?.isActive?.() ?? true) && state.active;
+}
+
+function getSubscriptionsItems(this: InternalSubscriptions): SubscriptionsItems {
+	return this[SUBSCRIPTION_SYMBOL].items;
+}
+
+function getSubscriptionsValues(this: InternalSubscriptions): SubscriptionsValues {
+	return this[SUBSCRIPTION_SYMBOL].values;
 }
 
 function createSubscriptionParameters(input: unknown): SubscriptionParameters {

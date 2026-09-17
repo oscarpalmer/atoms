@@ -111,7 +111,8 @@ export function getArray(value: unknown, indiced?: unknown): unknown[] {
 		return Object.entries(value);
 	}
 
-	const keys = Object.keys(value);
+	const obj = value as PlainObject;
+	const keys = Object.keys(obj);
 	const {length} = keys;
 
 	const array: unknown[] = [];
@@ -121,7 +122,7 @@ export function getArray(value: unknown, indiced?: unknown): unknown[] {
 		const asNumber = Number.parseInt(key, 10);
 
 		if (!Number.isNaN(asNumber)) {
-			array[asNumber] = (value as Record<string, unknown>)[key];
+			array[asNumber] = obj[key];
 		}
 	}
 

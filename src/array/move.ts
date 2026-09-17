@@ -316,13 +316,4 @@ export function moveToIndex(
 move.indices = moveIndices;
 move.toIndex = moveToIndex;
 
-Object.defineProperties(move, {
-	indices: {
-		value: moveIndices,
-	},
-	toIndex: {
-		value: moveToIndex,
-	},
-});
-
 // #endregion

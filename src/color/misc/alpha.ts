@@ -1,7 +1,7 @@
 import {round} from '../../internal/math/misc';
 import {clamp} from '../../internal/number';
-import {COLOR_ALPHA, COLOR_DEFAULTS, COLOR_EXPRESSION, COLOR_MAX} from '../constants';
-import type {Alpha} from '../models';
+import {COLOR_ALPHA, COLOR_DEFAULTS, COLOR_EXPRESSION, COLOR_MAX, COLOR_SYMBOL} from '../constants';
+import type {Alpha, InternalColor} from '../models';
 
 // #region Functions
 
@@ -22,6 +22,10 @@ export function getAlpha(value: unknown, hex: boolean): Alpha {
 	}
 
 	return getAlphaFromValue(Number.parseFloat(value));
+}
+
+export function getColorAlpha(this: InternalColor): number {
+	return this[COLOR_SYMBOL].values.alpha.value;
 }
 
 export function getAlphaHexadecimal(value: number): string {
@@ -51,6 +55,12 @@ export function getAlphaValue(original: number): number {
 	}
 
 	return clamp(original, COLOR_ALPHA.noneValue, COLOR_MAX.percent);
+}
+
+export function setColorAlpha(this: InternalColor, value: unknown): void {
+	if (typeof value === 'number' && !Number.isNaN(value)) {
+		this[COLOR_SYMBOL].values.alpha = getAlpha(value, false);
+	}
 }
 
 // #endregion

@@ -1,4 +1,4 @@
-import type {PlainObject} from '../../models';
+import {isPlainObject} from '../../internal/is';
 
 export function partial<Value extends object, ValueKey extends keyof Value>(
 	value: unknown,
@@ -17,7 +17,7 @@ export function partial<Value extends object, ValueKey extends keyof Value>(
 	providedKeys: ValueKey[],
 	omit: boolean,
 ): Partial<Value> {
-	if (typeof value !== 'object' || value === null) {
+	if (!isPlainObject(value)) {
 		return {} as Partial<Value>;
 	}
 
@@ -31,14 +31,14 @@ export function partial<Value extends object, ValueKey extends keyof Value>(
 	const partials: Partial<Value> = {};
 
 	for (let index = 0; index < length; index += 1) {
-		const key = keys[index];
+		const key = keys[index] as ValueKey;
 
 		if (!(key in value)) {
 			continue;
 		}
 
-		if (omit ? !providedKeys.includes(key as ValueKey) : true) {
-			(partials as PlainObject)[key] = (value as PlainObject)[key];
+		if (omit ? !providedKeys.includes(key) : true) {
+			partials[key] = (value as Partial<Value>)[key];
 		}
 	}
 

@@ -195,8 +195,4 @@ export function lastOrDefault(
 
 last.default = lastOrDefault;
 
-Object.defineProperty(last, 'default', {
-	value: lastOrDefault,
-});
-
 // #endregion

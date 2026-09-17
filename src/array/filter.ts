@@ -183,8 +183,4 @@ export function filter(array: unknown[], ...parameters: unknown[]): unknown[] {
 
 filter.remove = exclude;
 
-Object.defineProperty(filter, 'remove', {
-	value: exclude,
-});
-
 // #endregion

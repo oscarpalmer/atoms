@@ -197,12 +197,14 @@ test('transform', () => {
 	});
 
 	expect(
-		transform.initialize(() => 'blah' as never).transform({
-			a: 123,
-			b: 'abc',
-			c: true,
-			d: [1, 2, 3],
-		}),
+		transform
+			.initialize(() => 'blah' as never)
+			.transform({
+				a: 123,
+				b: 'abc',
+				c: true,
+				d: [1, 2, 3],
+			}),
 	).toEqual({
 		a: 'blah',
 		b: 'blah',

@@ -136,17 +136,13 @@ export function assertIs<Value>(
  * @param error Error constructor _(defaults to `Error`)_
  * @returns _Asserter_
  */
-export function assertProperty<
-	Value extends PlainObject,
-	Path extends NestedKeys<Value>,
-	Asserted = NestedPick<Value, Path>,
->(
+export function assertProperty<Value extends PlainObject, Path extends NestedKeys<Value>>(
 	path: Path,
 	condition: (value: NestedValue<Value, Path>) => boolean,
 	message: string,
 	error?: ErrorConstructor,
-): Asserter<Asserted> {
-	return (value: unknown): asserts value is Asserted => {
+): Asserter<NestedPick<Value, Path>> {
+	return (value: unknown): asserts value is unknown => {
 		assert(
 			() => {
 				const result = hasValueResult(value as never, path, false);
@@ -174,23 +170,5 @@ assert.defined = assertDefined;
 assert.instanceOf = assertInstanceOf;
 assert.is = assertIs;
 assert.property = assertProperty;
-
-Object.defineProperties(assert, {
-	condition: {
-		value: assertCondition,
-	},
-	defined: {
-		value: assertDefined,
-	},
-	instanceOf: {
-		value: assertInstanceOf,
-	},
-	is: {
-		value: assertIs,
-	},
-	property: {
-		value: assertProperty,
-	},
-});
 
 // #endregion

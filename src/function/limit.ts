@@ -85,14 +85,6 @@ export function throttle<Callback extends GenericCallback>(
 debounce.async = asyncDebounce;
 throttle.async = asyncThrottle;
 
-Object.defineProperty(debounce, 'async', {
-	value: asyncDebounce,
-});
-
-Object.defineProperty(throttle, 'async', {
-	value: asyncThrottle,
-});
-
 // #endregion
 
 // #region Exports

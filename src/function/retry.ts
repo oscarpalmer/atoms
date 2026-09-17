@@ -173,8 +173,4 @@ const RETRY_MESSAGE_FAILED = 'Retry failed';
 
 retry.async = asyncRetry;
 
-Object.defineProperty(retry, 'async', {
-	value: asyncRetry,
-});
-
 // #endregion

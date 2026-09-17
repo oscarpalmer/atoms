@@ -2,6 +2,7 @@ import {COLOR_DEFAULTS, COLOR_MAX, COLOR_TYPE} from '../constants';
 import {getAlphaValue} from '../misc/alpha';
 import {getDegrees, getPercentage} from '../misc/get';
 import {isHwbLike} from '../misc/is';
+import {getStateValue, setStateValue} from '../misc/state';
 import type {
 	ColorState,
 	ColorType,
@@ -9,6 +10,7 @@ import type {
 	HSLColor,
 	HWBAColor,
 	HWBColor,
+	InternalColor,
 	RGBAColor,
 	RGBColor,
 } from '../models';
@@ -18,7 +20,7 @@ import {rgbToHex} from './rgb';
 // #region Functions
 
 export function convertHwbToHsl(input: HWBAColor | HWBColor): HSLAColor {
-	let {blackness, hue, whiteness} = isHwbLike(input) ? getHwbValue(input) : COLOR_DEFAULTS.hwb;
+	let {blackness, hue, whiteness} = isHwbLike(input) ? getHwbValues(input) : COLOR_DEFAULTS.hwb;
 
 	blackness /= COLOR_MAX.percent;
 	whiteness /= COLOR_MAX.percent;
@@ -75,7 +77,15 @@ function getHwbSaturation(blackness: number, whiteness: number, lightness: numbe
 	return hue / Math.min(2 * lightness, 2 - 2 * lightness);
 }
 
-export function getHwbValue(value: Record<keyof HWBColor, unknown>): HWBColor {
+export function getHwbValue(this: InternalColor): HWBColor {
+	return getStateValue(this, COLOR_TYPE.hwb, false) as HWBColor;
+}
+
+export function getHwbaValue(this: InternalColor): HWBAColor {
+	return getStateValue(this, COLOR_TYPE.hwb, true) as HWBAColor;
+}
+
+export function getHwbValues(value: Record<keyof HWBColor, unknown>): HWBColor {
 	return {
 		hue: getDegrees(value.hue),
 		whiteness: getPercentage(value.whiteness),
@@ -148,6 +158,31 @@ export function hwbToRgb(hwb: HWBAColor | HWBColor): RGBColor {
  */
 export function hwbToRgba(hwb: HWBAColor | HWBColor): RGBAColor {
 	return hslToRgba(hwbToHsla(hwb));
+}
+
+export function setHwbValue(this: InternalColor, value: unknown): void {
+	setHwbColorValueInState(this, value, false);
+}
+
+function setHwbColorValueInState(instance: InternalColor, value: unknown, alpha: boolean): void {
+	if (!isHwbLike(value)) {
+		return;
+	}
+
+	setStateValue(
+		instance,
+		COLOR_TYPE.hwb,
+		{
+			hue: getDegrees(value.hue),
+			whiteness: getPercentage(value.whiteness),
+			blackness: getPercentage(value.blackness),
+		},
+		alpha ? (value as HWBAColor).alpha : undefined,
+	);
+}
+
+export function setHwbaValue(this: InternalColor, value: unknown): void {
+	setHwbColorValueInState(this, value, true);
 }
 
 // #endregion

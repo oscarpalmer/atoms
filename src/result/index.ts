@@ -106,8 +106,4 @@ export function attempt<Value, E>(
 
 attempt.async = asyncAttempt;
 
-Object.defineProperty(attempt, 'async', {
-	value: asyncAttempt,
-});
-
 // #endregion

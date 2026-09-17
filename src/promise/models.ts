@@ -1,4 +1,4 @@
-import type {Aborter} from '../internal/abort';
+import type {Aborter} from '../internal/aborter';
 import type {Result} from '../internal/result/models';
 import type {ArrayOrPlainObject, GenericCallback, Key} from '../models';
 import {

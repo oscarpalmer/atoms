@@ -60,16 +60,10 @@ type TemplaterRenderer = (variables?: PlainObject) => string;
 // #region Instances
 
 function Templater(this: any, options: Required<TemplateOptions>) {
-	Object.defineProperty(this, TEMPLATE_SYMBOL, {
-		value: options,
-	});
+	this[TEMPLATE_SYMBOL] = options;
 }
 
-Object.defineProperties(Templater.prototype, {
-	render: {
-		value: render,
-	},
-});
+Templater.prototype.render = render;
 
 // #endregion
 
@@ -192,9 +186,5 @@ const TEMPLATE_SYMBOL = Symbol('template');
 // #region Initialization
 
 template.initialize = initializeTemplater;
-
-Object.defineProperty(template, 'initialize', {
-	value: initializeTemplater,
-});
 
 // #endregion

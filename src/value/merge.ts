@@ -96,31 +96,19 @@ type ReplaceableObjectsCallback = (name: string) => boolean;
 // #region Instances
 
 function Assigner(this: any, options: Options) {
-	Object.defineProperty(this, MERGE_SYMBOL_ASSIGN, {
-		value: {
-			...options,
-			assignValues: true,
-		},
-	});
+	this[MERGE_SYMBOL_ASSIGN] = {
+		...options,
+		assignValues: true,
+	};
 }
 
-Object.defineProperties(Assigner.prototype, {
-	assign: {
-		value: assignFromAssigner,
-	},
-});
+Assigner.prototype.assign = assignFromAssigner;
 
 function Merger(this: any, options: Options) {
-	Object.defineProperty(this, MERGE_SYMBOL_MERGE, {
-		value: options,
-	});
+	this[MERGE_SYMBOL_MERGE] = options;
 }
 
-Object.defineProperties(Merger.prototype, {
-	merge: {
-		value: mergeFromMerger,
-	},
-});
+Merger.prototype.merge = mergeFromMerger;
 
 // #endregion
 
@@ -328,13 +316,5 @@ const MERGE_SYMBOL_MERGE = Symbol('merge');
 
 assign.initialize = initializeAssigner;
 merge.initialize = initializeMerger;
-
-Object.defineProperty(assign, 'initialize', {
-	value: initializeAssigner,
-});
-
-Object.defineProperty(merge, 'initialize', {
-	value: initializeMerger,
-});
 
 // #endregion

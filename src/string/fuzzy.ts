@@ -133,38 +133,34 @@ type InternalFuzzy<Item = unknown> = {
 // #region Instances
 
 function Fuzzy(this: any, state: FuzzyState<unknown>) {
-	Object.defineProperty(this, FUZZY_SYMBOL, {
-		value: state,
-	});
+	this[FUZZY_SYMBOL] = state;
 }
 
+Fuzzy.prototype[FUZZY_PROPERTY] = true;
+
+Fuzzy.prototype.search = search;
+
 Object.defineProperties(Fuzzy.prototype, {
-	[FUZZY_PROPERTY]: {
-		value: true,
-	},
 	items: {
 		enumerable: true,
-		get(): unknown[] {
-			return (this as InternalFuzzy)[FUZZY_SYMBOL].items.slice();
-		},
-		set(value: unknown): void {
-			setItems((this as InternalFuzzy)[FUZZY_SYMBOL], value);
-		},
-	},
-	search: {
-		value: search,
+		get: getFuzzyItems,
+		set: setFuzzyItems,
 	},
 	strings: {
 		enumerable: true,
-		get(): string[] {
-			return (this as InternalFuzzy)[FUZZY_SYMBOL].strings.slice();
-		},
+		get: getFuzzyStrings,
 	},
 });
 
 // #endregion
 
 // #region Functions
+
+function createFuzzyItems<Item>(items: Array<FuzzyItem<Item>>): Item[] {
+	return items
+		.sort((first, second) => first.haystack.localeCompare(second.haystack))
+		.map(({item}) => item);
+}
 
 function createFuzzyOptions<Item>(
 	input: unknown,
@@ -285,10 +281,12 @@ function getHandler<Item>(input: unknown): (item: Item) => string {
 	}
 }
 
-function getFuzzyItems<Item>(items: Array<FuzzyItem<Item>>): Item[] {
-	return items
-		.sort((first, second) => first.haystack.localeCompare(second.haystack))
-		.map(({item}) => item);
+function getFuzzyItems(this: InternalFuzzy): unknown[] {
+	return this[FUZZY_SYMBOL].items.slice();
+}
+
+function getFuzzyStrings(this: InternalFuzzy): string[] {
+	return this[FUZZY_SYMBOL].strings.slice();
 }
 
 function getScore(haystack: string, needle: string): number {
@@ -452,11 +450,11 @@ function search<Item>(
 				break;
 			}
 
-			similar.push(...getFuzzyItems(scored[key]));
+			similar.push(...createFuzzyItems(scored[key]));
 		}
 	}
 
-	result.exact = getFuzzyItems(options.limit == null ? exact : exact.slice(0, options.limit));
+	result.exact = createFuzzyItems(options.limit == null ? exact : exact.slice(0, options.limit));
 
 	if (options.limit == null) {
 		result.similar = similar;
@@ -467,10 +465,12 @@ function search<Item>(
 	return result;
 }
 
-function setItems(state: FuzzyState<unknown>, value: unknown): void {
+function setFuzzyItems(this: InternalFuzzy, value: unknown): void {
 	if (!Array.isArray(value)) {
 		throw new TypeError(FUZZY_MESSAGE_ARRAY);
 	}
+
+	const state = this[FUZZY_SYMBOL];
 
 	state.items = value.slice();
 	state.strings = value.map(state.handler);
@@ -494,14 +494,5 @@ const FUZZY_PROXIMITY_THRESHOLD = 5;
 
 fuzzy.is = isFuzzy;
 fuzzy.match = fuzzyMatch;
-
-Object.defineProperties(fuzzy, {
-	is: {
-		value: isFuzzy,
-	},
-	match: {
-		value: fuzzyMatch,
-	},
-});
 
 // #endregion

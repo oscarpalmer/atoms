@@ -323,8 +323,4 @@ function swapValues(array: unknown[], from: unknown, to: unknown, key?: unknown)
 
 swap.indices = swapIndices;
 
-Object.defineProperty(swap, 'indices', {
-	value: swapIndices,
-});
-
 // #endregion

@@ -1,5 +1,5 @@
 import {assert} from '../internal/function/assert';
-import type {GenericAsyncCallback, GenericCallback, Once, OnceAsync as AsyncOnce} from '../models';
+import type {OnceAsync as AsyncOnce, GenericAsyncCallback, GenericCallback, Once} from '../models';
 
 // #region Special variables
 
@@ -44,87 +44,63 @@ type OnceState<Value, Callback = GenericCallback> = {
 // #region Instances
 
 function AsyncOnce(this: any, callback: GenericAsyncCallback) {
-	Object.defineProperty(this, ONCE_SYMBOL, {
-		value: {
-			callback,
-			called: false,
-			cleared: false,
-			error: false,
-			finished: false,
-			items: [],
-			value: undefined as never,
-		} satisfies OnceAsyncState<unknown>,
-	});
+	this[ONCE_SYMBOL] = {
+		callback,
+		called: false,
+		cleared: false,
+		error: false,
+		finished: false,
+		items: [],
+		value: undefined,
+	};
 }
 
+AsyncOnce.prototype[ONCE_PROPERTY] = ONCE_NAME_ASYNC;
+
+AsyncOnce.prototype.clear = clearOnce;
+AsyncOnce.prototype.run = runOnceAsync;
+
 Object.defineProperties(AsyncOnce.prototype, {
-	[ONCE_PROPERTY]: {
-		value: ONCE_NAME_ASYNC,
-	},
 	called: {
 		enumerable: true,
-		get(): boolean {
-			return (this as InternalOnceAsync)[ONCE_SYMBOL].called;
-		},
-	},
-	clear: {
-		value: clearOnce,
+		get: getOnceCalled,
 	},
 	cleared: {
 		enumerable: true,
-		get(): boolean {
-			return (this as InternalOnceAsync)[ONCE_SYMBOL].cleared;
-		},
+		get: getOnceCleared,
 	},
 	error: {
 		enumerable: true,
-		get(): boolean {
-			return (this as InternalOnceAsync)[ONCE_SYMBOL].error;
-		},
+		get: getAsyncOnceError,
 	},
 	finished: {
 		enumerable: true,
-		get(): boolean {
-			return (this as InternalOnceAsync)[ONCE_SYMBOL].finished;
-		},
-	},
-	run: {
-		value: runOnceAsync,
+		get: getAsyncOnceFinished,
 	},
 });
 
 function Once(this: any, callback: GenericCallback) {
-	Object.defineProperty(this, ONCE_SYMBOL, {
-		value: {
-			callback,
-			called: false,
-			cleared: false,
-			value: undefined as never,
-		} satisfies OnceState<GenericCallback>,
-	});
+	this[ONCE_SYMBOL] = {
+		callback,
+		called: false,
+		cleared: false,
+		value: undefined,
+	};
 }
 
+Once.prototype[ONCE_PROPERTY] = ONCE_NAME_SYNC;
+
+Once.prototype.clear = clearOnce;
+Once.prototype.run = runOnce;
+
 Object.defineProperties(Once.prototype, {
-	[ONCE_PROPERTY]: {
-		value: ONCE_NAME_SYNC,
-	},
-	clear: {
-		value: clearOnce,
-	},
 	called: {
 		enumerable: true,
-		get(): boolean {
-			return (this as InternalOnce)[ONCE_SYMBOL].called;
-		},
+		get: getOnceCalled,
 	},
 	cleared: {
 		enumerable: true,
-		get(): boolean {
-			return (this as InternalOnce)[ONCE_SYMBOL].cleared;
-		},
-	},
-	run: {
-		value: runOnce,
+		get: getOnceCleared,
 	},
 });
 
@@ -161,14 +137,26 @@ function clearOnce(this: InternalOnce | InternalOnceAsync): void {
 	state.value = undefined as never;
 }
 
-function handleOnceResult<Value>(
-	state: OnceAsyncState<Value>,
-	value: unknown,
-	error: boolean,
-): void {
+function getAsyncOnceError(this: InternalOnceAsync): boolean {
+	return this[ONCE_SYMBOL].error;
+}
+
+function getAsyncOnceFinished(this: InternalOnceAsync): boolean {
+	return this[ONCE_SYMBOL].finished;
+}
+
+function getOnceCalled(this: InternalOnce | InternalOnceAsync): boolean {
+	return this[ONCE_SYMBOL].called;
+}
+
+function getOnceCleared(this: InternalOnce | InternalOnceAsync): boolean {
+	return this[ONCE_SYMBOL].cleared;
+}
+
+function handleOnceResult<Value>(state: OnceAsyncState<Value>, value: Value, error: boolean): void {
 	state.error = error;
 	state.finished = true;
-	state.value = value as Value;
+	state.value = value;
 
 	const items = state.items.splice(0);
 	const {length} = items;
@@ -179,7 +167,7 @@ function handleOnceResult<Value>(
 		if (error) {
 			reject(value);
 		} else {
-			resolve(value as Value);
+			resolve(value);
 		}
 	}
 }
@@ -296,21 +284,5 @@ asyncOnce.is = isAsyncOnce;
 once.async = asyncOnce;
 once.is = isOnce;
 once.isAsync = isAsyncOnce;
-
-Object.defineProperty(asyncOnce, 'is', {
-	value: isAsyncOnce,
-});
-
-Object.defineProperties(once, {
-	async: {
-		value: asyncOnce,
-	},
-	is: {
-		value: isOnce,
-	},
-	isAsync: {
-		value: isAsyncOnce,
-	},
-});
 
 // #endregion

@@ -325,13 +325,4 @@ const frozenValues = new WeakSet();
 freeze.flat = flatFreeze;
 freeze.is = isFrozen;
 
-Object.defineProperties(freeze, {
-	flat: {
-		value: flatFreeze,
-	},
-	is: {
-		value: isFrozen,
-	},
-});
-
 // #endregion

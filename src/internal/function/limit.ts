@@ -84,52 +84,34 @@ type LimiterType = 'debounce' | 'throttle' | 'wait';
 // #region Instances
 
 function AsyncLimiter(this: any, type: LimiterType, callback: GenericAsyncCallback, time?: number) {
-	Object.defineProperty(this, LIMITER_SYMBOL, {
-		value: {
-			callback,
-			type,
-			interval: getNumberOrDefault(time, 0),
-			parameters: [],
-			throttle: type === LIMITER_THROTTLE,
-		} satisfies AsyncLimiterState,
-	});
+	this[LIMITER_SYMBOL] = {
+		callback,
+		type,
+		interval: getNumberOrDefault(time, 0),
+		parameters: [],
+		throttle: type === LIMITER_THROTTLE,
+	};
 }
 
-Object.defineProperties(AsyncLimiter.prototype, {
-	[LIMITER_PROPERTY]: {
-		value: LIMITER_NAME_ASYNC,
-	},
-	cancel: {
-		value: cancelAsyncLimiter,
-	},
-	run: {
-		value: runAsyncLimiter,
-	},
-});
+AsyncLimiter.prototype[LIMITER_PROPERTY] = LIMITER_NAME_ASYNC;
+
+AsyncLimiter.prototype.cancel = cancelAsyncLimiter;
+AsyncLimiter.prototype.run = runAsyncLimiter;
 
 function Limiter(this: any, type: LimiterType, callback: GenericCallback, time?: number) {
-	Object.defineProperty(this, LIMITER_SYMBOL, {
-		value: {
-			callback,
-			type,
-			interval: getNumberOrDefault(time, 0),
-			parameters: [],
-			throttle: type === LIMITER_THROTTLE,
-		} satisfies LimiterState,
-	});
+	this[LIMITER_SYMBOL] = {
+		callback,
+		type,
+		interval: getNumberOrDefault(time, 0),
+		parameters: [],
+		throttle: type === LIMITER_THROTTLE,
+	};
 }
 
-Object.defineProperties(Limiter.prototype, {
-	[LIMITER_PROPERTY]: {
-		value: LIMITER_NAME_SYNC,
-	},
-	cancel: {
-		value: cancelLimiter,
-	},
-	run: {
-		value: runLimiter,
-	},
-});
+Limiter.prototype[LIMITER_PROPERTY] = LIMITER_NAME_SYNC;
+
+Limiter.prototype.cancel = cancelLimiter;
+Limiter.prototype.run = runLimiter;
 
 // #endregion
 

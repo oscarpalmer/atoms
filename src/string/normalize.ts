@@ -56,16 +56,10 @@ type Options = Required<NormalizeOptions>;
 // #region Instances
 
 function Normalizer(this: any, options: Required<NormalizeOptions>) {
-	Object.defineProperty(this, NORMALIZE_SYMBOL, {
-		value: options,
-	});
+	this[NORMALIZE_SYMBOL] = options;
 }
 
-Object.defineProperties(Normalizer.prototype, {
-	normalize: {
-		value: normalizeString,
-	},
-});
+Normalizer.prototype.normalize = normalizeString;
 
 // #endregion
 
@@ -237,9 +231,5 @@ let deburrMemoizer: Memoized<typeof deburr>;
 // #region Initialization
 
 normalize.initialize = initializeNormalizer;
-
-Object.defineProperty(normalize, 'initialize', {
-	value: initializeNormalizer,
-});
 
 // #endregion
