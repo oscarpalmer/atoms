@@ -172,10 +172,12 @@ export {
 	isNonNumber,
 	isNonPlainObject,
 	isNonPrimitive,
+	isNonTemplateStringsArray,
 	isNonTypedArray,
 	isNumber,
 	isPlainObject,
 	isPrimitive,
+	isTemplateStringsArray,
 	isTypedArray,
 } from './internal/is';
 
