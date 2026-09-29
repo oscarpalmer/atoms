@@ -1,4 +1,4 @@
-import {expect, test} from 'vitest';
+import {expect, test} from 'vite-plus/test';
 import {FulfilledPromise, promises, RejectedPromise} from '../../src';
 
 test('abort', () =>

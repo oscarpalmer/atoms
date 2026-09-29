@@ -132,7 +132,7 @@ type InternalFuzzy<Item = unknown> = {
 
 // #region Instances
 
-function Fuzzy(this: any, state: FuzzyState<unknown>) {
+function Fuzzy(this: any, state: FuzzyState<unknown>): void {
 	this[FUZZY_SYMBOL] = state;
 }
 
@@ -487,6 +487,15 @@ const FUZZY_MESSAGE_ARRAY = 'Fuzzy requires an array of items';
 const FUZZY_MESSAGE_HANDLER = 'Fuzzy requires a key or function to stringify items';
 
 const FUZZY_PROXIMITY_THRESHOLD = 5;
+
+// #endregion
+
+// #region Namespace
+
+export declare namespace fuzzy {
+	export var is: typeof isFuzzy;
+	export var match: typeof fuzzyMatch;
+}
 
 // #endregion
 

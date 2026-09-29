@@ -1,4 +1,4 @@
-import {expect, test} from 'vitest';
+import {expect, test} from 'vite-plus/test';
 import {copy} from '../../src';
 import {TestCloneItem} from '../.fixtures/clone.fixture';
 

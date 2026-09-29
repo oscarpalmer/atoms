@@ -59,7 +59,7 @@ type TemplaterRenderer = (variables?: PlainObject) => string;
 
 // #region Instances
 
-function Templater(this: any, options: Required<TemplateOptions>) {
+function Templater(this: any, options: Required<TemplateOptions>): void {
 	this[TEMPLATE_SYMBOL] = options;
 }
 
@@ -180,6 +180,14 @@ export function template(
 const TEMPLATE_EXPRESSION_VARIABLE = /{{([\s\S]+?)}}/g;
 
 const TEMPLATE_SYMBOL = Symbol('template');
+
+// #endregion
+
+// #region Namespace
+
+export declare namespace template {
+	export var initialize: typeof initializeTemplater;
+}
 
 // #endregion
 

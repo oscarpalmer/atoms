@@ -1,6 +1,6 @@
 import type {ArrayOrPlainObject, Constructor, TypedArray} from '../../models';
 import {isNonPlainObject, isPlainObject, isPrimitive, isTypedArray} from '../is';
-import {createCompareHandler} from './handlers';
+import {createCompareHandler, type CompareHandler} from './handlers';
 
 // #region Types
 
@@ -86,7 +86,7 @@ type OptionsKeys<Values> = {
 
 // #region Instances
 
-function Equalizer(this: any, options: Options) {
+function Equalizer(this: any, options: Options): void {
 	this[EQUAL_SYMBOL] = options;
 }
 
@@ -476,9 +476,20 @@ const EQUAL_MINIMUM_LENGTH_FOR_SET = 16;
 
 const EQUAL_SYMBOL = Symbol('equal');
 
-const equalHandler = createCompareHandler<boolean>(equal, {
+const equalHandler: CompareHandler<boolean> = createCompareHandler<boolean>(equal, {
 	callback: Object.is,
 });
+
+// #endregion
+
+// #region Namespace
+
+export declare namespace equal {
+	export var deregister: typeof deregisterEqualizer;
+	export var handler: CompareHandler<boolean>;
+	export var initialize: typeof initializeEqualizer;
+	export var register: typeof registerEqualizer;
+}
 
 // #endregion
 

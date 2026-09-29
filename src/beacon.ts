@@ -154,7 +154,7 @@ type Observer<Value> = {
 
 // #region Instances
 
-function Beacon(this: any, value: unknown, options?: BeaconOptions<unknown>) {
+function Beacon(this: any, value: unknown, options?: BeaconOptions<unknown>): void {
 	this[BEACON_SYMBOL] = {
 		value,
 		active: true,
@@ -184,7 +184,7 @@ Object.defineProperties(Beacon.prototype, {
 	},
 });
 
-function Observable(this: any, beacon: BeaconState<unknown>) {
+function Observable(this: any, beacon: BeaconState<unknown>): void {
 	this[BEACON_SYMBOL] = {
 		beacon,
 		active: beacon.active,
@@ -193,7 +193,7 @@ function Observable(this: any, beacon: BeaconState<unknown>) {
 
 Observable.prototype[BEACON_PROPERTY] = BEACON_OBSERVABLE;
 
-Observable.prototype.deactivate = deactiveateObservable;
+Observable.prototype.deactivate = deactivateObservable;
 Observable.prototype.subscribe = subscribeToObservable;
 
 Object.defineProperty(Observable.prototype, 'active', {
@@ -275,7 +275,7 @@ function deactivateBeacon(this: InternalBeacon): void {
 	closeBeacon(this[BEACON_SYMBOL], false);
 }
 
-function deactiveateObservable(this: InternalObservable): void {
+function deactivateObservable(this: InternalObservable): void {
 	this[BEACON_SYMBOL].active = false;
 }
 

@@ -43,7 +43,7 @@ type OnceState<Value, Callback = GenericCallback> = {
 
 // #region Instances
 
-function AsyncOnce(this: any, callback: GenericAsyncCallback) {
+function AsyncOnce(this: any, callback: GenericAsyncCallback): void {
 	this[ONCE_SYMBOL] = {
 		callback,
 		called: false,
@@ -79,7 +79,7 @@ Object.defineProperties(AsyncOnce.prototype, {
 	},
 });
 
-function Once(this: any, callback: GenericCallback) {
+function Once(this: any, callback: GenericCallback): void {
 	this[ONCE_SYMBOL] = {
 		callback,
 		called: false,
@@ -274,6 +274,20 @@ const ONCE_MESSAGE_CLEARED = 'Once has been cleared';
 const ONCE_MESSAGE_EXPECTATION = 'Once expected a function';
 
 const ONCE_SYMBOL = Symbol(ONCE_PROPERTY);
+
+// #endregion
+
+// #region Namespace
+
+export declare namespace asyncOnce {
+	export var is: typeof isAsyncOnce;
+}
+
+export declare namespace once {
+	export var async: typeof asyncOnce;
+	export var is: typeof isOnce;
+	export var isAsync: typeof isAsyncOnce;
+}
 
 // #endregion
 

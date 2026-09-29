@@ -1,9 +1,11 @@
 export * from './array/filter';
+export * from './array/find';
 export * from './array/first';
 export * from './array/group-by';
 export * from './array/index';
 export * from './array/last';
 export * from './array/move';
+export * from './array/select';
 export * from './array/sort';
 export * from './array/swap';
 export * from './array/to-map';
@@ -14,11 +16,12 @@ export * from './function/index';
 export * from './function/limit';
 export * from './function/once';
 export * from './function/retry';
-export * from './internal/function/work';
 
+export * from './internal/array/index-of';
 export * from './internal/function/assert';
 export * from './internal/function/memoize';
 export * from './internal/function/misc';
+export * from './internal/function/work';
 export * from './internal/result/models';
 export * from './internal/sized/map';
 export * from './internal/string/case';

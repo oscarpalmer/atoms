@@ -312,6 +312,14 @@ export async function resultPromises(
 
 // #endregion
 
+// #region Namespace
+
+export declare namespace promises {
+	export var result: typeof resultPromises;
+}
+
+// #endregion
+
 // #region Initialization
 
 promises.result = resultPromises;

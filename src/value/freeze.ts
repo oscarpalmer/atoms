@@ -320,6 +320,15 @@ const frozenValues = new WeakSet();
 
 // #endregion
 
+// #region Namespace
+
+export declare namespace freeze {
+	export var flat: typeof flatFreeze;
+	export var is: typeof isFrozen;
+}
+
+// #endregion
+
 // #region Initialization
 
 freeze.flat = flatFreeze;

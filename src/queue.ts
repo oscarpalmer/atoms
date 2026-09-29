@@ -304,7 +304,11 @@ type Tail<Values extends any[]> = Values extends [infer _, ...infer Rest] ? Rest
 
 // #region Instances
 
-function KeyedQueue(this: any, callback: GenericAsyncCallback, options: Required<QueueOptions>) {
+function KeyedQueue(
+	this: any,
+	callback: GenericAsyncCallback,
+	options: Required<QueueOptions>,
+): void {
 	this[QUEUE_SYMBOL] = {
 		callback,
 		options: createQueueOptions(options),
@@ -369,7 +373,7 @@ function Queue(
 	callback: GenericAsyncCallback,
 	options: Required<QueueOptions>,
 	key?: string,
-) {
+): void {
 	this[QUEUE_SYMBOL] = {
 		callback,
 		key,
@@ -912,6 +916,14 @@ const QUEUE_STATUS_FULL: StatusKey = 'full';
 const QUEUE_STATUS_PAUSED: StatusKey = 'paused';
 
 const QUEUE_SYMBOL = Symbol(QUEUE_PROPERTY);
+
+// #endregion
+
+// #region Namespace
+
+export declare namespace queue {
+	export var keyed: typeof keyedQueue;
+}
 
 // #endregion
 

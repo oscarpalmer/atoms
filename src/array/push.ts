@@ -21,3 +21,9 @@ export function push<Item>(array: Item[], pushed: Item[]): number {
 }
 
 // #endregion
+
+// #region Exports
+
+export {push as append};
+
+// #endregion

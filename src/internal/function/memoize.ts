@@ -102,7 +102,7 @@ type Options = {
 
 // #region Instances
 
-function Memoized(this: any, callback: GenericCallback, options: Options) {
+function Memoized(this: any, callback: GenericCallback, options: Options): void {
 	this[MEMOIZED_SYMBOL] = {
 		options,
 		cache: new SizedMap(options.cacheSize),

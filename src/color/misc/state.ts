@@ -12,8 +12,10 @@ import type {
 	ColorType,
 	HSLAColor,
 	HSLColor,
+	HWBAColor,
 	HWBColor,
 	InternalColor,
+	RGBAColor,
 	RGBColor,
 } from '../models';
 import {getColorFromHex, getNormalizedHex} from '../space/hex';
@@ -100,7 +102,11 @@ function getDefaultColorState(): ColorState {
 	};
 }
 
-export function getStateValue(instance: InternalColor, type: ColorType, alpha: boolean) {
+export function getStateValue(
+	instance: InternalColor,
+	type: ColorType,
+	alpha: boolean,
+): string | HSLAColor | HSLColor | HWBAColor | HWBColor | RGBAColor | RGBColor {
 	const {values} = instance[COLOR_SYMBOL];
 
 	const value = getColorFromState(values, type);

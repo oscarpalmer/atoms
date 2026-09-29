@@ -229,6 +229,22 @@ export type ColorChanges = {
 	rgba: (value: RGBAColor) => void;
 };
 
+export type ColorDefaults = {
+	alpha: Alpha;
+	hexBlack: string;
+	hexWhite: string;
+	hsl: HSLColor;
+	hwb: HWBColor;
+	rgb: RGBColor;
+};
+
+export type ColorExpressions = {
+	alphaHex: RegExp;
+	hexLong: RegExp;
+	hexShort: RegExp;
+	prefix: RegExp;
+};
+
 type ColorWithAlpha = {
 	/**
 	 * Alpha channel _(opacity)_ of the color _(in percentage; 0-100)_

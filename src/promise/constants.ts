@@ -22,7 +22,7 @@ export const PROMISE_MESSAGE_EXPECTATION_TIMED = 'Timed function expected a Prom
 
 export const PROMISE_MESSAGE_TIMEOUT = 'Promise timed out';
 
-export const PROMISE_STRATEGY_ALL = new Set<PromiseStrategy>(['complete', 'first']);
+export const PROMISE_STRATEGY_ALL: Set<PromiseStrategy> = new Set(['complete', 'first']);
 
 export const PROMISE_STRATEGY_DEFAULT: PromiseStrategy = 'complete';
 

@@ -55,7 +55,7 @@ type Options = Required<NormalizeOptions>;
 
 // #region Instances
 
-function Normalizer(this: any, options: Required<NormalizeOptions>) {
+function Normalizer(this: any, options: Required<NormalizeOptions>): void {
 	this[NORMALIZE_SYMBOL] = options;
 }
 
@@ -225,6 +225,14 @@ const NORMALIZE_WHITESPACE_PATTERN = /\s+/g;
 const NORMALIZE_WHITESPACE_REPLACEMENT = ' ';
 
 let deburrMemoizer: Memoized<typeof deburr>;
+
+// #endregion
+
+// #region Namespace
+
+export declare namespace normalize {
+	export var initialize: typeof initializeNormalizer;
+}
 
 // #endregion
 

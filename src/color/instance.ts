@@ -13,7 +13,7 @@ import {getRgbaColor, getRgbColor, setRgbaValue, setRgbValue} from './space/rgb'
 
 // #region Instances
 
-function Color(this: any, value: unknown) {
+function Color(this: any, value: unknown): void {
 	this[COLOR_SYMBOL] = {
 		changes: herald<ColorChanges>({
 			names: [COLOR_TYPE.wildcard, ...COLOR_TYPE.all],

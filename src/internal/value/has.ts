@@ -115,6 +115,14 @@ export function hasValueResult(
 
 // #endregion
 
+// #region Namespace
+
+export declare namespace hasValue {
+	export var get: typeof hasValueResult;
+}
+
+// #endregion
+
 // #region Initialization
 
 hasValue.get = hasValueResult;

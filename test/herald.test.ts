@@ -1,4 +1,4 @@
-import {expect, test} from 'vitest';
+import {expect, test} from 'vite-plus/test';
 import {herald, isHeraldEvents, isHerald, isHeraldSubscription, isSubscription} from '../src';
 
 type Events = {

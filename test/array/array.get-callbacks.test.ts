@@ -1,4 +1,4 @@
-import {expect, test} from 'vitest';
+import {expect, test} from 'vite-plus/test';
 import {getArrayCallbacks} from '../../src/internal/array/callbacks';
 
 test('', () => {

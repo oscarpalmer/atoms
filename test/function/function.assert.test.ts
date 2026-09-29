@@ -1,4 +1,4 @@
-import {expect, test} from 'vitest';
+import {expect, test} from 'vite-plus/test';
 import {assert, AssertProperty} from '../../src/internal/function/assert';
 import {TestFunctionItem, testIsString} from '../.fixtures/function.fixture';
 

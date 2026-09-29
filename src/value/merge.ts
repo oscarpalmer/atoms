@@ -95,7 +95,7 @@ type ReplaceableObjectsCallback = (name: string) => boolean;
 
 // #region Instances
 
-function Assigner(this: any, options: Options) {
+function Assigner(this: any, options: Options): void {
 	this[MERGE_SYMBOL_ASSIGN] = {
 		...options,
 		assignValues: true,
@@ -104,7 +104,7 @@ function Assigner(this: any, options: Options) {
 
 Assigner.prototype.assign = assignFromAssigner;
 
-function Merger(this: any, options: Options) {
+function Merger(this: any, options: Options): void {
 	this[MERGE_SYMBOL_MERGE] = options;
 }
 
@@ -309,6 +309,18 @@ function mergeValues(
 const MERGE_SYMBOL_ASSIGN = Symbol('assign');
 
 const MERGE_SYMBOL_MERGE = Symbol('merge');
+
+// #endregion
+
+// #region Namespace
+
+export declare namespace assign {
+	export var initialize: typeof initializeAssigner;
+}
+
+export declare namespace merge {
+	export var initialize: typeof initializeMerger;
+}
 
 // #endregion
 

@@ -2,6 +2,8 @@ import {SUBSCRIPTION_NAME} from '../internal/subscription';
 import type {SubscriptionProperty} from '../subscription';
 import type {
 	Alpha,
+	ColorDefaults,
+	ColorExpressions,
 	ColorTypeExtended,
 	HSLAColor,
 	HSLColor,
@@ -38,7 +40,7 @@ export const COLOR_ALPHA = {
 	noneValue: 0,
 };
 
-export const COLOR_DEFAULTS = {
+export const COLOR_DEFAULTS: ColorDefaults = {
 	alpha: {
 		hex: COLOR_ALPHA.fullHexLong,
 		value: 100,
@@ -62,7 +64,7 @@ export const COLOR_DEFAULTS = {
 	},
 };
 
-export const COLOR_EXPRESSION = {
+export const COLOR_EXPRESSION: ColorExpressions = {
 	alphaHex: /^([a-f0-9]{1,2})$/i,
 	hexLong: /^#?([a-f0-9]{2})([a-f0-9]{2})([a-f0-9]{2})([a-f0-9]{2})?$/i,
 	hexShort: /^#?([a-f0-9]{3,4})$/i,
@@ -99,7 +101,7 @@ export const COLOR_NAME = 'color';
 
 export const COLOR_PROPERTY = '$color';
 
-export const COLOR_SYMBOL = Symbol(COLOR_PROPERTY);
+export const COLOR_SYMBOL: symbol = Symbol(COLOR_PROPERTY);
 
 export const COLOR_TYPE: ColorTypes = {
 	all: undefined as unknown as Set<'alpha' | ColorTypeExtended>,

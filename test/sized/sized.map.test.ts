@@ -1,4 +1,4 @@
-import {expect, test} from 'vitest';
+import {expect, test} from 'vite-plus/test';
 import {SizedMap} from '../../src';
 import {sizedFixture} from '../.fixtures/sized.fixture';
 

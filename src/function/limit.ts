@@ -80,6 +80,18 @@ export function throttle<Callback extends GenericCallback>(
 
 // #endregion
 
+// #region Namespace
+
+export declare namespace debounce {
+	export var async: typeof asyncDebounce;
+}
+
+export declare namespace throttle {
+	export var async: typeof asyncThrottle;
+}
+
+// #endregion
+
 // #region Initialization
 
 debounce.async = asyncDebounce;

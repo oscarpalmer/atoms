@@ -1,4 +1,4 @@
-import {expect, test} from 'vitest';
+import {expect, test} from 'vite-plus/test';
 import {inMap, inSet, times, toMap, toSet} from '../../src';
 
 const persons = times(100, index => ({

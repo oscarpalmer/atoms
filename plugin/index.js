@@ -1,4 +1,4 @@
-import {eslintCompatPlugin} from '@oxlint/plugins';
+import {eslintCompatPlugin} from 'vite-plus/lint/plugins';
 import {groupBy} from '../dist/array/group-by.mjs';
 import pkg from '../package.json' with {type: 'json'};
 import getStringPlugin from './get-string.js';

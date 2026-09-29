@@ -179,6 +179,10 @@ export function lastIndexOf(array: unknown[], ...parameters: unknown[]): number 
 
 // #endregion
 
+export declare namespace indexOf {
+	export var last: typeof lastIndexOf;
+}
+
 // #region Initialization
 
 indexOf.last = lastIndexOf;

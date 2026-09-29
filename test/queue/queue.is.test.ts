@@ -1,4 +1,4 @@
-import {expect, test} from 'vitest';
+import {expect, test} from 'vite-plus/test';
 import {isKeyedQueue, isQueue, keyedQueue, queue} from '../../src';
 import {isFixture} from '../.fixtures/is.fixture';
 

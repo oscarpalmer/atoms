@@ -485,6 +485,14 @@ export function attemptFlow(...fns: GenericCallback[]): (...args: unknown[]) => 
 
 // #endregion
 
+// #region Namespace
+
+export declare namespace attemptFlow {
+	export var async: typeof attemptAsyncFlow;
+}
+
+// #endregion
+
 // #region Initialization
 
 attemptFlow.async = attemptAsyncFlow;

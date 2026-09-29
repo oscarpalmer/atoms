@@ -1,4 +1,4 @@
-import {expect, test} from 'vitest';
+import {expect, test} from 'vite-plus/test';
 import {dedent, getString, getUuid, join, parse, trim, truncate, words} from '../../src';
 import {
 	TestStringItemWithToString,

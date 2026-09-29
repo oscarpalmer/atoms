@@ -167,6 +167,18 @@ const RESULT_PROPERTY_VALUE = 'value';
 
 // #endregion
 
+// #region Namespace
+
+export declare namespace error {
+	export var is: typeof isError;
+}
+
+export declare namespace ok {
+	export var is: typeof isOk;
+}
+
+// #endregion
+
 // #region Initialization
 
 error.is = isError;

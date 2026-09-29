@@ -95,7 +95,7 @@ type InternalHerald = {
 
 // #region Instances
 
-function Events(this: any, herald: InternalHerald, state: HeraldState) {
+function Events(this: any, herald: InternalHerald, state: HeraldState): void {
 	for (const key of state.keys) {
 		Object.defineProperty(this, key, {
 			value: (callback: never, signal?: AbortSignal) => herald.subscribe(key, callback, signal),
@@ -105,7 +105,7 @@ function Events(this: any, herald: InternalHerald, state: HeraldState) {
 
 Events.prototype[HERALD_PROPERTY] = HERALD_NAME_EVENTS;
 
-function Herald(this: any, state: HeraldState) {
+function Herald(this: any, state: HeraldState): void {
 	this[HERALD_SYMBOL] = {
 		state,
 		// @ts-expect-error All good, no worries :-)

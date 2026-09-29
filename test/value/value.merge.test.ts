@@ -1,4 +1,4 @@
-import {expect, test} from 'vitest';
+import {expect, test} from 'vite-plus/test';
 import {assign, merge, PlainObject, type NestedPartial} from '../../src';
 import {TestValueMergeable} from '../.fixtures/value.fixture';
 

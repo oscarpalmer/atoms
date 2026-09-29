@@ -1,4 +1,4 @@
-import {expect, test} from 'vitest';
+import {expect, test} from 'vite-plus/test';
 import {average, ceil, count, floor, max, median, min, round, sum} from '../src';
 import {mathFixture} from './.fixtures/math.fixture';
 

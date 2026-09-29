@@ -155,7 +155,7 @@ function Subscription(
 	state: SubscriptionState,
 	property: SubscriptionProperty,
 	parameters: SubscriptionParameters,
-) {
+): void {
 	this[SUBSCRIPTION_SYMBOL] = state;
 	this[property.key] = property.value;
 
@@ -175,7 +175,7 @@ Object.defineProperty(Subscription.prototype, 'active', {
 	get: getSubscriptionActive,
 });
 
-function Subscriptions(this: any, parameters?: SubscriptionsParameters) {
+function Subscriptions(this: any, parameters?: SubscriptionsParameters): void {
 	const {keys, property} = createSubscriptionsParameters(parameters);
 
 	this[SUBSCRIPTION_SYMBOL] = createSubscriptionsState(property, keys);

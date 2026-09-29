@@ -1,7 +1,7 @@
 import type {Constructor} from '../../models';
 import {max} from '../math/aggregate';
 import {getString, words} from '../string/misc';
-import {createCompareHandler} from './handlers';
+import {createCompareHandler, type CompareHandler} from './handlers';
 
 // #region Types
 
@@ -155,11 +155,21 @@ const comparators: Record<string, Comparator> = {
 	symbol: compareSymbols,
 };
 
-const compareHandler = createCompareHandler<number>(compare, {
+const compareHandler: CompareHandler<number> = createCompareHandler<number>(compare, {
 	callback: (first: unknown, second: unknown, compareStrings: boolean): unknown =>
 		compareStrings ? getString(first).localeCompare(getString(second)) : undefined,
 	method: COMPARE_NAME,
 });
+
+// #endregion
+
+// #region Namespace
+
+export declare namespace compare {
+	export var deregister: typeof deregisterComparator;
+	export var handler: CompareHandler<number>;
+	export var register: typeof registerComparator;
+}
 
 // #endregion
 

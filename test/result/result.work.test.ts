@@ -1,4 +1,4 @@
-import {expect, test} from 'vitest';
+import {expect, test} from 'vite-plus/test';
 import {attempt, attemptFlow, attemptPipe, Err, error, isError, isOk, ok, Ok} from '../../src';
 
 test('flow: asynchronous', async () => {

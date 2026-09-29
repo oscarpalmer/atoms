@@ -136,6 +136,14 @@ export function groupArraysBy(array: unknown[], first?: unknown, second?: unknow
 
 // #endregion
 
+// #region Namespace
+
+export declare namespace groupBy {
+	export var arrays: typeof groupArraysBy;
+}
+
+// #endregion
+
 // #region Initialization
 
 groupBy.arrays = groupArraysBy;

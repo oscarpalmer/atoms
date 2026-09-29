@@ -163,6 +163,18 @@ const ASSERT_MESSAGE_VALUE_DEFINED = 'Expected value to be defined';
 
 // #endregion
 
+// #region Namespace
+
+export declare namespace assert {
+	export var condition: typeof assertCondition;
+	export var defined: typeof assertDefined;
+	export var instanceOf: typeof assertInstanceOf;
+	export var is: typeof assertIs;
+	export var property: typeof assertProperty;
+}
+
+// #endregion
+
 // #region Initialization
 
 assert.condition = assertCondition;

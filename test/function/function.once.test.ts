@@ -1,4 +1,4 @@
-import {expect, test} from 'vitest';
+import {expect, test} from 'vite-plus/test';
 import {asyncOnce, delay, once} from '../../src';
 import {TestFunctionItem} from '../.fixtures/function.fixture';
 import {isFixture} from '../.fixtures/is.fixture';

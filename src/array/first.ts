@@ -193,8 +193,16 @@ export function firstOrDefault(
 
 // #endregion
 
+// #region Namespace
+
+export declare namespace first {
+	export var defaulted: typeof firstOrDefault;
+}
+
+// #endregion
+
 // #region Initialization
 
-first.default = firstOrDefault;
+first.defaulted = firstOrDefault;
 
 // #endregion

@@ -1,4 +1,4 @@
-import {expect, test} from 'vitest';
+import {expect, test} from 'vite-plus/test';
 import {fromQuery, toQuery, tryDecode, tryEncode} from '../src';
 import {queryFixture} from './.fixtures/query.fixture';
 

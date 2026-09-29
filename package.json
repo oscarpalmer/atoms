@@ -1,6 +1,6 @@
 {
 	"name": "@oscarpalmer/atoms",
-	"version": "0.204.1",
+	"version": "0.205.0",
 	"description": "Atomic utilities for making your JavaScript better.",
 	"keywords": [
 		"array",
@@ -46,6 +46,10 @@
 			"types": "./dist/array/filter.d.mts",
 			"default": "./dist/array/filter.mjs"
 		},
+		"./array/find": {
+			"types": "./dist/array/find.d.mts",
+			"default": "./dist/array/find.mjs"
+		},
 		"./array/first": {
 			"types": "./dist/array/first.d.mts",
 			"default": "./dist/array/first.mjs"
@@ -54,6 +58,10 @@
 			"types": "./dist/array/group-by.d.mts",
 			"default": "./dist/array/group-by.mjs"
 		},
+		"./array/index-of": {
+			"types": "./dist/internal/array/index-of.d.mts",
+			"default": "./dist/internal/array/index-of.mjs"
+		},
 		"./array/last": {
 			"types": "./dist/array/last.d.mts",
 			"default": "./dist/array/last.mjs"
@@ -61,6 +69,10 @@
 		"./array/move": {
 			"types": "./dist/array/move.d.mts",
 			"default": "./dist/array/move.mjs"
+		},
+		"./array/select": {
+			"types": "./dist/array/select.d.mts",
+			"default": "./dist/array/select.mjs"
 		},
 		"./array/sort": {
 			"types": "./dist/array/sort.d.mts",
@@ -278,16 +290,19 @@
 		"watch": "npx vite build --watch"
 	},
 	"devDependencies": {
-		"@oxlint/plugins": "^1.83",
-		"@types/node": "^26.5",
-		"@vitest/coverage-istanbul": "^4.1",
-		"eslint": "^10.10",
-		"jsdom": "^30",
+		"@types/node": "^26.6",
+		"@vitest/coverage-istanbul": "5.0.1",
+		"eslint": "^10.11",
+		"jsdom": "^30.1",
 		"tsdown": "^0.23",
-		"typescript": "^6",
-		"vite": "npm:@voidzero-dev/vite-plus-core@latest",
-		"vite-plus": "latest",
-		"vitest": "npm:@voidzero-dev/vite-plus-test@latest"
+		"typescript": "^7",
+		"vite": "npm:@voidzero-dev/vite-plus-core@1.0.0",
+		"vite-plus": "1.0.0",
+		"vitest": "5.0.1"
+	},
+	"overrides": {
+		"vite": "npm:@voidzero-dev/vite-plus-core@1.0.0",
+		"vitest": "5.0.1"
 	},
 	"packageManager": "npm@11.11.1"
 }

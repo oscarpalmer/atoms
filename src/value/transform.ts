@@ -184,6 +184,14 @@ const TRANSFORM_SYMBOL = Symbol('transform');
 
 // #endregion
 
+// #region Namespace
+
+export declare namespace transform {
+	export var initialize: typeof initializeTransformer;
+}
+
+// #endregion
+
 // #region Initialization
 
 transform.initialize = initializeTransformer;

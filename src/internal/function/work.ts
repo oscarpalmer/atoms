@@ -997,6 +997,18 @@ const assertPipeFunctions: Asserter<Function[]> = assert.condition(
 
 // #endregion
 
+// #region Namespace
+
+export declare namespace flow {
+	export var async: typeof asyncFlow;
+}
+
+export declare namespace pipe {
+	export var async: typeof asyncPipe;
+}
+
+// #endregion
+
 // #region Initialization
 
 flow.async = asyncFlow;

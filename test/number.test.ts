@@ -1,4 +1,4 @@
-import {expect, test} from 'vitest';
+import {expect, test} from 'vite-plus/test';
 import {between, clamp, getNumber} from '../src';
 
 test('between', () => {

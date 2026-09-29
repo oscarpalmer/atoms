@@ -1,4 +1,4 @@
-import {expect, test} from 'vitest';
+import {expect, test} from 'vite-plus/test';
 import {single} from '../../src';
 import {arrayFixture} from '../.fixtures/array.fixture';
 

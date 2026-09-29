@@ -58,7 +58,13 @@ export async function asyncAttempt<Value, E>(
 	err?: E,
 ): Promise<unknown> {
 	try {
-		let result = typeof value === 'function' ? value() : await value;
+		let result: unknown;
+
+		if (typeof value === 'function') {
+			result = value();
+		} else {
+			result = value;
+		}
 
 		if (result instanceof Promise) {
 			result = await result;
@@ -98,6 +104,14 @@ export function attempt<Value, E>(
 	} catch (thrown) {
 		return getError((err ?? thrown) as E, err == null ? undefined : (thrown as Error));
 	}
+}
+
+// #endregion
+
+// #region Namespace
+
+export declare namespace attempt {
+	export var async: typeof asyncAttempt;
 }
 
 // #endregion

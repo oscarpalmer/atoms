@@ -634,6 +634,16 @@ const modifiers: Record<string, number> = {
 
 // #endregion
 
+// #region Namespace
+
+export declare namespace sort {
+	export var getIndex: typeof getSortedIndex;
+	export var initialize: typeof initializeSorter;
+	export var is: typeof isSorted;
+}
+
+// #endregion
+
 // #region Initialization
 
 sort.getIndex = getSortedIndex;

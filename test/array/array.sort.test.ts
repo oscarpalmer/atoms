@@ -1,4 +1,4 @@
-import {expect, test} from 'vitest';
+import {expect, test} from 'vite-plus/test';
 import {ArraySorters, diff, getRandomInteger, shuffle, sort, times} from '../../src';
 import {arrayFixture, TestArrayItem} from '../.fixtures/array.fixture';
 

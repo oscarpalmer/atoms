@@ -1,4 +1,4 @@
-import {expect, test} from 'vitest';
+import {expect, test} from 'vite-plus/test';
 import {beacon, equal, isBeacon, isBeaconSubscription, isObservable, isSubscription} from '../src';
 import {isFixture} from './.fixtures/is.fixture';
 

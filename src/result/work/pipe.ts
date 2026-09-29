@@ -493,6 +493,14 @@ export function attemptPipe(
 
 // #endregion
 
+// #region Namespace
+
+export declare namespace attemptPipe {
+	export var async: typeof attemptAsyncPipe;
+}
+
+// #endregion
+
 // #region Initialization
 
 attemptPipe.async = attemptAsyncPipe;

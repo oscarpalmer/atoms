@@ -191,8 +191,16 @@ export function lastOrDefault(
 
 // #endregion
 
+// #region Namespace
+
+export declare namespace last {
+	export var defaulted: typeof lastOrDefault;
+}
+
+// #endregion
+
 // #region Initialization
 
-last.default = lastOrDefault;
+last.defaulted = lastOrDefault;
 
 // #endregion

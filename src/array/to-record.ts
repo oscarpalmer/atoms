@@ -130,6 +130,14 @@ export function toRecordArrays(array: unknown[], first?: unknown, second?: unkno
 
 // #endregion
 
+// #region Namespace
+
+export declare namespace toRecord {
+	export var arrays: typeof toRecordArrays;
+}
+
+// #endregion
+
 // #region Initialization
 
 toRecord.arrays = toRecordArrays;

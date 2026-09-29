@@ -1,4 +1,4 @@
-import {expect, test} from 'vitest';
+import {expect, test} from 'vite-plus/test';
 import {deburr, normalize} from '../../src';
 
 const original = 'Æ æ Ð ð Đ đ Ħ ħ Ĳ ĳ İ ı ĸ Ŀ ŀ Ł ł Ŋ ŋ ŉ Œ œ Ø ø ſ ß Þ þ Ŧ ŧ';

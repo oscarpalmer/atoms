@@ -83,7 +83,12 @@ type LimiterType = 'debounce' | 'throttle' | 'wait';
 
 // #region Instances
 
-function AsyncLimiter(this: any, type: LimiterType, callback: GenericAsyncCallback, time?: number) {
+function AsyncLimiter(
+	this: any,
+	type: LimiterType,
+	callback: GenericAsyncCallback,
+	time?: number,
+): void {
 	this[LIMITER_SYMBOL] = {
 		callback,
 		type,
@@ -98,7 +103,7 @@ AsyncLimiter.prototype[LIMITER_PROPERTY] = LIMITER_NAME_ASYNC;
 AsyncLimiter.prototype.cancel = cancelAsyncLimiter;
 AsyncLimiter.prototype.run = runAsyncLimiter;
 
-function Limiter(this: any, type: LimiterType, callback: GenericCallback, time?: number) {
+function Limiter(this: any, type: LimiterType, callback: GenericCallback, time?: number): void {
 	this[LIMITER_SYMBOL] = {
 		callback,
 		type,

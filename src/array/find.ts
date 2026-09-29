@@ -180,6 +180,14 @@ export function findLast(array: unknown[], ...parameters: unknown[]): unknown {
 
 // #endregion
 
+// #region Namespace
+
+export declare namespace find {
+	export var last: typeof findLast;
+}
+
+// #endregion
+
 // #region Initialization
 
 find.last = findLast;

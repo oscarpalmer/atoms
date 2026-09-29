@@ -111,7 +111,7 @@ type TimeLoggerState = {
 
 // #region Instances
 
-function Lumberjack(this: any) {}
+function Lumberjack(this: any): void {}
 
 Lumberjack.prototype[LOGGER_PROPERTY] = LOGGER_NAME;
 
@@ -149,7 +149,7 @@ Object.defineProperties(Lumberjack.prototype, {
 	},
 });
 
-function TimeLogger(this: any, label: string) {
+function TimeLogger(this: any, label: string): void {
 	this[LOGGER_SYMBOL] = {
 		label,
 		started: enabled,

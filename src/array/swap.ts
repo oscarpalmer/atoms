@@ -319,6 +319,14 @@ function swapValues(array: unknown[], from: unknown, to: unknown, key?: unknown)
 
 // #endregion
 
+// #region Namespace
+
+export declare namespace swap {
+	export var indices: typeof swapIndices;
+}
+
+// #endregion
+
 // #region Initialization
 
 swap.indices = swapIndices;

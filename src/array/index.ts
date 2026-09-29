@@ -1,13 +1,11 @@
 export * from '../internal/array/chunk';
 export * from '../internal/array/compact';
 export * from '../internal/array/get';
-export * from '../internal/array/index-of';
 export * from '../internal/array/match';
 export * from '../internal/array/shuffle';
 
 export * from './difference';
 export * from './exists';
-export * from './find';
 export * from './flatten';
 export * from './from';
 export * from './insert';
@@ -15,7 +13,6 @@ export * from './intersection';
 export * from './partition';
 export * from './push';
 export * from './reverse';
-export * from './select';
 export * from './single';
 export * from './slice';
 export * from './splice';

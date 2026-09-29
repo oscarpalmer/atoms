@@ -1,5 +1,5 @@
 import {isArrayOrPlainObject, isTypedArray} from '../internal/is';
-import {createValueHandler} from '../internal/value/handlers';
+import {createValueHandler, type ValueHandler} from '../internal/value/handlers';
 import type {ArrayOrPlainObject, Constructor, PlainObject, TypedArray} from '../models';
 
 // #region Special variables
@@ -67,7 +67,7 @@ type InternalCloner = {
 
 // #region Instances
 
-function Cloner(this: any, options: Required<CloneOptions>) {
+function Cloner(this: any, options: Required<CloneOptions>): void {
 	this[CLONE_SYMBOL] = options;
 }
 
@@ -423,7 +423,7 @@ const CLONE_DEFAULT_OPTIONS: Required<CloneOptions> = {
 
 const CLONE_MAX_DEPTH = 100;
 
-const cloneHandler = createValueHandler(clone, {
+const cloneHandler: ValueHandler = createValueHandler(clone, {
 	callback: tryStructuredClone,
 	method: CLONE_NAME,
 });
@@ -443,7 +443,18 @@ const CLONE_SYMBOL = Symbol(CLONE_NAME);
 
 // #endregion
 
-// #Initialization
+// #region Namespace
+
+export declare namespace clone {
+	export var deregister: typeof deregisterCloner;
+	export var handlers: ValueHandler;
+	export var initialize: typeof initializeCloner;
+	export var register: typeof registerCloner;
+}
+
+// #endregion
+
+// #region Initialization
 
 clone.deregister = deregisterCloner;
 clone.handlers = cloneHandler;

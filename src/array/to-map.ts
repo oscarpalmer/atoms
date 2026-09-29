@@ -166,6 +166,14 @@ export function toMapArrays(array: unknown[], first?: unknown, second?: unknown)
 
 // #endregion
 
+// #region Namespace
+
+export declare namespace toMap {
+	export var arrays: typeof toMapArrays;
+}
+
+// #endregion
+
 // #region Initialization
 
 toMap.arrays = toMapArrays;

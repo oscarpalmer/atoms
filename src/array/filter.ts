@@ -179,6 +179,14 @@ export function filter(array: unknown[], ...parameters: unknown[]): unknown[] {
 
 // #endregion
 
+// #region Namespace
+
+export declare namespace filter {
+	export var remove: typeof exclude;
+}
+
+// #endregion
+
 // #region Initialization
 
 filter.remove = exclude;

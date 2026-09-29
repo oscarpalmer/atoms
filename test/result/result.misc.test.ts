@@ -1,4 +1,4 @@
-import {expect, test} from 'vitest';
+import {expect, test} from 'vite-plus/test';
 import {attempt, error, isError, isOk, isResult, ok, toPromise, unwrap} from '../../src';
 
 test('error', () => {

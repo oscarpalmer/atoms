@@ -17,7 +17,7 @@ type BaseHandlerOptions = {
 	method?: string;
 };
 
-type CompareHandler<Value> = {
+export type CompareHandler<Value> = {
 	base: BaseHandler;
 	handle(first: unknown, second: unknown, ...parameters: unknown[]): Value;
 };
@@ -28,7 +28,7 @@ type Constructable = {
 
 type Handleable = Record<string, GenericCallback>;
 
-type ValueHandler = {
+export type ValueHandler = {
 	base: BaseHandler;
 	handle(value: unknown, ...parameters: unknown[]): unknown;
 };
@@ -37,7 +37,7 @@ type ValueHandler = {
 
 // #region Instances
 
-function BaseHandler(this: any, owner: GenericCallback, options: BaseHandlerOptions) {
+function BaseHandler(this: any, owner: GenericCallback, options: BaseHandlerOptions): void {
 	this.handlers = new WeakMap<Constructor, string | GenericCallback>();
 	this.owner = owner;
 	this.options = options;
@@ -47,13 +47,13 @@ BaseHandler.prototype.deregister = deregisterHandler;
 BaseHandler.prototype.get = getHandler;
 BaseHandler.prototype.register = registerHandler;
 
-function CompareHandler(this: any, base: BaseHandler) {
+function CompareHandler(this: any, base: BaseHandler): void {
 	this.base = base;
 }
 
 CompareHandler.prototype.handle = handleComparison;
 
-function ValueHandler(this: any, value: BaseHandler) {
+function ValueHandler(this: any, value: BaseHandler): void {
 	this.base = value;
 }
 

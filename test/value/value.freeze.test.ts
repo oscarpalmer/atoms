@@ -1,4 +1,4 @@
-import {expect, test} from 'vitest';
+import {expect, test} from 'vite-plus/test';
 import {freeze, flatFreeze, isFrozen} from '../../src/value/freeze';
 
 test('freeze', () => {

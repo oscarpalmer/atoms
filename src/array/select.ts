@@ -26,151 +26,6 @@ type ObjectKeysOf<Item> = {
 // #region Functions
 
 /**
- * Get a mapped and filtered array of items
- *
- * @param array Array to search in
- * @param map Callback or key to map the items
- * @param filterCallback Callback to get a mapped value's value for matching
- * @param filterValue Value to match against
- * @returns Mapped and filtered array of items
- *
- * @example
- * ```typescript
- * reverseSelect(
- *   [{id: 1, name: 'Alice'}, {id: 2, name: 'Bob'}, {id: 3, name: 'Charlie'}],
- *   item => item.name,
- *   value => value.length,
- *   3,
- * ); // => ['Bob']
- * ```
- */
-export function reverseSelect<
-	Item,
-	Map extends MapKeyOrCallback<Item>,
-	FilterCallback extends (item: Mapped<Item, Map>, index: number, array: Item[]) => unknown,
->(
-	array: Item[],
-	map: Map,
-	filterCallback: FilterCallback,
-	filterValue: ReturnType<FilterCallback>,
-): Array<Mapped<Item, Map>>;
-
-/**
- * Get a mapped and filtered array of items
- *
- * @param array Array to search in
- * @param map Callback to map the items
- * @param filterKey Key to get a mapped value's value for matching
- * @param filterValue Value to match against
- * @returns Mapped and filtered array of items
- *
- * @example
- * ```typescript
- * reverseSelect(
- *   [{id: 1, name: 'Alice'}, {id: 2, name: 'Bob'}, {id: 3, name: 'Charlie'}],
- *   item => ({label: item.name}),
- *   'label',
- *   'Bob',
- * ); // => [{label: 'Bob'}]
- * ```
- */
-export function reverseSelect<
-	Item,
-	MapCallback extends (item: Item, index: number, array: Item[]) => PlainObject,
-	ItemKey extends keyof ReturnType<MapCallback>,
->(
-	array: Item[],
-	map: MapCallback,
-	filterKey: ItemKey,
-	filterValue: ReturnType<MapCallback>[ItemKey],
-): Array<ReturnType<MapCallback>>;
-
-/**
- * Get a mapped and filtered array of items
- *
- * @param array Array to search in
- * @param map Key to map the items
- * @param filterKey Key to get a mapped value's value for matching
- * @param filterValue Value to match against
- * @returns Mapped and filtered array of items
- *
- * @example
- * ```typescript
- * reverseSelect(
- *   [{meta: {tag: 'a'}}, {meta: {tag: 'b'}}],
- *   'meta',
- *   'tag',
- *   'b',
- * ); // => [{tag: 'b'}]
- * ```
- */
-export function reverseSelect<
-	Item,
-	MapKey extends ObjectKeysOf<Item>,
-	ItemKey extends keyof Item[MapKey],
->(
-	array: Item[],
-	map: MapKey,
-	filterKey: ItemKey,
-	filterValue: Item[MapKey][ItemKey],
-): Array<Item[MapKey]>;
-
-/**
- * Get a mapped and filtered array of items
- *
- * @param array Array to search in
- * @param map Callback or key to map the items
- * @param filter Filter callback to match mapped values
- * @returns Mapped and filtered array of items
- *
- * @example
- * ```typescript
- * reverseSelect(
- *   [{id: 1, name: 'Alice'}, {id: 2, name: 'Bob'}, {id: 3, name: 'Charlie'}],
- *   item => item.name,
- *   value => value.startsWith('B'),
- * ); // => ['Bob']
- * ```
- */
-export function reverseSelect<Item, Map extends MapKeyOrCallback<Item>>(
-	array: Item[],
-	map: Map,
-	filter: (item: Mapped<Item, Map>, index: number, array: Item[]) => boolean,
-): Array<Mapped<Item, Map>>;
-
-/**
- * Get a mapped and filtered array of items
- *
- * @param array Array to search in
- * @param map Callback or key to map the items
- * @param value Mapped value to match against
- * @returns Mapped and filtered array of items
- *
- * @example
- * ```typescript
- * reverseSelect(
- *   [1, 2, 3, 2, 1],
- *   value => value ** 2,
- *   4,
- * ); // => [4, 4]
- * ```
- */
-export function reverseSelect<Item, Map extends MapKeyOrCallback<Item>>(
-	array: Item[],
-	map: Map,
-	value: Mapped<Item, Map>,
-): Array<Mapped<Item, Map>>;
-
-export function reverseSelect(array: unknown[], ...parameters: unknown[]): unknown[] {
-	const mapper = parameters.shift();
-
-	return findValues(FIND_VALUES_ALL, array, parameters, {
-		callback: mapper,
-		reverse: true,
-	}).matched;
-}
-
-/**
  * Get a filtered and mapped array of items
  *
  * @param array Array to search in
@@ -189,7 +44,7 @@ export function reverseSelect(array: unknown[], ...parameters: unknown[]): unkno
  * ); // => ['Bob']
  * ```
  */
-export function select<
+export function filterAndMap<
 	Item,
 	FilterCallback extends (item: Item, index: number, array: Item[]) => unknown,
 	Map extends MapKeyOrCallback<Item>,
@@ -219,7 +74,7 @@ export function select<
  * ); // => ['Bob']
  * ```
  */
-export function select<
+export function filterAndMap<
 	Item extends PlainObject,
 	ItemKey extends keyof Item,
 	Map extends MapKeyOrCallback<Item>,
@@ -247,7 +102,7 @@ export function select<
  * ); // => ['Bob']
  * ```
  */
-export function select<Item, Map extends MapKeyOrCallback<Item>>(
+export function filterAndMap<Item, Map extends MapKeyOrCallback<Item>>(
 	array: Item[],
 	filter: (item: Item, index: number, array: Item[]) => boolean,
 	map: Map,
@@ -270,14 +125,169 @@ export function select<Item, Map extends MapKeyOrCallback<Item>>(
  * ); // => [9]
  * ```
  */
-export function select<Item, Map extends MapKeyOrCallback<Item>>(
+export function filterAndMap<Item, Map extends MapKeyOrCallback<Item>>(
 	array: Item[],
 	item: Item,
 	map: Map,
 ): Array<Mapped<Item, Map>>;
 
-export function select(array: unknown[], ...parameters: unknown[]): unknown[] {
+export function filterAndMap(array: unknown[], ...parameters: unknown[]): unknown[] {
 	return selectValues(array, parameters);
+}
+
+/**
+ * Get a mapped and filtered array of items
+ *
+ * _Available as `reverseSelect`_ and `select.reverse`_
+ *
+ * @param array Array to search in
+ * @param map Callback or key to map the items
+ * @param filterCallback Callback to get a mapped value's value for matching
+ * @param filterValue Value to match against
+ * @returns Mapped and filtered array of items
+ *
+ * @example
+ * ```typescript
+ * reverseSelect(
+ *   [{id: 1, name: 'Alice'}, {id: 2, name: 'Bob'}, {id: 3, name: 'Charlie'}],
+ *   item => item.name,
+ *   value => value.length,
+ *   3,
+ * ); // => ['Bob']
+ * ```
+ */
+export function mapAndFilter<
+	Item,
+	Map extends MapKeyOrCallback<Item>,
+	FilterCallback extends (item: Mapped<Item, Map>, index: number, array: Item[]) => unknown,
+>(
+	array: Item[],
+	map: Map,
+	filterCallback: FilterCallback,
+	filterValue: ReturnType<FilterCallback>,
+): Array<Mapped<Item, Map>>;
+
+/**
+ * Get a mapped and filtered array of items
+ *
+ * _Available as `reverseSelect`_ and `select.reverse`_
+ *
+ * @param array Array to search in
+ * @param map Callback to map the items
+ * @param filterKey Key to get a mapped value's value for matching
+ * @param filterValue Value to match against
+ * @returns Mapped and filtered array of items
+ *
+ * @example
+ * ```typescript
+ * reverseSelect(
+ *   [{id: 1, name: 'Alice'}, {id: 2, name: 'Bob'}, {id: 3, name: 'Charlie'}],
+ *   item => ({label: item.name}),
+ *   'label',
+ *   'Bob',
+ * ); // => [{label: 'Bob'}]
+ * ```
+ */
+export function mapAndFilter<
+	Item,
+	MapCallback extends (item: Item, index: number, array: Item[]) => PlainObject,
+	ItemKey extends keyof ReturnType<MapCallback>,
+>(
+	array: Item[],
+	map: MapCallback,
+	filterKey: ItemKey,
+	filterValue: ReturnType<MapCallback>[ItemKey],
+): Array<ReturnType<MapCallback>>;
+
+/**
+ * Get a mapped and filtered array of items
+ *
+ * _Available as `reverseSelect`_ and `select.reverse`_
+ *
+ * @param array Array to search in
+ * @param map Key to map the items
+ * @param filterKey Key to get a mapped value's value for matching
+ * @param filterValue Value to match against
+ * @returns Mapped and filtered array of items
+ *
+ * @example
+ * ```typescript
+ * reverseSelect(
+ *   [{meta: {tag: 'a'}}, {meta: {tag: 'b'}}],
+ *   'meta',
+ *   'tag',
+ *   'b',
+ * ); // => [{tag: 'b'}]
+ * ```
+ */
+export function mapAndFilter<
+	Item,
+	MapKey extends ObjectKeysOf<Item>,
+	ItemKey extends keyof Item[MapKey],
+>(
+	array: Item[],
+	map: MapKey,
+	filterKey: ItemKey,
+	filterValue: Item[MapKey][ItemKey],
+): Array<Item[MapKey]>;
+
+/**
+ * Get a mapped and filtered array of items
+ *
+ * _Available as `reverseSelect`_ and `select.reverse`_
+ *
+ * @param array Array to search in
+ * @param map Callback or key to map the items
+ * @param filter Filter callback to match mapped values
+ * @returns Mapped and filtered array of items
+ *
+ * @example
+ * ```typescript
+ * reverseSelect(
+ *   [{id: 1, name: 'Alice'}, {id: 2, name: 'Bob'}, {id: 3, name: 'Charlie'}],
+ *   item => item.name,
+ *   value => value.startsWith('B'),
+ * ); // => ['Bob']
+ * ```
+ */
+export function mapAndFilter<Item, Map extends MapKeyOrCallback<Item>>(
+	array: Item[],
+	map: Map,
+	filter: (item: Mapped<Item, Map>, index: number, array: Item[]) => boolean,
+): Array<Mapped<Item, Map>>;
+
+/**
+ * Get a mapped and filtered array of items
+ *
+ * _Available as `reverseSelect`_ and `select.reverse`_
+ *
+ * @param array Array to search in
+ * @param map Callback or key to map the items
+ * @param value Mapped value to match against
+ * @returns Mapped and filtered array of items
+ *
+ * @example
+ * ```typescript
+ * reverseSelect(
+ *   [1, 2, 3, 2, 1],
+ *   value => value ** 2,
+ *   4,
+ * ); // => [4, 4]
+ * ```
+ */
+export function mapAndFilter<Item, Map extends MapKeyOrCallback<Item>>(
+	array: Item[],
+	map: Map,
+	value: Mapped<Item, Map>,
+): Array<Mapped<Item, Map>>;
+
+export function mapAndFilter(array: unknown[], ...parameters: unknown[]): unknown[] {
+	const mapper = parameters.shift();
+
+	return findValues(FIND_VALUES_ALL, array, parameters, {
+		callback: mapper,
+		reverse: true,
+	}).matched;
 }
 
 function selectValues(array: unknown[], parameters: unknown[]): unknown[] {
@@ -291,8 +301,22 @@ function selectValues(array: unknown[], parameters: unknown[]): unknown[] {
 
 // #endregion
 
+// #region Namespace
+
+export declare namespace filterAndMap {
+	export var reverse: typeof mapAndFilter;
+}
+
+// #endregion
+
 // #region Initialization
 
-select.reverse = reverseSelect;
+filterAndMap.reverse = mapAndFilter;
+
+// #endregion
+
+// #region Exports
+
+export {filterAndMap as select, mapAndFilter as reverseSelect};
 
 // #endregion

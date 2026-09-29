@@ -311,6 +311,15 @@ export function moveToIndex(
 
 // #endregion
 
+// #region Namespace
+
+export declare namespace move {
+	export var indices: typeof moveIndices;
+	export var toIndex: typeof moveToIndex;
+}
+
+// #endregion
+
 // #region Initialization
 
 move.indices = moveIndices;

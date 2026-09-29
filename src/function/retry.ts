@@ -169,6 +169,14 @@ const RETRY_MESSAGE_FAILED = 'Retry failed';
 
 // #endregion
 
+// #region Namespace
+
+export declare namespace retry {
+	export var async: typeof asyncRetry;
+}
+
+// #endregion
+
 // #region Initialization
 
 retry.async = asyncRetry;

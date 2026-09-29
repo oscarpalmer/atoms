@@ -1,4 +1,4 @@
-import {expect, test} from 'vitest';
+import {expect, test} from 'vite-plus/test';
 import {isLogger, isTimeLogger, Logger, noop} from '../src';
 import {isFixture} from './.fixtures/is.fixture';
 

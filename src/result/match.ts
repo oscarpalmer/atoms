@@ -121,6 +121,14 @@ const MATCH_MESSAGE = '`result.match` expected a Result or a function that retur
 
 // #endregion
 
+// #region Namespace
+
+export declare namespace matchResult {
+	export var async: typeof asyncMatchResult;
+}
+
+// #endregion
+
 // #region Initialization
 
 matchResult.async = asyncMatchResult;
