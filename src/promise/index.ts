@@ -1,9 +1,9 @@
 import {createAborter} from '../internal/aborter';
 import {isArrayOrPlainObject} from '../internal/is';
+import {asyncAttempt} from '../internal/result/attempt';
 import type {ArrayOrPlainObject, Key, PlainObject} from '../models';
 import {
 	PROMISE_MESSAGE_EXPECTATION_ATTEMPT,
-	PROMISE_MESSAGE_EXPECTATION_ITEMS_EMPTY,
 	PROMISE_MESSAGE_EXPECTATION_ITEMS_TYPE,
 	PROMISE_STRATEGY_DEFAULT,
 	PROMISE_TYPE_FULFILLED,
@@ -87,16 +87,20 @@ export async function attemptPromise<Value>(
 		resolve: (value: Value) => void,
 		reject: (reason: unknown) => void,
 	): Promise<void> {
-		try {
+		const result = await asyncAttempt(async () => {
 			let result = isFunction ? value() : await value;
 
 			if (result instanceof Promise) {
 				result = await result;
 			}
 
-			settlePromise(resolve, result, aborter);
-		} catch (error) {
-			settlePromise(reject, error, aborter);
+			return result;
+		});
+
+		if (result.ok) {
+			settlePromise(resolve, result.value, aborter);
+		} else {
+			settlePromise(reject, result.error, aborter);
 		}
 	}
 
@@ -224,17 +228,13 @@ export async function promises(items: ArrayOrPlainObject, options?: unknown): Pr
 		.map(([key, value]) => [key, typeof value === 'function' ? value() : value])
 		.filter(([, value]) => value instanceof Promise) as Array<[Key, Promise<unknown>]>;
 
-	const {length} = actual;
-
-	if (length === 0) {
-		return Promise.reject(PROMISE_MESSAGE_EXPECTATION_ITEMS_EMPTY);
-	}
-
-	const complete = strategy === PROMISE_STRATEGY_DEFAULT;
-
 	const aborter = createAborter(signal, () => {
 		handlers.reject(signal?.reason);
 	});
+
+	const complete = strategy === PROMISE_STRATEGY_DEFAULT;
+
+	const {length} = actual;
 
 	const data: PromiseData = {
 		last: length - 1,

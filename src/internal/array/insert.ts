@@ -1,3 +1,4 @@
+import {max, min} from '../math/aggregate';
 import {chunk} from './chunk';
 
 // #region Types
@@ -16,7 +17,7 @@ function insertChunkedValues(
 	deleteCount: number,
 ): unknown {
 	const actualDeleteCount = deleteCount < 0 ? 0 : deleteCount;
-	const actualStart = Math.min(Math.max(0, start), array.length);
+	const actualStart = min([max([0, start]), array.length]);
 	const chunked = chunk(items);
 	const lastIndex = chunked.length - 1;
 

@@ -242,6 +242,70 @@ export function max(array: unknown[], key?: unknown, first?: unknown): unknown {
 	return getAggregated(AGGREGATION_MAX, array, key, first);
 }
 
+/**
+ * Get the minimum value from a list of items
+ *
+ * @param items List of items
+ * @param callback Callback to get an item's value
+ * @param first Return only the first item with the minimum value
+ * @returns First item with the minimum value, or `undefined` if no minimum can be found
+ */
+export function min<Item>(
+	items: Item[],
+	callback: (item: Item, index: number, array: Item[]) => number,
+	first: true,
+): Item | undefined;
+
+/**
+ * Get the minimum value from a list of items
+ *
+ * @param items List of items
+ * @param key Key to use for value
+ * @param first Return only the first item with the minimum value
+ * @returns First item with the minimum value, or `undefined` if no minimum can be found
+ */
+export function min<Item extends PlainObject>(
+	items: Item[],
+	key: keyof NumericalValues<Item>,
+	first: true,
+): Item | undefined;
+
+/**
+ * Get the minimum value from a list of items
+ *
+ * @param items List of items
+ * @param callback Callback to get an item's value
+ * @returns Items with the minimum value
+ */
+export function min<Item>(
+	items: Item[],
+	callback: (item: Item, index: number, array: Item[]) => number,
+): Item[];
+
+/**
+ * Get the minimum value from a list of items
+ *
+ * @param items List of items
+ * @param key Key to use for value
+ * @returns Items with the minimum value
+ */
+export function min<Item extends PlainObject>(
+	items: Item[],
+	key: keyof NumericalValues<Item>,
+): Item[];
+
+/**
+ * Get the minimum value from a list of numbers
+ *
+ * @param values List of numbers
+ * @returns Minimum value, or `Number.NaN` if no minimum can be found
+ */
+export function min(values: number[]): number;
+
+export function min(array: unknown[], key?: unknown, first?: unknown): unknown {
+	return getAggregated(AGGREGATION_MIN, array, key, first);
+}
+
 // #endregion
 
 // #region Variables

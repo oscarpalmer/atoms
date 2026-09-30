@@ -1,4 +1,6 @@
 import {isPlainObject} from '../internal/is';
+import {max} from '../internal/math/aggregate';
+import {floor} from '../internal/math/misc';
 import {lowerCase} from '../internal/string/case';
 import {getString} from '../internal/string/misc';
 import type {PlainObject, RequiredKeys} from '../models';
@@ -171,7 +173,7 @@ function createFuzzyOptions<Item>(
 	const limit = typeof input === 'number' ? input : options.limit;
 
 	if (typeof limit === 'number' && !Number.isNaN(limit) && limit >= 1) {
-		options.limit = Math.floor(limit);
+		options.limit = floor(limit);
 	} else {
 		options.limit = state?.limit;
 	}
@@ -317,7 +319,7 @@ function getScore(haystack: string, needle: string): number {
 			if (previousMatchIndex !== -1) {
 				const gap = haystackIndex - previousMatchIndex - 1;
 
-				score += Math.max(0, FUZZY_PROXIMITY_THRESHOLD - gap);
+				score += max([0, FUZZY_PROXIMITY_THRESHOLD - gap]);
 			}
 
 			previousMatchIndex = haystackIndex;
@@ -332,14 +334,14 @@ function getScore(haystack: string, needle: string): number {
 	}
 
 	// Penalty for longer strings to favour tighter matches
-	score -= Math.floor(lowerCaseHaystack.length / FUZZY_LENGTH_DIVISOR);
+	score -= floor(lowerCaseHaystack.length / FUZZY_LENGTH_DIVISOR);
 
-	return Math.max(0, score);
+	return max([0, score]);
 }
 
 function getTolerance<Item>(input: unknown, state?: FuzzyState<Item>): number {
 	if (typeof input === 'number' && !Number.isNaN(input)) {
-		return input < 0 ? 0 : Math.floor(input);
+		return input < 0 ? 0 : floor(input);
 	}
 
 	return state?.tolerance ?? FUZZY_PROXIMITY_THRESHOLD;

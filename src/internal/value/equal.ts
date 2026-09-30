@@ -1,5 +1,6 @@
 import type {ArrayOrPlainObject, Constructor, TypedArray} from '../../models';
 import {isNonPlainObject, isPlainObject, isPrimitive, isTypedArray} from '../is';
+import {round} from '../math/misc';
 import {createCompareHandler, type CompareHandler} from './handlers';
 
 // #region Types
@@ -211,7 +212,7 @@ function equalArray(first: unknown[], second: unknown[], options: Options): bool
 	let offset = 0;
 
 	if (length >= EQUAL_ARRAY_THRESHOLD) {
-		offset = Math.round(length / EQUAL_ARRAY_PEEK_PERCENTAGE);
+		offset = round(length / EQUAL_ARRAY_PEEK_PERCENTAGE);
 		offset = offset > EQUAL_ARRAY_THRESHOLD ? EQUAL_ARRAY_THRESHOLD : offset;
 
 		for (let index = 0; index < offset; index += 1) {

@@ -123,9 +123,13 @@ test('synchronous', () =>
 		const firstController = new AbortController();
 		const secondController = new AbortController();
 
-		void attemptPromise(() => 2, firstController.signal).then(result => {
-			results.push(result);
-		});
+		void attemptPromise(() => 2, firstController.signal)
+			.then(result => {
+				results.push(result);
+			})
+			.catch(error => {
+				errors.push(error);
+			});
 
 		firstController.abort('Aborted during');
 		secondController.abort('Aborted before');
@@ -135,12 +139,13 @@ test('synchronous', () =>
 		});
 
 		setTimeout(() => {
-			expect(errors.length).toBe(2);
+			expect(errors.length).toBe(3);
 
-			expect((errors[0] as Error).message).toBe('Thrown');
-			expect(errors[1]).toBe('Aborted before');
+			expect(errors[0]).toBe('Aborted before');
+			expect((errors[1] as Error).message).toBe('Thrown');
+			expect(errors[2]).toBe('Aborted during');
 
-			expect(results).toEqual([0, 2]);
+			expect(results).toEqual([0]);
 
 			done();
 		}, 100);

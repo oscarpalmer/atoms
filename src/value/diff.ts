@@ -1,4 +1,5 @@
 import {isArrayOrPlainObject} from '../internal/is';
+import {max, min} from '../internal/math/aggregate';
 import {join} from '../internal/string/misc';
 import {equal} from '../internal/value/equal';
 
@@ -172,8 +173,8 @@ function getDiffs(
 	const changes: KeyedDiffValue[] = [];
 
 	if (Array.isArray(first) && Array.isArray(second)) {
-		const maximumLength = Math.max(first.length, second.length);
-		const minimumLength = Math.min(first.length, second.length);
+		const maximumLength = max([first.length, second.length]);
+		const minimumLength = min([first.length, second.length]);
 
 		for (let index = minimumLength; index < maximumLength; index += 1) {
 			const key = join([prefix, index], '.');

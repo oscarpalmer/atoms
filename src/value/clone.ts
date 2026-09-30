@@ -1,4 +1,6 @@
 import {isArrayOrPlainObject, isTypedArray} from '../internal/is';
+import {attempt} from '../internal/result/attempt';
+import {unwrap} from '../internal/result/misc';
 import {createValueHandler, type ValueHandler} from '../internal/value/handlers';
 import type {ArrayOrPlainObject, Constructor, PlainObject, TypedArray} from '../models';
 
@@ -394,17 +396,14 @@ function tryStructuredClone(value: object, parameters: CloneParameters, depth: n
 		return value;
 	}
 
-	try {
-		const cloned = structuredClone(value);
+	const cloned = unwrap(
+		attempt(() => structuredClone(value)),
+		value,
+	);
 
-		parameters.references.set(value, cloned);
+	parameters.references.set(value, cloned);
 
-		return cloned;
-	} catch {
-		parameters.references.set(value, value);
-
-		return value;
-	}
+	return cloned;
 }
 
 // #endregion

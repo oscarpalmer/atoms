@@ -1,5 +1,6 @@
 import type {GenericAsyncCallback, GenericCallback} from '../../models';
 import {getNumberOrDefault} from '../defaults';
+import {asyncAttempt} from '../result/attempt';
 
 // #region Special variables
 
@@ -172,19 +173,23 @@ async function handleAsyncLimiter(state: AsyncLimiterState, item: AsyncLimiterIt
 
 		item.running = true;
 
-		try {
-			let result = state.callback(...item.parameters);
+		const result = await asyncAttempt(async () => {
+			let value = state.callback(...item.parameters);
 
-			if (result instanceof Promise) {
-				result = await result;
+			if (value instanceof Promise) {
+				value = await value;
 			}
 
-			item.resolve(result);
-		} catch (error) {
-			item.reject(error);
-		} finally {
-			item.running = false;
+			return value;
+		});
+
+		if (result.ok) {
+			item.resolve(result.value);
+		} else {
+			item.reject(result.error);
 		}
+
+		item.running = false;
 	} else {
 		state.timer = startTimer(() => handleAsyncLimiter(state, item));
 	}

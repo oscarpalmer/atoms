@@ -1,3 +1,4 @@
+import {min} from '../../internal/math/aggregate';
 import {COLOR_DEFAULTS, COLOR_MAX, COLOR_TYPE} from '../constants';
 import {getAlphaValue} from '../misc/alpha';
 import {getDegrees, getPercentage} from '../misc/get';
@@ -74,7 +75,7 @@ function getHwbSaturation(blackness: number, whiteness: number, lightness: numbe
 		return 0;
 	}
 
-	return hue / Math.min(2 * lightness, 2 - 2 * lightness);
+	return hue / min([2 * lightness, 2 - 2 * lightness]);
 }
 
 export function getHwbValue(this: InternalColor): HWBColor {

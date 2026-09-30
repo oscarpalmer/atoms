@@ -1,3 +1,5 @@
+import {floor} from '../internal/math/misc';
+
 // #region Functions
 
 /**
@@ -17,7 +19,7 @@ export function reverse<Item>(array: Item[]): Item[] {
 		return array;
 	}
 
-	const half = Math.floor(length / 2);
+	const half = floor(length / 2);
 
 	for (let firstIndex = 0; firstIndex < half; firstIndex += 1) {
 		const temporaryItem = array[firstIndex];

@@ -1,3 +1,4 @@
+import {max, min} from '../../internal/math/aggregate';
 import {join} from '../../internal/string/misc';
 import {COLOR_DEFAULTS, COLOR_MAX, COLOR_TYPE} from '../constants';
 import {getAlpha, getAlphaValue} from '../misc/alpha';
@@ -22,8 +23,8 @@ type RgbValues = {
 	blue: number;
 	delta: number;
 	green: number;
-	max: number;
-	min: number;
+	maximum: number;
+	minimum: number;
 	red: number;
 };
 
@@ -53,15 +54,15 @@ export function convertRgbToHsla(value: unknown): HSLAColor {
 	const rgb = isRgbLike(value) ? getRgbValues(value) : {...COLOR_DEFAULTS.rgb};
 	const values = getRgbCalculationValues(rgb);
 
-	const {delta, max, min} = values;
+	const {delta, maximum, minimum} = values;
 
-	const lightness = (min + max) / 2;
+	const lightness = (minimum + maximum) / 2;
 
 	let hue = 0;
 	let saturation = 0;
 
 	if (delta !== 0) {
-		saturation = (max - lightness) / Math.min(lightness, 1 - lightness);
+		saturation = (maximum - lightness) / min([lightness, 1 - lightness]);
 
 		hue = getRgbHue(values);
 
@@ -80,7 +81,7 @@ export function convertRgbToHwba(value: unknown): HWBAColor {
 	const rgb = isRgbLike(value) ? getRgbValues(value) : {...COLOR_DEFAULTS.rgb};
 	const values = getRgbCalculationValues(rgb);
 
-	const {delta, max, min} = values;
+	const {delta, maximum, minimum} = values;
 
 	let hue = 0;
 
@@ -92,8 +93,8 @@ export function convertRgbToHwba(value: unknown): HWBAColor {
 
 	return {
 		hue,
-		whiteness: min * COLOR_MAX.percent,
-		blackness: (1 - max) * COLOR_MAX.percent,
+		whiteness: minimum * COLOR_MAX.percent,
+		blackness: (1 - maximum) * COLOR_MAX.percent,
 		alpha: getAlphaValue((value as RGBAColor)?.alpha ?? COLOR_MAX.percent),
 	};
 }
@@ -124,12 +125,12 @@ function getRgbCalculationValues(rgb: RGBColor): RgbValues {
 	const green = rgb.green / COLOR_MAX.hex;
 	const red = rgb.red / COLOR_MAX.hex;
 
-	const max = Math.max(blue, green, red);
-	const min = Math.min(blue, green, red);
+	const maximum = max([blue, green, red]);
+	const minimum = min([blue, green, red]);
 
-	const delta = max - min;
+	const delta = maximum - minimum;
 
-	return {blue, delta, green, max, min, red};
+	return {blue, delta, green, maximum, minimum, red};
 }
 
 export function getRgbColor(this: InternalColor): RGBColor {
@@ -141,9 +142,9 @@ export function getRgbaColor(this: InternalColor): RGBAColor {
 }
 
 function getRgbHue(values: RgbValues): number {
-	const {blue, delta, green, max, red} = values;
+	const {blue, delta, green, maximum, red} = values;
 
-	switch (max) {
+	switch (maximum) {
 		case blue:
 			return (red - green) / delta + 4;
 

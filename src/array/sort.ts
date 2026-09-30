@@ -1,4 +1,5 @@
 import {isPlainObject} from '../internal/is';
+import {floor, round} from '../internal/math/misc';
 import {compare} from '../internal/value/compare';
 import type {PlainObject, Primitive} from '../models';
 
@@ -263,7 +264,7 @@ function getSortedArrayIndex(
 	let high = length - 1;
 
 	while (low <= high) {
-		const mid = Math.floor((low + high) / 2);
+		const mid = floor((low + high) / 2);
 
 		if (getComparisonValue(item, array[mid], sorters, sortersLength) < 0) {
 			high = mid - 1;
@@ -507,7 +508,7 @@ function isSortedArray(this: InternalSorter | SortHandler[], array: unknown[]): 
 	let offset = 0;
 
 	if (length >= SORT_THRESHOLD) {
-		offset = Math.round(length / SORT_PEEK_PERCENTAGE);
+		offset = round(length / SORT_PEEK_PERCENTAGE);
 		offset = offset > SORT_THRESHOLD ? SORT_THRESHOLD : offset;
 
 		for (let index = 0; index < offset; index += 1) {

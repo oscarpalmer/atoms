@@ -1,3 +1,6 @@
+import {unwrap} from '../../result/misc';
+import {attempt} from '../result/attempt';
+
 // #region Functions
 
 /**
@@ -91,11 +94,10 @@ export function join(array: unknown[], delimiter?: string): string {
 }
 
 function tryCallback<T, U>(value: T, callback: (value: T) => U): U {
-	try {
-		return callback(value);
-	} catch {
-		return value as never;
-	}
+	return unwrap(
+		attempt(() => callback(value)),
+		value,
+	) as U;
 }
 
 export function tryDecode(value: string): string {

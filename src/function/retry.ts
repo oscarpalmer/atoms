@@ -1,6 +1,7 @@
 import {getNumberOrDefault} from '../internal/defaults';
 import {getLimiter, LIMITER_WAIT} from '../internal/function/limit';
 import {isPlainObject} from '../internal/is';
+import {asyncAttempt, attempt} from '../internal/result/attempt';
 import type {GenericAsyncCallback, GenericCallback} from '../models';
 
 // #region Types
@@ -75,13 +76,13 @@ async function asyncRetry<Callback extends GenericCallback>(
 	}
 
 	async function handle(): Promise<void> {
-		try {
-			const result = await callback();
+		const result = await asyncAttempt(async () => callback());
 
-			resolver(result);
-		} catch (error) {
-			if (attempts >= times || !when(error)) {
-				rejector(new RetryError(RETRY_MESSAGE_FAILED, error));
+		if (result.ok) {
+			resolver(result.value);
+		} else {
+			if (attempts >= times || !when(result.error)) {
+				rejector(new RetryError(RETRY_MESSAGE_FAILED, result.error));
 			} else {
 				attempts += 1;
 
@@ -137,16 +138,16 @@ export function retry<Callback extends GenericCallback>(
 	let last: unknown;
 
 	for (let index = 0; index <= times; index += 1) {
-		try {
-			const result = callback();
+		const result = attempt(callback);
 
-			return result;
-		} catch (error) {
-			if (index >= times || !when(error)) {
-				last = error;
+		if (result.ok) {
+			return result.value;
+		}
 
-				break;
-			}
+		if (index >= times || !when(result.error)) {
+			last = result.error;
+
+			break;
 		}
 	}
 

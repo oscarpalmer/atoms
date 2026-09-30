@@ -1,5 +1,7 @@
 import {createAborter, type Aborter} from './internal/aborter';
 import {getBooleanOrDefault, getNumberOrDefault} from './internal/defaults';
+import {min} from './internal/math/aggregate';
+import {asyncAttempt} from './internal/result/attempt';
 import type {GenericAsyncCallback, GenericCallback} from './models';
 
 // #region Special variables
@@ -833,7 +835,7 @@ function resumeQueue(this: InternalQueue): void {
 
 	state.paused = false;
 
-	const length = Math.min(state.options.concurrency, state.items.length);
+	const length = min([state.options.concurrency, state.items.length]);
 
 	for (let index = 0; index < length; index += 1) {
 		void run(state);
@@ -858,15 +860,21 @@ async function run(state: QueueState): Promise<void> {
 
 		let result: unknown;
 
-		try {
-			if (!(item.aborter?.signal?.aborted ?? false)) {
+		const attempted = await asyncAttempt(async () => {
+			if (item != null && !(item.aborter?.signal?.aborted ?? false)) {
 				const parameters = item.key == null ? item.parameters : [item.key, ...item.parameters];
 
-				result = await state.callback(...parameters);
+				return await state.callback(...parameters);
 			}
-		} catch (thrown) {
+
+			throw new Error();
+		});
+
+		if (attempted.ok) {
+			result = attempted.value;
+		} else {
 			error = true;
-			result = thrown;
+			result = attempted.error;
 		}
 
 		if (state.paused) {

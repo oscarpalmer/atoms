@@ -1,4 +1,5 @@
 import {isTemplateStringsArray} from '../internal/is';
+import {min} from '../internal/math/aggregate';
 import {interpolate} from '../internal/string/misc';
 
 // #region Functions
@@ -54,7 +55,7 @@ export function dedent(value: string | TemplateStringsArray, ...values: unknown[
 		return actual.trim();
 	}
 
-	const minimum = Math.min(...lengths);
+	const minimum = min(lengths);
 
 	const pattern = new RegExp(`^\\s{0,${minimum}}`);
 
@@ -131,6 +132,7 @@ export function parse(
 	reviver?: (this: unknown, key: string, value: unknown) => unknown,
 ): unknown {
 	try {
+		// oxlint-disable-next-line @oscarpalmer/atoms/attempt
 		return JSON.parse(value, reviver);
 	} catch {
 		return undefined;

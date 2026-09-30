@@ -174,8 +174,8 @@ test('error', () =>
 		}
 
 		setTimeout(() => {
-			expect(empty).toEqual({errors: length, successes: 0});
-			expect(type).toEqual({errors: length, successes: 0});
+			expect(empty).toEqual({errors: 0, successes: 0});
+			expect(type).toEqual({errors: 8, successes: 0});
 
 			done();
 		}, 25);

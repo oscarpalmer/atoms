@@ -1,4 +1,5 @@
 import {isNumber} from './is';
+import {floor} from './math/misc';
 
 // #region Functions
 
@@ -43,7 +44,7 @@ export function getRandomFloatingNumber(minimum?: number, maximum?: number): num
  * @returns Random integer
  */
 export function getRandomInteger(minimum?: number, maximum?: number): number {
-	return Math.floor(getRandomFloatingNumberValue(true, minimum, maximum));
+	return floor(getRandomFloatingNumberValue(true, minimum, maximum));
 }
 
 // #endregion

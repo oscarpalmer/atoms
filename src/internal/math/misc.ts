@@ -1,4 +1,15 @@
 /**
+ * Round a number down
+ *
+ * @param value Number to round down
+ * @param decimals Number of decimal places to round to _(defaults to `0`)_
+ * @returns Rounded number, or `Number.NaN` if the value if unable to be rounded
+ */
+export function floor(value: number, decimals?: number): number {
+	return roundNumber(Math.floor, value, decimals);
+}
+
+/**
  * Round a number
  *
  * @param value Number to round

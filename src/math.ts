@@ -2,12 +2,11 @@ import {isNumber} from './internal/is';
 import {
 	aggregate,
 	AGGREGATION_AVERAGE,
-	AGGREGATION_MIN,
 	AGGREGATION_SUM,
 	getAggregateCallback,
 	getAggregated,
 } from './internal/math/aggregate';
-import {roundNumber} from './internal/math/misc';
+import {floor, roundNumber} from './internal/math/misc';
 import type {NumericalValues, PlainObject} from './models';
 
 // #region Functions
@@ -124,17 +123,6 @@ export function count(array: unknown[], key?: unknown, value?: unknown): number 
 }
 
 /**
- * Round a number down
- *
- * @param value Number to round down
- * @param decimals Number of decimal places to round to _(defaults to `0`)_
- * @returns Rounded number, or `Number.NaN` if the value if unable to be rounded
- */
-export function floor(value: number, decimals?: number): number {
-	return roundNumber(Math.floor, value, decimals);
-}
-
-/**
  * Get the median value from a list of items
  *
  * @param array List of items
@@ -196,71 +184,7 @@ export function median(array: unknown[], key?: unknown): number {
 		return (numbers[first] + numbers[second]) / 2;
 	}
 
-	return numbers[Math.floor(length / 2)];
-}
-
-/**
- * Get the minimum value from a list of items
- *
- * @param items List of items
- * @param callback Callback to get an item's value
- * @param first Return only the first item with the minimum value
- * @returns First item with the minimum value, or `undefined` if no minimum can be found
- */
-export function min<Item>(
-	items: Item[],
-	callback: (item: Item, index: number, array: Item[]) => number,
-	first: true,
-): Item | undefined;
-
-/**
- * Get the minimum value from a list of items
- *
- * @param items List of items
- * @param key Key to use for value
- * @param first Return only the first item with the minimum value
- * @returns First item with the minimum value, or `undefined` if no minimum can be found
- */
-export function min<Item extends PlainObject>(
-	items: Item[],
-	key: keyof NumericalValues<Item>,
-	first: true,
-): Item | undefined;
-
-/**
- * Get the minimum value from a list of items
- *
- * @param items List of items
- * @param callback Callback to get an item's value
- * @returns Items with the minimum value
- */
-export function min<Item>(
-	items: Item[],
-	callback: (item: Item, index: number, array: Item[]) => number,
-): Item[];
-
-/**
- * Get the minimum value from a list of items
- *
- * @param items List of items
- * @param key Key to use for value
- * @returns Items with the minimum value
- */
-export function min<Item extends PlainObject>(
-	items: Item[],
-	key: keyof NumericalValues<Item>,
-): Item[];
-
-/**
- * Get the minimum value from a list of numbers
- *
- * @param values List of numbers
- * @returns Minimum value, or `Number.NaN` if no minimum can be found
- */
-export function min(values: number[]): number;
-
-export function min(array: unknown[], key?: unknown, first?: unknown): unknown {
-	return getAggregated(AGGREGATION_MIN, array, key, first);
+	return numbers[floor(length / 2)];
 }
 
 /**
@@ -303,7 +227,7 @@ export function sum(array: unknown[], key?: unknown): unknown {
 
 // #region Exports
 
-export {max} from './internal/math/aggregate';
-export {round} from './internal/math/misc';
+export {max, min} from './internal/math/aggregate';
+export {floor, round} from './internal/math/misc';
 
 // #endregion

@@ -6,7 +6,7 @@ import type {PlainObject} from '../models';
 /**
  * Get the _only_ item matching the given value
  *
- * Throws an error if multiple items match the value
+ * _Throws an error if multiple items match the value_
  *
  * @param array Array to search in
  * @param callback Callback to get an item's value for matching
@@ -30,7 +30,7 @@ export function single<
 /**
  * Get the _only_ item matching the given value by key
  *
- * Throws an error if multiple items match the value
+ * _Throws an error if multiple items match the value_
  *
  * @param array Array to search in
  * @param key Key to get an item's value for matching
@@ -55,7 +55,7 @@ export function single<Item extends PlainObject, ItemKey extends keyof Item>(
 /**
  * Get the _only_ item matching the filter
  *
- * Throws an error if multiple items match the filter
+ * _Throws an error if multiple items match the filter_
  *
  * @param array Array to search in
  * @param filter Filter callback to match items

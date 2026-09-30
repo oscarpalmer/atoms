@@ -10,9 +10,6 @@ export const PROMISE_ERROR_NAME = 'PromiseTimeoutError';
 
 export const PROMISE_MESSAGE_EXPECTATION_ATTEMPT = 'Attempt expected a function or a promise';
 
-export const PROMISE_MESSAGE_EXPECTATION_ITEMS_EMPTY =
-	'promises expected at least one promise-function or promise in the array or object';
-
 export const PROMISE_MESSAGE_EXPECTATION_ITEMS_TYPE =
 	'promises expected an array or object holding promise-functions or promises';
 

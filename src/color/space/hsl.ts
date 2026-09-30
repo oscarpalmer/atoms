@@ -1,3 +1,4 @@
+import {max, min} from '../../internal/math/aggregate';
 import {COLOR_DEFAULTS, COLOR_MAX, COLOR_TYPE} from '../constants';
 import {getAlphaValue} from '../misc/alpha';
 import {getDegrees, getHexValue, getPercentage} from '../misc/get';
@@ -26,7 +27,7 @@ function convertHslToHwba(input: unknown): HWBAColor {
 	lightness /= COLOR_MAX.percent;
 	saturation /= COLOR_MAX.percent;
 
-	const value = lightness + saturation * Math.min(lightness, 1 - lightness);
+	const value = lightness + saturation * min([lightness, 1 - lightness]);
 
 	if (value === 0) {
 		saturation = 0;
@@ -83,9 +84,9 @@ export function getColorFromHsl<Type extends ColorType>(
 
 function getHexyValue(hue: number, lightness: number, saturation: number, value: number): number {
 	const part = (value + hue / 30) % 12;
-	const mod = saturation * Math.min(lightness, 1 - lightness);
+	const mod = saturation * min([lightness, 1 - lightness]);
 
-	return (lightness - mod * Math.max(-1, Math.min(part - 3, 9 - part, 1))) * COLOR_MAX.hex;
+	return (lightness - mod * max([-1, min([part - 3, 9 - part, 1])])) * COLOR_MAX.hex;
 }
 
 export function getHslValue(this: InternalColor): HSLColor {
