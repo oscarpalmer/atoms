@@ -1,5 +1,5 @@
 import type {Aborter} from '../internal/aborter';
-import type {Result} from '../internal/result/models';
+import type {Result} from '../internal/models/result.model';
 import type {ArrayOrPlainObject, GenericCallback, Key} from '../models';
 import {
 	PROMISE_ERROR_NAME,

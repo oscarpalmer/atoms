@@ -1,6 +1,6 @@
 {
 	"name": "@oscarpalmer/atoms",
-	"version": "0.206.0",
+	"version": "0.207.0",
 	"description": "Atomic utilities for making your JavaScript better.",
 	"keywords": [
 		"array",
@@ -149,6 +149,13 @@
 			"types": "./dist/number.d.mts",
 			"default": "./dist/number.mjs"
 		},
+		"./plan": {
+			"types": "./dist/plan/index.d.mts",
+			"default": "./dist/plan/index.mjs"
+		},
+		"./plan/models": {
+			"default": "./dist/plan/models.mjs"
+		},
 		"./promise": {
 			"types": "./dist/promise/index.d.mts",
 			"default": "./dist/promise/index.mjs"
@@ -162,7 +169,6 @@
 			"default": "./dist/promise/misc.mjs"
 		},
 		"./promise/models": {
-			"types": "./dist/promise/models.d.mts",
 			"default": "./dist/promise/models.mjs"
 		},
 		"./promise/timed": {
@@ -198,8 +204,7 @@
 			"default": "./dist/result/misc.mjs"
 		},
 		"./result/models": {
-			"types": "./dist/internal/result/models.d.mts",
-			"default": "./dist/internal/result/models.mjs"
+			"default": "./dist/internal/models/result.model.mjs"
 		},
 		"./result/pipe": {
 			"types": "./dist/result/work/pipe.d.mts",

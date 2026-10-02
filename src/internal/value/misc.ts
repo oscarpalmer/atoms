@@ -1,6 +1,6 @@
 import {error, ok} from '../../internal/result/misc';
 import type {PlainObject} from '../../models';
-import type {Result} from '../result/models';
+import type {Result} from '../models/result.model';
 import {ignoreKey} from '../string/misc';
 
 // #region Functions

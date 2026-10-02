@@ -1,6 +1,6 @@
 import type {Aborter} from '../internal/aborter';
 import {error, ok} from '../internal/result/misc';
-import type {Result} from '../internal/result/models';
+import type {Result} from '../internal/models/result.model';
 import {
 	PROMISE_MESSAGE_EXPECTATION_RESULT,
 	PROMISE_TYPE_FULFILLED,

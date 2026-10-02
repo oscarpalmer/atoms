@@ -1,5 +1,5 @@
 import {isOk, isResult} from '../internal/result/misc';
-import type {AnyResult, ExtendedErr, ResultMatch} from '../internal/result/models';
+import type {AnyResult, ExtendedErr, ResultMatch} from '../internal/models/result.model';
 
 // #region Functions
 

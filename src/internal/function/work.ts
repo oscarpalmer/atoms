@@ -1,6 +1,6 @@
 import type {GenericCallback} from '../../models';
 import {isError, isOk} from '../result/misc';
-import type {UnwrapValue} from '../result/models';
+import type {UnwrapValue} from '../models/result.model';
 import {assert, type Asserter} from './assert';
 
 // #region Types
