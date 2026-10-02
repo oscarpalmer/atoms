@@ -15,6 +15,7 @@ import {
 import type {Result} from '../internal/models/result.model';
 import {asyncAttempt, attempt} from '../internal/result/attempt';
 import type {PlainObject} from '../models';
+import {isError, isOk} from '../result/misc';
 
 // #region Instances
 
@@ -25,6 +26,10 @@ function AsyncPlan(this: any, generator: () => AsyncGenerator): void {
 	};
 }
 
+AsyncPlan.prototype[Symbol.asyncIterator] = function (this: InternalAsyncPlan) {
+	return this[PLAN_SYMBOL].generator();
+};
+
 AsyncPlan.prototype.run = runAsyncPlan;
 
 function Plan(this: any, generator: () => Generator): void {
@@ -33,6 +38,10 @@ function Plan(this: any, generator: () => Generator): void {
 		type: PLAN_TYPE_PLAN_SYNC,
 	};
 }
+
+Plan.prototype[Symbol.iterator] = function (this: InternalPlan) {
+	return this[PLAN_SYMBOL].generator();
+};
 
 Plan.prototype.run = runPlan;
 
@@ -49,10 +58,19 @@ function asyncExecute(callback: () => AsyncGenerator): Promise<unknown> {
 		while (true) {
 			const next = await generator.next();
 			const {done} = next;
+
 			let value = next.value;
 
 			if (value instanceof Error) {
 				throw value;
+			}
+
+			if (isError(value)) {
+				throw value.error;
+			}
+
+			if (isOk(value)) {
+				value = value.value;
 			}
 
 			lastValue = value;
@@ -124,10 +142,19 @@ function execute(callback: () => Generator): Result<unknown, unknown> {
 		while (true) {
 			const next = generator.next();
 			const {done} = next;
+
 			let {value} = next;
 
 			if (value instanceof Error) {
 				throw value;
+			}
+
+			if (isError(value)) {
+				throw value.error;
+			}
+
+			if (isOk(value)) {
+				value = value.value;
 			}
 
 			lastValue = value;
@@ -160,13 +187,7 @@ export function isAsyncPlan<Value = unknown, Error = unknown>(
  * @returns `true` if the value is an asynchronous generator function, otherwise `false`
  */
 export function isAsyncGenerator(value: unknown): value is () => AsyncGenerator {
-	return (
-		typeof value === 'function' &&
-		value.constructor.name === GENERATOR_NAME_ASYNC &&
-		typeof value.prototype.next === 'function' &&
-		typeof value.prototype.return === 'function' &&
-		typeof value.prototype.throw === 'function'
-	);
+	return isGeneratorInstance(GENERATOR_NAME_ASYNC, value);
 }
 
 /**
@@ -176,9 +197,14 @@ export function isAsyncGenerator(value: unknown): value is () => AsyncGenerator 
  * @returns `true` if the value is a generator function, otherwise `false`
  */
 export function isGenerator(value: unknown): value is () => Generator {
+	return isGeneratorInstance(GENERATOR_NAME_SYNC, value);
+}
+
+function isGeneratorInstance(name: string, value: unknown): boolean {
 	return (
 		typeof value === 'function' &&
-		value.constructor.name === GENERATOR_NAME_SYNC &&
+		value !== null &&
+		value.constructor.name === name &&
 		typeof value.prototype.next === 'function' &&
 		typeof value.prototype.return === 'function' &&
 		typeof value.prototype.throw === 'function'

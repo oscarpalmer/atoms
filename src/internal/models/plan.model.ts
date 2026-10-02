@@ -7,6 +7,12 @@ import type {Result} from './result.model';
  */
 export type AsyncPlan<Value, Error = unknown> = {
 	/**
+	 * Get the asynchronous generator for the plan
+	 *
+	 * @returns Asynchronous generator
+	 */
+	[Symbol.asyncIterator]: () => AsyncGenerator<unknown, Value, unknown>;
+	/**
 	 * Run the plan to completion
 	 *
 	 * @returns Result
@@ -34,6 +40,12 @@ export type InternalPlan = {
  * A plan of execution that can yield intermediate results and eventually return a result
  */
 export type Plan<Value, Error = unknown> = {
+	/**
+	 * Get the generator for the plan
+	 *
+	 * @returns Generator
+	 */
+	[Symbol.iterator]: () => Generator<unknown, Value, unknown>;
 	/**
 	 * Run the plan to completion
 	 *

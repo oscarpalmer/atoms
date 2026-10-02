@@ -3,6 +3,7 @@ import {
 	asyncPlan,
 	asyncRun,
 	Err,
+	error,
 	isAsyncGenerator,
 	isAsyncPlan,
 	isError,
@@ -10,6 +11,7 @@ import {
 	isOk,
 	isPlan,
 	isResult,
+	ok,
 	Ok,
 	plan,
 	run,
@@ -17,7 +19,7 @@ import {
 import {isFixture} from './.fixtures/is.fixture';
 
 function* a() {
-	yield;
+	yield ok('a');
 
 	return 'a';
 }
@@ -31,18 +33,19 @@ function* abc() {
 }
 
 function* b() {
-	yield;
+	yield 'b';
 
 	return 'b';
 }
 
 function* c() {
-	yield;
+	yield 'c';
 
 	return 'c';
 }
 
 async function* getPrefix() {
+	yield ok('prefix');
 	yield new Promise(resolve => setTimeout(resolve, 1000));
 
 	return 'hello';
@@ -52,7 +55,11 @@ async function* getMessage() {
 	const prefix = yield* getPrefix();
 	const suffix = getSuffix();
 
-	return `${prefix}${suffix}`;
+	const message = `${prefix}${suffix}`;
+
+	yield message;
+
+	return message;
 }
 
 function getSuffix() {
@@ -70,6 +77,14 @@ test('error', () => {
 				return 'hello, world';
 			},
 			'yielded error',
+		],
+		[
+			function* resultError() {
+				yield error(new Error('result error'));
+
+				return 'hello, again';
+			},
+			'result error',
 		],
 		[
 			function* thrownError() {
@@ -112,6 +127,14 @@ test('error, async', async () => {
 				return 'hello, world';
 			},
 			'yielded error',
+		],
+		[
+			async function* resultError() {
+				yield error(new Error('result error'));
+
+				return 'hello, again';
+			},
+			'result error',
 		],
 		[
 			async function* thrownError() {
@@ -182,6 +205,51 @@ test('is', () => {
 	expect(isAsyncPlan(asyncPlanned)).toBe(true);
 	expect(isGenerator(asyncPlanned)).toBe(false);
 	expect(isPlan(asyncPlanned)).toBe(false);
+});
+
+test('iterator', async () => {
+	const asynchronous = asyncPlan(getMessage);
+	const synchronous = plan(abc);
+
+	expect(isAsyncGenerator(asynchronous)).toBe(false);
+	expect(isAsyncPlan(asynchronous)).toBe(true);
+	expect(isGenerator(asynchronous)).toBe(false);
+	expect(isPlan(asynchronous)).toBe(false);
+
+	expect(isAsyncGenerator(synchronous)).toBe(false);
+	expect(isAsyncPlan(synchronous)).toBe(false);
+	expect(isGenerator(synchronous)).toBe(false);
+	expect(isPlan(synchronous)).toBe(true);
+
+	const asynchronousResults = [];
+
+	for await (const result of asynchronous) {
+		asynchronousResults.push(result);
+	}
+
+	expect(asynchronousResults).toEqual([
+		{
+			ok: true,
+			value: 'prefix',
+		},
+		undefined,
+		'hello, world!',
+	]);
+
+	const synchronousResults = [];
+
+	for (const result of synchronous) {
+		synchronousResults.push(result);
+	}
+
+	expect(synchronousResults).toEqual([
+		{
+			ok: true,
+			value: 'a',
+		},
+		'b',
+		'c',
+	]);
 });
 
 test('plan', () => {
