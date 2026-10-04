@@ -1,23 +1,22 @@
-import type {Result} from './result.model';
-
 // #region Types
 
 /**
  * An asynchronous plan of execution that can yield intermediate results and eventually return a result
  */
-export type AsyncPlan<Value, Error = unknown> = {
+export type AsyncPlan<Yielded, Returned> = {
 	/**
 	 * Get the asynchronous generator for the plan
 	 *
 	 * @returns Asynchronous generator
 	 */
-	[Symbol.asyncIterator]: () => AsyncGenerator<unknown, Value, unknown>;
+	[Symbol.asyncIterator]: () => AsyncGenerator<Yielded, Returned, unknown>;
 	/**
 	 * Run the plan to completion
 	 *
+	 * @throws {PlanError<Yielded, Returned>}
 	 * @returns Result
 	 */
-	run: () => Promise<Result<Value, Error>>;
+	run: () => Promise<PlanResult<Returned>>;
 };
 
 type AsyncPlanState = {
@@ -39,26 +38,36 @@ export type InternalPlan = {
 /**
  * A plan of execution that can yield intermediate results and eventually return a result
  */
-export type Plan<Value, Error = unknown> = {
+export type Plan<Yielded, Returned> = {
 	/**
 	 * Get the generator for the plan
 	 *
 	 * @returns Generator
 	 */
-	[Symbol.iterator]: () => Generator<unknown, Value, unknown>;
+	[Symbol.iterator]: () => Generator<Yielded, Returned, unknown>;
 	/**
 	 * Run the plan to completion
 	 *
+	 * @throws {PlanError<Yielded, Returned>}
 	 * @returns Result
 	 */
-	run: () => Result<Value, Error>;
+	run: () => PlanResult<Returned>;
 };
+
+type PlanErrorValues<Original> = Original extends Error ? Original : never;
+
+export type PlanError<Yielded, Returned> =
+	| PlanErrorValues<Yielded>
+	| PlanErrorValues<Returned>
+	| Error;
+
+export type PlanResult<Returned> = Returned extends Error ? never : Returned;
 
 type PlanState = {
 	generator: () => Generator;
 } & BaseState<typeof PLAN_TYPE_PLAN_SYNC>;
 
-export type PlanType = 'asyncPlan' | 'plan';
+export type PlanType = 'asyncPlan' | 'plan' | 'stop';
 
 // #endregion
 

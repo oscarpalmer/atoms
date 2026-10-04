@@ -33,7 +33,9 @@ export * from './internal/value/has';
 export * from './internal/value/set';
 
 export * from './plan/index';
+export * from './plan/is';
 export * from './plan/models';
+export * from './plan/misc';
 
 export * from './promise/delay';
 export * from './promise/index';

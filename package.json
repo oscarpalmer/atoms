@@ -1,6 +1,6 @@
 {
 	"name": "@oscarpalmer/atoms",
-	"version": "0.209.0",
+	"version": "0.210.0",
 	"description": "Atomic utilities for making your JavaScript better.",
 	"keywords": [
 		"array",
@@ -153,6 +153,14 @@
 			"types": "./dist/plan/index.d.mts",
 			"default": "./dist/plan/index.mjs"
 		},
+		"./plan/is": {
+			"types": "./dist/plan/is.d.mts",
+			"default": "./dist/plan/is.mjs"
+		},
+		"./plan/misc": {
+			"types": "./dist/plan/misc.d.mts",
+			"default": "./dist/plan/misc.mjs"
+		},
 		"./plan/models": {
 			"default": "./dist/plan/models.mjs"
 		},
@@ -297,7 +305,7 @@
 	"devDependencies": {
 		"@types/node": "^26.6",
 		"@vitest/coverage-istanbul": "5.0.1",
-		"eslint": "^10.11",
+		"eslint": "^10.12",
 		"jsdom": "^30.1",
 		"tsdown": "^0.23",
 		"typescript": "^7",

@@ -1,1 +1,1 @@
-export type {Plan} from '../internal/models/plan.model';
+export type {AsyncPlan, Plan} from '../internal/models/plan.model';

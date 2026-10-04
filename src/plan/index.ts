@@ -3,19 +3,15 @@ import {
 	type InternalAsyncPlan,
 	type InternalPlan,
 	type Plan,
-	type PlanType,
-	GENERATOR_NAME_ASYNC,
-	GENERATOR_NAME_SYNC,
 	PLAN_MESSAGE_PLAN_INPUT,
 	PLAN_MESSAGE_RUN_INPUT,
 	PLAN_SYMBOL,
 	PLAN_TYPE_PLAN_ASYNC,
 	PLAN_TYPE_PLAN_SYNC,
+	type PlanError,
+	type PlanResult,
 } from '../internal/models/plan.model';
-import type {Result} from '../internal/models/result.model';
-import {asyncAttempt, attempt} from '../internal/result/attempt';
-import type {PlainObject} from '../models';
-import {isError, isOk} from '../result/misc';
+import {isAsyncGenerator, isAsyncPlan, isGenerator, isPlan} from '../internal/plan';
 
 // #region Instances
 
@@ -49,98 +45,15 @@ Plan.prototype.run = runPlan;
 
 // #region Functions
 
-function asyncExecute(callback: () => AsyncGenerator): Promise<unknown> {
-	return asyncAttempt(async () => {
-		const generator = callback();
+async function asyncExecute(callback: () => AsyncGenerator): Promise<unknown> {
+	const generator = callback();
 
-		let lastValue: unknown;
+	let success = true;
+	let lastValue: unknown;
 
+	try {
 		while (true) {
-			const next = await generator.next();
-			const {done} = next;
-
-			let value = next.value;
-
-			if (value instanceof Error) {
-				throw value;
-			}
-
-			if (isError(value)) {
-				throw value.error;
-			}
-
-			if (isOk(value)) {
-				value = value.value;
-			}
-
-			lastValue = value;
-
-			if (done === true) {
-				break;
-			}
-		}
-
-		return lastValue;
-	});
-}
-
-/**
- * Create a plan for an asynchronous generator function
- *
- * @param generator Generator to plan for
- * @returns Generator plan
- */
-export function asyncPlan<Value = unknown, Error = unknown>(
-	generator: () => AsyncGenerator<unknown, Value, unknown>,
-): AsyncPlan<Value, Error> {
-	if (!isAsyncGenerator(generator)) {
-		throw new Error(PLAN_MESSAGE_PLAN_INPUT);
-	}
-
-	// @ts-expect-error All good, no worries :-)
-	return new AsyncPlan(generator) as AsyncPlan<Value, Error>;
-}
-
-/**
- * Run an asynchronous generator to completion
- *
- * @param generator Generator to run
- * @returns Result
- */
-export async function asyncRun<Value = unknown, Error = unknown>(
-	generator: () => AsyncGenerator<unknown, Value, unknown>,
-): Promise<Result<Value, Error>>;
-
-/**
- * Run an asynchronous plan to completion
- *
- * @param plan Plan to run
- * @returns Result
- */
-export async function asyncRun<Value = unknown, Error = unknown>(
-	plan: AsyncPlan<Value, Error>,
-): Promise<Result<Value, Error>>;
-
-export async function asyncRun(input: unknown): Promise<unknown> {
-	if (isAsyncPlan(input)) {
-		return input.run();
-	}
-
-	if (!isAsyncGenerator(input)) {
-		throw new Error(PLAN_MESSAGE_RUN_INPUT);
-	}
-
-	return asyncExecute(input);
-}
-
-function execute(callback: () => Generator): Result<unknown, unknown> {
-	return attempt(() => {
-		const generator = callback();
-
-		let lastValue: unknown;
-
-		while (true) {
-			const next = generator.next();
+			const next = await generator.next(lastValue);
 			const {done} = next;
 
 			let {value} = next;
@@ -149,88 +62,72 @@ function execute(callback: () => Generator): Result<unknown, unknown> {
 				throw value;
 			}
 
-			if (isError(value)) {
-				throw value.error;
-			}
-
-			if (isOk(value)) {
-				value = value.value;
-			}
-
 			lastValue = value;
 
 			if (done === true) {
 				break;
 			}
 		}
+	} catch (error) {
+		lastValue = error;
+		success = false;
+	} finally {
+		generator?.return(lastValue);
+	}
 
+	if (success) {
 		return lastValue;
-	});
+	}
+
+	throw lastValue;
+}
+
+function execute(callback: () => Generator): unknown {
+	const generator = callback();
+
+	let success = true;
+	let lastValue: unknown;
+
+	try {
+		while (true) {
+			const next = generator.next(lastValue);
+			const done = next.done === true;
+
+			let {value} = next;
+
+			if (value instanceof Error) {
+				throw value;
+			}
+
+			lastValue = value;
+
+			if (done) {
+				break;
+			}
+		}
+	} catch (error) {
+		lastValue = error;
+		success = false;
+	} finally {
+		generator.return(lastValue);
+	}
+
+	if (success) {
+		return lastValue;
+	}
+
+	throw lastValue;
 }
 
 /**
- * Is the value an asynchronous plan?
+ * Create a plan for an asynchronous generator function
  *
- * @param value Value to check
- * @returns `true` if the value is an asynchronous plan, otherwise `false`
+ * @param generator Generator to plan for
+ * @returns Generator plan
  */
-export function isAsyncPlan<Value = unknown, Error = unknown>(
-	value: unknown,
-): value is AsyncPlan<Value, Error> {
-	return isPlanInstance(PLAN_TYPE_PLAN_ASYNC, value);
-}
-
-/**
- * Is the value an asynchronous generator function?
- *
- * @param value Value to check
- * @returns `true` if the value is an asynchronous generator function, otherwise `false`
- */
-export function isAsyncGenerator(value: unknown): value is () => AsyncGenerator {
-	return isGeneratorInstance(GENERATOR_NAME_ASYNC, value);
-}
-
-/**
- * Is the value a generator function?
- *
- * @param value Value to check
- * @returns `true` if the value is a generator function, otherwise `false`
- */
-export function isGenerator(value: unknown): value is () => Generator {
-	return isGeneratorInstance(GENERATOR_NAME_SYNC, value);
-}
-
-function isGeneratorInstance(name: string, value: unknown): boolean {
-	return (
-		typeof value === 'function' &&
-		value !== null &&
-		value.constructor.name === name &&
-		typeof value.prototype.next === 'function' &&
-		typeof value.prototype.return === 'function' &&
-		typeof value.prototype.throw === 'function'
-	);
-}
-
-/**
- * Is the value a plan?
- *
- * @param value Value to check
- * @returns `true` if the value is a plan, otherwise `false`
- */
-export function isPlan<Value = unknown, Error = unknown>(
-	value: unknown,
-): value is Plan<Value, Error> {
-	return isPlanInstance(PLAN_TYPE_PLAN_SYNC, value);
-}
-
-function isPlanInstance(type: PlanType, value: unknown): boolean {
-	return (
-		typeof value === 'object' &&
-		value !== null &&
-		PLAN_SYMBOL in value &&
-		((value as PlainObject)[PLAN_SYMBOL] as PlainObject).type === type
-	);
-}
+export function plan<Yielded, Returned>(
+	generator: () => AsyncGenerator<Yielded, Returned>,
+): AsyncPlan<Yielded, Returned>;
 
 /**
  * Create a plan for a generator function
@@ -238,16 +135,45 @@ function isPlanInstance(type: PlanType, value: unknown): boolean {
  * @param generator Generator to plan for
  * @returns Generator plan
  */
-export function plan<Value = unknown, Error = unknown>(
-	generator: () => Generator<unknown, Value, Error>,
-): Plan<Value, Error> {
-	if (!isGenerator(generator)) {
-		throw new Error(PLAN_MESSAGE_PLAN_INPUT);
+export function plan<Yielded, Returned>(
+	generator: () => Generator<Yielded, Returned>,
+): Plan<Yielded, Returned>;
+
+export function plan<Y, R, N>(
+	generator: () => AsyncGenerator<Y, R, N> | Generator<Y, R, N>,
+): AsyncPlan<Y, R> | Plan<Y, R> {
+	if (isAsyncGenerator(generator)) {
+		// @ts-expect-error All good, no worries :-)
+		return new AsyncPlan(generator);
 	}
 
-	// @ts-expect-error All good, no worries :-)
-	return new Plan(generator) as Plan<Value, Error>;
+	if (isGenerator(generator)) {
+		// @ts-expect-error All good, no worries :-)
+		return new Plan(generator);
+	}
+
+	throw new Error(PLAN_MESSAGE_PLAN_INPUT);
 }
+
+/**
+ * Run an asynchronous generator to completion
+ *
+ * @param generator Generator to run
+ * @returns Result
+ */
+export async function run<Yielded, Returned>(
+	generator: () => AsyncGenerator<Yielded, Returned>,
+): Promise<PlanResult<Returned> | PlanError<Yielded, Returned>>;
+
+/**
+ * Run an asynchronous plan to completion
+ *
+ * @param plan Plan to run
+ * @returns Result
+ */
+export async function run<Yielded, Returned>(
+	plan: AsyncPlan<Yielded, Returned>,
+): Promise<PlanResult<Returned> | PlanError<Yielded, Returned>>;
 
 /**
  * Run a generator to completion
@@ -255,9 +181,9 @@ export function plan<Value = unknown, Error = unknown>(
  * @param generator Generator to run
  * @returns Result
  */
-export function run<Value = unknown, Error = unknown>(
-	generator: () => Generator<unknown, Value, unknown>,
-): Result<Value, Error>;
+export function run<Yielded, Returned>(
+	generator: () => Generator<Yielded, Returned>,
+): PlanResult<Returned> | PlanError<Yielded, Returned>;
 
 /**
  * Run a plan to completion
@@ -265,20 +191,24 @@ export function run<Value = unknown, Error = unknown>(
  * @param plan Plan to run
  * @returns Result
  */
-export function run<Value = unknown, Error = unknown>(
-	plan: Plan<Value, Error>,
-): Result<Value, Error>;
+export function run<Yielded, Returned>(
+	plan: Plan<Yielded, Returned>,
+): PlanResult<Returned> | PlanError<Yielded, Returned>;
 
 export function run(input: unknown): unknown {
-	if (isPlan(input)) {
+	if (isAsyncPlan(input) || isPlan(input)) {
 		return input.run();
 	}
 
-	if (!isGenerator(input)) {
-		throw new Error(PLAN_MESSAGE_RUN_INPUT);
+	if (isAsyncGenerator(input)) {
+		return asyncExecute(input);
 	}
 
-	return execute(input);
+	if (isGenerator(input)) {
+		return execute(input);
+	}
+
+	throw new Error(PLAN_MESSAGE_RUN_INPUT);
 }
 
 function runAsyncPlan(this: InternalAsyncPlan): Promise<unknown> {
@@ -288,24 +218,5 @@ function runAsyncPlan(this: InternalAsyncPlan): Promise<unknown> {
 function runPlan(this: InternalPlan): unknown {
 	return execute(this[PLAN_SYMBOL].generator);
 }
-
-// #endregion
-
-// #region Namespaces
-
-export declare namespace plan {
-	export var async: typeof asyncPlan;
-}
-
-export declare namespace run {
-	export var async: typeof asyncRun;
-}
-
-// #endregion
-
-// #region Initialization
-
-plan.async = asyncPlan;
-run.async = asyncRun;
 
 // #endregion
