@@ -28,8 +28,6 @@ test('plan, async', async () => {
 	expect(isGenerator(planned)).toBe(false);
 	expect(isPlan(planned)).toBe(false);
 
-	const ran = await planned.run();
-
 	await planned.run().then(result => {
 		expect(result).toBe('hello, world!');
 	});

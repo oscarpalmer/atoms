@@ -35,7 +35,7 @@ test('fail', async () => {
 		return 'default';
 	}
 
-	return run(asyncFailing).catch(error => {
+	return run.async(asyncFailing).catch(error => {
 		expect(error).toBe('error');
 	});
 });
@@ -125,7 +125,7 @@ test('succeed', async () => {
 		return `result: ${result}`;
 	}
 
-	return run(asyncSucceeding).then(result => {
+	return run.async(asyncSucceeding).then(result => {
 		expect(result).toBe('result: 123');
 	});
 });

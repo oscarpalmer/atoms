@@ -1,5 +1,5 @@
 import {expect, test} from 'vite-plus/test';
-import {isAsyncPlan, isPlan, plan, run} from '../../src';
+import {asyncRun, isAsyncPlan, isPlan, plan, run} from '../../src';
 import {isFixture} from '../.fixtures/is.fixture';
 import {getABC, getMessage} from '../.fixtures/plan.fixture';
 
@@ -11,9 +11,15 @@ test('run', () => {
 	expect(isPlan(planned)).toBe(true);
 
 	const ranGenerator = run(getABC);
-	const ranPlan = run(planned);
 
 	expect(ranGenerator).toBe('abc');
+
+	let ranPlan = run(planned);
+
+	expect(ranPlan).toBe('abc');
+
+	ranPlan = planned.run();
+
 	expect(ranPlan).toBe('abc');
 
 	for (let index = 0; index < length; index += 1) {
@@ -27,13 +33,19 @@ test('run, async', async () => {
 	expect(isAsyncPlan(planned)).toBe(true);
 	expect(isPlan(planned)).toBe(false);
 
-	const ranGenerator = await run(getMessage);
-	const ranPlan = await planned.run();
+	const ranGenerator = await run.async(getMessage);
 
 	expect(ranGenerator).toBe('hello, world!');
+
+	let ranPlan = await asyncRun(planned);
+
+	expect(ranPlan).toBe('hello, world!');
+
+	ranPlan = await planned.run();
+
 	expect(ranPlan).toBe('hello, world!');
 
 	for (let index = 0; index < length; index += 1) {
-		expect(() => run(values[index] as never)).toThrow();
+		expect(() => asyncRun(values[index] as never)).toThrow();
 	}
 });

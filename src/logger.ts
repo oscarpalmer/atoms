@@ -101,7 +101,7 @@ type TimeLogger = {
 };
 
 type TimeLoggerState = {
-	isActive: () => boolean;
+	isActive(): boolean;
 	label: string;
 	started: boolean;
 	stopped: boolean;

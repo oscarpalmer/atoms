@@ -17,8 +17,8 @@ const LIMITER_PROPERTY = '$limiter';
 type AsyncLimiterItem = {
 	parameters: unknown[];
 	promise: Promise<unknown>;
-	reject: (reason?: unknown) => void;
-	resolve: (value?: unknown) => void;
+	reject(reason?: unknown): void;
+	resolve(value?: unknown): void;
 	running: boolean;
 };
 

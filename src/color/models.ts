@@ -217,16 +217,16 @@ export type Color = {
 };
 
 export type ColorChanges = {
-	'*': (value: Color) => void;
-	alpha: (value: number) => void;
-	hex: (value: string) => void;
-	hexa: (value: string) => void;
-	hsl: (value: HSLColor) => void;
-	hsla: (value: HSLAColor) => void;
-	hwb: (value: HWBColor) => void;
-	hwba: (value: HWBAColor) => void;
-	rgb: (value: RGBColor) => void;
-	rgba: (value: RGBAColor) => void;
+	'*'(value: Color): void;
+	alpha(value: number): void;
+	hex(value: string): void;
+	hexa(value: string): void;
+	hsl(value: HSLColor): void;
+	hsla(value: HSLAColor): void;
+	hwb(value: HWBColor): void;
+	hwba(value: HWBAColor): void;
+	rgb(value: RGBColor): void;
+	rgba(value: RGBAColor): void;
 };
 
 export type ColorDefaults = {

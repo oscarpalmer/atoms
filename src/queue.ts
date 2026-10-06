@@ -294,8 +294,8 @@ type QueuedItem = {
 	key?: string;
 	parameters: unknown[];
 	promise: Promise<unknown>;
-	reject: (reason?: unknown) => void;
-	resolve: (value: unknown) => void;
+	reject(reason?: unknown): void;
+	resolve(value: unknown): void;
 };
 
 type StatusKey = 'active' | 'empty' | 'full' | 'paused';

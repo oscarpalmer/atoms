@@ -1,5 +1,5 @@
 import {expect, test} from 'vite-plus/test';
-import {fail, plan, run} from '../../src';
+import {error, fail, plan, run} from '../../src';
 
 test('error', () => {
 	const items = [
@@ -9,35 +9,43 @@ test('error', () => {
 
 				return 'hello, world';
 			},
-			'yielded error',
+			new Error('yielded error'),
 		],
 		[
-			function* resultError() {
-				yield fail(new Error('plan error'));
+			function* failError() {
+				yield fail('fail error');
 
 				return 'hello, again';
 			},
-			'plan error',
+			'fail error',
+		],
+		[
+			function* resultError() {
+				yield error('result error');
+			},
+			'result error',
 		],
 		[
 			function* thrownError() {
+				yield;
+
 				throw new Error('thrown error');
 			},
-			'thrown error',
+			new Error('thrown error'),
 		],
 	] as const;
 
-	for (const [generator, message] of items) {
+	for (const [generator, expectation] of items) {
 		try {
 			run(generator as never);
 		} catch (error) {
-			expect((error as Error).message).toBe(message);
+			expect(error).toEqual(expectation);
 		}
 
 		try {
 			plan(generator as never).run();
 		} catch (error) {
-			expect((error as Error).message).toBe(message);
+			expect(error).toEqual(expectation);
 		}
 	}
 });
@@ -50,33 +58,41 @@ test('error, async', async () => {
 
 				return 'hello, world';
 			},
-			'yielded error',
+			new Error('yielded error'),
 		],
 		[
-			async function* resultError() {
-				yield fail(new Error('plan error'));
+			async function* failError() {
+				yield fail(new Error('fail error'));
 
 				return 'hello, again';
 			},
-			'plan error',
+			new Error('fail error'),
+		],
+		[
+			async function* resultError() {
+				yield error('result error');
+			},
+			'result error',
 		],
 		[
 			async function* thrownError() {
+				yield;
+
 				throw new Error('thrown error');
 			},
-			'thrown error',
+			new Error('thrown error'),
 		],
 	] as const;
 
-	for (const [asyncGenerator, message] of items) {
-		await run(asyncGenerator as never).catch(error => {
-			expect((error as Error).message).toBe(message);
+	for (const [asyncGenerator, expectation] of items) {
+		await run.async(asyncGenerator as never).catch(error => {
+			expect(error).toEqual(expectation);
 		});
 
 		await plan(asyncGenerator as never)
 			.run()
 			.catch(error => {
-				expect((error as Error).message).toBe(message);
+				expect(error).toEqual(expectation);
 			});
 	}
 });

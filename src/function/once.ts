@@ -22,8 +22,8 @@ type InternalOnce = {
 } & Once<GenericCallback>;
 
 type OnceAsyncItem<Value> = {
-	reject: (reason?: unknown) => void;
-	resolve: (value: Value) => void;
+	reject(reason?: unknown): void;
+	resolve(value: Value): void;
 };
 
 type OnceAsyncState<Value> = {

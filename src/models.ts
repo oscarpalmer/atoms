@@ -187,7 +187,7 @@ export type OnceAsync<Callback extends GenericAsyncCallback> = {
 	 * @param parameters Callback parameters
 	 * @returns Call result
 	 */
-	run: (...parameters: Parameters<Callback>) => ReturnType<Callback>;
+	run(...parameters: Parameters<Callback>): ReturnType<Callback>;
 } & OnceProperties;
 
 /**
@@ -200,7 +200,7 @@ export type Once<Callback extends GenericCallback> = {
 	 * @param parameters Callback parameters
 	 * @returns Call result
 	 */
-	run: (...parameters: Parameters<Callback>) => ReturnType<Callback>;
+	run(...parameters: Parameters<Callback>): ReturnType<Callback>;
 } & OnceProperties;
 
 type OnceProperties = {
@@ -215,7 +215,7 @@ type OnceProperties = {
 	/**
 	 * Clear the callback's cached value
 	 */
-	clear: () => void;
+	clear(): void;
 };
 
 /**

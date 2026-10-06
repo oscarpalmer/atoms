@@ -4,8 +4,8 @@ import type {GenericCallback} from '../models';
 
 export type Aborter = {
 	callback: GenericCallback;
+	cancel(): void;
 	signal: AbortSignal;
-	cancel: () => void;
 };
 
 // #endregion

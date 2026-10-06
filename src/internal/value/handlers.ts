@@ -7,9 +7,9 @@ type BaseHandler = {
 	handlers: WeakMap<WeakKey, string | GenericCallback>;
 	options: BaseHandlerOptions;
 	owner: GenericCallback;
-	deregister: (constructor: Constructor) => void;
-	get: (first: unknown, second: unknown) => string | GenericCallback | undefined;
-	register: (constructor: Constructor, handler?: string | GenericCallback) => void;
+	deregister(constructor: Constructor): void;
+	get(first: unknown, second: unknown): string | GenericCallback | undefined;
+	register(constructor: Constructor, handler?: string | GenericCallback): void;
 };
 
 type BaseHandlerOptions = {

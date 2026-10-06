@@ -72,7 +72,7 @@ export type ArrayValueSorter<Item> = {
 	/**
 	 * Value to sort by
 	 */
-	value: (item: Item) => unknown;
+	value(item: Item): unknown;
 };
 
 /**

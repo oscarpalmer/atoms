@@ -62,8 +62,8 @@ export type PromiseData = {
 };
 
 export type PromiseHandlers = {
-	resolve: (value: unknown[]) => void;
-	reject: (reason: unknown) => void;
+	resolve(value: unknown[]): void;
+	reject(reason: unknown): void;
 };
 
 /**

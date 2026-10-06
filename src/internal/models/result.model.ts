@@ -51,14 +51,14 @@ export type ResultMatch<Value, Returned, E = Error> = {
 	 * @param original Original error, if available
 	 * @returns Value to return
 	 */
-	error: (error: E, original?: Error) => Returned;
+	error(error: E, original?: Error): Returned;
 	/**
 	 * Callback for ok result
 	 *
 	 * @param value Ok value
 	 * @returns Value to return
 	 */
-	ok: (value: Value) => Returned;
+	ok(value: Value): Returned;
 };
 
 /**

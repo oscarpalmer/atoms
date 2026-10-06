@@ -119,7 +119,7 @@ export type FuzzyResult<Item> = {
 export type FuzzySearchOptions = FuzzyOptions;
 
 type FuzzyState<Item> = {
-	handler: (item: Item) => string;
+	handler(item: Item): string;
 	items: Item[];
 	limit?: number;
 	strings: string[];

@@ -18,8 +18,10 @@ import {
  * @param reason Failure reason
  * @returns Failing generator
  */
-export function fail<Reason>(reason: Reason): Generator<never, never> {
+export function fail<Reason>(reason: Reason): Generator<unknown, never> {
 	return (function* () {
+		yield;
+
 		throw reason;
 	})();
 }
@@ -40,9 +42,11 @@ export function isAsyncGenerator(value: unknown): value is () => AsyncGenerator 
  * @param value Value to check
  * @returns `true` if the value is an asynchronous plan, otherwise `false`
  */
-export function isAsyncPlan<Yielded = unknown, Returned = unknown>(
-	value: unknown,
-): value is AsyncPlan<Yielded, Returned> {
+export function isAsyncPlan<
+	Yielded = unknown,
+	Returned = unknown,
+	Parameters extends unknown[] = unknown[],
+>(value: unknown): value is AsyncPlan<Yielded, Returned, Parameters> {
 	return isPlanInstance(PLAN_TYPE_PLAN_ASYNC, value);
 }
 
@@ -73,9 +77,11 @@ function isGeneratorInstance(name: string, value: unknown): boolean {
  * @param value Value to check
  * @returns `true` if the value is a plan, otherwise `false`
  */
-export function isPlan<Yielded = unknown, Returned = unknown>(
-	value: unknown,
-): value is Plan<Yielded, Returned> {
+export function isPlan<
+	Yielded = unknown,
+	Returned = unknown,
+	Parameters extends unknown[] = unknown[],
+>(value: unknown): value is Plan<Yielded, Returned, Parameters> {
 	return isPlanInstance(PLAN_TYPE_PLAN_SYNC, value);
 }
 
@@ -94,8 +100,10 @@ function isPlanInstance(type: PlanType, value: unknown): boolean {
  * @param value Success value
  * @returns Succeeding generator
  */
-export function succeed<Value>(value: Value): Generator<never, Value> {
+export function succeed<Value>(value: Value): Generator<unknown, Value> {
 	return (function* () {
+		yield;
+
 		return value;
 	})();
 }

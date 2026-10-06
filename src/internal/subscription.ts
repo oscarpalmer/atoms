@@ -99,7 +99,7 @@ export type Subscriptions<Value = unknown> = {
 	/**
 	 * Clear all subscriptions
 	 */
-	clear: () => void;
+	clear(): void;
 
 	/**
 	 * Create _(or retrieve)_ a subscription
@@ -107,7 +107,7 @@ export type Subscriptions<Value = unknown> = {
 	 * @param parameters Subscription parameters
 	 * @returns Tuple holding subsccription and existing boolean
 	 */
-	create: (parameters: SubscriptionParameters) => [Subscription, boolean];
+	create(parameters: SubscriptionParameters): [Subscription, boolean];
 };
 
 /**
