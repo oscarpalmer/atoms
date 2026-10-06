@@ -1,4 +1,4 @@
-import type {Herald, HeraldEvents} from '../internal/herald';
+import type {Herald, HeraldEvents} from '../internal/models/herald.model';
 import type {Subscription} from '../internal/subscription';
 import type {COLOR_SYMBOL} from './constants';
 
