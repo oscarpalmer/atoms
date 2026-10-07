@@ -12,7 +12,7 @@ import type {
 	HWBColor,
 	RGBAColor,
 	RGBColor,
-} from './models';
+} from '../models/color.model';
 
 // #region Functions
 

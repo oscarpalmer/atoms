@@ -1,4 +1,4 @@
-import type {GenericCallback} from '../../models';
+import type {GenericCallback} from './index';
 
 // #region Types
 
@@ -6,6 +6,20 @@ import type {GenericCallback} from '../../models';
  * An unknown result
  */
 export type AnyResult<Value, E> = Err<E> | ExtendedErr<E> | Ok<Value>;
+
+/**
+ * A synchronous _Flow_, a function that attempts to pipe values through a series of functions
+ */
+export type AttemptFlow<Callback extends GenericCallback, Value> = (
+	...args: Parameters<Callback>
+) => Result<UnwrapValue<Value>>;
+
+/**
+ * An asynchronous _Flow_, a function that attempts to pipe values through a series of functions
+ */
+export type AttemptAsyncFlow<Callback extends GenericCallback, Value> = (
+	...args: Parameters<Callback>
+) => Promise<Result<UnwrapValue<Value>>>;
 
 /**
  * An error result

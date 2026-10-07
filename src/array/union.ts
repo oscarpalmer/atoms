@@ -1,4 +1,5 @@
-import {SETS_COMPARE_UNION, compareSets} from '../internal/array/sets';
+import {compareSets} from '../internal/array/sets';
+import {ARRAY_SETS_COMPARE_UNION} from '../models/array/array.misc.model';
 
 // #region Functions
 
@@ -66,7 +67,7 @@ export function union<
 export function union<First, Second>(first: First[], second: Second[]): (First | Second)[];
 
 export function union(first: unknown[], second: unknown[], key?: unknown): unknown[] {
-	return compareSets(SETS_COMPARE_UNION, first, second, key);
+	return compareSets(ARRAY_SETS_COMPARE_UNION, first, second, key);
 }
 
 // #endregion

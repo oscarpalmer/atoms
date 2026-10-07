@@ -1,13 +1,20 @@
 import {isError, isOk} from '../internal/result/misc';
+import type {AsyncPlanState, PlanState} from '../models/plan.model';
 
 // #region Functions
 
 export async function asyncGenerate(
-	callback: (...parameters: unknown[]) => AsyncGenerator,
+	input: AsyncPlanState | ((...parameters: unknown[]) => AsyncGenerator),
 	parameters: unknown[],
 	unwrap: boolean,
 ): Promise<unknown> {
-	const generator = callback(...parameters);
+	let generator: AsyncGenerator;
+
+	if (typeof input === 'function') {
+		generator = input(...parameters);
+	} else {
+		generator = input.generator(...parameters);
+	}
 
 	let success = true;
 	let lastValue: unknown;
@@ -15,9 +22,9 @@ export async function asyncGenerate(
 	try {
 		while (true) {
 			const next = await generator.next(lastValue);
-			const {done} = next;
+			const done = next.done === true;
 
-			let {value} = next;
+			const {value} = next;
 
 			if (value instanceof Error) {
 				throw value;
@@ -37,7 +44,7 @@ export async function asyncGenerate(
 		lastValue = error;
 		success = false;
 	} finally {
-		await generator?.return(lastValue);
+		await generator.return(lastValue);
 	}
 
 	if (success) {
@@ -48,11 +55,17 @@ export async function asyncGenerate(
 }
 
 export function generate(
-	callback: (...parameters: unknown[]) => Generator,
+	input: PlanState | ((...parameters: unknown[]) => Generator),
 	parameters: unknown[],
 	unwrap: boolean,
 ): unknown {
-	const generator = callback(...parameters);
+	let generator: Generator;
+
+	if (typeof input === 'function') {
+		generator = input(...parameters);
+	} else {
+		generator = input.generator(...parameters);
+	}
 
 	let success = true;
 	let lastValue: unknown;

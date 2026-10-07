@@ -1,4 +1,7 @@
+import {isPrimitive} from '../internal/is';
 import {equal} from '../internal/value/equal';
+
+// #region Functions
 
 /**
  * Does the value exist for a key in a _Map_?
@@ -57,6 +60,10 @@ export function inSet<Value>(set: Set<Value>, value: Value): boolean {
 		return true;
 	}
 
+	if (isPrimitive(value)) {
+		return false;
+	}
+
 	for (const item of set) {
 		if (equal(item, value)) {
 			return true;
@@ -65,3 +72,5 @@ export function inSet<Value>(set: Set<Value>, value: Value): boolean {
 
 	return false;
 }
+
+// #endregion

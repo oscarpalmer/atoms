@@ -1,14 +1,4 @@
-import type {GenericCallback} from '../models';
-
-// #region Types
-
-export type Aborter = {
-	callback: GenericCallback;
-	cancel(): void;
-	signal: AbortSignal;
-};
-
-// #endregion
+import {ABORTER_EVENT, ABORTER_OPTIONS, type Aborter} from '../models/aborter.model';
 
 // #region Functions
 
@@ -17,21 +7,13 @@ export function createAborter(value: unknown, onAbort: () => void): Aborter | un
 		return;
 	}
 
-	value.addEventListener(ABORT_EVENT, onAbort, ABORT_OPTIONS);
+	value.addEventListener(ABORTER_EVENT, onAbort, ABORTER_OPTIONS);
 
 	return {
 		callback: onAbort,
 		signal: value,
-		cancel: () => value.removeEventListener(ABORT_EVENT, onAbort),
+		cancel: () => value.removeEventListener(ABORTER_EVENT, onAbort),
 	};
 }
-
-// #endregion
-
-// #region Variables
-
-const ABORT_EVENT = 'abort';
-
-const ABORT_OPTIONS = {once: true};
 
 // #endregion

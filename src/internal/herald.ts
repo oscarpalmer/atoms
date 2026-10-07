@@ -1,5 +1,4 @@
 import type {GenericCallback} from '../models';
-import {isPlainObject} from './is';
 import {
 	HERALD_MESSAGE_ARRAY,
 	HERALD_MESSAGE_ONCREATE,
@@ -15,14 +14,11 @@ import {
 	type HeraldOptions,
 	type HeraldState,
 	type InternalHerald,
-} from './models/herald.model';
-import {
-	isSubscription,
-	SUBSCRIPTION_NAME,
-	subscriptions,
-	type Subscription,
-	type SubscriptionProperty,
-} from './subscription';
+} from '../models/herald.model';
+import {SUBSCRIPTION_NAME} from '../models/subscription.model';
+import type {Subscription, SubscriptionProperty} from '../subscription';
+import {isPlainObject} from './is';
+import {isSubscription, subscriptions} from './subscription';
 
 // #region Instances
 

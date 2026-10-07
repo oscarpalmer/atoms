@@ -1,32 +1,15 @@
 import {getNumberOrDefault} from '../internal/defaults';
-import {getLimiter, LIMITER_WAIT} from '../internal/function/limit';
+import {getLimiter} from '../internal/function/limit';
 import {isPlainObject} from '../internal/is';
 import {asyncAttempt, attempt} from '../internal/result/attempt';
 import type {GenericAsyncCallback, GenericCallback} from '../models';
-
-// #region Types
-
-/**
- * An error thrown when a retry fails
- */
-export class RetryError extends Error {
-	constructor(
-		message: string,
-		readonly original: unknown,
-	) {
-		super(message);
-
-		this.name = RETRY_ERROR_NAME;
-	}
-}
-
-export type RetryOptions = {
-	delay?: number;
-	times?: number;
-	when?: (error: unknown) => boolean;
-};
-
-// #endregion
+import {LIMITER_WAIT} from '../models/function/limiter.model';
+import {
+	RETRY_MESSAGE_EXPECTATION,
+	RETRY_MESSAGE_FAILED,
+	RetryError,
+	type RetryOptions,
+} from '../models/function/retry.model';
 
 // #region Functions
 
@@ -160,16 +143,6 @@ function shouldRetry(): boolean {
 
 // #endregion
 
-// #region Variables
-
-const RETRY_ERROR_NAME = 'RetryError';
-
-const RETRY_MESSAGE_EXPECTATION = 'Retry expected a function';
-
-const RETRY_MESSAGE_FAILED = 'Retry failed';
-
-// #endregion
-
 // #region Namespace
 
 export declare namespace retry {
@@ -183,3 +156,7 @@ export declare namespace retry {
 retry.async = asyncRetry;
 
 // #endregion
+
+// #region Exports
+
+export {RetryError};

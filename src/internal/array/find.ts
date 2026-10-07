@@ -1,32 +1,19 @@
+import {
+	ARRAY_FIND_UNIQUE_THRESHOLD,
+	ARRAY_FIND_VALUE_INDEX,
+	ARRAY_FIND_VALUES_ALL,
+	ARRAY_FIND_VALUES_UNIQUE,
+	type ArrayFindMapper,
+	type ArrayFindValuesResult,
+	type ArrayFindValuesType,
+	type ArrayFindValueType,
+	type ArrayParameters,
+} from '../../models/array/array.find.model';
 import {getArrayCallback, getArrayCallbacks} from './callbacks';
-
-// #region Types
-
-type FindMapper = {
-	callback: unknown;
-	reverse: boolean;
-};
-
-type FindValueType = 'index' | 'item';
-
-type FindValuesResult = {
-	matched: unknown[];
-	notMatched: unknown[];
-};
-
-type FindValuesType = 'all' | 'unique';
-
-type Parameters = {
-	bool?: unknown;
-	key?: unknown;
-	value?: unknown;
-};
-
-// #endregion
 
 // #region Functions
 
-export function createFindParameters(original: unknown[]): Parameters {
+export function createFindParameters(original: unknown[]): ArrayParameters {
 	const {length} = original;
 
 	return {
@@ -37,26 +24,26 @@ export function createFindParameters(original: unknown[]): Parameters {
 }
 
 export function findValue(
-	type: Exclude<FindValueType, 'item'>,
+	type: Exclude<ArrayFindValueType, 'item'>,
 	array: unknown[],
 	parameters: unknown[],
 	reversed: boolean,
 ): number;
 
 export function findValue(
-	type: Exclude<FindValueType, 'index'>,
+	type: Exclude<ArrayFindValueType, 'index'>,
 	array: unknown[],
 	parameters: unknown[],
 	reversed: boolean,
 ): unknown;
 
 export function findValue(
-	type: FindValueType,
+	type: ArrayFindValueType,
 	array: unknown[],
 	parameters: unknown[],
 	reversed: boolean,
 ): unknown {
-	const findIndex = type === FIND_VALUE_INDEX;
+	const findIndex = type === ARRAY_FIND_VALUE_INDEX;
 
 	if (!Array.isArray(array) || array.length === 0) {
 		return findIndex ? -1 : undefined;
@@ -120,18 +107,18 @@ export function findAbsoluteValueOrDefault(
 		return useDefaultValue ? defaultValue : undefined;
 	}
 
-	const index = findValue(FIND_VALUE_INDEX, array, parameters, reversed) as number;
+	const index = findValue(ARRAY_FIND_VALUE_INDEX, array, parameters, reversed) as number;
 
 	return index > -1 ? array[index] : useDefaultValue ? defaultValue : undefined;
 }
 
 export function findValues(
-	type: FindValuesType,
+	type: ArrayFindValuesType,
 	array: unknown[],
 	parameters: unknown[],
-	mapper?: FindMapper,
-): FindValuesResult {
-	const result: FindValuesResult = {
+	mapper?: ArrayFindMapper,
+): ArrayFindValuesResult {
+	const result: ArrayFindValuesResult = {
 		matched: [],
 		notMatched: [],
 	};
@@ -144,7 +131,11 @@ export function findValues(
 	const {bool, key, value} = createFindParameters(parameters);
 	const callbacks = getArrayCallbacks(bool, key);
 
-	if (type === FIND_VALUES_UNIQUE && callbacks?.keyed == null && length >= FIND_UNIQUE_THRESHOLD) {
+	if (
+		type === ARRAY_FIND_VALUES_UNIQUE &&
+		callbacks?.keyed == null &&
+		length >= ARRAY_FIND_UNIQUE_THRESHOLD
+	) {
 		result.matched = [...new Set(array)];
 
 		return result;
@@ -156,7 +147,7 @@ export function findValues(
 	const mapAfter = mapCallback == null ? undefined : mapReverse ? undefined : mapCallback;
 	const mapBefore = mapCallback == null ? undefined : mapReverse ? mapCallback : undefined;
 
-	if (callbacks?.bool != null || (type === FIND_VALUES_ALL && key == null)) {
+	if (callbacks?.bool != null || (type === ARRAY_FIND_VALUES_ALL && key == null)) {
 		const callback = callbacks?.bool ?? (item => Object.is(item, value));
 
 		for (let index = 0; index < length; index += 1) {
@@ -190,8 +181,8 @@ export function findValues(
 		}
 
 		if (
-			(type === FIND_VALUES_ALL && Object.is(keyed, value)) ||
-			(type === FIND_VALUES_UNIQUE && !keys.has(keyed))
+			(type === ARRAY_FIND_VALUES_ALL && Object.is(keyed, value)) ||
+			(type === ARRAY_FIND_VALUES_UNIQUE && !keys.has(keyed))
 		) {
 			keys.add(keyed);
 			result.matched.push(mapAfter?.(item, index, array) ?? transformed);
@@ -202,19 +193,5 @@ export function findValues(
 
 	return result;
 }
-
-// #endregion
-
-// #region Variables
-
-export const FIND_VALUE_INDEX = 'index';
-
-export const FIND_VALUE_ITEM = 'item';
-
-export const FIND_VALUES_ALL: FindValuesType = 'all';
-
-export const FIND_VALUES_UNIQUE: FindValuesType = 'unique';
-
-const FIND_UNIQUE_THRESHOLD = 100;
 
 // #endregion

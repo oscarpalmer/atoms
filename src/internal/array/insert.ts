@@ -1,16 +1,15 @@
+import {
+	ARRAY_INSERT_TYPE_INSERT,
+	ARRAY_INSERT_TYPE_SPLICE,
+	type ArrayInsertType,
+} from '../../models/array/array.misc.model';
 import {max, min} from '../math/aggregate';
 import {chunk} from './chunk';
-
-// #region Types
-
-type InsertType = 'insert' | 'push' | 'splice';
-
-// #endregion
 
 // #region Functions
 
 function insertChunkedValues(
-	type: InsertType,
+	type: ArrayInsertType,
 	array: unknown[],
 	items: unknown[],
 	start: number,
@@ -40,21 +39,21 @@ function insertChunkedValues(
 		}
 	}
 
-	if (type === INSERT_TYPE_INSERT) {
+	if (type === ARRAY_INSERT_TYPE_INSERT) {
 		return array;
 	}
 
-	return type === INSERT_TYPE_SPLICE ? returned : array.length;
+	return type === ARRAY_INSERT_TYPE_SPLICE ? returned : array.length;
 }
 
 export function insertValues(
-	type: InsertType,
+	type: ArrayInsertType,
 	array: unknown,
 	items: unknown,
 	start: unknown,
 	deleteCount: number,
 ): unknown {
-	const spliceArray = type === INSERT_TYPE_INSERT || type === INSERT_TYPE_SPLICE;
+	const spliceArray = type === ARRAY_INSERT_TYPE_INSERT || type === ARRAY_INSERT_TYPE_SPLICE;
 
 	if (
 		!Array.isArray(array) ||
@@ -67,15 +66,5 @@ export function insertValues(
 
 	return insertChunkedValues(type, array, items, start, spliceArray ? deleteCount : 0);
 }
-
-// #endregion
-
-// #region Variables
-
-export const INSERT_TYPE_INSERT: InsertType = 'insert';
-
-export const INSERT_TYPE_PUSH: InsertType = 'push';
-
-export const INSERT_TYPE_SPLICE: InsertType = 'splice';
 
 // #endregion

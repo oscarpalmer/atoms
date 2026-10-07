@@ -1,4 +1,5 @@
-import {SETS_COMPARE_INTERSECTION, compareSets} from '../internal/array/sets';
+import {compareSets} from '../internal/array/sets';
+import {ARRAY_SETS_COMPARE_INTERSECTION} from '../models/array/array.misc.model';
 
 // #region Functions
 
@@ -66,7 +67,7 @@ export function intersection<
 export function intersection<First, Second>(first: First[], second: Second[]): First[];
 
 export function intersection(first: unknown[], second: unknown[], key?: unknown): unknown[] {
-	return compareSets(SETS_COMPARE_INTERSECTION, first, second, key);
+	return compareSets(ARRAY_SETS_COMPARE_INTERSECTION, first, second, key);
 }
 
 // #endregion

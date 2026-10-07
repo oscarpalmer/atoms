@@ -1,5 +1,7 @@
 import {isPlainObject} from '../../internal/is';
 
+// #region Functions
+
 export function partial<Value extends object, ValueKey extends keyof Value>(
 	value: unknown,
 	keys: ValueKey[],
@@ -44,3 +46,5 @@ export function partial<Value extends object, ValueKey extends keyof Value>(
 
 	return partials;
 }
+
+// #endregion

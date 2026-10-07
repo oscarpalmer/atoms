@@ -1,25 +1,15 @@
 import type {GenericCallback} from '../../models';
+import {
+	assertFlowFunctions,
+	assertPipeFunctions,
+	type AsyncFlow,
+	type Flow,
+	WORK_MESSAGE_FLOW_PROMISE,
+	WORK_MESSAGE_NESTING,
+	WORK_MESSAGE_PIPE_PROMISE,
+} from '../../models/function/work.model';
+import type {UnwrapValue} from '../../models/result.model';
 import {isError, isOk} from '../result/misc';
-import type {UnwrapValue} from '../models/result.model';
-import {assert, type Asserter} from './assert';
-
-// #region Types
-
-/**
- * A synchronous _Flow_, a function that pipe a value through a series of functions
- */
-export type Flow<Callback extends GenericCallback, Value> = (
-	...args: Parameters<Callback>
-) => UnwrapValue<Value>;
-
-/**
- * An asynchronous _Flow_, a function that pipes a value through a series of functions
- */
-export type FlowPromise<Callback extends GenericCallback, Value> = (
-	...args: Parameters<Callback>
-) => Promise<UnwrapValue<Value>>;
-
-// #endregion
 
 // #region Functions
 
@@ -34,7 +24,7 @@ export type FlowPromise<Callback extends GenericCallback, Value> = (
  *
  * @returns _Flow_ function
  */
-export function asyncFlow<Fn extends GenericCallback>(fn: Fn): FlowPromise<Fn, ReturnType<Fn>>;
+export function asyncFlow<Fn extends GenericCallback>(fn: Fn): AsyncFlow<Fn, ReturnType<Fn>>;
 
 /**
  * Create an asynchronous _Flow_, a function that pipes values through a series of functions
@@ -46,7 +36,7 @@ export function asyncFlow<Fn extends GenericCallback>(fn: Fn): FlowPromise<Fn, R
 export function asyncFlow<First extends GenericCallback, Second>(
 	first: First,
 	second: (value: Awaited<UnwrapValue<ReturnType<First>>>) => Second,
-): FlowPromise<First, Second>;
+): AsyncFlow<First, Second>;
 
 /**
  * Create an asynchronous _Flow_, a function that pipes values through a series of functions
@@ -59,7 +49,7 @@ export function asyncFlow<First extends GenericCallback, Second, Third>(
 	first: First,
 	second: (value: Awaited<UnwrapValue<ReturnType<First>>>) => Second,
 	third: (value: Awaited<UnwrapValue<Second>>) => Third,
-): FlowPromise<First, Third>;
+): AsyncFlow<First, Third>;
 
 /**
  * Create an asynchronous _Flow_, a function that pipes values through a series of functions
@@ -73,7 +63,7 @@ export function asyncFlow<First extends GenericCallback, Second, Third, Fourth>(
 	second: (value: Awaited<UnwrapValue<ReturnType<First>>>) => Second,
 	third: (value: Awaited<UnwrapValue<Second>>) => Third,
 	fourth: (value: Awaited<UnwrapValue<Third>>) => Fourth,
-): FlowPromise<First, Fourth>;
+): AsyncFlow<First, Fourth>;
 
 /**
  * Create an asynchronous _Flow_, a function that pipes values through a series of functions
@@ -88,7 +78,7 @@ export function asyncFlow<First extends GenericCallback, Second, Third, Fourth, 
 	third: (value: Awaited<UnwrapValue<Second>>) => Third,
 	fourth: (value: Awaited<UnwrapValue<Third>>) => Fourth,
 	fifth: (value: Awaited<UnwrapValue<Fourth>>) => Fifth,
-): FlowPromise<First, Fifth>;
+): AsyncFlow<First, Fifth>;
 
 /**
  * Create an asynchronous _Flow_, a function that pipes values through a series of functions
@@ -104,7 +94,7 @@ export function asyncFlow<First extends GenericCallback, Second, Third, Fourth, 
 	fourth: (value: Awaited<UnwrapValue<Third>>) => Fourth,
 	fifth: (value: Awaited<UnwrapValue<Fourth>>) => Fifth,
 	sixth: (value: Awaited<UnwrapValue<Fifth>>) => Sixth,
-): FlowPromise<First, Sixth>;
+): AsyncFlow<First, Sixth>;
 
 /**
  * Create an asynchronous _Flow_, a function that pipes values through a series of functions
@@ -129,7 +119,7 @@ export function asyncFlow<
 	fifth: (value: Awaited<UnwrapValue<Fourth>>) => Fifth,
 	sixth: (value: Awaited<UnwrapValue<Fifth>>) => Sixth,
 	seventh: (value: Awaited<UnwrapValue<Sixth>>) => Seventh,
-): FlowPromise<First, Seventh>;
+): AsyncFlow<First, Seventh>;
 
 /**
  * Create an asynchronous _Flow_, a function that pipes values through a series of functions
@@ -156,7 +146,7 @@ export function asyncFlow<
 	sixth: (value: Awaited<UnwrapValue<Fifth>>) => Sixth,
 	seventh: (value: Awaited<UnwrapValue<Sixth>>) => Seventh,
 	eighth: (value: Awaited<UnwrapValue<Seventh>>) => Eighth,
-): FlowPromise<First, Eighth>;
+): AsyncFlow<First, Eighth>;
 
 /**
  * Create an asynchronous _Flow_, a function that pipes values through a series of functions
@@ -185,7 +175,7 @@ export function asyncFlow<
 	seventh: (value: Awaited<UnwrapValue<Sixth>>) => Seventh,
 	eighth: (value: Awaited<UnwrapValue<Seventh>>) => Eighth,
 	ninth: (value: Awaited<UnwrapValue<Eighth>>) => Ninth,
-): FlowPromise<First, Ninth>;
+): AsyncFlow<First, Ninth>;
 
 /**
  * Create an asynchronous _Flow_, a function that pipes values through a series of functions
@@ -216,7 +206,7 @@ export function asyncFlow<
 	eighth: (value: Awaited<UnwrapValue<Seventh>>) => Eighth,
 	ninth: (value: Awaited<UnwrapValue<Eighth>>) => Ninth,
 	tenth: (value: Awaited<UnwrapValue<Ninth>>) => Tenth,
-): FlowPromise<First, Tenth>;
+): AsyncFlow<First, Tenth>;
 
 /**
  * Create an asynchronous _Flow_, a function that pipes values through a series of functions
@@ -228,7 +218,7 @@ export function asyncFlow<
 export function asyncFlow<Fn extends GenericCallback>(
 	fn: Fn,
 	...fns: Array<(value: Awaited<UnwrapValue<ReturnType<Fn>>>) => unknown>
-): FlowPromise<Fn, ReturnType<Fn>>;
+): AsyncFlow<Fn, ReturnType<Fn>>;
 
 /**
  * Create an asynchronous _Flow_, a function that pipes values through a series of functions
@@ -971,32 +961,6 @@ function work(initial: unknown, functions: GenericCallback[], flow: boolean): un
 
 // #endregion
 
-// #region Variables
-
-const WORK_MESSAGE_FLOW_ARRAY = 'Flow expected to receive an array of functions';
-
-const WORK_MESSAGE_FLOW_PROMISE = 'Synchronous Flow received a promise. Use `flow.async` instead.';
-
-const WORK_MESSAGE_NESTING = 'Return values are too deeply nested.';
-
-const WORK_MESSAGE_PIPE_ARRAY = 'Pipe expected to receive an array of functions';
-
-const WORK_MESSAGE_PIPE_PROMISE = 'Synchronous Pipe received a promise. Use `pipe.async` instead.';
-
-const assertFlowFunctions: Asserter<Function[]> = assert.condition(
-	value => Array.isArray(value) && value.every(item => typeof item === 'function'),
-	WORK_MESSAGE_FLOW_ARRAY,
-	TypeError,
-);
-
-const assertPipeFunctions: Asserter<Function[]> = assert.condition(
-	value => Array.isArray(value) && value.every(item => typeof item === 'function'),
-	WORK_MESSAGE_PIPE_ARRAY,
-	TypeError,
-);
-
-// #endregion
-
 // #region Namespace
 
 export declare namespace flow {
@@ -1013,5 +977,11 @@ export declare namespace pipe {
 
 flow.async = asyncFlow;
 pipe.async = asyncPipe;
+
+// #endregion
+
+// #region Exports
+
+export type {AsyncFlow, Flow};
 
 // #endregion

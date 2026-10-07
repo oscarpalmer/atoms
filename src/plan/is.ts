@@ -1,3 +1,4 @@
+import type {PlainObject} from '../models';
 import {
 	GENERATOR_NAME_ASYNC,
 	GENERATOR_NAME_SYNC,
@@ -7,8 +8,7 @@ import {
 	type AsyncPlan,
 	type Plan,
 	type PlanType,
-} from '../internal/models/plan.model';
-import type {PlainObject} from '../models';
+} from '../models/plan.model';
 
 // #region Functions
 

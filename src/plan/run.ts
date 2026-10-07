@@ -6,7 +6,7 @@ import {
 	type InternalPlan,
 	type Plan,
 	type PlanReturned,
-} from '../internal/models/plan.model';
+} from '../models/plan.model';
 import {asyncGenerate, generate} from './generate';
 import {isAsyncGenerator, isAsyncPlan, isGenerator, isPlan} from './is';
 import {asyncAttemptRun, attemptRun} from './result';
@@ -82,11 +82,11 @@ export function run(input: unknown, ...parameters: unknown[]): unknown {
 }
 
 export function runAsyncPlan(this: InternalAsyncPlan, ...parameters: unknown[]): Promise<unknown> {
-	return asyncGenerate(this[PLAN_SYMBOL].generator, parameters, false);
+	return asyncGenerate(this[PLAN_SYMBOL], parameters, false);
 }
 
 export function runPlan(this: InternalPlan, ...parameters: unknown[]): unknown {
-	return generate(this[PLAN_SYMBOL].generator, parameters, false);
+	return generate(this[PLAN_SYMBOL], parameters, false);
 }
 
 // #endregion

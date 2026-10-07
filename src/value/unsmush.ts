@@ -1,42 +1,19 @@
 import {isArrayOrPlainObject} from '../internal/is';
 import {setValue} from '../internal/value/set';
-import type {PlainObject, Simplify, UnionToIntersection} from '../models';
+import type {PlainObject} from '../models';
+import type {Unsmushed, UnsmushedKey} from '../models/value/value.misc.model';
 
 // #region Types
-
-/**
- * Thanks, type-fest!
- */
-type KeysOfUnion<ObjectType> = keyof UnionToIntersection<
-	ObjectType extends unknown ? Record<keyof ObjectType, never> : never
->;
-
-type OrderedKey = {
-	order: number;
-	value: string;
-};
-
-/**
- * An unsmushed object, with all dot notation keys turned into nested keys
- */
-export type Unsmushed<Value extends PlainObject> = Simplify<
-	Omit<
-		{
-			[UnionKey in KeysOfUnion<Value>]: Value[UnionKey];
-		},
-		`${string}.${string}`
-	>
->;
 
 // #endregion
 
 // #region Functions
 
-function getKeys(value: PlainObject): OrderedKey[] {
+function getKeys(value: PlainObject): UnsmushedKey[] {
 	const keys = Object.keys(value);
 	const {length} = keys;
 
-	const orderedKeys: OrderedKey[] = [];
+	const orderedKeys: UnsmushedKey[] = [];
 
 	for (let index = 0; index < length; index += 1) {
 		const key = keys[index];
@@ -80,5 +57,11 @@ export function unsmush<Value extends PlainObject>(value: Value): Unsmushed<Valu
 
 	return unsmushed as never;
 }
+
+// #endregion
+
+// #region Exports
+
+export type {Unsmushed};
 
 // #endregion

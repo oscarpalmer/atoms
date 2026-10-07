@@ -8,10 +8,6 @@ import {
 	PROMISE_STRATEGY_DEFAULT,
 	PROMISE_TYPE_FULFILLED,
 	PROMISE_TYPE_REJECTED,
-} from './constants';
-import {createPromiseOptions, createPromisesOptions, getResultsFromPromises} from './helpers';
-import {handleResult, settlePromise} from './misc';
-import {
 	type PromiseData,
 	type PromiseHandlers,
 	type PromiseOptions,
@@ -22,7 +18,9 @@ import {
 	type PromiseStrategy,
 	type PromisesUnwrapped,
 	type PromisesValues,
-} from './models';
+} from '../models/promise.model';
+import {createPromiseOptions, createPromisesOptions, getResultsFromPromises} from './helpers';
+import {handleResult, settlePromise} from './misc';
 import {getTimedPromise} from './timed';
 
 // #region Functions

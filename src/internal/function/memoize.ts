@@ -1,108 +1,23 @@
 import type {GenericCallback} from '../../models';
+import {
+	type InternalMemoized,
+	MEMOIZED_CACHE_SIZE_DEFAULT,
+	MEMOIZED_CALLBACK,
+	MEMOIZED_KEY_SEPARATOR,
+	MEMOIZED_SYMBOL,
+	type Memoized,
+	type MemoizedOptions,
+	type MemoizedState,
+	type MemoizedStateOptions,
+} from '../../models/function/memoize.model';
 import {getNumberOrDefault} from '../defaults';
 import {isPlainObject} from '../is';
 import {SizedMap} from '../sized/map';
 import {getString, join} from '../string/misc';
 
-// #region Types
-
-type InternalMemoized = {
-	[MEMOIZED_SYMBOL]: MemoizedState;
-} & Memoized<GenericCallback>;
-
-/**
- * A _Memoized_ function instance, caching and retrieving results based on the its parameters _(or a custom cache key)_
- */
-export type Memoized<Callback extends GenericCallback> = {
-	/**
-	 * Maximum cache size
-	 *
-	 * @returns Maximum cache size _(or `Number.NaN` if the instance has been destroyed)_
-	 */
-	get maximum(): number;
-
-	/**
-	 * Current cache size
-	 *
-	 * @returns Current cache size _(or `Number.NaN` if the instance has been destroyed)_
-	 */
-	get size(): number;
-
-	/**
-	 * Clear the cache
-	 */
-	clear(): void;
-
-	/**
-	 * Delete a result from the cache
-	 *
-	 * @param key Key to delete
-	 * @returns `true` if the key existed and was removed, otherwise `false`
-	 */
-	delete(key: unknown): boolean;
-
-	/**
-	 * Destroy the instance
-	 *
-	 * _(When a Memoized instance is destroyed, its cache and callback are removed, and calls to `run` will throw an error)_
-	 */
-	destroy(): void;
-
-	/**
-	 * Get a result from the cache
-	 *
-	 * @param key Key to get
-	 * @returns Cached result or `undefined` if it does not exist
-	 */
-	get(key: unknown): ReturnType<Callback> | undefined;
-
-	/**
-	 * Does the result exist?
-	 *
-	 * @param key Key to check
-	 * @returns `true` if the result exists, otherwise `false`
-	 */
-	has(key: unknown): boolean;
-
-	/**
-	 * Run the callback with the provided parameters
-	 *
-	 * @param parameters Parameters to pass to the callback
-	 * @returns Cached or computed _(then cached)_ result
-	 */
-	run(...parameters: Parameters<Callback>): ReturnType<Callback>;
-};
-
-/**
- * Options for a _Memoized_ function
- */
-export type MemoizedOptions<Callback extends GenericCallback> = {
-	/**
-	 * Callback for getting a cache key for the provided parameters
-	 */
-	cacheKey?: (...parameters: Parameters<Callback>) => unknown;
-	/**
-	 * Size of the cache
-	 */
-	cacheSize?: number;
-};
-
-type MemoizedState = {
-	cache: SizedMap<unknown, unknown>;
-	getter: GenericCallback;
-	options: Options;
-};
-
-type Options = {
-	cacheKey?: GenericCallback;
-	cacheSize: number;
-};
-
-// #endregion
-
 // #region Instances
 
-function Memoized(this: any, callback: GenericCallback, options: Options): void {
+function Memoized(this: any, callback: GenericCallback, options: MemoizedStateOptions): void {
 	this[MEMOIZED_SYMBOL] = {
 		options,
 		cache: new SizedMap(options.cacheSize),
@@ -134,11 +49,11 @@ Object.defineProperties(Memoized.prototype, {
 // #region Functions
 
 function clearMemoized(this: InternalMemoized): void {
-	(this[MEMOIZED_SYMBOL] as MemoizedState).cache.clear();
+	this[MEMOIZED_SYMBOL].cache.clear();
 }
 
 function deleteMemoizedValue(this: InternalMemoized, key: unknown): boolean {
-	return (this[MEMOIZED_SYMBOL] as MemoizedState).cache.delete(key);
+	return this[MEMOIZED_SYMBOL].cache.delete(key);
 }
 
 function createGetter(state: MemoizedState, callback: GenericCallback): GenericCallback {
@@ -163,7 +78,7 @@ function createGetter(state: MemoizedState, callback: GenericCallback): GenericC
 
 function createMemoizationOptions<Callback extends GenericCallback>(
 	input?: MemoizedOptions<Callback>,
-): Options {
+): MemoizedStateOptions {
 	const {cacheKey, cacheSize} = isPlainObject(input) ? input : {};
 
 	return {
@@ -173,19 +88,19 @@ function createMemoizationOptions<Callback extends GenericCallback>(
 }
 
 function getMemoizedMaximum(this: InternalMemoized): number {
-	return (this[MEMOIZED_SYMBOL] as MemoizedState).cache.maximum;
+	return this[MEMOIZED_SYMBOL].cache.maximum;
 }
 
 function getMemoizedSize(this: InternalMemoized): number {
-	return (this[MEMOIZED_SYMBOL] as MemoizedState).cache.size;
+	return this[MEMOIZED_SYMBOL].cache.size;
 }
 
 function getMemoizedValue(this: InternalMemoized, key: unknown): unknown {
-	return (this[MEMOIZED_SYMBOL] as MemoizedState).cache.get(key);
+	return this[MEMOIZED_SYMBOL].cache.get(key);
 }
 
 function hasMemoizedValue(this: InternalMemoized, key: unknown): boolean {
-	return (this[MEMOIZED_SYMBOL] as MemoizedState).cache.has(key);
+	return this[MEMOIZED_SYMBOL].cache.has(key);
 }
 
 /**
@@ -208,19 +123,13 @@ export function memoize<Callback extends GenericCallback>(
 }
 
 function runMemoized(this: InternalMemoized, ...parameters: Parameters<GenericCallback>): unknown {
-	return (this[MEMOIZED_SYMBOL] as MemoizedState).getter(...parameters);
+	return this[MEMOIZED_SYMBOL].getter(...parameters);
 }
 
 // #endregion
 
-// #region Variables
+// #region Exports
 
-const MEMOIZED_CACHE_SIZE_DEFAULT = 1024;
-
-const MEMOIZED_CALLBACK = 'Memoized requires a callback function';
-
-const MEMOIZED_KEY_SEPARATOR = '_';
-
-const MEMOIZED_SYMBOL = Symbol('memoized');
+export type {Memoized, MemoizedOptions};
 
 // #endregion

@@ -1,15 +1,15 @@
+import {
+	ARRAY_SETS_COMPARE_DIFFERENCE,
+	ARRAY_SETS_COMPARE_INTERSECTION,
+	ARRAY_SETS_COMPARE_UNION,
+	type ArrayCompareSetsType,
+} from '../../models/array/array.misc.model';
 import {getArrayCallback} from './callbacks';
-
-// #region Types
-
-type CompareSetsType = 'difference' | 'intersection' | 'union';
-
-// #endregion
 
 // #region Functions
 
 export function compareSets(
-	type: CompareSetsType,
+	type: ArrayCompareSetsType,
 	first: unknown[],
 	second: unknown[],
 	key?: unknown,
@@ -18,9 +18,9 @@ export function compareSets(
 		return [];
 	}
 
-	const isDifference = type === SETS_COMPARE_DIFFERENCE;
-	const isIntersection = type === SETS_COMPARE_INTERSECTION;
-	const isUnion = type === SETS_COMPARE_UNION;
+	const isDifference = type === ARRAY_SETS_COMPARE_DIFFERENCE;
+	const isIntersection = type === ARRAY_SETS_COMPARE_INTERSECTION;
+	const isUnion = type === ARRAY_SETS_COMPARE_UNION;
 
 	if (first.length === 0) {
 		return isDifference ? first.slice() : isIntersection ? [] : second.slice();
@@ -60,15 +60,5 @@ export function compareSets(
 
 	return result;
 }
-
-// #endregion
-
-// #region Variables
-
-export const SETS_COMPARE_DIFFERENCE: CompareSetsType = 'difference';
-
-export const SETS_COMPARE_INTERSECTION: CompareSetsType = 'intersection';
-
-export const SETS_COMPARE_UNION: CompareSetsType = 'union';
 
 // #endregion

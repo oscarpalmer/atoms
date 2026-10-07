@@ -1,3 +1,5 @@
+// #region Functions
+
 export function getBooleanOrDefault(value: unknown, defaultValue: boolean): boolean {
 	return typeof value === 'boolean' ? value : defaultValue;
 }
@@ -7,3 +9,5 @@ export function getNumberOrDefault(value: unknown, defaultValue: number, minimum
 		? value
 		: defaultValue;
 }
+
+// #endregion

@@ -1,19 +1,9 @@
 import type {Constructor} from '../../models';
+import type {CompareHandler} from '../../models/value/value.handler.model';
+import {COMPARE_NAME, type ComparisonHandler} from '../../models/value/value.misc.model';
 import {max} from '../math/aggregate';
 import {getString, words} from '../string/misc';
-import {createCompareHandler, type CompareHandler} from './handlers';
-
-// #region Types
-
-type Comparator<Value = any> = (first: Value, second: Value) => number;
-
-// #endregion
-
-// #region Special variables
-
-const COMPARE_NAME: string = 'compare';
-
-// #endregion
+import {createCompareHandler} from './handlers';
 
 // #region Functions
 
@@ -139,7 +129,7 @@ function getComparisonParts(value: unknown): unknown[] {
  */
 export function registerComparator<Instance>(
 	constructor: Constructor<Instance>,
-	handler?: string | Comparator<Instance>,
+	handler?: string | ComparisonHandler<Instance>,
 ): void {
 	compare.handler.base.register(constructor, handler);
 }
@@ -148,7 +138,7 @@ export function registerComparator<Instance>(
 
 // #region Variables
 
-const comparators: Record<string, Comparator> = {
+const comparators: Record<string, ComparisonHandler> = {
 	bigint: compareNumbers,
 	boolean: (first, second) => compareNumbers(first ? 1 : 0, second ? 1 : 0),
 	number: compareNumbers,

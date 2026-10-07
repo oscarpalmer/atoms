@@ -1,4 +1,5 @@
-import {INSERT_TYPE_PUSH, insertValues} from '../internal/array/insert';
+import {insertValues} from '../internal/array/insert';
+import {ARRAY_INSERT_TYPE_PUSH} from '../models/array/array.misc.model';
 
 // #region Functions
 
@@ -17,7 +18,7 @@ import {INSERT_TYPE_PUSH, insertValues} from '../internal/array/insert';
  * ```
  */
 export function push<Item>(array: Item[], pushed: Item[]): number {
-	return insertValues(INSERT_TYPE_PUSH, array, pushed, array.length, 0) as number;
+	return insertValues(ARRAY_INSERT_TYPE_PUSH, array, pushed, array.length, 0) as number;
 }
 
 // #endregion

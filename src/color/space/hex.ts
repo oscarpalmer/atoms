@@ -21,7 +21,7 @@ import type {
 	InternalColor,
 	RGBAColor,
 	RGBColor,
-} from '../models';
+} from '../../models/color.model';
 import {convertRgbToHsla, convertRgbToHwba} from './rgb';
 
 // #region Functions

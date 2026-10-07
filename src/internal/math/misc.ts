@@ -1,3 +1,5 @@
+// #region Functions
+
 /**
  * Round a number down
  *
@@ -37,3 +39,5 @@ export function roundNumber(
 
 	return callback((value + Number.EPSILON) * mod) / mod;
 }
+
+// #endregion

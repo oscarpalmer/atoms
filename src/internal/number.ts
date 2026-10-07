@@ -1,3 +1,9 @@
+import {
+	EXPRESSION_NUMBER_BINARY,
+	EXPRESSION_NUMBER_OCTAL,
+	EXPRESSION_NUMBER_ZEROISH,
+	NUMBER_OCTAL_VALUE,
+} from '../models/misc.model';
 import {isNumber} from './is';
 
 // #region Functions
@@ -95,29 +101,17 @@ export function getNumber(value: unknown): number {
 		return Number.NaN;
 	}
 
-	if (NUMBER_EXPRESSION_ZEROISH.test(parsed)) {
+	if (EXPRESSION_NUMBER_ZEROISH.test(parsed)) {
 		return 0;
 	}
 
-	const isBinary = NUMBER_EXPRESSION_BINARY.test(trimmed);
+	const isBinary = EXPRESSION_NUMBER_BINARY.test(trimmed);
 
-	if (isBinary || NUMBER_EXPRESSION_OCTAL.test(trimmed)) {
+	if (isBinary || EXPRESSION_NUMBER_OCTAL.test(trimmed)) {
 		return Number.parseInt(trimmed.slice(2), isBinary ? 2 : NUMBER_OCTAL_VALUE);
 	}
 
 	return Number(trimmed);
 }
-
-// #endregion
-
-// #region Variables
-
-const NUMBER_EXPRESSION_BINARY = /^0b[01]+$/i;
-
-const NUMBER_EXPRESSION_OCTAL = /^0o[0-7]+$/i;
-
-const NUMBER_EXPRESSION_ZEROISH = /^\s*0+\s*$/;
-
-const NUMBER_OCTAL_VALUE = 8;
 
 // #endregion

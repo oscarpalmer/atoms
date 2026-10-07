@@ -1,5 +1,5 @@
-import type {Ok} from '../internal/models/result.model';
 import {ok} from '../internal/result/misc';
+import type {Ok} from '../models/result.model';
 
 // #region Functions
 

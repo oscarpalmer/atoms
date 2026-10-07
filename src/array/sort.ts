@@ -1,158 +1,31 @@
 import {isPlainObject} from '../internal/is';
 import {floor, round} from '../internal/math/misc';
 import {compare} from '../internal/value/compare';
-import type {PlainObject, Primitive} from '../models';
-
-// #region Types
-
-/**
- * Sorting information for arrays _(using a comparison callback)_
- */
-export type ArrayComparisonSorter<Item> = {
-	/**
-	 * Callback to use when comparing items and values
-	 */
-	comparison: ComparisonSorter<Item>;
-	/**
-	 * Direction to sort by
-	 */
-	direction?: SortDirection;
-};
-
-/**
- * Sorting information for arrays _(using a key)_
- */
-export type ArrayKeySorter<Item extends PlainObject, ItemKey extends keyof Item> = {
-	/**
-	 * Comparator to use when comparing items and values
-	 */
-	compare?: CompareCallback<Item, Item[ItemKey]>;
-	/**
-	 * Direction to sort by
-	 */
-	direction?: SortDirection;
-	/**
-	 * Key to sort by
-	 */
-	key: ItemKey;
-};
-
-/**
- * Sorters based on keys in an object
- */
-type ArrayKeySorters<Item extends PlainObject> = {
-	[ItemKey in keyof Item]: ArrayKeySorter<Item, ItemKey>;
-}[keyof Item];
-
-/**
- * Sorter to use for sorting
- */
-export type ArraySorter<Item> = Item extends PlainObject
-	?
-			| keyof Item
-			| ArrayComparisonSorter<Item>
-			| ArrayKeySorters<Item>
-			| ArrayValueSorter<Item>
-			| ComparisonSorter<Item>
-	: ArrayComparisonSorter<Item> | ArrayValueSorter<Item> | ComparisonSorter<Item>;
-
-/**
- * Sorters to use for sorting
- */
-export type ArraySorters<Item> = Array<ArraySorter<Item>>;
-
-/**
- * Sorting information for arrays _(using a value callback and built-in comparison)_
- */
-export type ArrayValueSorter<Item> = {
-	/**
-	 * Direction to sort by
-	 */
-	direction?: SortDirection;
-	/**
-	 * Value to sort by
-	 */
-	value(item: Item): unknown;
-};
-
-/**
- * Comparator to use when comparing items and values
- */
-type CompareCallback<Item, Value = CompareCallbackValue<Item>> = (
-	first: Item,
-	firstValue: Value,
-	second: Item,
-	secondValue: Value,
-) => number;
-
-type CompareCallbackValue<Item> = Item extends Primitive ? Item : unknown;
-
-/**
- * Callback to use when comparing items and values
- */
-type ComparisonSorter<Item> = (first: Item, second: Item) => number;
-
-type InternalSorter = {
-	[SORTER_SYMBOL]: SortHandler[];
-};
-
-/**
- * Direction to sort by
- */
-export type SortDirection = 'ascending' | 'descending';
-
-type SortHandler = {
-	comparison?: SortHandlerComparison;
-	get: boolean;
-	identifier: string;
-	modifier: number;
-	value?: Function;
-};
-
-type SortHandlerComparison = {
-	complex?: Function;
-	simple?: Function;
-};
-
-/**
- * Sorter for an array with predefined sorters
- *
- * Can be used to sort an array, get the predicted index for an item, and check if an array is sorted
- */
-export type Sorter<Item> = {
-	/**
-	 * Get the index for an item _(to be inserted into an array of items)_
-	 *
-	 * _(If the array is not sorted, it will be treated as sorted, and the result may be inaccurate)_
-	 *
-	 * @param array Array to get the index from
-	 * @param item Item to get the index for
-	 * @returns Index for item
-	 */
-	index(array: Item[], item: Item): number;
-
-	/**
-	 * Is the array sorted?
-	 *
-	 * @param array Array to check
-	 * @returns `true` if sorted, otherwise `false`
-	 */
-	is(array: Item[]): boolean;
-
-	/**
-	 * Sort an array of items
-	 *
-	 * @param array Array to sort
-	 * @returns Sorted array
-	 */
-	sort(array: Item[]): Item[];
-};
-
-// #endregion
+import type {PlainObject} from '../models';
+import {
+	arrayModifiers,
+	SORT_DIRECTION_ASCENDING,
+	SORT_DIRECTION_DESCENDING,
+	SORT_PEEK_PERCENTAGE,
+	SORT_THRESHOLD,
+	SORTER_SYMBOL,
+	type ArrayComparisonSorter,
+	type ArrayKeySorter,
+	type ArrayKeySorters,
+	type ArraySorter,
+	type ArraySorters,
+	type ArrayValueSorter,
+	type CompareCallback,
+	type ComparisonSorter,
+	type InternalSorter,
+	type SortDirection,
+	type Sorter,
+	type SortHandler,
+} from '../models/array/array.sort.model';
 
 // #region Instances
 
-function Sorter(this: any, sorters: SortHandler[]) {
+function Sorter(this: any, sorters: SortHandler[]): void {
 	this[SORTER_SYMBOL] = sorters;
 }
 
@@ -206,7 +79,7 @@ function getModifier(first: unknown, second: unknown): number {
 	const direction =
 		first === true || second === true ? SORT_DIRECTION_DESCENDING : SORT_DIRECTION_ASCENDING;
 
-	return modifiers[direction];
+	return arrayModifiers[direction];
 }
 
 function getObjectSorter(obj: PlainObject, modifier: number): SortHandler | undefined {
@@ -227,7 +100,7 @@ function getObjectSorter(obj: PlainObject, modifier: number): SortHandler | unde
 	}
 
 	if (sorter != null && typeof obj.direction === 'string') {
-		sorter.modifier = modifiers[obj.direction] ?? modifier;
+		sorter.modifier = arrayModifiers[obj.direction] ?? modifier;
 	}
 
 	return sorter;
@@ -616,25 +489,6 @@ function sortArray(this: InternalSorter | SortHandler[], array: unknown[]): unkn
 
 // #endregion
 
-// #region Variables
-
-const SORT_PEEK_PERCENTAGE = 10;
-
-const SORT_THRESHOLD = 100;
-
-export const SORT_DIRECTION_ASCENDING: SortDirection = 'ascending';
-
-export const SORT_DIRECTION_DESCENDING: SortDirection = 'descending';
-
-const SORTER_SYMBOL = Symbol('sorter');
-
-const modifiers: Record<string, number> = {
-	[SORT_DIRECTION_ASCENDING]: 1,
-	[SORT_DIRECTION_DESCENDING]: -1,
-};
-
-// #endregion
-
 // #region Namespace
 
 export declare namespace sort {
@@ -650,5 +504,24 @@ export declare namespace sort {
 sort.getIndex = getSortedIndex;
 sort.initialize = initializeSorter;
 sort.is = isSorted;
+
+// #endregion
+
+// #region Exports
+
+export {
+	SORT_DIRECTION_ASCENDING,
+	SORT_DIRECTION_DESCENDING,
+	type ArrayComparisonSorter,
+	type ArrayKeySorter,
+	type ArrayKeySorters,
+	type ArraySorter,
+	type ArraySorters,
+	type ArrayValueSorter,
+	type CompareCallback,
+	type ComparisonSorter,
+	type SortDirection,
+	type Sorter,
+};
 
 // #endregion

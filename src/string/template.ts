@@ -2,64 +2,20 @@ import {isPlainObject, isTemplateStringsArray} from '../internal/is';
 import {getString, interpolate} from '../internal/string/misc';
 import {getValue} from '../internal/value/get';
 import type {PlainObject} from '../models';
-
-// #region Types
-
-type InternalTemplater = {
-	[TEMPLATE_SYMBOL]: Required<TemplateOptions>;
-} & Templater;
-
-/**
- * Renderer for a string template with variables
- *
- * @param variables Variables to use
- * @param options Templating options
- * @returns Templated string
- */
-type Renderer = (variables?: PlainObject, options?: Partial<TemplateOptions>) => string;
-
-/**
- * Options for templating strings
- */
-export type TemplateOptions = {
-	/**
-	 * Ignore case when searching for variables?
-	 */
-	ignoreCase?: boolean;
-	/**
-	 * Custom pattern for outputting variables
-	 */
-	pattern?: RegExp;
-};
-
-type Templater = {
-	/**
-	 * Render a string from a template with variables
-	 *
-	 * @returns Templated string
-	 */
-	render(strings: TemplateStringsArray, ...values: unknown[]): TemplaterRenderer;
-
-	/**
-	 * Render a string from a template with variables
-	 *
-	 * @param value Template string
-	 * @param variables Variables to use
-	 * @returns Templated string
-	 */
-	render(value: string, variables?: PlainObject): string;
-};
-
-/**
- * Render a template string with variables
- */
-type TemplaterRenderer = (variables?: PlainObject) => string;
-
-// #endregion
+import {
+	TEMPLATE_EXPRESSION_VARIABLE,
+	TEMPLATE_SYMBOL,
+	type InternalTemplater,
+	type Renderer,
+	type TemplateOptions,
+	type Templater,
+	type TemplaterOptions,
+	type TemplaterRenderer,
+} from '../models/string/string.template.model';
 
 // #region Instances
 
-function Templater(this: any, options: Required<TemplateOptions>): void {
+function Templater(this: any, options: TemplaterOptions): void {
 	this[TEMPLATE_SYMBOL] = options;
 }
 
@@ -175,14 +131,6 @@ export function template(
 
 // #endregion
 
-// #region Variables
-
-const TEMPLATE_EXPRESSION_VARIABLE = /{{([\s\S]+?)}}/g;
-
-const TEMPLATE_SYMBOL = Symbol('template');
-
-// #endregion
-
 // #region Namespace
 
 export declare namespace template {
@@ -194,5 +142,11 @@ export declare namespace template {
 // #region Initialization
 
 template.initialize = initializeTemplater;
+
+// #endregion
+
+// #region Exports
+
+export type {Renderer, TemplateOptions, Templater, TemplaterOptions, TemplaterRenderer};
 
 // #endregion

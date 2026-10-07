@@ -1,25 +1,6 @@
 import {noop} from '../internal/function/misc';
 import {isPlainObject} from '../internal/is';
-import type {PlainObject} from '../models';
-
-// #region Types
-
-/**
- * A frozen value with readonly properties _(going as deep as possible)_
- */
-export type Frozen<Value> = Value extends unknown[]
-	? Readonly<Value>
-	: Value extends PlainObject
-		? {
-				readonly [Key in keyof Value]: Frozen<Value[Key]>;
-			}
-		: Value extends Map<infer Key, infer Value>
-			? ReadonlyMap<Key, Frozen<Value>>
-			: Value extends Set<infer Item>
-				? ReadonlySet<Frozen<Item>>
-				: Readonly<Value>;
-
-// #endregion
+import type {Frozen, PlainObject} from '../models';
 
 // #region Functions
 

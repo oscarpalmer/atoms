@@ -1,61 +1,27 @@
-import {memoize, type Memoized} from '../internal/function/memoize';
+import {memoize} from '../internal/function/memoize';
 import {isPlainObject} from '../internal/is';
 import {lowerCase} from '../internal/string/case';
-
-// #region Types
-
-type InternalNormalizer = {
-	[NORMALIZE_SYMBOL]: Required<NormalizeOptions>;
-} & Normalizer;
-
-/**
- * Options for normalizing a string
- */
-export type NormalizeOptions = {
-	/**
-	 * Remove diacritical marks from the string? _(defaults to `true`)_
-	 */
-	deburr?: boolean;
-	/**
-	 * Convert the string to lower case? _(defaults to `true`)_
-	 */
-	lowerCase?: boolean;
-	/**
-	 * Remove special characters from the string? _(defaults to `false`)_
-	 *
-	 * _(Punctuation and symbol characters are considered special)_
-	 */
-	special?: boolean;
-	/**
-	 * Trim the string? _(defaults to `true`)_
-	 */
-	trim?: boolean;
-	/**
-	 * Shorten consecutive whitespace characters to a single space? _(defaults to `true`)_
-	 */
-	whitespace?: boolean;
-};
-
-/**
- * String normalizer function
- */
-export type Normalizer = {
-	/**
-	 * Normalize a string
-	 *
-	 * @param value String to normalize
-	 * @returns Normalized string
-	 */
-	normalize(value: string): string;
-};
-
-type Options = Required<NormalizeOptions>;
-
-// #endregion
+import type {Memoized} from '../models/function/memoize.model';
+import {EXPRESSION_WHITESPACE_MULTIPLE} from '../models/misc.model';
+import {
+	NORMALIZE_DEBURR_CHARACTERS,
+	NORMALIZE_DEBURR_NORMALIZATION,
+	NORMALIZE_DEBURR_PATTERN_CHARACTERS,
+	NORMALIZE_DEBURR_PATTERN_SIMPLE,
+	NORMALIZE_NORMALIZATION_NORMALIZATION,
+	NORMALIZE_SPECIAL_PATTERN,
+	NORMALIZE_SPECIAL_REPLACEMENT,
+	NORMALIZE_SYMBOL,
+	NORMALIZE_WHITESPACE_REPLACEMENT,
+	type InternalNormalizer,
+	type NormalizeOptions,
+	type Normalizer,
+	type NormalizerOptions,
+} from '../models/string/string.normalize.model';
 
 // #region Instances
 
-function Normalizer(this: any, options: Required<NormalizeOptions>): void {
+function Normalizer(this: any, options: NormalizerOptions): void {
 	this[NORMALIZE_SYMBOL] = options;
 }
 
@@ -65,7 +31,7 @@ Normalizer.prototype.normalize = normalizeString;
 
 // #region Functions
 
-function createNormalizeOptions(input?: NormalizeOptions): Options {
+function createNormalizerOptions(input?: NormalizeOptions): NormalizerOptions {
 	const options = isPlainObject(input) ? input : {};
 
 	return {
@@ -115,7 +81,7 @@ export function deburr(value: string): string {
  */
 export function initializeNormalizer(options?: NormalizeOptions): Normalizer {
 	// @ts-expect-error All good, no worries :-)
-	return new Normalizer(createNormalizeOptions(options));
+	return new Normalizer(createNormalizerOptions(options));
 }
 
 /**
@@ -128,7 +94,7 @@ export function initializeNormalizer(options?: NormalizeOptions): Normalizer {
  * @returns Normalized string
  */
 export function normalize(value: string, options?: NormalizeOptions): string {
-	return normalizeString.call(createNormalizeOptions(options), value);
+	return normalizeString.call(createNormalizerOptions(options), value);
 }
 
 function normalizeString(
@@ -148,7 +114,7 @@ function normalizeString(
 	}
 
 	if (options.whitespace) {
-		result = result.replace(NORMALIZE_WHITESPACE_PATTERN, NORMALIZE_WHITESPACE_REPLACEMENT);
+		result = result.replace(EXPRESSION_WHITESPACE_MULTIPLE, NORMALIZE_WHITESPACE_REPLACEMENT);
 	}
 
 	if (options.deburr) {
@@ -170,60 +136,6 @@ function normalizeString(
 
 // #region Variables
 
-const NORMALIZE_DEBURR_CHARACTERS = {
-	Æ: 'AE',
-	æ: 'ae',
-	Ð: 'D',
-	ð: 'd',
-	Đ: 'D',
-	đ: 'd',
-	Ħ: 'H',
-	ħ: 'h',
-	Ĳ: 'IJ',
-	ĳ: 'ij',
-	İ: 'I',
-	ı: 'i',
-	ĸ: 'k',
-	Ŀ: 'L',
-	ŀ: 'l',
-	Ł: 'L',
-	ł: 'l',
-	Ŋ: 'N',
-	ŋ: 'n',
-	ŉ: "'n",
-	Œ: 'OE',
-	œ: 'oe',
-	Ø: 'O',
-	ø: 'o',
-	ſ: 's',
-	ß: 'ss',
-	Þ: 'TH',
-	þ: 'th',
-	Ŧ: 'T',
-	ŧ: 't',
-};
-
-const NORMALIZE_DEBURR_NORMALIZATION = 'NFD';
-
-const NORMALIZE_DEBURR_PATTERN_CHARACTERS = new RegExp(
-	`(${Object.keys(NORMALIZE_DEBURR_CHARACTERS).join('|')})`,
-	'g',
-);
-
-const NORMALIZE_DEBURR_PATTERN_SIMPLE = /[\u0300-\u036f]/g;
-
-const NORMALIZE_NORMALIZATION_NORMALIZATION = 'NFC';
-
-const NORMALIZE_SPECIAL_PATTERN = /[\p{P}\p{S}]/gu;
-
-const NORMALIZE_SPECIAL_REPLACEMENT = '';
-
-const NORMALIZE_SYMBOL = Symbol('normalize');
-
-const NORMALIZE_WHITESPACE_PATTERN = /\s+/g;
-
-const NORMALIZE_WHITESPACE_REPLACEMENT = ' ';
-
 let deburrMemoizer: Memoized<typeof deburr>;
 
 // #endregion
@@ -239,5 +151,11 @@ export declare namespace normalize {
 // #region Initialization
 
 normalize.initialize = initializeNormalizer;
+
+// #endregion
+
+// #region Exports
+
+export type {NormalizeOptions, Normalizer};
 
 // #endregion

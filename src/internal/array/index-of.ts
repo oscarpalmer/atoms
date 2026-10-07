@@ -1,5 +1,6 @@
 import type {PlainObject} from '../../models';
-import {FIND_VALUE_INDEX, findValue} from './find';
+import {ARRAY_FIND_VALUE_INDEX} from '../../models/array/array.find.model';
+import {findValue} from './find';
 
 // #region Functions
 
@@ -83,7 +84,7 @@ export function indexOf<Item>(
 export function indexOf<Item>(array: Item[], item: Item): number;
 
 export function indexOf(array: unknown[], ...parameters: unknown[]): number {
-	return findValue(FIND_VALUE_INDEX, array, parameters, false);
+	return findValue(ARRAY_FIND_VALUE_INDEX, array, parameters, false);
 }
 
 /**
@@ -174,7 +175,7 @@ export function lastIndexOf<Item>(
 export function lastIndexOf<Item>(array: Item[], item: Item): number;
 
 export function lastIndexOf(array: unknown[], ...parameters: unknown[]): number {
-	return findValue(FIND_VALUE_INDEX, array, parameters, true);
+	return findValue(ARRAY_FIND_VALUE_INDEX, array, parameters, true);
 }
 
 // #endregion

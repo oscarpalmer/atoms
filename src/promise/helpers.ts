@@ -7,15 +7,13 @@ import {
 	PROMISE_STRATEGY_DEFAULT,
 	PROMISE_TYPE_FULFILLED,
 	PROMISE_TYPE_REJECTED,
-} from './constants';
-import {
 	type FulfilledPromise,
 	type PromiseOptions,
 	type PromisesOptions,
 	type PromiseStrategy,
 	type PromisesValue,
 	type RejectedPromise,
-} from './models';
+} from '../models/promise.model';
 
 // #region Functions
 
@@ -90,7 +88,11 @@ export function getStrategyOrDefault(value: unknown): PromiseStrategy {
  * @returns `true` if the value is a fulfilled _Promise_ result, otherwise `false`
  */
 export function isFulfilled<Value>(value: unknown): value is FulfilledPromise<Value> {
-	return isType(value, PROMISE_TYPE_FULFILLED);
+	return isPromiseResult(value, PROMISE_TYPE_FULFILLED);
+}
+
+function isPromiseResult(value: unknown, type: string): boolean {
+	return isPlainObject(value) && 'status' in value && value.status === type;
 }
 
 /**
@@ -100,11 +102,7 @@ export function isFulfilled<Value>(value: unknown): value is FulfilledPromise<Va
  * @returns `true` if the value is a rejected _Promise_ result, otherwise `false`
  */
 export function isRejected(value: unknown): value is RejectedPromise {
-	return isType(value, PROMISE_TYPE_REJECTED);
-}
-
-function isType(value: unknown, type: string): boolean {
-	return isPlainObject(value) && 'status' in value && value.status === type;
+	return isPromiseResult(value, PROMISE_TYPE_REJECTED);
 }
 
 // #endregion

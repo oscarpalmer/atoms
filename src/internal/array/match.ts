@@ -1,14 +1,17 @@
 import type {PlainObject} from '../../models';
+import {
+	ARRAY_MATCH_COMPARISON_END,
+	ARRAY_MATCH_COMPARISON_INSIDE,
+	ARRAY_MATCH_COMPARISON_SAME,
+	ARRAY_MATCH_COMPARISON_START,
+	arrayMatchEndings,
+	arrayMatchInvalid,
+	arrayMatchOutside,
+	arrayMatchOutsides,
+	arrayMatchStarts,
+} from '../../models/array/array.match.model';
+import type {ArrayComparison} from '../../models/array/array.misc.model';
 import {getArrayCallback} from './callbacks';
-
-// #region Types
-
-/**
- * Comparison of an array within another array
- */
-export type ArrayComparison = 'end' | 'inside' | 'invalid' | 'outside' | 'same' | 'start';
-
-// #endregion
 
 // #region Functions
 
@@ -73,7 +76,7 @@ export function endsWithArray<Item extends PlainObject>(
 export function endsWithArray<Item>(haystack: Item[], needle: Item[]): boolean;
 
 export function endsWithArray(haystack: unknown[], needle: unknown[], key?: unknown): boolean {
-	return endings.has(getPosition(haystack, needle, key)[1]);
+	return arrayMatchEndings.has(getPosition(haystack, needle, key)[1]);
 }
 
 /**
@@ -146,10 +149,10 @@ export function getArrayComparison(
 
 function getName(start: number, haystack: number, needle: number): ArrayComparison {
 	if (start === 0) {
-		return haystack === needle ? MATCH_COMPARISON_SAME : MATCH_COMPARISON_START;
+		return haystack === needle ? ARRAY_MATCH_COMPARISON_SAME : ARRAY_MATCH_COMPARISON_START;
 	}
 
-	return start + needle === haystack ? MATCH_COMPARISON_END : MATCH_COMPARISON_INSIDE;
+	return start + needle === haystack ? ARRAY_MATCH_COMPARISON_END : ARRAY_MATCH_COMPARISON_INSIDE;
 }
 
 function getPosition(
@@ -158,18 +161,18 @@ function getPosition(
 	key?: unknown,
 ): readonly [number, ArrayComparison] {
 	if (!Array.isArray(haystack) || !Array.isArray(needle)) {
-		return invalid;
+		return arrayMatchInvalid;
 	}
 
 	const haystackLength = haystack.length;
 	const needleLength = needle.length;
 
 	if (haystackLength === 0 || needleLength === 0) {
-		return outside;
+		return arrayMatchOutside;
 	}
 
 	if (needleLength > haystackLength) {
-		return outside;
+		return arrayMatchOutside;
 	}
 
 	const callback = getArrayCallback(key);
@@ -212,7 +215,7 @@ function getPosition(
 		}
 	}
 
-	return outside;
+	return arrayMatchOutside;
 }
 
 /**
@@ -276,7 +279,7 @@ export function includesArray<Item extends PlainObject>(
 export function includesArray<Item>(haystack: Item[], needle: Item[]): boolean;
 
 export function includesArray(haystack: unknown[], needle: unknown[], key?: unknown): boolean {
-	return !outsides.has(getPosition(haystack, needle, key)[1]);
+	return !arrayMatchOutsides.has(getPosition(haystack, needle, key)[1]);
 }
 
 /**
@@ -404,33 +407,7 @@ export function startsWithArray<Item extends PlainObject>(
 export function startsWithArray<Item>(haystack: Item[], needle: Item[]): boolean;
 
 export function startsWithArray(haystack: unknown[], needle: unknown[], key?: unknown): boolean {
-	return starts.has(getPosition(haystack, needle, key)[1]);
+	return arrayMatchStarts.has(getPosition(haystack, needle, key)[1]);
 }
-
-// #endregion
-
-// #region Variables
-
-const MATCH_COMPARISON_END: ArrayComparison = 'end';
-
-const MATCH_COMPARISON_INSIDE: ArrayComparison = 'inside';
-
-const MATCH_COMPARISON_INVALID: ArrayComparison = 'invalid';
-
-const MATCH_COMPARISON_OUTSIDE: ArrayComparison = 'outside';
-
-const MATCH_COMPARISON_SAME: ArrayComparison = 'same';
-
-const MATCH_COMPARISON_START: ArrayComparison = 'start';
-
-const endings = new Set<ArrayComparison>([MATCH_COMPARISON_END, MATCH_COMPARISON_SAME]);
-
-const invalid = [-1, MATCH_COMPARISON_INVALID] as const;
-
-const outside = [-1, MATCH_COMPARISON_OUTSIDE] as const;
-
-const outsides = new Set<ArrayComparison>([MATCH_COMPARISON_INVALID, MATCH_COMPARISON_OUTSIDE]);
-
-const starts = new Set<ArrayComparison>([MATCH_COMPARISON_START, MATCH_COMPARISON_SAME]);
 
 // #endregion

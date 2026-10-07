@@ -1,3 +1,7 @@
+import {
+	STRING_EXPRESSION_IGNORED,
+	STRING_EXPRESSION_WORDS,
+} from '../../models/string/string.misc.model';
 import {unwrap} from '../../result/misc';
 import {attempt} from '../result/attempt';
 
@@ -117,15 +121,5 @@ export function tryEncode(value: boolean | number | string): unknown {
 export function words(value: string): string[] {
 	return typeof value === 'string' ? (value.match(STRING_EXPRESSION_WORDS) ?? []) : [];
 }
-
-// #endregion
-
-// #region Variables
-
-const STRING_EXPRESSION_IGNORED = /(^|\.)(__proto__|constructor|prototype)(\.|$)/i;
-
-// Lodash uses it, so it's fine ;-)
-// oxlint-disable-next-line no-control-regex
-const STRING_EXPRESSION_WORDS = /[^\x00-\x2f\x3a-\x40\x5b-\x60\x7b-\x7f]+/g;
 
 // #endregion

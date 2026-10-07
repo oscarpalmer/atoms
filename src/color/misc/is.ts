@@ -1,6 +1,16 @@
 import {between} from '../../internal/number';
-import {isSubscription, SUBSCRIPTION_NAME, type Subscription} from '../../internal/subscription';
+import {isSubscription} from '../../internal/subscription';
 import type {PlainObject} from '../../models';
+import type {
+	ColorProperty,
+	HSLAColor,
+	HSLColor,
+	HWBAColor,
+	HWBColor,
+	RGBAColor,
+	RGBColor,
+} from '../../models/color.model';
+import {SUBSCRIPTION_NAME, type Subscription} from '../../models/subscription.model';
 import {
 	COLOR_ALPHA,
 	COLOR_EXPRESSION,
@@ -11,15 +21,6 @@ import {
 	COLOR_PROPERTY,
 } from '../constants';
 import type {Color} from '../index';
-import type {
-	ColorProperty,
-	HSLAColor,
-	HSLColor,
-	HWBAColor,
-	HWBColor,
-	RGBAColor,
-	RGBColor,
-} from '../models';
 
 // ##region Functions
 

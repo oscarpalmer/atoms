@@ -2,69 +2,15 @@ import {isArrayOrPlainObject} from '../internal/is';
 import {max, min} from '../internal/math/aggregate';
 import {join} from '../internal/string/misc';
 import {equal} from '../internal/value/equal';
-
-// #region Types
-
-/**
- * Options for value comparison
- */
-export type DiffOptions = {
-	/**
-	 * Should `null` and `undefined` be considered equal and ignored in results?
-	 */
-	relaxedNullish?: boolean;
-};
-
-/**
- * The result of a comparison beteen two values
- */
-export type DiffResult<First, Second = First> = {
-	/**
-	 * The original values that were compared
-	 */
-	original: DiffValue<First, Second>;
-	/**
-	 * The type of difference between the two values
-	 */
-	type: DiffType;
-	/**
-	 * The differences between the two values
-	 *
-	 * - Keys are in dot notation
-	 * - Values are objects with `from` and `to` properties
-	 */
-	values: Record<string, DiffValue>;
-};
-
-type DiffType = 'full' | 'none' | 'partial';
-
-/**
- * The difference between two values
- */
-export type DiffValue<First = unknown, Second = First> = {
-	/**
-	 * The value from the first value
-	 */
-	from: First;
-	/**
-	 * The value from the second value
-	 */
-	to: Second;
-};
-
-type KeyedDiffValue = {
-	key: string;
-} & DiffValue;
-
-type Parameters = {
-	changes: KeyedDiffValue[];
-	key: PropertyKey;
-	options: Required<DiffOptions>;
-	values: {first: unknown; second: unknown};
-	prefix?: string;
-};
-
-// #endregion
+import {
+	DIFF_FULL,
+	DIFF_NONE,
+	DIFF_PARTIAL,
+	type DiffKeyedValue,
+	type DiffOptions,
+	type DiffParameters,
+	type DiffResult,
+} from '../models/value/value.diff.model';
 
 // #region Functions
 
@@ -127,12 +73,12 @@ export function diff<First, Second = First>(
 }
 
 function getChanges(
-	changes: KeyedDiffValue[],
+	changes: DiffKeyedValue[],
 	first: unknown,
 	second: unknown,
 	options: Required<DiffOptions>,
 	prefix?: string,
-): KeyedDiffValue[] {
+): DiffKeyedValue[] {
 	const checked = new Set<PropertyKey>();
 
 	for (let outerIndex = 0; outerIndex < 2; outerIndex += 1) {
@@ -169,8 +115,8 @@ function getDiffs(
 	second: unknown,
 	options: Required<DiffOptions>,
 	prefix?: string,
-): KeyedDiffValue[] {
-	const changes: KeyedDiffValue[] = [];
+): DiffKeyedValue[] {
+	const changes: DiffKeyedValue[] = [];
 
 	if (Array.isArray(first) && Array.isArray(second)) {
 		const maximumLength = max([first.length, second.length]);
@@ -190,7 +136,7 @@ function getDiffs(
 	return getChanges(changes, first, second, options, prefix);
 }
 
-function setChanges(parameters: Parameters): void {
+function setChanges(parameters: DiffParameters): void {
 	const {changes, key, prefix, options, values} = parameters;
 
 	const prefixed = join([prefix, key], '.');
@@ -222,12 +168,8 @@ function setChanges(parameters: Parameters): void {
 
 // #endregion
 
-// #region Variables
+// #region Exports
 
-const DIFF_FULL: DiffType = 'full';
-
-const DIFF_NONE: DiffType = 'none';
-
-const DIFF_PARTIAL: DiffType = 'partial';
+export type {DiffOptions, DiffResult};
 
 // #endregion

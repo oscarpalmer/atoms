@@ -1,12 +1,13 @@
-import type {Aborter} from '../internal/aborter';
 import {error, ok} from '../internal/result/misc';
-import type {Result} from '../internal/models/result.model';
+import type {Aborter} from '../models/aborter.model';
 import {
+	CancelablePromise,
 	PROMISE_MESSAGE_EXPECTATION_RESULT,
 	PROMISE_TYPE_FULFILLED,
 	PROMISE_TYPE_REJECTED,
-} from './constants';
-import {CancelablePromise, type PromiseParameters} from './models';
+	type PromiseParameters,
+} from '../models/promise.model';
+import type {Result} from '../models/result.model';
 
 // #region Functions
 
@@ -30,7 +31,9 @@ export function handleResult(status: string, parameters: PromiseParameters): voi
 	}
 
 	if (!complete && status === PROMISE_TYPE_REJECTED) {
-		settlePromise(handlers.reject, value, aborter);
+		aborter?.cancel();
+
+		handlers.reject(value);
 
 		return;
 	}
@@ -42,7 +45,9 @@ export function handleResult(status: string, parameters: PromiseParameters): voi
 			: {status, reason: value};
 
 	if (index === data.last) {
-		settlePromise(handlers.resolve, data.result, aborter);
+		aborter?.cancel();
+
+		handlers.resolve(data.result as unknown[]);
 	}
 }
 

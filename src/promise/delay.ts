@@ -1,8 +1,9 @@
 import {createAborter} from '../internal/aborter';
-import {getLimiter, LIMITER_WAIT} from '../internal/function/limit';
+import {getLimiter} from '../internal/function/limit';
+import {LIMITER_WAIT} from '../models/function/limiter.model';
 import {createPromiseOptions} from './helpers';
 import {settlePromise} from './misc';
-import {type PromiseOptions} from './models';
+import {type PromiseOptions} from '../models/promise.model';
 
 // #region Functions
 

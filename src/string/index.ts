@@ -1,6 +1,14 @@
 import {isTemplateStringsArray} from '../internal/is';
 import {min} from '../internal/math/aggregate';
 import {interpolate} from '../internal/string/misc';
+import {EXPRESSION_NUMERICAL_PREFIX} from '../models/misc.model';
+import {
+	STRING_DELIMITER_UUID_DEFAULT,
+	STRING_DELIMITER_UUID_HTML,
+	STRING_EXPRESSION_WHITESPACE_PREFIX,
+	STRING_NEWLINE,
+	STRING_ZERO,
+} from '../models/string/string.misc.model';
 
 // #region Functions
 
@@ -32,7 +40,7 @@ export function dedent(value: string | TemplateStringsArray, ...values: unknown[
 		return '';
 	}
 
-	const lines = actual.split('\n');
+	const lines = actual.split(STRING_NEWLINE);
 	const {length} = lines;
 
 	if (length === 1) {
@@ -44,7 +52,7 @@ export function dedent(value: string | TemplateStringsArray, ...values: unknown[
 	const lengths: number[] = [];
 
 	for (let index = 0; index < length; index += 1) {
-		const [, indentation] = /^(\s+)/.exec(lines[index]) ?? [];
+		const [, indentation] = STRING_EXPRESSION_WHITESPACE_PREFIX.exec(lines[index]) ?? [];
 
 		if (indentation != null) {
 			lengths.push(indentation.length);
@@ -64,7 +72,7 @@ export function dedent(value: string | TemplateStringsArray, ...values: unknown[
 	for (let index = 0; index < length; index += 1) {
 		const line = lines[index];
 
-		result += line.replace(pattern, '') + (index === lastIndex ? '' : '\n');
+		result += line.replace(pattern, '') + (index === lastIndex ? '' : STRING_NEWLINE);
 	}
 
 	return result.trim();
@@ -106,7 +114,7 @@ export function getUuid(html?: unknown): string {
 
 		const first = hex.substring(0, 8);
 
-		if (forHTML && STRING_NUMERICAL_PREFIX_PATTERN.test(first)) {
+		if (forHTML && EXPRESSION_NUMERICAL_PREFIX.test(first)) {
 			continue;
 		}
 
@@ -177,18 +185,6 @@ export function truncate(value: string, length: number, suffix?: string): string
 
 	return `${value.slice(0, truncatedLength)}${actualSuffix}`;
 }
-
-// #endregion
-
-// #region Variables
-
-const STRING_DELIMITER_UUID_DEFAULT = '-';
-
-const STRING_DELIMITER_UUID_HTML = '_';
-
-const STRING_NUMERICAL_PREFIX_PATTERN = /^\d/;
-
-const STRING_ZERO = '0';
 
 // #endregion
 

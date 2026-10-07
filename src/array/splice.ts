@@ -1,4 +1,5 @@
-import {INSERT_TYPE_SPLICE, insertValues} from '../internal/array/insert';
+import {insertValues} from '../internal/array/insert';
+import {ARRAY_INSERT_TYPE_SPLICE} from '../models/array/array.misc.model';
 
 // #region Functions
 
@@ -95,7 +96,7 @@ export function splice(
 	const deleteCountIsNumber = typeof deleteCountOrItems === 'number';
 
 	return insertValues(
-		INSERT_TYPE_SPLICE,
+		ARRAY_INSERT_TYPE_SPLICE,
 		array,
 		deleteCountIsNumber ? items : deleteCountOrItems,
 		start,

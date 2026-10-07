@@ -1,45 +1,18 @@
 import {assert} from '../internal/function/assert';
-import type {OnceAsync as AsyncOnce, GenericAsyncCallback, GenericCallback, Once} from '../models';
-
-// #region Special variables
-
-const ONCE_NAME_ASYNC = 'asyncOnce';
-
-const ONCE_NAME_SYNC = 'once';
-
-const ONCE_PROPERTY = '$once';
-
-// #endregion
-
-// #region Types
-
-type InternalOnceAsync = {
-	[ONCE_SYMBOL]: OnceAsyncState<unknown>;
-} & AsyncOnce<GenericAsyncCallback>;
-
-type InternalOnce = {
-	[ONCE_SYMBOL]: OnceState<unknown>;
-} & Once<GenericCallback>;
-
-type OnceAsyncItem<Value> = {
-	reject(reason?: unknown): void;
-	resolve(value: Value): void;
-};
-
-type OnceAsyncState<Value> = {
-	error: boolean;
-	finished: boolean;
-	items: Array<OnceAsyncItem<Value>>;
-} & OnceState<Value, GenericAsyncCallback>;
-
-type OnceState<Value, Callback = GenericCallback> = {
-	callback: Callback;
-	called: boolean;
-	cleared: boolean;
-	value: Value;
-};
-
-// #endregion
+import type {GenericAsyncCallback, GenericCallback} from '../models';
+import {
+	ONCE_MESSAGE_CLEARED,
+	ONCE_MESSAGE_EXPECTATION,
+	ONCE_NAME_ASYNC,
+	ONCE_NAME_SYNC,
+	ONCE_PROPERTY,
+	ONCE_SYMBOL,
+	type AsyncOnce,
+	type AsyncOnceState,
+	type InternalAsyncOnce,
+	type InternalOnce,
+	type Once,
+} from '../models/function/once.model';
 
 // #region Instances
 
@@ -125,7 +98,7 @@ export function asyncOnce<Callback extends GenericAsyncCallback>(
 	return new AsyncOnce(callback);
 }
 
-function clearOnce(this: InternalOnce | InternalOnceAsync): void {
+function clearOnce(this: InternalOnce | InternalAsyncOnce): void {
 	const state = this[ONCE_SYMBOL];
 
 	if (!state.called || state.cleared) {
@@ -137,23 +110,23 @@ function clearOnce(this: InternalOnce | InternalOnceAsync): void {
 	state.value = undefined as never;
 }
 
-function getAsyncOnceError(this: InternalOnceAsync): boolean {
+function getAsyncOnceError(this: InternalAsyncOnce): boolean {
 	return this[ONCE_SYMBOL].error;
 }
 
-function getAsyncOnceFinished(this: InternalOnceAsync): boolean {
+function getAsyncOnceFinished(this: InternalAsyncOnce): boolean {
 	return this[ONCE_SYMBOL].finished;
 }
 
-function getOnceCalled(this: InternalOnce | InternalOnceAsync): boolean {
+function getOnceCalled(this: InternalOnce | InternalAsyncOnce): boolean {
 	return this[ONCE_SYMBOL].called;
 }
 
-function getOnceCleared(this: InternalOnce | InternalOnceAsync): boolean {
+function getOnceCleared(this: InternalOnce | InternalAsyncOnce): boolean {
 	return this[ONCE_SYMBOL].cleared;
 }
 
-function handleOnceResult<Value>(state: OnceAsyncState<Value>, value: Value, error: boolean): void {
+function handleOnceResult<Value>(state: AsyncOnceState<Value>, value: Value, error: boolean): void {
 	state.error = error;
 	state.finished = true;
 	state.value = value;
@@ -162,12 +135,12 @@ function handleOnceResult<Value>(state: OnceAsyncState<Value>, value: Value, err
 	const {length} = items;
 
 	for (let index = 0; index < length; index += 1) {
-		const {reject, resolve} = items[index];
+		const item = items[index];
 
 		if (error) {
-			reject(value);
+			item.reject(value);
 		} else {
-			resolve(value);
+			item.resolve(value);
 		}
 	}
 }
@@ -232,7 +205,7 @@ function runOnce(this: InternalOnce, ...parameters: unknown[]): unknown {
 	return state.value;
 }
 
-function runOnceAsync(this: InternalOnceAsync, ...parameters: unknown[]): Promise<unknown> {
+function runOnceAsync(this: InternalAsyncOnce, ...parameters: unknown[]): Promise<unknown> {
 	const state = this[ONCE_SYMBOL];
 
 	if (state.cleared) {
@@ -267,16 +240,6 @@ function runOnceAsync(this: InternalOnceAsync, ...parameters: unknown[]): Promis
 
 // #endregion
 
-// #region Variables
-
-const ONCE_MESSAGE_CLEARED = 'Once has been cleared';
-
-const ONCE_MESSAGE_EXPECTATION = 'Once expected a function';
-
-const ONCE_SYMBOL = Symbol(ONCE_PROPERTY);
-
-// #endregion
-
 // #region Namespace
 
 export declare namespace asyncOnce {
@@ -298,5 +261,11 @@ asyncOnce.is = isAsyncOnce;
 once.async = asyncOnce;
 once.is = isOnce;
 once.isAsync = isAsyncOnce;
+
+// #endregion
+
+// #region Exports
+
+export type {AsyncOnce, Once};
 
 // #endregion

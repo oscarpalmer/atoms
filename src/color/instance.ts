@@ -1,11 +1,11 @@
 import {herald} from '../internal/herald';
-import {type Subscription} from '../internal/subscription';
 import type {GenericCallback} from '../models';
+import type {Color, ColorChanges, ColorType, InternalColor} from '../models/color.model';
+import {type Subscription} from '../models/subscription.model';
 import {COLOR_NAME, COLOR_PROPERTY, COLOR_SYMBOL, COLOR_TYPE, colorSubscription} from './constants';
 import {getColorAlpha, setColorAlpha} from './misc/alpha';
 import {formatHexColor, formatHslColor, formatHwbColor, formatRgbColor} from './misc/format';
 import {getColorState} from './misc/state';
-import type {Color, ColorChanges, ColorType, InternalColor} from './models';
 import {getHexaColor, getHexColor, setHexaValue, setHexValue} from './space/hex';
 import {getHslaValue, getHslValue, setHslaValue, setHslValue} from './space/hsl';
 import {getHwbaValue, getHwbValue, setHwbaValue, setHwbValue} from './space/hwb';

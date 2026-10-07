@@ -1,4 +1,5 @@
-import {INSERT_TYPE_INSERT, insertValues} from '../internal/array/insert';
+import {insertValues} from '../internal/array/insert';
+import {ARRAY_INSERT_TYPE_INSERT} from '../models/array/array.misc.model';
 
 // #region Functions
 
@@ -41,7 +42,7 @@ export function insert(
 	items?: unknown[],
 ): unknown[] {
 	return insertValues(
-		INSERT_TYPE_INSERT,
+		ARRAY_INSERT_TYPE_INSERT,
 		array,
 		items == null ? indexOrItems : items,
 		typeof indexOrItems === 'number' ? indexOrItems : array?.length,

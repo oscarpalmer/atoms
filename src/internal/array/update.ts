@@ -1,5 +1,7 @@
 import {getArrayCallback} from './callbacks';
 
+// #region Functions
+
 export function updateInArray(
 	array: unknown[],
 	items: unknown[],
@@ -50,3 +52,5 @@ export function updateInArray(
 
 	return array;
 }
+
+// #endregion

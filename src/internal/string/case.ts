@@ -1,17 +1,21 @@
-import {memoize, type Memoized} from '../function/memoize';
+import type {Memoized} from '../../models/function/memoize.model';
+import {
+	STRING_CASE_CAMEL,
+	STRING_CASE_KEBAB,
+	STRING_CASE_PASCAL,
+	STRING_CASE_SNAKE,
+	STRING_DELIMITER_HYPHEN,
+	STRING_DELIMITER_UNDERSCORE,
+	STRING_DELIMTER_EMPTY,
+	STRING_EXPRESSION_ACRONYM,
+	STRING_EXPRESSION_CAMEL_CASE,
+	STRING_REPLACEMENT_CAMEL_CASE,
+	STRING_S,
+	type StringCase,
+	type StringCaseOptions,
+} from '../../models/string/string.case.model';
+import {memoize} from '../function/memoize';
 import {join, words} from './misc';
-
-// #region Types
-
-type Case = 'camel' | 'kebab' | 'pascal' | 'snake';
-
-type Options = {
-	capitalizeAny: boolean;
-	capitalizeFirst: boolean;
-	type: Case;
-};
-
-// #endregion
 
 // #region Functions
 
@@ -110,7 +114,7 @@ export function titleCase(value: string): string {
 }
 
 function toCase(
-	type: Case,
+	type: StringCase,
 	value: string,
 	capitalizeAny: boolean,
 	capitalizeFirst: boolean,
@@ -120,7 +124,7 @@ function toCase(
 	return caseMemoizers[type].run(value);
 }
 
-function toCaseCallback(this: Options, value: string): string {
+function toCaseCallback(this: StringCaseOptions, value: string): string {
 	if (typeof value !== 'string') {
 		return '';
 	}
@@ -197,31 +201,9 @@ export function upperCase(value: string): string {
 
 // #region Variables
 
-const STRING_CASE_CAMEL: Case = 'camel';
-
-const STRING_CASE_KEBAB: Case = 'kebab';
-
-const STRING_CASE_PASCAL: Case = 'pascal';
-
-const STRING_CASE_SNAKE: Case = 'snake';
-
-const STRING_DELIMTER_EMPTY = '';
-
-const STRING_DELIMITER_HYPHEN = '-';
-
-const STRING_DELIMITER_UNDERSCORE = '_';
-
-const STRING_EXPRESSION_CAMEL_CASE = /(\p{Ll})(\p{Lu})/gu;
-
-const STRING_EXPRESSION_ACRONYM = /(\p{Lu}*)(\p{Lu})(\p{Ll}+)/gu;
-
-const STRING_REPLACEMENT_CAMEL_CASE = '$1-$2';
-
-const STRING_S = 's';
-
 const caseMemoizers: Partial<Record<string, Memoized<typeof toCaseCallback>>> = {};
 
-const delimiters: Record<Case, string> = {
+const delimiters: Record<string, string> = {
 	[STRING_CASE_CAMEL]: STRING_DELIMTER_EMPTY,
 	[STRING_CASE_KEBAB]: STRING_DELIMITER_HYPHEN,
 	[STRING_CASE_PASCAL]: STRING_DELIMTER_EMPTY,

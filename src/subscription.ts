@@ -1,10 +1,8 @@
+export {isSubscription, isSubscriptions, subscriptions} from './internal/subscription';
 export {
-	isSubscription,
-	isSubscriptions,
-	subscriptions,
 	type Subscription,
 	type SubscriptionParameters,
 	type SubscriptionProperty,
 	type Subscriptions,
 	type SubscriptionsParameters,
-} from './internal/subscription';
+} from './models/subscription.model';

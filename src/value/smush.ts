@@ -1,24 +1,7 @@
 import {isArrayOrPlainObject} from '../internal/is';
 import {join} from '../internal/string/misc';
-import type {
-	ArrayOrPlainObject,
-	NestedKeys,
-	NestedValue,
-	PlainObject,
-	Simplify,
-	ToString,
-} from '../models';
-
-// #region Types
-
-/**
- * A smushed object, with all nested objects flattened into a single level, using dot notation keys
- */
-export type Smushed<Value extends PlainObject> = Simplify<{
-	[NestedKey in NestedKeys<Value>]: NestedValue<Value, ToString<NestedKey>>;
-}>;
-
-// #endregion
+import type {ArrayOrPlainObject, PlainObject} from '../models';
+import {SMUSH_MAX_DEPTH, type Smushed} from '../models/value/value.misc.model';
 
 // #region Functions
 
@@ -82,8 +65,8 @@ export function smush<Value extends PlainObject>(value: Value): Smushed<Value> {
 
 // #endregion
 
-// #region Variables
+// #region Exports
 
-const SMUSH_MAX_DEPTH = 100;
+export type {Smushed};
 
 // #endregion

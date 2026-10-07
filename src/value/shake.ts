@@ -1,26 +1,6 @@
 import {isNonPlainObject} from '../internal/is';
-import type {PlainObject, Simplify} from '../models';
-
-// #region Types
-
-/**
- * A shaken object, without any `undefined` values
- */
-export type Shaken<Value extends PlainObject> = Simplify<
-	{
-		[Key in keyof Value as undefined extends Value[Key] ? never : Key]: Value[Key];
-	} & {
-		[
-			Key in keyof Value as undefined extends Value[Key]
-				? [Value[Key]] extends [undefined]
-					? never
-					: Key
-				: never
-		]?: Exclude<Value[Key], undefined>;
-	}
->;
-
-// #endregion
+import type {PlainObject} from '../models';
+import type {Shaken} from '../models/value/value.misc.model';
 
 // #region Functions
 
@@ -51,5 +31,11 @@ export function shake<Value extends PlainObject>(value: Value): Shaken<Value> {
 
 	return shaken as Shaken<Value>;
 }
+
+// #endregion
+
+// #region Exports
+
+export type {Shaken};
 
 // #endregion

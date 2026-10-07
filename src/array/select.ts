@@ -1,27 +1,11 @@
-import {FIND_VALUES_ALL, findValues} from '../internal/array/find';
+import {findValues} from '../internal/array/find';
 import type {PlainObject} from '../models';
-
-// #region Types
-
-type MapKeyOrCallback<Item> =
-	| ((item: Item, index: number, array: Item[]) => unknown)
-	| (Item extends PlainObject ? keyof Item : never);
-
-type Mapped<Item, Map extends MapKeyOrCallback<Item>> = Map extends (
-	item: Item,
-	index: number,
-	array: Item[],
-) => unknown
-	? ReturnType<Map>
-	: Map extends keyof Item
-		? Item[Map]
-		: never;
-
-type ObjectKeysOf<Item> = {
-	[Key in keyof Item]: Item[Key] extends PlainObject ? Key : never;
-}[keyof Item];
-
-// #endregion
+import {ARRAY_FIND_VALUES_ALL} from '../models/array/array.find.model';
+import type {
+	ArrayMapKeyOrCallback,
+	ArrayMapped,
+	ArrayObjectKeysOf,
+} from '../models/array/array.misc.model';
 
 // #region Functions
 
@@ -47,13 +31,13 @@ type ObjectKeysOf<Item> = {
 export function filterAndMap<
 	Item,
 	FilterCallback extends (item: Item, index: number, array: Item[]) => unknown,
-	Map extends MapKeyOrCallback<Item>,
+	Map extends ArrayMapKeyOrCallback<Item>,
 >(
 	array: Item[],
 	filterCallback: FilterCallback,
 	filterValue: ReturnType<FilterCallback>,
 	map: Map,
-): Array<Mapped<Item, Map>>;
+): Array<ArrayMapped<Item, Map>>;
 
 /**
  * Get a filtered and mapped array of items
@@ -77,13 +61,13 @@ export function filterAndMap<
 export function filterAndMap<
 	Item extends PlainObject,
 	ItemKey extends keyof Item,
-	Map extends MapKeyOrCallback<Item>,
+	Map extends ArrayMapKeyOrCallback<Item>,
 >(
 	array: Item[],
 	filterKey: ItemKey,
 	filterValue: Item[ItemKey],
 	map: Map,
-): Array<Mapped<Item, Map>>;
+): Array<ArrayMapped<Item, Map>>;
 
 /**
  * Get a filtered and mapped array of items
@@ -102,11 +86,11 @@ export function filterAndMap<
  * ); // => ['Bob']
  * ```
  */
-export function filterAndMap<Item, Map extends MapKeyOrCallback<Item>>(
+export function filterAndMap<Item, Map extends ArrayMapKeyOrCallback<Item>>(
 	array: Item[],
 	filter: (item: Item, index: number, array: Item[]) => boolean,
 	map: Map,
-): Array<Mapped<Item, Map>>;
+): Array<ArrayMapped<Item, Map>>;
 
 /**
  * Get a filtered and mapped array of items
@@ -125,11 +109,11 @@ export function filterAndMap<Item, Map extends MapKeyOrCallback<Item>>(
  * ); // => [9]
  * ```
  */
-export function filterAndMap<Item, Map extends MapKeyOrCallback<Item>>(
+export function filterAndMap<Item, Map extends ArrayMapKeyOrCallback<Item>>(
 	array: Item[],
 	item: Item,
 	map: Map,
-): Array<Mapped<Item, Map>>;
+): Array<ArrayMapped<Item, Map>>;
 
 export function filterAndMap(array: unknown[], ...parameters: unknown[]): unknown[] {
 	return selectValues(array, parameters);
@@ -158,14 +142,14 @@ export function filterAndMap(array: unknown[], ...parameters: unknown[]): unknow
  */
 export function mapAndFilter<
 	Item,
-	Map extends MapKeyOrCallback<Item>,
-	FilterCallback extends (item: Mapped<Item, Map>, index: number, array: Item[]) => unknown,
+	Map extends ArrayMapKeyOrCallback<Item>,
+	FilterCallback extends (item: ArrayMapped<Item, Map>, index: number, array: Item[]) => unknown,
 >(
 	array: Item[],
 	map: Map,
 	filterCallback: FilterCallback,
 	filterValue: ReturnType<FilterCallback>,
-): Array<Mapped<Item, Map>>;
+): Array<ArrayMapped<Item, Map>>;
 
 /**
  * Get a mapped and filtered array of items
@@ -222,7 +206,7 @@ export function mapAndFilter<
  */
 export function mapAndFilter<
 	Item,
-	MapKey extends ObjectKeysOf<Item>,
+	MapKey extends ArrayObjectKeysOf<Item>,
 	ItemKey extends keyof Item[MapKey],
 >(
 	array: Item[],
@@ -250,11 +234,11 @@ export function mapAndFilter<
  * ); // => ['Bob']
  * ```
  */
-export function mapAndFilter<Item, Map extends MapKeyOrCallback<Item>>(
+export function mapAndFilter<Item, Map extends ArrayMapKeyOrCallback<Item>>(
 	array: Item[],
 	map: Map,
-	filter: (item: Mapped<Item, Map>, index: number, array: Item[]) => boolean,
-): Array<Mapped<Item, Map>>;
+	filter: (item: ArrayMapped<Item, Map>, index: number, array: Item[]) => boolean,
+): Array<ArrayMapped<Item, Map>>;
 
 /**
  * Get a mapped and filtered array of items
@@ -275,16 +259,16 @@ export function mapAndFilter<Item, Map extends MapKeyOrCallback<Item>>(
  * ); // => [4, 4]
  * ```
  */
-export function mapAndFilter<Item, Map extends MapKeyOrCallback<Item>>(
+export function mapAndFilter<Item, Map extends ArrayMapKeyOrCallback<Item>>(
 	array: Item[],
 	map: Map,
-	value: Mapped<Item, Map>,
-): Array<Mapped<Item, Map>>;
+	value: ArrayMapped<Item, Map>,
+): Array<ArrayMapped<Item, Map>>;
 
 export function mapAndFilter(array: unknown[], ...parameters: unknown[]): unknown[] {
 	const mapper = parameters.shift();
 
-	return findValues(FIND_VALUES_ALL, array, parameters, {
+	return findValues(ARRAY_FIND_VALUES_ALL, array, parameters, {
 		callback: mapper,
 		reverse: true,
 	}).matched;
@@ -293,7 +277,7 @@ export function mapAndFilter(array: unknown[], ...parameters: unknown[]): unknow
 function selectValues(array: unknown[], parameters: unknown[]): unknown[] {
 	const mapper = parameters.pop();
 
-	return findValues(FIND_VALUES_ALL, array, parameters, {
+	return findValues(ARRAY_FIND_VALUES_ALL, array, parameters, {
 		callback: mapper,
 		reverse: false,
 	}).matched;
@@ -317,6 +301,6 @@ filterAndMap.reverse = mapAndFilter;
 
 // #region Exports
 
-export {filterAndMap as select, mapAndFilter as reverseSelect};
+export {mapAndFilter as reverseSelect, filterAndMap as select};
 
 // #endregion

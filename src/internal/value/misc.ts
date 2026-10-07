@@ -1,6 +1,15 @@
 import {error, ok} from '../../internal/result/misc';
 import type {PlainObject} from '../../models';
-import type {Result} from '../models/result.model';
+import type {Result} from '../../models/result.model';
+import {
+	VALUE_MISC_EXPRESSION_BRACKET,
+	VALUE_MISC_EXPRESSION_DOTS,
+	VALUE_MISC_EXPRESSION_NESTED,
+	VALUE_MISC_NESTED_MESSAGE_INPUT,
+	VALUE_MISC_NESTED_MESSAGE_MISSING,
+	VALUE_MISC_NESTED_MESSAGE_PATH,
+	VALUE_MISC_NESTED_MESSAGE_UNSAFE,
+} from '../../models/value/value.misc.model';
 import {ignoreKey} from '../string/misc';
 
 // #region Functions
@@ -19,11 +28,11 @@ export function getNestedValue(
 	ignoreCase: boolean,
 ): Result<unknown, string> {
 	if (typeof data !== 'object' || data === null) {
-		return error(MISC_NESTED_MESSAGE_INPUT);
+		return error(VALUE_MISC_NESTED_MESSAGE_INPUT);
 	}
 
 	if (typeof path !== 'string' || path.trim().length === 0) {
-		return error(MISC_NESTED_MESSAGE_PATH);
+		return error(VALUE_MISC_NESTED_MESSAGE_PATH);
 	}
 
 	const shouldIgnoreCase = ignoreCase === true;
@@ -55,13 +64,13 @@ export function getNestedValue(
 export function getPaths(path: string, lowercase: boolean): string | string[] {
 	const normalized = lowercase ? path.toLowerCase() : path;
 
-	if (!MISC_EXPRESSION_NESTED.test(normalized)) {
+	if (!VALUE_MISC_EXPRESSION_NESTED.test(normalized)) {
 		return normalized;
 	}
 
 	return normalized
-		.replace(MISC_EXPRESSION_BRACKET, '.$1')
-		.replace(MISC_EXPRESSION_DOTS, '')
+		.replace(VALUE_MISC_EXPRESSION_BRACKET, '.$1')
+		.replace(VALUE_MISC_EXPRESSION_DOTS, '')
 		.split('.');
 }
 
@@ -90,40 +99,22 @@ export function handleValue(
 ): Result<unknown, string> | void {
 	if (typeof data === 'object' && data !== null) {
 		if (ignoreKey(path)) {
-			return error(MISC_NESTED_MESSAGE_UNSAFE);
+			return error(VALUE_MISC_NESTED_MESSAGE_UNSAFE);
 		}
 
 		const dataObject = data as PlainObject;
 		const key = ignoreCase ? findKey(path, dataObject) : path;
 
 		if (get) {
-			return key in dataObject ? ok(dataObject[key]) : error(MISC_NESTED_MESSAGE_MISSING);
+			return key in dataObject ? ok(dataObject[key]) : error(VALUE_MISC_NESTED_MESSAGE_MISSING);
 		}
 
 		dataObject[key] = typeof value === 'function' ? value(dataObject[key]) : value;
 	}
 
 	if (get) {
-		return error(MISC_NESTED_MESSAGE_MISSING);
+		return error(VALUE_MISC_NESTED_MESSAGE_MISSING);
 	}
 }
-
-// #endregion
-
-// #region Variables
-
-const MISC_EXPRESSION_BRACKET = /\[(\w+)\]/g;
-
-const MISC_EXPRESSION_DOTS = /^\.|\.$/g;
-
-const MISC_EXPRESSION_NESTED = /\.|\[\w+\]/;
-
-const MISC_NESTED_MESSAGE_INPUT = 'Expected data to be an object';
-
-const MISC_NESTED_MESSAGE_MISSING = 'Expected property to exist in object';
-
-const MISC_NESTED_MESSAGE_PATH = 'Expected path to be a string';
-
-const MISC_NESTED_MESSAGE_UNSAFE = 'Access to this property is not allowed';
 
 // #endregion

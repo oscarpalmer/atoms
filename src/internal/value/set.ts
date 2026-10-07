@@ -1,4 +1,5 @@
 import type {NestedKeys, NestedValue, PlainObject} from '../../models';
+import {EXPRESSION_INTEGER} from '../../models/misc.model';
 import {unwrap} from '../result/misc';
 import {getPaths, handleValue} from './misc';
 
@@ -107,7 +108,7 @@ export function setValue(data: object, path: string, value: unknown, ignoreCase?
 		if (typeof next !== 'object' || next === null) {
 			const nextPath = paths[index + 1];
 
-			if (SET_EXPRESSION_INDEX.test(nextPath)) {
+			if (EXPRESSION_INTEGER.test(nextPath)) {
 				next = Array.from({length: +nextPath + 1}, () => undefined);
 			} else {
 				next = {};
@@ -121,11 +122,5 @@ export function setValue(data: object, path: string, value: unknown, ignoreCase?
 
 	return data;
 }
-
-// #endregion
-
-// #region Variables
-
-const SET_EXPRESSION_INDEX = /^\d+$/;
 
 // #endregion

@@ -1,86 +1,24 @@
 import type {GenericAsyncCallback, GenericCallback} from '../../models';
+import {
+	clearTimer,
+	LIMITER_NAME_ASYNC,
+	LIMITER_NAME_SYNC,
+	LIMITER_OFFSET,
+	LIMITER_PROPERTY,
+	LIMITER_SYMBOL,
+	LIMITER_THROTTLE,
+	startTimer,
+	type AsyncLimiter,
+	type AsyncLimiterItem,
+	type AsyncLimiterState,
+	type InternalAsyncLimiter,
+	type InternalLimiter,
+	type Limiter,
+	type LimiterState,
+	type LimiterType,
+} from '../../models/function/limiter.model';
 import {getNumberOrDefault} from '../defaults';
 import {asyncAttempt} from '../result/attempt';
-
-// #region Special variables
-
-const LIMITER_NAME_ASYNC = 'asyncLimiter';
-
-const LIMITER_NAME_SYNC = 'limiter';
-
-const LIMITER_PROPERTY = '$limiter';
-
-// #endregion
-
-// #region Types
-
-type AsyncLimiterItem = {
-	parameters: unknown[];
-	promise: Promise<unknown>;
-	reject(reason?: unknown): void;
-	resolve(value?: unknown): void;
-	running: boolean;
-};
-
-/**
- * An asynchronous function that can be cancelled
- */
-export type AsyncLimiter<Callback extends GenericAsyncCallback> = {
-	/**
-	 * Cancel the function
-	 */
-	cancel(): void;
-	/**
-	 * Call the function
-	 *
-	 * @param parameters Function parameters
-	 * @returns Function result
-	 */
-	run(...parameters: Parameters<Callback>): Promise<ReturnType<Callback>>;
-};
-
-type AsyncLimiterState = {
-	last?: AsyncLimiterItem;
-} & LimiterState<GenericAsyncCallback>;
-
-type InternalAsyncLimiter = {
-	[LIMITER_SYMBOL]: AsyncLimiterState;
-} & AsyncLimiter<GenericAsyncCallback>;
-
-type InternalLimiter = {
-	[LIMITER_SYMBOL]: LimiterState;
-} & Limiter<GenericCallback>;
-
-/**
- * A function that can be cancelled
- */
-export type Limiter<Callback extends GenericCallback> = {
-	/**
-	 * Cancel the function
-	 */
-	cancel(): void;
-	/**
-	 * Call the function
-	 *
-	 * @param parameters Function parameters
-	 * @returns Function result
-	 */
-	run(...parameters: Parameters<Callback>): ReturnType<Callback>;
-};
-
-type LimiterState<Callback = GenericCallback> = {
-	callback: Callback;
-	interval: number;
-	parameters: unknown[];
-	start?: number;
-	throttle: boolean;
-	timer?: number;
-	type: LimiterType;
-};
-
-type LimiterType = 'debounce' | 'throttle' | 'wait';
-
-// #endregion
 
 // #region Instances
 
@@ -248,25 +186,5 @@ function runLimiter(this: InternalLimiter, ...parameters: unknown[]): void {
 		state.timer = startTimer(() => handleLimiter(state));
 	}
 }
-
-// #endregion
-
-// #region Variables
-
-export const LIMITER_DEBOUNCE: LimiterType = 'debounce';
-
-const LIMITER_OFFSET = 5;
-
-const LIMITER_SYMBOL = Symbol('limiter');
-
-export const LIMITER_THROTTLE: LimiterType = 'throttle';
-
-export const LIMITER_WAIT: LimiterType = 'wait';
-
-// istanbul ignore next
-const clearTimer = typeof cancelAnimationFrame === 'function' ? cancelAnimationFrame : clearTimeout;
-
-// istanbul ignore next
-const startTimer = typeof requestAnimationFrame === 'function' ? requestAnimationFrame : setTimeout;
 
 // #endregion

@@ -22,7 +22,6 @@ export * from './internal/function/assert';
 export * from './internal/function/memoize';
 export * from './internal/function/misc';
 export * from './internal/function/work';
-export * from './internal/models/result.model';
 export * from './internal/sized/map';
 export * from './internal/string/case';
 export * from './internal/string/misc';
@@ -32,10 +31,14 @@ export * from './internal/value/get';
 export * from './internal/value/has';
 export * from './internal/value/set';
 
+export * from './models/result.model';
+
 export * from './plan/index';
 export * from './plan/is';
 export * from './plan/models';
 export * from './plan/misc';
+export * from './plan/result';
+export * from './plan/run';
 
 export * from './promise/delay';
 export * from './promise/index';

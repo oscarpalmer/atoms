@@ -1,14 +1,5 @@
 import type {GenericCallback, PlainObject} from '../../models';
-
-// #region Types
-
-export type Callbacks = {
-	bool?: GenericCallback;
-	keyed?: GenericCallback;
-	value?: GenericCallback;
-};
-
-// #endregion
+import type {ArrayGetCallbacks} from '../../models/array/array.misc.model';
 
 // #region Functions
 
@@ -32,7 +23,7 @@ export function getArrayCallbacks(
 	bool?: unknown,
 	key?: unknown,
 	value?: unknown,
-): Callbacks | undefined {
+): ArrayGetCallbacks | undefined {
 	if (typeof bool === 'function') {
 		return {
 			bool: bool as GenericCallback,

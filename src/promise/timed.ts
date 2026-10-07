@@ -1,10 +1,14 @@
 import {createAborter} from '../internal/aborter';
-import {getLimiter, LIMITER_WAIT} from '../internal/function/limit';
+import {getLimiter} from '../internal/function/limit';
 import type {RequiredKeys} from '../models';
-import {PROMISE_MESSAGE_EXPECTATION_TIMED} from './constants';
+import {LIMITER_WAIT} from '../models/function/limiter.model';
+import {
+	PROMISE_MESSAGE_EXPECTATION_TIMED,
+	PromiseTimeoutError,
+	type PromiseOptions,
+} from '../models/promise.model';
 import {createPromiseOptions} from './helpers';
 import {settlePromise} from './misc';
-import {PromiseTimeoutError, type PromiseOptions} from './models';
 
 // #region Functions
 

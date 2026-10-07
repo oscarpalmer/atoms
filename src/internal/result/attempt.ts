@@ -1,5 +1,5 @@
+import type {ExtendedErr, ExtendedResult, Result} from '../../models/result.model';
 import {getError, ok} from './misc';
-import type {ExtendedErr, ExtendedResult, Result} from '../models/result.model';
 
 // #region Functions
 

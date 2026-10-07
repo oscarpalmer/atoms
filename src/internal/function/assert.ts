@@ -1,33 +1,10 @@
 import type {Constructor, NestedKeys, NestedValue, PlainObject} from '../../models';
+import {
+	ASSERT_MESSAGE_VALUE_DEFINED,
+	type Asserter,
+	type AssertNestedPick,
+} from '../../models/function/assert.model';
 import {hasValueResult} from '../value/has';
-
-// #region Types
-
-/**
- * Asserter for a property of a value
- */
-export type AssertProperty<
-	Value extends PlainObject,
-	Path extends NestedKeys<Value>,
-	Asserted extends NestedPick<Value, Path> = NestedPick<Value, Path>,
-> = Asserter<Asserted>;
-
-/**
- * A function that asserts a value is of a specific type, throwing an error if it is not
- */
-export type Asserter<Value> = (value: unknown) => asserts value is Value;
-
-type NestedPick<Value, Path extends string> = Value extends PlainObject
-	? Path extends `${infer Head}.${infer Rest}`
-		? Head extends keyof Value
-			? {[Key in Head]: NestedPick<Value[Key], Rest>}
-			: never
-		: Path extends keyof Value
-			? {[Key in Path]: Value[Key]}
-			: never
-	: never;
-
-// #endregion
 
 // #region Functions
 
@@ -141,7 +118,7 @@ export function assertProperty<Value extends PlainObject, Path extends NestedKey
 	condition: (value: NestedValue<Value, Path>) => boolean,
 	message: string,
 	error?: ErrorConstructor,
-): Asserter<NestedPick<Value, Path>> {
+): Asserter<AssertNestedPick<Value, Path>> {
 	return (value: unknown): asserts value is unknown => {
 		assert(
 			() => {
@@ -154,12 +131,6 @@ export function assertProperty<Value extends PlainObject, Path extends NestedKey
 		);
 	};
 }
-
-// #endregion
-
-// #region Variables
-
-const ASSERT_MESSAGE_VALUE_DEFINED = 'Expected value to be defined';
 
 // #endregion
 
@@ -182,5 +153,11 @@ assert.defined = assertDefined;
 assert.instanceOf = assertInstanceOf;
 assert.is = assertIs;
 assert.property = assertProperty;
+
+// #endregion
+
+// #region Exports
+
+export type {Asserter};
 
 // #endregion

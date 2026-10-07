@@ -1,6 +1,12 @@
 import {shuffle} from './internal/array/shuffle';
 import {getRandomInteger} from './internal/random';
 import {join} from './internal/string/misc';
+import {
+	RANDOM_ALPHABET,
+	RANDOM_BOOLEAN_MODIFIER,
+	RANDOM_HEX_CHARACTERS,
+	RANDOM_HEX_MAXIMUM,
+} from './models/random.model';
 
 // #region Functions
 
@@ -104,18 +110,6 @@ export function getRandomItems<Value>(array: Value[], amount?: number): Value[] 
 		? shuffle(array)
 		: shuffle(array).slice(0, amount);
 }
-
-// #endregion
-
-// #region Variables
-
-const RANDOM_ALPHABET = 'abcdefghijklmnopqrstuvwxyz';
-
-const RANDOM_BOOLEAN_MODIFIER = 0.5;
-
-const RANDOM_HEX_CHARACTERS = '0123456789ABCDEF';
-
-const RANDOM_HEX_MAXIMUM = 15;
 
 // #endregion
 

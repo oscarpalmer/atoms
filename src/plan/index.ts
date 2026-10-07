@@ -7,7 +7,7 @@ import {
 	PLAN_SYMBOL,
 	PLAN_TYPE_PLAN_ASYNC,
 	PLAN_TYPE_PLAN_SYNC,
-} from '../internal/models/plan.model';
+} from '../models/plan.model';
 import {isAsyncGenerator, isGenerator} from './is';
 import {asyncAttemptRun, attemptRun, attemptRunAsyncPlan, attemptRunPlan} from './result';
 import {asyncRun, run, runAsyncPlan, runPlan} from './run';

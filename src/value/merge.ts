@@ -1,101 +1,21 @@
 import {isArrayOrPlainObject} from '../internal/is';
-import type {ArrayOrPlainObject, NestedPartial, PlainObject, UnionToIntersection} from '../models';
-
-// #region Types
-
-/**
- * Options for assigning values
- */
-export type AssignOptions = Omit<MergeOptions, 'assignValues'>;
-
-/**
- * An assigner function for assigning values from one or more objects to the first one
- */
-export type Assigner = {
-	/**
-	 * Assign values from one or more objects to the first one
-	 *
-	 * @param to Value to assign to
-	 * @param from Values to assign
-	 * @returns Assigned value
-	 */
-	assign<To extends PlainObject, From extends PlainObject[]>(
-		to: To,
-		from: [...From],
-	): To & UnionToIntersection<From[number]>;
-};
-
-type InternalAssigner = {
-	[MERGE_SYMBOL_ASSIGN]: Options;
-} & Assigner;
-
-type InternalMerger = {
-	[MERGE_SYMBOL_MERGE]: Options;
-} & Merger;
-
-/**
- * Options for merging values
- */
-export type MergeOptions = {
-	/**
-	 * Assign values to the first array or object instead of creating a new one?
-	 */
-	assignValues?: boolean;
-	/**
-	 * Key _(or key epxressions)_ for values that should be replaced
-	 *
-	 * ```ts
-	 * merge([{items: [1, 2, 3]}, {items: [99]}]); // => {items: [99]}
-	 * ```
-	 */
-	replaceableObjects?: string | RegExp | Array<string | RegExp>;
-	/**
-	 * Skip nullable values when merging objects?
-	 *
-	 * ```ts
-	 * merge({a: 1, b: 2}, {b: null, c: 3}, {d: null}); // => {a: 1, b: 2, c: 3}
-	 * ```
-	 */
-	skipNullableAny?: boolean;
-	/**
-	 * Skip nullable values when merging arrays?
-	 *
-	 * ```ts
-	 * merge([1, 2, 3], [null, null, 99]); // => [1, 2, 99]
-	 * ```
-	 */
-	skipNullableInArrays?: boolean;
-};
-
-/**
- * A merger function for merging multiple arrays or objects into a single one
- */
-export type Merger = {
-	/**
-	 * Merge multiple arrays or objects into a single one
-	 *
-	 * @param values Values to merge
-	 * @returns Merged value
-	 */
-	merge<Values extends ArrayOrPlainObject[]>(
-		values: Array<NestedPartial<Values[number]>>,
-	): UnionToIntersection<Values[number]>;
-};
-
-type Options = {
-	assignValues: boolean;
-	replaceableObjects: ReplaceableObjectsCallback | undefined;
-	skipNullableAny: boolean;
-	skipNullableInArrays: boolean;
-};
-
-type ReplaceableObjectsCallback = (name: string) => boolean;
-
-// #endregion
+import type {ArrayOrPlainObject, PlainObject, UnionToIntersection} from '../models';
+import {
+	type AssignOptions,
+	type Assigner,
+	type InternalAssigner,
+	type InternalMerger,
+	type MergeOptions,
+	type MergeReplaceableObjectsCallback,
+	type Merger,
+	type MergingOptions,
+	MERGE_SYMBOL_ASSIGN,
+	MERGE_SYMBOL_MERGE,
+} from '../models/value/value.merge.model';
 
 // #region Instances
 
-function Assigner(this: any, options: Options): void {
+function Assigner(this: any, options: MergingOptions): void {
 	this[MERGE_SYMBOL_ASSIGN] = {
 		...options,
 		assignValues: true,
@@ -104,7 +24,7 @@ function Assigner(this: any, options: Options): void {
 
 Assigner.prototype.assign = assignFromAssigner;
 
-function Merger(this: any, options: Options): void {
+function Merger(this: any, options: MergingOptions): void {
 	this[MERGE_SYMBOL_MERGE] = options;
 }
 
@@ -127,7 +47,7 @@ export function assign<To extends PlainObject, From extends PlainObject[]>(
 	from: [...From],
 	options?: AssignOptions,
 ): To & UnionToIntersection<From[number]> {
-	const actual = createMergeOptions(options);
+	const actual = createMergingOptions(options);
 
 	actual.assignValues = true;
 
@@ -138,17 +58,19 @@ function assignFromAssigner(this: InternalAssigner, to: PlainObject, from: Plain
 	return mergeValues([to, ...from], this[MERGE_SYMBOL_ASSIGN]);
 }
 
-function createMergeOptions(options?: MergeOptions): Options {
-	const actual: Options = {
+function createMergingOptions(input?: unknown): MergingOptions {
+	const actual: MergingOptions = {
 		assignValues: false,
 		replaceableObjects: undefined,
 		skipNullableAny: false,
 		skipNullableInArrays: false,
 	};
 
-	if (typeof options !== 'object' || options == null) {
+	if (typeof input !== 'object' || input == null) {
 		return actual;
 	}
+
+	const options = input as PlainObject;
 
 	actual.replaceableObjects = getReplaceableObjects(options.replaceableObjects);
 
@@ -159,7 +81,7 @@ function createMergeOptions(options?: MergeOptions): Options {
 	return actual;
 }
 
-function getReplaceableObjects(value: unknown): ReplaceableObjectsCallback | undefined {
+function getReplaceableObjects(value: unknown): MergeReplaceableObjectsCallback | undefined {
 	const items = (Array.isArray(value) ? value : [value]).filter(
 		item => typeof item === 'string' || item instanceof RegExp,
 	);
@@ -182,7 +104,7 @@ function getReplaceableObjects(value: unknown): ReplaceableObjectsCallback | und
  */
 export function initializeAssigner(options?: AssignOptions): Assigner {
 	// @ts-expect-error All good, no worries :-)
-	return new Assigner(createMergeOptions(options));
+	return new Assigner(createMergingOptions(options));
 }
 
 /**
@@ -195,7 +117,7 @@ export function initializeAssigner(options?: AssignOptions): Assigner {
  */
 export function initializeMerger(options?: MergeOptions): Merger {
 	// @ts-expect-error All good, no worries :-)
-	return new Merger(createMergeOptions(options));
+	return new Merger(createMergingOptions(options));
 }
 
 /**
@@ -209,7 +131,7 @@ export function merge<Values extends ArrayOrPlainObject[]>(
 	values: [...Values],
 	options?: MergeOptions,
 ): UnionToIntersection<Values[number]> {
-	return mergeValues(values, createMergeOptions(options)) as UnionToIntersection<Values[number]>;
+	return mergeValues(values, createMergingOptions(options)) as UnionToIntersection<Values[number]>;
 }
 
 function mergeFromMerger(this: InternalMerger, values: ArrayOrPlainObject[]): ArrayOrPlainObject {
@@ -218,7 +140,7 @@ function mergeFromMerger(this: InternalMerger, values: ArrayOrPlainObject[]): Ar
 
 function mergeObjects(
 	values: ArrayOrPlainObject[],
-	options: Options,
+	options: MergingOptions,
 	destination?: ArrayOrPlainObject,
 	prefix?: string,
 ): ArrayOrPlainObject {
@@ -269,7 +191,7 @@ function mergeObjects(
 
 function mergeValues(
 	values: ArrayOrPlainObject[],
-	options: Options,
+	options: MergingOptions,
 	prefix?: string,
 ): ArrayOrPlainObject {
 	if (!Array.isArray(values)) {
@@ -304,14 +226,6 @@ function mergeValues(
 
 // #endregion
 
-// #region Variables
-
-const MERGE_SYMBOL_ASSIGN = Symbol('assign');
-
-const MERGE_SYMBOL_MERGE = Symbol('merge');
-
-// #endregion
-
 // #region Namespace
 
 export declare namespace assign {
@@ -328,5 +242,11 @@ export declare namespace merge {
 
 assign.initialize = initializeAssigner;
 merge.initialize = initializeMerger;
+
+// #endregion
+
+// #region Exports
+
+export type {AssignOptions, Assigner, MergeOptions, Merger};
 
 // #endregion

@@ -1,28 +1,13 @@
 import type {NumericalValues, PlainObject} from '../../models';
+import {
+	AGGREGATION_MAX,
+	AGGREGATION_MIN,
+	type Aggregation,
+	type AggregationCallback,
+	type AggregationType,
+	type NonAverageAggregationType,
+} from '../../models/math.model';
 import {isNonNumber} from '../is';
-
-// #region Types
-
-type Aggregation = {
-	array: boolean;
-	count: number;
-	first: boolean;
-	items?: Record<number, unknown[]>;
-	value: number;
-};
-
-type AggregationCallback = (
-	aggregation: Aggregation,
-	value: number,
-	notNumber: boolean,
-	item?: unknown,
-) => number;
-
-export type AggregationType = 'average' | 'max' | 'min' | 'sum';
-
-type NonAverageAggregationType = 'max' | 'min' | 'sum';
-
-// #endregion
 
 // #region Functions
 
@@ -309,14 +294,6 @@ export function min(array: unknown[], key?: unknown, first?: unknown): unknown {
 // #endregion
 
 // #region Variables
-
-export const AGGREGATION_AVERAGE: AggregationType = 'average';
-
-export const AGGREGATION_MAX = 'max';
-
-export const AGGREGATION_MIN = 'min';
-
-export const AGGREGATION_SUM = 'sum';
 
 const aggregators: Record<AggregationType, AggregationCallback> = {
 	average: calculateSum,

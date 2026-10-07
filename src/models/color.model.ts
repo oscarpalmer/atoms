@@ -1,6 +1,6 @@
-import type {Herald, HeraldEvents} from '../internal/models/herald.model';
-import type {Subscription} from '../internal/subscription';
-import type {COLOR_SYMBOL} from './constants';
+import type {COLOR_SYMBOL} from '../color/constants';
+import type {Herald, HeraldEvents} from './herald.model';
+import type {Subscription} from './subscription.model';
 
 // #region Types
 

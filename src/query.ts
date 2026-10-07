@@ -3,6 +3,15 @@ import {getNumber} from './internal/number';
 import {getString, ignoreKey, join, tryDecode, tryEncode} from './internal/string/misc';
 import {setValue} from './internal/value/set';
 import type {ArrayOrPlainObject, PlainObject} from './models';
+import {
+	QUERY_AMPERSAND,
+	QUERY_DOT,
+	QUERY_EQUAL,
+	QUERY_EXPRESSION_ARRAY_SUFFIX,
+	QUERY_EXPRESSION_BOOLEAN,
+	QUERY_TRUE,
+	QUERY_TYPES,
+} from './models/query.model';
 
 // #region Functions
 
@@ -125,23 +134,5 @@ export function toQuery(parameters: PlainObject): string {
 			)
 		: '';
 }
-
-// #endregion
-
-// #region Variables
-
-const QUERY_AMPERSAND = '&';
-
-const QUERY_DOT = '.';
-
-const QUERY_EQUAL = '=';
-
-const QUERY_EXPRESSION_ARRAY_SUFFIX = /\[\]$/;
-
-const QUERY_EXPRESSION_BOOLEAN = /^(false|true)$/;
-
-const QUERY_TRUE = 'true';
-
-const QUERY_TYPES = new Set(['boolean', 'number', 'string']);
 
 // #endregion

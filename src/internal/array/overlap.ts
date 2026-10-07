@@ -1,15 +1,11 @@
-type OverlapItem = {
-	array: unknown[];
-	index: number;
-};
+import type {ArrayOverlapItem, ArrayOverlapResult} from '../../models/array/array.misc.model';
 
-type OverlapResult = {
-	first: OverlapItem;
-	second: OverlapItem;
-	overlap: boolean;
-};
+// #region Functions
 
-export function arraysOverlap(first: OverlapItem, second: OverlapItem): OverlapResult {
+export function arraysOverlap(
+	first: ArrayOverlapItem,
+	second: ArrayOverlapItem,
+): ArrayOverlapResult {
 	const firstArray = first.index < second.index ? first.array : second.array;
 	const secondArray = first.index < second.index ? second.array : first.array;
 
@@ -33,3 +29,5 @@ export function arraysOverlap(first: OverlapItem, second: OverlapItem): OverlapR
 		},
 	};
 }
+
+// #endregion

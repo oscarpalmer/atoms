@@ -1,5 +1,5 @@
+import type {Err, ExtendedErr, Ok, Result} from '../../models/result.model';
 import {isPlainObject} from '../is';
-import type {Err, ExtendedErr, Ok, Result} from '../models/result.model';
 
 // #region Functions
 

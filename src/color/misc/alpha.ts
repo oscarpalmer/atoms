@@ -1,7 +1,7 @@
 import {round} from '../../internal/math/misc';
 import {clamp} from '../../internal/number';
 import {COLOR_ALPHA, COLOR_DEFAULTS, COLOR_EXPRESSION, COLOR_MAX, COLOR_SYMBOL} from '../constants';
-import type {Alpha, InternalColor} from '../models';
+import type {Alpha, InternalColor} from '../../models/color.model';
 
 // #region Functions
 

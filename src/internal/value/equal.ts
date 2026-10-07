@@ -1,93 +1,24 @@
 import type {ArrayOrPlainObject, Constructor, TypedArray} from '../../models';
+import {
+	EQUAL_ARRAY_PEEK_PERCENTAGE,
+	EQUAL_ARRAY_THRESHOLD,
+	EQUAL_ERROR_PROPERTIES,
+	EQUAL_EXPRESSION_PROPERTIES,
+	EQUAL_MINIMUM_LENGTH_FOR_SET,
+	EQUAL_SYMBOL,
+	type Equalizer,
+	type EqualizerOptions,
+	type EqualOptions,
+	type InternalEqualizer,
+} from '../../models/value/value.equal.model';
+import type {CompareHandler} from '../../models/value/value.handler.model';
 import {isNonPlainObject, isPlainObject, isPrimitive, isTypedArray} from '../is';
 import {round} from '../math/misc';
-import {createCompareHandler, type CompareHandler} from './handlers';
-
-// #region Types
-
-/**
- * Options for value equality comparison
- */
-export type EqualOptions = {
-	/**
-	 * When `true`, strings are compared case-insensitively
-	 */
-	ignoreCase?: boolean;
-	/**
-	 * Keys _(or key expressions)_ to ignore when comparing objects
-	 */
-	ignoreKeys?: string | RegExp | Array<string | RegExp>;
-	/**
-	 * Should `null` and `undefined` be considered equal?
-	 */
-	relaxedNullish?: boolean;
-};
-
-/**
- * An equalizer function for comparing values for equality, with predefined options
- *
- * Can be used to compare values, and register or deregister equality comparison handlers for specific classes
- */
-type Equalizer = {
-	/**
-	 * Are two strings equal?
-	 *
-	 * @param first First string
-	 * @param second Second string
-	 * @param ignoreCase If `true`, comparison will be case-insensitive
-	 * @returns `true` if the strings are equal, otherwise `false`
-	 */
-	compare(first: string, second: string, ignoreCase?: boolean): boolean;
-
-	/**
-	 * Are two values equal?
-	 *
-	 * @param first First value
-	 * @param second Second value
-	 * @returns `true` if the values are equal, otherwise `false`
-	 */
-	compare(first: unknown, second: unknown): boolean;
-
-	/**
-	 * Deregister a equality comparison handler for a specific class
-	 *
-	 * @param constructor Class constructor
-	 */
-	deregister: <Instance>(constructor: Constructor<Instance>) => void;
-
-	/**
-	 * Register a equality comparison function for a specific class
-	 *
-	 * @param constructor Class constructor
-	 * @param handler Comparison function
-	 */
-	register: <Instance>(
-		constructor: Constructor<Instance>,
-		handler: (first: Instance, second: Instance) => boolean,
-	) => void;
-};
-
-type InternalEqualizer = {
-	[EQUAL_SYMBOL]: Options;
-} & Equalizer;
-
-type Options = {
-	ignoreCase: boolean;
-	ignoreExpressions: OptionsKeys<RegExp[]>;
-	ignoreKeys: OptionsKeys<Set<string>>;
-	relaxedNullish: boolean;
-};
-
-type OptionsKeys<Values> = {
-	enabled: boolean;
-	values: Values;
-};
-
-// #endregion
+import {createCompareHandler} from './handlers';
 
 // #region Instances
 
-function Equalizer(this: any, options: Options): void {
+function Equalizer(this: any, options: EqualizerOptions): void {
 	this[EQUAL_SYMBOL] = options;
 }
 
@@ -103,8 +34,8 @@ function compare(this: InternalEqualizer, first: unknown, second: unknown): bool
 	return equalValue(first, second, this[EQUAL_SYMBOL]);
 }
 
-function createEqualOptions(input?: boolean | EqualOptions): Options {
-	const options: Options = {
+function createEqualOptions(input?: boolean | EqualOptions): EqualizerOptions {
+	const options: EqualizerOptions = {
 		ignoreCase: false,
 		ignoreExpressions: {
 			enabled: false,
@@ -159,7 +90,7 @@ export function deregisterEqualizer<Instance>(constructor: Constructor<Instance>
 	equalHandler.base.deregister(constructor);
 }
 
-function filterKey(key: string | symbol, options: Options): boolean {
+function filterKey(key: string | symbol, options: EqualizerOptions): boolean {
 	if (typeof key !== 'string') {
 		return true;
 	}
@@ -202,7 +133,7 @@ export function equal(first: unknown, second: unknown, options?: boolean | Equal
 	return equalValue(first, second, createEqualOptions(options));
 }
 
-function equalArray(first: unknown[], second: unknown[], options: Options): boolean {
+function equalArray(first: unknown[], second: unknown[], options: EqualizerOptions): boolean {
 	const {length} = first;
 
 	if (length !== second.length) {
@@ -238,13 +169,17 @@ function equalArray(first: unknown[], second: unknown[], options: Options): bool
 	return true;
 }
 
-function equalArrayBuffer(first: ArrayBuffer, second: ArrayBuffer, options: Options): boolean {
+function equalArrayBuffer(
+	first: ArrayBuffer,
+	second: ArrayBuffer,
+	options: EqualizerOptions,
+): boolean {
 	return first.byteLength === second.byteLength
 		? equalArray(new Uint8Array(first) as never, new Uint8Array(second) as never, options)
 		: false;
 }
 
-function equalDataView(first: DataView, second: DataView, options: Options): boolean {
+function equalDataView(first: DataView, second: DataView, options: EqualizerOptions): boolean {
 	return first.byteOffset === second.byteOffset
 		? equalArrayBuffer(first.buffer as ArrayBuffer, second.buffer as ArrayBuffer, options)
 		: false;
@@ -253,7 +188,7 @@ function equalDataView(first: DataView, second: DataView, options: Options): boo
 function equalMap(
 	first: Map<unknown, unknown>,
 	second: Map<unknown, unknown>,
-	options: Options,
+	options: EqualizerOptions,
 ): boolean {
 	const {size} = first;
 
@@ -277,7 +212,7 @@ function equalMap(
 function equalPlainObject(
 	first: ArrayOrPlainObject,
 	second: ArrayOrPlainObject,
-	options: Options,
+	options: EqualizerOptions,
 ): boolean {
 	let firstKeys = [...Object.keys(first), ...Object.getOwnPropertySymbols(first)];
 	let secondKeys = [...Object.keys(second), ...Object.getOwnPropertySymbols(second)];
@@ -314,7 +249,7 @@ function equalProperties(
 	first: object,
 	second: object,
 	properties: string[],
-	options: Options,
+	options: EqualizerOptions,
 ): boolean {
 	const {length} = properties;
 
@@ -335,7 +270,7 @@ function equalProperties(
 	return true;
 }
 
-function equalSet(first: Set<unknown>, second: Set<unknown>, options: Options): boolean {
+function equalSet(first: Set<unknown>, second: Set<unknown>, options: EqualizerOptions): boolean {
 	const {size} = first;
 
 	if (size !== second.size) {
@@ -380,7 +315,7 @@ function equalTypedArray(first: TypedArray, second: TypedArray): boolean {
 	return true;
 }
 
-function equalValue(first: unknown, second: unknown, options: Options): boolean {
+function equalValue(first: unknown, second: unknown, options: EqualizerOptions): boolean {
 	if (options.relaxedNullish && first == null && second == null) {
 		return true;
 	}
@@ -465,18 +400,6 @@ export function registerEqualizer<Instance>(
 
 // #region Variables
 
-const EQUAL_ARRAY_PEEK_PERCENTAGE = 10;
-
-const EQUAL_ARRAY_THRESHOLD = 100;
-
-const EQUAL_ERROR_PROPERTIES: string[] = ['name', 'message'];
-
-const EQUAL_EXPRESSION_PROPERTIES: string[] = ['source', 'flags'];
-
-const EQUAL_MINIMUM_LENGTH_FOR_SET = 16;
-
-const EQUAL_SYMBOL = Symbol('equal');
-
 const equalHandler: CompareHandler<boolean> = createCompareHandler<boolean>(equal, {
 	callback: Object.is,
 });
@@ -500,5 +423,11 @@ equal.deregister = deregisterEqualizer;
 equal.handler = equalHandler;
 equal.initialize = initializeEqualizer;
 equal.register = registerEqualizer;
+
+// #endregion
+
+// #region Exports
+
+export type {EqualOptions, Equalizer};
 
 // #endregion

@@ -1,5 +1,7 @@
+import {isPlainObject} from '../internal/is';
 import {isOk, isResult} from '../internal/result/misc';
-import type {AnyResult, ExtendedErr, ResultMatch} from '../internal/models/result.model';
+import type {GenericCallback} from '../models/index';
+import type {AnyResult, ExtendedErr, Result, ResultMatch} from '../models/result.model';
 
 // #region Functions
 
@@ -33,12 +35,12 @@ export async function asyncMatchResult<Value, Returned, E = Error>(
 	error: ResultMatch<Value, Returned, E>['error'],
 ): Promise<Returned>;
 
-export async function asyncMatchResult<Value, Returned, E = Error>(
-	result: AnyResult<Value, E> | Promise<AnyResult<Value, E>> | (() => Promise<AnyResult<Value, E>>),
-	first: ResultMatch<Value, Returned, E> | ResultMatch<Value, Returned, E>['ok'],
-	error?: ResultMatch<Value, Returned, E>['error'],
-): Promise<Returned> {
-	let value: AnyResult<Value, E>;
+export async function asyncMatchResult(
+	result: unknown,
+	first: unknown,
+	second?: unknown,
+): Promise<unknown> {
+	let value: unknown;
 
 	if (typeof result === 'function') {
 		value = await result();
@@ -49,19 +51,37 @@ export async function asyncMatchResult<Value, Returned, E = Error>(
 	}
 
 	if (!isResult(value)) {
-		throw new Error(MATCH_MESSAGE);
+		throw new Error(MATCH_MESSAGE_RESULT);
 	}
 
-	const hasObj = typeof first === 'object' && first !== null;
+	return handleResult(value, first, second);
+}
 
-	const okHandler = hasObj ? first.ok : first;
-	const errorHandler = hasObj ? first.error : error;
+function handleResult(result: Result<unknown, unknown>, first: unknown, second?: unknown): unknown {
+	let error: GenericCallback;
+	let ok: GenericCallback;
 
-	if (isOk(value)) {
-		return okHandler(value.value);
+	if (isPlainObject(first)) {
+		ok = first.ok as GenericCallback;
+		error = first.error as GenericCallback;
+	} else {
+		ok = first as GenericCallback;
+		error = second as GenericCallback;
 	}
 
-	return errorHandler!(value.error, (value as ExtendedErr<E>).original);
+	if (isOk(result)) {
+		if (typeof ok !== 'function') {
+			throw new Error(MATCH_MESSAGE_OK);
+		}
+
+		return ok(result.value);
+	}
+
+	if (typeof error !== 'function') {
+		throw new Error(MATCH_MESSAGE_ERROR);
+	}
+
+	return error(result.error, (result as ExtendedErr<unknown>).original);
 }
 
 /**
@@ -90,34 +110,25 @@ export function matchResult<Value, Returned, E = Error>(
 	error: ResultMatch<Value, Returned, E>['error'],
 ): Returned;
 
-export function matchResult<Value, Returned, E = Error>(
-	result: AnyResult<Value, E> | (() => AnyResult<Value, E>),
-	first: ResultMatch<Value, Returned, E> | ResultMatch<Value, Returned, E>['ok'],
-	error?: ResultMatch<Value, Returned, E>['error'],
-): Returned {
+export function matchResult(result: unknown, first: unknown, second?: unknown): unknown {
 	const value = typeof result === 'function' ? result() : result;
 
 	if (!isResult(value)) {
-		throw new Error(MATCH_MESSAGE);
+		throw new Error(MATCH_MESSAGE_RESULT);
 	}
 
-	const hasObj = typeof first === 'object' && first !== null;
-
-	const okHandler = hasObj ? first.ok : first;
-	const errorHandler = hasObj ? first.error : error;
-
-	if (isOk(value)) {
-		return okHandler(value.value);
-	}
-
-	return errorHandler!(value.error, (value as ExtendedErr<E>).original);
+	return handleResult(value, first, second);
 }
 
 // #endregion
 
 // #region Variables
 
-const MATCH_MESSAGE = '`result.match` expected a Result or a function that returns a Result';
+const MATCH_MESSAGE_ERROR = '`result.match` expected an Error callback';
+
+const MATCH_MESSAGE_OK = '`result.match` expected an Ok callback';
+
+const MATCH_MESSAGE_RESULT = '`result.match` expected a Result or a function that returns a Result';
 
 // #endregion
 

@@ -1,39 +1,13 @@
 import type {Constructor, GenericCallback} from '../../models';
+import type {
+	BaseHandler,
+	BaseHandlerOptions,
+	CompareHandler,
+	Constructable,
+	Handleable,
+	ValueHandler,
+} from '../../models/value/value.handler.model';
 import {isNonConstructor} from '../is';
-
-// #region Types
-
-type BaseHandler = {
-	handlers: WeakMap<WeakKey, string | GenericCallback>;
-	options: BaseHandlerOptions;
-	owner: GenericCallback;
-	deregister(constructor: Constructor): void;
-	get(first: unknown, second: unknown): string | GenericCallback | undefined;
-	register(constructor: Constructor, handler?: string | GenericCallback): void;
-};
-
-type BaseHandlerOptions = {
-	callback: GenericCallback;
-	method?: string;
-};
-
-export type CompareHandler<Value> = {
-	base: BaseHandler;
-	handle(first: unknown, second: unknown, ...parameters: unknown[]): Value;
-};
-
-type Constructable = {
-	constructor: Constructor;
-};
-
-type Handleable = Record<string, GenericCallback>;
-
-export type ValueHandler = {
-	base: BaseHandler;
-	handle(value: unknown, ...parameters: unknown[]): unknown;
-};
-
-// #endregion
 
 // #region Instances
 

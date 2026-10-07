@@ -1,8 +1,16 @@
 import {round} from '../../internal/math/misc';
 import {clamp} from '../../internal/number';
+import type {
+	Color,
+	HSLAColor,
+	HSLColor,
+	HWBAColor,
+	HWBColor,
+	RGBAColor,
+	RGBColor,
+} from '../../models/color.model';
 import {COLOR_DEFAULTS, COLOR_MAX, COLOR_SRGB, COLOR_TYPE} from '../constants';
 import {color} from '../instance';
-import type {Color, HSLAColor, HSLColor, HWBAColor, HWBColor, RGBAColor, RGBColor} from '../models';
 import {getColorFromState, getColorState} from './state';
 
 // #region Functions

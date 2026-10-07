@@ -1,10 +1,10 @@
-import type {GenericCallback} from '../../models';
+import type {GenericCallback} from './index';
 import {
 	SUBSCRIPTION_NAME,
 	type Subscription,
 	type SubscriptionProperty,
 	type Subscriptions,
-} from '../subscription';
+} from './subscription.model';
 
 // #region Types
 
@@ -53,7 +53,9 @@ export type HeraldEvents<Events extends Record<string, GenericCallback>> = {
 		: (callback: Events[Key], signal?: AbortSignal) => void;
 };
 
-export type HeraldOnCreate<Events extends Record<string, GenericCallback>> = <Event extends keyof Events>(
+export type HeraldOnCreate<Events extends Record<string, GenericCallback>> = <
+	Event extends keyof Events,
+>(
 	event: Event,
 	callback: Events[Event],
 	subscription: Subscription,

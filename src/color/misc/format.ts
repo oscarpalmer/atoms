@@ -1,5 +1,5 @@
 import {COLOR_SYMBOL, COLOR_TYPE} from '../constants';
-import type {ColorState, InternalColor} from '../models';
+import type {ColorState, InternalColor} from '../../models/color.model';
 import {getColorFromState} from './state';
 
 // #region Functions

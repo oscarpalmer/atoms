@@ -1,152 +1,26 @@
 import type {Key} from '../models';
-import {createAborter, type Aborter} from './aborter';
+import {
+	SUBSCRIPTION_DISALLOWED_KEY,
+	SUBSCRIPTION_INVALID_KEY,
+	SUBSCRIPTION_INVALID_VALUE,
+	SUBSCRIPTION_NAME,
+	SUBSCRIPTION_PROPERTY,
+	SUBSCRIPTION_STORE,
+	SUBSCRIPTION_SYMBOL,
+	type InternalSubscription,
+	type InternalSubscriptions,
+	type Subscription,
+	type SubscriptionParameters,
+	type SubscriptionProperty,
+	type Subscriptions,
+	type SubscriptionsItems,
+	type SubscriptionsParameters,
+	type SubscriptionsState,
+	type SubscriptionState,
+	type SubscriptionsValues,
+} from '../models/subscription.model';
+import {createAborter} from './aborter';
 import {isKey, isPlainObject} from './is';
-
-// #region Special variables
-
-export const SUBSCRIPTION_NAME = 'subscription';
-
-const SUBSCRIPTION_PROPERTY = '$subscription';
-
-const SUBSCRIPTION_STORE = 'subscriptions';
-
-// #endregion
-
-// #region Types
-
-type InternalSubscription = {
-	[SUBSCRIPTION_SYMBOL]: SubscriptionState;
-} & Subscription;
-
-type InternalSubscriptions = {
-	[SUBSCRIPTION_SYMBOL]: SubscriptionsState;
-} & Subscriptions;
-
-export type Subscription = {
-	/**
-	 * Is the subscription active?
-	 */
-	get active(): boolean;
-
-	/**
-	 * Unsubscribe from changes
-	 */
-	unsubscribe(): void;
-};
-
-/**
- * Parameters for creating a subscription
- */
-export type SubscriptionParameters = {
-	/**
-	 * Is the owner of the subscription alive? _(defaults to `true`)_
-	 */
-	isActive?: () => boolean;
-	/**
-	 * Key used to identify a subscription _(defaults to `undefined`)_
-	 */
-	key?: unknown;
-	/**
-	 * Signal used to abort the subscription _(defaults to `undefined`)_
-	 */
-	signal?: AbortSignal;
-	/**
-	 * Value used to identify a subscription
-	 */
-	value: unknown;
-};
-
-/**
- * Property information for subscription identification
- */
-export type SubscriptionProperty = {
-	/**
-	 * Name of the property used to identify a subscription
-	 */
-	key: string;
-	/**
-	 * Value of the property used to identify a subscription
-	 */
-	value: unknown;
-};
-
-type SubscriptionState = {
-	aborter?: Aborter;
-	active: boolean;
-	parameters: SubscriptionParameters;
-	subscriptions: SubscriptionsState;
-};
-
-export type Subscriptions<Value = unknown> = {
-	/**
-	 * Items of the subscriptions store
-	 *
-	 * - `any` - Set of subscriptions _(for unkeyed subscriptions)_
-	 * - `keyed` - Map of keys to sets of subscriptions _(for keyed subscriptions)_
-	 */
-	readonly items: Readonly<SubscriptionsItems>;
-
-	/**
-	 * Values of the subscriptions store
-	 *
-	 * - `from.any` - Map of values to subscriptions _(for unkeyed subscriptions)_
-	 * - `from.keyed` - Map of keys to maps of values to subscriptions _(for keyed subscriptions)_
-	 * - `to.any` - Map of subscriptions to values _(for unkeyed subscriptions)_
-	 * - `to.keyed` - Map of keys to maps of subscriptions to values _(for keyed subscriptions)_
-	 */
-	readonly values: Readonly<SubscriptionsValues<Value>>;
-
-	/**
-	 * Clear all subscriptions
-	 */
-	clear(): void;
-
-	/**
-	 * Create _(or retrieve)_ a subscription
-	 *
-	 * @param parameters Subscription parameters
-	 * @returns Tuple holding subsccription and existing boolean
-	 */
-	create(parameters: SubscriptionParameters): [Subscription, boolean];
-};
-
-/**
- * Parameters for creating a subscription store
- */
-export type SubscriptionsParameters = {
-	/**
-	 * Allow any or specific keys for subscriptions? _(defaults to `false`, which prevents keyed subscriptions)_
-	 */
-	keys?: boolean | Set<Key>;
-	/**
-	 * Property information for subscription identification
-	 */
-	property?: SubscriptionProperty;
-};
-
-type SubscriptionsState = {
-	items: SubscriptionsItems;
-	keys: boolean | Set<Key>;
-	property: SubscriptionProperty;
-	values: SubscriptionsValues;
-};
-
-type SubscriptionsItems = {
-	any: Set<Subscription>;
-	keyed?: Map<Key, Set<Subscription>>;
-};
-
-type SubscriptionsValues<Value = unknown> = {
-	from: SubscriptionsValuesItem<Value, Subscription>;
-	to: SubscriptionsValuesItem<Subscription, Value>;
-};
-
-type SubscriptionsValuesItem<MapKey, MapValue> = {
-	any: Map<MapKey, MapValue>;
-	keyed?: Map<Key, Map<MapKey, MapValue>>;
-};
-
-// #endregion
 
 // #region Instances
 
@@ -493,17 +367,5 @@ export function subscriptions<Value = unknown>(
 	// @ts-expect-error All good, no worries :-)
 	return new Subscriptions(parameters);
 }
-
-// #endregion
-
-// #region Variables
-
-const SUBSCRIPTION_DISALLOWED_KEY = 'Disallowed key for subscription';
-
-const SUBSCRIPTION_INVALID_KEY = 'Invalid key for subscription';
-
-const SUBSCRIPTION_INVALID_VALUE = 'A subscription requires a non-null value to identify it';
-
-const SUBSCRIPTION_SYMBOL = Symbol(SUBSCRIPTION_PROPERTY);
 
 // #endregion

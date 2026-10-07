@@ -1,6 +1,6 @@
-// #region Types
-
 import type {Err, Ok, Result} from './result.model';
+
+// #region Types
 
 /**
  * An asynchronous plan of execution that can yield intermediate results and eventually return a result
@@ -31,7 +31,7 @@ export type AsyncPlan<Yielded, Returned, Parameters extends unknown[]> = {
 	run(...parameters: Parameters): Promise<PlanReturned<Returned>>;
 };
 
-type AsyncPlanState = {
+export type AsyncPlanState = {
 	generator(...parameters: unknown[]): AsyncGenerator;
 } & BaseState<typeof PLAN_TYPE_PLAN_ASYNC>;
 
@@ -100,7 +100,7 @@ export type PlanReturned<Returned> = Returned extends Error
 		? never
 		: Returned;
 
-type PlanState = {
+export type PlanState = {
 	generator(...parameters: unknown[]): Generator;
 } & BaseState<typeof PLAN_TYPE_PLAN_SYNC>;
 

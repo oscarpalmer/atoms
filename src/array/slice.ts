@@ -1,11 +1,10 @@
 import {getArrayCallbacks} from '../internal/array/callbacks';
 import type {PlainObject} from '../models';
-
-// #region Types
-
-type ExtractType = 'drop' | 'take';
-
-// #endregion
+import {
+	ARRAY_SLICE_DROP,
+	ARRAY_SLICE_TAKE,
+	type ArrayExtractType,
+} from '../models/array/array.misc.model';
 
 // #region Functions
 
@@ -91,11 +90,11 @@ export function drop<Item extends PlainObject>(
 export function drop(array: unknown[], count: number): unknown[];
 
 export function drop(array: unknown[], first?: unknown, second?: unknown): unknown[] {
-	return extract(SLICE_DROP, array, first, second);
+	return extract(ARRAY_SLICE_DROP, array, first, second);
 }
 
 function extract(
-	type: ExtractType,
+	type: ArrayExtractType,
 	array: unknown[],
 	first?: unknown,
 	second?: unknown,
@@ -110,7 +109,7 @@ function extract(
 		return [];
 	}
 
-	const isTake = type === SLICE_TAKE;
+	const isTake = type === ARRAY_SLICE_TAKE;
 
 	if (typeof first === 'number') {
 		if (Math.abs(first) >= length) {
@@ -321,15 +320,7 @@ export function take<Item extends PlainObject>(
 export function take(array: unknown[], count: number): unknown[];
 
 export function take(array: unknown[], first?: unknown, second?: unknown): unknown[] {
-	return extract(SLICE_TAKE, array, first, second);
+	return extract(ARRAY_SLICE_TAKE, array, first, second);
 }
-
-// #endregion
-
-// #region Variables
-
-const SLICE_DROP: ExtractType = 'drop';
-
-const SLICE_TAKE: ExtractType = 'take';
 
 // #endregion

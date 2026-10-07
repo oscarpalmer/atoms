@@ -1,5 +1,3 @@
-import {SUBSCRIPTION_NAME} from '../internal/subscription';
-import type {SubscriptionProperty} from '../subscription';
 import type {
 	Alpha,
 	ColorDefaults,
@@ -11,7 +9,9 @@ import type {
 	HWBColor,
 	RGBAColor,
 	RGBColor,
-} from './models';
+} from '../models/color.model';
+import {SUBSCRIPTION_NAME} from '../models/subscription.model';
+import type {SubscriptionProperty} from '../subscription';
 
 // #region Types
 

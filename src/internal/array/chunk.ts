@@ -1,3 +1,5 @@
+import {ARRAY_CHUNK_MAX_SIZE} from '../../models/array/array.misc.model';
+
 // #region Functions
 
 /**
@@ -24,7 +26,9 @@ export function chunk<Item>(array: Item[], size?: number): Item[][] {
 	const {length} = array;
 
 	const actualSize =
-		typeof size === 'number' && size > 0 && size <= CHUNK_MAX_SIZE ? size : CHUNK_MAX_SIZE;
+		typeof size === 'number' && size > 0 && size <= ARRAY_CHUNK_MAX_SIZE
+			? size
+			: ARRAY_CHUNK_MAX_SIZE;
 
 	if (length <= actualSize) {
 		return [array];
@@ -42,11 +46,5 @@ export function chunk<Item>(array: Item[], size?: number): Item[][] {
 
 	return chunks;
 }
-
-// #endregion
-
-// #region Variables
-
-const CHUNK_MAX_SIZE = 5_000;
 
 // #endregion

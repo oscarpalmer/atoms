@@ -1,5 +1,6 @@
-import {FIND_VALUES_ALL, findValues} from '../internal/array/find';
+import {findValues} from '../internal/array/find';
 import type {PlainObject} from '../models';
+import {ARRAY_FIND_VALUES_ALL} from '../models/array/array.find.model';
 
 // #region Functions
 
@@ -91,7 +92,7 @@ export function exclude<Item>(
 export function exclude<Item>(array: Item[], item: Item): unknown[];
 
 export function exclude(array: unknown[], ...parameters: unknown[]): unknown[] {
-	return findValues(FIND_VALUES_ALL, array, parameters).notMatched;
+	return findValues(ARRAY_FIND_VALUES_ALL, array, parameters).notMatched;
 }
 
 /**
@@ -174,7 +175,7 @@ export function filter<Item>(
 export function filter<Item>(array: Item[], item: Item): Item[];
 
 export function filter(array: unknown[], ...parameters: unknown[]): unknown[] {
-	return findValues(FIND_VALUES_ALL, array, parameters).matched;
+	return findValues(ARRAY_FIND_VALUES_ALL, array, parameters).matched;
 }
 
 // #endregion

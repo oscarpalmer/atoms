@@ -1,5 +1,6 @@
-import {FIND_VALUE_INDEX, findValue} from '../internal/array/find';
+import {findValue} from '../internal/array/find';
 import type {PlainObject} from '../models';
+import {ARRAY_FIND_VALUE_INDEX} from '../models/array/array.find.model';
 
 // #region Functions
 
@@ -87,7 +88,7 @@ export function exists(array: unknown[], ...parameters: unknown[]): boolean {
 		return Array.isArray(array) ? array.includes(parameters[0]) : false;
 	}
 
-	return findValue(FIND_VALUE_INDEX, array, parameters, false) > -1;
+	return findValue(ARRAY_FIND_VALUE_INDEX, array, parameters, false) > -1;
 }
 
 // #endregion

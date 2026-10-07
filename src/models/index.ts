@@ -18,6 +18,21 @@ export type BuiltIns = void | Date | Primitive | RegExp;
 export type Constructor<Instance = unknown> = new (...args: any[]) => Instance;
 
 /**
+ * A frozen value with readonly properties _(going as deep as possible)_
+ */
+export type Frozen<Value> = Value extends unknown[]
+	? Readonly<Value>
+	: Value extends PlainObject
+		? {
+				readonly [Key in keyof Value]: Frozen<Value[Key]>;
+			}
+		: Value extends Map<infer Key, infer Value>
+			? ReadonlyMap<Key, Frozen<Value>>
+			: Value extends Set<infer Item>
+				? ReadonlySet<Frozen<Item>>
+				: Readonly<Value>;
+
+/**
  * A generic async callback function
  */
 export type GenericAsyncCallback = (...args: any[]) => Promise<any>;
@@ -168,55 +183,6 @@ export type NumericalKeys<Value> = {
 export type NumericalValues<Item extends PlainObject> = Simplify<{
 	[ItemKey in keyof Item as Item[ItemKey] extends number ? ItemKey : never]: Item[ItemKey];
 }>;
-
-/**
- * An asynchronous function that can only be called once, returning the same value on subsequent calls
- */
-export type OnceAsync<Callback extends GenericAsyncCallback> = {
-	/**
-	 * Did the callback's promise reject?
-	 */
-	readonly error: boolean;
-	/**
-	 * Has the callback finished?
-	 */
-	readonly finished: boolean;
-	/**
-	 * Run the callback
-	 *
-	 * @param parameters Callback parameters
-	 * @returns Call result
-	 */
-	run(...parameters: Parameters<Callback>): ReturnType<Callback>;
-} & OnceProperties;
-
-/**
- * A callback function that can only be called once, returning the same value on subsequent calls
- */
-export type Once<Callback extends GenericCallback> = {
-	/**
-	 * Run the callback
-	 *
-	 * @param parameters Callback parameters
-	 * @returns Call result
-	 */
-	run(...parameters: Parameters<Callback>): ReturnType<Callback>;
-} & OnceProperties;
-
-type OnceProperties = {
-	/**
-	 * Has the callback been called?
-	 */
-	readonly called: boolean;
-	/**
-	 * Has the callback's value been cleared?
-	 */
-	readonly cleared: boolean;
-	/**
-	 * Clear the callback's cached value
-	 */
-	clear(): void;
-};
 
 /**
  * A generic object

@@ -15,7 +15,7 @@ import type {
 	InternalColor,
 	RGBAColor,
 	RGBColor,
-} from '../models';
+} from '../../models/color.model';
 
 // #region Types
 

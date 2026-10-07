@@ -1,6 +1,7 @@
 import {getArray} from './internal/array/get';
 import {isNumber} from './internal/is';
 import {getString} from './internal/string/misc';
+import {EXPRESSION_WHITESPACE_ONLY} from './models/misc.model';
 
 // #region Functions
 
@@ -74,7 +75,7 @@ export function isNonNullableOrEmpty<Value>(
 export function isNonNullableOrWhitespace<Value>(
 	value: Value,
 ): value is Exclude<Value, undefined | null | ''> {
-	return value != null && !EXPRESSION_WHITESPACE.test(getString(value));
+	return value != null && !EXPRESSION_WHITESPACE_ONLY.test(getString(value));
 }
 
 /**
@@ -124,7 +125,7 @@ export function isNullableOrEmpty(value: unknown): value is undefined | null | '
  * @returns `true` if the value is nullable or matches a whitespace-only string, otherwise `false`
  */
 export function isNullableOrWhitespace(value: unknown): value is undefined | null | '' {
-	return value == null || EXPRESSION_WHITESPACE.test(getString(value));
+	return value == null || EXPRESSION_WHITESPACE_ONLY.test(getString(value));
 }
 
 /**
@@ -149,12 +150,6 @@ export function isNumerical(value: unknown): value is number | `${number}` {
 export function isObject(value: unknown): value is object {
 	return (typeof value === 'object' && value !== null) || typeof value === 'function';
 }
-
-// #endregion
-
-// #region Variables
-
-const EXPRESSION_WHITESPACE = /^\s*$/;
 
 // #endregion
 

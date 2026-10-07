@@ -14,7 +14,7 @@ import type {
 	InternalColor,
 	RGBAColor,
 	RGBColor,
-} from '../models';
+} from '../../models/color.model';
 import {hslToRgb, hslToRgba} from './hsl';
 import {rgbToHex} from './rgb';
 

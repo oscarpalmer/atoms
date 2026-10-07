@@ -1,3 +1,4 @@
+import {asyncAttempt, attempt} from '../internal/result/attempt';
 import {
 	type AsyncPlan,
 	type InternalAsyncPlan,
@@ -7,9 +8,8 @@ import {
 	type Plan,
 	type PlanError,
 	type PlanOk,
-} from '../internal/models/plan.model';
-import type {Result} from '../internal/models/result.model';
-import {asyncAttempt, attempt} from '../internal/result/attempt';
+} from '../models/plan.model';
+import type {Result} from '../models/result.model';
 import {asyncGenerate, generate} from './generate';
 import {isAsyncGenerator, isAsyncPlan, isGenerator, isPlan} from './is';
 
@@ -91,11 +91,11 @@ export function attemptRunAsyncPlan(
 	this: InternalAsyncPlan,
 	...parameters: unknown[]
 ): Promise<unknown> {
-	return asyncAttempt(() => asyncGenerate(this[PLAN_SYMBOL].generator, parameters, true));
+	return asyncAttempt(() => asyncGenerate(this[PLAN_SYMBOL], parameters, true));
 }
 
 export function attemptRunPlan(this: InternalPlan, ...parameters: unknown[]): unknown {
-	return attempt(() => generate(this[PLAN_SYMBOL].generator, parameters, true));
+	return attempt(() => generate(this[PLAN_SYMBOL], parameters, true));
 }
 
 // #endregion

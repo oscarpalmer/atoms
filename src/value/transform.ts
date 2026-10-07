@@ -1,49 +1,16 @@
 import {isNonPlainObject} from '../internal/is';
 import type {PlainObject} from '../models';
-
-// #region Types
-
-type InternalTransformer<Value extends PlainObject> = {
-	[TRANSFORM_SYMBOL]: TransformHandler<Value>;
-} & Transformer<Value>;
-
-/**
- * A callback transform an object's properties
- */
-type TransformCallback<Value extends PlainObject, Key extends keyof Value> = (
-	key: Key,
-	value: Value[Key],
-) => Value[Key];
-
-/**
- * A collection of keyed callbacks to transform an object's properties
- */
-type TransformCallbacks<Value extends PlainObject> = Partial<{
-	[Key in keyof Value]: (value: Value[Key]) => Value[Key];
-}>;
-
-type TransformHandler<Value extends PlainObject> =
-	| TransformCallback<Value, keyof Value>
-	| TransformCallbacks<Value>;
-
-/**
- * A transformer for an object, with predefined callbacks for transforming its properties
- */
-export type Transformer<Value extends PlainObject> = {
-	/**
-	 * Transform an object's properties
-	 *
-	 * @param value Object to transform
-	 * @returns Transformed object
-	 */
-	transform(value: Value): Value;
-};
-
-// #endregion
+import {
+	TRANSFORM_SYMBOL,
+	type InternalTransformer,
+	type TransformCallback,
+	type TransformCallbacks,
+	type TransformHandler,
+} from '../models/value/value.transform.model';
 
 // #region Instances
 
-function Transformer(this: any, transformer: ReturnType<typeof getTransformHandler>) {
+function Transformer(this: any, transformer: ReturnType<typeof getTransformHandler>): void {
 	this[TRANSFORM_SYMBOL] = transformer;
 }
 
@@ -178,12 +145,6 @@ function transformValue<Value extends PlainObject, Key extends keyof Value>(
 
 // #endregion
 
-// #region Variables
-
-const TRANSFORM_SYMBOL = Symbol('transform');
-
-// #endregion
-
 // #region Namespace
 
 export declare namespace transform {
@@ -195,5 +156,11 @@ export declare namespace transform {
 // #region Initialization
 
 transform.initialize = initializeTransformer;
+
+// #endregion
+
+// #region Exports
+
+export type {TransformCallback, TransformCallbacks, Transformer};
 
 // #endregion
