@@ -1,6 +1,6 @@
 {
 	"name": "@oscarpalmer/atoms",
-	"version": "0.212.0",
+	"version": "0.213.0",
 	"description": "Atomic utilities for making your JavaScript better.",
 	"keywords": [
 		"array",
@@ -295,6 +295,7 @@
 			"default": "./dist/value/transform.mjs"
 		}
 	},
+	"sideEffects": false,
 	"scripts": {
 		"build": "npx vp pack && npm run tsdown:build",
 		"tsdown:build": "npx tsdown -c ./tsdown.config.ts",

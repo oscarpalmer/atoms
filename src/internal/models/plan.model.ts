@@ -11,24 +11,24 @@ export type AsyncPlan<Yielded, Returned, Parameters extends unknown[]> = {
 	 *
 	 * @returns Asynchronous generator
 	 */
-	[Symbol.asyncIterator]: () => AsyncGenerator<Yielded, Returned, unknown>;
+	[Symbol.asyncIterator]: (...parameters: Parameters) => AsyncGenerator<Yielded, Returned>;
 	/**
 	 * Attempt to run the plan to completion
 	 *
 	 * _Returns a promised {@link Result} instead of a raw value or throwing an error_
 	 *
-	 * @returns Promised result
+	 * @returns Attempted result
 	 */
 	attempt(
 		...parameters: Parameters
-	): Promise<Result<PlanResult<Returned>, PlanError<Yielded, Returned>>>;
+	): Promise<Result<PlanOk<Returned>, PlanError<Yielded, Returned>>>;
 	/**
 	 * Run the plan to completion
 	 *
 	 * @throws {PlanError<Yielded, Returned>}
 	 * @returns Result
 	 */
-	run(...parameters: Parameters): Promise<PlanResult<Returned>>;
+	run(...parameters: Parameters): Promise<PlanReturned<Returned>>;
 };
 
 type AsyncPlanState = {
@@ -56,52 +56,55 @@ export type Plan<Yielded, Returned, Parameters extends unknown[]> = {
 	 *
 	 * @returns Generator
 	 */
-	[Symbol.iterator]: () => Generator<Yielded, Returned, unknown>;
+	[Symbol.iterator]: (...parameters: Parameters) => Generator<Yielded, Returned>;
 	/**
 	 * Attempt to run the plan to completion
 	 *
 	 * _Returns a {@link Result} instead of a raw value or throwing an error_
 	 *
-	 * @returns Result
+	 * @returns Attempted result
 	 */
-	attempt(...parameters: Parameters): Result<PlanResult<Returned>, PlanError<Yielded, Returned>>;
+	attempt(...parameters: Parameters): Result<PlanOk<Returned>, PlanError<Yielded, Returned>>;
 	/**
 	 * Run the plan to completion
 	 *
 	 * @throws {PlanError<Yielded, Returned>}
 	 * @returns Result
 	 */
-	run(...parameters: Parameters): PlanResult<Returned>;
+	run(...parameters: Parameters): PlanReturned<Returned>;
 };
 
-type PlanErrorValues<Original> = Original extends Error
-	? Original
-	: Original extends Err<infer Error>
-		? Error
-		: Original extends Result<infer _, infer Error>
-			? Error
-			: never;
-
-export type PlanError<Yielded, Returned> =
-	| PlanErrorValues<Yielded>
-	| PlanErrorValues<Returned>
-	| Error;
-
-export type PlanResult<Returned> = Returned extends Error
+export type PlanOk<Returned> = Returned extends Error
 	? never
 	: Returned extends Err<infer _>
 		? never
 		: Returned extends Ok<infer Value>
 			? Value
-			: Returned extends Result<infer Value, infer _>
-				? Value
-				: Returned;
+			: Returned;
+
+type PlanErrors<Yielded, Returned> = PlanErrorValues<Yielded> | PlanErrorValues<Returned>;
+
+export type PlanError<Yielded, Returned> = [PlanErrors<Yielded, Returned>] extends [never]
+	? Error
+	: PlanErrors<Yielded, Returned>;
+
+type PlanErrorValues<Original> = Original extends Error
+	? Original
+	: Original extends Err<infer Error>
+		? Error
+		: never;
+
+export type PlanReturned<Returned> = Returned extends Error
+	? never
+	: Returned extends Err<infer _>
+		? never
+		: Returned;
 
 type PlanState = {
 	generator(...parameters: unknown[]): Generator;
 } & BaseState<typeof PLAN_TYPE_PLAN_SYNC>;
 
-export type PlanType = 'asyncPlan' | 'plan' | 'stop';
+export type PlanType = 'asyncPlan' | 'plan';
 
 // #endregion
 

@@ -1,10 +1,11 @@
-import {isError} from '../internal/result/misc';
+import {isError, isOk} from '../internal/result/misc';
 
 // #region Functions
 
 export async function asyncGenerate(
 	callback: (...parameters: unknown[]) => AsyncGenerator,
 	parameters: unknown[],
+	unwrap: boolean,
 ): Promise<unknown> {
 	const generator = callback(...parameters);
 
@@ -40,7 +41,7 @@ export async function asyncGenerate(
 	}
 
 	if (success) {
-		return lastValue;
+		return unwrap && isOk(lastValue) ? lastValue.value : lastValue;
 	}
 
 	throw lastValue;
@@ -49,6 +50,7 @@ export async function asyncGenerate(
 export function generate(
 	callback: (...parameters: unknown[]) => Generator,
 	parameters: unknown[],
+	unwrap: boolean,
 ): unknown {
 	const generator = callback(...parameters);
 
@@ -84,7 +86,7 @@ export function generate(
 	}
 
 	if (success) {
-		return lastValue;
+		return unwrap && isOk(lastValue) ? lastValue.value : lastValue;
 	}
 
 	throw lastValue;

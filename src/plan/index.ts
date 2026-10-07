@@ -8,7 +8,7 @@ import {
 	PLAN_TYPE_PLAN_ASYNC,
 	PLAN_TYPE_PLAN_SYNC,
 } from '../internal/models/plan.model';
-import {isAsyncGenerator, isGenerator} from '../internal/plan';
+import {isAsyncGenerator, isGenerator} from './is';
 import {asyncAttemptRun, attemptRun, attemptRunAsyncPlan, attemptRunPlan} from './result';
 import {asyncRun, run, runAsyncPlan, runPlan} from './run';
 
@@ -66,8 +66,8 @@ export function plan<Yielded, Returned, Parameters extends unknown[]>(
 	generator: (...parameters: Parameters) => Generator<Yielded, Returned>,
 ): Plan<Yielded, Returned, Parameters>;
 
-export function plan<Y, R, N>(
-	generator: () => AsyncGenerator<Y, R, N> | Generator<Y, R, N>,
+export function plan<Y, R>(
+	generator: () => AsyncGenerator<Y, R> | Generator<Y, R>,
 ): AsyncPlan<Y, R, never> | Plan<Y, R, never> {
 	if (isAsyncGenerator(generator)) {
 		// @ts-expect-error All good, no worries :-)

@@ -4,7 +4,9 @@ import {
 	isAsyncGenerator,
 	isAsyncPlan,
 	isGenerator,
+	isOk,
 	isPlan,
+	Ok,
 	plan,
 	run,
 	succeed,
@@ -127,5 +129,23 @@ test('succeed', async () => {
 
 	return run.async(asyncSucceeding).then(result => {
 		expect(result).toBe('result: 123');
+	});
+});
+
+test('succeed, result', async () => {
+	function* succeeding() {
+		return yield* succeed.result(456);
+	}
+
+	expect(isOk(run(succeeding))).toBe(true);
+	expect((run(succeeding) as Ok<number>).value).toBe(456);
+
+	async function* asyncSucceeding() {
+		return yield* succeed.result(123);
+	}
+
+	return run.async(asyncSucceeding).then(result => {
+		expect(isOk(result)).toBe(true);
+		expect((result as Ok<number>).value).toBe(123);
 	});
 });

@@ -117,7 +117,9 @@ export type PromisesItems<Items extends ArrayOrPlainObject> = {
 		: Items[ItemsKey] extends Promise<infer Value>
 			? Promise<Value>
 			: Promise<Items[ItemsKey]>;
-};
+} extends infer Result
+	? Result
+	: never;
 
 /**
  * Options for handling multiple _Promises_
@@ -147,15 +149,19 @@ export type PromisesUnwrapped<Items extends ArrayOrPlainObject> = {
 		: Items[ItemsKey] extends Promise<infer Value>
 			? Awaited<Value>
 			: never;
-};
+} extends infer Result
+	? Result
+	: never;
 
-export type PromisesValue<Value> = FulfilledPromise<Value> | RejectedPromise;
+export type PromisesValue<Value> = (FulfilledPromise<Value> | RejectedPromise);
 
 export type PromisesValues<Items extends ArrayOrPlainObject> = {
 	[ItemsKey in keyof Items]: Items[ItemsKey] extends Promise<infer Value>
 		? PromisesValue<Awaited<Value>>
 		: never;
-};
+} extends infer Result
+	? Result
+	: never;
 
 /**
  * A _Promise_ that was rejected

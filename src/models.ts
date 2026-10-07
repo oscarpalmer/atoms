@@ -147,9 +147,9 @@ type _NestedValue<Value, Path extends string> = Path extends `${infer ItemKey}.$
 /**
  * The nested _(keyed)_ values of an object _(up to 5 levels deep)_
  */
-export type NestedValues<Value extends PlainObject> = {
+export type NestedValues<Value extends PlainObject> = Simplify<{
 	[Path in NestedKeys<Value>]: NestedValue<Value, Path>;
-};
+}>;
 
 /**
  * The numerical keys of an object
@@ -165,9 +165,9 @@ export type NumericalKeys<Value> = {
 /**
  * The numerical values of an object
  */
-export type NumericalValues<Item extends PlainObject> = {
+export type NumericalValues<Item extends PlainObject> = Simplify<{
 	[ItemKey in keyof Item as Item[ItemKey] extends number ? ItemKey : never]: Item[ItemKey];
-};
+}>;
 
 /**
  * An asynchronous function that can only be called once, returning the same value on subsequent calls
@@ -233,10 +233,9 @@ export type Primitive = null | undefined | string | number | boolean | symbol | 
 /**
  * Set required keys for a type
  */
-export type RequiredKeys<Model extends object, Keys extends keyof Model> = Required<
-	Pick<Model, Keys>
-> &
-	Omit<Model, Keys>;
+export type RequiredKeys<Model extends object, Keys extends keyof Model> = Simplify<
+	Required<Pick<Model, Keys>> & Omit<Model, Keys>
+>;
 
 /**
  * Flattens the type to improve type hints in IDEs

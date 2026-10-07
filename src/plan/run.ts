@@ -5,11 +5,10 @@ import {
 	type InternalAsyncPlan,
 	type InternalPlan,
 	type Plan,
-	type PlanError,
-	type PlanResult,
+	type PlanReturned,
 } from '../internal/models/plan.model';
-import {isAsyncGenerator, isAsyncPlan, isGenerator, isPlan} from '../internal/plan';
 import {asyncGenerate, generate} from './generate';
+import {isAsyncGenerator, isAsyncPlan, isGenerator, isPlan} from './is';
 import {asyncAttemptRun, attemptRun} from './result';
 
 // #region Functions
@@ -21,9 +20,9 @@ import {asyncAttemptRun, attemptRun} from './result';
  * @returns Result
  */
 export async function asyncRun<Yielded, Returned, Parameters extends unknown[]>(
-	generator: (...parameters: Parameters) => AsyncGenerator<Yielded, Returned, unknown>,
+	generator: (...parameters: Parameters) => AsyncGenerator<Yielded, Returned>,
 	...parameters: Parameters
-): Promise<PlanResult<Returned>>;
+): Promise<PlanReturned<Returned>>;
 
 /**
  * Run an asynchronous plan to completion
@@ -34,7 +33,7 @@ export async function asyncRun<Yielded, Returned, Parameters extends unknown[]>(
 export async function asyncRun<Yielded, Returned, Parameters extends unknown[]>(
 	plan: AsyncPlan<Yielded, Returned, Parameters>,
 	...parameters: Parameters
-): Promise<PlanResult<Returned>>;
+): Promise<PlanReturned<Returned>>;
 
 export function asyncRun(input: unknown, ...parameters: unknown[]): unknown {
 	if (isAsyncPlan(input)) {
@@ -42,7 +41,7 @@ export function asyncRun(input: unknown, ...parameters: unknown[]): unknown {
 	}
 
 	if (isAsyncGenerator(input)) {
-		return asyncGenerate(input, parameters);
+		return asyncGenerate(input, parameters, false);
 	}
 
 	throw new Error(PLAN_MESSAGE_RUN_INPUT);
@@ -55,9 +54,9 @@ export function asyncRun(input: unknown, ...parameters: unknown[]): unknown {
  * @returns Result
  */
 export function run<Yielded, Returned, Parameters extends unknown[]>(
-	generator: (...parameters: Parameters) => Generator<Yielded, Returned, unknown>,
+	generator: (...parameters: Parameters) => Generator<Yielded, Returned>,
 	...parameters: Parameters
-): PlanResult<Returned> | PlanError<Yielded, Returned>;
+): PlanReturned<Returned>;
 
 /**
  * Run a plan to completion
@@ -68,7 +67,7 @@ export function run<Yielded, Returned, Parameters extends unknown[]>(
 export function run<Yielded, Returned, Parameters extends unknown[]>(
 	plan: Plan<Yielded, Returned, Parameters>,
 	...parameters: Parameters
-): PlanResult<Returned> | PlanError<Yielded, Returned>;
+): PlanReturned<Returned>;
 
 export function run(input: unknown, ...parameters: unknown[]): unknown {
 	if (isPlan(input)) {
@@ -76,18 +75,18 @@ export function run(input: unknown, ...parameters: unknown[]): unknown {
 	}
 
 	if (isGenerator(input)) {
-		return generate(input, parameters);
+		return generate(input, parameters, false);
 	}
 
 	throw new Error(PLAN_MESSAGE_RUN_INPUT);
 }
 
 export function runAsyncPlan(this: InternalAsyncPlan, ...parameters: unknown[]): Promise<unknown> {
-	return asyncGenerate(this[PLAN_SYMBOL].generator, parameters);
+	return asyncGenerate(this[PLAN_SYMBOL].generator, parameters, false);
 }
 
 export function runPlan(this: InternalPlan, ...parameters: unknown[]): unknown {
-	return generate(this[PLAN_SYMBOL].generator, parameters);
+	return generate(this[PLAN_SYMBOL].generator, parameters, false);
 }
 
 // #endregion
