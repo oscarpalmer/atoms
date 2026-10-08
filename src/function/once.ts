@@ -1,5 +1,4 @@
 import {assert} from '../internal/function/assert';
-import type {GenericAsyncCallback, GenericCallback} from '../models';
 import {
 	ONCE_MESSAGE_CLEARED,
 	ONCE_MESSAGE_EXPECTATION,
@@ -13,6 +12,7 @@ import {
 	type InternalOnce,
 	type Once,
 } from '../models/function/once.model';
+import type {GenericAsyncCallback, GenericCallback} from '../models/index';
 
 // #region Instances
 

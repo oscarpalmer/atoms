@@ -1,7 +1,7 @@
 import {isPlainObject, isTemplateStringsArray} from '../internal/is';
 import {getString, interpolate} from '../internal/string/misc';
 import {getValue} from '../internal/value/get';
-import type {PlainObject} from '../models';
+import type {PlainObject} from '../models/index';
 import {
 	TEMPLATE_EXPRESSION_VARIABLE,
 	TEMPLATE_SYMBOL,

@@ -1,7 +1,6 @@
 import {isPlainObject} from '../internal/is';
 import {floor, round} from '../internal/math/misc';
 import {compare} from '../internal/value/compare';
-import type {PlainObject} from '../models';
 import {
 	arrayModifiers,
 	SORT_DIRECTION_ASCENDING,
@@ -22,6 +21,7 @@ import {
 	type Sorter,
 	type SortHandler,
 } from '../models/array/array.sort.model';
+import type {PlainObject} from '../models/index';
 
 // #region Instances
 

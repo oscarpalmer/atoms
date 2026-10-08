@@ -1,6 +1,6 @@
 import {herald} from '../internal/herald';
-import type {GenericCallback} from '../models';
 import type {Color, ColorChanges, ColorType, InternalColor} from '../models/color.model';
+import type {GenericCallback} from '../models/index';
 import {type Subscription} from '../models/subscription.model';
 import {COLOR_NAME, COLOR_PROPERTY, COLOR_SYMBOL, COLOR_TYPE, colorSubscription} from './constants';
 import {getColorAlpha, setColorAlpha} from './misc/alpha';

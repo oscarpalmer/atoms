@@ -1,6 +1,6 @@
 import {asyncPipe, pipe} from '../../internal/function/work';
 import {isError, isOk} from '../../internal/result/misc';
-import type {GenericCallback} from '../../models';
+import type {GenericCallback} from '../../models/index';
 import type {Result, UnwrapValue} from '../../models/result.model';
 import {asyncAttempt, attempt} from '../index';
 

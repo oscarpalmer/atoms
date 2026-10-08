@@ -1,5 +1,5 @@
 import {isNonPlainObject} from '../internal/is';
-import type {PlainObject} from '../models';
+import type {PlainObject} from '../models/index';
 import {
 	TRANSFORM_SYMBOL,
 	type InternalTransformer,

@@ -1,5 +1,5 @@
 import {error, ok} from '../../internal/result/misc';
-import type {PlainObject} from '../../models';
+import type {PlainObject} from '../../models/index';
 import type {Result} from '../../models/result.model';
 import {
 	VALUE_MISC_EXPRESSION_BRACKET,

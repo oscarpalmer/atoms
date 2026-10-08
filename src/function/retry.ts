@@ -2,7 +2,6 @@ import {getNumberOrDefault} from '../internal/defaults';
 import {getLimiter} from '../internal/function/limit';
 import {isPlainObject} from '../internal/is';
 import {asyncAttempt, attempt} from '../internal/result/attempt';
-import type {GenericAsyncCallback, GenericCallback} from '../models';
 import {LIMITER_WAIT} from '../models/function/limiter.model';
 import {
 	RETRY_MESSAGE_EXPECTATION,
@@ -10,6 +9,7 @@ import {
 	RetryError,
 	type RetryOptions,
 } from '../models/function/retry.model';
+import type {GenericAsyncCallback, GenericCallback} from '../models/index';
 
 // #region Functions
 

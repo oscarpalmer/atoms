@@ -1,7 +1,7 @@
 import {createAborter} from '../internal/aborter';
 import {isArrayOrPlainObject} from '../internal/is';
 import {asyncAttempt} from '../internal/result/attempt';
-import type {ArrayOrPlainObject, Key, PlainObject} from '../models';
+import type {ArrayOrPlainObject, Key, PlainObject} from '../models/index';
 import {
 	PROMISE_MESSAGE_EXPECTATION_ATTEMPT,
 	PROMISE_MESSAGE_EXPECTATION_ITEMS_TYPE,

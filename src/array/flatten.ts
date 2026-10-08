@@ -1,4 +1,4 @@
-import type {NestedArray} from '../models';
+import type {NestedArray} from '../models/index';
 
 // #region Functions
 

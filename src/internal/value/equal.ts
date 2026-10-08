@@ -1,4 +1,4 @@
-import type {ArrayOrPlainObject, Constructor, TypedArray} from '../../models';
+import type {ArrayOrPlainObject, Constructor, TypedArray} from '../../models/index';
 import {
 	EQUAL_ARRAY_PEEK_PERCENTAGE,
 	EQUAL_ARRAY_THRESHOLD,
@@ -428,6 +428,6 @@ equal.register = registerEqualizer;
 
 // #region Exports
 
-export type {EqualOptions, Equalizer};
+export type {Equalizer, EqualOptions};
 
 // #endregion

@@ -1,4 +1,3 @@
-import type {GenericAsyncCallback, GenericCallback} from '../../models';
 import {
 	clearTimer,
 	LIMITER_NAME_ASYNC,
@@ -17,6 +16,7 @@ import {
 	type LimiterState,
 	type LimiterType,
 } from '../../models/function/limiter.model';
+import type {GenericAsyncCallback, GenericCallback} from '../../models/index';
 import {getNumberOrDefault} from '../defaults';
 import {asyncAttempt} from '../result/attempt';
 

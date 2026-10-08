@@ -1,5 +1,5 @@
 import {findAbsoluteValueOrDefault} from '../internal/array/find';
-import type {PlainObject} from '../models';
+import type {PlainObject} from '../models/index';
 
 // #region Functions
 

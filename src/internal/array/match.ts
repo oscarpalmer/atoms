@@ -1,4 +1,3 @@
-import type {PlainObject} from '../../models';
 import {
 	ARRAY_MATCH_COMPARISON_END,
 	ARRAY_MATCH_COMPARISON_INSIDE,
@@ -11,6 +10,7 @@ import {
 	arrayMatchStarts,
 } from '../../models/array/array.match.model';
 import type {ArrayComparison} from '../../models/array/array.misc.model';
+import type {PlainObject} from '../../models/index';
 import {getArrayCallback} from './callbacks';
 
 // #region Functions

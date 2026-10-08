@@ -1,11 +1,11 @@
 import {getAsyncLimiter, getLimiter} from '../internal/function/limit';
-import type {GenericAsyncCallback, GenericCallback} from '../models';
 import {
 	LIMITER_DEBOUNCE,
 	LIMITER_THROTTLE,
 	type AsyncLimiter,
 	type Limiter,
 } from '../models/function/limiter.model';
+import type {GenericAsyncCallback, GenericCallback} from '../models/index';
 
 // #region Functions
 

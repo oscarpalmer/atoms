@@ -1,6 +1,6 @@
 import {noop} from './internal/function/misc';
 import {getString} from './internal/string/misc';
-import type {GenericCallback} from './models';
+import type {GenericCallback} from './models/index';
 import {
 	type InternalTimeLogger,
 	type Lumberjack,

@@ -1,6 +1,5 @@
 import {between} from '../../internal/number';
 import {isSubscription} from '../../internal/subscription';
-import type {PlainObject} from '../../models';
 import type {
 	ColorProperty,
 	HSLAColor,
@@ -10,6 +9,7 @@ import type {
 	RGBAColor,
 	RGBColor,
 } from '../../models/color.model';
+import type {PlainObject} from '../../models/index';
 import {SUBSCRIPTION_NAME, type Subscription} from '../../models/subscription.model';
 import {
 	COLOR_ALPHA,

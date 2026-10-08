@@ -1,11 +1,11 @@
 import {findValues} from '../internal/array/find';
-import type {PlainObject} from '../models';
 import {ARRAY_FIND_VALUES_ALL} from '../models/array/array.find.model';
 import type {
 	ArrayMapKeyOrCallback,
 	ArrayMapped,
 	ArrayObjectKeysOf,
 } from '../models/array/array.misc.model';
+import type {PlainObject} from '../models/index';
 
 // #region Functions
 

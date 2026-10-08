@@ -1,4 +1,4 @@
-import type {PlainObject} from '../models';
+import type {PlainObject} from '../models/index';
 import {
 	GENERATOR_NAME_ASYNC,
 	GENERATOR_NAME_SYNC,

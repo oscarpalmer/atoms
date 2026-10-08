@@ -1,5 +1,11 @@
 import {groupValues} from '../internal/array/group';
-import type {Key, KeyOrCallback, KeyOrCallbackKey, KeyOrCallbackValue, Simplify} from '../models';
+import type {
+	Key,
+	KeyOrCallback,
+	KeyOrCallbackKey,
+	KeyOrCallbackValue,
+	Simplify,
+} from '../models/index';
 
 // #region Functions
 

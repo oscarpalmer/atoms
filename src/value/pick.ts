@@ -1,5 +1,5 @@
 import {partial} from '../internal/value/partial';
-import type {PlainObject} from '../models';
+import type {PlainObject} from '../models/index';
 
 // #region Functions
 

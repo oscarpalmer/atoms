@@ -1,4 +1,4 @@
-import type {NestedKeys, NestedValue, PlainObject} from '../../models';
+import type {NestedKeys, NestedValue, PlainObject} from '../../models/index';
 import {EXPRESSION_INTEGER} from '../../models/misc.model';
 import {unwrap} from '../result/misc';
 import {getPaths, handleValue} from './misc';

@@ -35,8 +35,8 @@ export * from './models/result.model';
 
 export * from './plan/index';
 export * from './plan/is';
-export * from './plan/models';
 export * from './plan/misc';
+export * from './plan/models';
 export * from './plan/result';
 export * from './plan/run';
 
@@ -72,7 +72,7 @@ export * from './herald';
 export * from './is';
 export * from './logger';
 export * from './math';
-export * from './models';
+export * from './models/index';
 export * from './number';
 export * from './query';
 export * from './queue';

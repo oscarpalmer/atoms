@@ -1,7 +1,6 @@
 import {noop} from './internal/function/misc';
 import {isPlainObject} from './internal/is';
 import {isSubscription, subscriptions} from './internal/subscription';
-import type {GenericCallback, PlainObject} from './models';
 import {
 	BEACON_MESSAGE_RETRIEVE,
 	BEACON_MESSAGE_SUBSCRIBE,
@@ -20,6 +19,7 @@ import {
 	type Observer,
 	beaconSubscription,
 } from './models/beacon.model';
+import type {GenericCallback, PlainObject} from './models/index';
 import {SUBSCRIPTION_NAME} from './models/subscription.model';
 import type {Subscription} from './subscription';
 

@@ -1,4 +1,4 @@
-import type {NumericalKeys, PlainObject} from '../../models';
+import type {NumericalKeys, PlainObject} from '../../models/index';
 import {isNonPlainObject} from '../is';
 
 // #region Functions

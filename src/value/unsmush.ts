@@ -1,6 +1,6 @@
 import {isArrayOrPlainObject} from '../internal/is';
 import {setValue} from '../internal/value/set';
-import type {PlainObject} from '../models';
+import type {PlainObject} from '../models/index';
 import type {Unsmushed, UnsmushedKey} from '../models/value/value.misc.model';
 
 // #region Types

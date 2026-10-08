@@ -1,4 +1,3 @@
-import type {GenericCallback} from '../../models';
 import {
 	type InternalMemoized,
 	MEMOIZED_CACHE_SIZE_DEFAULT,
@@ -10,6 +9,7 @@ import {
 	type MemoizedState,
 	type MemoizedStateOptions,
 } from '../../models/function/memoize.model';
+import type {GenericCallback} from '../../models/index';
 import {getNumberOrDefault} from '../defaults';
 import {isPlainObject} from '../is';
 import {SizedMap} from '../sized/map';

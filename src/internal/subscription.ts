@@ -1,4 +1,4 @@
-import type {Key} from '../models';
+import type {Key} from '../models/index';
 import {
 	SUBSCRIPTION_DISALLOWED_KEY,
 	SUBSCRIPTION_INVALID_KEY,

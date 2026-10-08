@@ -1,5 +1,5 @@
 import {updateInArray} from '../internal/array/update';
-import type {PlainObject} from '../models';
+import type {PlainObject} from '../models/index';
 
 // #region Functions
 

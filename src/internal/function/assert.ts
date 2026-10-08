@@ -1,9 +1,9 @@
-import type {Constructor, NestedKeys, NestedValue, PlainObject} from '../../models';
 import {
 	ASSERT_MESSAGE_VALUE_DEFINED,
 	type Asserter,
 	type AssertNestedPick,
 } from '../../models/function/assert.model';
+import type {Constructor, NestedKeys, NestedValue, PlainObject} from '../../models/index';
 import {hasValueResult} from '../value/has';
 
 // #region Functions

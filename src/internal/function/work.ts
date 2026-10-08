@@ -1,4 +1,3 @@
-import type {GenericCallback} from '../../models';
 import {
 	assertFlowFunctions,
 	assertPipeFunctions,
@@ -8,6 +7,7 @@ import {
 	WORK_MESSAGE_NESTING,
 	WORK_MESSAGE_PIPE_PROMISE,
 } from '../../models/function/work.model';
+import type {GenericCallback} from '../../models/index';
 import type {UnwrapValue} from '../../models/result.model';
 import {isError, isOk} from '../result/misc';
 

@@ -1,5 +1,5 @@
-import type {GenericCallback, PlainObject} from '../../models';
 import type {ArrayGetCallbacks} from '../../models/array/array.misc.model';
+import type {GenericCallback, PlainObject} from '../../models/index';
 
 // #region Functions
 

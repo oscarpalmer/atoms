@@ -1,5 +1,5 @@
 import {isArrayOrPlainObject} from '../internal/is';
-import type {ArrayOrPlainObject, PlainObject, UnionToIntersection} from '../models';
+import type {ArrayOrPlainObject, PlainObject, UnionToIntersection} from '../models/index';
 import {
 	type AssignOptions,
 	type Assigner,

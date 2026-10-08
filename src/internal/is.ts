@@ -5,7 +5,7 @@ import type {
 	PlainObject,
 	Primitive,
 	TypedArray,
-} from '../models';
+} from '../models/index';
 
 // #region Functions
 

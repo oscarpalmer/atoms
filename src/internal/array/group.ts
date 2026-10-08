@@ -1,4 +1,4 @@
-import type {Key} from '../../models';
+import type {Key} from '../../models/index';
 import {getArrayCallbacks} from './callbacks';
 
 // #region Functions

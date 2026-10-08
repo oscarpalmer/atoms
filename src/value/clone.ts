@@ -2,7 +2,7 @@ import {isArrayOrPlainObject, isTypedArray} from '../internal/is';
 import {attempt} from '../internal/result/attempt';
 import {unwrap} from '../internal/result/misc';
 import {createValueHandler} from '../internal/value/handlers';
-import type {ArrayOrPlainObject, Constructor, PlainObject, TypedArray} from '../models';
+import type {ArrayOrPlainObject, Constructor, PlainObject, TypedArray} from '../models/index';
 import {
 	CLONE_COPY_OPTIONS,
 	CLONE_DEFAULT_OPTIONS,

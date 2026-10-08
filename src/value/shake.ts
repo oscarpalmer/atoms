@@ -1,5 +1,5 @@
 import {isNonPlainObject} from '../internal/is';
-import type {PlainObject} from '../models';
+import type {PlainObject} from '../models/index';
 import type {Shaken} from '../models/value/value.misc.model';
 
 // #region Functions

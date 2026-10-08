@@ -2,7 +2,7 @@ import {createAborter} from './internal/aborter';
 import {getBooleanOrDefault, getNumberOrDefault} from './internal/defaults';
 import {min} from './internal/math/aggregate';
 import {asyncAttempt} from './internal/result/attempt';
-import type {GenericAsyncCallback, GenericCallback} from './models';
+import type {GenericAsyncCallback, GenericCallback} from './models/index';
 import {
 	type InternalKeyedQueue,
 	type InternalQueue,

@@ -1,6 +1,6 @@
 import {isArrayOrPlainObject} from '../internal/is';
 import {join} from '../internal/string/misc';
-import type {ArrayOrPlainObject, PlainObject} from '../models';
+import type {ArrayOrPlainObject, PlainObject} from '../models/index';
 import {SMUSH_MAX_DEPTH, type Smushed} from '../models/value/value.misc.model';
 
 // #region Functions

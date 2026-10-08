@@ -1,4 +1,4 @@
-import type {NumericalValues, PlainObject} from '../../models';
+import type {NumericalValues, PlainObject} from '../../models/index';
 import {
 	AGGREGATION_MAX,
 	AGGREGATION_MIN,

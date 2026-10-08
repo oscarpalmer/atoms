@@ -3,7 +3,7 @@ import {max} from '../internal/math/aggregate';
 import {floor} from '../internal/math/misc';
 import {lowerCase} from '../internal/string/case';
 import {getString} from '../internal/string/misc';
-import type {PlainObject, RequiredKeys} from '../models';
+import type {PlainObject, RequiredKeys} from '../models/index';
 import {
 	FUZZY_LENGTH_DIVISOR,
 	FUZZY_MESSAGE_ARRAY,

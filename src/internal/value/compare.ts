@@ -1,4 +1,4 @@
-import type {Constructor} from '../../models';
+import type {Constructor} from '../../models/index';
 import type {CompareHandler} from '../../models/value/value.handler.model';
 import {COMPARE_NAME, type ComparisonHandler} from '../../models/value/value.misc.model';
 import {max} from '../math/aggregate';

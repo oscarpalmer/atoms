@@ -1,10 +1,10 @@
 import {getArrayCallbacks} from '../internal/array/callbacks';
-import type {PlainObject} from '../models';
 import {
 	ARRAY_SLICE_DROP,
 	ARRAY_SLICE_TAKE,
 	type ArrayExtractType,
 } from '../models/array/array.misc.model';
+import type {PlainObject} from '../models/index';
 
 // #region Functions
 

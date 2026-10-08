@@ -1,5 +1,5 @@
 import {getArrayCallbacks} from '../internal/array/callbacks';
-import type {Key, KeyOrCallback, KeyOrCallbackKey, KeyOrCallbackValue} from '../models';
+import type {Key, KeyOrCallback, KeyOrCallbackKey, KeyOrCallbackValue} from '../models/index';
 
 // #region Functions
 

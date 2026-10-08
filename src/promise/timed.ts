@@ -1,7 +1,7 @@
 import {createAborter} from '../internal/aborter';
 import {getLimiter} from '../internal/function/limit';
-import type {RequiredKeys} from '../models';
 import {LIMITER_WAIT} from '../models/function/limiter.model';
+import type {RequiredKeys} from '../models/index';
 import {
 	PROMISE_MESSAGE_EXPECTATION_TIMED,
 	PromiseTimeoutError,
