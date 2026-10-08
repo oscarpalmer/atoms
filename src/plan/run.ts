@@ -17,31 +17,61 @@ import {asyncAttemptRun, attemptRun} from './result';
  * Run an asynchronous generator to completion
  *
  * @param generator Generator to run
+ * @param parameters Parameters for starting the run
+ * @param signal Optional abort signal
  * @returns Result
  */
 export async function asyncRun<Yielded, Returned, Parameters extends unknown[]>(
 	generator: (...parameters: Parameters) => AsyncGenerator<Yielded, Returned>,
-	...parameters: Parameters
+	parameters: Parameters,
+	signal?: AbortSignal,
+): Promise<PlanReturned<Returned>>;
+
+/**
+ * Run an asynchronous generator to completion
+ *
+ * @param generator Generator to run
+ * @param signal Optional abort signal
+ * @returns Result
+ */
+export async function asyncRun<Yielded, Returned>(
+	generator: () => AsyncGenerator<Yielded, Returned>,
+	signal?: AbortSignal,
 ): Promise<PlanReturned<Returned>>;
 
 /**
  * Run an asynchronous plan to completion
  *
  * @param plan Plan to run
+ * @param parameters Parameters for starting the run
+ * @param signal Optional abort signal
  * @returns Result
  */
 export async function asyncRun<Yielded, Returned, Parameters extends unknown[]>(
 	plan: AsyncPlan<Yielded, Returned, Parameters>,
-	...parameters: Parameters
+	parameters: Parameters,
+	signal?: AbortSignal,
 ): Promise<PlanReturned<Returned>>;
 
-export function asyncRun(input: unknown, ...parameters: unknown[]): unknown {
+/**
+ * Run an asynchronous plan to completion
+ *
+ * @param plan Plan to run
+ * @param signal Optional abort signal
+ * @returns Result
+ */
+export async function asyncRun<Yielded, Returned>(
+	plan: AsyncPlan<Yielded, Returned, []>,
+	signal?: AbortSignal,
+): Promise<PlanReturned<Returned>>;
+
+export function asyncRun(input: unknown, first?: unknown, second?: unknown): unknown {
 	if (isAsyncPlan(input)) {
-		return input.run(...parameters);
+		return asyncGenerate((input as InternalAsyncPlan)[PLAN_SYMBOL], false, first, second);
 	}
 
 	if (isAsyncGenerator(input)) {
-		return asyncGenerate(input, parameters, false);
+		return asyncGenerate(input, false, first, second);
 	}
 
 	throw new Error(PLAN_MESSAGE_RUN_INPUT);
@@ -51,6 +81,7 @@ export function asyncRun(input: unknown, ...parameters: unknown[]): unknown {
  * Run a generator to completion
  *
  * @param generator Generator to run
+ * @param parameters Parameters for starting the run
  * @returns Result
  */
 export function run<Yielded, Returned, Parameters extends unknown[]>(
@@ -62,6 +93,7 @@ export function run<Yielded, Returned, Parameters extends unknown[]>(
  * Run a plan to completion
  *
  * @param plan Plan to run
+ * @param parameters Parameters for starting the run
  * @returns Result
  */
 export function run<Yielded, Returned, Parameters extends unknown[]>(
@@ -81,8 +113,12 @@ export function run(input: unknown, ...parameters: unknown[]): unknown {
 	throw new Error(PLAN_MESSAGE_RUN_INPUT);
 }
 
-export function runAsyncPlan(this: InternalAsyncPlan, ...parameters: unknown[]): Promise<unknown> {
-	return asyncGenerate(this[PLAN_SYMBOL], parameters, false);
+export function runAsyncPlan(
+	this: InternalAsyncPlan,
+	first: never,
+	second: never,
+): Promise<unknown> {
+	return asyncGenerate(this[PLAN_SYMBOL], false, first, second);
 }
 
 export function runPlan(this: InternalPlan, ...parameters: unknown[]): unknown {

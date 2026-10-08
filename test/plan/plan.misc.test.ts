@@ -1,12 +1,13 @@
 import {expect, test} from 'vite-plus/test';
 import {
+	delay,
+	Err,
 	fail,
 	isAsyncGenerator,
 	isAsyncPlan,
+	isError,
 	isGenerator,
-	isOk,
 	isPlan,
-	Ok,
 	plan,
 	run,
 	succeed,
@@ -15,6 +16,43 @@ import {isFixture} from '../.fixtures/is.fixture';
 import {getABC, getMessage} from '../.fixtures/plan.fixture';
 
 const {length, values} = isFixture;
+
+test('abort', async () => {
+	const first = new AbortController();
+	const second = new AbortController();
+	const third = new AbortController();
+
+	async function* complex(result: string) {
+		yield await delay(50);
+
+		return result;
+	}
+
+	async function* simple() {
+		yield await delay(50);
+
+		return 'simple';
+	}
+
+	setTimeout(() => {
+		first.abort('aborted first');
+		second.abort('aborted second');
+	}, 25);
+
+	third.abort('aborted third');
+
+	const ranFirst = await run.attempt.async(simple, [123] as never, first.signal);
+	const ranSecond = await run.attempt.async(complex, ['third'], second.signal);
+	const ranThird = await run.attempt.async(simple, third.signal);
+
+	expect(isError(ranFirst)).toBe(true);
+	expect(isError(ranSecond)).toBe(true);
+	expect(isError(ranThird)).toBe(true);
+
+	expect((ranFirst as unknown as Err<string>).error).toBe('aborted first');
+	expect((ranSecond as unknown as Err<string>).error).toBe('aborted second');
+	expect((ranThird as unknown as Err<string>).error).toBe('aborted third');
+});
 
 test('fail', async () => {
 	function* failing() {
@@ -129,23 +167,5 @@ test('succeed', async () => {
 
 	return run.async(asyncSucceeding).then(result => {
 		expect(result).toBe('result: 123');
-	});
-});
-
-test('succeed, result', async () => {
-	function* succeeding() {
-		return yield* succeed.result(456);
-	}
-
-	expect(isOk(run(succeeding))).toBe(true);
-	expect((run(succeeding) as Ok<number>).value).toBe(456);
-
-	async function* asyncSucceeding() {
-		return yield* succeed.result(123);
-	}
-
-	return run.async(asyncSucceeding).then(result => {
-		expect(isOk(result)).toBe(true);
-		expect((result as Ok<number>).value).toBe(123);
 	});
 });

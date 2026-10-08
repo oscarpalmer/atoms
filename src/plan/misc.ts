@@ -1,18 +1,43 @@
-import {ok} from '../internal/result/misc';
-import type {Ok} from '../models/result.model';
+import {error} from '../internal/result/misc';
+import {PLAN_SYMBOL, type PlanFailure, type PlanSuccess} from '../models/plan.model';
+
+// #region Instances
+
+function PlanFailure(this: any, generator: Generator): void {
+	this[PLAN_SYMBOL] = {
+		generator,
+	};
+}
+
+PlanFailure.prototype[Symbol.iterator] = function () {
+	return this[PLAN_SYMBOL].generator();
+};
+
+function PlanSuccess(this: any, generator: Generator): void {
+	this[PLAN_SYMBOL] = {
+		generator,
+	};
+}
+
+PlanSuccess.prototype[Symbol.iterator] = function () {
+	return this[PLAN_SYMBOL].generator();
+};
+
+// #endregion
 
 // #region Functions
 
 /**
  * Create an immediately failing plan
  *
- * @param reason Failure reason
+ * @param value Failure value
  * @returns Plan failure
  */
-export function fail<Reason>(reason: Reason): Generator<Reason, void> {
-	return (function* () {
-		throw reason;
-	})();
+export function fail<Value>(value: Value): PlanFailure<Value> {
+	// @ts-expect-error All good, no worries :-)
+	return new PlanFailure(function* () {
+		yield error(value);
+	});
 }
 
 /**
@@ -21,30 +46,11 @@ export function fail<Reason>(reason: Reason): Generator<Reason, void> {
  * @param value Success value
  * @returns Plan success
  */
-export function succeed<Value>(value: Value): Generator<never, Value> {
-	return (function* () {
+export function succeed<Value>(value: Value): PlanSuccess<Value> {
+	// @ts-expect-error All good, no worries :-)
+	return new PlanSuccess(function* () {
 		return value;
-	})();
+	});
 }
-
-export function succeedResult<Returned>(value: Returned): Generator<never, Ok<Returned>> {
-	return (function* () {
-		return ok(value);
-	})();
-}
-
-// #endregion
-
-// #region Namespace
-
-export declare namespace succeed {
-	export var result: typeof succeedResult;
-}
-
-// #endregion
-
-// #region Initialization
-
-succeed.result = succeedResult;
 
 // #endregion

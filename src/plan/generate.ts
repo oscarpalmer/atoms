@@ -1,13 +1,24 @@
+import {createAborter} from '../internal/aborter';
+import {noop} from '../internal/function/misc';
 import {isError, isOk} from '../internal/result/misc';
 import type {AsyncPlanState, PlanState} from '../models/plan.model';
 
 // #region Functions
 
 export async function asyncGenerate(
-	input: AsyncPlanState | ((...parameters: unknown[]) => AsyncGenerator),
-	parameters: unknown[],
+	input: AsyncPlanState | ((...args: unknown[]) => AsyncGenerator),
 	unwrap: boolean,
+	first?: unknown,
+	second?: unknown,
 ): Promise<unknown> {
+	const aborter = createAborter(second ?? first, noop);
+
+	if (aborter != null && aborter.signal.aborted) {
+		throw aborter.signal.reason;
+	}
+
+	const parameters = Array.isArray(first) ? first : [];
+
 	let generator: AsyncGenerator;
 
 	if (typeof input === 'function') {
@@ -21,17 +32,21 @@ export async function asyncGenerate(
 
 	try {
 		while (true) {
+			if (aborter != null && aborter.signal.aborted) {
+				await generator.throw(aborter.signal.reason);
+			}
+
 			const next = await generator.next(lastValue);
 			const done = next.done === true;
 
 			const {value} = next;
 
 			if (value instanceof Error) {
-				throw value;
+				await generator.throw(value);
 			}
 
 			if (isError(value)) {
-				throw value.error;
+				await generator.throw(value.error);
 			}
 
 			lastValue = value;
@@ -40,11 +55,17 @@ export async function asyncGenerate(
 				break;
 			}
 		}
-	} catch (error) {
+	} catch (error: unknown) {
 		lastValue = error;
 		success = false;
 	} finally {
+		aborter?.cancel();
+
 		await generator.return(lastValue);
+	}
+
+	if (aborter != null && aborter.signal.aborted) {
+		throw aborter.signal.reason;
 	}
 
 	if (success) {
@@ -78,11 +99,11 @@ export function generate(
 			const {value} = next;
 
 			if (value instanceof Error) {
-				throw value;
+				generator.throw(value);
 			}
 
 			if (isError(value)) {
-				throw value.error;
+				generator.throw(value.error);
 			}
 
 			lastValue = value;
@@ -91,7 +112,7 @@ export function generate(
 				break;
 			}
 		}
-	} catch (error) {
+	} catch (error: unknown) {
 		lastValue = error;
 		success = false;
 	} finally {

@@ -33,17 +33,17 @@ test('error', () => {
 			},
 			new Error('thrown error'),
 		],
-	] as const;
+	] as [() => Generator, unknown][];
 
 	for (const [generator, expectation] of items) {
 		try {
-			run(generator as never);
+			run(generator);
 		} catch (error) {
 			expect(error).toEqual(expectation);
 		}
 
 		try {
-			plan(generator as never).run();
+			plan(generator).run();
 		} catch (error) {
 			expect(error).toEqual(expectation);
 		}
@@ -62,11 +62,11 @@ test('error, async', async () => {
 		],
 		[
 			async function* failError() {
-				yield fail(new Error('fail error'));
+				yield fail('fail error');
 
 				return 'hello, again';
 			},
-			new Error('fail error'),
+			'fail error',
 		],
 		[
 			async function* resultError() {
@@ -82,14 +82,14 @@ test('error, async', async () => {
 			},
 			new Error('thrown error'),
 		],
-	] as const;
+	] as [() => AsyncGenerator, unknown][];
 
 	for (const [asyncGenerator, expectation] of items) {
-		await run.async(asyncGenerator as never).catch(error => {
+		await run.async(asyncGenerator).catch(error => {
 			expect(error).toEqual(expectation);
 		});
 
-		await plan(asyncGenerator as never)
+		await plan(asyncGenerator)
 			.run()
 			.catch(error => {
 				expect(error).toEqual(expectation);
