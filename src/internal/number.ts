@@ -16,6 +16,13 @@ import {max, min} from './math/aggregate';
  * @param minimum Minimum value
  * @param maximum Maximum value _(inclusive)_
  * @returns `true` if the value is between the minimum and maximum, otherwise `false`
+ *
+ * @example
+ * ```typescript
+ * between(5, 1, 10); // => true
+ * between(0, 1, 10); // => false
+ * between(10, 10, 10); // => true
+ * ```
  */
 export function between(value: number, minimum: number, maximum: number): boolean {
 	if (![value, minimum, maximum].every(isNumber)) {
@@ -68,6 +75,17 @@ export function clamp(value: number, minimum: number, maximum: number, loop?: bo
  *
  * @param value Original value
  * @returns Original value as a number, or `Number.NaN` if the value is unable to be parsed
+ *
+ * @example
+ * ```typescript
+ * getNumber(null)       // => Number.NaN
+ * getNumber('foo')      // => Number.NaN
+ * getNumber('123')        // => 123
+ * getNumber(true)       // => 1
+ * getNumber([1, 2, 3])  // => Number.NaN
+ * getNumber({a: 1})     // => Number.NaN
+ * getNumber(() => 123)  // => 123
+ * ```
  */
 export function getNumber(value: unknown): number {
 	if (typeof value === 'number') {

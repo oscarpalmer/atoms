@@ -24,6 +24,14 @@ import {join, words} from './misc';
  *
  * @param value String to convert
  * @returns Camel-cased string
+ *
+ * @example
+ * ```typescript
+ * camelCase('this is camel case'); // => 'thisIsCamelCase'
+ * camelCase('ThisIsCamelCase');    // => 'thisIsCamelCase'
+ * camelCase('this-is-camel-case'); // => 'thisIsCamelCase'
+ * camelCase('this_is_camel_case'); // => 'thisIsCamelCase'
+ * ```
  */
 export function camelCase(value: string): string {
 	return toCase(STRING_CASE_CAMEL, value, true, false);
@@ -34,6 +42,14 @@ export function camelCase(value: string): string {
  *
  * @param value String to capitalize
  * @returns Capitalized string
+ *
+ * @example
+ * ```typescript
+ * capitalize('this is a test'); // => 'This is a test'
+ * capitalize('This Is A Test'); // => 'This is a test'
+ * capitalize('t');              // => 'T'
+ * capitalize('');               // => ''
+ * ```
  */
 export function capitalize(value: string): string {
 	if (typeof value !== 'string' || value.length === 0) {
@@ -54,6 +70,14 @@ export function capitalize(value: string): string {
  *
  * @param value String to convert
  * @returns Kebab-cased string
+ *
+ * @example
+ * ```typescript
+ * kebabCase('this is kebab case'); // => 'this-is-kebab-case'
+ * kebabCase('ThisIsKebabCase');    // => 'this-is-kebab-case'
+ * kebabCase('this-is-kebab-case'); // => 'this-is-kebab-case'
+ * kebabCase('this_is_kebab_case'); // => 'this-is-kebab-case'
+ * ```
  */
 export function kebabCase(value: string): string {
 	return toCase(STRING_CASE_KEBAB, value, false, false);
@@ -64,6 +88,13 @@ export function kebabCase(value: string): string {
  *
  * @param value String to convert
  * @returns Lower-cased string
+ *
+ * @example
+ * ```typescript
+ * lowerCase('THIS IS A TEST'); // => 'this is a test'
+ * lowerCase('this is a test'); // => 'this is a test'
+ * lowerCase('t');              // => 't'
+ * ```
  */
 export function lowerCase(value: string): string {
 	if (typeof value !== 'string') {
@@ -80,6 +111,14 @@ export function lowerCase(value: string): string {
  *
  * @param value String to convert
  * @returns Pascal-cased string
+ *
+ * @example
+ * ```typescript
+ * pascalCase('this is pascal case'); // => 'ThisIsPascalCase'
+ * pascalCase('ThisIsPascalCase');    // => 'ThisIsPascalCase'
+ * pascalCase('this-is-pascal-case'); // => 'ThisIsPascalCase'
+ * pascalCase('this_is_pascal_case'); // => 'ThisIsPascalCase'
+ * ```
  */
 export function pascalCase(value: string): string {
 	return toCase(STRING_CASE_PASCAL, value, true, true);
@@ -90,6 +129,14 @@ export function pascalCase(value: string): string {
  *
  * @param value String to convert
  * @returns Snake-cased string
+ *
+ * @example
+ * ```typescript
+ * snakeCase('this is snake case'); // => 'this_is_snake_case'
+ * snakeCase('ThisIsSnakeCase');    // => 'this_is_snake_case'
+ * snakeCase('this-is-snake-case'); // => 'this_is_snake_case'
+ * snakeCase('this_is_snake_case'); // => 'this_is_snake_case'
+ * ```
  */
 export function snakeCase(value: string): string {
 	return toCase(STRING_CASE_SNAKE, value, false, false);
@@ -100,6 +147,14 @@ export function snakeCase(value: string): string {
  *
  * @param value String to convert
  * @returns Title-cased string
+ *
+ * @example
+ * ```typescript
+ * titleCase('this is a test'); // => 'This Is A Test'
+ * titleCase('This Is A Test'); // => 'This Is A Test'
+ * titleCase('t');              // => 'T'
+ * titleCase('');               // => ''
+ * ```
  */
 export function titleCase(value: string): string {
 	if (typeof value !== 'string' || value.length === 0) {
@@ -186,6 +241,14 @@ function toCaseCallback(this: StringCaseOptions, value: string): string {
  *
  * @param value String to convert
  * @returns Upper-cased string
+ *
+ * @example
+ * ```typescript
+ * upperCase('this is a test'); // => 'THIS IS A TEST'
+ * upperCase('This Is A Test'); // => 'THIS IS A TEST'
+ * upperCase('t');              // => 'T'
+ * upperCase('');               // => ''
+ * ```
  */
 export function upperCase(value: string): string {
 	if (typeof value !== 'string' || value.length === 0) {

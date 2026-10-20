@@ -12,6 +12,9 @@ import {settlePromise} from './misc';
 
 // #region Functions
 
+/**
+ * @internal
+ */
 export async function getTimedPromise<Value>(
 	promise: Promise<Value>,
 	time: number,

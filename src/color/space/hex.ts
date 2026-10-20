@@ -82,6 +82,14 @@ export function getHexaColor(this: InternalColor): string {
  * @param value Value to normalize
  * @param alpha Include alpha channel _(opacity)_? _(defaults to `false`)_
  * @returns Normalized hex color
+ *
+ * @example
+ * ```typescript
+ * getNormalizedHex('#abc'); // => '#aabbcc'
+ * getNormalizedHex('#abc', true); // => '#aabbccff'
+ * getNormalizedHex(123); // => '#000000'
+ * getNormalizedHex(123, true); // => '#000000ff'
+ * ```
  */
 export function getNormalizedHex(value: unknown, alpha?: boolean): string {
 	const includeAlpha = alpha === true;

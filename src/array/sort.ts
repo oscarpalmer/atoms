@@ -162,6 +162,11 @@ function getSortedArrayIndex(
  * @param sorters Sorters to use to determine sorting
  * @param descending Sorted in descending order? _(defaults to `false`; overridden by individual sorters)_
  * @returns Index for item
+ *
+ * @example
+ * ```typescript
+ * getSortedIndex([1, 3, 2], 2, [{key: 'value', direction: 'asc'}]); // => 1
+ * ```
  */
 export function getSortedIndex<Item>(
 	array: Item[],
@@ -182,6 +187,11 @@ export function getSortedIndex<Item>(
  * @param sorter Sorter to use to determine sorting
  * @param descending Sorted in descending order? _(defaults to `false`; overridden by individual sorters)_
  * @returns Index for item
+ *
+ * @example
+ * ```typescript
+ * getSortedIndex([1, 3, 2], 2, {key: 'value', direction: 'asc'}); // => 1
+ * ```
  */
 export function getSortedIndex<Item>(
 	array: Item[],
@@ -201,6 +211,11 @@ export function getSortedIndex<Item>(
  * @param item Item to get the index for
  * @param descending Sorted in descending order? _(defaults to `false`)_
  * @returns Index for item
+ *
+ * @example
+ * ```typescript
+ * getSortedIndex([1, 3, 2], 2); // => 1
+ * ```
  */
 export function getSortedIndex<Item>(array: Item[], item: Item, descending?: boolean): number;
 
@@ -326,6 +341,12 @@ export function initializeSorter(first?: unknown, second?: unknown): Sorter<unkn
  * @param sorters Sorters to determine sorting
  * @param descending Sorted in descending order? _(defaults to `false`; overridden by individual sorters)_
  * @returns `true` if sorted, otherwise `false`
+ *
+ * @example
+ * ```typescript
+ * isSorted([1, 2, 3], [{key: 'value', direction: 'asc'}]); // => true
+ * isSorted([3, 2, 1], [{key: 'value', direction: 'asc'}]); // => false
+ * ```
  */
 export function isSorted<Item>(
 	array: Item[],
@@ -342,6 +363,12 @@ export function isSorted<Item>(
  * @param sorter Sorter to determine sorting
  * @param descending Sorted in descending order? _(defaults to `false`; overridden by individual sorters)_
  * @returns `true` if sorted, otherwise `false`
+ *
+ * @example
+ * ```typescript
+ * isSorted([1, 2, 3], {key: 'value', direction: 'asc'}); // => true
+ * isSorted([3, 2, 1], {key: 'value', direction: 'asc'}); // => false
+ * ```
  */
 export function isSorted<Item>(
 	array: Item[],
@@ -357,6 +384,12 @@ export function isSorted<Item>(
  * @param array Array to check
  * @param descending Sorted in descending order? _(defaults to `false`)_
  * @returns `true` if sorted, otherwise `false`
+ *
+ * @example
+ * ```typescript
+ * isSorted([1, 2, 3]); // => true
+ * isSorted([3, 2, 1]); // => false
+ * ```
  */
 export function isSorted<Item>(array: Item[], descending?: boolean): boolean;
 
@@ -445,6 +478,14 @@ export function sort<Item>(
  * @param sorters Sorters to use for sorting
  * @param descending Sort in descending order? _(defaults to `false`; overridden by individual sorters)_
  * @returns Sorted array
+ *
+ * @example
+ * ```typescript
+ * sort(
+ *   [{id: 3}, {id: 1}, {id: 2}],
+ *   [{key: 'id', direction: 'asc'}],
+ * ); // => [{id: 1}, {id: 2}, {id: 3}]
+ * ```
  */
 export function sort<Item>(
 	array: Item[],
@@ -459,6 +500,14 @@ export function sort<Item>(
  * @param sorter Sorter to use for sorting
  * @param descending Sort in descending order? _(defaults to `false`; overridden by individual sorters)_
  * @returns Sorted array
+ *
+ * @example
+ * ```typescript
+ * sort(
+ *   [{id: 3}, {id: 1}, {id: 2}],
+ *   {key: 'id', direction: 'asc'},
+ * ); // => [{id: 1}, {id: 2}, {id: 3}]
+ * ```
  */
 export function sort<Item>(array: Item[], sorter: ArraySorter<Item>, descending?: boolean): Item[];
 
@@ -468,6 +517,11 @@ export function sort<Item>(array: Item[], sorter: ArraySorter<Item>, descending?
  * @param array Array to sort
  * @param descending Sort in descending order? _(defaults to `false`)_
  * @returns Sorted array
+ *
+ * @example
+ * ```typescript
+ * sort([3, 1, 2]); // => [1, 2, 3]
+ * ```
  */
 export function sort<Item>(array: Item[], descending?: boolean): Item[];
 

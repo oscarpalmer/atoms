@@ -423,7 +423,7 @@ export function isQueue(value: unknown): value is Queue<GenericCallback | Generi
 	return isQueueInstance(QUEUE_NAME_QUEUE, value);
 }
 
-export function isQueueInstance<Instance>(name: string, value: unknown): value is Instance {
+function isQueueInstance<Instance>(name: string, value: unknown): value is Instance {
 	return (
 		typeof value === 'object' &&
 		value != null &&

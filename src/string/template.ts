@@ -109,6 +109,10 @@ export function template(strings: TemplateStringsArray, ...values: unknown[]): R
  * @param variables Variables to use
  * @param options Templating options
  * @returns Templated string
+ * @example
+ * ```typescript
+ * template('Hello, {{name}}!', {name: 'World'}); // => 'Hello, World!'
+ * ```
  */
 export function template(
 	value: string,

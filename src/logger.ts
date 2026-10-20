@@ -123,6 +123,12 @@ function getTimeLoggerStop(this: InternalTimeLogger): GenericCallback {
 	return noop;
 }
 
+/**
+ * Is the value a _Logger_?
+ *
+ * @param value Value to check
+ * @returns `true` if the value is a _Logger_, otherwise `false`
+ */
 function isLogger(value: unknown): value is Lumberjack {
 	return isLoggerInstance<Lumberjack>(LOGGER_NAME, value);
 }
@@ -136,6 +142,12 @@ function isLoggerInstance<Instance>(name: string, value: unknown): value is Inst
 	);
 }
 
+/**
+ * Is the value a _TimeLogger_?
+ *
+ * @param value Value to check
+ * @returns `true` if the value is a _TimeLogger_, otherwise `false`
+ */
 function isTimeLogger(value: unknown): value is TimeLogger {
 	return isLoggerInstance<TimeLogger>(LOGGER_NAME_TIMED, value);
 }

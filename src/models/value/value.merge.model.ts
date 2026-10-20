@@ -13,7 +13,7 @@ type BaseOptions = {
 	/**
 	 * Key _(or key epxressions)_ for values that should be replaced
 	 *
-	 * ```ts
+	 * ```typescript
 	 * merge([{items: [1, 2, 3]}, {items: [99]}]); // => {items: [99]}
 	 * ```
 	 */
@@ -21,7 +21,7 @@ type BaseOptions = {
 	/**
 	 * Skip nullable values when merging objects?
 	 *
-	 * ```ts
+	 * ```typescript
 	 * merge({a: 1, b: 2}, {b: null, c: 3}, {d: null}); // => {a: 1, b: 2, c: 3}
 	 * ```
 	 */
@@ -29,7 +29,7 @@ type BaseOptions = {
 	/**
 	 * Skip nullable values when merging arrays?
 	 *
-	 * ```ts
+	 * ```typescript
 	 * merge([1, 2, 3], [null, null, 99]); // => [1, 2, 99]
 	 * ```
 	 */

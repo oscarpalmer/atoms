@@ -12,6 +12,16 @@ import {AGGREGATION_AVERAGE, AGGREGATION_SUM} from './models/math.model';
  * @param items List of items
  * @param callback Callback to get an item's value
  * @returns Average value, or `Number.NaN` if no average can be calculated
+ *
+ * @example
+ * ```typescript
+ * average([
+ *   {value: 1},
+ *   {value: 2},
+ *   {value: 3},
+ * ], item => item.value); // => 2
+ * average([{value: 1}], item => item.nope); // => Number.NaN
+ * ```
  */
 export function average<Item>(
 	items: Item[],
@@ -24,6 +34,12 @@ export function average<Item>(
  * @param items List of items
  * @param key Key to use for value
  * @returns Average value, or `Number.NaN` if no average can be calculated
+ *
+ * @example
+ * ```typescript
+ * average([{value: 1}, {value: 2}, {value: 3}], 'value'); // => 2
+ * average([{value: 1}], 'nope'); // => Number.NaN
+ * ```
  */
 export function average<Item extends PlainObject>(
 	items: Item[],
@@ -35,6 +51,12 @@ export function average<Item extends PlainObject>(
  *
  * @param numbers List of numbers
  * @returns Average value, or `Number.NaN` if no average can be calculated
+ *
+ * @example
+ * ```typescript
+ * average([1, 2, 3, 4, 5]); // => 3
+ * average([]); // => Number.NaN
+ * ```
  */
 export function average(numbers: number[]): number;
 
@@ -50,6 +72,13 @@ export function average(array: unknown[], key?: unknown): number {
  * @param value Number to round up
  * @param decimals Number of decimal places to round to _(defaults to `0`)_
  * @returns Rounded number, or `Number.NaN` if the value if unable to be rounded
+ *
+ * @example
+ * ```typescript
+ * ceil(1.234, 2); // => 1.24
+ * ceil(1.234);    // => 2
+ * ceil('abc');    // => Number.NaN
+ * ```
  */
 export function ceil(value: number, decimals?: number): number {
 	return roundNumber(Math.ceil, value, decimals);
@@ -62,6 +91,14 @@ export function ceil(value: number, decimals?: number): number {
  * @param callback Callback to get an item's value
  * @param value Value to match and count
  * @returns Number of items that match the condition, or `Number.NaN` if no count can be calculated
+ *
+ * @example
+ * ```typescript
+ * count([1, 2, 3, 2], (item) => item, 2); // => 2
+ * count([{value: 1}, {value: 2}, {value: 3}], 'value', 2); // => 1
+ * count([1, 2, 3], (item) => item, 4); // => 0
+ * count([], (item) => item, 1); // => Number.NaN
+ * ```
  */
 export function count<Item>(
 	array: Item[],
@@ -76,6 +113,12 @@ export function count<Item>(
  * @param key Key to use for value
  * @param value Value to match and count
  * @returns Number of items with the specified key value, or `Number.NaN` if no count can be calculated
+ *
+ * @example
+ * ```typescript
+ * count([{value: 1}, {value: 2}, {value: 3}], 'value', 2); // => 1
+ * count([{value: 1}], 'nope', 1); // => Number.NaN
+ * ```
  */
 export function count<Item extends PlainObject, ItemKey extends keyof Item>(
 	array: Item[],
@@ -88,6 +131,12 @@ export function count<Item extends PlainObject, ItemKey extends keyof Item>(
  *
  * @param values Array to count for
  * @returns Number of items, or `Number.NaN` if no count can be calculated
+ *
+ * @example
+ * ```typescript
+ * count([1, 2, 3]); // => 3
+ * count([]);        // => Number.NaN
+ * ```
  */
 export function count(values: unknown[]): number;
 
@@ -123,6 +172,13 @@ export function count(array: unknown[], key?: unknown, value?: unknown): number 
  * @param array List of items
  * @param callback Callback to get an item's value
  * @returns Median value, or `Number.NaN` if no median can be calculated
+ *
+ * @example
+ * ```typescript
+ * median([1, 2, 3, 4, 5]); // => 3
+ * median([1, 2, 3, 4]);    // => 2.5
+ * median([]);              // => Number.NaN
+ * ```
  */
 export function median<Item>(
 	array: Item[],
@@ -135,6 +191,13 @@ export function median<Item>(
  * @param array List of items
  * @param key Key to use for value
  * @returns Median value, or `Number.NaN` if no median can be calculated
+ *
+ * @example
+ * ```typescript
+ * median([{value: 1}, {value: 2}, {value: 3}], 'value'); // => 2
+ * median([{value: 1}, {value: 2}, {value: 3}, {value: 4}], 'value'); // => 2.5
+ * median([], 'value'); // => Number.NaN
+ * ```
  */
 export function median<Item extends PlainObject>(
 	array: Item[],
@@ -146,6 +209,13 @@ export function median<Item extends PlainObject>(
  *
  * @param array List of numbers
  * @returns Median value, or `Number.NaN` if no median can be calculated
+ *
+ * @example
+ * ```typescript
+ * median([1, 2, 3, 4, 5]); // => 3
+ * median([1, 2, 3, 4]);    // => 2.5
+ * median([]);              // => Number.NaN
+ * ```
  */
 export function median(array: number[]): number;
 
@@ -188,6 +258,13 @@ export function median(array: unknown[], key?: unknown): number {
  * @param items List of items
  * @param callback Callback to get an item's value
  * @returns Sum of the values, or `Number.NaN` if no sum can be calculated
+ *
+ * @example
+ * ```typescript
+ * sum([{value: 1}, {value: 2}, {value: 3}], 'value'); // => 6
+ * sum([{value: 1}, {value: 2}, {value: 3}], item => item.value); // => 6
+ * sum([]); // => Number.NaN
+ * ```
  */
 export function sum<Item>(
 	items: Item[],
@@ -200,6 +277,13 @@ export function sum<Item>(
  * @param items List of items
  * @param key Key to use for value
  * @returns Sum of the values, or `Number.NaN` if no sum can be calculated
+ *
+ * @example
+ * ```typescript
+ * sum([{value: 1}, {value: 2}, {value: 3}], 'value'); // => 6
+ * sum([{value: 1}, {value: 2}, {value: 3}], item => item.value); // => 6
+ * sum([]); // => Number.NaN
+ * ```
  */
 export function sum<Item extends PlainObject>(
 	items: Item[],
@@ -211,6 +295,12 @@ export function sum<Item extends PlainObject>(
  *
  * @param values List of numbers
  * @returns Sum of the numbers, or `Number.NaN` if no sum can be calculated
+ *
+ * @example
+ * ```typescript
+ * sum([1, 2, 3]); // => 6
+ * sum([]);        // => Number.NaN
+ * ```
  */
 export function sum(values: number[]): number;
 

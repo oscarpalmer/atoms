@@ -46,10 +46,16 @@ export function getString(value: unknown): string {
 	return asString.startsWith('[object ') ? JSON.stringify(value) : asString;
 }
 
+/**
+ * @internal
+ */
 export function ignoreKey(key: string): boolean {
 	return STRING_EXPRESSION_IGNORED.test(key);
 }
 
+/**
+ * @internal
+ */
 export function interpolate(strings: TemplateStringsArray, values: unknown[]): string {
 	const {length} = strings;
 
@@ -72,6 +78,14 @@ export function interpolate(strings: TemplateStringsArray, values: unknown[]): s
  * @param array Array of values
  * @param delimiter Delimiter to use between values
  * @returns Joined string
+ * @example
+ * ```typescript
+ * join(['a', 'b', 'c']);          // => 'abc'
+ * join(['a', 'b', 'c'], ', ');   // => 'a, b, c'
+ * join(['a', '', 'c']);           // => 'ac'
+ * join([null, 'b', undefined]);   // => 'b'
+ * join([]);                       // => ''
+ * ```
  */
 export function join(array: unknown[], delimiter?: string): string {
 	if (!Array.isArray(array)) {
@@ -104,10 +118,16 @@ function tryCallback<T, U>(value: T, callback: (value: T) => U): U {
 	) as U;
 }
 
+/**
+ * @internal
+ */
 export function tryDecode(value: string): string {
 	return tryCallback(value, decodeURIComponent);
 }
 
+/**
+ * @internal
+ */
 export function tryEncode(value: boolean | number | string): unknown {
 	return tryCallback(value, encodeURIComponent);
 }

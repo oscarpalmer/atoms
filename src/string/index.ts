@@ -133,7 +133,7 @@ export function getUuid(html?: unknown): string {
  *
  * @param value JSON string to parse
  * @param reviver Reviver function to transform the parsed values
- * @returns Parsed value or `undefined` if parsing fails
+ * @returns Parsed value, or `undefined` if parsing fails
  */
 export function parse(
 	value: string,
@@ -152,6 +152,13 @@ export function parse(
  *
  * @param value String to trim
  * @returns Trimmed string
+ * @example
+ * ```typescript
+ * trim('  this is a test  '); // => 'this is a test'
+ * trim('this is a test');     // => 'this is a test'
+ * trim('   ');                // => ''
+ * trim('');                   // => ''
+ * ```
  */
 export function trim(value: string): string {
 	return typeof value === 'string' ? value.trim() : '';
@@ -164,6 +171,13 @@ export function trim(value: string): string {
  * @param length Maximum length of the string after truncation
  * @param suffix Suffix to append to the truncated string
  * @returns Truncated string
+ * @example
+ * ```typescript
+ * truncate('this is a test', 7);          // => 'this is'
+ * truncate('this is a test', 7, '...');   // => 'this ...'
+ * truncate('this is a test', 20);         // => 'this is a test'
+ * truncate('this is a test', 0);          // => ''
+ * ```
  */
 export function truncate(value: string, length: number, suffix?: string): string {
 	if (typeof value !== 'string' || typeof length !== 'number' || length === 0) {

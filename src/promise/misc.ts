@@ -23,6 +23,9 @@ export function cancelable<Value>(
 	return new CancelablePromise(executor);
 }
 
+/**
+ * @internal
+ */
 export function handleResult(status: string, parameters: PromiseParameters): void {
 	const {aborter, complete, data, handlers, index, key, value} = parameters;
 
@@ -55,6 +58,9 @@ export function handleResult(status: string, parameters: PromiseParameters): voi
 	}
 }
 
+/**
+ * @internal
+ */
 export function settlePromise(
 	settler: (value: any) => void,
 	value: unknown,

@@ -124,6 +124,11 @@ function isMinValue(aggregation: Aggregation, value: number): boolean {
 /**
  * Get the maximum value from a list of items
  *
+ * @param items List of items
+ * @param callback Callback to get an item's value
+ * @param first Return only the first item with the maximum value
+ * @returns Item with the maximum value, or `undefined` if no maximum can be found
+ *
  * @example
  * ```typescript
  * max(
@@ -133,11 +138,6 @@ function isMinValue(aggregation: Aggregation, value: number): boolean {
  *
  * max([], item => item.value); // => []
  * ```
- *
- * @param items List of items
- * @param callback Callback to get an item's value
- * @param first Return only the first item with the maximum value
- * @returns Item with the maximum value, or `undefined` if no maximum can be found
  */
 export function max<Item>(
 	items: Item[],
@@ -148,6 +148,11 @@ export function max<Item>(
 /**
  * Get the maximum value from a list of items
  *
+ * @param items List of items
+ * @param key Key to use for value
+ * @param first Return only the first item with the maximum value
+ * @returns Item with the maximum value, or `undefined` if no maximum can be found
+ *
  * @example
  * ```typescript
  * max(
@@ -157,11 +162,6 @@ export function max<Item>(
  *
  * max([], 'value'); // => []
  * ```
- *
- * @param items List of items
- * @param key Key to use for value
- * @param first Return only the first item with the maximum value
- * @returns Item with the maximum value, or `undefined` if no maximum can be found
  */
 export function max<Item extends PlainObject>(
 	items: Item[],
@@ -172,6 +172,10 @@ export function max<Item extends PlainObject>(
 /**
  * Get the maximum value from a list of items
  *
+ * @param items List of items
+ * @param callback Callback to get an item's value
+ * @returns Items with the maximum value
+ *
  * @example
  * ```typescript
  * max(
@@ -181,10 +185,6 @@ export function max<Item extends PlainObject>(
  *
  * max([], item => item.value); // => []
  * ```
- *
- * @param items List of items
- * @param callback Callback to get an item's value
- * @returns Items with the maximum value
  */
 export function max<Item>(
 	items: Item[],
@@ -193,6 +193,10 @@ export function max<Item>(
 
 /**
  * Get the maximum value from a list of items
+ *
+ * @param items List of items
+ * @param key Key to use for value
+ * @returns Items with the maximum value
  *
  * @example
  * ```typescript
@@ -203,10 +207,6 @@ export function max<Item>(
  *
  * max([], 'value'); // => []
  * ```
- *
- * @param items List of items
- * @param key Key to use for value
- * @returns Items with the maximum value
  */
 export function max<Item extends PlainObject>(
 	items: Item[],
@@ -216,14 +216,14 @@ export function max<Item extends PlainObject>(
 /**
  * Get the maximum value from a list of numbers
  *
+ * @param values List of numbers
+ * @returns Maximum value, or `Number.NaN` if no maximum can be found
+ *
  * @example
  * ```typescript
  * max([10, 20]); // => 20
  * max([]);       // => Number.NaN
  * ```
- *
- * @param values List of numbers
- * @returns Maximum value, or `Number.NaN` if no maximum can be found
  */
 export function max(values: number[]): number;
 
@@ -238,6 +238,17 @@ export function max(array: unknown[], key?: unknown, first?: unknown): unknown {
  * @param callback Callback to get an item's value
  * @param first Return only the first item with the minimum value
  * @returns First item with the minimum value, or `undefined` if no minimum can be found
+ *
+ * @example
+ * ```typescript
+ * min(
+ *   [{id: 1, value: 10}, {id: 2, value: 5}],
+ *   item => item.value,
+ *   true,
+ * ); // => {id: 2, value: 5}
+ *
+ * min([], item => item.value, true); // => undefined
+ * ```
  */
 export function min<Item>(
 	items: Item[],
@@ -252,6 +263,17 @@ export function min<Item>(
  * @param key Key to use for value
  * @param first Return only the first item with the minimum value
  * @returns First item with the minimum value, or `undefined` if no minimum can be found
+ *
+ * @example
+ * ```typescript
+ * min(
+ *   [{id: 1, value: 10}, {id: 2, value: 5}],
+ *   'value',
+ *   true,
+ * ); // => {id: 2, value: 5}
+ *
+ * min([], 'value', true); // => undefined
+ * ```
  */
 export function min<Item extends PlainObject>(
 	items: Item[],
@@ -265,6 +287,16 @@ export function min<Item extends PlainObject>(
  * @param items List of items
  * @param callback Callback to get an item's value
  * @returns Items with the minimum value
+ *
+ * @example
+ * ```typescript
+ * min(
+ *   [{id: 1, value: 10}, {id: 2, value: 5}],
+ *   item => item.value,
+ * ); // => [{id: 2, value: 5}]
+ *
+ * min([], item => item.value); // => []
+ * ```
  */
 export function min<Item>(
 	items: Item[],
@@ -277,6 +309,16 @@ export function min<Item>(
  * @param items List of items
  * @param key Key to use for value
  * @returns Items with the minimum value
+ *
+ * @example
+ * ```typescript
+ * min(
+ *   [{id: 1, value: 10}, {id: 2, value: 5}],
+ *   'value',
+ * ); // => [{id: 2, value: 5}]
+ *
+ * min([], 'value'); // => []
+ * ```
  */
 export function min<Item extends PlainObject>(
 	items: Item[],
@@ -288,6 +330,12 @@ export function min<Item extends PlainObject>(
  *
  * @param values List of numbers
  * @returns Minimum value, or `Number.NaN` if no minimum can be found
+ *
+ * @example
+ * ```typescript
+ * min([10, 20]); // => 10
+ * min([]);       // => Number.NaN
+ * ```
  */
 export function min(values: number[]): number;
 

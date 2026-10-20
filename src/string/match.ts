@@ -16,6 +16,14 @@ import {
  * @param needle String to look for
  * @param ignoreCase Ignore case when matching? _(defaults to `false`)_
  * @returns `true` if the string ends with the given substring, otherwise `false`
+ *
+ * @example
+ * ```typescript
+ * endsWith('this is a test', 'test');          // => true
+ * endsWith('this is a test', 'Test');          // => false
+ * endsWith('this is a test', 'Test', true);    // => true
+ * endsWith('this is a test', 'not');           // => false
+ * ```
  */
 export function endsWith(haystack: string, needle: string, ignoreCase?: boolean): boolean {
 	return match(STRING_MATCH_ENDS_WITH, haystack, needle, ignoreCase === true);
@@ -28,6 +36,14 @@ export function endsWith(haystack: string, needle: string, ignoreCase?: boolean)
  * @param needle String to look for
  * @param ignoreCase Ignore case when matching? _(defaults to `false`)_
  * @returns `true` if the string includes the given substring, otherwise `false`
+ *
+ * @example
+ * ```typescript
+ * includes('this is a test', 'is');          // => true
+ * includes('this is a test', 'Is');          // => false
+ * includes('this is a test', 'Is', true);    // => true
+ * includes('this is a test', 'not');         // => false
+ * ```
  */
 export function includes(haystack: string, needle: string, ignoreCase?: boolean): boolean {
 	return match(STRING_MATCH_INCLUDES, haystack, needle, ignoreCase === true);
@@ -61,6 +77,14 @@ function matchCallback(
  * @param needle String to look for
  * @param ignoreCase Ignore case when matching? _(defaults to `false`)_
  * @returns `true` if the string starts with the given substring, otherwise `false`
+ *
+ * @example
+ * ```typescript
+ * startsWith('this is a test', 'this');          // => true
+ * startsWith('this is a test', 'This');          // => false
+ * startsWith('this is a test', 'This', true);    // => true
+ * startsWith('this is a test', 'not');           // => false
+ * ```
  */
 export function startsWith(haystack: string, needle: string, ignoreCase?: boolean): boolean {
 	return match(STRING_MATCH_STARTS_WITH, haystack, needle, ignoreCase === true);

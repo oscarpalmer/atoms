@@ -7,6 +7,11 @@ import {getRandomInteger} from '../random';
  *
  * @param array Original array
  * @returns Shuffled array
+ *
+ * @example
+ * ```typescript
+ * shuffle([1, 2, 3]); // => [3, 1, 2] (maybe? it's random, you know)
+ * ```
  */
 export function shuffle<Item>(array: Item[]): Item[] {
 	if (!Array.isArray(array)) {

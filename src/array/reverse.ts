@@ -7,6 +7,12 @@ import {floor} from '../internal/math/misc';
  *
  * @param array Array to reverse
  * @returns Reversed array
+ *
+ * @example
+ * ```typescript
+ * reverse([1, 2, 3]);       // => [3, 2, 1]
+ * reverse(['a', 'b', 'c']); // => ['c', 'b', 'a']
+ * ```
  */
 export function reverse<Item>(array: Item[]): Item[] {
 	if (!Array.isArray(array)) {
