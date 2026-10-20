@@ -38,11 +38,15 @@ export function handleResult(status: string, parameters: PromiseParameters): voi
 		return;
 	}
 
-	data.result[key as never] = !complete
-		? value
-		: status === PROMISE_TYPE_FULFILLED
-			? {status, value}
-			: {status, reason: value};
+	let resultValue: unknown;
+
+	if (complete) {
+		resultValue = status === PROMISE_TYPE_FULFILLED ? {status, value} : {status, reason: value};
+	} else {
+		resultValue = value;
+	}
+
+	data.result[key as never] = resultValue;
 
 	if (index === data.last) {
 		aborter?.cancel();
@@ -83,7 +87,7 @@ export async function toResult<Value>(
 	const actual = typeof value === 'function' ? value() : value;
 
 	if (!(actual instanceof Promise)) {
-		return Promise.reject(new TypeError(PROMISE_MESSAGE_EXPECTATION_RESULT));
+		throw new TypeError(PROMISE_MESSAGE_EXPECTATION_RESULT);
 	}
 
 	return actual.then(result => ok(result)).catch(reason => error(reason));

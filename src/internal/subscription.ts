@@ -242,7 +242,7 @@ function createSubscriptionsProperty(input: unknown): Required<SubscriptionPrope
 
 	return {
 		key: typeof values.key === 'string' ? values.key : SUBSCRIPTION_PROPERTY,
-		value: values.value == null ? SUBSCRIPTION_NAME : values.value,
+		value: values.value ?? SUBSCRIPTION_NAME,
 	};
 }
 

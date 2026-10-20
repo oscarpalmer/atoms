@@ -21,9 +21,13 @@ function getClampedValue(
 	maximum: number,
 	rounding?: boolean,
 ): number {
-	return typeof value === 'number' && !Number.isNaN(value)
-		? clamp((rounding ?? false) ? round(value) : value, minimum, maximum)
-		: minimum;
+	if (typeof value !== 'number' || Number.isNaN(value)) {
+		return minimum;
+	}
+
+	const actual = (rounding ?? false) ? round(value) : value;
+
+	return clamp(actual, minimum, maximum);
 }
 
 /**

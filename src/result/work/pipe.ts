@@ -6,6 +6,14 @@ import {asyncAttempt, attempt} from '../index';
 
 // #region Types
 
+type InitialAsyncPipeValue<Initial> =
+	| GenericCallback
+	| Initial
+	| Promise<Initial>
+	| Result<Initial>;
+
+type InitialPipeValue<Initial> = GenericCallback | Initial | Result<Initial>;
+
 type WrapValue<Value> = Result<UnwrapValue<Value>>;
 
 // #endregion
@@ -23,7 +31,7 @@ type WrapValue<Value> = Result<UnwrapValue<Value>>;
  * @returns _Piped_ result
  */
 export async function attemptAsyncPipe<Initial, Piped>(
-	initial: GenericCallback | Initial | Promise<Initial> | Result<Initial>,
+	initial: InitialAsyncPipeValue<Initial>,
 	pipe: (value: UnwrapValue<Initial>) => Piped,
 ): Promise<WrapValue<Piped>>;
 
@@ -36,7 +44,7 @@ export async function attemptAsyncPipe<Initial, Piped>(
  * @returns _Piped_ result
  */
 export async function attemptAsyncPipe<Initial, First, Second>(
-	initial: GenericCallback | Initial | Promise<Initial> | Result<Initial>,
+	initial: InitialAsyncPipeValue<Initial>,
 	first: (value: UnwrapValue<Initial>) => First,
 	second: (value: UnwrapValue<First>) => Second,
 ): Promise<WrapValue<Second>>;
@@ -50,7 +58,7 @@ export async function attemptAsyncPipe<Initial, First, Second>(
  * @returns _Piped_ result
  */
 export async function attemptAsyncPipe<Initial, First, Second, Third>(
-	initial: GenericCallback | Initial | Promise<Initial> | Result<Initial>,
+	initial: InitialAsyncPipeValue<Initial>,
 	first: (value: UnwrapValue<Initial>) => First,
 	second: (value: UnwrapValue<First>) => Second,
 	third: (value: UnwrapValue<Second>) => Third,
@@ -65,7 +73,7 @@ export async function attemptAsyncPipe<Initial, First, Second, Third>(
  * @returns _Piped_ result
  */
 export async function attemptAsyncPipe<Initial, First, Second, Third, Fourth>(
-	initial: GenericCallback | Initial | Promise<Initial> | Result<Initial>,
+	initial: InitialAsyncPipeValue<Initial>,
 	first: (value: UnwrapValue<Initial>) => First,
 	second: (value: UnwrapValue<First>) => Second,
 	third: (value: UnwrapValue<Second>) => Third,
@@ -81,7 +89,7 @@ export async function attemptAsyncPipe<Initial, First, Second, Third, Fourth>(
  * @returns _Piped_ result
  */
 export async function attemptAsyncPipe<Initial, First, Second, Third, Fourth, Fifth>(
-	initial: GenericCallback | Initial | Promise<Initial> | Result<Initial>,
+	initial: InitialAsyncPipeValue<Initial>,
 	first: (value: UnwrapValue<Initial>) => First,
 	second: (value: UnwrapValue<First>) => Second,
 	third: (value: UnwrapValue<Second>) => Third,
@@ -98,7 +106,7 @@ export async function attemptAsyncPipe<Initial, First, Second, Third, Fourth, Fi
  * @returns _Piped_ result
  */
 export async function attemptAsyncPipe<Initial, First, Second, Third, Fourth, Fifth, Sixth>(
-	initial: GenericCallback | Initial | Promise<Initial> | Result<Initial>,
+	initial: InitialAsyncPipeValue<Initial>,
 	first: (value: UnwrapValue<Initial>) => First,
 	second: (value: UnwrapValue<First>) => Second,
 	third: (value: UnwrapValue<Second>) => Third,
@@ -125,7 +133,7 @@ export async function attemptAsyncPipe<
 	Sixth,
 	Seventh,
 >(
-	initial: GenericCallback | Initial | Promise<Initial> | Result<Initial>,
+	initial: InitialAsyncPipeValue<Initial>,
 	first: (value: UnwrapValue<Initial>) => First,
 	second: (value: UnwrapValue<First>) => Second,
 	third: (value: UnwrapValue<Second>) => Third,
@@ -154,7 +162,7 @@ export async function attemptAsyncPipe<
 	Seventh,
 	Eighth,
 >(
-	initial: GenericCallback | Initial | Promise<Initial> | Result<Initial>,
+	initial: InitialAsyncPipeValue<Initial>,
 	first: (value: UnwrapValue<Initial>) => First,
 	second: (value: UnwrapValue<First>) => Second,
 	third: (value: UnwrapValue<Second>) => Third,
@@ -185,7 +193,7 @@ export async function attemptAsyncPipe<
 	Eighth,
 	Ninth,
 >(
-	initial: GenericCallback | Initial | Promise<Initial> | Result<Initial>,
+	initial: InitialAsyncPipeValue<Initial>,
 	first: (value: UnwrapValue<Initial>) => First,
 	second: (value: UnwrapValue<First>) => Second,
 	third: (value: UnwrapValue<Second>) => Third,
@@ -218,7 +226,7 @@ export async function attemptAsyncPipe<
 	Ninth,
 	Tenth,
 >(
-	initial: GenericCallback | Initial | Promise<Initial> | Result<Initial>,
+	initial: InitialAsyncPipeValue<Initial>,
 	first: (value: UnwrapValue<Initial>) => First,
 	second: (value: UnwrapValue<First>) => Second,
 	third: (value: UnwrapValue<Second>) => Third,
@@ -240,7 +248,7 @@ export async function attemptAsyncPipe<
  * @returns _Piped_ result
  */
 export async function attemptAsyncPipe<Initial>(
-	initial: GenericCallback | Initial | Promise<Initial> | Result<Initial>,
+	initial: InitialAsyncPipeValue<Initial>,
 	first?: (value: UnwrapValue<Initial>) => unknown,
 	...seconds: Array<(value: unknown) => unknown>
 ): Promise<WrapValue<Initial>>;
@@ -250,17 +258,18 @@ export async function attemptAsyncPipe(
 	first?: (value: unknown) => unknown,
 	...seconds: Array<(value: unknown) => unknown>
 ): Promise<Result<unknown>> {
-	return asyncAttempt(() => {
+	return asyncAttempt(async () => {
 		if (isError(initial)) {
 			throw initial.error;
 		}
 
-		const value =
-			typeof initial === 'function'
-				? (initial as GenericCallback)()
-				: isOk(initial)
-					? initial.value
-					: initial;
+		let value: unknown;
+
+		if (typeof initial === 'function') {
+			value = (initial as GenericCallback)();
+		} else {
+			value = isOk(initial) ? initial.value : initial;
+		}
 
 		if (first == null) {
 			return value;
@@ -281,7 +290,7 @@ export async function attemptAsyncPipe(
  * @returns _Piped_ result
  */
 export function attemptPipe<Initial, Pipe>(
-	initial: GenericCallback | Initial | Result<Initial>,
+	initial: InitialPipeValue<Initial>,
 	pipe: (value: UnwrapValue<Initial>) => Pipe,
 ): WrapValue<Pipe>;
 
@@ -292,7 +301,7 @@ export function attemptPipe<Initial, Pipe>(
  * @returns _Piped_ result
  */
 export function attemptPipe<Initial, First, Second>(
-	initial: GenericCallback | Initial | Result<Initial>,
+	initial: InitialPipeValue<Initial>,
 	first: (value: UnwrapValue<Initial>) => First,
 	second: (value: UnwrapValue<First>) => Second,
 ): WrapValue<Second>;
@@ -304,7 +313,7 @@ export function attemptPipe<Initial, First, Second>(
  * @returns _Piped_ result
  */
 export function attemptPipe<Initial, First, Second, Third>(
-	initial: GenericCallback | Initial | Result<Initial>,
+	initial: InitialPipeValue<Initial>,
 	first: (value: UnwrapValue<Initial>) => First,
 	second: (value: UnwrapValue<First>) => Second,
 	third: (value: UnwrapValue<Second>) => Third,
@@ -317,7 +326,7 @@ export function attemptPipe<Initial, First, Second, Third>(
  * @returns _Piped_ result
  */
 export function attemptPipe<Initial, First, Second, Third, Fourth>(
-	initial: GenericCallback | Initial | Result<Initial>,
+	initial: InitialPipeValue<Initial>,
 	first: (value: UnwrapValue<Initial>) => First,
 	second: (value: UnwrapValue<First>) => Second,
 	third: (value: UnwrapValue<Second>) => Third,
@@ -331,7 +340,7 @@ export function attemptPipe<Initial, First, Second, Third, Fourth>(
  * @returns _Piped_ result
  */
 export function attemptPipe<Initial, First, Second, Third, Fourth, Fifth>(
-	initial: GenericCallback | Initial | Result<Initial>,
+	initial: InitialPipeValue<Initial>,
 	first: (value: UnwrapValue<Initial>) => First,
 	second: (value: UnwrapValue<First>) => Second,
 	third: (value: UnwrapValue<Second>) => Third,
@@ -346,7 +355,7 @@ export function attemptPipe<Initial, First, Second, Third, Fourth, Fifth>(
  * @returns _Piped_ result
  */
 export function attemptPipe<Initial, First, Second, Third, Fourth, Fifth, Sixth>(
-	initial: GenericCallback | Initial | Result<Initial>,
+	initial: InitialPipeValue<Initial>,
 	first: (value: UnwrapValue<Initial>) => First,
 	second: (value: UnwrapValue<First>) => Second,
 	third: (value: UnwrapValue<Second>) => Third,
@@ -362,7 +371,7 @@ export function attemptPipe<Initial, First, Second, Third, Fourth, Fifth, Sixth>
  * @returns _Piped_ result
  */
 export function attemptPipe<Initial, First, Second, Third, Fourth, Fifth, Sixth, Seventh>(
-	initial: GenericCallback | Initial | Result<Initial>,
+	initial: InitialPipeValue<Initial>,
 	first: (value: UnwrapValue<Initial>) => First,
 	second: (value: UnwrapValue<First>) => Second,
 	third: (value: UnwrapValue<Second>) => Third,
@@ -379,7 +388,7 @@ export function attemptPipe<Initial, First, Second, Third, Fourth, Fifth, Sixth,
  * @returns _Piped_ result
  */
 export function attemptPipe<Initial, First, Second, Third, Fourth, Fifth, Sixth, Seventh, Eighth>(
-	initial: GenericCallback | Initial | Result<Initial>,
+	initial: InitialPipeValue<Initial>,
 	first: (value: UnwrapValue<Initial>) => First,
 	second: (value: UnwrapValue<First>) => Second,
 	third: (value: UnwrapValue<Second>) => Third,
@@ -408,7 +417,7 @@ export function attemptPipe<
 	Eighth,
 	Ninth,
 >(
-	initial: GenericCallback | Initial | Result<Initial>,
+	initial: InitialPipeValue<Initial>,
 	first: (value: UnwrapValue<Initial>) => First,
 	second: (value: UnwrapValue<First>) => Second,
 	third: (value: UnwrapValue<Second>) => Third,
@@ -439,7 +448,7 @@ export function attemptPipe<
 	Ninth,
 	Tenth,
 >(
-	initial: GenericCallback | Initial | Result<Initial>,
+	initial: InitialPipeValue<Initial>,
 	first: (value: UnwrapValue<Initial>) => First,
 	second: (value: UnwrapValue<First>) => Second,
 	third: (value: UnwrapValue<Second>) => Third,
@@ -459,7 +468,7 @@ export function attemptPipe<
  * @returns _Piped_ result
  */
 export function attemptPipe<Initial>(
-	initial: GenericCallback | Initial | Result<Initial>,
+	initial: InitialPipeValue<Initial>,
 	first?: (value: UnwrapValue<Initial>) => unknown,
 	...seconds: Array<(value: unknown) => unknown>
 ): WrapValue<Initial>;
@@ -474,12 +483,13 @@ export function attemptPipe(
 			throw initial.error;
 		}
 
-		const value =
-			typeof initial === 'function'
-				? (initial as GenericCallback)()
-				: isOk(initial)
-					? initial.value
-					: initial;
+		let value: unknown;
+
+		if (typeof initial === 'function') {
+			value = (initial as GenericCallback)();
+		} else {
+			value = isOk(initial) ? initial.value : initial;
+		}
 
 		if (first == null) {
 			return value;

@@ -97,7 +97,11 @@ export function getAggregated(
 	const aggregation = aggregate(type, array, key, first);
 
 	if (aggregation.count === 0) {
-		return aggregation.array ? (aggregation.first ? undefined : []) : Number.NaN;
+		if (aggregation.array) {
+			return aggregation.first ? undefined : [];
+		}
+
+		return Number.NaN;
 	}
 
 	if (aggregation.array) {

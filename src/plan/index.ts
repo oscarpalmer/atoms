@@ -10,8 +10,7 @@ import {
 	PLAN_TYPE_SYNC,
 } from '../models/plan.model';
 import {isAsyncGeneratorFunction, isGeneratorFunction} from './is';
-import {asyncAttemptRun, attemptRun} from './result';
-import {asyncRun, run} from './run';
+import {asyncAttemptRun} from './result';
 
 // #region Instances
 
@@ -86,11 +85,5 @@ export function plan<Y, R>(
 
 	throw new Error(PLAN_MESSAGE_PLAN_INPUT);
 }
-
-// #endregion
-
-// #region Exports
-
-export {asyncAttemptRun, asyncRun, attemptRun, run};
 
 // #endregion

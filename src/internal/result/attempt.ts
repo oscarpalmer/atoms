@@ -71,8 +71,8 @@ export async function asyncAttempt<Value, E>(
 		}
 
 		return ok(result);
-	} catch (thrown) {
-		return getError((err ?? thrown) as E, err == null ? undefined : (thrown as Error));
+	} catch (error) {
+		return getError((err ?? error) as E, err == null ? undefined : (error as Error));
 	}
 }
 
@@ -101,8 +101,8 @@ export function attempt<Value, E>(
 		const value = callback();
 
 		return ok(value);
-	} catch (thrown) {
-		return getError((err ?? thrown) as E, err == null ? undefined : (thrown as Error));
+	} catch (error) {
+		return getError((err ?? error) as E, err == null ? undefined : (error as Error));
 	}
 }
 

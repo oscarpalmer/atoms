@@ -49,7 +49,7 @@ Object.defineProperties(Fuzzy.prototype, {
 
 function createFuzzyItems<Item>(items: Array<FuzzyItem<Item>>): Item[] {
 	return items
-		.sort((first, second) => first.haystack.localeCompare(second.haystack))
+		.toSorted((first, second) => first.haystack.localeCompare(second.haystack))
 		.map(({item}) => item);
 }
 

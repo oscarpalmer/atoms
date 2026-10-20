@@ -35,6 +35,7 @@ export default defineConfig({
 			provider: 'istanbul',
 		},
 		environment: 'jsdom',
+		isolate: false,
 		watch: false,
 	},
 });

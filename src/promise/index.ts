@@ -23,6 +23,12 @@ import {createPromiseOptions, createPromisesOptions, getResultsFromPromises} fro
 import {handleResult, settlePromise} from './misc';
 import {getTimedPromise} from './timed';
 
+// #region Types
+
+type AttemptPromiseOptions = PromiseOptions | AbortSignal | number;
+
+// #endregion
+
 // #region Functions
 
 /**
@@ -34,7 +40,7 @@ import {getTimedPromise} from './timed';
  */
 export async function attemptPromise<Value>(
 	promise: Promise<Value>,
-	options?: PromiseOptions | AbortSignal | number,
+	options?: AttemptPromiseOptions,
 ): Promise<Value>;
 
 /**
@@ -46,7 +52,7 @@ export async function attemptPromise<Value>(
  */
 export async function attemptPromise<Value>(
 	callback: () => Promise<Value>,
-	options?: PromiseOptions | AbortSignal | number,
+	options?: AttemptPromiseOptions,
 ): Promise<Value>;
 
 /**
@@ -58,23 +64,23 @@ export async function attemptPromise<Value>(
  */
 export async function attemptPromise<Value>(
 	callback: () => Value,
-	options?: PromiseOptions | AbortSignal | number,
+	options?: AttemptPromiseOptions,
 ): Promise<Value>;
 
 export async function attemptPromise<Value>(
 	value: (() => Value) | Promise<Value>,
-	options?: PromiseOptions | AbortSignal | number,
+	options?: AttemptPromiseOptions,
 ): Promise<Value> {
 	const isFunction = typeof value === 'function';
 
 	if (!isFunction && !(value instanceof Promise)) {
-		return Promise.reject(new TypeError(PROMISE_MESSAGE_EXPECTATION_ATTEMPT));
+		throw new TypeError(PROMISE_MESSAGE_EXPECTATION_ATTEMPT);
 	}
 
 	const {signal, time} = createPromiseOptions(options);
 
 	if (signal?.aborted ?? false) {
-		return Promise.reject(signal?.reason);
+		throw signal?.reason;
 	}
 
 	const aborter = createAborter(signal, () => {
@@ -209,11 +215,11 @@ export async function promises(items: ArrayOrPlainObject, options?: unknown): Pr
 	const {signal, strategy} = createPromisesOptions(options);
 
 	if (signal?.aborted ?? false) {
-		return Promise.reject(signal?.reason);
+		throw signal?.reason;
 	}
 
 	if (!isArrayOrPlainObject(items)) {
-		return Promise.reject(PROMISE_MESSAGE_EXPECTATION_ITEMS_TYPE);
+		throw new TypeError(PROMISE_MESSAGE_EXPECTATION_ITEMS_TYPE);
 	}
 
 	const isArray = Array.isArray(items);

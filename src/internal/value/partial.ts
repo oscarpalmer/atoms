@@ -23,7 +23,14 @@ export function partial<Value extends object, ValueKey extends keyof Value>(
 		return {} as Partial<Value>;
 	}
 
-	const keys = omit ? Object.keys(value) : Array.isArray(providedKeys) ? providedKeys : [];
+	let keys: unknown[];
+
+	if (omit) {
+		keys = Object.keys(value);
+	} else {
+		keys = Array.isArray(providedKeys) ? providedKeys : [];
+	}
+
 	const {length} = keys;
 
 	if (length === 0) {

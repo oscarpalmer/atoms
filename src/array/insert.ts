@@ -44,7 +44,7 @@ export function insert(
 	return insertValues(
 		ARRAY_INSERT_TYPE_INSERT,
 		array,
-		items == null ? indexOrItems : items,
+		items ?? indexOrItems,
 		typeof indexOrItems === 'number' ? indexOrItems : array?.length,
 		0,
 	) as unknown[];

@@ -1,5 +1,5 @@
 import {shuffle} from './internal/array/shuffle';
-import {getRandomInteger} from './internal/random';
+import {getRandom, getRandomInteger} from './internal/random';
 import {join} from './internal/string/misc';
 import {
 	RANDOM_ALPHABET,
@@ -16,7 +16,7 @@ import {
  * @returns Random boolean
  */
 export function getRandomBoolean(): boolean {
-	return Math.random() > RANDOM_BOOLEAN_MODIFIER;
+	return getRandom() > RANDOM_BOOLEAN_MODIFIER;
 }
 
 /**
@@ -115,6 +115,10 @@ export function getRandomItems<Value>(array: Value[], amount?: number): Value[] 
 
 // #region Exports
 
-export {getRandomFloatingNumber as getRandomFloat, getRandomInteger} from './internal/random';
+export {
+	getRandom,
+	getRandomFloatingNumber as getRandomFloat,
+	getRandomInteger,
+} from './internal/random';
 
 // #endregion

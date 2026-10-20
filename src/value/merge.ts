@@ -81,6 +81,22 @@ function createMergingOptions(input?: unknown): MergingOptions {
 	return actual;
 }
 
+function getFullKey(
+	prefix: string | undefined,
+	key: string,
+	options: MergingOptions,
+): string | undefined {
+	let full: string | undefined;
+
+	if (options.replaceableObjects == null) {
+		full = undefined;
+	} else {
+		full = prefix == null ? key : `${prefix}.${key}`;
+	}
+
+	return full;
+}
+
 function getReplaceableObjects(value: unknown): MergeReplaceableObjectsCallback | undefined {
 	const items = (Array.isArray(value) ? value : [value]).filter(
 		item => typeof item === 'string' || item instanceof RegExp,
@@ -118,6 +134,19 @@ export function initializeAssigner(options?: AssignOptions): Assigner {
 export function initializeMerger(options?: MergeOptions): Merger {
 	// @ts-expect-error All good, no worries :-)
 	return new Merger(createMergingOptions(options));
+}
+
+function isMergeable(
+	next: unknown,
+	previous: unknown,
+	options: MergingOptions,
+	full?: string,
+): boolean {
+	return (
+		isArrayOrPlainObject(next) &&
+		isArrayOrPlainObject(previous) &&
+		!(options.replaceableObjects?.(full!) ?? false)
+	);
 }
 
 /**
@@ -162,23 +191,18 @@ function mergeObjects(
 			const next = item[key];
 			const previous = merged[key];
 
-			if (next == null && (options.skipNullableAny || (isArray && options.skipNullableInArrays))) {
+			if (skipMerge(next, options, isArray)) {
 				continue;
 			}
 
-			const full =
-				options.replaceableObjects == null ? undefined : prefix == null ? key : `${prefix}.${key}`;
+			const fullKey = getFullKey(prefix, key, options);
 
-			if (
-				isArrayOrPlainObject(next) &&
-				isArrayOrPlainObject(previous) &&
-				!(options.replaceableObjects?.(full!) ?? false)
-			) {
+			if (isMergeable(next, previous, options, fullKey)) {
 				merged[key] = mergeObjects(
-					[previous, next],
+					[previous as ArrayOrPlainObject, next as ArrayOrPlainObject],
 					options,
 					(destination == null ? undefined : merged[key]) as ArrayOrPlainObject,
-					full,
+					fullKey,
 				);
 			} else {
 				merged[key] = next;
@@ -217,11 +241,15 @@ function mergeValues(
 		return mergeObjects(actual, options, options.assignValues ? actual[0] : undefined, prefix);
 	}
 
-	return options.assignValues
-		? actual[0]
-		: Array.isArray(actual[0])
-			? actual[0].slice()
-			: {...actual[0]};
+	if (options.assignValues) {
+		return actual[0];
+	}
+
+	return Array.isArray(actual[0]) ? actual[0].slice() : {...actual[0]};
+}
+
+function skipMerge(next: unknown, options: MergingOptions, isArray: boolean): boolean {
+	return next == null && (options.skipNullableAny || (isArray && options.skipNullableInArrays));
 }
 
 // #endregion

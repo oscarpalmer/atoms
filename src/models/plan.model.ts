@@ -345,6 +345,10 @@ export const PLAN_MESSAGE_PLAN_INPUT = 'plan requires a generator function';
 
 export const PLAN_MESSAGE_RUN_INPUT = 'run requires a plan or a generator function';
 
+export const PLAN_MESSAGE_USE_NESTED_FN = "Cannot use nested functions with 'use'";
+
+export const PLAN_MESSAGE_USE_SYNC_ASYNC = "Cannot use asynchronous values with 'use'";
+
 export const PLAN_STEP_ASYNC = 'asyncStep' as const;
 
 export const PLAN_STEP_SYNC = 'step' as const;

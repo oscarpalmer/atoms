@@ -102,7 +102,9 @@ export type FuzzyResult<Item> = {
 /**
  * Options for fuzzy searching
  */
-export type FuzzySearchOptions = FuzzyOptions;
+export type FuzzySearchOptions = {
+	[Key in keyof FuzzyOptions]: FuzzyOptions[Key];
+};
 
 export type FuzzyState<Item> = {
 	handler(item: Item): string;

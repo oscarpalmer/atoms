@@ -13,7 +13,9 @@ import {
 
 // #region Instances
 
-function Lumberjack(this: any): void {}
+function Lumberjack(this: any): void {
+	// The Logger instance
+}
 
 Lumberjack.prototype[LOGGER_PROPERTY] = LOGGER_NAME;
 

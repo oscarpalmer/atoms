@@ -71,14 +71,14 @@ function handleResult(result: Result<unknown, unknown>, first: unknown, second?:
 
 	if (isOk(result)) {
 		if (typeof ok !== 'function') {
-			throw new Error(MATCH_MESSAGE_OK);
+			throw new TypeError(MATCH_MESSAGE_OK);
 		}
 
 		return ok(result.value);
 	}
 
 	if (typeof error !== 'function') {
-		throw new Error(MATCH_MESSAGE_ERROR);
+		throw new TypeError(MATCH_MESSAGE_ERROR);
 	}
 
 	return error(result.error, (result as ExtendedErr<unknown>).original);

@@ -13,7 +13,7 @@ export async function asyncGenerate(
 ): Promise<unknown> {
 	const aborter = createAborter(second ?? first, noop);
 
-	if (aborter != null && aborter.signal.aborted) {
+	if (aborter?.signal.aborted) {
 		throw aborter.signal.reason;
 	}
 
@@ -32,7 +32,7 @@ export async function asyncGenerate(
 
 	try {
 		while (true) {
-			if (aborter != null && aborter.signal.aborted) {
+			if (aborter?.signal.aborted) {
 				await generator.throw(aborter.signal.reason);
 			}
 
@@ -64,7 +64,7 @@ export async function asyncGenerate(
 		await generator.return(lastValue);
 	}
 
-	if (aborter != null && aborter.signal.aborted) {
+	if (aborter?.signal.aborted) {
 		throw aborter.signal.reason;
 	}
 

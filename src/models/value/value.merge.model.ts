@@ -5,7 +5,9 @@ import type {ArrayOrPlainObject, NestedPartial, PlainObject, UnionToIntersection
 /**
  * Options for assigning values
  */
-export type AssignOptions = BaseOptions;
+export type AssignOptions = {
+	[Key in keyof BaseOptions]: BaseOptions[Key];
+};
 
 type BaseOptions = {
 	/**

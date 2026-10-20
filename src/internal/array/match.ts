@@ -10,7 +10,7 @@ import {
 	arrayMatchStarts,
 } from '../../models/array/array.match.model';
 import type {ArrayComparison} from '../../models/array/array.misc.model';
-import type {PlainObject} from '../../models/index';
+import type {GenericCallback, PlainObject} from '../../models/index';
 import {getArrayCallback} from './callbacks';
 
 // #region Functions
@@ -77,6 +77,48 @@ export function endsWithArray<Item>(haystack: Item[], needle: Item[]): boolean;
 
 export function endsWithArray(haystack: unknown[], needle: unknown[], key?: unknown): boolean {
 	return arrayMatchEndings.has(getPosition(haystack, needle, key)[1]);
+}
+
+function evaluatePosition(
+	haystack: unknown[],
+	haystackLength: number,
+	needle: unknown[],
+	needleLength: number,
+	key?: unknown,
+): readonly [number, ArrayComparison] {
+	const callback = getArrayCallback(key);
+
+	const limit = haystackLength - needleLength + 1;
+
+	let needleValues = callback == null ? needle : needle.slice();
+
+	if (callback != null) {
+		for (let needleIndex = 0; needleIndex < needleLength; needleIndex += 1) {
+			needleValues[needleIndex] = callback(needle[needleIndex], needleIndex, needle);
+		}
+	}
+
+	for (let haystackIndex = 0; haystackIndex < limit; haystackIndex += 1) {
+		if (!inHaystack(haystack, haystackIndex, needleValues, 0, callback)) {
+			continue;
+		}
+
+		if (needleLength === 1) {
+			return [haystackIndex, getName(haystackIndex, haystackLength, needleLength)];
+		}
+
+		for (let needleIndex = 1; needleIndex < needleLength; needleIndex += 1) {
+			if (!inHaystack(haystack, haystackIndex, needleValues, needleIndex, callback)) {
+				break;
+			}
+
+			if (needleIndex === needleLength - 1) {
+				return [haystackIndex, getName(haystackIndex, haystackLength, needleLength)];
+			}
+		}
+	}
+
+	return arrayMatchOutside;
 }
 
 /**
@@ -175,47 +217,22 @@ function getPosition(
 		return arrayMatchOutside;
 	}
 
-	const callback = getArrayCallback(key);
+	return evaluatePosition(haystack, haystackLength, needle, needleLength, key);
+}
 
-	const limit = haystackLength - needleLength + 1;
+function inHaystack(
+	haystack: unknown[],
+	haystackIndex: number,
+	needleValues: unknown[],
+	needleIndex: number,
+	callback?: GenericCallback,
+) {
+	const haystackItem = haystack[haystackIndex + needleIndex];
 
-	let needleValues = callback == null ? needle : needle.slice();
+	const haystackValue =
+		callback?.(haystackItem, haystackIndex + needleIndex, haystack) ?? haystackItem;
 
-	if (callback != null) {
-		for (let needleIndex = 0; needleIndex < needleLength; needleIndex += 1) {
-			needleValues[needleIndex] = callback(needle[needleIndex], needleIndex, needle);
-		}
-	}
-
-	for (let haystackIndex = 0; haystackIndex < limit; haystackIndex += 1) {
-		let haystackItem = haystack[haystackIndex];
-		let haystackValue = callback?.(haystackItem, haystackIndex, haystack) ?? haystackItem;
-
-		if (!Object.is(haystackValue, needleValues[0])) {
-			continue;
-		}
-
-		if (needleLength === 1) {
-			return [haystackIndex, getName(haystackIndex, haystackLength, needleLength)];
-		}
-
-		for (let needleIndex = 1; needleIndex < needleLength; needleIndex += 1) {
-			haystackItem = haystack[haystackIndex + needleIndex];
-
-			haystackValue =
-				callback?.(haystackItem, haystackIndex + needleIndex, haystack) ?? haystackItem;
-
-			if (!Object.is(haystackValue, needleValues[needleIndex])) {
-				break;
-			}
-
-			if (needleIndex === needleLength - 1) {
-				return [haystackIndex, getName(haystackIndex, haystackLength, needleLength)];
-			}
-		}
-	}
-
-	return arrayMatchOutside;
+	return Object.is(haystackValue, needleValues[needleIndex]);
 }
 
 /**

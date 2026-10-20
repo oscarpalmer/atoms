@@ -1,18 +1,6 @@
+import type {Color} from '../models/color.model';
 import {color} from './instance';
 import {isColor} from './misc/is';
-import type {
-	Color,
-	ColorType,
-	ColorTypeExtended,
-	ColorValue,
-	ColorValueExtended,
-	HSLAColor,
-	HSLColor,
-	HWBAColor,
-	HWBColor,
-	RGBAColor,
-	RGBColor,
-} from '../models/color.model';
 
 // #region Functions
 
@@ -33,6 +21,18 @@ export function getColor(value: unknown): Color {
 
 // #region Exports
 
+export {
+	type ColorType,
+	type ColorTypeExtended,
+	type ColorValue,
+	type ColorValueExtended,
+	type HSLAColor,
+	type HSLColor,
+	type HWBAColor,
+	type HWBColor,
+	type RGBAColor,
+	type RGBColor,
+} from '../models/color.model';
 export {
 	getForegroundColor,
 	getHexaColor,
@@ -66,18 +66,6 @@ export {
 export {hslToHex, hslToHwb, hslToHwba, hslToRgb, hslToRgba} from './space/hsl';
 export {hwbToHex, hwbToHsl, hwbToHsla, hwbToRgb, hwbToRgba} from './space/hwb';
 export {rgbToHex, rgbToHsl, rgbToHsla, rgbToHwb, rgbToHwba} from './space/rgb';
-export type {
-	Color,
-	ColorType,
-	ColorTypeExtended,
-	ColorValue,
-	ColorValueExtended,
-	HSLAColor,
-	HSLColor,
-	HWBAColor,
-	HWBColor,
-	RGBAColor,
-	RGBColor,
-};
+export type {Color};
 
 // #endregion

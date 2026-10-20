@@ -5,6 +5,7 @@ import {
 	NUMBER_OCTAL_VALUE,
 } from '../models/misc.model';
 import {isNumber} from './is';
+import {max, min} from './math/aggregate';
 
 // #region Functions
 
@@ -13,7 +14,7 @@ import {isNumber} from './is';
  *
  * @param value Value to check
  * @param minimum Minimum value
- * @param maximum Maximum value
+ * @param maximum Maximum value _(inclusive)_
  * @returns `true` if the value is between the minimum and maximum, otherwise `false`
  */
 export function between(value: number, minimum: number, maximum: number): boolean {
@@ -25,10 +26,10 @@ export function between(value: number, minimum: number, maximum: number): boolea
 		return Object.is(value, minimum);
 	}
 
-	const max = maximum > minimum ? maximum : minimum;
-	const min = maximum > minimum ? minimum : maximum;
+	const maximumValue = max([maximum, minimum]);
+	const minimumValue = min([maximum, minimum]);
 
-	return value >= min && value <= max;
+	return value >= minimumValue && value <= maximumValue;
 }
 
 /**

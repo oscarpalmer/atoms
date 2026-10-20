@@ -586,18 +586,20 @@ async function run(state: QueueState): Promise<void> {
 	let item = state.items.shift();
 
 	while (item != null) {
+		const next = item;
+
 		let error = false;
 
 		let result: unknown;
 
 		const attempted = await asyncAttempt(async () => {
-			if (item != null && !(item.aborter?.signal?.aborted ?? false)) {
-				const parameters = item.key == null ? item.parameters : [item.key, ...item.parameters];
-
-				return await state.callback(...parameters);
+			if (next.aborter?.signal?.aborted) {
+				throw next.aborter.signal.reason;
 			}
 
-			throw new Error();
+			const parameters = next.key == null ? next.parameters : [next.key, ...next.parameters];
+
+			return await state.callback(...parameters);
 		});
 
 		if (attempted.ok) {

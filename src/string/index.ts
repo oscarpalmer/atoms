@@ -65,7 +65,7 @@ export function dedent(value: string | TemplateStringsArray, ...values: unknown[
 
 	const minimum = min(lengths);
 
-	const pattern = new RegExp(`^\\s{0,${minimum}}`);
+	const pattern = new RegExp(String.raw`^\s{0,${minimum}}`);
 
 	let result = '';
 

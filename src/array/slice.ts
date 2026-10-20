@@ -3,6 +3,7 @@ import {
 	ARRAY_SLICE_DROP,
 	ARRAY_SLICE_TAKE,
 	type ArrayExtractType,
+	type ArrayGetCallbacks,
 } from '../models/array/array.misc.model';
 import type {PlainObject} from '../models/index';
 
@@ -109,32 +110,27 @@ function extract(
 		return [];
 	}
 
-	const isTake = type === ARRAY_SLICE_TAKE;
+	const take = type === ARRAY_SLICE_TAKE;
 
-	if (typeof first === 'number') {
-		if (Math.abs(first) >= length) {
-			return isTake ? array.slice() : [];
-		}
+	return typeof first === 'number'
+		? getSlice(array, length, first, take)
+		: extractSlice(array, length, first, second, take);
+}
 
-		if (first === 0) {
-			return isTake ? [] : array.slice();
-		}
-
-		if (isTake) {
-			return first >= 0 ? array.slice(0, first) : array.slice(array.length + first);
-		}
-
-		return first >= 0 ? array.slice(first) : array.slice(0, array.length + first);
-	}
-
-	const callbacks =
-		second == null ? getArrayCallbacks(first) : getArrayCallbacks(undefined, undefined, first);
-
-	const isBoolean = callbacks?.bool != null;
+function extractSlice(
+	array: unknown[],
+	length: number,
+	first: unknown,
+	second: unknown,
+	take: boolean,
+) {
+	const callbacks = getCallbacks(first, second);
 
 	if (callbacks?.bool == null && callbacks?.value == null) {
-		return isTake ? array.slice() : [];
+		return take ? array.slice() : [];
 	}
+
+	const isBoolean = callbacks?.bool != null;
 
 	const extracted: unknown[] = [];
 
@@ -143,23 +139,20 @@ function extract(
 	for (let index = 0; index < length; index += 1) {
 		const item = array[index];
 
-		const matches = isBoolean
-			? callbacks.bool!(item, index, array)
-			: Object.is(callbacks!.value!(item, index, array), second);
+		const matches = isMatch(item, index, array, callbacks!, second, isBoolean);
+		const reached = isBoolean ? !matches : matches;
 
-		if (isTake) {
-			if (isBoolean ? !matches : matches) {
-				break;
-			}
+		if (take && reached) {
+			break;
+		}
 
+		if (push || take) {
 			extracted.push(item);
 
 			continue;
 		}
 
-		if (push) {
-			extracted.push(item);
-		} else if (isBoolean ? !matches : matches) {
+		if (reached) {
 			push = true;
 
 			if (isBoolean) {
@@ -169,6 +162,49 @@ function extract(
 	}
 
 	return extracted;
+}
+
+function getCallbacks(first: unknown, second: unknown): ArrayGetCallbacks | undefined {
+	let callbacks: ArrayGetCallbacks | undefined;
+
+	if (second == null) {
+		callbacks = getArrayCallbacks(first);
+	} else {
+		callbacks = getArrayCallbacks(undefined, undefined, first);
+	}
+
+	return callbacks;
+}
+
+function getSlice(array: unknown[], length: number, amount: number, take: boolean): unknown[] {
+	if (Math.abs(amount) >= length) {
+		return take ? array.slice() : [];
+	}
+
+	if (amount === 0) {
+		return take ? [] : array.slice();
+	}
+
+	if (take) {
+		return amount >= 0 ? array.slice(0, amount) : array.slice(length + amount);
+	}
+
+	return amount >= 0 ? array.slice(amount) : array.slice(0, length + amount);
+}
+
+function isMatch(
+	item: unknown,
+	index: number,
+	array: unknown[],
+	callbacks: ArrayGetCallbacks,
+	second: unknown,
+	isBoolean: boolean,
+): boolean {
+	if (isBoolean) {
+		return callbacks.bool!(item, index, array);
+	}
+
+	return Object.is(callbacks!.value!(item, index, array), second);
 }
 
 /**

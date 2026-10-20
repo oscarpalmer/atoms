@@ -84,7 +84,7 @@ export function getHexaColor(this: InternalColor): string {
  * @returns Normalized hex color
  */
 export function getNormalizedHex(value: unknown, alpha?: boolean): string {
-	const includeAlpha = alpha ?? false;
+	const includeAlpha = alpha === true;
 
 	if (!isHexColor(value)) {
 		return `${COLOR_DEFAULTS.hexBlack}${includeAlpha ? COLOR_ALPHA.fullHexLong : ''}`;

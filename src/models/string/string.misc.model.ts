@@ -14,7 +14,7 @@ export const STRING_EXPRESSION_IGNORED: RegExp = /(^|\.)(__proto__|constructor|p
 
 // Lodash uses it, so it's fine ;-)
 // oxlint-disable-next-line no-control-regex
-export const STRING_EXPRESSION_WORDS: RegExp = /[^\x00-\x2f\x3a-\x40\x5b-\x60\x7b-\x7f]+/g;
+export const STRING_EXPRESSION_WORDS: RegExp = /([^\x00-\x2f\x3a-\x40\x5b-\x60\x7b-\x7f]+)/g;
 
 export const STRING_EXPRESSION_WHITESPACE_PREFIX: RegExp = /^(\s+)/;
 

@@ -13,6 +13,7 @@ import {
 } from '../../models/value/value.equal.model';
 import type {CompareHandler} from '../../models/value/value.handler.model';
 import {isNonPlainObject, isPlainObject, isPrimitive, isTypedArray} from '../is';
+import {min} from '../math/aggregate';
 import {round} from '../math/misc';
 import {createCompareHandler} from './handlers';
 
@@ -144,7 +145,7 @@ function equalArray(first: unknown[], second: unknown[], options: EqualizerOptio
 
 	if (length >= EQUAL_ARRAY_THRESHOLD) {
 		offset = round(length / EQUAL_ARRAY_PEEK_PERCENTAGE);
-		offset = offset > EQUAL_ARRAY_THRESHOLD ? EQUAL_ARRAY_THRESHOLD : offset;
+		offset = min([offset, EQUAL_ARRAY_THRESHOLD]);
 
 		for (let index = 0; index < offset; index += 1) {
 			if (

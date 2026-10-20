@@ -25,24 +25,18 @@ export async function toPromise<Value, E = Error>(
  */
 export async function toPromise<Value, E = Error>(result: AnyResult<Value, E>): Promise<Value>;
 
-/**
- * Converts a _Result_ to a _Promise_
- *
- * Resolves if ok, rejects for error
- *
- * @param result _Result_ to convert
- * @returns Promised result
- */
-export async function toPromise<Value, E = Error>(
-	result: AnyResult<Value, E> | (() => AnyResult<Value, E>),
-): Promise<Value> {
+export async function toPromise(result: unknown): Promise<unknown> {
 	const actual = typeof result === 'function' ? result() : result;
 
 	if (!isResult(actual)) {
-		return Promise.reject(new Error(RESULT_MESSAGE_PROMISE));
+		throw new TypeError(RESULT_MESSAGE_PROMISE);
 	}
 
-	return isOk(actual) ? Promise.resolve(actual.value) : Promise.reject(actual.error);
+	if (isOk(actual)) {
+		return actual.value;
+	}
+
+	throw actual.error;
 }
 
 // #endregion

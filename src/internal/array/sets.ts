@@ -23,13 +23,27 @@ export function compareSets(
 	const isUnion = type === ARRAY_SETS_COMPARE_UNION;
 
 	if (first.length === 0) {
-		return isDifference ? first.slice() : isIntersection ? [] : second.slice();
+		if (isDifference) {
+			return first.slice();
+		}
+
+		return isIntersection ? [] : second.slice();
 	}
 
 	if (!Array.isArray(second) || second.length === 0) {
 		return isIntersection ? [] : first.slice();
 	}
 
+	return getComparison(first, second, isIntersection, isUnion, key);
+}
+
+function getComparison(
+	first: unknown[],
+	second: unknown[],
+	isIntersection: boolean,
+	isUnion: boolean,
+	key?: unknown,
+) {
 	const callback = getArrayCallback(key);
 
 	const values = isUnion ? first : second;

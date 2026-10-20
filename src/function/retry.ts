@@ -36,7 +36,7 @@ async function asyncRetry<Callback extends GenericAsyncCallback>(
  * @param options Retry options
  * @returns Callback result
  */
-async function asyncRetry<Callback extends GenericCallback>(
+async function asyncRetry<Callback extends GenericAsyncCallback>(
 	callback: Callback,
 	options?: RetryOptions,
 ): Promise<ReturnType<Callback>>;
@@ -50,7 +50,7 @@ async function asyncRetry<Callback extends GenericCallback>(
  * @param options Retry options
  * @returns Callback result
  */
-async function asyncRetry<Callback extends GenericCallback>(
+async function asyncRetry<Callback extends GenericAsyncCallback>(
 	callback: Callback,
 	options?: RetryOptions,
 ): Promise<ReturnType<Callback>> {
@@ -63,14 +63,16 @@ async function asyncRetry<Callback extends GenericCallback>(
 
 		if (result.ok) {
 			resolver(result.value);
-		} else {
-			if (attempts >= times || !when(result.error)) {
-				rejector(new RetryError(RETRY_MESSAGE_FAILED, result.error));
-			} else {
-				attempts += 1;
 
-				void limiter.run();
-			}
+			return;
+		}
+
+		if (attempts >= times || !when(result.error)) {
+			rejector(new RetryError(RETRY_MESSAGE_FAILED, result.error));
+		} else {
+			attempts += 1;
+
+			void limiter.run();
 		}
 	}
 

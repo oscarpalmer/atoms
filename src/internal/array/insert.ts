@@ -15,7 +15,7 @@ function insertChunkedValues(
 	start: number,
 	deleteCount: number,
 ): unknown {
-	const actualDeleteCount = deleteCount < 0 ? 0 : deleteCount;
+	const actualDeleteCount = max([deleteCount, 0]);
 	const actualStart = min([max([0, start]), array.length]);
 	const chunked = chunk(items);
 	const lastIndex = chunked.length - 1;

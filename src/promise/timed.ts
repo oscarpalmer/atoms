@@ -71,13 +71,13 @@ export async function timed<Value>(promise: Promise<Value>, time: number): Promi
 
 export async function timed<Value>(promise: Promise<Value>, options: unknown): Promise<Value> {
 	if (!(promise instanceof Promise)) {
-		return Promise.reject(new TypeError(PROMISE_MESSAGE_EXPECTATION_TIMED));
+		throw new TypeError(PROMISE_MESSAGE_EXPECTATION_TIMED);
 	}
 
 	const {signal, time} = createPromiseOptions(options);
 
 	if (signal?.aborted ?? false) {
-		return Promise.reject(signal?.reason);
+		throw signal?.reason;
 	}
 
 	return time > 0 ? getTimedPromise(promise, time, signal) : promise;

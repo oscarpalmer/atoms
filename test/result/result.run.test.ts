@@ -86,6 +86,8 @@ test('asynchronous', async () => {
 		}),
 	);
 
+	const resolvedSimple = await attempt.async(() => 'success: simple' as never);
+
 	expect(isError(rejected)).toBe(true);
 	expect(isError(rejected, true)).toBe(false);
 	expect(isOk(rejected)).toBe(false);
@@ -120,4 +122,8 @@ test('asynchronous', async () => {
 	expect((resolvedPromise as any).error).toBeUndefined();
 	expect((resolvedPromise as any).original).toBeUndefined();
 	expect((resolvedPromise as any).value).toBe('success: promise');
+
+	expect((resolvedSimple as any).error).toBeUndefined();
+	expect((resolvedSimple as any).original).toBeUndefined();
+	expect((resolvedSimple as any).value).toBe('success: simple');
 });

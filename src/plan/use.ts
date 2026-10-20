@@ -1,6 +1,8 @@
 import {getGenerator} from '../internal/plan';
 import {isError, isOk} from '../internal/result/misc';
 import {
+	PLAN_MESSAGE_USE_NESTED_FN,
+	PLAN_MESSAGE_USE_SYNC_ASYNC,
 	PLAN_STEP_ASYNC,
 	PLAN_STEP_SYNC,
 	PLAN_SYMBOL,
@@ -75,7 +77,7 @@ export function asyncUse(value: unknown): AsyncStep<any> {
 		actual = await actual;
 
 		if (typeof actual === 'function') {
-			throw new Error();
+			throw new TypeError(PLAN_MESSAGE_USE_NESTED_FN);
 		}
 
 		if (typeof actual === 'object' && actual !== null && PLAN_SYMBOL in actual) {
@@ -179,11 +181,11 @@ function validateUseInput(value: unknown, resolved: boolean): void {
 		isAsyncStep(value) ||
 		isAsyncSuccess(value)
 	) {
-		throw new Error();
+		throw new Error(PLAN_MESSAGE_USE_SYNC_ASYNC);
 	}
 
 	if (resolved && typeof value === 'function') {
-		throw new Error();
+		throw new Error(PLAN_MESSAGE_USE_NESTED_FN);
 	}
 }
 

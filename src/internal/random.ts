@@ -3,6 +3,20 @@ import {floor} from './math/misc';
 
 // #region Functions
 
+/**
+ * Get a random number between 0 _(inclusive)_ and 1 _(exclusive)_
+ *
+ * @returns Random number
+ */
+export function getRandom(): number {
+	/* istanbul ignore if */
+	if (globalThis.crypto == null) {
+		return Math.random();
+	}
+
+	return globalThis.crypto.getRandomValues(new Uint32Array(1))[0] / RANDOM_DIVISOR;
+}
+
 function getRandomFloatingNumberValue(
 	inclusive: boolean,
 	minimum?: number,
@@ -22,7 +36,7 @@ function getRandomFloatingNumberValue(
 		[minFloat, maxFloat] = [maxFloat, minFloat];
 	}
 
-	return Math.random() * (maxFloat + (inclusive ? 1 : 0) - minFloat) + minFloat;
+	return getRandom() * (maxFloat + (inclusive ? 1 : 0) - minFloat) + minFloat;
 }
 
 /**
@@ -46,5 +60,11 @@ export function getRandomFloatingNumber(minimum?: number, maximum?: number): num
 export function getRandomInteger(minimum?: number, maximum?: number): number {
 	return floor(getRandomFloatingNumberValue(true, minimum, maximum));
 }
+
+// #endregion
+
+// #region Variables
+
+const RANDOM_DIVISOR = 2 ** 32;
 
 // #endregion

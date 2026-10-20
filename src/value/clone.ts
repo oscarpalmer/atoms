@@ -55,7 +55,7 @@ function cloneAny(
 			return value;
 
 		case value instanceof Date:
-			return new Date(value.getTime());
+			return new Date(value);
 
 		case typeof value === 'function': {
 			parameters.options ??= createCloneOptions(options);

@@ -119,7 +119,11 @@ export function tryEncode(value: boolean | number | string): unknown {
  * @returns Array of words found in the string
  */
 export function words(value: string): string[] {
-	return typeof value === 'string' ? (value.match(STRING_EXPRESSION_WORDS) ?? []) : [];
+	if (typeof value === 'string') {
+		return value.match(STRING_EXPRESSION_WORDS) ?? [];
+	}
+
+	return [];
 }
 
 // #endregion

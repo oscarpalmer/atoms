@@ -1,4 +1,5 @@
 import {isPlainObject} from '../internal/is';
+import {min} from '../internal/math/aggregate';
 import {floor, round} from '../internal/math/misc';
 import {compare} from '../internal/value/compare';
 import {
@@ -382,7 +383,7 @@ function isSortedArray(this: InternalSorter | SortHandler[], array: unknown[]): 
 
 	if (length >= SORT_THRESHOLD) {
 		offset = round(length / SORT_PEEK_PERCENTAGE);
-		offset = offset > SORT_THRESHOLD ? SORT_THRESHOLD : offset;
+		offset = min([offset, SORT_THRESHOLD]);
 
 		for (let index = 0; index < offset; index += 1) {
 			const [firstItem, firstOffset] = [array[index], array[index + 1]];

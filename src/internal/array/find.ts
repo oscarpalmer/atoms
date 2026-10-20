@@ -1,3 +1,4 @@
+import type {GenericCallback} from '../../models';
 import {
 	ARRAY_FIND_UNIQUE_THRESHOLD,
 	ARRAY_FIND_VALUE_INDEX,
@@ -11,6 +12,21 @@ import {
 } from '../../models/array/array.find.model';
 import {getArrayCallback, getArrayCallbacks} from './callbacks';
 
+// #region Types
+
+type FindComplexValuesParameters = {
+	array: unknown[];
+	keyCallback: GenericCallback | undefined;
+	length: number;
+	mapAfter: GenericCallback | undefined;
+	mapBefore: GenericCallback | undefined;
+	result: ArrayFindValuesResult;
+	type: ArrayFindValuesType;
+	value: unknown;
+};
+
+// #endregion
+
 // #region Functions
 
 export function createFindParameters(original: unknown[]): ArrayParameters {
@@ -21,6 +37,74 @@ export function createFindParameters(original: unknown[]): ArrayParameters {
 		key: length === 2 ? original[0] : undefined,
 		value: length === 1 && typeof original[0] !== 'function' ? original[0] : original[1],
 	};
+}
+
+function findComplexValues(parameters: FindComplexValuesParameters) {
+	const {array, keyCallback, length, mapAfter, mapBefore, result, type, value} = parameters;
+
+	const keys = new Set();
+
+	for (let index = 0; index < length; index += 1) {
+		const item = array[index];
+
+		let keyed: unknown;
+		let transformed: unknown;
+
+		if (mapBefore == null) {
+			keyed = keyCallback?.(item, index, array) ?? item;
+			transformed = item;
+		} else {
+			transformed = mapBefore(item, index, array);
+			keyed = keyCallback?.(transformed, index, array) ?? transformed;
+		}
+
+		if (
+			(type === ARRAY_FIND_VALUES_ALL && Object.is(keyed, value)) ||
+			(type === ARRAY_FIND_VALUES_UNIQUE && !keys.has(keyed))
+		) {
+			keys.add(keyed);
+			result.matched.push(mapAfter?.(item, index, array) ?? transformed);
+		} else {
+			result.notMatched.push(item);
+		}
+	}
+
+	return result;
+}
+
+function findSimpleValue(array: unknown[], value: unknown, findIndex: boolean, reversed: boolean) {
+	if (findIndex) {
+		return reversed ? array.lastIndexOf(value) : array.indexOf(value);
+	}
+
+	return reversed
+		? array.findLast(item => Object.is(item, value))
+		: array.find(item => Object.is(item, value));
+}
+
+function findSimpleValues(
+	array: unknown[],
+	length: number,
+	value: unknown,
+	boolCallback: GenericCallback | undefined,
+	mapBefore: GenericCallback | undefined,
+	mapAfter: GenericCallback | undefined,
+	result: ArrayFindValuesResult,
+) {
+	const callback = boolCallback ?? (item => Object.is(item, value));
+
+	for (let index = 0; index < length; index += 1) {
+		const item = array[index];
+		const transformed = mapBefore?.(item, index, array) ?? item;
+
+		if (callback(transformed, index, array)) {
+			result.matched.push(mapAfter?.(item, index, array) ?? transformed);
+		} else {
+			result.notMatched.push(item);
+		}
+	}
+
+	return result;
 }
 
 export function findValue(
@@ -54,13 +138,7 @@ export function findValue(
 	const callbacks = getArrayCallbacks(bool, key);
 
 	if (callbacks?.bool == null && callbacks?.keyed == null) {
-		if (findIndex) {
-			return reversed ? array.lastIndexOf(value) : array.indexOf(value);
-		}
-
-		return reversed
-			? array.findLast(item => Object.is(item, value))
-			: array.find(item => Object.is(item, value));
+		return findSimpleValue(array, value, findIndex, reversed);
 	}
 
 	if (callbacks.bool != null) {
@@ -109,7 +187,11 @@ export function findAbsoluteValueOrDefault(
 
 	const index = findValue(ARRAY_FIND_VALUE_INDEX, array, parameters, reversed) as number;
 
-	return index > -1 ? array[index] : useDefaultValue ? defaultValue : undefined;
+	if (index === -1) {
+		return useDefaultValue ? defaultValue : undefined;
+	}
+
+	return array[index];
 }
 
 export function findValues(
@@ -144,54 +226,31 @@ export function findValues(
 	const mapCallback = getArrayCallback(mapper?.callback);
 	const mapReverse = mapper?.reverse ?? false;
 
-	const mapAfter = mapCallback == null ? undefined : mapReverse ? undefined : mapCallback;
-	const mapBefore = mapCallback == null ? undefined : mapReverse ? mapCallback : undefined;
+	let mapAfter: GenericCallback | undefined;
+	let mapBefore: GenericCallback | undefined;
+
+	if (mapCallback == null) {
+		mapAfter = undefined;
+		mapBefore = undefined;
+	} else {
+		mapAfter = mapReverse ? undefined : mapCallback;
+		mapBefore = mapReverse ? mapCallback : undefined;
+	}
 
 	if (callbacks?.bool != null || (type === ARRAY_FIND_VALUES_ALL && key == null)) {
-		const callback = callbacks?.bool ?? (item => Object.is(item, value));
-
-		for (let index = 0; index < length; index += 1) {
-			const item = array[index];
-			const transformed = mapBefore?.(item, index, array) ?? item;
-
-			if (callback(transformed, index, array)) {
-				result.matched.push(mapAfter?.(item, index, array) ?? transformed);
-			} else {
-				result.notMatched.push(item);
-			}
-		}
-
-		return result;
+		return findSimpleValues(array, length, value, callbacks?.bool, mapBefore, mapAfter, result);
 	}
 
-	const keys = new Set();
-
-	for (let index = 0; index < length; index += 1) {
-		const item = array[index];
-
-		let keyed: unknown;
-		let transformed: unknown;
-
-		if (mapBefore == null) {
-			keyed = callbacks?.keyed?.(item, index, array) ?? item;
-			transformed = item;
-		} else {
-			transformed = mapBefore(item, index, array);
-			keyed = callbacks?.keyed?.(transformed, index, array) ?? transformed;
-		}
-
-		if (
-			(type === ARRAY_FIND_VALUES_ALL && Object.is(keyed, value)) ||
-			(type === ARRAY_FIND_VALUES_UNIQUE && !keys.has(keyed))
-		) {
-			keys.add(keyed);
-			result.matched.push(mapAfter?.(item, index, array) ?? transformed);
-		} else {
-			result.notMatched.push(item);
-		}
-	}
-
-	return result;
+	return findComplexValues({
+		array,
+		length,
+		mapAfter,
+		mapBefore,
+		result,
+		type,
+		value,
+		keyCallback: callbacks?.keyed,
+	});
 }
 
 // #endregion
