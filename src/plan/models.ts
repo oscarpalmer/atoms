@@ -1,1 +1,15 @@
-export type {AsyncPlan, Plan, PlanFailure, PlanResult, PlanSuccess} from '../models/plan.model';
+export type {
+	AsyncFailure,
+	AsyncPlan,
+	AsyncPlanned,
+	AsyncStep,
+	AsyncSuccess,
+	Failure,
+	Plan,
+	PlanError,
+	PlanOk,
+	PlanReturned,
+	Planned,
+	Step,
+	Success,
+} from '../models/plan.model';

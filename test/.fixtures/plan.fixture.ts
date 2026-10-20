@@ -45,3 +45,13 @@ export async function* getMessage() {
 function getSuffix() {
 	return ', world!';
 }
+
+export function getThrown(callback: () => unknown): unknown {
+	try {
+		callback();
+	} catch (error) {
+		return error;
+	}
+
+	throw new Error('expected callback to throw');
+}

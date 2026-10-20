@@ -39,6 +39,7 @@ export * from './plan/misc';
 export * from './plan/models';
 export * from './plan/result';
 export * from './plan/run';
+export * from './plan/use';
 
 export * from './promise/delay';
 export * from './promise/index';

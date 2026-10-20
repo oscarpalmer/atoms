@@ -1,7 +1,8 @@
 import {expect, test} from 'vite-plus/test';
-import {error, fail, plan, run} from '../../src';
+import {error, fail, isError, plan, run, type Err} from '../../src';
+import {getThrown} from '../.fixtures/plan.fixture';
 
-test('error', () => {
+test('errors', () => {
 	const items = [
 		[
 			function* yieldedError() {
@@ -13,7 +14,7 @@ test('error', () => {
 		],
 		[
 			function* failError() {
-				yield fail('fail error');
+				yield* fail('fail error');
 
 				return 'hello, again';
 			},
@@ -26,6 +27,18 @@ test('error', () => {
 			'result error',
 		],
 		[
+			function* returnedError() {
+				return new Error('returned error');
+			},
+			new Error('returned error'),
+		],
+		[
+			function* returnedResultError() {
+				return error('returned result error');
+			},
+			'returned result error',
+		],
+		[
 			function* thrownError() {
 				yield;
 
@@ -36,21 +49,17 @@ test('error', () => {
 	] as [() => Generator, unknown][];
 
 	for (const [generator, expectation] of items) {
-		try {
-			run(generator);
-		} catch (error) {
-			expect(error).toEqual(expectation);
-		}
+		expect(getThrown(() => run(generator))).toEqual(expectation);
+		expect(getThrown(() => plan(generator).run())).toEqual(expectation);
 
-		try {
-			plan(generator).run();
-		} catch (error) {
-			expect(error).toEqual(expectation);
-		}
+		const attempted = plan(generator).attempt();
+
+		expect(isError(attempted)).toBe(true);
+		expect((attempted as Err<unknown>).error).toEqual(expectation);
 	}
 });
 
-test('error, async', async () => {
+test('errors, async', async () => {
 	const items = [
 		[
 			async function* yieldedError() {
@@ -62,7 +71,7 @@ test('error, async', async () => {
 		],
 		[
 			async function* failError() {
-				yield fail('fail error');
+				yield* fail('fail error');
 
 				return 'hello, again';
 			},
@@ -75,6 +84,18 @@ test('error, async', async () => {
 			'result error',
 		],
 		[
+			async function* returnedError() {
+				return new Error('returned error');
+			},
+			new Error('returned error'),
+		],
+		[
+			async function* returnedResultError() {
+				return error('returned result error');
+			},
+			'returned result error',
+		],
+		[
 			async function* thrownError() {
 				yield;
 
@@ -85,14 +106,12 @@ test('error, async', async () => {
 	] as [() => AsyncGenerator, unknown][];
 
 	for (const [asyncGenerator, expectation] of items) {
-		await run.async(asyncGenerator).catch(error => {
-			expect(error).toEqual(expectation);
-		});
+		await expect(run.async(asyncGenerator)).rejects.toEqual(expectation);
+		await expect(plan(asyncGenerator).run()).rejects.toEqual(expectation);
 
-		await plan(asyncGenerator)
-			.run()
-			.catch(error => {
-				expect(error).toEqual(expectation);
-			});
+		const attempted = await plan(asyncGenerator).attempt();
+
+		expect(isError(attempted)).toBe(true);
+		expect((attempted as Err<unknown>).error).toEqual(expectation);
 	}
 });

@@ -1,14 +1,13 @@
+import {asyncGenerate, generate} from '../internal/plan/plan.generate';
 import {
 	PLAN_MESSAGE_RUN_INPUT,
 	PLAN_SYMBOL,
 	type AsyncPlan,
 	type InternalAsyncPlan,
-	type InternalPlan,
 	type Plan,
 	type PlanReturned,
 } from '../models/plan.model';
-import {asyncGenerate, generate} from './generate';
-import {isAsyncGenerator, isAsyncPlan, isGenerator, isPlan} from './is';
+import {isAsyncGeneratorFunction, isAsyncPlan, isGeneratorFunction, isPlan} from './is';
 import {asyncAttemptRun, attemptRun} from './result';
 
 // #region Functions
@@ -70,7 +69,7 @@ export function asyncRun(input: unknown, first?: unknown, second?: unknown): unk
 		return asyncGenerate((input as InternalAsyncPlan)[PLAN_SYMBOL], false, first, second);
 	}
 
-	if (isAsyncGenerator(input)) {
+	if (isAsyncGeneratorFunction(input)) {
 		return asyncGenerate(input, false, first, second);
 	}
 
@@ -106,23 +105,11 @@ export function run(input: unknown, ...parameters: unknown[]): unknown {
 		return input.run(...parameters);
 	}
 
-	if (isGenerator(input)) {
+	if (isGeneratorFunction(input)) {
 		return generate(input, parameters, false);
 	}
 
 	throw new Error(PLAN_MESSAGE_RUN_INPUT);
-}
-
-export function runAsyncPlan(
-	this: InternalAsyncPlan,
-	first: never,
-	second: never,
-): Promise<unknown> {
-	return asyncGenerate(this[PLAN_SYMBOL], false, first, second);
-}
-
-export function runPlan(this: InternalPlan, ...parameters: unknown[]): unknown {
-	return generate(this[PLAN_SYMBOL], parameters, false);
 }
 
 // #endregion

@@ -12,10 +12,7 @@ import {
 	run,
 	succeed,
 } from '../../src';
-import {isFixture} from '../.fixtures/is.fixture';
-import {getABC, getMessage} from '../.fixtures/plan.fixture';
-
-const {length, values} = isFixture;
+import {getABC, getMessage, getThrown} from '../.fixtures/plan.fixture';
 
 test('abort', async () => {
 	const first = new AbortController();
@@ -55,68 +52,59 @@ test('abort', async () => {
 });
 
 test('fail', async () => {
-	function* failing() {
+	function* syncFailingBasic() {
 		yield* fail('error');
 		yield* succeed('yay');
 
 		return 'default';
 	}
 
-	try {
-		run(failing);
-	} catch (error) {
-		expect(error).toBe('error');
-	}
+	expect(getThrown(() => run(syncFailingBasic))).toBe('error');
 
-	async function* asyncFailing() {
-		yield* fail('error');
+	function* syncFailingFn() {
+		yield* fail(() => 'error');
 		yield* succeed('yay');
 
 		return 'default';
 	}
 
-	return run.async(asyncFailing).catch(error => {
-		expect(error).toBe('error');
-	});
-});
+	expect(getThrown(() => run(syncFailingFn))).toBe('error');
 
-test('is', () => {
-	for (let index = 0; index < length; index += 1) {
-		const actual = values[index];
+	async function* asyncFailingBasic() {
+		yield* fail.async('error');
+		yield* succeed('yay');
 
-		expect(isAsyncGenerator(actual)).toBe(false);
-		expect(isAsyncPlan(actual)).toBe(false);
-		expect(isGenerator(actual)).toBe(false);
-		expect(isPlan(actual)).toBe(false);
+		return 'default';
 	}
 
-	function* generator() {}
+	await expect(run.async(asyncFailingBasic)).rejects.toBe('error');
 
-	expect(isAsyncGenerator(generator)).toBe(false);
-	expect(isAsyncPlan(generator)).toBe(false);
-	expect(isGenerator(generator)).toBe(true);
-	expect(isPlan(generator)).toBe(false);
+	async function* asyncFailingFn() {
+		yield* fail.async(() => 'error');
+		yield* succeed('yay');
 
-	const planned = plan(function* () {});
+		return 'default';
+	}
 
-	expect(isAsyncGenerator(planned)).toBe(false);
-	expect(isAsyncPlan(planned)).toBe(false);
-	expect(isGenerator(planned)).toBe(false);
-	expect(isPlan(planned)).toBe(true);
+	await expect(run.async(asyncFailingFn)).rejects.toBe('error');
 
-	async function* asyncGenerator() {}
+	async function* asyncFailingPromiseBasic() {
+		yield* fail.async(new Promise(resolve => resolve('error')));
+		yield* succeed('yay');
 
-	expect(isAsyncGenerator(asyncGenerator)).toBe(true);
-	expect(isAsyncPlan(asyncGenerator)).toBe(false);
-	expect(isGenerator(asyncGenerator)).toBe(false);
-	expect(isPlan(asyncGenerator)).toBe(false);
+		return 'default';
+	}
 
-	const asyncPlanned = plan(async function* () {});
+	await expect(run.async(asyncFailingPromiseBasic)).rejects.toBe('error');
 
-	expect(isAsyncGenerator(asyncPlanned)).toBe(false);
-	expect(isAsyncPlan(asyncPlanned)).toBe(true);
-	expect(isGenerator(asyncPlanned)).toBe(false);
-	expect(isPlan(asyncPlanned)).toBe(false);
+	async function* asyncFailingPromiseFn() {
+		yield* fail.async(() => new Promise(resolve => resolve('error')));
+		yield* succeed('yay');
+
+		return 'default';
+	}
+
+	await expect(run.async(asyncFailingPromiseFn)).rejects.toBe('error');
 });
 
 test('iterator', async () => {
@@ -151,21 +139,59 @@ test('iterator', async () => {
 });
 
 test('succeed', async () => {
-	function* succeeding() {
+	function* succeedingBasic() {
 		const result = yield* succeed(456);
 
 		return `result: ${result}`;
 	}
 
-	expect(run(succeeding)).toBe('result: 456');
+	expect(run(succeedingBasic)).toBe('result: 456');
 
-	async function* asyncSucceeding() {
-		const result = yield* succeed(123);
+	function* succeedingFn() {
+		const result = yield* succeed(() => 456);
 
 		return `result: ${result}`;
 	}
 
-	return run.async(asyncSucceeding).then(result => {
+	expect(run(succeedingFn)).toBe('result: 456');
+
+	async function* asyncSucceedingBasic() {
+		const result = yield* succeed.async(123);
+
+		return `result: ${result}`;
+	}
+
+	await run.async(asyncSucceedingBasic).then(result => {
+		expect(result).toBe('result: 123');
+	});
+
+	async function* asyncSucceedingFn() {
+		const result = yield* succeed.async(() => 123);
+
+		return `result: ${result}`;
+	}
+
+	await run.async(asyncSucceedingFn).then(result => {
+		expect(result).toBe('result: 123');
+	});
+
+	async function* asyncSucceedingPromiseBasic() {
+		const result = yield* succeed.async(new Promise<number>(resolve => resolve(123)));
+
+		return `result: ${result}`;
+	}
+
+	await run.async(asyncSucceedingPromiseBasic).then(result => {
+		expect(result).toBe('result: 123');
+	});
+
+	async function* asyncSucceedingPromiseFn() {
+		const result = yield* succeed.async(() => new Promise<number>(resolve => resolve(123)));
+
+		return `result: ${result}`;
+	}
+
+	await run.async(asyncSucceedingPromiseFn).then(result => {
 		expect(result).toBe('result: 123');
 	});
 });

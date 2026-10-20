@@ -1,3 +1,4 @@
+import {attemptRunPlan, getGenerator, runAsyncPlan, runPlan} from '../internal/plan';
 import {
 	type AsyncPlan,
 	type InternalAsyncPlan,
@@ -5,39 +6,35 @@ import {
 	type Plan,
 	PLAN_MESSAGE_PLAN_INPUT,
 	PLAN_SYMBOL,
-	PLAN_TYPE_PLAN_ASYNC,
-	PLAN_TYPE_PLAN_SYNC,
+	PLAN_TYPE_ASYNC,
+	PLAN_TYPE_SYNC,
 } from '../models/plan.model';
-import {isAsyncGenerator, isGenerator} from './is';
-import {asyncAttemptRun, attemptRun, attemptRunAsyncPlan, attemptRunPlan} from './result';
-import {asyncRun, run, runAsyncPlan, runPlan} from './run';
+import {isAsyncGeneratorFunction, isGeneratorFunction} from './is';
+import {asyncAttemptRun, attemptRun} from './result';
+import {asyncRun, run} from './run';
 
 // #region Instances
 
-function AsyncPlan(this: any, generator: () => AsyncGenerator): void {
+function AsyncPlan(this: InternalAsyncPlan, generator: () => AsyncGenerator): void {
 	this[PLAN_SYMBOL] = {
 		generator,
-		type: PLAN_TYPE_PLAN_ASYNC,
+		type: PLAN_TYPE_ASYNC,
 	};
 }
 
-AsyncPlan.prototype[Symbol.asyncIterator] = function (this: InternalAsyncPlan) {
-	return this[PLAN_SYMBOL].generator();
-};
+AsyncPlan.prototype[Symbol.asyncIterator] = getGenerator;
 
 AsyncPlan.prototype.attempt = attemptRunAsyncPlan;
 AsyncPlan.prototype.run = runAsyncPlan;
 
-function Plan(this: any, generator: () => Generator): void {
+function Plan(this: InternalPlan, generator: () => Generator): void {
 	this[PLAN_SYMBOL] = {
 		generator,
-		type: PLAN_TYPE_PLAN_SYNC,
+		type: PLAN_TYPE_SYNC,
 	};
 }
 
-Plan.prototype[Symbol.iterator] = function (this: InternalPlan) {
-	return this[PLAN_SYMBOL].generator();
-};
+Plan.prototype[Symbol.iterator] = getGenerator;
 
 Plan.prototype.attempt = attemptRunPlan;
 Plan.prototype.run = runPlan;
@@ -45,6 +42,14 @@ Plan.prototype.run = runPlan;
 // #endregion
 
 // #region Functions
+
+function attemptRunAsyncPlan(
+	this: InternalAsyncPlan,
+	first: never,
+	second: never,
+): Promise<unknown> {
+	return asyncAttemptRun(this, first, second);
+}
 
 /**
  * Create a plan for an asynchronous generator function
@@ -69,12 +74,12 @@ export function plan<Yielded, Returned, Parameters extends unknown[]>(
 export function plan<Y, R>(
 	generator: () => AsyncGenerator<Y, R> | Generator<Y, R>,
 ): AsyncPlan<Y, R, never> | Plan<Y, R, never> {
-	if (isAsyncGenerator(generator)) {
+	if (isAsyncGeneratorFunction(generator)) {
 		// @ts-expect-error All good, no worries :-)
 		return new AsyncPlan(generator);
 	}
 
-	if (isGenerator(generator)) {
+	if (isGeneratorFunction(generator)) {
 		// @ts-expect-error All good, no worries :-)
 		return new Plan(generator);
 	}
