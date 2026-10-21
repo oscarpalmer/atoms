@@ -5,91 +5,54 @@ import {isFixture} from '../.fixtures/is.fixture';
 
 const {complex, people} = arrayFixture;
 
+const airs = ['Chair', 'Flair'];
+
 const greek = ['Alpha', 'Beta', 'Gamma', 'Delta', 'Epsilon'];
 
-test('basic', () => {
-	const fuzzyGreek = fuzzy(greek);
-	const fuzzyHello = fuzzy(['Hello', 'Helllllo']);
+const sortedComplex = [people.alice, people.aliceAgain, people.bob, people.charlie, people.david];
 
-	expect(fuzzyGreek.search('a')).toEqual({
-		exact: ['Alpha', 'Beta', 'Delta', 'Gamma'],
+const sortedGreek = ['Alpha', 'Beta', 'Delta', 'Epsilon', 'Gamma'];
+
+test('boundaries', () => {
+	expect(fuzzy(['toMap', 'bitmap-map']).search('map')).toEqual({
+		exact: [],
+		included: ['toMap', 'bitmap-map'],
 		similar: [],
 	});
 
-	expect(fuzzyGreek.search('aa')).toEqual({
+	expect(fuzzy(['getMessage', 'XMLParser']).search('gm')).toEqual({
 		exact: [],
-		similar: ['Alpha', 'Gamma'],
+		included: [],
+		similar: ['getMessage'],
 	});
 
-	expect(fuzzyGreek.search('ea')).toEqual({
+	expect(fuzzy(['İstanbulMap']).search('istanbul')).toEqual({
 		exact: [],
-		similar: ['Beta', 'Delta'],
+		included: [],
+		similar: ['İstanbulMap'],
 	});
+});
 
+test('compare', () => {
 	expect(
-		fuzzyHello.search('eo', {
-			limit: 10,
-		}),
+		fuzzy(airs, {
+			compare: (first: string, second: string) => second.localeCompare(first),
+		}).search('a'),
 	).toEqual({
 		exact: [],
-		similar: ['Hello', 'Helllllo'],
-	});
-
-	expect(
-		fuzzyHello.search('eo', {
-			limit: 1,
-		}),
-	).toEqual({
-		exact: [],
-		similar: ['Hello'],
-	});
-
-	expect(
-		fuzzyHello.search('eo', {
-			tolerance: 0,
-		}),
-	).toEqual({
-		exact: [],
+		included: ['Flair', 'Chair'],
 		similar: [],
 	});
 
 	expect(
-		fuzzyHello.search('eo', {
-			tolerance: 2,
-		}),
+		fuzzy(airs, {
+			compare: 123 as never,
+		}).search('a'),
 	).toEqual({
 		exact: [],
-		similar: ['Hello'],
-	});
-
-	const greetings = ['Hiya', 'Howdy'];
-
-	fuzzyHello.items = greetings;
-
-	expect(fuzzyHello.items).toEqual(greetings);
-	expect(fuzzyHello.strings).toEqual(greetings);
-
-	expect(fuzzyHello.search('eo')).toEqual({
-		exact: [],
+		included: ['Chair', 'Flair'],
 		similar: [],
 	});
-
-	expect(fuzzyHello.search('w')).toEqual({
-		exact: ['Howdy'],
-		similar: [],
-	});
-
-	expect(() => {
-		fuzzyHello.items = 'blah' as never;
-	}).toThrow(TypeError);
-
-	expect(fuzzyHello.search('w')).toEqual({
-		exact: ['Howdy'],
-		similar: [],
-	});
-
-	expect(() => fuzzy([''], 123 as never)).toThrow(TypeError);
-	expect(() => fuzzy(123 as never)).toThrow(TypeError);
 });
 
 test('complex', () => {
@@ -117,27 +80,32 @@ test('complex', () => {
 	expect(keyed.search('a')).toEqual(handled.search('a'));
 
 	expect(fuzzyItems.search(123 as never)).toEqual({
-		exact: complex,
+		exact: sortedComplex,
+		included: [],
 		similar: [],
 	});
 
 	expect(fuzzyItems.search('')).toEqual({
-		exact: complex,
+		exact: sortedComplex,
+		included: [],
 		similar: [],
 	});
 
 	expect(fuzzyItems.search('   ')).toEqual({
-		exact: complex,
+		exact: sortedComplex,
+		included: [],
 		similar: [],
 	});
 
 	expect(fuzzyItems.search('', 1)).toEqual({
 		exact: [complex[0]],
+		included: [],
 		similar: [],
 	});
 
 	expect(fuzzyItems.search('', 'blah' as never)).toEqual({
-		exact: complex,
+		exact: sortedComplex,
+		included: [],
 		similar: [],
 	});
 
@@ -147,6 +115,7 @@ test('complex', () => {
 		}),
 	).toEqual({
 		exact: [complex[0]],
+		included: [],
 		similar: [],
 	});
 
@@ -155,12 +124,14 @@ test('complex', () => {
 			limit: 'blah' as never,
 		}),
 	).toEqual({
-		exact: complex,
+		exact: sortedComplex,
+		included: [],
 		similar: [],
 	});
 
 	expect(fuzzyItems.search('al')).toEqual({
-		exact: [people.alice, people.aliceAgain],
+		exact: [],
+		included: [people.alice, people.aliceAgain],
 		similar: [people.charlie],
 	});
 
@@ -169,7 +140,120 @@ test('complex', () => {
 			tolerance: 0,
 		}),
 	).toEqual({
-		exact: [people.alice, people.aliceAgain],
+		exact: [],
+		included: [people.alice, people.aliceAgain],
+		similar: [people.charlie],
+	});
+});
+
+test('errors', () => {
+	expect(() => fuzzy([''], true as never)).toThrow(TypeError);
+	expect(() => fuzzy(123 as never)).toThrow(TypeError);
+
+	const searcher = fuzzy(greek);
+
+	expect(() => {
+		searcher.items = 'blah' as never;
+	}).toThrow(TypeError);
+
+	expect(searcher.items).toEqual(greek);
+});
+
+test('exact', () => {
+	expect(fuzzy([...greek, 'BETA']).search('beta')).toEqual({
+		exact: ['Beta', 'BETA'],
+		included: [],
+		similar: [],
+	});
+});
+
+test('greek', () => {
+	const searcher = fuzzy(greek);
+
+	expect(searcher.search('a')).toEqual({
+		exact: [],
+		included: ['Alpha', 'Gamma', 'Beta', 'Delta'],
+		similar: [],
+	});
+
+	expect(searcher.search('a', 2)).toEqual({
+		exact: [],
+		included: ['Alpha', 'Gamma'],
+		similar: [],
+	});
+
+	expect(searcher.search('aa')).toEqual({
+		exact: [],
+		included: [],
+		similar: ['Alpha', 'Gamma'],
+	});
+
+	expect(searcher.search('ea')).toEqual({
+		exact: [],
+		included: [],
+		similar: ['Beta', 'Delta'],
+	});
+});
+
+test('greetings', () => {
+	const searcher = fuzzy(['Hello', 'Helllllo']);
+
+	expect(
+		searcher.search('eo', {
+			limit: 10,
+		}),
+	).toEqual({
+		exact: [],
+		included: [],
+		similar: ['Hello', 'Helllllo'],
+	});
+
+	expect(
+		searcher.search('eo', {
+			limit: 1,
+		}),
+	).toEqual({
+		exact: [],
+		included: [],
+		similar: ['Hello'],
+	});
+
+	expect(
+		searcher.search('eo', {
+			tolerance: 0,
+		}),
+	).toEqual({
+		exact: [],
+		included: [],
+		similar: ['Hello'],
+	});
+
+	expect(
+		searcher.search('eo', {
+			tolerance: 2,
+		}),
+	).toEqual({
+		exact: [],
+		included: [],
+		similar: ['Hello'],
+	});
+
+	const greetings = ['Hiya', 'Howdy'];
+
+	searcher.items = greetings;
+
+	expect(searcher.items).toEqual(greetings);
+	expect(searcher.strings).toEqual(greetings);
+
+	expect(searcher.search('eo')).toEqual({
+		exact: [],
+		included: [],
+		similar: [],
+	});
+
+	expect(searcher.search('w')).toEqual({
+		exact: [],
+		included: ['Howdy'],
 		similar: [],
 	});
 });
@@ -182,6 +266,22 @@ test('is', () => {
 	}
 
 	expect(fuzzy.is(fuzzy(greek))).toBe(true);
+});
+
+test('keys', () => {
+	expect(fuzzy([{1: 'One'}], 1).search('One')).toEqual({
+		exact: [{1: 'One'}],
+		included: [],
+		similar: [],
+	});
+
+	const key = Symbol('key');
+
+	expect(fuzzy([{[key]: 'Symbol'}], key).search('Symbol')).toEqual({
+		exact: [{[key]: 'Symbol'}],
+		included: [],
+		similar: [],
+	});
 });
 
 test('match', () => {
@@ -209,7 +309,8 @@ test('options', () => {
 			limit: 2,
 		}),
 	).toEqual({
-		exact: greek.slice(0, 2),
+		exact: sortedGreek.slice(0, 2),
+		included: [],
 		similar: [],
 	});
 
@@ -218,7 +319,8 @@ test('options', () => {
 			limit: 100,
 		}),
 	).toEqual({
-		exact: greek,
+		exact: sortedGreek,
+		included: [],
 		similar: [],
 	});
 
@@ -227,7 +329,8 @@ test('options', () => {
 			limit: -1,
 		}),
 	).toEqual({
-		exact: greek,
+		exact: sortedGreek,
+		included: [],
 		similar: [],
 	});
 
@@ -236,7 +339,8 @@ test('options', () => {
 			limit: Number.NaN,
 		}),
 	).toEqual({
-		exact: greek,
+		exact: sortedGreek,
+		included: [],
 		similar: [],
 	});
 
@@ -245,12 +349,14 @@ test('options', () => {
 			limit: 'blah' as never,
 		}),
 	).toEqual({
-		exact: greek,
+		exact: sortedGreek,
+		included: [],
 		similar: [],
 	});
 
 	expect(searcher.search('ea')).toEqual({
 		exact: [],
+		included: [],
 		similar: ['Beta', 'Delta'],
 	});
 
@@ -260,7 +366,8 @@ test('options', () => {
 		}),
 	).toEqual({
 		exact: [],
-		similar: [],
+		included: [],
+		similar: ['Beta'],
 	});
 
 	expect(
@@ -269,6 +376,7 @@ test('options', () => {
 		}),
 	).toEqual({
 		exact: [],
+		included: [],
 		similar: ['Beta', 'Delta'],
 	});
 
@@ -278,6 +386,7 @@ test('options', () => {
 		}),
 	).toEqual({
 		exact: [],
+		included: [],
 		similar: ['Beta', 'Delta'],
 	});
 
@@ -287,7 +396,8 @@ test('options', () => {
 		}),
 	).toEqual({
 		exact: [],
-		similar: [],
+		included: [],
+		similar: ['Beta'],
 	});
 
 	expect(
@@ -296,6 +406,7 @@ test('options', () => {
 		}),
 	).toEqual({
 		exact: [],
+		included: [],
 		similar: ['Beta', 'Delta'],
 	});
 
@@ -305,6 +416,21 @@ test('options', () => {
 		}),
 	).toEqual({
 		exact: [],
+		included: [],
 		similar: ['Beta', 'Delta'],
+	});
+});
+
+test('scoring', () => {
+	expect(fuzzy(['abcxabbc']).search('ac')).toEqual({
+		exact: [],
+		included: [],
+		similar: ['abcxabbc'],
+	});
+
+	expect(fuzzy(airs).search('Airplane')).toEqual({
+		exact: [],
+		included: [],
+		similar: [],
 	});
 });
