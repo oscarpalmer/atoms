@@ -1,36 +1,17 @@
-import type {GenericCallback} from '../../models';
 import {
 	ARRAY_FIND_UNIQUE_THRESHOLD,
 	ARRAY_FIND_VALUE_INDEX,
 	ARRAY_FIND_VALUES_ALL,
 	ARRAY_FIND_VALUES_UNIQUE,
-	type ArrayFindMapper,
+	type ArrayFindOptions,
+	type ArrayFindParameters,
+	type ArrayFindParametersMap,
 	type ArrayFindValuesResult,
 	type ArrayFindValuesType,
 	type ArrayFindValueType,
 	type ArrayParameters,
 } from '../../models/array/array.find.model';
 import {getArrayCallback, getArrayCallbacks} from './callbacks';
-
-// #region Types
-
-type FindParameters = {
-	array: unknown[];
-	arrayLength: number;
-	callback?: GenericCallback;
-	flat: boolean;
-	map?: MapCallbacks;
-	result: ArrayFindValuesResult;
-	type: ArrayFindValuesType;
-	value: unknown;
-};
-
-type MapCallbacks = {
-	after?: GenericCallback;
-	before?: GenericCallback;
-};
-
-// #endregion
 
 // #region Functions
 
@@ -84,8 +65,8 @@ export function findAbsoluteValueOrDefault(
 	return array[index];
 }
 
-function findComplexValues(parameters: FindParameters) {
-	const {array, arrayLength, callback, result, type, value} = parameters;
+function findComplexValues(parameters: ArrayFindParameters) {
+	const {array, arrayLength, callback, limit, result, type, value} = parameters;
 
 	const keys = new Set();
 
@@ -102,6 +83,10 @@ function findComplexValues(parameters: FindParameters) {
 			keys.add(keyed);
 
 			result.matched.push(mapped);
+
+			if (result.matched.length >= limit) {
+				return result;
+			}
 		} else {
 			result.notMatched.push(arrayItem);
 		}
@@ -120,8 +105,8 @@ function findSimpleValue(array: unknown[], value: unknown, findIndex: boolean, r
 		: array.find(item => Object.is(item, value));
 }
 
-function findSimpleValues(parameters: FindParameters) {
-	const {array, arrayLength, callback, flat, map, result, value} = parameters;
+function findSimpleValues(parameters: ArrayFindParameters) {
+	const {array, arrayLength, callback, flat, limit, map, result, value} = parameters;
 	const {after, before} = map ?? {};
 
 	const handler = callback ?? (item => Object.is(item, value));
@@ -136,6 +121,10 @@ function findSimpleValues(parameters: FindParameters) {
 				mapped = after == null ? mapped : after(arrayItem, arrayIndex, array);
 
 				addResult(result, mapped, flat);
+
+				if (result.matched.length >= limit) {
+					return result;
+				}
 			} else {
 				result.notMatched.push(arrayItem);
 			}
@@ -227,7 +216,7 @@ export function findValues(
 	type: ArrayFindValuesType,
 	array: unknown[],
 	parameters: unknown[],
-	mapper?: ArrayFindMapper,
+	options?: ArrayFindOptions,
 ): ArrayFindValuesResult {
 	const result: ArrayFindValuesResult = {
 		matched: [],
@@ -257,11 +246,13 @@ export function findValues(
 		return result;
 	}
 
-	const flat = mapper?.flat ?? false;
-	const mapCallback = getArrayCallback(mapper?.callback);
-	const mapReverse = mapper?.reverse ?? false;
+	const limit = options?.limit ?? Number.POSITIVE_INFINITY;
 
-	let map: MapCallbacks | undefined;
+	const flat = options?.map?.flat ?? false;
+	const mapCallback = getArrayCallback(options?.map?.callback);
+	const mapReverse = options?.map?.reverse ?? false;
+
+	let map: ArrayFindParametersMap | undefined;
 
 	if (mapCallback != null) {
 		map = {
@@ -270,25 +261,21 @@ export function findValues(
 		};
 	}
 
+	const simple = callbacks?.bool != null || (type === ARRAY_FIND_VALUES_ALL && key == null);
+
 	const findParameters = {
 		array,
 		arrayLength,
 		flat,
+		limit,
 		map,
 		result,
 		type,
 		value,
-	} as FindParameters;
+		callback: simple ? callbacks?.bool : callbacks?.keyed,
+	} as ArrayFindParameters;
 
-	if (callbacks?.bool != null || (type === ARRAY_FIND_VALUES_ALL && key == null)) {
-		findParameters.callback = callbacks?.bool;
-
-		return findSimpleValues(findParameters);
-	}
-
-	findParameters.callback = callbacks?.keyed;
-
-	return findComplexValues(findParameters);
+	return simple ? findSimpleValues(findParameters) : findComplexValues(findParameters);
 }
 
 // #endregion

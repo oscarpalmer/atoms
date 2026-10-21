@@ -50,6 +50,26 @@ export function first<Item extends PlainObject, ItemKey extends keyof Item>(
 ): Item | undefined;
 
 /**
+ * Get the first narrowed item matching the filter
+ *
+ * @param array Array to search in
+ * @param filter Type guard to match and narrow down the items
+ * @returns First narrowed item that matches the filter, or `undefined` if no match is found
+ *
+ * @example
+ * ```typescript
+ * first(
+ *   [{id: 1, value: 10}, {id: 2, value: 'a'}, {id: 3, value: 'b'}],
+ *   (item): item is {id: number; value: string} => typeof item.value === 'string',
+ * ); // => {id: 2, value: 'a'}
+ * ```
+ */
+export function first<Item, Narrowed extends Item>(
+	array: Item[],
+	filter: (item: Item, index: number, array: Item[]) => item is Narrowed,
+): Narrowed | undefined;
+
+/**
  * Get the first item matching the filter
  *
  * @param array Array to search in
@@ -91,7 +111,7 @@ export function first(array: unknown[], ...parameters: unknown[]): unknown {
 /**
  * Get the first item matching the given value, or a default value if no match is found
  *
- * _Available as `firstOrDefault` and `first.default`_
+ * _Available as `firstOrDefault` and `first.defaulted`_
  *
  * @param array Array to search in
  * @param defaultValue Default value to return if no match is found
@@ -117,7 +137,7 @@ export function firstOrDefault<
 /**
  * Get the first item matching the given value by key, or a default value if no match is found
  *
- * _Available as `firstOrDefault` and `first.default`_
+ * _Available as `firstOrDefault` and `first.defaulted`_
  *
  * @param array Array to search in
  * @param defaultValue Default value to return if no match is found
@@ -143,9 +163,34 @@ export function firstOrDefault<Item extends PlainObject, ItemKey extends keyof I
 ): Item;
 
 /**
+ * Get the first narrowed item matching the filter, or a default value if no match is found
+ *
+ * _Available as `firstOrDefault` and `first.defaulted`_
+ *
+ * @param array Array to search in
+ * @param defaultValue Default value to return if no match is found
+ * @param filter Type guard to match and narrow down the items
+ * @returns First narrowed item that matches the filter, or the default value if no match is found
+ *
+ * @example
+ * ```typescript
+ * firstOrDefault(
+ *   [{id: 1, value: 10}, {id: 2, value: 'a'}, {id: 3, value: 'b'}],
+ *   {id: -1, value: 'c'},
+ *   (item): item is {id: number; value: string} => typeof item.value === 'string',
+ * ); // => {id: 2, value: 'a'}
+ * ```
+ */
+export function firstOrDefault<Item, Narrowed extends Item, Default>(
+	array: Item[],
+	defaultValue: Default,
+	filter: (item: Item, index: number, array: Item[]) => item is Narrowed,
+): Narrowed | Default;
+
+/**
  * Get the first item matching the filter, or a default value if no match is found
  *
- * _Available as `firstOrDefault` and `first.default`_
+ * _Available as `firstOrDefault` and `first.defaulted`_
  *
  * @param array Array to search in
  * @param defaultValue Default value to return if no match is found
@@ -170,7 +215,7 @@ export function firstOrDefault<Item>(
 /**
  * Get the first item from an array, or a default value if the array is empty
  *
- * _Available as `firstOrDefault` and `first.default`_
+ * _Available as `firstOrDefault` and `first.defaulted`_
  *
  * @param array Array to get from
  * @param defaultValue Default value to return if the array is empty

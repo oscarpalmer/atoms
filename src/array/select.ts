@@ -245,9 +245,11 @@ function selectValues(
 	reverse: boolean,
 ): unknown[] {
 	return findValues(ARRAY_FIND_VALUES_ALL, array, [filter], {
-		flat,
-		reverse,
-		callback: mapper,
+		map: {
+			flat,
+			reverse,
+			callback: mapper,
+		},
 	}).matched;
 }
 

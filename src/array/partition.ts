@@ -10,7 +10,7 @@ import type {PlainObject} from '../models/index';
  * @param array Array to search in
  * @param callback Callback to get an item's value for matching
  * @param value Value to match against
- * @returns Partitioned array of items
+ * @returns Tuple of matching and non-matching items
  *
  * @example
  * ```typescript
@@ -24,7 +24,7 @@ import type {PlainObject} from '../models/index';
 export function partition<
 	Item,
 	Callback extends (item: Item, index: number, array: Item[]) => unknown,
->(array: Item[], callback: Callback, value: ReturnType<Callback>): Item[][];
+>(array: Item[], callback: Callback, value: ReturnType<Callback>): [Item[], Item[]];
 
 /**
  * Get a partitioned array of items
@@ -32,7 +32,7 @@ export function partition<
  * @param array Array to search in
  * @param key Key to get an item's value for matching
  * @param value Value to match against
- * @returns Partitioned array of items
+ * @returns Tuple of matching and non-matching items
  *
  * @example
  * ```typescript
@@ -47,14 +47,34 @@ export function partition<Item extends PlainObject, ItemKey extends keyof Item>(
 	array: Item[],
 	key: ItemKey,
 	value: Item[ItemKey],
-): Item[][];
+): [Item[], Item[]];
+
+/**
+ * Get a partitioned array of items
+ *
+ * @param array Array to search in
+ * @param filter Type guard to match and narrow down the items
+ * @returns Tuple of matching and non-matching items
+ *
+ * @example
+ * ```typescript
+ * partition(
+ *   [{id: 1, value: 10}, {id: 2, value: 'a'}, {id: 3, value: 'b'}],
+ *   (item): item is {id: number; value: string} => typeof item.value === 'string',
+ * ); // => [[{id: 2, value: 'a'}, {id: 3, value: 'b'}], [{id: 1, value: 10}]]
+ * ```
+ */
+export function partition<Item, Narrowed extends Item>(
+	array: Item[],
+	filter: (item: Item, index: number, array: Item[]) => item is Narrowed,
+): [Narrowed[], Array<Exclude<Item, Narrowed>>];
 
 /**
  * Get a partitioned array of items
  *
  * @param array Array to search in
  * @param filter Filter callback to match items
- * @returns Partitioned array of items
+ * @returns Tuple of matching and non-matching items
  *
  * @example
  * ```typescript
@@ -67,23 +87,23 @@ export function partition<Item extends PlainObject, ItemKey extends keyof Item>(
 export function partition<Item>(
 	array: Item[],
 	filter: (item: Item, index: number, array: Item[]) => boolean,
-): Item[][];
+): [Item[], Item[]];
 
 /**
  * Get a partitioned array of items matching the given item
  *
  * @param array Array to search in
  * @param item Item to match against
- * @returns Partitioned array of items
+ * @returns Tuple of matching and non-matching items
  *
  * @example
  * ```typescript
  * partition([1, 2, 3, 4, 5], 3); // => [[3], [1, 2, 4, 5]]
  * ```
  */
-export function partition<Item>(array: Item[], item: Item): Item[][];
+export function partition<Item>(array: Item[], item: Item): [Item[], Item[]];
 
-export function partition(array: unknown[], ...parameters: unknown[]): unknown[][] {
+export function partition(array: unknown[], ...parameters: unknown[]): [unknown[], unknown[]] {
 	const {matched, notMatched} = findValues(ARRAY_FIND_VALUES_ALL, array, parameters);
 
 	return [matched, notMatched];

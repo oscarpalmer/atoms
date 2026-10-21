@@ -35,7 +35,7 @@ const dataViews = [
 
 const firstDate = new Date();
 
-const dates = [firstDate, new Date(firstDate.getTime()), new Date(firstDate.getTime() + 1_000)];
+const dates = [firstDate, new Date(firstDate), new Date(firstDate.getTime() + 1_000)];
 
 const errors = [new Error('foo'), new Error('foo'), new Error('bar')];
 

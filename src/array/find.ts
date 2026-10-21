@@ -51,6 +51,26 @@ export function find<Item extends PlainObject, ItemKey extends keyof Item>(
 ): Item | undefined;
 
 /**
+ * Get the first narrowed item matching the filter
+ *
+ * @param array Array to search in
+ * @param filter Type guard to match and narrow down the items
+ * @returns First narrowed item that matches the filter, or `undefined` if no match is found
+ *
+ * @example
+ * ```typescript
+ * find(
+ *   [{id: 1, value: 10}, {id: 2, value: 'a'}, {id: 3, value: 'b'}],
+ *   (item): item is {id: number; value: string} => typeof item.value === 'string',
+ * ); // => {id: 2, value: 'a'}
+ * ```
+ */
+export function find<Item, Narrowed extends Item>(
+	array: Item[],
+	filter: (item: Item, index: number, array: Item[]) => item is Narrowed,
+): Narrowed | undefined;
+
+/**
  * Get the first item matching the filter
  *
  * @param array Array to search in
@@ -136,6 +156,28 @@ export function findLast<Item extends PlainObject, ItemKey extends keyof Item>(
 	key: ItemKey,
 	value: Item[ItemKey],
 ): Item | undefined;
+
+/**
+ * Get the last narrowed item matching the filter
+ *
+ * _Available as `findLast` and `find.last`_
+ *
+ * @param array Array to search in
+ * @param filter Type guard to match and narrow down the items
+ * @returns Last narrowed item that matches the filter, or `undefined` if no match is found
+ *
+ * @example
+ * ```typescript
+ * findLast(
+ *   [{id: 1, value: 10}, {id: 2, value: 'a'}, {id: 3, value: 'b'}],
+ *   (item): item is {id: number; value: string} => typeof item.value === 'string',
+ * ); // => {id: 3, value: 'b'}
+ * ```
+ */
+export function findLast<Item, Narrowed extends Item>(
+	array: Item[],
+	filter: (item: Item, index: number, array: Item[]) => item is Narrowed,
+): Narrowed | undefined;
 
 /**
  * Get the last item matching the filter

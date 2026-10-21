@@ -26,7 +26,7 @@ import type {PlainObject} from '../models/index';
 export function exclude<
 	Item,
 	Callback extends (item: Item, index: number, array: Item[]) => unknown,
->(array: Item[], callback: Callback, value: ReturnType<Callback>): unknown[];
+>(array: Item[], callback: Callback, value: ReturnType<Callback>): Item[];
 
 /**
  * Get a filtered array of items that do not match the value
@@ -51,7 +51,29 @@ export function exclude<Item extends PlainObject, ItemKey extends keyof Item>(
 	array: Item[],
 	key: ItemKey,
 	value: Item[ItemKey],
-): unknown[];
+): Item[];
+
+/**
+ * Get a narrowed array of items that do not match the filter
+ *
+ * _Available as `exclude` and `filter.remove`_
+ *
+ * @param array Array to search in
+ * @param filter Type guard to exclude and narrow down the items
+ * @returns Narrowed array of items that do not match the filter
+ *
+ * @example
+ * ```typescript
+ * exclude(
+ *   [1, 'a', 2, 'b'],
+ *   (item): item is string => typeof item === 'string',
+ * ); // => [1, 2]
+ * ```
+ */
+export function exclude<Item, Narrowed extends Item>(
+	array: Item[],
+	filter: (item: Item, index: number, array: Item[]) => item is Narrowed,
+): Array<Exclude<Item, Narrowed>>;
 
 /**
  * Get a filtered array of items that do not match the filter
@@ -73,7 +95,7 @@ export function exclude<Item extends PlainObject, ItemKey extends keyof Item>(
 export function exclude<Item>(
 	array: Item[],
 	filter: (item: Item, index: number, array: Item[]) => boolean,
-): unknown[];
+): Item[];
 
 /**
  * Get a filtered array of items that do not match the given item
@@ -89,7 +111,7 @@ export function exclude<Item>(
  * exclude([1, 2, 3], 2); // => [1, 3]
  * ```
  */
-export function exclude<Item>(array: Item[], item: Item): unknown[];
+export function exclude<Item>(array: Item[], item: Item): Item[];
 
 export function exclude(array: unknown[], ...parameters: unknown[]): unknown[] {
 	return findValues(ARRAY_FIND_VALUES_ALL, array, parameters).notMatched;
@@ -139,6 +161,26 @@ export function filter<Item extends PlainObject, ItemKey extends keyof Item>(
 	key: ItemKey,
 	value: Item[ItemKey],
 ): Item[];
+
+/**
+ * Get a narrowed array of items matching the filter
+ *
+ * @param array Array to search in
+ * @param filter Type guard to match and narrow down the items
+ * @returns Narrowed array of items
+ *
+ * @example
+ * ```typescript
+ * filter(
+ *   [{id: 1, tags: ['a', 'b']}, {id: 2}, {id: 3, tags: ['c']}],
+ *   (item): item is {id: number; tags: string[]} => item.tags != null,
+ * ); // => [{id: 1, tags: ['a', 'b']}, {id: 3, tags: ['c']}]
+ * ```
+ */
+export function filter<Item, Narrowed extends Item>(
+	array: Item[],
+	filter: (item: Item, index: number, array: Item[]) => item is Narrowed,
+): Narrowed[];
 
 /**
  * Get a filtered array of items matching the filter

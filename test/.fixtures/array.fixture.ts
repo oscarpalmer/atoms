@@ -1,4 +1,4 @@
-import {ArrayComparison} from '../../src';
+import {ArrayComparison} from '../../src/models/array/array.misc.model';
 
 export type TestArrayItem = {
 	age: number;

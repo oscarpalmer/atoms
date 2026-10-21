@@ -4,7 +4,7 @@ import type {PlainObject} from '../models/index';
 // #region Functions
 
 /**
- * Get the last items matching the given value
+ * Get the last item matching the given value
  *
  * @param array Array to search in
  * @param callback Callback to get an item's value for matching
@@ -27,7 +27,7 @@ export function last<Item, Callback extends (item: Item, index: number, array: I
 ): Item | undefined;
 
 /**
- * Get the first item matching the given value by key
+ * Get the last item matching the given value by key
  *
  * @param array Array to search in
  * @param key Key to get an item's value for matching
@@ -48,6 +48,26 @@ export function last<Item extends PlainObject, ItemKey extends keyof Item>(
 	key: ItemKey,
 	value: Item[ItemKey],
 ): Item | undefined;
+
+/**
+ * Get the last narrowed item matching the filter
+ *
+ * @param array Array to search in
+ * @param filter Type guard to match and narrow down the items
+ * @returns Last narrowed item that matches the filter, or `undefined` if no match is found
+ *
+ * @example
+ * ```typescript
+ * last(
+ *   [{id: 1, value: 10}, {id: 2, value: 'a'}, {id: 3, value: 'b'}],
+ *   (item): item is {id: number; value: string} => typeof item.value === 'string',
+ * ); // => {id: 3, value: 'b'}
+ * ```
+ */
+export function last<Item, Narrowed extends Item>(
+	array: Item[],
+	filter: (item: Item, index: number, array: Item[]) => item is Narrowed,
+): Narrowed | undefined;
 
 /**
  * Get the last item matching the filter
@@ -87,9 +107,9 @@ export function last(array: unknown[], ...parameters: unknown[]): unknown {
 }
 
 /**
- * Get the last item matching the given value
+ * Get the last item matching the given value, or a default value if no match is found
  *
- * _Available as `lastOrDefault` and `last.default`_
+ * _Available as `lastOrDefault` and `last.defaulted`_
  *
  * @param array Array to search in
  * @param defaultValue Default value to return if no match is found
@@ -113,9 +133,9 @@ export function lastOrDefault<
 >(array: Item[], defaultValue: Item, callback: Callback, value: ReturnType<Callback>): Item;
 
 /**
- * Get the last item matching the given value by key
+ * Get the last item matching the given value by key, or a default value if no match is found
  *
- * _Available as `lastOrDefault` and `last.default`_
+ * _Available as `lastOrDefault` and `last.defaulted`_
  *
  * @param array Array to search in
  * @param defaultValue Default value to return if no match is found
@@ -141,9 +161,34 @@ export function lastOrDefault<Item extends PlainObject, ItemKey extends keyof It
 ): Item;
 
 /**
- * Get the last item matching the filter
+ * Get the last narrowed item matching the filter, or a default value if no match is found
  *
- * _Available as `lastOrDefault` and `last.default`_
+ * _Available as `lastOrDefault` and `last.defaulted`_
+ *
+ * @param array Array to search in
+ * @param defaultValue Default value to return if no match is found
+ * @param filter Type guard to match and narrow down the items
+ * @returns Last narrowed item that matches the filter, or the default value if no match is found
+ *
+ * @example
+ * ```typescript
+ * lastOrDefault(
+ *   [{id: 1, value: 10}, {id: 2, value: 'a'}, {id: 3, value: 'b'}],
+ *   {id: -1, value: 'c'},
+ *   (item): item is {id: number; value: string} => typeof item.value === 'string',
+ * ); // => {id: 3, value: 'b'}
+ * ```
+ */
+export function lastOrDefault<Item, Narrowed extends Item, Default>(
+	array: Item[],
+	defaultValue: Default,
+	filter: (item: Item, index: number, array: Item[]) => item is Narrowed,
+): Narrowed | Default;
+
+/**
+ * Get the last item matching the filter, or a default value if no match is found
+ *
+ * _Available as `lastOrDefault` and `last.defaulted`_
  *
  * @param array Array to search in
  * @param defaultValue Default value to return if no match is found
@@ -166,9 +211,9 @@ export function lastOrDefault<Item>(
 ): Item;
 
 /**
- * Get the last item from an array
+ * Get the last item from an array, or a default value if the array is empty
  *
- * _Available as `lastOrDefault` and `last.default`_
+ * _Available as `lastOrDefault` and `last.defaulted`_
  *
  * @param array Array to get from
  * @param defaultValue Default value to return if the array is empty

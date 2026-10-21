@@ -18,6 +18,8 @@ test('', () => {
 	expect(() => single(simple, item => item > 2)).toThrow();
 	expect(() => single(complex, item => item.age > 30)).toThrow();
 
+	expect(() => single(complex, 'age', 30)).toThrow();
+
 	expect(single(complex, 'id', 99)).toBeUndefined();
 	expect(single('blah' as never, 99 as never)).toBeUndefined();
 	expect(single([], 99 as never)).toBeUndefined();
