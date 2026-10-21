@@ -10,9 +10,7 @@ export function getArrayCallback(value: unknown): GenericCallback | undefined {
 
 		case 'number':
 		case 'string':
-			return typeof value === 'string' && value.includes('.')
-				? undefined
-				: (obj: PlainObject) => obj[value];
+			return (obj: PlainObject) => obj?.[value];
 
 		default:
 			return;

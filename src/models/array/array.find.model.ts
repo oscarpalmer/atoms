@@ -2,6 +2,7 @@
 
 export type ArrayFindMapper = {
 	callback: unknown;
+	flat: boolean;
 	reverse: boolean;
 };
 

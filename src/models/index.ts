@@ -92,7 +92,7 @@ export type KeyOrCallbackValue<Item, Arg extends KeyOrCallback<Item>> = Arg exte
  * A nested array
  */
 export type NestedArray<Value> =
-	Value extends Array<infer NestedValue> ? NestedArray<NestedValue> : Value;
+	Value extends ReadonlyArray<infer NestedValue> ? NestedArray<NestedValue> : Value;
 
 /**
  * All nested keys of an object as dot notation strings _(up to 5 levels deep)_

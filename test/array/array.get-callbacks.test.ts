@@ -6,7 +6,7 @@ test('', () => {
 	expect(withBoolean?.keyed).toBeUndefined();
 
 	const withDotNotation = getArrayCallbacks(null, 'prop.nested');
-	expect(withDotNotation?.keyed).toBeUndefined();
+	expect(typeof withDotNotation?.keyed).toBe('function');
 
 	const withFunction = getArrayCallbacks(() => true);
 	expect(typeof withFunction?.bool).toBe('function');

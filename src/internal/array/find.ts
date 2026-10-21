@@ -14,20 +14,41 @@ import {getArrayCallback, getArrayCallbacks} from './callbacks';
 
 // #region Types
 
-type FindComplexValuesParameters = {
+type FindParameters = {
 	array: unknown[];
-	keyCallback: GenericCallback | undefined;
-	length: number;
-	mapAfter: GenericCallback | undefined;
-	mapBefore: GenericCallback | undefined;
+	arrayLength: number;
+	callback?: GenericCallback;
+	flat: boolean;
+	map?: MapCallbacks;
 	result: ArrayFindValuesResult;
 	type: ArrayFindValuesType;
 	value: unknown;
 };
 
+type MapCallbacks = {
+	after?: GenericCallback;
+	before?: GenericCallback;
+};
+
 // #endregion
 
 // #region Functions
+
+function addResult(result: ArrayFindValuesResult, mapped: unknown, flat: boolean) {
+	if (!flat) {
+		result.matched.push(mapped);
+
+		return;
+	}
+
+	const array = Array.isArray(mapped) ? mapped : [mapped];
+
+	const {length} = array;
+
+	for (let index = 0; index < length; index += 1) {
+		result.matched.push(array[index]);
+	}
+}
 
 export function createFindParameters(original: unknown[]): ArrayParameters {
 	const {length} = original;
@@ -39,33 +60,50 @@ export function createFindParameters(original: unknown[]): ArrayParameters {
 	};
 }
 
-function findComplexValues(parameters: FindComplexValuesParameters) {
-	const {array, keyCallback, length, mapAfter, mapBefore, result, type, value} = parameters;
+export function findAbsoluteValueOrDefault(
+	array: unknown[],
+	parameters: unknown[],
+	defaultValue: unknown,
+	useDefaultValue: boolean,
+	reversed: boolean,
+): unknown {
+	if (parameters.length === 0) {
+		if (Array.isArray(array) && array.length > 0) {
+			return reversed ? array.at(-1) : array[0];
+		}
+
+		return useDefaultValue ? defaultValue : undefined;
+	}
+
+	const index = findValue(ARRAY_FIND_VALUE_INDEX, array, parameters, reversed) as number;
+
+	if (index === -1) {
+		return useDefaultValue ? defaultValue : undefined;
+	}
+
+	return array[index];
+}
+
+function findComplexValues(parameters: FindParameters) {
+	const {array, arrayLength, callback, result, type, value} = parameters;
 
 	const keys = new Set();
 
-	for (let index = 0; index < length; index += 1) {
-		const item = array[index];
+	for (let arrayIndex = 0; arrayIndex < arrayLength; arrayIndex += 1) {
+		const arrayItem = array[arrayIndex];
 
-		let keyed: unknown;
-		let transformed: unknown;
-
-		if (mapBefore == null) {
-			keyed = keyCallback?.(item, index, array) ?? item;
-			transformed = item;
-		} else {
-			transformed = mapBefore(item, index, array);
-			keyed = keyCallback?.(transformed, index, array) ?? transformed;
-		}
+		const keyed = callback == null ? arrayItem : callback(arrayItem, arrayIndex, array);
+		const mapped = arrayItem;
 
 		if (
 			(type === ARRAY_FIND_VALUES_ALL && Object.is(keyed, value)) ||
 			(type === ARRAY_FIND_VALUES_UNIQUE && !keys.has(keyed))
 		) {
 			keys.add(keyed);
-			result.matched.push(mapAfter?.(item, index, array) ?? transformed);
+
+			result.matched.push(mapped);
 		} else {
-			result.notMatched.push(item);
+			result.notMatched.push(arrayItem);
 		}
 	}
 
@@ -82,25 +120,40 @@ function findSimpleValue(array: unknown[], value: unknown, findIndex: boolean, r
 		: array.find(item => Object.is(item, value));
 }
 
-function findSimpleValues(
-	array: unknown[],
-	length: number,
-	value: unknown,
-	boolCallback: GenericCallback | undefined,
-	mapBefore: GenericCallback | undefined,
-	mapAfter: GenericCallback | undefined,
-	result: ArrayFindValuesResult,
-) {
-	const callback = boolCallback ?? (item => Object.is(item, value));
+function findSimpleValues(parameters: FindParameters) {
+	const {array, arrayLength, callback, flat, map, result, value} = parameters;
+	const {after, before} = map ?? {};
 
-	for (let index = 0; index < length; index += 1) {
-		const item = array[index];
-		const transformed = mapBefore?.(item, index, array) ?? item;
+	const handler = callback ?? (item => Object.is(item, value));
 
-		if (callback(transformed, index, array)) {
-			result.matched.push(mapAfter?.(item, index, array) ?? transformed);
-		} else {
-			result.notMatched.push(item);
+	for (let arrayIndex = 0; arrayIndex < arrayLength; arrayIndex += 1) {
+		const arrayItem = array[arrayIndex];
+
+		let mapped = before == null ? arrayItem : before(arrayItem, arrayIndex, array);
+
+		if (!flat || after != null) {
+			if (handler(mapped, arrayIndex, array)) {
+				mapped = after == null ? mapped : after(arrayItem, arrayIndex, array);
+
+				addResult(result, mapped, flat);
+			} else {
+				result.notMatched.push(arrayItem);
+			}
+
+			continue;
+		}
+
+		const flatItems = Array.isArray(mapped) ? mapped : [mapped];
+		const flatLength = flatItems.length;
+
+		for (let flatIndex = 0; flatIndex < flatLength; flatIndex += 1) {
+			const flatItem = flatItems[flatIndex];
+
+			if (handler(flatItem, arrayIndex, array)) {
+				result.matched.push(flatItem);
+			} else {
+				result.notMatched.push(flatItem);
+			}
 		}
 	}
 
@@ -170,30 +223,6 @@ function findValueInArray(
 	return findIndex ? -1 : undefined;
 }
 
-export function findAbsoluteValueOrDefault(
-	array: unknown[],
-	parameters: unknown[],
-	defaultValue: unknown,
-	useDefaultValue: boolean,
-	reversed: boolean,
-): unknown {
-	if (parameters.length === 0) {
-		if (Array.isArray(array) && array.length > 0) {
-			return reversed ? array.at(-1) : array[0];
-		}
-
-		return useDefaultValue ? defaultValue : undefined;
-	}
-
-	const index = findValue(ARRAY_FIND_VALUE_INDEX, array, parameters, reversed) as number;
-
-	if (index === -1) {
-		return useDefaultValue ? defaultValue : undefined;
-	}
-
-	return array[index];
-}
-
 export function findValues(
 	type: ArrayFindValuesType,
 	array: unknown[],
@@ -205,52 +234,61 @@ export function findValues(
 		notMatched: [],
 	};
 
-	if (!Array.isArray(array) || array.length === 0) {
+	if (!Array.isArray(array)) {
 		return result;
 	}
 
-	const {length} = array;
+	const arrayLength = array.length;
+
+	if (arrayLength === 0) {
+		return result;
+	}
+
 	const {bool, key, value} = createFindParameters(parameters);
 	const callbacks = getArrayCallbacks(bool, key);
 
 	if (
 		type === ARRAY_FIND_VALUES_UNIQUE &&
 		callbacks?.keyed == null &&
-		length >= ARRAY_FIND_UNIQUE_THRESHOLD
+		arrayLength >= ARRAY_FIND_UNIQUE_THRESHOLD
 	) {
 		result.matched = [...new Set(array)];
 
 		return result;
 	}
 
+	const flat = mapper?.flat ?? false;
 	const mapCallback = getArrayCallback(mapper?.callback);
 	const mapReverse = mapper?.reverse ?? false;
 
-	let mapAfter: GenericCallback | undefined;
-	let mapBefore: GenericCallback | undefined;
+	let map: MapCallbacks | undefined;
 
-	if (mapCallback == null) {
-		mapAfter = undefined;
-		mapBefore = undefined;
-	} else {
-		mapAfter = mapReverse ? undefined : mapCallback;
-		mapBefore = mapReverse ? mapCallback : undefined;
+	if (mapCallback != null) {
+		map = {
+			before: mapReverse ? mapCallback : undefined,
+			after: mapReverse ? undefined : mapCallback,
+		};
 	}
 
-	if (callbacks?.bool != null || (type === ARRAY_FIND_VALUES_ALL && key == null)) {
-		return findSimpleValues(array, length, value, callbacks?.bool, mapBefore, mapAfter, result);
-	}
-
-	return findComplexValues({
+	const findParameters = {
 		array,
-		length,
-		mapAfter,
-		mapBefore,
+		arrayLength,
+		flat,
+		map,
 		result,
 		type,
 		value,
-		keyCallback: callbacks?.keyed,
-	});
+	} as FindParameters;
+
+	if (callbacks?.bool != null || (type === ARRAY_FIND_VALUES_ALL && key == null)) {
+		findParameters.callback = callbacks?.bool;
+
+		return findSimpleValues(findParameters);
+	}
+
+	findParameters.callback = callbacks?.keyed;
+
+	return findComplexValues(findParameters);
 }
 
 // #endregion

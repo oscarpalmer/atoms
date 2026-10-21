@@ -1,4 +1,4 @@
-import type {GenericCallback, PlainObject} from '../index';
+import type {GenericCallback} from '../index';
 
 // #region Types
 
@@ -10,6 +10,8 @@ export type ArrayCompareSetsType = 'difference' | 'intersection' | 'union';
 export type ArrayComparison = 'end' | 'inside' | 'invalid' | 'outside' | 'same' | 'start';
 
 export type ArrayExtractType = 'drop' | 'take';
+
+export type ArrayFlattened<Value> = Value extends ReadonlyArray<infer Inner> ? Inner : Value;
 
 export type ArrayGetCallbacks = {
 	bool?: GenericCallback;
@@ -23,24 +25,6 @@ export type ArrayOverlapItem = {
 	array: unknown[];
 	index: number;
 };
-
-export type ArrayMapKeyOrCallback<Item> =
-	| ((item: Item, index: number, array: Item[]) => unknown)
-	| (Item extends PlainObject ? keyof Item : never);
-
-export type ArrayMapped<Item, Map extends ArrayMapKeyOrCallback<Item>> = Map extends (
-	item: Item,
-	index: number,
-	array: Item[],
-) => unknown
-	? ReturnType<Map>
-	: Map extends keyof Item
-		? Item[Map]
-		: never;
-
-export type ArrayObjectKeysOf<Item> = {
-	[Key in keyof Item]: Item[Key] extends PlainObject ? Key : never;
-}[keyof Item];
 
 export type ArrayOverlapResult = {
 	first: ArrayOverlapItem;
