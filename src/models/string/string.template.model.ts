@@ -58,7 +58,7 @@ export type TemplaterRenderer = (variables?: PlainObject) => string;
 
 // #region Variables
 
-export const TEMPLATE_EXPRESSION_VARIABLE: RegExp = /{{([\s\S]+?)}}/g;
+export const TEMPLATE_EXPRESSION_VARIABLE: RegExp = /{{([^{}]+)}}/g;
 
 export const TEMPLATE_SYMBOL: unique symbol = Symbol('template');
 

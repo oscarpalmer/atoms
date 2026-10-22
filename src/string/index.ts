@@ -140,7 +140,6 @@ export function parse(
 	reviver?: (this: unknown, key: string, value: unknown) => unknown,
 ): unknown {
 	try {
-		// oxlint-disable-next-line @oscarpalmer/atoms/attempt
 		return JSON.parse(value, reviver);
 	} catch {
 		return undefined;

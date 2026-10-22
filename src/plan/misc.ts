@@ -99,7 +99,6 @@ export function asyncSucceed<Value>(value: Value): AsyncSuccess<Awaited<Value>>;
 
 export function asyncSucceed(value: unknown): AsyncSuccess<unknown> {
 	// @ts-expect-error All good, no worries :-)
-	// oxlint-disable-next-line require-yield
 	return new AsyncSuccess(async function* () {
 		return typeof value === 'function' ? value() : value;
 	});
@@ -146,7 +145,6 @@ export function succeed<Value>(value: Value): Success<Value>;
 
 export function succeed(value: unknown): Success<unknown> {
 	// @ts-expect-error All good, no worries :-)
-	// oxlint-disable-next-line require-yield
 	return new Success(function* () {
 		return typeof value === 'function' ? value() : value;
 	});

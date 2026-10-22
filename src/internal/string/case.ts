@@ -1,16 +1,21 @@
 import type {Memoized} from '../../models/function/memoize.model';
 import {
+	ignoreCachingCases,
 	STRING_CASE_CAMEL,
+	STRING_CASE_CAPITALIZE,
 	STRING_CASE_KEBAB,
+	STRING_CASE_LOWER,
 	STRING_CASE_PASCAL,
 	STRING_CASE_SNAKE,
+	STRING_CASE_TITLE,
+	STRING_CASE_UPPER,
+	STRING_DELIMITER_EMPTY,
 	STRING_DELIMITER_HYPHEN,
+	STRING_DELIMITER_SPACE,
 	STRING_DELIMITER_UNDERSCORE,
-	STRING_DELIMTER_EMPTY,
 	STRING_EXPRESSION_ACRONYM,
 	STRING_EXPRESSION_CAMEL_CASE,
 	STRING_REPLACEMENT_CAMEL_CASE,
-	STRING_S,
 	type StringCase,
 	type StringCaseOptions,
 } from '../../models/string/string.case.model';
@@ -52,17 +57,15 @@ export function camelCase(value: string): string {
  * ```
  */
 export function capitalize(value: string): string {
-	if (typeof value !== 'string' || value.length === 0) {
-		return '';
+	return toCase(STRING_CASE_CAPITALIZE, value, true, true, capitalizeHandler);
+}
+
+function capitalizeHandler(value: string): string {
+	if (value.length === 1) {
+		return value.toLocaleUpperCase();
 	}
 
-	memoizedCapitalize ??= memoize(v =>
-		v.length === 1
-			? v.toLocaleUpperCase()
-			: `${v.charAt(0).toLocaleUpperCase()}${v.slice(1).toLocaleLowerCase()}`,
-	);
-
-	return memoizedCapitalize.run(value);
+	return `${value.charAt(0).toLocaleUpperCase()}${value.slice(1).toLocaleLowerCase()}`;
 }
 
 /**
@@ -97,13 +100,11 @@ export function kebabCase(value: string): string {
  * ```
  */
 export function lowerCase(value: string): string {
-	if (typeof value !== 'string') {
-		return '';
-	}
+	return toCase(STRING_CASE_LOWER, value, false, false, lowerCaseHandler);
+}
 
-	memoizedLowerCase ??= memoize(v => v.toLocaleLowerCase());
-
-	return memoizedLowerCase.run(value);
+function lowerCaseHandler(value: string): string {
+	return value.toLocaleLowerCase();
 }
 
 /**
@@ -157,15 +158,15 @@ export function snakeCase(value: string): string {
  * ```
  */
 export function titleCase(value: string): string {
-	if (typeof value !== 'string' || value.length === 0) {
-		return '';
+	return toCase(STRING_CASE_TITLE, value, true, true, titleCaseHandler);
+}
+
+function titleCaseHandler(value: string): string {
+	if (value.length < 2) {
+		return capitalize(value);
 	}
 
-	memoizedTitleCase ??= memoize(v =>
-		v.length < 2 ? capitalize(v) : join(words(v).map(capitalize), ' '),
-	);
-
-	return memoizedTitleCase.run(value);
+	return join(words(value).map(capitalize), STRING_DELIMITER_SPACE);
 }
 
 function toCase(
@@ -173,21 +174,32 @@ function toCase(
 	value: string,
 	capitalizeAny: boolean,
 	capitalizeFirst: boolean,
+	handler?: (value: string) => string,
 ): string {
-	caseMemoizers[type] ??= memoize(toCaseCallback.bind({type, capitalizeAny, capitalizeFirst}));
-
-	return caseMemoizers[type].run(value);
-}
-
-function toCaseCallback(this: StringCaseOptions, value: string): string {
 	if (typeof value !== 'string') {
 		return '';
 	}
 
-	if (value.length < 1) {
+	if (value.trim().length === 0) {
 		return value;
 	}
 
+	if (handler == null) {
+		caseMemoizers[type] ??= memoize(toCaseCallback.bind({type, capitalizeAny, capitalizeFirst}));
+
+		return caseMemoizers[type].run(value);
+	}
+
+	if (ignoreCachingCases.has(type)) {
+		return handler(value);
+	}
+
+	simpleMemoizers[type] ??= memoize(handler);
+
+	return simpleMemoizers[type].run(value);
+}
+
+export function toCaseCallback(this: StringCaseOptions, value: string): string {
 	const {capitalizeAny, capitalizeFirst, type} = this;
 
 	const parts = words(value);
@@ -198,16 +210,14 @@ function toCaseCallback(this: StringCaseOptions, value: string): string {
 	for (let partIndex = 0; partIndex < partsLength; partIndex += 1) {
 		const part = parts[partIndex];
 
-		const acronymParts = part.replace(STRING_EXPRESSION_ACRONYM, (full, one, two, three) =>
-			three === STRING_S ? full : `${one}-${two}${three}`,
-		);
+		const acronymParts = part.replace(STRING_EXPRESSION_ACRONYM, STRING_DELIMITER_HYPHEN);
 
 		const camelCaseParts = acronymParts.replace(
 			STRING_EXPRESSION_CAMEL_CASE,
 			STRING_REPLACEMENT_CAMEL_CASE,
 		);
 
-		const items = camelCaseParts.split('-');
+		const items = camelCaseParts.split(STRING_DELIMITER_HYPHEN);
 		const itemsLength = items.length;
 
 		const partResult: string[] = [];
@@ -216,10 +226,6 @@ function toCaseCallback(this: StringCaseOptions, value: string): string {
 
 		for (let itemIndex = 0; itemIndex < itemsLength; itemIndex += 1) {
 			const item = items[itemIndex];
-
-			if (item.length === 0) {
-				continue;
-			}
 
 			if (!capitalizeAny || (itemCount === 0 && partIndex === 0 && !capitalizeFirst)) {
 				partResult.push(item.toLocaleLowerCase());
@@ -251,34 +257,26 @@ function toCaseCallback(this: StringCaseOptions, value: string): string {
  * ```
  */
 export function upperCase(value: string): string {
-	if (typeof value !== 'string' || value.length === 0) {
-		return '';
-	}
+	return toCase(STRING_CASE_UPPER, value, false, false, upperCaseHandler);
+}
 
-	memoizedUpperCase ??= memoize(v => v.toLocaleUpperCase());
-
-	return memoizedUpperCase.run(value);
+function upperCaseHandler(value: string): string {
+	return value.toLocaleUpperCase();
 }
 
 // #endregion
 
 // #region Variables
 
-const caseMemoizers: Partial<Record<string, Memoized<typeof toCaseCallback>>> = {};
+const caseMemoizers: Partial<Record<StringCase, Memoized<typeof toCaseCallback>>> = {};
 
 const delimiters: Record<string, string> = {
-	[STRING_CASE_CAMEL]: STRING_DELIMTER_EMPTY,
+	[STRING_CASE_CAMEL]: STRING_DELIMITER_EMPTY,
 	[STRING_CASE_KEBAB]: STRING_DELIMITER_HYPHEN,
-	[STRING_CASE_PASCAL]: STRING_DELIMTER_EMPTY,
+	[STRING_CASE_PASCAL]: STRING_DELIMITER_EMPTY,
 	[STRING_CASE_SNAKE]: STRING_DELIMITER_UNDERSCORE,
 };
 
-let memoizedCapitalize: Memoized<(value: string) => string>;
-
-let memoizedLowerCase: Memoized<(value: string) => string>;
-
-let memoizedTitleCase: Memoized<(value: string) => string>;
-
-let memoizedUpperCase: Memoized<(value: string) => string>;
+const simpleMemoizers: Partial<Record<StringCase, Memoized<(value: string) => string>>> = {};
 
 // #endregion

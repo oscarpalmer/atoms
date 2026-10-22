@@ -91,8 +91,6 @@ function addSubscription(instance: InternalSubscription): void {
 
 	/* istanbul ignore if */
 	if (items.keyed == null || values.from.keyed == null || values.to.keyed == null) {
-		// TODO: fix tests or document
-		// istanbul ignore next
 		return;
 	}
 
@@ -343,8 +341,6 @@ function removeSubscription(this: InternalSubscription): void {
 
 	/* istanbul ignore if */
 	if (items.keyed == null || keyed == null) {
-		// TODO, fix tests or document
-		// istanbul ignore next
 		return;
 	}
 

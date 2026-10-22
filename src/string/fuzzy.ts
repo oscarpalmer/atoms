@@ -414,7 +414,7 @@ function getScore(item: FuzzyString, needle: string): number {
 		return -1;
 	}
 
-	// Penalty for longer strings to favour tighter matches
+	// Penalty for longer strings to favor tighter matches
 	return max([0, best - floor(haystackLength / FUZZY_LENGTH_DIVISOR)]);
 }
 

@@ -97,9 +97,7 @@ export function assertIs<Value>(
 	message: string,
 	error?: ErrorConstructor,
 ): Asserter<Value> {
-	return value => {
-		assert(() => condition(value), message, error);
-	};
+	return assertCondition(condition, message, error);
 }
 
 /**
