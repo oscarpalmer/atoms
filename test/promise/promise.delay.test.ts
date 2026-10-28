@@ -1,7 +1,7 @@
 import {expect, test} from 'vite-plus/test';
 import {delay} from '../../src';
 
-test('', () =>
+test('promise, delay', () =>
 	new Promise<void>(done => {
 		const start = Date.now();
 

@@ -1,7 +1,7 @@
 import {expect, test} from 'vite-plus/test';
 import {compare} from '../../src';
 
-test('', () => {
+test('compare, basic', () => {
 	expect(compare(null, null)).toBe(0);
 	expect(compare(null, 123)).toBe(-1);
 	expect(compare(123, null)).toBe(1);

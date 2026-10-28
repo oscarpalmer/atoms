@@ -2,7 +2,7 @@ import {expect, test} from 'vite-plus/test';
 import {exists} from '../../src';
 import {arrayFixture} from '../.fixtures/array.fixture';
 
-test('', () => {
+test('array, exists', () => {
 	const {complex, simple} = arrayFixture;
 
 	expect(exists(simple, 2)).toBe(true);

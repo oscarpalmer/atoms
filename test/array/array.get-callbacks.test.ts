@@ -1,7 +1,7 @@
 import {expect, test} from 'vite-plus/test';
 import {getArrayCallbacks} from '../../src/internal/array/callbacks';
 
-test('', () => {
+test('array, getArrayCallbacks', () => {
 	const withBoolean = getArrayCallbacks(null, true);
 	expect(withBoolean?.keyed).toBeUndefined();
 

@@ -13,7 +13,7 @@ import {
 } from '../../src';
 import {isColorSubscription} from '../../src/color/misc/is';
 
-test('', () => {
+test('color, subscription', () => {
 	function onHex(hex: string) {
 		values.hexes.push(hex);
 	}

@@ -1,7 +1,7 @@
 import {expect, test} from 'vite-plus/test';
 import {flatten} from '../../src';
 
-test('', () => {
+test('array, flatten', () => {
 	expect(flatten([1, [2, [3, [4, [5, [6, [7, [8, [9, [10]]]]]]]]]])).toEqual([
 		1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
 	]);

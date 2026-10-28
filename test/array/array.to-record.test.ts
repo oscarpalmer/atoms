@@ -2,7 +2,7 @@ import {expect, test} from 'vite-plus/test';
 import {toRecord} from '../../src';
 import {arrayFixture} from '../.fixtures/array.fixture';
 
-test('', () => {
+test('array, toRecord', () => {
 	const {complex} = arrayFixture;
 
 	const indiced = toRecord(complex);

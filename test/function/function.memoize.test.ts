@@ -1,7 +1,7 @@
 import {expect, test} from 'vite-plus/test';
 import {memoize, noop} from '../../src';
 
-test('', () => {
+test('function, memoize', () => {
 	const memoized = memoize((value: number) => value * 2);
 
 	expect(memoized.maximum).toBe(1024);

@@ -1,7 +1,7 @@
 import {expect, test} from 'vite-plus/test';
 import {noop} from '../../src';
 
-test('', () => {
+test('function, noop', () => {
 	expect(noop).toBeInstanceOf(Function);
 	expect(noop()).toBeUndefined();
 });

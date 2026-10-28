@@ -1,7 +1,7 @@
 import {expect, test} from 'vite-plus/test';
 import {chunk} from '../../src';
 
-test('', () => {
+test('array, chunk', () => {
 	const array = Array.from({length: 10_000}, (_, i) => i + 1);
 
 	expect(chunk(array).length).toBe(2);

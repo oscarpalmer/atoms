@@ -2,7 +2,7 @@ import {expect, test} from 'vite-plus/test';
 import {toggle} from '../../src';
 import {arrayFixture, TestArrayItem} from '../.fixtures/array.fixture';
 
-test('', () => {
+test('array, toggle', () => {
 	expect(toggle([], [1])).toEqual([1]);
 	expect(toggle([1], [1])).toEqual([]);
 	expect(toggle([1], [2])).toEqual([1, 2]);

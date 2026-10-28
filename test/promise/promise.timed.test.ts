@@ -1,7 +1,7 @@
 import {expect, test} from 'vite-plus/test';
 import {PromiseTimeoutError, timed} from '../../src';
 
-test('', () =>
+test('promise, timed', () =>
 	new Promise<void>(done => {
 		const errors: unknown[] = [undefined, undefined, undefined, undefined, undefined];
 		const values: unknown[] = [undefined, undefined, undefined, undefined, undefined];

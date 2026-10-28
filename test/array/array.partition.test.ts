@@ -2,7 +2,7 @@ import {expect, test} from 'vite-plus/test';
 import {partition} from '../../src';
 import {arrayFixture} from '../.fixtures/array.fixture';
 
-test('', () => {
+test('array, partition', () => {
 	const {complex, simple} = arrayFixture;
 
 	expect(partition(simple, 2)).toEqual([[2], [1, 3, 4, 5]]);

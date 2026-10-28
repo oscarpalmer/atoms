@@ -1,7 +1,7 @@
 import {expect, test} from 'vite-plus/test';
 import {isSubscriptions, isSubscription, subscriptions} from '../src';
 
-test('', () => {
+test('subscription', () => {
 	const simple = subscriptions({keys: 123 as never});
 	const keyed = subscriptions({keys: true});
 	const specific = subscriptions({keys: new Set(['a', 'b'])});

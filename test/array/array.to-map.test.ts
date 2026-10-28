@@ -2,7 +2,7 @@ import {expect, test} from 'vite-plus/test';
 import {toMap} from '../../src';
 import {arrayFixture} from '../.fixtures/array.fixture';
 
-test('', () => {
+test('array, toMap', () => {
 	const {complex} = arrayFixture;
 
 	const indiced = toMap(complex);

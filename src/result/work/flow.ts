@@ -1,5 +1,5 @@
+import {unwrapWork} from '../../internal/function/misc';
 import {asyncFlow, flow} from '../../internal/function/work';
-import {isError, isOk} from '../../internal/result/misc';
 import type {GenericCallback} from '../../models/index';
 import type {AttemptAsyncFlow, AttemptFlow, Result, UnwrapValue} from '../../models/result.model';
 import {asyncAttempt, attempt} from '../index';
@@ -240,15 +240,7 @@ export function attemptAsyncFlow(
 		asyncAttempt(() => {
 			Flow ??= asyncFlow(...fns);
 
-			return Flow(
-				...args.map(value => {
-					if (isError(value)) {
-						throw value.error;
-					}
-
-					return isOk(value) ? value.value : value;
-				}),
-			);
+			return Flow(...args.map(unwrapWork));
 		});
 }
 
@@ -451,15 +443,7 @@ export function attemptFlow(...fns: GenericCallback[]): (...args: unknown[]) => 
 		attempt(() => {
 			Flow ??= flow(...fns);
 
-			return Flow(
-				...args.map(value => {
-					if (isError(value)) {
-						throw value.error;
-					}
-
-					return isOk(value) ? value.value : value;
-				}),
-			);
+			return Flow(...args.map(unwrapWork));
 		});
 }
 

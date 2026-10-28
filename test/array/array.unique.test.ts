@@ -1,7 +1,7 @@
 import {expect, test} from 'vite-plus/test';
 import {unique} from '../../src';
 
-test('', () => {
+test('array, unique', () => {
 	const simple = [1, 2, 2, 3, 3, 3, 4, 4, 4, 4];
 
 	expect(unique(simple)).toEqual([1, 2, 3, 4]);

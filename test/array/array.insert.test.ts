@@ -1,7 +1,7 @@
 import {expect, test} from 'vite-plus/test';
 import {insert} from '../../src';
 
-test('', () => {
+test('array, insert', () => {
 	const length = 100_000;
 
 	const values = Array.from({length}, (_, i) => `#${i + 1}`);

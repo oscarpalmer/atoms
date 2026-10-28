@@ -2,7 +2,7 @@ import {expect, test} from 'vite-plus/test';
 import {single} from '../../src';
 import {arrayFixture} from '../.fixtures/array.fixture';
 
-test('', () => {
+test('array, single', () => {
 	const {complex, simple} = arrayFixture;
 
 	const singleByKeyCallback = single(complex, item => item.id === 3);

@@ -2,7 +2,7 @@ import {expect, test} from 'vite-plus/test';
 import {compact} from '../../src';
 import {arrayFixture} from '../.fixtures/array.fixture';
 
-test('', () => {
+test('array, compact', () => {
 	expect(compact(arrayFixture.simple)).toEqual(arrayFixture.simple);
 
 	expect(compact([0, 1, null, 2, undefined, 3, false, 4, '', 5])).toEqual([

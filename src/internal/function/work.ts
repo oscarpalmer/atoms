@@ -9,7 +9,7 @@ import {
 } from '../../models/function/work.model';
 import type {GenericCallback} from '../../models/index';
 import type {UnwrapValue} from '../../models/result.model';
-import {isError, isOk} from '../result/misc';
+import {unwrapWork} from './misc';
 
 // #region Functions
 
@@ -232,18 +232,7 @@ export function asyncFlow(...fns: GenericCallback[]): (...args: unknown[]) => Pr
 export function asyncFlow(...fns: GenericCallback[]): (...args: unknown[]) => Promise<unknown> {
 	assertFlowFunctions(fns);
 
-	return (...args: unknown[]): Promise<unknown> =>
-		asyncWork(
-			args.map(value => {
-				if (isError(value)) {
-					throw value.error;
-				}
-
-				return isOk(value) ? value.value : value;
-			}),
-			fns,
-			true,
-		);
+	return (...args: unknown[]): Promise<unknown> => asyncWork(args.map(unwrapWork), fns, true);
 }
 
 // #endregion
@@ -433,18 +422,7 @@ export function flow(...fns: GenericCallback[]): (...args: unknown[]) => unknown
 export function flow(...fns: GenericCallback[]): (...args: unknown[]) => unknown {
 	assertFlowFunctions(fns);
 
-	return (...args: unknown[]): unknown =>
-		work(
-			args.map(value => {
-				if (isError(value)) {
-					throw value.error;
-				}
-
-				return isOk(value) ? value.value : value;
-			}),
-			fns,
-			true,
-		);
+	return (...args: unknown[]): unknown => work(args.map(unwrapWork), fns, true);
 }
 
 // #endregion
@@ -934,11 +912,7 @@ function unwrapValue(value: unknown, flow?: boolean, nested?: boolean): unknown 
 		throw new TypeError(flow ? WORK_MESSAGE_FLOW_PROMISE : WORK_MESSAGE_PIPE_PROMISE);
 	}
 
-	if (isError(value)) {
-		throw value.error;
-	}
-
-	return isOk(value) ? value.value : value;
+	return unwrapWork(value);
 }
 
 function work(initial: unknown, functions: GenericCallback[], flow: boolean): unknown {

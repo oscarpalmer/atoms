@@ -4,7 +4,7 @@ import {sizedFixture} from '../.fixtures/sized.fixture';
 
 const {actualMax, joinMap, niceMax} = sizedFixture;
 
-test('', () =>
+test('sized, map', () =>
 	new Promise<void>(done => {
 		const entriesMap = new SizedMap([
 			[0, 'a'],

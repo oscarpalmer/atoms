@@ -2,7 +2,7 @@ import {expect, test} from 'vite-plus/test';
 import {toSet} from '../../src';
 import {arrayFixture} from '../.fixtures/array.fixture';
 
-test('', () => {
+test('array, toSet', () => {
 	const {complex} = arrayFixture;
 
 	const simpleSet = toSet(complex);

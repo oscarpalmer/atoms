@@ -1,7 +1,7 @@
 import {expect, test} from 'vite-plus/test';
 import {cancelable} from '../../src';
 
-test('', () =>
+test('promise, cancelable', () =>
 	new Promise<void>(done => {
 		const errors: unknown[] = [];
 		const results: unknown[] = [];

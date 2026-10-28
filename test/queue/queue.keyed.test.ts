@@ -1,7 +1,7 @@
 import {expect, test} from 'vite-plus/test';
 import {keyedQueue} from '../../src';
 
-test('', () =>
+test('queue, keyed', () =>
 	new Promise<void>(done => {
 		const queue = keyedQueue(
 			(key: string, value: number) =>

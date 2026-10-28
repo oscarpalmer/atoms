@@ -4,7 +4,7 @@ import {sizedFixture} from '../.fixtures/sized.fixture';
 
 const {actualMax, joinSet, niceMax} = sizedFixture;
 
-test('', () =>
+test('sized, set', () =>
 	new Promise<void>(done => {
 		const valuesSet = new SizedSet(['a', 'b', 'c']);
 		const maxSet = new SizedSet(2);

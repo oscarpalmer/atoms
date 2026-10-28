@@ -1,7 +1,7 @@
 import {expect, test} from 'vite-plus/test';
 import {compare, deregisterCloner, deregisterComparator} from '../../src';
 
-test('', () => {
+test('compare, custom', () => {
 	class Test {
 		constructor(readonly value: number[]) {}
 

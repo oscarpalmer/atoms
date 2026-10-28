@@ -9,7 +9,7 @@ type Events = {
 	sig: () => void;
 };
 
-test('', () => {
+test('herald', () => {
 	function onFoo(id: number, name: string): void {
 		values.foo.push({id, name});
 	}
@@ -158,6 +158,7 @@ test('', () => {
 			names: ['hello, world!'],
 			property: {
 				key: 123 as never,
+				value: 'hmm',
 			},
 		});
 	}).toThrow();

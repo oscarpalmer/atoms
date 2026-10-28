@@ -2,7 +2,7 @@ import {expect, test} from 'vite-plus/test';
 import {update} from '../../src';
 import {arrayFixture} from '../.fixtures/array.fixture';
 
-test('', () => {
+test('array, update', () => {
 	expect(update([], [1])).toEqual([1]);
 	expect(update([1], [1])).toEqual([1]);
 	expect(update([1], [2])).toEqual([1, 2]);

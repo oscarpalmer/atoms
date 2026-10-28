@@ -1,7 +1,7 @@
 import {expect, test} from 'vite-plus/test';
 import {clone, initializeCloner} from '../../src';
 
-test('', () => {
+test('clone, initialize', () => {
 	const cloner = initializeCloner({
 		copyFunctions: true,
 	});

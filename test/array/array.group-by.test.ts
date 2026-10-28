@@ -2,7 +2,7 @@ import {expect, test} from 'vite-plus/test';
 import {groupBy} from '../../src';
 import {arrayFixture} from '../.fixtures/array.fixture';
 
-test('', () => {
+test('array, groupBy', () => {
 	const {complex} = arrayFixture;
 
 	const keyed = groupBy(complex, 'id');
