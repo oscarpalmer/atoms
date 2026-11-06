@@ -1,4 +1,3 @@
-import {ARRAY_FIND_VALUE_INDEX} from '../../models/array/array.find.model';
 import type {PlainObject} from '../../models/index';
 import {findValue} from './find';
 
@@ -84,7 +83,12 @@ export function indexOf<Item>(
 export function indexOf<Item>(array: Item[], item: Item): number;
 
 export function indexOf(array: unknown[], ...parameters: unknown[]): number {
-	return findValue(ARRAY_FIND_VALUE_INDEX, array, parameters, false);
+	return (
+		(findValue(array, {
+			indiced: true,
+			input: parameters,
+		})?.values[0] as number) ?? -1
+	);
 }
 
 /**
@@ -175,7 +179,13 @@ export function lastIndexOf<Item>(
 export function lastIndexOf<Item>(array: Item[], item: Item): number;
 
 export function lastIndexOf(array: unknown[], ...parameters: unknown[]): number {
-	return findValue(ARRAY_FIND_VALUE_INDEX, array, parameters, true);
+	return (
+		(findValue(array, {
+			indiced: true,
+			input: parameters,
+			reverse: true,
+		})?.values[0] as number) ?? -1
+	);
 }
 
 // #endregion

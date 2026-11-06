@@ -3,7 +3,6 @@ import {
 	LIMITER_NAME_ASYNC,
 	LIMITER_NAME_SYNC,
 	LIMITER_OFFSET,
-	LIMITER_PROPERTY,
 	LIMITER_SYMBOL,
 	LIMITER_THROTTLE,
 	startTimer,
@@ -32,12 +31,11 @@ function AsyncLimiter(
 		callback,
 		type,
 		interval: getNumberOrDefault(time, 0),
+		name: LIMITER_NAME_ASYNC,
 		parameters: [],
 		throttle: type === LIMITER_THROTTLE,
 	};
 }
-
-AsyncLimiter.prototype[LIMITER_PROPERTY] = LIMITER_NAME_ASYNC;
 
 AsyncLimiter.prototype.cancel = cancelAsyncLimiter;
 AsyncLimiter.prototype.run = runAsyncLimiter;
@@ -47,12 +45,11 @@ function Limiter(this: any, type: LimiterType, callback: GenericCallback, time?:
 		callback,
 		type,
 		interval: getNumberOrDefault(time, 0),
+		name: LIMITER_NAME_SYNC,
 		parameters: [],
 		throttle: type === LIMITER_THROTTLE,
 	};
 }
-
-Limiter.prototype[LIMITER_PROPERTY] = LIMITER_NAME_SYNC;
 
 Limiter.prototype.cancel = cancelLimiter;
 Limiter.prototype.run = runLimiter;
@@ -111,7 +108,7 @@ async function handleAsyncLimiter(state: AsyncLimiterState, item: AsyncLimiterIt
 
 		item.running = true;
 
-		const result = await asyncAttempt(async () => {
+		const attempted = await asyncAttempt(async () => {
 			let value = state.callback(...item.parameters);
 
 			if (value instanceof Promise) {
@@ -121,10 +118,10 @@ async function handleAsyncLimiter(state: AsyncLimiterState, item: AsyncLimiterIt
 			return value;
 		});
 
-		if (result.ok) {
-			item.resolve(result.value);
+		if (attempted.ok) {
+			item.resolve(attempted.value);
 		} else {
-			item.reject(result.error);
+			item.reject(attempted.error);
 		}
 
 		item.running = false;

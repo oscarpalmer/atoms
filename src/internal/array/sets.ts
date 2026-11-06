@@ -61,18 +61,18 @@ function getComparison(
 
 	length = source.length;
 
-	const result: unknown[] = isUnion ? first.slice() : [];
+	const compared: unknown[] = isUnion ? first.slice() : [];
 
 	for (let index = 0; index < length; index += 1) {
 		const item = source[index];
 		const value = callback?.(item, index, source) ?? item;
 
 		if (isIntersection ? set.has(value) : !set.has(value)) {
-			result.push(item);
+			compared.push(item);
 		}
 	}
 
-	return result;
+	return compared;
 }
 
 // #endregion

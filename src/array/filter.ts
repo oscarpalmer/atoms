@@ -1,6 +1,4 @@
-import {findValues} from '../internal/array/find';
-import {ARRAY_FIND_VALUES_ALL} from '../models/array/array.find.model';
-import type {PlainObject} from '../models/index';
+import type {GenericCallback, PlainObject} from '../models/index';
 
 // #region Functions
 
@@ -114,7 +112,7 @@ export function exclude<Item>(
 export function exclude<Item>(array: Item[], item: Item): Item[];
 
 export function exclude(array: unknown[], ...parameters: unknown[]): unknown[] {
-	return findValues(ARRAY_FIND_VALUES_ALL, array, parameters).notMatched;
+	return filterValues(array, parameters, false);
 }
 
 /**
@@ -217,7 +215,44 @@ export function filter<Item>(
 export function filter<Item>(array: Item[], item: Item): Item[];
 
 export function filter(array: unknown[], ...parameters: unknown[]): unknown[] {
-	return findValues(ARRAY_FIND_VALUES_ALL, array, parameters).matched;
+	return filterValues(array, parameters, true);
+}
+
+function filterValues(array: unknown[], parameters: unknown[], include: boolean): unknown[] {
+	if (!Array.isArray(array)) {
+		return [];
+	}
+
+	if (array.length === 0) {
+		return [];
+	}
+
+	const [first, second] = parameters;
+	const {length} = parameters;
+
+	if (length === 1) {
+		return typeof first === 'function'
+			? array.filter(
+					(item, index, array) => (first as GenericCallback)(item, index, array) === include,
+				)
+			: array.filter(item => Object.is(item, first) === include);
+	}
+
+	let callback: GenericCallback | undefined;
+
+	if (typeof first === 'function') {
+		callback = first as GenericCallback;
+	} else if (typeof first === 'number' || typeof first === 'string') {
+		callback = (item: PlainObject) => item[first];
+	}
+
+	if (callback == null) {
+		return [];
+	}
+
+	return array.filter(
+		(item, index, array) => Object.is(callback(item, index, array), second) === include,
+	);
 }
 
 // #endregion

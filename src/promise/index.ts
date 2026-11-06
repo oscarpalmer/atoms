@@ -91,7 +91,7 @@ export async function attemptPromise<Value>(
 		resolve: (value: Value) => void,
 		reject: (reason: unknown) => void,
 	): Promise<void> {
-		const result = await asyncAttempt(async () => {
+		const attempted = await asyncAttempt(async () => {
 			let result = isFunction ? value() : await value;
 
 			if (result instanceof Promise) {
@@ -101,10 +101,10 @@ export async function attemptPromise<Value>(
 			return result;
 		});
 
-		if (result.ok) {
-			settlePromise(resolve, result.value, aborter);
+		if (attempted.ok) {
+			settlePromise(resolve, attempted.value, aborter);
 		} else {
-			settlePromise(reject, result.error, aborter);
+			settlePromise(reject, attempted.error, aborter);
 		}
 	}
 

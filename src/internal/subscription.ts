@@ -1,17 +1,15 @@
-import type {Key} from '../models/index';
+import type {Key, PlainObject} from '../models/index';
 import {
 	SUBSCRIPTION_DISALLOWED_KEY,
 	SUBSCRIPTION_INVALID_KEY,
 	SUBSCRIPTION_INVALID_VALUE,
 	SUBSCRIPTION_NAME,
-	SUBSCRIPTION_PROPERTY,
 	SUBSCRIPTION_STORE,
 	SUBSCRIPTION_SYMBOL,
 	type InternalSubscription,
 	type InternalSubscriptions,
 	type Subscription,
 	type SubscriptionParameters,
-	type SubscriptionProperty,
 	type Subscriptions,
 	type SubscriptionsItems,
 	type SubscriptionsParameters,
@@ -27,11 +25,9 @@ import {isKey, isPlainObject} from './is';
 function Subscription(
 	this: any,
 	state: SubscriptionState,
-	property: SubscriptionProperty,
 	parameters: SubscriptionParameters,
 ): void {
 	this[SUBSCRIPTION_SYMBOL] = state;
-	this[property.key] = property.value;
 
 	state.aborter = createAborter(parameters.signal, () =>
 		this.unsubscribe(subscriptions, this, state),
@@ -39,8 +35,6 @@ function Subscription(
 
 	addSubscription(this);
 }
-
-Subscription.prototype[SUBSCRIPTION_PROPERTY] = SUBSCRIPTION_NAME;
 
 Subscription.prototype.unsubscribe = removeSubscription;
 
@@ -50,12 +44,10 @@ Object.defineProperty(Subscription.prototype, 'active', {
 });
 
 function Subscriptions(this: any, parameters?: SubscriptionsParameters): void {
-	const {keys, property} = createSubscriptionsParameters(parameters);
+	const {keys} = createSubscriptionsParameters(parameters);
 
-	this[SUBSCRIPTION_SYMBOL] = createSubscriptionsState(property, keys);
+	this[SUBSCRIPTION_SYMBOL] = createSubscriptionsState(keys);
 }
-
-Subscriptions.prototype[SUBSCRIPTION_PROPERTY] = SUBSCRIPTION_STORE;
 
 Subscriptions.prototype.clear = clearSubscriptions;
 Subscriptions.prototype.create = createSubscription;
@@ -157,6 +149,7 @@ function createSubscription(
 		parameters,
 		subscriptions,
 		active: true,
+		name: SUBSCRIPTION_NAME,
 	};
 
 	const existing = getExistingSubscription(subscriptions, state);
@@ -174,7 +167,7 @@ function createSubscription(
 	}
 
 	// @ts-expect-error All good, no worries :-)
-	return [new Subscription(state, subscriptions.property, parameters), false];
+	return [new Subscription(state, parameters), false];
 }
 
 function getExistingSubscription(
@@ -231,30 +224,17 @@ function createSubscriptionsParameters(input: unknown): Required<SubscriptionsPa
 
 	return {
 		keys,
-		property: createSubscriptionsProperty(values.property),
 	};
 }
 
-function createSubscriptionsProperty(input: unknown): Required<SubscriptionProperty> {
-	const values = (isPlainObject(input) ? input : {}) as Partial<SubscriptionProperty>;
-
-	return {
-		key: typeof values.key === 'string' ? values.key : SUBSCRIPTION_PROPERTY,
-		value: values.value ?? SUBSCRIPTION_NAME,
-	};
-}
-
-function createSubscriptionsState(
-	property: SubscriptionProperty,
-	keys: boolean | Set<Key>,
-): SubscriptionsState {
+function createSubscriptionsState(keys: boolean | Set<Key>): SubscriptionsState {
 	return {
 		keys,
-		property,
 		items: {
 			any: new Set(),
 			keyed: keys === false ? undefined : new Map(),
 		},
+		name: SUBSCRIPTION_STORE,
 		values: {
 			from: {
 				any: new Map(),
@@ -275,15 +255,15 @@ function createSubscriptionsState(
  * @returns `true` if the value is a subscription, otherwise `false`
  */
 export function isSubscription(value: unknown): value is Subscription {
-	return isSubscriptionInstance(value, SUBSCRIPTION_NAME);
+	return isSubscriptionInstance(SUBSCRIPTION_NAME, value);
 }
 
-function isSubscriptionInstance(value: unknown, name: string): boolean {
+function isSubscriptionInstance(type: string, value: unknown): boolean {
 	return (
 		typeof value === 'object' &&
 		value !== null &&
-		SUBSCRIPTION_PROPERTY in value &&
-		value[SUBSCRIPTION_PROPERTY] === name
+		SUBSCRIPTION_SYMBOL in value &&
+		(value[SUBSCRIPTION_SYMBOL] as PlainObject).name === type
 	);
 }
 
@@ -294,7 +274,7 @@ function isSubscriptionInstance(value: unknown, name: string): boolean {
  * @returns `true` if the value is a subscriptions store, otherwise `false`
  */
 export function isSubscriptions(value: unknown): value is Subscriptions {
-	return isSubscriptionInstance(value, SUBSCRIPTION_STORE);
+	return isSubscriptionInstance(SUBSCRIPTION_STORE, value);
 }
 
 function removeFromStore(

@@ -59,6 +59,7 @@ export type Limiter<Callback extends GenericCallback> = {
 export type LimiterState<Callback = GenericCallback> = {
 	callback: Callback;
 	interval: number;
+	name: string;
 	parameters: unknown[];
 	start?: number;
 	throttle: boolean;
@@ -77,8 +78,6 @@ export const LIMITER_DEBOUNCE: LimiterType = 'debounce';
 export const LIMITER_NAME_ASYNC = 'asyncLimiter';
 
 export const LIMITER_NAME_SYNC = 'limiter';
-
-export const LIMITER_PROPERTY = '$limiter';
 
 export const LIMITER_OFFSET = 5;
 

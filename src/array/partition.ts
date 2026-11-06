@@ -1,8 +1,27 @@
-import {findValues} from '../internal/array/find';
-import {ARRAY_FIND_VALUES_ALL} from '../models/array/array.find.model';
-import type {PlainObject} from '../models/index';
+import type {GenericCallback, PlainObject} from '../models/index';
 
 // #region Functions
+
+function getCallback(first: unknown, second: unknown, length: number): GenericCallback | undefined {
+	if (length === 1 && typeof first === 'function') {
+		return first as GenericCallback;
+	}
+
+	switch (true) {
+		case length === 1:
+			return (item: unknown) => Object.is(item, first);
+
+		case typeof first === 'function':
+			return (item: unknown, index: number, array: unknown[]) =>
+				Object.is(first(item, index, array), second);
+
+		case typeof first === 'number' || typeof first === 'string':
+			return (item: PlainObject) => Object.is(item[first], second);
+
+		default:
+			return undefined;
+	}
+}
 
 /**
  * Get a partitioned array of items
@@ -104,7 +123,37 @@ export function partition<Item>(
 export function partition<Item>(array: Item[], item: Item): [Item[], Item[]];
 
 export function partition(array: unknown[], ...parameters: unknown[]): [unknown[], unknown[]] {
-	const {matched, notMatched} = findValues(ARRAY_FIND_VALUES_ALL, array, parameters);
+	if (!Array.isArray(array)) {
+		return [[], []];
+	}
+
+	const arrayLength = array.length;
+
+	if (arrayLength === 0) {
+		return [[], []];
+	}
+
+	const parametersLength = parameters.length;
+	const [first, second] = parameters;
+
+	const callback = getCallback(first, second, parametersLength);
+
+	if (callback == null) {
+		return [[], []];
+	}
+
+	const matched: unknown[] = [];
+	const notMatched: unknown[] = [];
+
+	for (let index = 0; index < arrayLength; index += 1) {
+		const item = array[index];
+
+		if (callback(item, index, array)) {
+			matched.push(item);
+		} else {
+			notMatched.push(item);
+		}
+	}
 
 	return [matched, notMatched];
 }

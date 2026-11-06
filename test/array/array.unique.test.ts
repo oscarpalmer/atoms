@@ -36,4 +36,5 @@ test('array, unique', () => {
 	expect(unique('blah' as never)).toEqual([]);
 	expect(unique([])).toEqual([]);
 	expect(unique([1])).toEqual([1]);
+	expect(unique([1, 2, 3], [] as never)).toEqual([1, 2, 3]);
 });

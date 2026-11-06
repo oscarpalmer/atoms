@@ -1,12 +1,11 @@
 import {noop} from './internal/function/misc';
 import {isPlainObject} from './internal/is';
-import {isSubscription, subscriptions} from './internal/subscription';
+import {subscriptions} from './internal/subscription';
 import {
 	BEACON_MESSAGE_RETRIEVE,
 	BEACON_MESSAGE_SUBSCRIBE,
 	BEACON_NAME,
 	BEACON_OBSERVABLE,
-	BEACON_PROPERTY,
 	BEACON_SYMBOL,
 	BEACON_TYPE_ERROR,
 	BEACON_TYPE_NEXT,
@@ -17,23 +16,20 @@ import {
 	type InternalObservable,
 	type Observable,
 	type Observer,
-	beaconSubscription,
 } from './models/beacon.model';
 import type {GenericCallback, PlainObject} from './models/index';
-import {SUBSCRIPTION_NAME} from './models/subscription.model';
 import type {Subscription} from './subscription';
 
 // #region Instances
 
-function Beacon(this: any, value: unknown, options?: BeaconOptions<unknown>): void {
+function Beacon(this: InternalBeacon, value: unknown, options?: BeaconOptions<unknown>): void {
 	this[BEACON_SYMBOL] = {
 		value,
 		active: true,
 		options: createBeaconOptions(options),
+		name: BEACON_NAME,
 	};
 }
-
-Beacon.prototype[BEACON_PROPERTY] = BEACON_NAME;
 
 Beacon.prototype.deactivate = deactivateBeacon;
 Beacon.prototype.emit = emitBeaconValue;
@@ -55,14 +51,13 @@ Object.defineProperties(Beacon.prototype, {
 	},
 });
 
-function Observable(this: any, beacon: BeaconState<unknown>): void {
+function Observable(this: InternalObservable, beacon: BeaconState<unknown>): void {
 	this[BEACON_SYMBOL] = {
 		beacon,
 		active: beacon.active,
+		name: BEACON_OBSERVABLE,
 	};
 }
-
-Observable.prototype[BEACON_PROPERTY] = BEACON_OBSERVABLE;
 
 Observable.prototype.deactivate = deactivateObservable;
 Observable.prototype.subscribe = subscribeToObservable;
@@ -207,19 +202,9 @@ function isBeaconInstance<Instance>(name: string, value: unknown): value is Inst
 	return (
 		typeof value === 'object' &&
 		value !== null &&
-		BEACON_PROPERTY in value &&
-		value[BEACON_PROPERTY] === name
+		BEACON_SYMBOL in value &&
+		(value[BEACON_SYMBOL] as PlainObject).name === name
 	);
-}
-
-/**
- * Is the value a beacon subscription?
- *
- * @param value Value to check
- * @returns `true` if the value is a beacon subscription, otherwise `false`
- */
-export function isBeaconSubscription(value: unknown): value is Subscription {
-	return isSubscription(value) && (value as PlainObject)[BEACON_PROPERTY] === SUBSCRIPTION_NAME;
 }
 
 /**
@@ -244,9 +229,7 @@ function subscribeToObservable(
 		throw new Error(BEACON_MESSAGE_SUBSCRIBE);
 	}
 
-	state.beacon.subscriptions ??= subscriptions({
-		property: beaconSubscription,
-	});
+	state.beacon.subscriptions ??= subscriptions();
 
 	const observer = createObserver(first, second, third);
 

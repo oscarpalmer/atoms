@@ -101,8 +101,6 @@ export const LOGGER_NAME = 'Logger';
 
 export const LOGGER_NAME_TIMED = 'TimedLogger';
 
-export const LOGGER_PROPERTY = '$logger';
-
-export const LOGGER_SYMBOL: unique symbol = Symbol(LOGGER_PROPERTY);
+export const LOGGER_SYMBOL: unique symbol = Symbol('logger');
 
 // #endregion

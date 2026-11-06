@@ -11,6 +11,18 @@ export type ArrayComparison = 'end' | 'inside' | 'invalid' | 'outside' | 'same' 
 
 export type ArrayExtractType = 'drop' | 'take';
 
+export type ArrayFindParameters = {
+	bare?: boolean;
+	indiced?: boolean;
+	input: unknown[];
+	limit?: number;
+	reverse?: boolean;
+};
+
+export type ArrayFindResult = {
+	values: unknown[];
+};
+
 export type ArrayFlattened<Value> = Value extends ReadonlyArray<infer Inner> ? Inner : Value;
 
 export type ArrayGetCallbacks = {
@@ -53,5 +65,7 @@ export const ARRAY_SETS_COMPARE_UNION: ArrayCompareSetsType = 'union';
 export const ARRAY_SLICE_DROP: ArrayExtractType = 'drop';
 
 export const ARRAY_SLICE_TAKE: ArrayExtractType = 'take';
+
+export const ARRAY_UNIQUE_THRESHOLD = 100;
 
 // #endregion

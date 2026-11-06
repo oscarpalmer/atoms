@@ -1,5 +1,5 @@
 import {expect, test} from 'vite-plus/test';
-import {beacon, equal, isBeacon, isBeaconSubscription, isObservable, isSubscription} from '../src';
+import {beacon, equal, isBeacon, isObservable, isSubscription} from '../src';
 import {isFixture} from './.fixtures/is.fixture';
 
 const {length, values} = isFixture;
@@ -92,12 +92,6 @@ test('observable + subscription', () =>
 		expect(isSubscription(three)).toBe(true);
 		expect(isSubscription(first)).toBe(false);
 		expect(isSubscription(first.observable)).toBe(false);
-
-		expect(isBeaconSubscription(one)).toBe(true);
-		expect(isBeaconSubscription(two)).toBe(true);
-		expect(isBeaconSubscription(three)).toBe(true);
-		expect(isBeaconSubscription(first)).toBe(false);
-		expect(isBeaconSubscription(first.observable)).toBe(false);
 
 		first.observable.subscribe('blah' as never);
 

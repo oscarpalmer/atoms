@@ -1,5 +1,5 @@
 import {expect, test} from 'vite-plus/test';
-import {herald, isHeraldEvents, isHerald, isHeraldSubscription, isSubscription} from '../src';
+import {herald, isHeraldEvents, isHerald, isSubscription} from '../src';
 
 type Events = {
 	bar: () => void;
@@ -67,13 +67,6 @@ test('herald', () => {
 	expect(isSubscription(fooTwo)).toBe(true);
 	expect(isSubscription(sig)).toBe(true);
 	expect(isSubscription(harold)).toBe(false);
-
-	expect(isHeraldSubscription(bar)).toBe(true);
-	expect(isHeraldSubscription(baz)).toBe(true);
-	expect(isHeraldSubscription(fooOne)).toBe(true);
-	expect(isHeraldSubscription(fooTwo)).toBe(true);
-	expect(isHeraldSubscription(sig)).toBe(true);
-	expect(isHeraldSubscription(harold)).toBe(false);
 
 	expect(fooOne).toBe(fooTwo);
 
@@ -144,33 +137,6 @@ test('herald', () => {
 
 	expect(() => {
 		herald(123 as never);
-	}).toThrow();
-
-	expect(() => {
-		herald({
-			names: ['hello, world!'],
-			property: 123 as never,
-		});
-	}).toThrow();
-
-	expect(() => {
-		herald({
-			names: ['hello, world!'],
-			property: {
-				key: 123 as never,
-				value: 'hmm',
-			},
-		});
-	}).toThrow();
-
-	expect(() => {
-		herald({
-			names: ['hello, world!'],
-			property: {
-				key: 'ok',
-				value: 123 as never,
-			},
-		});
 	}).toThrow();
 
 	expect(() => {

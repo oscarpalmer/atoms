@@ -4,7 +4,6 @@ import {
 	ONCE_MESSAGE_EXPECTATION,
 	ONCE_NAME_ASYNC,
 	ONCE_NAME_SYNC,
-	ONCE_PROPERTY,
 	ONCE_SYMBOL,
 	type AsyncOnce,
 	type AsyncOnceState,
@@ -12,7 +11,7 @@ import {
 	type InternalOnce,
 	type Once,
 } from '../models/function/once.model';
-import type {GenericAsyncCallback, GenericCallback} from '../models/index';
+import type {GenericAsyncCallback, GenericCallback, PlainObject} from '../models/index';
 
 // #region Instances
 
@@ -24,11 +23,10 @@ function AsyncOnce(this: any, callback: GenericAsyncCallback): void {
 		error: false,
 		finished: false,
 		items: [],
+		type: ONCE_NAME_ASYNC,
 		value: undefined,
 	};
 }
-
-AsyncOnce.prototype[ONCE_PROPERTY] = ONCE_NAME_ASYNC;
 
 AsyncOnce.prototype.clear = clearOnce;
 AsyncOnce.prototype.run = runOnceAsync;
@@ -57,11 +55,10 @@ function Once(this: any, callback: GenericCallback): void {
 		callback,
 		called: false,
 		cleared: false,
+		type: ONCE_NAME_SYNC,
 		value: undefined,
 	};
 }
-
-Once.prototype[ONCE_PROPERTY] = ONCE_NAME_SYNC;
 
 Once.prototype.clear = clearOnce;
 Once.prototype.run = runOnce;
@@ -152,7 +149,7 @@ function handleOnceResult<Value>(state: AsyncOnceState<Value>, value: Value, err
  * @returns `true` if the value is an asynchronous once callback, otherwise `false`
  */
 export function isAsyncOnce(value: unknown): boolean {
-	return isOnceInstance(value, ONCE_NAME_ASYNC);
+	return isOnceInstance(ONCE_NAME_ASYNC, value);
 }
 
 /**
@@ -162,15 +159,15 @@ export function isAsyncOnce(value: unknown): boolean {
  * @returns `true` if the value is a once callback, otherwise `false`
  */
 export function isOnce(value: unknown): boolean {
-	return isOnceInstance(value, ONCE_NAME_SYNC);
+	return isOnceInstance(ONCE_NAME_SYNC, value);
 }
 
-function isOnceInstance(value: unknown, name: string): boolean {
+function isOnceInstance(type: string, value: unknown): boolean {
 	return (
 		typeof value === 'object' &&
 		value !== null &&
-		ONCE_PROPERTY in value &&
-		value[ONCE_PROPERTY] === name
+		ONCE_SYMBOL in value &&
+		(value[ONCE_SYMBOL] as PlainObject).type === type
 	);
 }
 

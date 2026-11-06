@@ -10,7 +10,6 @@ import {
 	FUZZY_LENGTH_DIVISOR,
 	FUZZY_MESSAGE_ARRAY,
 	FUZZY_MESSAGE_HANDLER,
-	FUZZY_PROPERTY,
 	FUZZY_PROXIMITY_THRESHOLD,
 	FUZZY_SYMBOL,
 	type Fuzzy,
@@ -29,8 +28,6 @@ import {
 function Fuzzy(this: InternalFuzzy, state: FuzzyState<unknown>): void {
 	this[FUZZY_SYMBOL] = state;
 }
-
-Fuzzy.prototype[FUZZY_PROPERTY] = true;
 
 Fuzzy.prototype.search = search;
 
@@ -456,12 +453,7 @@ function isBoundary(string: FuzzyString, index: number): boolean {
  * @returns `true` if the value is a fuzzy searcher, otherwise `false`
  */
 export function isFuzzy<Item = unknown>(value: unknown): value is Fuzzy<Item> {
-	return (
-		typeof value === 'object' &&
-		value !== null &&
-		FUZZY_PROPERTY in value &&
-		value[FUZZY_PROPERTY] === true
-	);
+	return typeof value === 'object' && value !== null && FUZZY_SYMBOL in value;
 }
 
 function search<Item>(

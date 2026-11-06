@@ -85,12 +85,10 @@ export const ONCE_NAME_ASYNC = 'asyncOnce';
 
 export const ONCE_NAME_SYNC = 'once';
 
-export const ONCE_PROPERTY = '$once';
-
 export const ONCE_MESSAGE_CLEARED = 'Once has been cleared';
 
 export const ONCE_MESSAGE_EXPECTATION = 'Once expected a function';
 
-export const ONCE_SYMBOL: unique symbol = Symbol(ONCE_PROPERTY);
+export const ONCE_SYMBOL: unique symbol = Symbol('once');
 
 // #endregion

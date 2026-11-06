@@ -1,6 +1,4 @@
-import {findValue} from '../internal/array/find';
-import {ARRAY_FIND_VALUE_INDEX} from '../models/array/array.find.model';
-import type {PlainObject} from '../models/index';
+import type {GenericCallback, PlainObject} from '../models/index';
 
 // #region Functions
 
@@ -84,11 +82,36 @@ export function exists<Item>(
 export function exists<Item>(array: Item[], item: Item): boolean;
 
 export function exists(array: unknown[], ...parameters: unknown[]): boolean {
-	if (parameters.length === 1 && typeof parameters[0] !== 'function') {
-		return Array.isArray(array) ? array.includes(parameters[0]) : false;
+	if (!Array.isArray(array)) {
+		return false;
 	}
 
-	return findValue(ARRAY_FIND_VALUE_INDEX, array, parameters, false) > -1;
+	if (array.length === 0) {
+		return false;
+	}
+
+	const [first, second] = parameters;
+	const {length} = parameters;
+
+	if (length === 1) {
+		return typeof first === 'function'
+			? array.some((item, index, array) => (first as GenericCallback)(item, index, array))
+			: array.includes(first);
+	}
+
+	let callback: GenericCallback | undefined;
+
+	if (typeof first === 'function') {
+		callback = first as GenericCallback;
+	} else if (typeof first === 'number' || typeof first === 'string') {
+		callback = (item: PlainObject) => item[first];
+	}
+
+	if (callback == null) {
+		return false;
+	}
+
+	return array.some((item, index, array) => Object.is(callback(item, index, array), second));
 }
 
 // #endregion

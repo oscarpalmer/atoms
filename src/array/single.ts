@@ -1,5 +1,4 @@
-import {findValues} from '../internal/array/find';
-import {ARRAY_FIND_VALUES_ALL} from '../models/array/array.find.model';
+import {findValue} from '../internal/array/find';
 import type {PlainObject} from '../models/index';
 
 // #region Functions
@@ -102,15 +101,20 @@ export function single<Item>(
 ): Item | undefined;
 
 export function single(array: unknown[], ...parameters: unknown[]): unknown {
-	const {matched} = findValues(ARRAY_FIND_VALUES_ALL, array, parameters, {
+	const result = findValue(array, {
+		input: parameters,
 		limit: 2,
 	});
 
-	if (matched.length > 1) {
+	if (result == null) {
+		return undefined;
+	}
+
+	if (result.values.length > 1) {
 		throw new Error(SINGLE_MESSAGE);
 	}
 
-	return matched[0];
+	return result.values[0];
 }
 
 // #endregion

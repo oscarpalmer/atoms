@@ -36,4 +36,5 @@ test('array, partition', () => {
 
 	expect(partition('blah' as never, 99)).toEqual([[], []]);
 	expect(partition([], 99)).toEqual([[], []]);
+	expect(partition([1, 2, 3], [] as never, [] as never)).toEqual([[], []]);
 });

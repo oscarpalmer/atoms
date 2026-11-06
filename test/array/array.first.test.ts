@@ -20,7 +20,9 @@ test('first', () => {
 	expect(first('blah' as never)).toBeUndefined();
 	expect(first(complex, 'id', 99)).toBeUndefined();
 	expect(first('blah' as never, 99 as never)).toBeUndefined();
+	expect(first([1, 2, 3], 99 as never)).toBeUndefined();
 	expect(first([], 99 as never)).toBeUndefined();
+	expect(first([1, 2, 3], [] as never)).toBeUndefined();
 });
 
 test('first.default', () => {

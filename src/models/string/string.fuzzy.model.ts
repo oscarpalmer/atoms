@@ -167,10 +167,8 @@ export const FUZZY_MESSAGE_ARRAY = 'Fuzzy requires an array of items';
 
 export const FUZZY_MESSAGE_HANDLER = 'Fuzzy requires a key or function to stringify items';
 
-export const FUZZY_PROPERTY = '$fuzzy';
-
 export const FUZZY_PROXIMITY_THRESHOLD = 5;
 
-export const FUZZY_SYMBOL: unique symbol = Symbol(FUZZY_PROPERTY);
+export const FUZZY_SYMBOL: unique symbol = Symbol('fuzzy');
 
 // #endregion

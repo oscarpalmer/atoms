@@ -97,11 +97,7 @@ export const COLOR_MAX = {
 	percent: 100,
 };
 
-export const COLOR_NAME = 'color';
-
-export const COLOR_PROPERTY = '$color';
-
-export const COLOR_SYMBOL: symbol = Symbol(COLOR_PROPERTY);
+export const COLOR_SYMBOL: unique symbol = Symbol('color');
 
 export const COLOR_TYPE: ColorTypes = {
 	all: undefined as unknown as Set<'alpha' | ColorTypeExtended>,
@@ -142,7 +138,7 @@ export const COLOR_SRGB = {
 };
 
 export const colorSubscription: SubscriptionProperty = {
-	key: COLOR_PROPERTY,
+	key: 'atoms:color',
 	value: SUBSCRIPTION_NAME,
 };
 

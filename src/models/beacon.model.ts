@@ -1,9 +1,4 @@
-import {
-	type Subscription,
-	type SubscriptionProperty,
-	type Subscriptions,
-	SUBSCRIPTION_NAME,
-} from './subscription.model';
+import {type Subscription, type Subscriptions} from './subscription.model';
 
 // #region Types
 
@@ -70,6 +65,7 @@ export type BeaconState<Value> = {
 	observable?: Observable<Value>;
 	options: Required<BeaconOptions<Value>>;
 	subscriptions?: Subscriptions<Observer<unknown>>;
+	name: typeof BEACON_NAME;
 	value: Value;
 };
 
@@ -118,6 +114,7 @@ export type Observable<Value> = {
 export type ObservableState<Value> = {
 	active: boolean;
 	beacon: BeaconState<Value>;
+	name: typeof BEACON_OBSERVABLE;
 };
 
 export type Observer<Value> = {
@@ -143,21 +140,14 @@ export const BEACON_MESSAGE_RETRIEVE = 'Cannot retrieve observable from a closed
 
 export const BEACON_MESSAGE_SUBSCRIBE = 'Cannot subscribe to a closed observable';
 
-export const BEACON_PROPERTY = '$beacon';
-
 export const BEACON_NAME = 'beacon';
 
 export const BEACON_OBSERVABLE = 'observable';
 
-export const BEACON_SYMBOL: unique symbol = Symbol(BEACON_PROPERTY);
+export const BEACON_SYMBOL: unique symbol = Symbol('beacon');
 
 export const BEACON_TYPE_ERROR = 'error';
 
 export const BEACON_TYPE_NEXT = 'next';
-
-export const beaconSubscription: SubscriptionProperty = {
-	key: BEACON_PROPERTY,
-	value: SUBSCRIPTION_NAME,
-};
 
 // #endregion

@@ -1,5 +1,4 @@
 import {between} from '../../internal/number';
-import {isSubscription} from '../../internal/subscription';
 import type {
 	ColorProperty,
 	HSLAColor,
@@ -10,15 +9,13 @@ import type {
 	RGBColor,
 } from '../../models/color.model';
 import type {PlainObject} from '../../models/index';
-import {SUBSCRIPTION_NAME, type Subscription} from '../../models/subscription.model';
 import {
 	COLOR_ALPHA,
 	COLOR_EXPRESSION,
 	COLOR_KEYS,
 	COLOR_LENGTHS,
 	COLOR_MAX,
-	COLOR_NAME,
-	COLOR_PROPERTY,
+	COLOR_SYMBOL,
 } from '../constants';
 import type {Color} from '../index';
 
@@ -43,24 +40,7 @@ function isBytey(value: unknown): value is number {
  * @returns `true` if the value is a _Color_, otherwise `false`
  */
 export function isColor(value: unknown): value is Color {
-	return (
-		typeof value === 'object' &&
-		value !== null &&
-		COLOR_PROPERTY in value &&
-		value[COLOR_PROPERTY] === COLOR_NAME
-	);
-}
-
-/**
- * Is the value a color subscription?
- *
- * @param value Value to check
- * @returns `true` if the value is a color subscription, otherwise `false`
- */
-export function isColorSubscription(value: unknown): value is Subscription {
-	return (
-		isSubscription(value) && COLOR_PROPERTY in value && value[COLOR_PROPERTY] === SUBSCRIPTION_NAME
-	);
+	return typeof value === 'object' && value !== null && COLOR_SYMBOL in value;
 }
 
 function isColorValue(value: unknown, properties: ColorProperty[]): boolean {

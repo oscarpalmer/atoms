@@ -1,5 +1,4 @@
 import {findValue} from '../internal/array/find';
-import {ARRAY_FIND_VALUE_ITEM} from '../models/array/array.find.model';
 import type {PlainObject} from '../models/index';
 
 // #region Functions
@@ -105,7 +104,10 @@ export function find<Item>(
 export function find<Item>(array: Item[], value: Item): Item | undefined;
 
 export function find(array: unknown[], ...parameters: unknown[]): unknown {
-	return findValue(ARRAY_FIND_VALUE_ITEM, array, parameters, false);
+	return findValue(array, {
+		input: parameters,
+		reverse: false,
+	})?.values[0];
 }
 
 /**
@@ -218,7 +220,10 @@ export function findLast<Item>(
 export function findLast<Item>(array: Item[], value: Item): Item | undefined;
 
 export function findLast(array: unknown[], ...parameters: unknown[]): unknown {
-	return findValue(ARRAY_FIND_VALUE_ITEM, array, parameters, true);
+	return findValue(array, {
+		input: parameters,
+		reverse: true,
+	})?.values[0];
 }
 
 // #endregion

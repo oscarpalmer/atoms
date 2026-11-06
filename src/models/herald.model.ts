@@ -1,10 +1,5 @@
 import type {GenericCallback} from './index';
-import {
-	SUBSCRIPTION_NAME,
-	type Subscription,
-	type SubscriptionProperty,
-	type Subscriptions,
-} from './subscription.model';
+import {type Subscription, type Subscriptions} from './subscription.model';
 
 // #region Types
 
@@ -63,7 +58,6 @@ export type HeraldOnCreate<Events extends Record<string, GenericCallback>> = <
 
 export type HeraldOptions<Events extends Record<string, GenericCallback>> = {
 	names: Array<keyof Events>;
-	property?: SubscriptionProperty;
 	onCreate?: HeraldOnCreate<Events>;
 };
 
@@ -76,9 +70,16 @@ export type HeraldState = {
 export type InternalHerald = {
 	[HERALD_SYMBOL]: {
 		events: HeraldEvents<Record<string, GenericCallback>>;
+		name: typeof HERALD_NAME_HERALD;
 		state: HeraldState;
 	};
 } & Herald<Record<string, GenericCallback>>;
+
+export type InternalHeraldEvents = {
+	[HERALD_SYMBOL]: {
+		name: typeof HERALD_NAME_EVENTS;
+	};
+} & HeraldEvents<Record<string, GenericCallback>>;
 
 // #endregion
 
@@ -94,13 +95,6 @@ export const HERALD_NAME_EVENTS = 'events';
 
 export const HERALD_NAME_HERALD = 'herald';
 
-export const HERALD_PROPERTY = '$herald';
-
-export const HERALD_SYMBOL: unique symbol = Symbol(HERALD_PROPERTY);
-
-export const heraldSubscription: SubscriptionProperty = {
-	key: HERALD_PROPERTY,
-	value: SUBSCRIPTION_NAME,
-};
+export const HERALD_SYMBOL: unique symbol = Symbol('herald');
 
 // #endregion

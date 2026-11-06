@@ -315,8 +315,6 @@ export const QUEUE_NAME_KEYED = 'keyedQueue';
 
 export const QUEUE_NAME_QUEUE = 'queue';
 
-export const QUEUE_PROPERTY = '$queue';
-
 export const QUEUE_STATUS_ACTIVE: QueueStatusKey = 'active';
 
 export const QUEUE_STATUS_EMPTY: QueueStatusKey = 'empty';
@@ -325,6 +323,6 @@ export const QUEUE_STATUS_FULL: QueueStatusKey = 'full';
 
 export const QUEUE_STATUS_PAUSED: QueueStatusKey = 'paused';
 
-export const QUEUE_SYMBOL: unique symbol = Symbol(QUEUE_PROPERTY);
+export const QUEUE_SYMBOL: unique symbol = Symbol('queue');
 
 // #endregion

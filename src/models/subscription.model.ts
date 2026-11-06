@@ -45,23 +45,10 @@ export type SubscriptionParameters = {
 	value: unknown;
 };
 
-/**
- * Property information for subscription identification
- */
-export type SubscriptionProperty = {
-	/**
-	 * Name of the property used to identify a subscription
-	 */
-	key: string;
-	/**
-	 * Value of the property used to identify a subscription
-	 */
-	value: unknown;
-};
-
 export type SubscriptionState = {
 	aborter?: Aborter;
 	active: boolean;
+	name: string;
 	parameters: SubscriptionParameters;
 	subscriptions: SubscriptionsState;
 };
@@ -107,16 +94,12 @@ export type SubscriptionsParameters = {
 	 * Allow any or specific keys for subscriptions? _(defaults to `false`, which prevents keyed subscriptions)_
 	 */
 	keys?: boolean | Set<Key>;
-	/**
-	 * Property information for subscription identification
-	 */
-	property?: SubscriptionProperty;
 };
 
 export type SubscriptionsState = {
 	items: SubscriptionsItems;
 	keys: boolean | Set<Key>;
-	property: SubscriptionProperty;
+	name: string;
 	values: SubscriptionsValues;
 };
 
@@ -147,10 +130,8 @@ export const SUBSCRIPTION_INVALID_VALUE = 'A subscription requires a non-null va
 
 export const SUBSCRIPTION_NAME = 'subscription';
 
-export const SUBSCRIPTION_PROPERTY = '$subscription';
-
 export const SUBSCRIPTION_STORE = 'subscriptions';
 
-export const SUBSCRIPTION_SYMBOL: unique symbol = Symbol(SUBSCRIPTION_PROPERTY);
+export const SUBSCRIPTION_SYMBOL: unique symbol = Symbol('subscription');
 
 // #endregion

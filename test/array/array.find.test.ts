@@ -23,6 +23,7 @@ test('first', () => {
 	expect(find(complex, 'id', 99)).toBeUndefined();
 	expect(find('blah' as never, 99)).toBeUndefined();
 	expect(find([], 99)).toBeUndefined();
+	expect(find([1, 2, 3], [] as never, [] as never)).toBeUndefined();
 });
 
 test('first', () => {

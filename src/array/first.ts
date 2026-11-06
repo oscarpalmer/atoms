@@ -1,4 +1,4 @@
-import {findAbsoluteValueOrDefault} from '../internal/array/find';
+import {findValue} from '../internal/array/find';
 import type {PlainObject} from '../models/index';
 
 // #region Functions
@@ -105,7 +105,10 @@ export function first<Item>(
 export function first<Item>(array: Item[]): Item | undefined;
 
 export function first(array: unknown[], ...parameters: unknown[]): unknown {
-	return findAbsoluteValueOrDefault(array, parameters, undefined, false, false);
+	return findValue(array, {
+		bare: true,
+		input: parameters,
+	})?.values[0];
 }
 
 /**
@@ -233,7 +236,12 @@ export function firstOrDefault(
 	defaultValue: unknown,
 	...parameters: unknown[]
 ): unknown {
-	return findAbsoluteValueOrDefault(array, parameters, defaultValue, true, false);
+	return (
+		findValue(array, {
+			bare: true,
+			input: parameters,
+		})?.values[0] ?? defaultValue
+	);
 }
 
 // #endregion

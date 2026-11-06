@@ -59,16 +59,16 @@ async function asyncRetry<Callback extends GenericAsyncCallback>(
 	}
 
 	async function handle(): Promise<void> {
-		const result = await asyncAttempt(async () => callback());
+		const attempted = await asyncAttempt(async () => callback());
 
-		if (result.ok) {
-			resolver(result.value);
+		if (attempted.ok) {
+			resolver(attempted.value);
 
 			return;
 		}
 
-		if (attempts >= times || !when(result.error)) {
-			rejector(new RetryError(RETRY_MESSAGE_FAILED, result.error));
+		if (attempts >= times || !when(attempted.error)) {
+			rejector(new RetryError(RETRY_MESSAGE_FAILED, attempted.error));
 		} else {
 			attempts += 1;
 
@@ -123,14 +123,14 @@ export function retry<Callback extends GenericCallback>(
 	let last: unknown;
 
 	for (let index = 0; index <= times; index += 1) {
-		const result = attempt(callback);
+		const attempted = attempt(callback);
 
-		if (result.ok) {
-			return result.value;
+		if (attempted.ok) {
+			return attempted.value;
 		}
 
-		if (index >= times || !when(result.error)) {
-			last = result.error;
+		if (index >= times || !when(attempted.error)) {
+			last = attempted.error;
 
 			break;
 		}

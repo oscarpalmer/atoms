@@ -1,5 +1,5 @@
-import {findValues} from '../internal/array/find';
-import {ARRAY_FIND_VALUES_UNIQUE} from '../models/array/array.find.model';
+import {getArrayCallback} from '../internal/array/callbacks';
+import {ARRAY_UNIQUE_THRESHOLD} from '../models/array/array.misc.model';
 import type {PlainObject} from '../models/index';
 
 // #region Functions
@@ -62,9 +62,32 @@ export function unique(array: unknown[], key?: unknown): unknown[] {
 		return [];
 	}
 
-	return array.length > 1
-		? findValues(ARRAY_FIND_VALUES_UNIQUE, array, [key, undefined]).matched
-		: array;
+	const {length} = array;
+
+	if (length < 2) {
+		return array.slice();
+	}
+
+	const callback = getArrayCallback(key);
+
+	if (callback == null && length >= ARRAY_UNIQUE_THRESHOLD) {
+		return [...new Set(array)];
+	}
+
+	const keyed = new Set();
+	const uniques: unknown[] = [];
+
+	for (let index = 0; index < length; index += 1) {
+		const item = array[index];
+		const value = callback == null ? item : callback(item, index, array);
+
+		if (!keyed.has(value)) {
+			keyed.add(value);
+			uniques.push(item);
+		}
+	}
+
+	return uniques;
 }
 
 // #endregion

@@ -1,23 +1,22 @@
 import {noop} from './internal/function/misc';
 import {getString} from './internal/string/misc';
-import type {GenericCallback} from './models/index';
+import type {GenericCallback, PlainObject} from './models/index';
 import {
 	type InternalTimeLogger,
 	type Lumberjack,
 	type TimeLogger,
 	LOGGER_NAME,
 	LOGGER_NAME_TIMED,
-	LOGGER_PROPERTY,
 	LOGGER_SYMBOL,
 } from './models/logger.model';
 
 // #region Instances
 
 function Lumberjack(this: any): void {
-	// The Logger instance
+	this[LOGGER_SYMBOL] = {
+		name: LOGGER_NAME,
+	};
 }
-
-Lumberjack.prototype[LOGGER_PROPERTY] = LOGGER_NAME;
 
 Lumberjack.prototype.time = getTimeLogger;
 
@@ -56,6 +55,7 @@ Object.defineProperties(Lumberjack.prototype, {
 function TimeLogger(this: any, label: string): void {
 	this[LOGGER_SYMBOL] = {
 		label,
+		name: LOGGER_NAME_TIMED,
 		started: enabled,
 		stopped: false,
 	};
@@ -68,8 +68,6 @@ function TimeLogger(this: any, label: string): void {
 		console.time(label);
 	}
 }
-
-TimeLogger.prototype[LOGGER_PROPERTY] = LOGGER_NAME_TIMED;
 
 Object.defineProperties(TimeLogger.prototype, {
 	active: {
@@ -137,8 +135,8 @@ function isLoggerInstance<Instance>(name: string, value: unknown): value is Inst
 	return (
 		typeof value === 'object' &&
 		value !== null &&
-		LOGGER_PROPERTY in value &&
-		value[LOGGER_PROPERTY] === name
+		LOGGER_SYMBOL in value &&
+		(value[LOGGER_SYMBOL] as PlainObject).name === name
 	);
 }
 

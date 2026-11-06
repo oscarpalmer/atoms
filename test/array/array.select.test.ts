@@ -64,6 +64,8 @@ test('select', () => {
 			item => item,
 		),
 	).toEqual([]);
+
+	expect(select([], (() => {}) as never, (() => {}) as never)).toEqual([]);
 });
 
 test('select.flat', () => {

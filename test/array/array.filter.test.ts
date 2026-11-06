@@ -21,7 +21,9 @@ test('filter', () => {
 	expect(filterByInvalidKey).toEqual([]);
 
 	expect(filter('blah' as never, 99)).toEqual([]);
+	expect(filter([1, 2, 3], 99)).toEqual([]);
 	expect(filter([], 99)).toEqual([]);
+	expect(filter([1, 2, 3], [] as never, [] as never)).toEqual([]);
 });
 
 test('remove', () => {

@@ -11,7 +11,6 @@ import {
 	isSubscription,
 	type Color,
 } from '../../src';
-import {isColorSubscription} from '../../src/color/misc/is';
 
 test('color, subscription', () => {
 	function onHex(hex: string) {
@@ -41,10 +40,6 @@ test('color, subscription', () => {
 	expect(isSubscription(hexOne)).toBe(true);
 	expect(isSubscription(hexTwo)).toBe(true);
 	expect(isSubscription(color)).toBe(false);
-
-	expect(isColorSubscription(hexOne)).toBe(true);
-	expect(isColorSubscription(hexTwo)).toBe(true);
-	expect(isColorSubscription(color)).toBe(false);
 
 	const controller = new AbortController();
 

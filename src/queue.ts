@@ -2,7 +2,7 @@ import {createAborter} from './internal/aborter';
 import {getBooleanOrDefault, getNumberOrDefault} from './internal/defaults';
 import {min} from './internal/math/aggregate';
 import {asyncAttempt} from './internal/result/attempt';
-import type {GenericAsyncCallback, GenericCallback} from './models/index';
+import type {GenericAsyncCallback, GenericCallback, PlainObject} from './models/index';
 import {
 	type InternalKeyedQueue,
 	type InternalQueue,
@@ -19,7 +19,6 @@ import {
 	QUEUE_MESSAGE_REMOVE,
 	QUEUE_NAME_KEYED,
 	QUEUE_NAME_QUEUE,
-	QUEUE_PROPERTY,
 	QUEUE_STATUS_ACTIVE,
 	QUEUE_STATUS_EMPTY,
 	QUEUE_STATUS_FULL,
@@ -45,10 +44,9 @@ function KeyedQueue(
 		callback,
 		options: createQueueOptions(options),
 		queues: new Map(),
+		type: QUEUE_NAME_KEYED,
 	};
 }
-
-KeyedQueue.prototype[QUEUE_PROPERTY] = QUEUE_NAME_KEYED;
 
 KeyedQueue.prototype.add = addKeyedQueue;
 KeyedQueue.prototype.clear = clearQueues;
@@ -115,10 +113,9 @@ function Queue(
 		items: [],
 		paused: !options.autostart,
 		runners: 0,
+		type: QUEUE_NAME_QUEUE,
 	};
 }
-
-Queue.prototype[QUEUE_PROPERTY] = QUEUE_NAME_QUEUE;
 
 Queue.prototype.add = addToQueue;
 Queue.prototype.clear = clearQueue;
@@ -354,15 +351,15 @@ function getQueueSize(this: InternalQueue): number {
 function getStatus(state: KeyedQueueState, status: QueueStatusKey): string[] {
 	const queues = state.queues.entries();
 
-	const result: string[] = [];
+	const queued: string[] = [];
 
 	for (const [key, queue] of queues) {
 		if (queue[status]) {
-			result.push(key);
+			queued.push(key);
 		}
 	}
 
-	return result;
+	return queued;
 }
 
 function handleQueuedResult(item: QueuedItem, error: boolean, result: unknown): void {
@@ -427,8 +424,8 @@ function isQueueInstance<Instance>(name: string, value: unknown): value is Insta
 	return (
 		typeof value === 'object' &&
 		value != null &&
-		QUEUE_PROPERTY in value &&
-		value[QUEUE_PROPERTY] === name
+		QUEUE_SYMBOL in value &&
+		(value[QUEUE_SYMBOL] as PlainObject).type === name
 	);
 }
 

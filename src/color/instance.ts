@@ -2,7 +2,7 @@ import {herald} from '../internal/herald';
 import type {Color, ColorChanges, ColorType, InternalColor} from '../models/color.model';
 import type {GenericCallback} from '../models/index';
 import {type Subscription} from '../models/subscription.model';
-import {COLOR_NAME, COLOR_PROPERTY, COLOR_SYMBOL, COLOR_TYPE, colorSubscription} from './constants';
+import {COLOR_SYMBOL, COLOR_TYPE, colorSubscription} from './constants';
 import {getColorAlpha, setColorAlpha} from './misc/alpha';
 import {formatHexColor, formatHslColor, formatHwbColor, formatRgbColor} from './misc/format';
 import {getColorState} from './misc/state';
@@ -23,8 +23,6 @@ function Color(this: any, value: unknown): void {
 		values: getColorState(value),
 	};
 }
-
-Color.prototype[COLOR_PROPERTY] = COLOR_NAME;
 
 Color.prototype.subscribe = subscribeToColor;
 Color.prototype.toHexString = formatHexColor;

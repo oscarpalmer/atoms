@@ -1,5 +1,3 @@
-import {findValues} from '../internal/array/find';
-import {ARRAY_FIND_VALUES_ALL} from '../models/array/array.find.model';
 import type {ArrayFlattened} from '../models/array/array.misc.model';
 import type {GenericCallback} from '../models/index';
 
@@ -237,6 +235,86 @@ export function mapAndFilter(
 	return selectValues(array, filter, mapper, false, true);
 }
 
+function selectBareValues(
+	array: unknown[],
+	length: number,
+	filter: GenericCallback,
+	mapper: GenericCallback,
+	reverse: boolean,
+): unknown[] {
+	const selected: unknown[] = [];
+
+	for (let index = 0; index < length; index += 1) {
+		const item = array[index];
+		const mapped = reverse ? mapper(item, index, array) : item;
+
+		if (filter(mapped, index, array)) {
+			selected.push(reverse ? mapped : mapper(item, index, array));
+		}
+	}
+
+	return selected;
+}
+
+function selectFlatValues(
+	array: unknown[],
+	arrayLength: number,
+	filter: GenericCallback,
+	mapper: GenericCallback,
+	reverse: boolean,
+): unknown[] {
+	if (reverse) {
+		return selectFlatValuesReversed(array, arrayLength, filter, mapper);
+	}
+
+	const selected: unknown[] = [];
+
+	for (let arrayIndex = 0; arrayIndex < arrayLength; arrayIndex += 1) {
+		const item = array[arrayIndex];
+
+		if (!filter(item, arrayIndex, array)) {
+			continue;
+		}
+
+		const mapped = mapper(item, arrayIndex, array);
+
+		if (Array.isArray(mapped)) {
+			selected.push(...mapped);
+		} else {
+			selected.push(mapped);
+		}
+	}
+
+	return selected;
+}
+
+function selectFlatValuesReversed(
+	array: unknown[],
+	arrayLength: number,
+	filter: GenericCallback,
+	mapper: GenericCallback,
+): unknown[] {
+	const selected: unknown[] = [];
+
+	for (let arrayIndex = 0; arrayIndex < arrayLength; arrayIndex += 1) {
+		const item = array[arrayIndex];
+		const mapped = mapper(item, arrayIndex, array);
+
+		const items = Array.isArray(mapped) ? mapped : [mapped];
+		const itemsLength = items.length;
+
+		for (let itemsIndex = 0; itemsIndex < itemsLength; itemsIndex += 1) {
+			const item = items[itemsIndex];
+
+			if (filter(item, arrayIndex, array)) {
+				selected.push(item);
+			}
+		}
+	}
+
+	return selected;
+}
+
 function selectValues(
 	array: unknown[],
 	filter: GenericCallback,
@@ -244,13 +322,19 @@ function selectValues(
 	flat: boolean,
 	reverse: boolean,
 ): unknown[] {
-	return findValues(ARRAY_FIND_VALUES_ALL, array, [filter], {
-		map: {
-			flat,
-			reverse,
-			callback: mapper,
-		},
-	}).matched;
+	if (!Array.isArray(array) || typeof filter !== 'function' || typeof mapper !== 'function') {
+		return [];
+	}
+
+	const {length} = array;
+
+	if (length === 0) {
+		return [];
+	}
+
+	return flat
+		? selectFlatValues(array, length, filter, mapper, reverse)
+		: selectBareValues(array, length, filter, mapper, reverse);
 }
 
 // #endregion
