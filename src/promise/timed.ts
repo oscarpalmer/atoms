@@ -4,7 +4,7 @@ import {LIMITER_WAIT} from '../models/function/limiter.model';
 import type {RequiredKeys} from '../models/index';
 import {
 	PROMISE_MESSAGE_EXPECTATION_TIMED,
-	PromiseTimeoutError,
+	TimedError,
 	type PromiseOptions,
 } from '../models/promise.model';
 import {createPromiseOptions} from './helpers';
@@ -28,7 +28,7 @@ export async function getTimedPromise<Value>(
 
 	const limiter = getLimiter(
 		LIMITER_WAIT,
-		() => settlePromise(rejector, new PromiseTimeoutError(), aborter),
+		() => settlePromise(rejector, new TimedError(), aborter),
 		time,
 	);
 

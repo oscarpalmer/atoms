@@ -1,6 +1,6 @@
 export {
 	CancelablePromise,
-	PromiseTimeoutError,
+	TimedError,
 	type FulfilledPromise,
 	type PromiseOptions,
 	type PromisesOptions,

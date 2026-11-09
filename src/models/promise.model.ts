@@ -92,17 +92,6 @@ export type PromiseParameters = {
  */
 export type PromiseStrategy = 'complete' | 'first';
 
-/**
- * An error thrown when a promise times out
- */
-export class PromiseTimeoutError extends Error {
-	constructor() {
-		super(PROMISE_MESSAGE_TIMEOUT);
-
-		this.name = PROMISE_ERROR_NAME;
-	}
-}
-
 export type PromisesItems<Items extends ArrayOrPlainObject> = {
 	[ItemsKey in keyof Items]: Items[ItemsKey] extends GenericCallback
 		? ReturnType<Items[ItemsKey]> extends Promise<infer Value>
@@ -169,6 +158,17 @@ export type RejectedPromise = {
 	reason: unknown;
 };
 
+/**
+ * An error thrown when a promise times out
+ */
+export class TimedError extends Error {
+	constructor() {
+		super(PROMISE_MESSAGE_TIMEOUT);
+
+		this.name = PROMISE_ERROR_NAME;
+	}
+}
+
 // #endregion
 
 // #region Variables
@@ -177,7 +177,7 @@ export const PROMISE_ABORT_EVENT = 'abort';
 
 export const PROMISE_ABORT_OPTIONS = {once: true};
 
-export const PROMISE_ERROR_NAME = 'PromiseTimeoutError';
+export const PROMISE_ERROR_NAME = 'TimedError';
 
 export const PROMISE_MESSAGE_EXPECTATION_ATTEMPT = 'Attempt expected a function or a promise';
 
