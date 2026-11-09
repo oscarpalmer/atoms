@@ -20,6 +20,9 @@ export class SizedSet<Value = unknown> extends Set<Value> {
 		return this.size >= this.#maximumSize;
 	}
 
+	/**
+	 * The maximum size of the _Set_
+	 */
 	get maximum(): number {
 		return this.#maximumSize;
 	}

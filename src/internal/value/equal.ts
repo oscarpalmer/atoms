@@ -378,7 +378,7 @@ function equalValue(first: unknown, second: unknown, options: EqualizerOptions):
  * @returns Equalizer function
  */
 export function initializeEqualizer(options?: EqualOptions): Equalizer {
-	// @ts-expect-error All good, no worries :-)
+	// @ts-expect-error Using old school function constructor, so all good, no worries :-)
 	return new Equalizer(createEqualOptions(options));
 }
 

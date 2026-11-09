@@ -328,7 +328,7 @@ export function initializeSorter<Item>(
 export function initializeSorter<Item>(descending?: boolean): Sorter<Item>;
 
 export function initializeSorter(first?: unknown, second?: unknown): Sorter<unknown> {
-	// @ts-expect-error All good, no worries :-)
+	// @ts-expect-error Using old school function constructor, so all good, no worries :-)
 	return new Sorter(getSortHandlers(first, getModifier(first, second)));
 }
 

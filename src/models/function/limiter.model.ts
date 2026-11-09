@@ -18,6 +18,7 @@ export type AsyncLimiter<Callback extends GenericAsyncCallback> = {
 	 * Cancel the function
 	 */
 	cancel(): void;
+
 	/**
 	 * Call the function
 	 *
@@ -47,6 +48,7 @@ export type Limiter<Callback extends GenericCallback> = {
 	 * Cancel the function
 	 */
 	cancel(): void;
+
 	/**
 	 * Call the function
 	 *

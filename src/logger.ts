@@ -95,7 +95,7 @@ function getLoggerEnabled(): boolean {
 }
 
 function getTimeLogger(label: unknown): TimeLogger {
-	// @ts-expect-error All good, no worries :-)
+	// @ts-expect-error Using old school function constructor, so all good, no worries :-)
 	return new TimeLogger(getString(label));
 }
 
@@ -163,7 +163,7 @@ function setLoggerEnabled(value: unknown): void {
  *
  * _(Logging can be enabled or disabled by setting the `enabled` property)_
  */
-// @ts-expect-error All good, no worries :-)
+// @ts-expect-error Using old school function constructor, so all good, no worries :-)
 const Logger = new Lumberjack() as Lumberjack;
 
 let enabled = true;

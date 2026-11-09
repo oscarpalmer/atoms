@@ -119,7 +119,7 @@ function getReplaceableObjects(value: unknown): MergeReplaceableObjectsCallback 
  * @returns Assigner function
  */
 export function initializeAssigner(options?: AssignOptions): Assigner {
-	// @ts-expect-error All good, no worries :-)
+	// @ts-expect-error Using old school function constructor, so all good, no worries :-)
 	return new Assigner(createMergingOptions(options));
 }
 
@@ -132,7 +132,7 @@ export function initializeAssigner(options?: AssignOptions): Assigner {
  * @returns Merger function
  */
 export function initializeMerger(options?: MergeOptions): Merger {
-	// @ts-expect-error All good, no worries :-)
+	// @ts-expect-error Using old school function constructor, so all good, no worries :-)
 	return new Merger(createMergingOptions(options));
 }
 

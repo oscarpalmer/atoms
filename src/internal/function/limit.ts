@@ -85,7 +85,7 @@ export function getAsyncLimiter<Callback extends GenericAsyncCallback | GenericC
 	callback: Callback,
 	time?: number,
 ): AsyncLimiter<Callback> {
-	// @ts-expect-error All good, no worries :-)
+	// @ts-expect-error Using old school function constructor, so all good, no worries :-)
 	return new AsyncLimiter(type, callback, time);
 }
 
@@ -94,7 +94,7 @@ export function getLimiter<Callback extends GenericCallback>(
 	callback: Callback,
 	time?: number,
 ): Limiter<Callback> {
-	// @ts-expect-error All good, no worries :-)
+	// @ts-expect-error Using old school function constructor, so all good, no worries :-)
 	return new Limiter(type, callback, time);
 }
 

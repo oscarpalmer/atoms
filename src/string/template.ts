@@ -76,7 +76,7 @@ function handleTemplate(
  * @returns _Templater_ function
  */
 export function initializeTemplater(options?: Partial<TemplateOptions>): Templater {
-	// @ts-expect-error All good, no worries :-)
+	// @ts-expect-error Using old school function constructor, so all good, no worries :-)
 	return new Templater(createTemplateOptions(options));
 }
 

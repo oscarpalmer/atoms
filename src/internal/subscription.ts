@@ -166,7 +166,7 @@ function createSubscription(
 		}
 	}
 
-	// @ts-expect-error All good, no worries :-)
+	// @ts-expect-error Using old school function constructor, so all good, no worries :-)
 	return [new Subscription(state, parameters), false];
 }
 
@@ -340,7 +340,7 @@ function removeSubscription(this: InternalSubscription): void {
 export function subscriptions<Value = unknown>(
 	parameters?: SubscriptionsParameters,
 ): Subscriptions<Value> {
-	// @ts-expect-error All good, no worries :-)
+	// @ts-expect-error Using old school function constructor, so all good, no worries :-)
 	return new Subscriptions(parameters);
 }
 

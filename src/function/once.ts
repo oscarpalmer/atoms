@@ -91,7 +91,7 @@ export function asyncOnce<Callback extends GenericAsyncCallback>(
 ): AsyncOnce<Callback> {
 	assert(() => typeof callback === 'function', ONCE_MESSAGE_EXPECTATION);
 
-	// @ts-expect-error All good, no worries :-)
+	// @ts-expect-error Using old school function constructor, so all good, no worries :-)
 	return new AsyncOnce(callback);
 }
 
@@ -180,7 +180,7 @@ function isOnceInstance(type: string, value: unknown): boolean {
 export function once<Callback extends GenericCallback>(callback: Callback): Once<Callback> {
 	assert(() => typeof callback === 'function', ONCE_MESSAGE_EXPECTATION);
 
-	// @ts-expect-error All good, no worries :-)
+	// @ts-expect-error Using old school function constructor, so all good, no worries :-)
 	return new Once(callback);
 }
 

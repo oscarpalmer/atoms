@@ -74,12 +74,12 @@ export function plan<Y, R>(
 	generator: () => AsyncGenerator<Y, R> | Generator<Y, R>,
 ): AsyncPlan<Y, R, never> | Plan<Y, R, never> {
 	if (isAsyncGeneratorFunction(generator)) {
-		// @ts-expect-error All good, no worries :-)
+		// @ts-expect-error Using old school function constructor, so all good, no worries :-)
 		return new AsyncPlan(generator);
 	}
 
 	if (isGeneratorFunction(generator)) {
-		// @ts-expect-error All good, no worries :-)
+		// @ts-expect-error Using old school function constructor, so all good, no worries :-)
 		return new Plan(generator);
 	}
 

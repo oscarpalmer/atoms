@@ -24,6 +24,7 @@ export type AsyncPlan<Yielded, Returned, Parameters extends unknown[]> = {
 	 * @returns Asynchronous generator
 	 */
 	[Symbol.asyncIterator]: (...parameters: Parameters) => AsyncGenerator<Yielded, Returned>;
+
 	/**
 	 * Attempt to run the plan to completion
 	 *
@@ -37,6 +38,7 @@ export type AsyncPlan<Yielded, Returned, Parameters extends unknown[]> = {
 				signal?: AbortSignal,
 			) => Promise<Result<PlanOk<Returned>, PlanError<Yielded, Returned>>>
 		: (signal?: AbortSignal) => Promise<Result<PlanOk<Returned>, PlanError<Yielded, Returned>>>;
+
 	/**
 	 * Run the plan to completion
 	 *
@@ -199,6 +201,7 @@ export type Plan<Yielded, Returned, Parameters extends unknown[]> = {
 	 * @returns Generator
 	 */
 	[Symbol.iterator]: (...parameters: Parameters) => Generator<Yielded, Returned>;
+
 	/**
 	 * Attempt to run the plan to completion
 	 *
@@ -206,6 +209,7 @@ export type Plan<Yielded, Returned, Parameters extends unknown[]> = {
 	 *
 	 * @returns Attempted result
 	 */
+
 	attempt(...parameters: Parameters): Result<PlanOk<Returned>, PlanError<Yielded, Returned>>;
 	/**
 	 * Run the plan to completion

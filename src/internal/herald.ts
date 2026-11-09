@@ -33,7 +33,7 @@ function Events(this: any, herald: InternalHerald, state: HeraldState): void {
 function Herald(this: any, state: HeraldState): void {
 	this[HERALD_SYMBOL] = {
 		state,
-		// @ts-expect-error All good, no worries :-)
+		// @ts-expect-error Using old school function constructor, so all good, no worries :-)
 		events: new Events(this, state),
 		name: HERALD_NAME_HERALD,
 	};
@@ -117,7 +117,7 @@ function getHeraldEvents(this: InternalHerald): HeraldEvents<Record<string, Gene
 export function herald<Events extends Record<string, GenericCallback>>(
 	options: HeraldOptions<Events>,
 ): Herald<Events> {
-	// @ts-expect-error All good, no worries :-)
+	// @ts-expect-error Using old school function constructor, so all good, no worries :-)
 	return new Herald(createHeraldState(options));
 }
 

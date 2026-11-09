@@ -75,7 +75,7 @@ export function asyncFail<Value>(callback: () => Value): AsyncFailure<Awaited<Va
 export function asyncFail<Value>(value: Value): AsyncFailure<Awaited<Value>>;
 
 export function asyncFail(value: unknown): AsyncFailure<unknown> {
-	// @ts-expect-error All good, no worries :-)
+	// @ts-expect-error Using old school function constructor, so all good, no worries :-)
 	return new AsyncFailure(async function* () {
 		yield error(await (typeof value === 'function' ? value() : value));
 	});
@@ -98,7 +98,7 @@ export function asyncSucceed<Value>(callback: () => Value): AsyncSuccess<Awaited
 export function asyncSucceed<Value>(value: Value): AsyncSuccess<Awaited<Value>>;
 
 export function asyncSucceed(value: unknown): AsyncSuccess<unknown> {
-	// @ts-expect-error All good, no worries :-)
+	// @ts-expect-error Using old school function constructor, so all good, no worries :-)
 	return new AsyncSuccess(async function* () {
 		return typeof value === 'function' ? value() : value;
 	});
@@ -121,7 +121,7 @@ export function fail<Value>(callback: () => Value): Failure<Value>;
 export function fail<Value>(value: Value): Failure<Value>;
 
 export function fail(value: unknown): Failure<unknown> {
-	// @ts-expect-error All good, no worries :-)
+	// @ts-expect-error Using old school function constructor, so all good, no worries :-)
 	return new Failure(function* () {
 		yield error(typeof value === 'function' ? value() : value);
 	});
@@ -144,7 +144,7 @@ export function succeed<Value>(callback: () => Value): Success<Value>;
 export function succeed<Value>(value: Value): Success<Value>;
 
 export function succeed(value: unknown): Success<unknown> {
-	// @ts-expect-error All good, no worries :-)
+	// @ts-expect-error Using old school function constructor, so all good, no worries :-)
 	return new Success(function* () {
 		return typeof value === 'function' ? value() : value;
 	});

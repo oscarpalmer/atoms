@@ -118,7 +118,7 @@ export function memoize<Callback extends GenericCallback>(
 		throw new TypeError(MEMOIZED_CALLBACK);
 	}
 
-	// @ts-expect-error All good, no worries :-)
+	// @ts-expect-error Using old school function constructor, so all good, no worries :-)
 	return new Memoized(callback, createMemoizationOptions(options));
 }
 

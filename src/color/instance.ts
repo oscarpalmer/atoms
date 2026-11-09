@@ -93,7 +93,7 @@ Object.defineProperties(Color.prototype, {
 // #region Functions
 
 export function color(value: unknown): Color {
-	// @ts-expect-error All good, no worries :-)
+	// @ts-expect-error Using old school function constructor, so all good, no worries :-)
 	return new Color(value);
 }
 

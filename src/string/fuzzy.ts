@@ -182,7 +182,7 @@ export function fuzzy(items: unknown[], configuration?: unknown): Fuzzy<unknown>
 		throw new TypeError(FUZZY_MESSAGE_ARRAY);
 	}
 
-	// @ts-expect-error All good, no worries :-)
+	// @ts-expect-error Using old school function constructor, so all good, no worries :-)
 	return new Fuzzy(createState(items, configuration));
 }
 

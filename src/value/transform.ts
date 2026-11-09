@@ -79,7 +79,7 @@ export function initializeTransformer<Value extends PlainObject>(
 export function initializeTransformer<Value extends PlainObject>(
 	transform: unknown,
 ): Transformer<Value> {
-	// @ts-expect-error All good, no worries :-)
+	// @ts-expect-error Using old school function constructor, so all good, no worries :-)
 	return new Transformer(getTransformHandler<Value>(transform));
 }
 

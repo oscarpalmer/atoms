@@ -322,7 +322,7 @@ export function deregisterCloner<Instance>(constructor: Constructor<Instance>): 
  * @returns Cloner function
  */
 export function initializeCloner(options?: CloneOptions): Cloner {
-	// @ts-expect-error All good, no worries :-)
+	// @ts-expect-error Using old school function constructor, so all good, no worries :-)
 	return new Cloner(createCloneOptions(options));
 }
 

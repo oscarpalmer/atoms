@@ -38,7 +38,7 @@ ValueHandler.prototype.handle = handleValue;
 // #region Functions
 
 function createBaseHandler(owner: GenericCallback, options: BaseHandlerOptions) {
-	// @ts-expect-error All good, no worries :-)
+	// @ts-expect-error Using old school function constructor, so all good, no worries :-)
 	return new BaseHandler(owner, options);
 }
 
@@ -46,7 +46,7 @@ export function createCompareHandler<Value>(
 	owner: GenericCallback,
 	options: BaseHandlerOptions,
 ): CompareHandler<Value> {
-	// @ts-expect-error All good, no worries :-)
+	// @ts-expect-error Using old school function constructor, so all good, no worries :-)
 	return new CompareHandler(createBaseHandler(owner, options));
 }
 
@@ -54,7 +54,7 @@ export function createValueHandler(
 	owner: GenericCallback,
 	options: BaseHandlerOptions,
 ): ValueHandler {
-	// @ts-expect-error All good, no worries :-)
+	// @ts-expect-error Using old school function constructor, so all good, no worries :-)
 	return new ValueHandler(createBaseHandler(owner, options));
 }
 

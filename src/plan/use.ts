@@ -66,7 +66,7 @@ export function asyncUse<Value>(callback: () => Value & AsyncStepValue<Value>): 
 export function asyncUse<Value>(value: Value & AsyncStepValue<Value>): AsyncStep<Value>;
 
 export function asyncUse(value: unknown): AsyncStep<any> {
-	// @ts-expect-error All good, no worries :-)
+	// @ts-expect-error Using old school function constructor, so all good, no worries :-)
 	return new AsyncStep(async function* (): any {
 		let actual = value;
 
@@ -131,7 +131,7 @@ export function use<Value>(value: Value & StepValue<Value>): Step<Value>;
 export function use(value: unknown): Step<any> {
 	validateUseInput(value, false);
 
-	// @ts-expect-error All good, no worries :-)
+	// @ts-expect-error Using old school function constructor, so all good, no worries :-)
 	return new Step(function* (): any {
 		let actual = value;
 

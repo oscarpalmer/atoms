@@ -240,7 +240,7 @@ function createQueue(
 		throw new TypeError(QUEUE_MESSAGE_CALLBACK);
 	}
 
-	// @ts-expect-error All good, no worries :-)
+	// @ts-expect-error Using old school function constructor, so all good, no worries :-)
 	return new Queue(callback, createQueueOptions(options), key);
 }
 
@@ -463,7 +463,7 @@ export function keyedQueue<Callback extends (key: string, ...parameters: any[]) 
 		throw new TypeError(QUEUE_MESSAGE_CALLBACK);
 	}
 
-	// @ts-expect-error All good, no worries :-)
+	// @ts-expect-error Using old school function constructor, so all good, no worries :-)
 	return new KeyedQueue(callback, createQueueOptions(options));
 }
 

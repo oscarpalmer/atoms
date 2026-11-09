@@ -10,10 +10,12 @@ export type AsyncOnce<Callback extends GenericAsyncCallback> = {
 	 * Did the callback's promise reject?
 	 */
 	readonly error: boolean;
+
 	/**
 	 * Has the callback finished?
 	 */
 	readonly finished: boolean;
+
 	/**
 	 * Run the callback
 	 *
@@ -60,10 +62,12 @@ type OnceProperties = {
 	 * Has the callback been called?
 	 */
 	readonly called: boolean;
+
 	/**
 	 * Has the callback's value been cleared?
 	 */
 	readonly cleared: boolean;
+
 	/**
 	 * Clear the callback's cached value
 	 */

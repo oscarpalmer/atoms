@@ -79,7 +79,7 @@ Object.defineProperty(Observable.prototype, 'active', {
  * @returns Beacon instance
  */
 export function beacon<Value>(value: Value, options?: BeaconOptions<Value>): Beacon<Value> {
-	// @ts-expect-error All good, no worries :-)
+	// @ts-expect-error Using old school function constructor, so all good, no worries :-)
 	return new Beacon(value, options);
 }
 
@@ -168,7 +168,7 @@ function getBeaconObservable(this: InternalBeacon): Observable<unknown> {
 		throw new Error(BEACON_MESSAGE_RETRIEVE);
 	}
 
-	// @ts-expect-error All good, no worries :-)
+	// @ts-expect-error Using old school function constructor, so all good, no worries :-)
 	state.observable ??= new Observable(state);
 
 	return state.observable!;

@@ -80,7 +80,7 @@ export function deburr(value: string): string {
  * @returns Normalizer function
  */
 export function initializeNormalizer(options?: NormalizeOptions): Normalizer {
-	// @ts-expect-error All good, no worries :-)
+	// @ts-expect-error Using old school function constructor, so all good, no worries :-)
 	return new Normalizer(createNormalizerOptions(options));
 }
 

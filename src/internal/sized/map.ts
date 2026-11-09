@@ -20,6 +20,9 @@ export class SizedMap<SizedKey = unknown, SizedValue = unknown> extends Map<Size
 		return super.size >= this.#maximumSize;
 	}
 
+	/**
+	 * The maximum size of the _Map_
+	 */
 	get maximum(): number {
 		return this.#maximumSize;
 	}
