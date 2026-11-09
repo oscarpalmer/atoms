@@ -10,8 +10,6 @@ import type {
 	RGBAColor,
 	RGBColor,
 } from '../models/color.model';
-import {SUBSCRIPTION_NAME} from '../models/subscription.model';
-import type {SubscriptionProperty} from '../subscription';
 
 // #region Types
 
@@ -135,11 +133,6 @@ export const COLOR_SRGB = {
 	luminanceOffset: 0.055,
 	luminanceRed: 0.2126,
 	luminanceThreshold: 0.625,
-};
-
-export const colorSubscription: SubscriptionProperty = {
-	key: 'atoms:color',
-	value: SUBSCRIPTION_NAME,
 };
 
 // #endregion
