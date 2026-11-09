@@ -5,7 +5,7 @@ import {
 	type AsyncPlan,
 	type InternalAsyncPlan,
 	type Plan,
-	type PlanReturned,
+	type PlannedReturned,
 } from '../models/plan.model';
 import {isAsyncGeneratorFunction, isAsyncPlan, isGeneratorFunction, isPlan} from './is';
 import {asyncAttemptRun, attemptRun} from './result';
@@ -24,7 +24,7 @@ export async function asyncRun<Yielded, Returned, Parameters extends unknown[]>(
 	generator: (...parameters: Parameters) => AsyncGenerator<Yielded, Returned>,
 	parameters: Parameters,
 	signal?: AbortSignal,
-): Promise<PlanReturned<Returned>>;
+): Promise<PlannedReturned<Returned>>;
 
 /**
  * Run an asynchronous generator to completion
@@ -36,7 +36,7 @@ export async function asyncRun<Yielded, Returned, Parameters extends unknown[]>(
 export async function asyncRun<Yielded, Returned>(
 	generator: () => AsyncGenerator<Yielded, Returned>,
 	signal?: AbortSignal,
-): Promise<PlanReturned<Returned>>;
+): Promise<PlannedReturned<Returned>>;
 
 /**
  * Run an asynchronous plan to completion
@@ -50,7 +50,7 @@ export async function asyncRun<Yielded, Returned, Parameters extends unknown[]>(
 	plan: AsyncPlan<Yielded, Returned, Parameters>,
 	parameters: Parameters,
 	signal?: AbortSignal,
-): Promise<PlanReturned<Returned>>;
+): Promise<PlannedReturned<Returned>>;
 
 /**
  * Run an asynchronous plan to completion
@@ -62,7 +62,7 @@ export async function asyncRun<Yielded, Returned, Parameters extends unknown[]>(
 export async function asyncRun<Yielded, Returned>(
 	plan: AsyncPlan<Yielded, Returned, []>,
 	signal?: AbortSignal,
-): Promise<PlanReturned<Returned>>;
+): Promise<PlannedReturned<Returned>>;
 
 export function asyncRun(input: unknown, first?: unknown, second?: unknown): unknown {
 	if (isAsyncPlan(input)) {
@@ -86,7 +86,7 @@ export function asyncRun(input: unknown, first?: unknown, second?: unknown): unk
 export function run<Yielded, Returned, Parameters extends unknown[]>(
 	generator: (...parameters: Parameters) => Generator<Yielded, Returned>,
 	...parameters: Parameters
-): PlanReturned<Returned>;
+): PlannedReturned<Returned>;
 
 /**
  * Run a plan to completion
@@ -98,7 +98,7 @@ export function run<Yielded, Returned, Parameters extends unknown[]>(
 export function run<Yielded, Returned, Parameters extends unknown[]>(
 	plan: Plan<Yielded, Returned, Parameters>,
 	...parameters: Parameters
-): PlanReturned<Returned>;
+): PlannedReturned<Returned>;
 
 export function run(input: unknown, ...parameters: unknown[]): unknown {
 	if (isPlan(input)) {

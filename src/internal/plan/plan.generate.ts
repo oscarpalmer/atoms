@@ -1,9 +1,33 @@
+import type {AsyncPlanState, PlanState} from '../../models/plan.model';
 import {createAborter} from '../aborter';
 import {noop} from '../function/misc';
 import {isError, isOk} from '../result/misc';
-import type {AsyncPlanState, PlanState} from '../../models/plan.model';
 
 // #region Functions
+
+async function asyncCleanup(generator: AsyncGenerator, input: unknown): Promise<void> {
+	try {
+		const returned = await generator.return(input);
+
+		if (returned.done) {
+			return;
+		}
+
+		let cleanupValue = returned.value;
+
+		while (true) {
+			const {done, value} = await generator.next(cleanupValue);
+
+			if (done) {
+				break;
+			}
+
+			cleanupValue = value;
+		}
+	} catch {
+		// Ignore any errors during cleanup
+	}
+}
 
 export async function asyncGenerate(
 	input: AsyncPlanState | ((...args: unknown[]) => AsyncGenerator),
@@ -27,41 +51,61 @@ export async function asyncGenerate(
 		generator = input.generator(...parameters);
 	}
 
+	let aborted = false;
 	let success = true;
+	let throwing = false;
+
+	let lastError: unknown;
 	let lastValue: unknown;
 
 	try {
 		while (true) {
 			if (aborter?.signal.aborted) {
-				await generator.throw(aborter.signal.reason);
+				if (aborted) {
+					// Generator has already been told about the abort, so we stop driving it
+					break;
+				}
+
+				aborted = true;
+				lastError = aborter.signal.reason;
+				throwing = true;
 			}
 
-			const next = await generator.next(lastValue);
-			const done = next.done === true;
+			const {done, value} = await asyncResume(
+				generator,
+				throwing ? lastError : lastValue,
+				throwing,
+			);
 
-			const {value} = next;
+			if (value instanceof Error || isError(value)) {
+				const errorValue = value instanceof Error ? value : value.error;
 
-			if (value instanceof Error) {
-				await generator.throw(value);
+				if (done) {
+					throw errorValue;
+				}
+
+				lastError = errorValue;
+				lastValue = undefined;
+				throwing = true;
+
+				continue;
 			}
 
-			if (isError(value)) {
-				await generator.throw(value.error);
-			}
-
+			lastError = undefined;
 			lastValue = value;
+			throwing = false;
 
-			if (done === true) {
+			if (done) {
 				break;
 			}
 		}
 	} catch (error: unknown) {
-		lastValue = error;
+		lastError = error;
 		success = false;
 	} finally {
 		aborter?.cancel();
 
-		await generator.return(lastValue);
+		await asyncCleanup(generator, lastValue);
 	}
 
 	if (aborter?.signal.aborted) {
@@ -72,7 +116,17 @@ export async function asyncGenerate(
 		return unwrap && isOk(lastValue) ? lastValue.value : lastValue;
 	}
 
-	throw lastValue;
+	throw lastError;
+}
+
+async function asyncResume(
+	generator: AsyncGenerator,
+	input: unknown,
+	throwing: boolean,
+): Promise<{done: boolean; value: unknown}> {
+	const {done, value} = await (throwing ? generator.throw(input) : generator.next(input));
+
+	return {value, done: done === true};
 }
 
 export function generate(
@@ -89,41 +143,57 @@ export function generate(
 	}
 
 	let success = true;
+	let throwing = false;
+
+	let lastError: unknown;
 	let lastValue: unknown;
 
 	try {
 		while (true) {
-			const next = generator.next(lastValue);
-			const done = next.done === true;
+			const {done, value} = resume(generator, throwing ? lastError : lastValue, throwing);
 
-			const {value} = next;
+			if (value instanceof Error || isError(value)) {
+				const errorValue = value instanceof Error ? value : value.error;
 
-			if (value instanceof Error) {
-				generator.throw(value);
+				if (done) {
+					throw errorValue;
+				}
+
+				lastError = errorValue;
+				lastValue = undefined;
+				throwing = true;
+
+				continue;
 			}
 
-			if (isError(value)) {
-				generator.throw(value.error);
-			}
-
+			lastError = undefined;
 			lastValue = value;
+			throwing = false;
 
 			if (done) {
 				break;
 			}
 		}
 	} catch (error: unknown) {
-		lastValue = error;
+		lastError = error;
 		success = false;
-	} finally {
-		generator.return(lastValue);
 	}
 
 	if (success) {
 		return unwrap && isOk(lastValue) ? lastValue.value : lastValue;
 	}
 
-	throw lastValue;
+	throw lastError;
+}
+
+function resume(
+	generator: Generator,
+	input: unknown,
+	throwing: boolean,
+): {done: boolean; value: unknown} {
+	const {done, value} = throwing ? generator.throw(input) : generator.next(input);
+
+	return {value, done: done === true};
 }
 
 // #endregion

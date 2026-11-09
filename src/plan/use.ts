@@ -67,7 +67,11 @@ export function asyncUse<Value>(value: Value & AsyncStepValue<Value>): AsyncStep
 
 export function asyncUse(value: unknown): AsyncStep<any> {
 	// @ts-expect-error Using old school function constructor, so all good, no worries :-)
-	return new AsyncStep(async function* (): any {
+	return new AsyncStep(getAsyncUseStep(value));
+}
+
+function getAsyncUseStep(value: unknown): () => AsyncGenerator {
+	return async function* (): any {
 		let actual = value;
 
 		if (typeof actual === 'function') {
@@ -107,32 +111,11 @@ export function asyncUse(value: unknown): AsyncStep<any> {
 		}
 
 		return actual;
-	});
+	};
 }
 
-/**
- * Create a step from a callback
- *
- * @param callback Callback
- * @returns A step
- * @throws Error If the input is invalid
- */
-export function use<Value>(callback: () => Value & StepValue<Value>): Step<Value>;
-
-/**
- * Create a step from a value
- *
- * @param value Value
- * @returns A step
- * @throws Error If the input is invalid
- */
-export function use<Value>(value: Value & StepValue<Value>): Step<Value>;
-
-export function use(value: unknown): Step<any> {
-	validateUseInput(value, false);
-
-	// @ts-expect-error Using old school function constructor, so all good, no worries :-)
-	return new Step(function* (): any {
+function getUseStep(value: unknown): () => Generator {
+	return function* (): any {
 		let actual = value;
 
 		if (typeof actual === 'function') {
@@ -168,7 +151,32 @@ export function use(value: unknown): Step<any> {
 		}
 
 		return actual;
-	});
+	};
+}
+
+/**
+ * Create a step from a callback
+ *
+ * @param callback Callback
+ * @returns A step
+ * @throws Error If the input is invalid
+ */
+export function use<Value>(callback: () => Value & StepValue<Value>): Step<Value>;
+
+/**
+ * Create a step from a value
+ *
+ * @param value Value
+ * @returns A step
+ * @throws Error If the input is invalid
+ */
+export function use<Value>(value: Value & StepValue<Value>): Step<Value>;
+
+export function use(value: unknown): Step<any> {
+	validateUseInput(value, false);
+
+	// @ts-expect-error Using old school function constructor, so all good, no worries :-)
+	return new Step(getUseStep(value));
 }
 
 function validateUseInput(value: unknown, resolved: boolean): void {

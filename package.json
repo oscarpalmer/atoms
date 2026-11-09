@@ -99,6 +99,7 @@
 			"types": "./dist/color/index.d.mts",
 			"default": "./dist/color/index.mjs"
 		},
+		"./eslint": "./plugin/index.js",
 		"./function": {
 			"types": "./dist/function/index.d.mts",
 			"default": "./dist/function/index.mjs"

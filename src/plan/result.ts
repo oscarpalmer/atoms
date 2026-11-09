@@ -8,8 +8,8 @@ import {
 	PLAN_MESSAGE_RUN_INPUT,
 	PLAN_SYMBOL,
 	type Plan,
-	type PlanError,
-	type PlanOk,
+	type PlannedError,
+	type PlannedOk,
 	type PlanState,
 } from '../models/plan.model';
 import type {Result} from '../models/result.model';
@@ -31,7 +31,7 @@ export async function asyncAttemptRun<Yielded, Returned, Parameters extends unkn
 	generator: (...parameters: Parameters) => AsyncGenerator<Yielded, Returned>,
 	parameters: Parameters,
 	signal?: AbortSignal,
-): Promise<Result<PlanOk<Returned>, PlanError<Yielded, Returned>>>;
+): Promise<Result<PlannedOk<Returned>, PlannedError<Yielded, Returned>>>;
 
 /**
  * Attempt to run the generator to completion
@@ -45,7 +45,7 @@ export async function asyncAttemptRun<Yielded, Returned, Parameters extends unkn
 export async function asyncAttemptRun<Yielded, Returned>(
 	generator: () => AsyncGenerator<Yielded, Returned>,
 	signal?: AbortSignal,
-): Promise<Result<PlanOk<Returned>, PlanError<Yielded, Returned>>>;
+): Promise<Result<PlannedOk<Returned>, PlannedError<Yielded, Returned>>>;
 
 /**
  * Attempt to run the plan to completion
@@ -61,7 +61,7 @@ export async function asyncAttemptRun<Yielded, Returned, Parameters extends unkn
 	plan: AsyncPlan<Yielded, Returned, Parameters>,
 	parameters: Parameters,
 	signal?: AbortSignal,
-): Promise<Result<PlanOk<Returned>, PlanError<Yielded, Returned>>>;
+): Promise<Result<PlannedOk<Returned>, PlannedError<Yielded, Returned>>>;
 
 /**
  * Attempt to run the plan to completion
@@ -75,7 +75,7 @@ export async function asyncAttemptRun<Yielded, Returned, Parameters extends unkn
 export async function asyncAttemptRun<Yielded, Returned>(
 	plan: AsyncPlan<Yielded, Returned, []>,
 	signal?: AbortSignal,
-): Promise<Result<PlanOk<Returned>, PlanError<Yielded, Returned>>>;
+): Promise<Result<PlannedOk<Returned>, PlannedError<Yielded, Returned>>>;
 
 export function asyncAttemptRun(input: unknown, first?: unknown, second?: unknown): unknown {
 	let generator: (() => AsyncGenerator) | AsyncPlanState | undefined;
@@ -105,7 +105,7 @@ export function asyncAttemptRun(input: unknown, first?: unknown, second?: unknow
 export function attemptRun<Yielded, Returned, Parameters extends unknown[]>(
 	generator: (...parameters: Parameters) => Generator<Yielded, Returned>,
 	...parameters: Parameters
-): Result<PlanOk<Returned>, PlanError<Yielded, Returned>>;
+): Result<PlannedOk<Returned>, PlannedError<Yielded, Returned>>;
 
 /**
  * Attempt to run the plan to completion
@@ -119,7 +119,7 @@ export function attemptRun<Yielded, Returned, Parameters extends unknown[]>(
 export function attemptRun<Yielded, Returned, Parameters extends unknown[]>(
 	plan: Plan<Yielded, Returned, Parameters>,
 	...parameters: Parameters
-): Result<PlanOk<Returned>, PlanError<Yielded, Returned>>;
+): Result<PlannedOk<Returned>, PlannedError<Yielded, Returned>>;
 
 export function attemptRun(input: unknown, ...parameters: unknown[]): unknown {
 	let generator: (() => Generator) | PlanState | undefined;

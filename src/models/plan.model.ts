@@ -14,6 +14,11 @@ export type AsyncFailure<Value> = {
 	[Symbol.asyncIterator]: () => AsyncGenerator<Err<Value>, never>;
 };
 
+export type AsyncImmediateState = {
+	generator: () => AsyncGenerator;
+	type: typeof PLAN_FAILURE_ASYNC | typeof PLAN_SUCCESS_ASYNC;
+};
+
 /**
  * An asynchronous plan of execution that can yield intermediate results and eventually return a result
  */
@@ -36,29 +41,26 @@ export type AsyncPlan<Yielded, Returned, Parameters extends unknown[]> = {
 		? (
 				parameters: Parameters,
 				signal?: AbortSignal,
-			) => Promise<Result<PlanOk<Returned>, PlanError<Yielded, Returned>>>
-		: (signal?: AbortSignal) => Promise<Result<PlanOk<Returned>, PlanError<Yielded, Returned>>>;
+			) => Promise<Result<PlannedOk<Returned>, PlannedError<Yielded, Returned>>>
+		: (
+				signal?: AbortSignal,
+			) => Promise<Result<PlannedOk<Returned>, PlannedError<Yielded, Returned>>>;
 
 	/**
 	 * Run the plan to completion
 	 *
-	 * @throws {PlanError<Yielded, Returned>}
+	 * @throws {PlannedError<Yielded, Returned>}
 	 * @returns Result
 	 */
 	run: Parameters extends [infer _, ...(infer _)[]]
-		? (parameters: Parameters, signal?: AbortSignal) => Promise<PlanReturned<Returned>>
-		: (signal?: AbortSignal) => Promise<PlanReturned<Returned>>;
+		? (parameters: Parameters, signal?: AbortSignal) => Promise<PlannedReturned<Returned>>
+		: (signal?: AbortSignal) => Promise<PlannedReturned<Returned>>;
 };
 
 /**
  * An immediately succeeding or failing asynchronous plan
  */
-export type AsyncPlanned<Value, Error> = AsyncSuccess<Value> | AsyncFailure<Error>;
-
-export type AsyncPlannedState = {
-	generator: () => AsyncGenerator;
-	type: typeof PLAN_FAILURE_ASYNC | typeof PLAN_SUCCESS_ASYNC;
-};
+export type AsyncImmediate<Value, Error> = AsyncSuccess<Value> | AsyncFailure<Error>;
 
 export type AsyncPlanState = {
 	generator(...parameters: unknown[]): AsyncGenerator;
@@ -136,11 +138,23 @@ export type GenericPlanItem = {
 
 export type GenericPlanItemState = {
 	generator: () => AsyncGenerator | Generator;
-	type: PlanType | PlannedType | StepType;
+	type: PlanType | ImmediateType | StepType;
 };
 
+/**
+ * An immediately succeeding or failing plan
+ */
+export type Immediate<Value, Error> = Success<Value> | Failure<Error>;
+
+export type ImmediateState = {
+	generator: () => Generator;
+	type: typeof PLAN_FAILURE_SYNC | typeof PLAN_SUCCESS_SYNC;
+};
+
+export type ImmediateType = 'asyncFailure' | 'asyncSuccess' | 'failure' | 'success';
+
 export type InternalAsyncFailure = {
-	[PLAN_SYMBOL]: AsyncPlannedState;
+	[PLAN_SYMBOL]: AsyncImmediateState;
 } & AsyncFailure<never>;
 
 export type InternalAsyncPlan = {
@@ -152,11 +166,11 @@ export type InternalAsyncStep = {
 } & AsyncStep<never>;
 
 export type InternalAsyncSuccess = {
-	[PLAN_SYMBOL]: AsyncPlannedState;
+	[PLAN_SYMBOL]: AsyncImmediateState;
 } & AsyncSuccess<never>;
 
 export type InternalFailure = {
-	[PLAN_SYMBOL]: PlannedState;
+	[PLAN_SYMBOL]: ImmediateState;
 } & Failure<never>;
 
 export type InternalPlan = {
@@ -164,7 +178,7 @@ export type InternalPlan = {
 } & Plan<never, never, unknown[]>;
 
 export type InternalSuccess = {
-	[PLAN_SYMBOL]: PlannedState;
+	[PLAN_SYMBOL]: ImmediateState;
 } & Success<never>;
 
 export type InternalStep = {
@@ -210,35 +224,29 @@ export type Plan<Yielded, Returned, Parameters extends unknown[]> = {
 	 * @returns Attempted result
 	 */
 
-	attempt(...parameters: Parameters): Result<PlanOk<Returned>, PlanError<Yielded, Returned>>;
+	attempt(...parameters: Parameters): Result<PlannedOk<Returned>, PlannedError<Yielded, Returned>>;
 	/**
 	 * Run the plan to completion
 	 *
-	 * @throws {PlanError<Yielded, Returned>}
+	 * @throws {PlannedError<Yielded, Returned>}
 	 * @returns Result
 	 */
-	run(...parameters: Parameters): PlanReturned<Returned>;
+	run(...parameters: Parameters): PlannedReturned<Returned>;
 };
 
-/**
- * An OK result of a plan execution
- */
-export type PlanOk<Returned> = Returned extends Error
-	? never
-	: Returned extends Err<infer _>
-		? never
-		: Returned extends Ok<infer Value>
-			? Value
-			: Returned;
-
-type PlanErrors<Yielded, Returned> = PlanErrorValues<Yielded> | PlanErrorValues<Returned>;
+export type PlanState = {
+	generator(...parameters: unknown[]): Generator;
+	type: typeof PLAN_TYPE_SYNC;
+};
 
 /**
  * An error result of a plan execution
  */
-export type PlanError<Yielded, Returned> = [PlanErrors<Yielded, Returned>] extends [never]
+export type PlannedError<Yielded, Returned> = [PlannedErrors<Yielded, Returned>] extends [never]
 	? Error
 	: PlanErrorValues<Yielded> | PlanErrorValues<Returned>;
+
+type PlannedErrors<Yielded, Returned> = PlanErrorValues<Yielded> | PlanErrorValues<Returned>;
 
 type PlanErrorValues<Original> = Original extends Error
 	? Original
@@ -249,30 +257,24 @@ type PlanErrorValues<Original> = Original extends Error
 			: never;
 
 /**
+ * An OK result of a plan execution
+ */
+export type PlannedOk<Returned> = Returned extends Error
+	? never
+	: Returned extends Err<infer _>
+		? never
+		: Returned extends Ok<infer Value>
+			? Value
+			: Returned;
+
+/**
  * The returned result of a plan execution _(excluding errors, which are thrown)_
  */
-export type PlanReturned<Returned> = Returned extends Error
+export type PlannedReturned<Returned> = Returned extends Error
 	? never
 	: Returned extends Err<infer _>
 		? never
 		: Returned;
-
-/**
- * An immediately succeeding or failing plan
- */
-export type Planned<Value, Error> = Success<Value> | Failure<Error>;
-
-export type PlannedState = {
-	generator: () => Generator;
-	type: typeof PLAN_FAILURE_SYNC | typeof PLAN_SUCCESS_SYNC;
-};
-
-export type PlannedType = 'asyncFailure' | 'asyncSuccess' | 'failure' | 'success';
-
-export type PlanState = {
-	generator(...parameters: unknown[]): Generator;
-	type: typeof PLAN_TYPE_SYNC;
-};
 
 /**
  * A single step within a plan of execution
