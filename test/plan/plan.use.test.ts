@@ -85,10 +85,10 @@ test('use, async', async () => {
 	});
 
 	expect(isError(erroredRun)).toBe(true);
-	expect((erroredRun as Err<string>).error).toBe('errored');
+	expect((erroredRun as Err<never, string>).error).toBe('errored');
 
 	expect(isError(failedRun)).toBe(true);
-	expect((failedRun as Err<string>).error).toBe('failed');
+	expect((failedRun as Err<never, string>).error).toBe('failed');
 
 	expect(isOk(generatorsRun)).toBe(true);
 	expect((generatorsRun as Ok<string[]>).value).toEqual(['async generator', 'generator']);
@@ -97,7 +97,7 @@ test('use, async', async () => {
 	expect((successfulRun as Ok<string[]>).value).toEqual(['okay', 'planned', 'succeeded']);
 
 	expect(isError(thrownRun)).toBe(true);
-	expect((thrownRun as Err<Error>).error).toBe(thrown);
+	expect((thrownRun as Err<never, Error>).error).toBe(thrown);
 });
 
 test('use, error', async () => {
@@ -206,7 +206,7 @@ test('use, nested', async () => {
 	expect((syncNestedRun as Ok<string>).value).toBe('nested');
 
 	expect(isError(syncNestedErrorRun)).toBe(true);
-	expect((syncNestedErrorRun as Err<string>).error).toBe('nested error');
+	expect((syncNestedErrorRun as Err<never, string>).error).toBe('nested error');
 
 	expect(isOk(asyncNestedRun)).toBe(true);
 
@@ -217,7 +217,7 @@ test('use, nested', async () => {
 	]);
 
 	expect(isError(asyncNestedErrorRun)).toBe(true);
-	expect((asyncNestedErrorRun as Err<string>).error).toBe('nested error');
+	expect((asyncNestedErrorRun as Err<never, string>).error).toBe('nested error');
 });
 
 test('use, sync', () => {
@@ -280,10 +280,10 @@ test('use, sync', () => {
 	});
 
 	expect(isError(erroredRun)).toBe(true);
-	expect((erroredRun as Err<string>).error).toBe('errored');
+	expect((erroredRun as Err<never, string>).error).toBe('errored');
 
 	expect(isError(failedRun)).toBe(true);
-	expect((failedRun as Err<string>).error).toBe('failed');
+	expect((failedRun as Err<never, string>).error).toBe('failed');
 
 	expect(isOk(generatorRun)).toBe(true);
 	expect((generatorRun as Ok<string>).value).toBe('generator');
@@ -292,5 +292,5 @@ test('use, sync', () => {
 	expect((successfulRun as Ok<string[]>).value).toEqual(['okay', 'planned', 'succeeded']);
 
 	expect(isError(thrownRun)).toBe(true);
-	expect((thrownRun as Err<Error>).error).toBe(thrown);
+	expect((thrownRun as Err<never, Error>).error).toBe(thrown);
 });

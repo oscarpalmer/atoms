@@ -1,5 +1,5 @@
 import {expect, test} from 'vite-plus/test';
-import {FulfilledPromise, promises, RejectedPromise} from '../../src';
+import {FulfilledPromise, promises, RejectedPromise, Result} from '../../src';
 
 test('abort', () =>
 	new Promise<void>(done => {
@@ -135,6 +135,14 @@ test('abort: results', () =>
 		setTimeout(done, 300);
 	}));
 
+test('empty', async () => {
+	expect(await promises([])).toEqual([]);
+	expect(await promises({})).toEqual({});
+
+	expect(await promises.result([])).toEqual([]);
+	expect(await promises.result({})).toEqual({});
+});
+
 test('error', () =>
 	new Promise<void>(done => {
 		const values = [undefined, null, true, 1, 'string', () => {}, new Map(), new Set()];
@@ -174,7 +182,7 @@ test('error', () =>
 		}
 
 		setTimeout(() => {
-			expect(empty).toEqual({errors: 0, successes: 0});
+			expect(empty).toEqual({errors: 0, successes: 8});
 			expect(type).toEqual({errors: 8, successes: 0});
 
 			done();
@@ -313,8 +321,8 @@ test('relaxed', () =>
 
 test('relaxed: results, array', () =>
 	new Promise<void>(done => {
-		const errors: unknown[] = [undefined, undefined];
-		const values: unknown[] = [undefined, undefined];
+		const errors: unknown[] = [];
+		const values: Array<Array<Result<unknown>>> = [];
 
 		void promises
 			.result([
@@ -344,24 +352,26 @@ test('relaxed: results, array', () =>
 			});
 
 		setTimeout(() => {
-			expect(errors.length).toBe(2);
+			expect(errors.length).toBe(0);
 			expect(values.length).toBe(2);
 
 			expect(errors[0]).toBeUndefined();
 			expect(errors[1]).toBeUndefined();
 
-			expect(values[0]).toEqual([
-				{ok: true, value: 1},
-				{ok: true, value: '2'},
-				{ok: false, error: new Error('Nope!')},
-			]);
+			expect(values[0][0].ok && values[0][0].value === 1).toBe(true);
+			expect(values[0][1].ok && values[0][1].value === '2').toBe(true);
+			expect(values[0][2].ok === false && values[0][2].error?.message === 'Nope!').toBe(true);
 
-			expect(values[1]).toEqual([
-				{ok: true, value: 1},
-				{ok: true, value: '2'},
-				{ok: false, error: new Error('Nope!')},
-				{ok: true, value: [1n, 2n]},
-			]);
+			expect(values[1][0].ok && values[1][0].value === 1).toBe(true);
+			expect(values[1][1].ok && values[1][1].value === '2').toBe(true);
+			expect(values[1][2].ok === false && values[1][2].error?.message === 'Nope!').toBe(true);
+
+			expect(
+				values[1][3].ok &&
+					Array.isArray(values[1][3].value) &&
+					values[1][3].value[0] === 1n &&
+					values[1][3].value[1] === 2n,
+			).toBe(true);
 
 			done();
 		}, 500);
@@ -369,8 +379,8 @@ test('relaxed: results, array', () =>
 
 test('relaxed: results, keyed', () =>
 	new Promise<void>(done => {
-		const errors: unknown[] = [undefined, undefined];
-		const values: unknown[] = [undefined, undefined];
+		const errors: unknown[] = [];
+		const values: Array<Record<string, Result<unknown>>> = [];
 
 		void promises
 			.result({
@@ -400,24 +410,26 @@ test('relaxed: results, keyed', () =>
 			});
 
 		setTimeout(() => {
-			expect(errors.length).toBe(2);
+			expect(errors.length).toBe(0);
 			expect(values.length).toBe(2);
 
 			expect(errors[0]).toBeUndefined();
 			expect(errors[1]).toBeUndefined();
 
-			expect(values[0]).toEqual({
-				one: {ok: true, value: 1},
-				two: {ok: true, value: '2'},
-				three: {ok: false, error: new Error('Nope!')},
-			});
+			expect(values[0].one.ok && values[0].one.value === 1).toBe(true);
+			expect(values[0].two.ok && values[0].two.value === '2').toBe(true);
+			expect(values[0].three.ok === false && values[0].three.error?.message === 'Nope!').toBe(true);
 
-			expect(values[1]).toEqual({
-				one: {ok: true, value: 1},
-				two: {ok: true, value: '2'},
-				three: {ok: false, error: new Error('Nope!')},
-				four: {ok: true, value: [1n, 2n]},
-			});
+			expect(values[1].one.ok && values[1].one.value === 1).toBe(true);
+			expect(values[1].two.ok && values[1].two.value === '2').toBe(true);
+			expect(values[1].three.ok === false && values[1].three.error?.message === 'Nope!').toBe(true);
+
+			expect(
+				values[1].four.ok &&
+					Array.isArray(values[1].four.value) &&
+					values[1].four.value[0] === 1n &&
+					values[1].four.value[1] === 2n,
+			).toBe(true);
 
 			done();
 		}, 500);

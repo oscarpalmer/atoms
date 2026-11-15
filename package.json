@@ -1,6 +1,6 @@
 {
 	"name": "@oscarpalmer/atoms",
-	"version": "0.223.0",
+	"version": "0.224.0",
 	"description": "Atomic utilities for making your JavaScript better.",
 	"keywords": [
 		"array",
@@ -31,13 +31,13 @@
 	],
 	"type": "module",
 	"sideEffects": false,
-	"module": "./dist/index.mjs",
+	"module": "./dist/atoms.full.mjs",
 	"types": "./dist/index.d.mts",
 	"exports": {
 		"./package.json": "./package.json",
 		".": {
 			"types": "./dist/index.d.mts",
-			"default": "./dist/index.mjs"
+			"default": "./dist/atoms.full.mjs"
 		},
 		"./array": {
 			"types": "./dist/array/index.d.mts",
@@ -100,6 +100,7 @@
 			"default": "./dist/color/index.mjs"
 		},
 		"./eslint": "./plugin/index.js",
+		"./eslint/rules": "./plugin/rules.js",
 		"./function": {
 			"types": "./dist/function/index.d.mts",
 			"default": "./dist/function/index.mjs"
@@ -310,7 +311,7 @@
 		}
 	},
 	"scripts": {
-		"build": "npx vp pack && npm run tsdown:build",
+		"build": "npx vp pack && npm run tsdown:build && vpx vp pack",
 		"tsdown:build": "npx tsdown -c ./tsdown.config.ts",
 		"tsdown:watch": "npx tsdown -c ./tsdown.config.ts --watch",
 		"test": "npx vp test run --coverage",
@@ -319,10 +320,10 @@
 	"devDependencies": {
 		"@types/node": "^26.6",
 		"@vitest/coverage-istanbul": "^5",
-		"eslint": "^10.14",
+		"eslint": "^10.15",
 		"jsdom": "^31",
 		"tsdown": "^0.23",
 		"typescript": "^7",
-		"vite-plus": "^1.5"
+		"vite-plus": "^1.6"
 	}
 }

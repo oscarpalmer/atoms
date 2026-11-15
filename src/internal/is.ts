@@ -130,6 +130,16 @@ export function isNonPrimitive<Value>(value: Value): value is Exclude<Value, Pri
 }
 
 /**
+ * Is the value not a promise?
+ *
+ * @param value Value to check
+ * @returns `true` if the value is not a `Promise`, otherwise `false`
+ */
+export function isNonPromise<Value>(value: Value): value is Exclude<Value, Promise<unknown>> {
+	return !isPromise(value);
+}
+
+/**
  * Is the value not a template strings array?
  *
  * @param value Value to check
@@ -205,6 +215,16 @@ export function isPrimitive(value: unknown): value is Primitive {
 		type === 'string' ||
 		type === 'symbol'
 	);
+}
+
+/**
+ * Is the value a promise?
+ *
+ * @param value Value to check
+ * @returns `true` if the value is a `Promise`, otherwise `false`
+ */
+export function isPromise(value: unknown): value is Promise<unknown> {
+	return typeof value === 'object' && value !== null && value instanceof Promise;
 }
 
 /**

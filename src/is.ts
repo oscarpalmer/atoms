@@ -167,11 +167,13 @@ export {
 	isNonNumber,
 	isNonPlainObject,
 	isNonPrimitive,
+	isNonPromise,
 	isNonTemplateStringsArray,
 	isNonTypedArray,
 	isNumber,
 	isPlainObject,
 	isPrimitive,
+	isPromise,
 	isTemplateStringsArray,
 	isTypedArray,
 } from './internal/is';

@@ -1,108 +1,50 @@
-import type {ExtendedErr, ExtendedResult, Result} from '../../models/result.model';
-import {getError, ok} from './misc';
+import type {Result} from '../../models/result.model';
+import {RESULT_MESSAGE_ATTEMPT} from '../../models/result.model';
+import {isPromise} from '../is';
+import {error, ok} from './misc';
 
 // #region Functions
 
 /**
- * Executes a _Promise_, catching any errors, and returns a result
+ * Executes a promise, catching any errors, and returns a result
  *
- * _Available as `asyncAttempt` and `attempt.async`_
- *
- * @param promise _Promise_ to execute
- * @param error Error value
+ * @param promise Promise to execute
  * @returns Callback result
  */
-export async function asyncAttempt<Value, E>(
-	promise: Promise<Value>,
-	error: E,
-): Promise<ExtendedResult<Awaited<Value>, E>>;
+export function attempt<V, E = Error>(promise: Promise<V>): Promise<Result<V, E>>;
 
 /**
- * Executes a callback asynchronously, catching any errors, and returns a result
- *
- * _Available as `asyncAttempt` and `attempt.async`_
- *
- * @param callback Callback to execute
- * @param error Error value
- * @returns Callback result
- */
-export async function asyncAttempt<Value, E>(
-	callback: () => Promise<Value>,
-	error: E,
-): Promise<ExtendedResult<Awaited<Value>, E>>;
-
-/**
- * Executes a _Promise_, catching any errors, and returns a result
- *
- * _Available as `asyncAttempt` and `attempt.async`_
- *
- * @param promise _Promise_ to execute
- * @returns Callback result
- */
-export async function asyncAttempt<Value>(promise: Promise<Value>): Promise<Result<Awaited<Value>>>;
-
-/**
- * Executes a callback asynchronously, catching any errors, and returns a result
- *
- * _Available as `asyncAttempt` and `attempt.async`_
+ * Executes a callback, catching any errors, and returns a result
  *
  * @param callback Callback to execute
  * @returns Callback result
  */
-export async function asyncAttempt<Value>(
-	callback: () => Promise<Value>,
-): Promise<Result<Awaited<Value>>>;
+export function attempt<V, E = Error>(
+	callback: () => V,
+): V extends Promise<infer U> ? Promise<Result<U, E>> : Result<V, E>;
 
-export async function asyncAttempt<Value, E>(
-	value: Promise<Value> | (() => Promise<Value>),
-	err?: E,
-): Promise<unknown> {
-	try {
-		let result: unknown;
+export function attempt(input: unknown): unknown {
+	const inputIsPromise = isPromise(input);
 
-		if (typeof value === 'function') {
-			result = value();
-		} else {
-			result = value;
-		}
-
-		if (result instanceof Promise) {
-			result = await result;
-		}
-
-		return ok(result);
-	} catch (error) {
-		return getError((err ?? error) as E, err == null ? undefined : (error as Error));
+	if (!inputIsPromise && typeof input !== 'function') {
+		throw new TypeError(RESULT_MESSAGE_ATTEMPT);
 	}
-}
 
-/**
- * Executes a callback, catching any errors, and returns a result
- *
- * @param callback Callback to execute
- * @param error Error value
- * @returns Callback result
- */
-export function attempt<Value, E>(callback: () => Value, error: E): ExtendedResult<Value, E>;
-
-/**
- * Executes a callback, catching any errors, and returns a result
- *
- * @param callback Callback to execute
- * @returns Callback result
- */
-export function attempt<Value>(callback: () => Value): Result<Value, Error>;
-
-export function attempt<Value, E>(
-	callback: () => Value,
-	err?: E,
-): ExtendedErr<E> | Result<Value, E> {
 	try {
-		const value = callback();
+		const value = inputIsPromise ? input : input();
+
+		if (isPromise(value)) {
+			return new Promise(resolve => {
+				void value.then(
+					v => resolve(ok(v)),
+					e => resolve(error(e)),
+				);
+			});
+		}
 
 		return ok(value);
-	} catch (error) {
-		return getError((err ?? error) as E, err == null ? undefined : (error as Error));
+	} catch (error_: unknown) {
+		return error(error_ as never);
 	}
 }
 
@@ -111,13 +53,13 @@ export function attempt<Value, E>(
 // #region Namespace
 
 export declare namespace attempt {
-	export var async: typeof asyncAttempt;
+	export var async: typeof attempt;
 }
 
 // #endregion
 
 // #region Initialization
 
-attempt.async = asyncAttempt;
+attempt.async = attempt;
 
 // #endregion

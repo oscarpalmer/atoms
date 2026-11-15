@@ -18,6 +18,7 @@ import {
 	isNonObject,
 	isNonPlainObject,
 	isNonPrimitive,
+	isNonPromise,
 	isNonTypedArray,
 	isNullable,
 	isNullableOrEmpty,
@@ -27,6 +28,7 @@ import {
 	isObject,
 	isPlainObject,
 	isPrimitive,
+	isPromise,
 	isTypedArray,
 } from '../src';
 import {isNonTemplateStringsArray, isTemplateStringsArray} from '../src/internal/is';
@@ -236,6 +238,22 @@ test('isPrimitive', () => {
 
 		expect(isPrimitive(value)).toBe(expected[index]);
 		expect(isNonPrimitive(value)).not.toBe(expected[index]);
+	}
+});
+
+test('isPromise', () => {
+	for (let index = 0; index < length; index += 1) {
+		const value = values[index];
+
+		expect(isPromise(value)).toBe(false);
+		expect(isNonPromise(value)).toBe(true);
+	}
+
+	const promises = [Promise.resolve(123), new Promise(() => {}), (async () => {})()];
+
+	for (const promise of promises) {
+		expect(isPromise(promise)).toBe(true);
+		expect(isNonPromise(promise)).toBe(false);
 	}
 });
 

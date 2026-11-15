@@ -1,4 +1,4 @@
-import {isError, isOk} from '../result/misc';
+import {isError, isOk} from '../result/is';
 
 // #region Functions
 

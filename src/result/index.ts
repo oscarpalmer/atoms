@@ -1,1 +1,1 @@
-export {asyncAttempt, attempt} from '../internal/result/attempt';
+export {attempt} from '../internal/result/attempt';

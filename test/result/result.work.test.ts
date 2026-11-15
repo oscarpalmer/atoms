@@ -17,12 +17,12 @@ test('flow: asynchronous', async () => {
 	const invalidName = await nameTransformer(123 as never);
 
 	expect(isError(invalidName)).toBe(true);
-	expect((invalidName as Err<Error>).error).toBeInstanceOf(Error);
+	expect((invalidName as Err<never, Error>).error).toBeInstanceOf(Error);
 
 	const invalidFlow = await attemptFlow.async(() => {}, 'not a function' as never)();
 
 	expect(isError(invalidFlow)).toBe(true);
-	expect((invalidFlow as Err<Error>).error.message).toBe(
+	expect((invalidFlow as Err<never, Error>).error.message).toBe(
 		'Flow expected to receive an array of functions',
 	);
 
@@ -37,7 +37,7 @@ test('flow: asynchronous', async () => {
 	expect(isError(errorResult)).toBe(true);
 	expect(isOk(okResult)).toBe(true);
 
-	expect((errorResult as Err<unknown>).error).toBe('Test error!');
+	expect((errorResult as Err<unknown, unknown>).error).toBe('Test error!');
 	expect((okResult as Ok<string>).value).toBe('Test value!');
 });
 
@@ -57,12 +57,12 @@ test('flow: synchronous', () => {
 	const invalidName = nameTransformer(123 as never);
 
 	expect(isError(invalidName)).toBe(true);
-	expect((invalidName as Err<Error>).error).toBeInstanceOf(Error);
+	expect((invalidName as Err<never, Error>).error).toBeInstanceOf(Error);
 
 	const invalidFlow = attemptFlow(() => {}, 'not a function' as never)();
 
 	expect(isError(invalidFlow)).toBe(true);
-	expect((invalidFlow as Err<Error>).error.message).toBe(
+	expect((invalidFlow as Err<never, Error>).error.message).toBe(
 		'Flow expected to receive an array of functions',
 	);
 
@@ -77,7 +77,7 @@ test('flow: synchronous', () => {
 	expect(isError(errorResult)).toBe(true);
 	expect(isOk(okResult)).toBe(true);
 
-	expect((errorResult as Err<unknown>).error).toBe('Test error!');
+	expect((errorResult as Err<unknown, unknown>).error).toBe('Test error!');
 	expect((okResult as Ok<string>).value).toBe('Test value!');
 });
 
@@ -128,7 +128,7 @@ test('pipe: asynchronous', async () => {
 	expect((resultOk as Ok<number>).value).toBe(248);
 
 	expect(isError(resultErr)).toBe(true);
-	expect((resultErr as Err<Error>).error.message).toBe('Test error');
+	expect((resultErr as Err<never, Error>).error.message).toBe('Test error');
 
 	expect(isOk(simple)).toBe(true);
 	expect((simple as Ok<number>).value).toBe(123);
@@ -139,7 +139,7 @@ test('pipe: asynchronous', async () => {
 
 	expect(isError(invalid)).toBe(true);
 
-	expect((invalid as Err<Error>).error.message).toBe(
+	expect((invalid as Err<never, Error>).error.message).toBe(
 		'Pipe expected to receive an array of functions',
 	);
 
@@ -195,7 +195,7 @@ test('pipe: synchronous', () => {
 	expect((resultOk as Ok<number>).value).toBe(248);
 
 	expect(isError(resultErr)).toBe(true);
-	expect((resultErr as Err<Error>).error.message).toBe('Test error');
+	expect((resultErr as Err<never, Error>).error.message).toBe('Test error');
 
 	expect(isOk(simple)).toBe(true);
 	expect((simple as Ok<number>).value).toBe(123);
@@ -206,7 +206,7 @@ test('pipe: synchronous', () => {
 
 	expect(isError(invalid)).toBe(true);
 
-	expect((invalid as Err<Error>).error.message).toBe(
+	expect((invalid as Err<never, Error>).error.message).toBe(
 		'Pipe expected to receive an array of functions',
 	);
 
@@ -229,8 +229,8 @@ test('return types', () => {
 	expect(isOk(basicFlow)).toBe(true);
 	expect(isOk(basicPipe)).toBe(true);
 
-	expect((basicFlow as Ok<string>).value).toBe('Returned value!');
-	expect((basicPipe as Ok<string>).value).toBe('Test value!');
+	expect((basicFlow as unknown as Ok<string>).value).toBe('Returned value!');
+	expect((basicPipe as unknown as Ok<string>).value).toBe('Test value!');
 
 	const errorFlow = attemptFlow(
 		() => {},
@@ -251,8 +251,8 @@ test('return types', () => {
 	expect(isError(errorFlow)).toBe(true);
 	expect(isError(errorPipe)).toBe(true);
 
-	expect((errorFlow as Err<Error>).error.message).toBe('Test error!');
-	expect((errorPipe as Err<Error>).error.message).toBe('Test error!');
+	expect((errorFlow as Err<never, Error>).error.message).toBe('Test error!');
+	expect((errorPipe as Err<never, Error>).error.message).toBe('Test error!');
 
 	const promiseFailFlow = attemptFlow(
 		() => {},
@@ -267,11 +267,11 @@ test('return types', () => {
 	expect(isError(promiseFailFlow)).toBe(true);
 	expect(isError(promiseFailPipe)).toBe(true);
 
-	expect((promiseFailFlow as Err<Error>).error.message).toBe(
+	expect((promiseFailFlow as Err<never, Error>).error.message).toBe(
 		'Synchronous Flow received a promise. Use `flow.async` instead.',
 	);
 
-	expect((promiseFailPipe as Err<Error>).error.message).toBe(
+	expect((promiseFailPipe as Err<never, Error>).error.message).toBe(
 		'Synchronous Pipe received a promise. Use `pipe.async` instead.',
 	);
 
@@ -288,11 +288,11 @@ test('return types', () => {
 	expect(isError(nestingFailFlow)).toBe(true);
 	expect(isError(nestingFailPipe)).toBe(true);
 
-	expect((nestingFailFlow as Err<Error>).error.message).toBe(
+	expect((nestingFailFlow as Err<never, Error>).error.message).toBe(
 		'Return values are too deeply nested.',
 	);
 
-	expect((nestingFailPipe as Err<Error>).error.message).toBe(
+	expect((nestingFailPipe as Err<never, Error>).error.message).toBe(
 		'Return values are too deeply nested.',
 	);
 });

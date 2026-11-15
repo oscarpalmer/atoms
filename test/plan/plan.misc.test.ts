@@ -46,9 +46,9 @@ test('abort', async () => {
 	expect(isError(ranSecond)).toBe(true);
 	expect(isError(ranThird)).toBe(true);
 
-	expect((ranFirst as unknown as Err<string>).error).toBe('aborted first');
-	expect((ranSecond as unknown as Err<string>).error).toBe('aborted second');
-	expect((ranThird as unknown as Err<string>).error).toBe('aborted third');
+	expect((ranFirst as Err<never, string>).error).toBe('aborted first');
+	expect((ranSecond as Err<never, string>).error).toBe('aborted second');
+	expect((ranThird as Err<never, string>).error).toBe('aborted third');
 });
 
 test('fail', async () => {

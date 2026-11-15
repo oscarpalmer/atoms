@@ -1,5 +1,5 @@
 import {expect, test} from 'vite-plus/test';
-import {getValue, hasValue, setValue} from '../../src';
+import {getValue, hasValue, Result, setValue} from '../../src';
 import {valueFixture} from '../.fixtures/value.fixture';
 
 const {nested} = valueFixture;
@@ -31,39 +31,41 @@ test('hasValue', () => {
 	expect(hasValue(nested, 'constructor')).toBe(false);
 	expect(hasValue(nested, 'prototype')).toBe(false);
 
-	expect(hasValue.get(nested, 'a.c.d')).toEqual({ok: true, value: 123});
+	let result: Result<unknown, unknown> = hasValue.get(nested, 'a.c.d');
 
-	expect(hasValue.get(nested, '')).toEqual({ok: false, error: 'Expected path to be a string'});
+	expect(result.ok && result.value === 123).toBe(true);
 
-	expect(hasValue.get(nested, 'a.B.1.C.1', true)).toEqual({
-		ok: false,
-		error: 'Expected property to exist in object',
-	});
+	result = hasValue.get(nested, '');
 
-	expect(hasValue.get(nested, 'a.b.99.c')).toEqual({
-		ok: false,
-		error: 'Expected property to exist in object',
-	});
+	expect(result.ok === false && result.error === 'Expected path to be a string').toBe(true);
 
-	expect(hasValue.get(nested, '__proto__')).toEqual({
-		ok: false,
-		error: 'Access to this property is not allowed',
-	});
+	result = hasValue.get(nested, 'a.B.1.C.1', true);
 
-	expect(hasValue.get(nested, 'constructor')).toEqual({
-		ok: false,
-		error: 'Access to this property is not allowed',
-	});
+	expect(result.ok === false && result.error === 'Expected property to exist in object').toBe(true);
 
-	expect(hasValue.get(nested, 'prototype')).toEqual({
-		ok: false,
-		error: 'Access to this property is not allowed',
-	});
+	result = hasValue.get(nested, 'a.b.99.c');
 
-	expect(hasValue.get('blah' as never, 'a.b.c.d')).toEqual({
-		ok: false,
-		error: 'Expected data to be an object',
-	});
+	expect(result.ok === false && result.error === 'Expected property to exist in object').toBe(true);
+
+	result = hasValue.get(nested, 'a.c.d.e');
+
+	expect(result.ok === false && result.error === 'Expected property to exist in object').toBe(true);
+
+	result = hasValue.get(nested, '__proto__');
+
+	expect(result.ok === false && result.error === 'Access to this property is not allowed').toBe(
+		true,
+	);
+
+	result = hasValue.get(nested, 'constructor');
+
+	expect(result.ok === false && result.error === 'Access to this property is not allowed').toBe(
+		true,
+	);
+
+	result = hasValue.get('blah' as never, 'a.b.c.d');
+
+	expect(result.ok === false && result.error === 'Expected data to be an object').toBe(true);
 });
 
 test('setValue', () => {

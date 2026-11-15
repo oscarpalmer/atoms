@@ -1,7 +1,7 @@
 import {getNumberOrDefault} from '../internal/defaults';
 import {getLimiter} from '../internal/function/limit';
 import {isPlainObject} from '../internal/is';
-import {asyncAttempt, attempt} from '../internal/result/attempt';
+import {attempt} from '../internal/result/attempt';
 import {LIMITER_WAIT} from '../models/function/limiter.model';
 import {
 	RETRY_MESSAGE_EXPECTATION,
@@ -10,6 +10,7 @@ import {
 	type RetryOptions,
 } from '../models/function/retry.model';
 import type {GenericAsyncCallback, GenericCallback} from '../models/index';
+import type {Result} from '../models/result.model';
 
 // #region Functions
 
@@ -59,7 +60,7 @@ async function asyncRetry<Callback extends GenericAsyncCallback>(
 	}
 
 	async function handle(): Promise<void> {
-		const attempted = await asyncAttempt(async () => callback());
+		const attempted = await attempt(async () => callback());
 
 		if (attempted.ok) {
 			resolver(attempted.value);
@@ -67,12 +68,16 @@ async function asyncRetry<Callback extends GenericAsyncCallback>(
 			return;
 		}
 
-		if (attempts >= times || !when(attempted.error)) {
-			rejector(new RetryError(RETRY_MESSAGE_FAILED, attempted.error));
-		} else {
-			attempts += 1;
+		try {
+			if (attempts >= times || !when(attempted.error)) {
+				rejector(new RetryError(RETRY_MESSAGE_FAILED, attempted.error));
+			} else {
+				attempts += 1;
 
-			void limiter.run();
+				void limiter.run();
+			}
+		} catch (error) {
+			rejector(error);
 		}
 	}
 
@@ -123,7 +128,7 @@ export function retry<Callback extends GenericCallback>(
 	let last: unknown;
 
 	for (let index = 0; index <= times; index += 1) {
-		const attempted = attempt(callback);
+		const attempted = attempt(callback) as Result<never, never>;
 
 		if (attempted.ok) {
 			return attempted.value;

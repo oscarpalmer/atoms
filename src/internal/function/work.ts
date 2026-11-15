@@ -9,6 +9,7 @@ import {
 } from '../../models/function/work.model';
 import type {GenericCallback} from '../../models/index';
 import type {UnwrapValue} from '../../models/result.model';
+import {isPromise} from '../is';
 import {unwrapWork} from './misc';
 
 // #region Functions
@@ -885,7 +886,7 @@ async function asyncWork(
 ): Promise<unknown> {
 	const {length} = functions;
 
-	let transformed = unwrapValue(initial);
+	let transformed = unwrapWork(await unwrapValue(initial));
 
 	for (let index = 0; index < length; index += 1) {
 		const fn = functions[index];
@@ -908,7 +909,7 @@ function unwrapValue(value: unknown, flow?: boolean, nested?: boolean): unknown 
 		return unwrapValue(value(), flow, true);
 	}
 
-	if (flow != null && value instanceof Promise) {
+	if (flow != null && isPromise(value)) {
 		throw new TypeError(flow ? WORK_MESSAGE_FLOW_PROMISE : WORK_MESSAGE_PIPE_PROMISE);
 	}
 

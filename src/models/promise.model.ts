@@ -51,8 +51,9 @@ export type FulfilledPromise<Value> = {
 };
 
 export type PromiseData = {
-	last: number;
 	result: ArrayOrPlainObject;
+	settled: number;
+	total: number;
 };
 
 export type PromiseHandlers = {
@@ -79,7 +80,6 @@ export type PromiseParameters = {
 	complete: boolean;
 	data: PromiseData;
 	handlers: PromiseHandlers;
-	index: number;
 	key: Key;
 	value?: unknown;
 };

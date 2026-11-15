@@ -1,6 +1,7 @@
 import {createAborter} from '../internal/aborter';
-import {isArrayOrPlainObject} from '../internal/is';
-import {asyncAttempt} from '../internal/result/attempt';
+import {noop} from '../internal/function/misc';
+import {isArrayOrPlainObject, isPromise} from '../internal/is';
+import {attempt} from '../internal/result/attempt';
 import type {ArrayOrPlainObject, Key, PlainObject} from '../models/index';
 import {
 	PROMISE_MESSAGE_EXPECTATION_ATTEMPT,
@@ -73,13 +74,17 @@ export async function attemptPromise<Value>(
 ): Promise<Value> {
 	const isFunction = typeof value === 'function';
 
-	if (!isFunction && !(value instanceof Promise)) {
+	if (!isFunction && !isPromise(value)) {
 		throw new TypeError(PROMISE_MESSAGE_EXPECTATION_ATTEMPT);
 	}
 
 	const {signal, time} = createPromiseOptions(options);
 
 	if (signal?.aborted ?? false) {
+		if (!isFunction) {
+			void value.catch(noop);
+		}
+
 		throw signal?.reason;
 	}
 
@@ -91,15 +96,7 @@ export async function attemptPromise<Value>(
 		resolve: (value: Value) => void,
 		reject: (reason: unknown) => void,
 	): Promise<void> {
-		const attempted = await asyncAttempt(async () => {
-			let result = isFunction ? value() : await value;
-
-			if (result instanceof Promise) {
-				result = await result;
-			}
-
-			return result;
-		});
+		const attempted = await attempt(value as never);
 
 		if (attempted.ok) {
 			settlePromise(resolve, attempted.value, aborter);
@@ -228,9 +225,16 @@ export async function promises(items: ArrayOrPlainObject, options?: unknown): Pr
 		? items.map((item, index) => [index, item])
 		: Object.entries(items);
 
-	const actual = entries
-		.map(([key, value]) => [key, typeof value === 'function' ? value() : value])
-		.filter(([, value]) => value instanceof Promise) as Array<[Key, Promise<unknown>]>;
+	let {length} = entries;
+
+	if (length === 0) {
+		return isArray ? [] : {};
+	}
+
+	const actual: Array<[Key, Promise<unknown>]> = entries.map(([key, value]) => [
+		key,
+		Promise.resolve(typeof value === 'function' ? value() : value),
+	]);
 
 	const aborter = createAborter(signal, () => {
 		handlers.reject(signal?.reason);
@@ -238,11 +242,12 @@ export async function promises(items: ArrayOrPlainObject, options?: unknown): Pr
 
 	const complete = strategy === PROMISE_STRATEGY_DEFAULT;
 
-	const {length} = actual;
+	length = actual.length;
 
 	const data: PromiseData = {
-		last: length - 1,
 		result: isArray ? [] : {},
+		settled: 0,
+		total: length,
 	};
 
 	let handlers: PromiseHandlers;
@@ -258,21 +263,21 @@ export async function promises(items: ArrayOrPlainObject, options?: unknown): Pr
 				complete,
 				data,
 				handlers,
-				index,
 				key,
 			};
 
-			void promise
-				.then(value => {
+			void promise.then(
+				value => {
 					parameters.value = value;
 
 					handleResult(PROMISE_TYPE_FULFILLED, parameters);
-				})
-				.catch(reason => {
+				},
+				reason => {
 					parameters.value = reason;
 
 					handleResult(PROMISE_TYPE_REJECTED, parameters);
-				});
+				},
+			);
 		}
 	});
 }

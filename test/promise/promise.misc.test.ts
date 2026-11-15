@@ -50,6 +50,14 @@ test('toResult', async () => {
 	expect((rejected as Err<Error>).error).toBeInstanceOf(Error);
 	expect((rejected as Err<Error>).error.message).toBe('Failure!');
 
+	const thrown = await toResult(() => {
+		throw new Error('Thrown!');
+	});
+
+	expect(thrown.ok).toBe(false);
+	expect((thrown as Err<Error>).error).toBeInstanceOf(Error);
+	expect((thrown as Err<Error>).error.message).toBe('Thrown!');
+
 	await expect(toResult('blah' as never)).rejects.toThrow('toResult expected a Promise');
 	await expect(toResult(() => 'blah' as never)).rejects.toThrow('toResult expected a Promise');
 });

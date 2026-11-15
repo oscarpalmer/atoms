@@ -1,13 +1,18 @@
 import {defineConfig} from 'vite-plus/pack';
 
 export default defineConfig({
+	copy: [
+		{
+			from: './dist/index.mjs',
+			to: './dist',
+			rename: 'atoms.full.mjs',
+		},
+	],
 	deps: {
-		// tsdown <0.23 compatibility: resolve external dependency subpaths.
-		// Remove to preserve subpath imports as written (the new default).
-		// https://tsdown.dev/options/dependencies#deps-resolvedepsubpath
+		onlyBundle: false,
 		resolveDepSubpath: true,
 	},
-	clean: false,
+	clean: true,
 	entry: './src/index.ts',
 	minify: 'dce-only',
 });

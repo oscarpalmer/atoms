@@ -1,5 +1,6 @@
+import {isPromise} from '../internal/is';
 import {getGenerator} from '../internal/plan';
-import {isError, isOk} from '../internal/result/misc';
+import {isError, isOk} from '../internal/result/is';
 import {
 	PLAN_MESSAGE_USE_NESTED_FN,
 	PLAN_MESSAGE_USE_SYNC_ASYNC,
@@ -181,7 +182,7 @@ export function use(value: unknown): Step<any> {
 
 function validateUseInput(value: unknown, resolved: boolean): void {
 	if (
-		value instanceof Promise ||
+		isPromise(value) ||
 		isAsyncFailure(value) ||
 		isAsyncGenerator(value) ||
 		isAsyncGeneratorFunction(value) ||

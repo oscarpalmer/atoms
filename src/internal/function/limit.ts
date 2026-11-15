@@ -5,6 +5,7 @@ import {
 	LIMITER_OFFSET,
 	LIMITER_SYMBOL,
 	LIMITER_THROTTLE,
+	LimiterError,
 	startTimer,
 	type AsyncLimiter,
 	type AsyncLimiterItem,
@@ -17,7 +18,9 @@ import {
 } from '../../models/function/limiter.model';
 import type {GenericAsyncCallback, GenericCallback} from '../../models/index';
 import {getNumberOrDefault} from '../defaults';
-import {asyncAttempt} from '../result/attempt';
+import {isPromise} from '../is';
+import {attempt} from '../result/attempt';
+import {noop} from './misc';
 
 // #region Instances
 
@@ -61,14 +64,14 @@ Limiter.prototype.run = runLimiter;
 function cancelAsyncLimiter(this: InternalAsyncLimiter): void {
 	const state = this[LIMITER_SYMBOL];
 
-	if (state.timer != null) {
-		clearTimer(state.timer);
-	}
-
 	if (state.last != null && !state.last.running) {
-		state.last.reject();
+		state.last.reject(new LimiterError());
 
 		state.last = undefined;
+	}
+
+	if (state.timer != null) {
+		clearTimer(state.timer);
 	}
 }
 
@@ -108,10 +111,10 @@ async function handleAsyncLimiter(state: AsyncLimiterState, item: AsyncLimiterIt
 
 		item.running = true;
 
-		const attempted = await asyncAttempt(async () => {
-			let value = state.callback(...item.parameters);
+		const attempted = await attempt(async () => {
+			let value: unknown = state.callback(...item.parameters);
 
-			if (value instanceof Promise) {
+			if (isPromise(value)) {
 				value = await value;
 			}
 
@@ -158,6 +161,8 @@ function runAsyncLimiter(this: InternalAsyncLimiter): Promise<unknown> {
 		next.reject = reject;
 		next.resolve = resolve;
 	});
+
+	void next.promise.catch(noop);
 
 	state.last = next;
 

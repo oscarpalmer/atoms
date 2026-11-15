@@ -1,7 +1,7 @@
 import type {AsyncPlanState, PlanState} from '../../models/plan.model';
 import {createAborter} from '../aborter';
 import {noop} from '../function/misc';
-import {isError, isOk} from '../result/misc';
+import {isError, isOk} from '../result/is';
 
 // #region Functions
 

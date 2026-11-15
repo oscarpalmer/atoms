@@ -2,7 +2,7 @@ import {unwrapWork} from '../../internal/function/misc';
 import {asyncFlow, flow} from '../../internal/function/work';
 import type {GenericCallback} from '../../models/index';
 import type {AttemptAsyncFlow, AttemptFlow, Result, UnwrapValue} from '../../models/result.model';
-import {asyncAttempt, attempt} from '../index';
+import {attempt} from '../index';
 
 // #region Functions
 
@@ -237,11 +237,11 @@ export function attemptAsyncFlow(
 	let Flow: GenericCallback;
 
 	return (...args: unknown[]) =>
-		asyncAttempt(() => {
+		attempt(() => {
 			Flow ??= asyncFlow(...fns);
 
 			return Flow(...args.map(unwrapWork));
-		});
+		}) as Promise<Result<unknown>>;
 }
 
 // #endregion
@@ -444,7 +444,7 @@ export function attemptFlow(...fns: GenericCallback[]): (...args: unknown[]) => 
 			Flow ??= flow(...fns);
 
 			return Flow(...args.map(unwrapWork));
-		});
+		}) as Result<unknown>;
 }
 
 // #endregion

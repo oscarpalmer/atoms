@@ -27,6 +27,14 @@ test('errors', () => {
 			'result error',
 		],
 		[
+			function* delegatedResultError() {
+				yield* error('delegated result error');
+
+				return 'hello, delegated';
+			},
+			'delegated result error',
+		],
+		[
 			function* returnedError() {
 				return new Error('returned error');
 			},
@@ -55,7 +63,7 @@ test('errors', () => {
 		const attempted = plan(generator).attempt();
 
 		expect(isError(attempted)).toBe(true);
-		expect((attempted as Err<unknown>).error).toEqual(expectation);
+		expect((attempted as Err<never, unknown>).error).toEqual(expectation);
 	}
 });
 
@@ -82,6 +90,14 @@ test('errors, async', async () => {
 				yield error('result error');
 			},
 			'result error',
+		],
+		[
+			async function* delegatedResultError() {
+				yield* error('delegated result error') as any;
+
+				return 'hello, delegated';
+			},
+			'delegated result error',
 		],
 		[
 			async function* returnedError() {
@@ -112,6 +128,6 @@ test('errors, async', async () => {
 		const attempted = await plan(asyncGenerator).attempt();
 
 		expect(isError(attempted)).toBe(true);
-		expect((attempted as Err<unknown>).error).toEqual(expectation);
+		expect((attempted as Err<never, unknown>).error).toEqual(expectation);
 	}
 });

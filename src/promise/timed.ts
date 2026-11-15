@@ -1,5 +1,7 @@
 import {createAborter} from '../internal/aborter';
 import {getLimiter} from '../internal/function/limit';
+import {noop} from '../internal/function/misc';
+import {isPromise} from '../internal/is';
 import {LIMITER_WAIT} from '../models/function/limiter.model';
 import type {RequiredKeys} from '../models/index';
 import {
@@ -41,13 +43,9 @@ export async function getTimedPromise<Value>(
 
 			limiter.run();
 		}),
-	]).then(value => {
+	]).finally(() => {
 		aborter?.cancel();
 		limiter.cancel();
-
-		rejector(undefined);
-
-		return value;
 	});
 }
 
@@ -73,13 +71,15 @@ export async function timed<Value>(
 export async function timed<Value>(promise: Promise<Value>, time: number): Promise<Value>;
 
 export async function timed<Value>(promise: Promise<Value>, options: unknown): Promise<Value> {
-	if (!(promise instanceof Promise)) {
+	if (!isPromise(promise)) {
 		throw new TypeError(PROMISE_MESSAGE_EXPECTATION_TIMED);
 	}
 
 	const {signal, time} = createPromiseOptions(options);
 
 	if (signal?.aborted ?? false) {
+		void promise.catch(noop);
+
 		throw signal?.reason;
 	}
 

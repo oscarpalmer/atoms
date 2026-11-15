@@ -1,5 +1,5 @@
 import {asyncGenerate, generate} from '../internal/plan/plan.generate';
-import {asyncAttempt, attempt} from '../internal/result/attempt';
+import {attempt} from '../internal/result/attempt';
 import {
 	type AsyncPlan,
 	type AsyncPlanState,
@@ -90,7 +90,7 @@ export function asyncAttemptRun(input: unknown, first?: unknown, second?: unknow
 		throw new Error(PLAN_MESSAGE_RUN_INPUT);
 	}
 
-	return asyncAttempt(() => asyncGenerate(generator, true, first, second));
+	return attempt(() => asyncGenerate(generator, true, first, second));
 }
 
 /**

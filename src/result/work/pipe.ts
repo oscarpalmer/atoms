@@ -1,8 +1,8 @@
 import {asyncPipe, pipe} from '../../internal/function/work';
-import {isError, isOk} from '../../internal/result/misc';
+import {isError, isOk} from '../../internal/result/is';
 import type {GenericCallback} from '../../models/index';
 import type {Result, UnwrapValue} from '../../models/result.model';
-import {asyncAttempt, attempt} from '../index';
+import {attempt} from '../index';
 
 // #region Types
 
@@ -258,7 +258,7 @@ export async function attemptAsyncPipe(
 	first?: (value: unknown) => unknown,
 	...seconds: Array<(value: unknown) => unknown>
 ): Promise<Result<unknown>> {
-	return asyncAttempt(async () => {
+	return attempt(async () => {
 		if (isError(initial)) {
 			throw initial.error;
 		}
@@ -496,7 +496,7 @@ export function attemptPipe(
 		}
 
 		return pipe(value, ...([first, ...seconds] as GenericCallback[]));
-	});
+	}) as WrapValue<unknown>;
 }
 
 // #endregion

@@ -1,16 +1,80 @@
-import type {Err, ExtendedErr, Ok, Result} from '../../models/result.model';
-import {isPlainObject} from '../is';
+import {
+	RESULT_MESSAGE_UNWRAP,
+	RESULT_NAME_ERR,
+	RESULT_NAME_OK,
+	RESULT_SYMBOL,
+	type Err,
+	type Ok,
+	type Result,
+} from '../../models/result.model';
+import {noop} from '../function/misc';
+import {isPromise} from '../is';
+import {isError, isOk, isResult} from './is';
+import {match} from './match';
+
+// #region Instances
+
+function Err(this: any, error: unknown): void {
+	this[RESULT_SYMBOL] = RESULT_NAME_ERR;
+
+	this.error = error;
+	this.ok = false;
+}
+
+Err.prototype[Symbol.asyncIterator] = iterateResultAsync;
+Err.prototype[Symbol.iterator] = iterateResult;
+
+Err.prototype.and = andResult;
+Err.prototype.isError = isErrorResult;
+Err.prototype.isOk = isOkResult;
+Err.prototype.map = mapResult;
+Err.prototype.mapError = mapErrorResult;
+Err.prototype.match = matchResult;
+Err.prototype.or = orResult;
+Err.prototype.unwrap = unwrapResult;
+
+function Ok(this: any, value: unknown): void {
+	this[RESULT_SYMBOL] = RESULT_NAME_OK;
+
+	this.value = value;
+	this.ok = true;
+}
+
+Ok.prototype[Symbol.asyncIterator] = iterateResultAsync;
+Ok.prototype[Symbol.iterator] = iterateResult;
+
+Ok.prototype.and = andResult;
+Ok.prototype.isError = isErrorResult;
+Ok.prototype.isOk = isOkResult;
+Ok.prototype.map = mapResult;
+Ok.prototype.mapError = mapErrorResult;
+Ok.prototype.match = matchResult;
+Ok.prototype.or = orResult;
+Ok.prototype.unwrap = unwrapResult;
+
+// #endregion
 
 // #region Functions
 
-/**
- * Creates an extended error result
- *
- * @param value Error value
- * @param original Original error
- * @returns Error result
- */
-export function error<E>(value: E, original: Error): ExtendedErr<E>;
+function andResult(this: Result<unknown, unknown>, next: unknown): unknown {
+	if (!this.ok) {
+		if (isPromise(next)) {
+			void next.then(noop, noop);
+		}
+
+		return this;
+	}
+
+	if (typeof next === 'function') {
+		next = next(this.value);
+	}
+
+	if (!isPromise(next)) {
+		return wrap(next);
+	}
+
+	return next.then(wrap);
+}
 
 /**
  * Creates an error result
@@ -18,108 +82,80 @@ export function error<E>(value: E, original: Error): ExtendedErr<E>;
  * @param value Error value
  * @returns Error result
  */
-export function error<E>(value: E): Err<E>;
-
-export function error<E>(value: E, original?: Error): Err<E> | ExtendedErr<E> {
-	return getError(value, original);
+export function error<V = never, E = Error>(value: E): Err<V, E> {
+	// @ts-expect-error Using old school function constructor, so all good, no worries :-)
+	return new Err(value);
 }
 
-export function getError<E>(value: E, original?: Error): Err<E> | ExtendedErr<E> {
-	const errorResult: Err<E> | ExtendedErr<E> = {
-		error: value,
-		ok: false,
-	};
+function isErrorResult(
+	this: Err<unknown, unknown>,
+	predicate?: (value: unknown) => boolean,
+): boolean {
+	return isError(this) && (typeof predicate === 'function' ? predicate(this.error) : true);
+}
 
-	if (original instanceof Error) {
-		(errorResult as ExtendedErr<E>).original = original;
+function isOkResult(this: Ok<unknown, unknown>, predicate?: (value: unknown) => boolean): boolean {
+	return isOk(this) && (typeof predicate === 'function' ? predicate(this.value) : true);
+}
+
+function* iterateResult(this: Result<unknown, unknown>): unknown {
+	if (this.ok) {
+		return this.value;
 	}
 
-	return errorResult;
+	yield this;
 }
 
-/**
- * Is the _Result_ an extended error?
- *
- * _Available as `isError` and `error.is`_
- *
- * @param result _Result_ to check
- * @returns `true` if the _Result_ is an extended error, otherwise `false`
- */
-export function isError<Value, E = Error>(
-	result: ExtendedErr<E> | Result<Value, E>,
-	extended: true,
-): result is ExtendedErr<E>;
+async function* iterateResultAsync(this: Result<unknown, unknown>): unknown {
+	if (this.ok) {
+		return await this.value;
+	}
 
-/**
- * Is the _Result_ an error?
- *
- * _Available as `isError` and `error.is`_
- *
- * @param result _Result_ to check
- * @returns `true` if the _Result_ is an error, otherwise `false`
- */
-export function isError<Value, E = Error>(result: Result<Value, E>): result is Err<E>;
-
-/**
- * Is the value an error?
- *
- * _Available as `isError` and `error.is`_
- *
- * @param value Value to check
- * @returns `true` if the value is an error, otherwise `false`
- */
-export function isError(value: unknown): value is Err<unknown> | ExtendedErr<unknown>;
-
-export function isError(
-	value: unknown,
-	extended?: boolean,
-): value is Err<unknown> | ExtendedErr<unknown> {
-	return (
-		isResultValue(value, false) &&
-		(extended === true ? (value as ExtendedErr<unknown>).original instanceof Error : true)
-	);
+	yield this;
 }
 
-/**
- * Is the _Result_ ok?
- *
- * _Available as `isOk` and `ok.is`_
- *
- * @param value _Result_ to check
- * @returns `true` if the _Result_ is ok, otherwise `false`
- */
-export function isOk<Value, E = Error>(value: Result<Value, E>): value is Ok<Value>;
+function mapResult(this: Result<unknown, unknown>, mapper: unknown): unknown {
+	if (!this.ok) {
+		if (isPromise(mapper)) {
+			void mapper.then(noop, noop);
+		}
 
-/**
- * Is the value ok?
- *
- * _Available as `isOk` and `ok.is`_
- *
- * @param value Value to check
- * @returns `true` if the value is ok, otherwise `false`
- */
-export function isOk(value: unknown): value is Ok<unknown>;
+		return this;
+	}
 
-export function isOk(value: unknown): value is Ok<unknown> {
-	return isResultValue(value, true);
+	if (typeof mapper === 'function') {
+		mapper = mapper(this.value);
+	}
+
+	if (!isPromise(mapper)) {
+		return ok(mapper);
+	}
+
+	return mapper.then(ok);
 }
 
-/**
- * Is the value a _Result_?
- *
- * @param value Value to check
- * @returns `true` if the value is a _Result_, otherwise `false`
- */
-export function isResult(value: unknown): value is ExtendedErr<unknown> | Result<unknown, unknown> {
-	return isResultValue(value, true) || isResultValue(value, false);
+function mapErrorResult(this: Result<unknown, unknown>, mapper: unknown): unknown {
+	if (this.ok) {
+		if (isPromise(mapper)) {
+			void mapper.then(noop, noop);
+		}
+
+		return this;
+	}
+
+	if (typeof mapper === 'function') {
+		mapper = mapper(this.error);
+	}
+
+	if (!isPromise(mapper)) {
+		return error(mapper);
+	}
+
+	return mapper.then(error);
 }
 
-function isResultValue(value: unknown, okValue: boolean): value is Result<unknown, unknown> {
-	return (
-		isPlainObject(value) &&
-		value.ok === okValue &&
-		(okValue ? RESULT_PROPERTY_VALUE : RESULT_PROPERTY_ERROR) in value
-	);
+function matchResult(this: Result<unknown, unknown>, first: unknown, second: unknown): unknown {
+	return match(this, first as never, second as never);
 }
 
 /**
@@ -128,42 +164,68 @@ function isResultValue(value: unknown, okValue: boolean): value is Result<unknow
  * @param value Value
  * @returns Ok result
  */
-export function ok<Value>(value: Value): Ok<Value> {
-	return {
-		ok: true,
-		value,
-	};
+export function ok<V, E = never>(value: V): Ok<V, E> {
+	// @ts-expect-error Using old school function constructor, so all good, no worries :-)
+	return new Ok(value) as Ok<V, E>;
+}
+
+function orResult(this: Result<unknown, unknown>, next: unknown): unknown {
+	if (this.ok) {
+		if (isPromise(next)) {
+			void next.then(noop, noop);
+		}
+
+		return this;
+	}
+
+	if (typeof next === 'function') {
+		next = next(this.error);
+	}
+
+	if (!isPromise(next)) {
+		return wrap(next);
+	}
+
+	return next.then(wrap);
 }
 
 /**
  * Gets the value of an ok result _(or a default value)_
  *
- * @param value _Result_ to unwrap
+ * @param value Result to unwrap
  * @param defaultValue Default value
- * @returns Value of the _Result_ _(or the default value)_
+ * @returns Value of the result _(or the default value)_
  */
-export function unwrap<Value, E = Error>(value: Result<Value, E>, defaultValue: Value): Value;
-
-/**
- * Gets the value of an ok result _(or a default value)_
- *
- * @param value _Result_ to unwrap
- * @param defaultValue Default value
- * @returns Value of the _Result_ _(or the default value)_
- */
-export function unwrap(value: unknown, defaultValue: unknown): unknown;
-
-export function unwrap(value: unknown, defaultValue: unknown): unknown {
+export function unwrap<V = unknown, E = Error, Next = V>(
+	value: Result<V, E>,
+	defaultValue: Next,
+): V | Next {
 	return isOk(value) ? value.value : defaultValue;
 }
 
-// #endregion
+function unwrapResult(this: Result<unknown, unknown>, ...args: unknown[]): unknown {
+	if (this.ok) {
+		return this.value;
+	}
 
-// #region Variable
+	if (args.length === 0) {
+		throw this.error instanceof Error
+			? this.error
+			: new Error(RESULT_MESSAGE_UNWRAP, {cause: this.error});
+	}
 
-const RESULT_PROPERTY_ERROR = 'error';
+	const [unwrapped] = args;
 
-const RESULT_PROPERTY_VALUE = 'value';
+	return typeof unwrapped === 'function' ? unwrapped(this.error) : unwrapped;
+}
+
+function wrap(value: unknown): Result<unknown, unknown> {
+	if (isResult(value)) {
+		return value;
+	}
+
+	return ok(value);
+}
 
 // #endregion
 

@@ -224,14 +224,16 @@ function runOnceAsync(this: InternalAsyncOnce, ...parameters: unknown[]): Promis
 	return new Promise<unknown>((resolve, reject) => {
 		state.items.push({reject, resolve});
 
-		void state
-			.callback(...parameters)
-			.then(value => {
-				handleOnceResult(state, value, false);
-			})
-			.catch(error => {
+		void new Promise<unknown>(resolve => {
+			resolve(state.callback(...parameters));
+		}).then(
+			value => {
+				handleOnceResult(state, value as never, false);
+			},
+			error => {
 				handleOnceResult(state, error, true);
-			});
+			},
+		);
 	});
 }
 

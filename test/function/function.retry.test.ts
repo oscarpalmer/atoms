@@ -54,6 +54,20 @@ test('asynchronous', async () => {
 			expect(((error as RetryError).original as Error).message).toBe('Failed attempt!');
 		});
 
+	await expect(
+		retry.async(
+			() => {
+				throw new Error('Failed attempt!');
+			},
+			{
+				times: 2,
+				when: () => {
+					throw new Error('Failed when!');
+				},
+			},
+		),
+	).rejects.toThrow('Failed when!');
+
 	await expect(retry.async('blah' as never)).rejects.toThrow('Retry expected a function');
 });
 

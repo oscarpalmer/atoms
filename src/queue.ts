@@ -1,7 +1,7 @@
 import {createAborter} from './internal/aborter';
 import {getBooleanOrDefault, getNumberOrDefault} from './internal/defaults';
 import {min} from './internal/math/aggregate';
-import {asyncAttempt} from './internal/result/attempt';
+import {attempt} from './internal/result/attempt';
 import type {GenericAsyncCallback, GenericCallback, PlainObject} from './models/index';
 import {
 	type InternalKeyedQueue,
@@ -179,7 +179,7 @@ function addToQueue(this: InternalQueue, parameters: unknown[], signal?: unknown
 	const abortSignal = signal instanceof AbortSignal ? signal : undefined;
 
 	if (abortSignal?.aborted ?? false) {
-		throw new Error(abortSignal?.reason);
+		throw abortSignal?.reason;
 	}
 
 	const state = this[QUEUE_SYMBOL];
@@ -589,7 +589,7 @@ async function run(state: QueueState): Promise<void> {
 
 		let result: unknown;
 
-		const attempted = await asyncAttempt(async () => {
+		const attempted = await attempt(async () => {
 			if (next.aborter?.signal?.aborted) {
 				throw next.aborter.signal.reason;
 			}

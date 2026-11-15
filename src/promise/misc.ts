@@ -1,3 +1,4 @@
+import {isPromise} from '../internal/is';
 import {error, ok} from '../internal/result/misc';
 import type {Aborter} from '../models/aborter.model';
 import {
@@ -27,7 +28,7 @@ export function cancelable<Value>(
  * @internal
  */
 export function handleResult(status: string, parameters: PromiseParameters): void {
-	const {aborter, complete, data, handlers, index, key, value} = parameters;
+	const {aborter, complete, data, handlers, key, value} = parameters;
 
 	if (aborter?.signal.aborted ?? false) {
 		return;
@@ -51,7 +52,9 @@ export function handleResult(status: string, parameters: PromiseParameters): voi
 
 	data.result[key as never] = resultValue;
 
-	if (index === data.last) {
+	data.settled += 1;
+
+	if (data.settled === data.total) {
 		aborter?.cancel();
 
 		handlers.resolve(data.result as unknown[]);
@@ -87,16 +90,25 @@ export async function toResult<Value>(callback: () => Promise<Value>): Promise<R
  */
 export async function toResult<Value>(promise: Promise<Value>): Promise<Result<Value>>;
 
-export async function toResult<Value>(
-	value: Promise<Value> | (() => Promise<Value>),
-): Promise<Result<Value>> {
-	const actual = typeof value === 'function' ? value() : value;
+export async function toResult(
+	value: Promise<unknown> | (() => Promise<unknown>),
+): Promise<Result<unknown>> {
+	let actual: unknown;
 
-	if (!(actual instanceof Promise)) {
+	try {
+		actual = typeof value === 'function' ? value() : value;
+	} catch (reason) {
+		return error(reason) as never;
+	}
+
+	if (!isPromise(actual)) {
 		throw new TypeError(PROMISE_MESSAGE_EXPECTATION_RESULT);
 	}
 
-	return actual.then(result => ok(result)).catch(reason => error(reason));
+	return actual.then(
+		result => ok(result),
+		reason => error(reason),
+	);
 }
 
 // #endregion

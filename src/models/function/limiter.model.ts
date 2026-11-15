@@ -58,6 +58,14 @@ export type Limiter<Callback extends GenericCallback> = {
 	run(...parameters: Parameters<Callback>): ReturnType<Callback>;
 };
 
+export class LimiterError extends Error {
+	constructor() {
+		super(LIMITER_MESSAGE_CANCELED);
+
+		this.name = LIMITER_NAME_ERROR;
+	}
+}
+
 export type LimiterState<Callback = GenericCallback> = {
 	callback: Callback;
 	interval: number;
@@ -76,6 +84,10 @@ export type LimiterType = 'debounce' | 'throttle' | 'wait';
 // #region Variables
 
 export const LIMITER_DEBOUNCE: LimiterType = 'debounce';
+
+const LIMITER_MESSAGE_CANCELED = 'Call was canceled';
+
+const LIMITER_NAME_ERROR = 'LimiterError';
 
 export const LIMITER_NAME_ASYNC = 'asyncLimiter';
 
