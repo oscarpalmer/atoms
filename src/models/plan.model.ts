@@ -11,7 +11,7 @@ export type AsyncFailure<Value> = {
 	 *
 	 * @returns Generator
 	 */
-	[Symbol.asyncIterator]: () => AsyncGenerator<Err<Value>, never>;
+	[Symbol.asyncIterator]: () => AsyncGenerator<Err<never, Value>, never>;
 };
 
 export type AsyncImmediateState = {
@@ -127,7 +127,7 @@ export type Failure<Value> = {
 	 *
 	 * @returns Generator
 	 */
-	[Symbol.iterator]: () => Generator<Err<Value>, never>;
+	[Symbol.iterator]: () => Generator<Err<never, Value>, never>;
 };
 
 export type GenericPlanItem = {
@@ -250,7 +250,7 @@ type PlannedErrors<Yielded, Returned> = PlanErrorValues<Yielded> | PlanErrorValu
 
 type PlanErrorValues<Original> = Original extends Error
 	? Original
-	: Original extends Err<infer E>
+	: Original extends Err<infer _, infer E>
 		? E
 		: Original extends Failure<infer E>
 			? E
@@ -261,7 +261,7 @@ type PlanErrorValues<Original> = Original extends Error
  */
 export type PlannedOk<Returned> = Returned extends Error
 	? never
-	: Returned extends Err<infer _>
+	: Returned extends Err<infer _, infer _>
 		? never
 		: Returned extends Ok<infer Value>
 			? Value
@@ -272,7 +272,7 @@ export type PlannedOk<Returned> = Returned extends Error
  */
 export type PlannedReturned<Returned> = Returned extends Error
 	? never
-	: Returned extends Err<infer _>
+	: Returned extends Err<infer _, infer _>
 		? never
 		: Returned;
 
@@ -290,7 +290,7 @@ export type Step<Input> = {
 
 type StepReturned<Input> = Input extends Error
 	? never
-	: Input extends Err<infer _>
+	: Input extends Err<infer _, infer __>
 		? never
 		: Input extends Ok<infer Value>
 			? Value
@@ -310,8 +310,8 @@ export type StepValue<Input> = [Extract<Input, InvalidStepValue<Input>>] extends
 	: never;
 
 type StepYielded<Input> = Input extends Error
-	? Err<Input>
-	: Input extends Err<infer _>
+	? Err<never, Input>
+	: Input extends Err<infer _, infer __>
 		? Input
 		: Input extends {[Symbol.iterator](): Generator<infer Yielded>}
 			? Yielded

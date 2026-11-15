@@ -117,7 +117,7 @@ type ErrOrResultValue<Next> = [Next] extends [Result<infer NV, infer NE>]
 	? Result<NV, NE>
 	: Ok<Next>;
 
-type IsError<V, E> = {
+interface IsError<V, E> {
 	/**
 	 * Is the result an error?
 	 *
@@ -140,9 +140,9 @@ type IsError<V, E> = {
 	 * @returns `true` if the result satisfies the predicate, otherwise `false`
 	 */
 	(predicate: (error: E) => boolean): this is Err<V, E> & CheckedResult;
-};
+}
 
-type IsOk<V, E> = {
+interface IsOk<V, E> {
 	/**
 	 * Is the result an ok result?
 	 *
@@ -165,7 +165,7 @@ type IsOk<V, E> = {
 	 * @returns `true` if the result satisfies the predicate, otherwise `false`
 	 */
 	(predicate: (value: V) => boolean): this is Ok<V, E> & CheckedResult;
-};
+}
 
 type Matchers<V, E> = {
 	/**

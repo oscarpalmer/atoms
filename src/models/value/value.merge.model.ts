@@ -69,7 +69,7 @@ export type MergeOptions = {
 	 * Assign values to the first array or object instead of creating a new one?
 	 */
 	assignValues?: boolean;
-};
+} & BaseOptions;
 
 /**
  * A merger function for merging multiple arrays or objects into a single one
