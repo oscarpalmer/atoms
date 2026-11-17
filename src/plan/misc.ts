@@ -1,8 +1,11 @@
+import {isAsyncFunction, isPromise} from '../internal/is';
 import {getGenerator} from '../internal/plan';
 import {error} from '../internal/result/value';
 import {
 	PLAN_FAILURE_ASYNC,
 	PLAN_FAILURE_SYNC,
+	PLAN_MESSAGE_FAIL_VALUE,
+	PLAN_MESSAGE_SUCCEED_VALUE,
 	PLAN_SUCCESS_ASYNC,
 	PLAN_SUCCESS_SYNC,
 	PLAN_SYMBOL,
@@ -64,7 +67,7 @@ Success.prototype[Symbol.iterator] = getGenerator;
  * @param callback Failure callback
  * @returns Plan failure
  */
-export function asyncFail<Value>(callback: () => Value): AsyncFailure<Awaited<Value>>;
+export function fail<Value>(callback: () => Promise<Value>): AsyncFailure<Awaited<Value>>;
 
 /**
  * Create an immediately failing plan
@@ -72,37 +75,7 @@ export function asyncFail<Value>(callback: () => Value): AsyncFailure<Awaited<Va
  * @param value Failure value
  * @returns Plan failure
  */
-export function asyncFail<Value>(value: Value): AsyncFailure<Awaited<Value>>;
-
-export function asyncFail(value: unknown): AsyncFailure<unknown> {
-	// @ts-expect-error Using old school function constructor, so all good, no worries :-)
-	return new AsyncFailure(async function* () {
-		yield error(await (typeof value === 'function' ? value() : value));
-	});
-}
-
-/**
- * Create an immediately succeeding plan
- *
- * @param callback Success callback
- * @returns Plan success
- */
-export function asyncSucceed<Value>(callback: () => Value): AsyncSuccess<Awaited<Value>>;
-
-/**
- * Create an immediately succeeding plan
- *
- * @param value Success value
- * @returns Plan success
- */
-export function asyncSucceed<Value>(value: Value): AsyncSuccess<Awaited<Value>>;
-
-export function asyncSucceed(value: unknown): AsyncSuccess<unknown> {
-	// @ts-expect-error Using old school function constructor, so all good, no worries :-)
-	return new AsyncSuccess(async function* () {
-		return typeof value === 'function' ? value() : value;
-	});
-}
+export function fail<Value>(value: Promise<Value>): AsyncFailure<Awaited<Value>>;
 
 /**
  * Create an immediately failing plan
@@ -120,12 +93,41 @@ export function fail<Value>(callback: () => Value): Failure<Value>;
  */
 export function fail<Value>(value: Value): Failure<Value>;
 
-export function fail(value: unknown): Failure<unknown> {
+export function fail(value: unknown): unknown {
+	if (isAsyncFunction(value) || isPromise(value)) {
+		// @ts-expect-error Using old school function constructor, so all good, no worries :-)
+		return new AsyncFailure(async function* () {
+			yield error(await (typeof value === 'function' ? value() : value));
+		});
+	}
+
 	// @ts-expect-error Using old school function constructor, so all good, no worries :-)
 	return new Failure(function* () {
-		yield error(typeof value === 'function' ? value() : value);
+		value = typeof value === 'function' ? value() : value;
+
+		if (isPromise(value)) {
+			throw new Error(PLAN_MESSAGE_FAIL_VALUE);
+		}
+
+		yield error(value);
 	});
 }
+
+/**
+ * Create an immediately succeeding plan
+ *
+ * @param callback Success callback
+ * @returns Plan success
+ */
+export function succeed<Value>(callback: () => Promise<Value>): AsyncSuccess<Awaited<Value>>;
+
+/**
+ * Create an immediately succeeding plan
+ *
+ * @param value Success value
+ * @returns Plan success
+ */
+export function succeed<Value>(value: Promise<Value>): AsyncSuccess<Awaited<Value>>;
 
 /**
  * Create an immediately succeeding plan
@@ -143,30 +145,24 @@ export function succeed<Value>(callback: () => Value): Success<Value>;
  */
 export function succeed<Value>(value: Value): Success<Value>;
 
-export function succeed(value: unknown): Success<unknown> {
+export function succeed(value: unknown): unknown {
+	if (isAsyncFunction(value) || isPromise(value)) {
+		// @ts-expect-error Using old school function constructor, so all good, no worries :-)
+		return new AsyncSuccess(async function* () {
+			return typeof value === 'function' ? value() : value;
+		});
+	}
+
 	// @ts-expect-error Using old school function constructor, so all good, no worries :-)
 	return new Success(function* () {
-		return typeof value === 'function' ? value() : value;
+		value = typeof value === 'function' ? value() : value;
+
+		if (isPromise(value)) {
+			throw new Error(PLAN_MESSAGE_SUCCEED_VALUE);
+		}
+
+		return value;
 	});
 }
-
-// #endregion
-
-// #region Namespaces
-
-export declare namespace fail {
-	export var async: typeof asyncFail;
-}
-
-export declare namespace succeed {
-	export var async: typeof asyncSucceed;
-}
-
-// #endregion
-
-// #region Initialization
-
-fail.async = asyncFail;
-succeed.async = asyncSucceed;
 
 // #endregion

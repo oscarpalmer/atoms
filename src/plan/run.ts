@@ -4,11 +4,12 @@ import {
 	PLAN_SYMBOL,
 	type AsyncPlan,
 	type InternalAsyncPlan,
+	type InternalPlan,
 	type Plan,
 	type PlannedReturned,
 } from '../models/plan.model';
 import {isAsyncGeneratorFunction, isAsyncPlan, isGeneratorFunction, isPlan} from './is';
-import {asyncAttemptRun, attemptRun} from './result';
+import {attemptRun} from './result';
 
 // #region Functions
 
@@ -18,23 +19,11 @@ import {asyncAttemptRun, attemptRun} from './result';
  * @param generator Generator to run
  * @param parameters Parameters for starting the run
  * @param signal Optional abort signal
- * @returns Result
+ * @returns Promised result
  */
-export async function asyncRun<Yielded, Returned, Parameters extends unknown[]>(
+export async function run<Yielded, Returned, Parameters extends unknown[]>(
 	generator: (...parameters: Parameters) => AsyncGenerator<Yielded, Returned>,
 	parameters: Parameters,
-	signal?: AbortSignal,
-): Promise<PlannedReturned<Returned>>;
-
-/**
- * Run an asynchronous generator to completion
- *
- * @param generator Generator to run
- * @param signal Optional abort signal
- * @returns Result
- */
-export async function asyncRun<Yielded, Returned>(
-	generator: () => AsyncGenerator<Yielded, Returned>,
 	signal?: AbortSignal,
 ): Promise<PlannedReturned<Returned>>;
 
@@ -44,11 +33,23 @@ export async function asyncRun<Yielded, Returned>(
  * @param plan Plan to run
  * @param parameters Parameters for starting the run
  * @param signal Optional abort signal
- * @returns Result
+ * @returns Promised result
  */
-export async function asyncRun<Yielded, Returned, Parameters extends unknown[]>(
+export async function run<Yielded, Returned, Parameters extends unknown[]>(
 	plan: AsyncPlan<Yielded, Returned, Parameters>,
 	parameters: Parameters,
+	signal?: AbortSignal,
+): Promise<PlannedReturned<Returned>>;
+
+/**
+ * Run an asynchronous generator to completion
+ *
+ * @param generator Generator to run
+ * @param signal Optional abort signal
+ * @returns Promised result
+ */
+export async function run<Yielded, Returned>(
+	generator: () => AsyncGenerator<Yielded, Returned>,
 	signal?: AbortSignal,
 ): Promise<PlannedReturned<Returned>>;
 
@@ -57,24 +58,12 @@ export async function asyncRun<Yielded, Returned, Parameters extends unknown[]>(
  *
  * @param plan Plan to run
  * @param signal Optional abort signal
- * @returns Result
+ * @returns Promised result
  */
-export async function asyncRun<Yielded, Returned>(
+export async function run<Yielded, Returned>(
 	plan: AsyncPlan<Yielded, Returned, []>,
 	signal?: AbortSignal,
 ): Promise<PlannedReturned<Returned>>;
-
-export function asyncRun(input: unknown, first?: unknown, second?: unknown): unknown {
-	if (isAsyncPlan(input)) {
-		return asyncGenerate((input as InternalAsyncPlan)[PLAN_SYMBOL], false, first, second);
-	}
-
-	if (isAsyncGeneratorFunction(input)) {
-		return asyncGenerate(input, false, first, second);
-	}
-
-	throw new Error(PLAN_MESSAGE_RUN_INPUT);
-}
 
 /**
  * Run a generator to completion
@@ -101,8 +90,21 @@ export function run<Yielded, Returned, Parameters extends unknown[]>(
 ): PlannedReturned<Returned>;
 
 export function run(input: unknown, ...parameters: unknown[]): unknown {
+	if (isAsyncPlan(input)) {
+		return asyncGenerate(
+			(input as InternalAsyncPlan)[PLAN_SYMBOL],
+			false,
+			parameters[0],
+			parameters[1],
+		);
+	}
+
+	if (isAsyncGeneratorFunction(input)) {
+		return asyncGenerate(input, false, parameters[0], parameters[1]);
+	}
+
 	if (isPlan(input)) {
-		return input.run(...parameters);
+		return generate((input as InternalPlan)[PLAN_SYMBOL], parameters, false);
 	}
 
 	if (isGeneratorFunction(input)) {
@@ -116,12 +118,7 @@ export function run(input: unknown, ...parameters: unknown[]): unknown {
 
 // #region Namespace
 
-export declare namespace asyncRun {
-	export var attempt: typeof asyncAttemptRun;
-}
-
 export declare namespace run {
-	export var async: typeof asyncRun;
 	export var attempt: typeof attemptRun;
 }
 
@@ -129,9 +126,6 @@ export declare namespace run {
 
 // #region Initialization
 
-asyncRun.attempt = asyncAttemptRun;
-
-run.async = asyncRun;
 run.attempt = attemptRun;
 
 // #endregion

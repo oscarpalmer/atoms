@@ -304,13 +304,17 @@ type UnwrapResult<Original extends Result<unknown, unknown>> =
  * Unwrap any value
  */
 export type UnwrapValue<Original> = Original extends GenericCallback
-	? ReturnType<Original> extends Result<unknown, unknown>
-		? UnwrapResult<ReturnType<Original>>
-		: ReturnType<Original>
-	: Original extends Result<unknown, unknown>
+	? UnwrapReturned<ReturnType<Original>>
+	: UnwrapReturned<Original>;
+
+/**
+ * Unwrap a returned value, resolving promises and results
+ */
+type UnwrapReturned<Original> =
+	Original extends Result<unknown, unknown>
 		? UnwrapResult<Original>
 		: Original extends Promise<infer V>
-			? Awaited<V>
+			? UnwrapReturned<Awaited<V>>
 			: Original;
 
 // #endregion

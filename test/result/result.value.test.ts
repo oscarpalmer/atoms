@@ -142,7 +142,7 @@ test('error.iterator & ok.iterator', async () => {
 	).toBe('success!');
 
 	await expect(
-		run.async(async function* () {
+		run(async function* () {
 			const value = yield* ok(Promise.resolve('promised'));
 
 			return `${value}!`;

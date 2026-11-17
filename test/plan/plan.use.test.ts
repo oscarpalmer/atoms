@@ -1,8 +1,5 @@
 import {expect, test} from 'vite-plus/test';
 import {
-	asyncFail,
-	asyncSucceed,
-	asyncUse,
 	attemptRun,
 	Err,
 	error,
@@ -16,6 +13,7 @@ import {
 	succeed,
 	use,
 } from '../../src';
+import {PLAN_MESSAGE_USE_SYNC_ASYNC} from '../../src/models/plan.model';
 import {isFixture} from '../.fixtures/is.fixture';
 
 const {length, values} = isFixture;
@@ -25,7 +23,7 @@ test('use, async', async () => {
 		const fn = async function* () {
 			const value = values[index];
 
-			const yielded = yield* asyncUse(value);
+			const yielded = yield* use(value);
 
 			expect(yielded).toBe(typeof value === 'function' ? value() : value);
 		};
@@ -34,9 +32,9 @@ test('use, async', async () => {
 	}
 
 	const errored = error('errored');
-	const failed = asyncFail('failed');
+	const failed = fail('failed');
 	const okay = ok('okay');
-	const succeeded = asyncSucceed('succeeded');
+	const succeeded = succeed('succeeded');
 	const thrown = new Error('thrown');
 
 	const asyncGenerator = async function* () {
@@ -51,41 +49,52 @@ test('use, async', async () => {
 		return 'planned';
 	});
 
-	const erroredRun = await attemptRun.async(async function* () {
-		yield* use.async(errored);
+	const erroredRunSync = await attemptRun(async function* () {
+		yield* use(errored);
 
 		return 'not errored';
 	});
 
-	const failedRun = await attemptRun.async(async function* () {
-		yield* use.async(failed);
+	const erroredRunAync = await attemptRun(async function* () {
+		yield* use(async () => Promise.resolve(errored));
+
+		return 'not errored';
+	});
+
+	const failedRun = await attemptRun(async function* () {
+		yield* use(failed);
 
 		return 'not failed';
 	});
 
-	const generatorsRun = await attemptRun.async(async function* () {
-		const async = yield* use.async(asyncGenerator);
-		const sync = yield* use.async(syncGenerator);
+	const generatorsRun = await attemptRun(async function* () {
+		const async = yield* use(asyncGenerator);
+		const sync = yield* use(syncGenerator);
 
 		return [async, sync];
 	});
 
-	const successfulRun = await attemptRun.async(async function* () {
-		const usedOkay = yield* use.async(okay);
-		const usedPlanned = yield* use.async(planned);
-		const usedSucceeded = yield* use.async(succeeded);
+	const successfulRun = await attemptRun(async function* () {
+		const usedOkayBasic = yield* use(okay);
+		const usedOkayPromise = yield* use(async () => Promise.resolve(okay));
+		const usedPlanned = yield* use(planned);
+		const usedSucceeded = yield* use(succeeded);
+		const usedValue = yield* use(async () => Promise.resolve('value'));
 
-		return [usedOkay, usedPlanned, usedSucceeded];
+		return [usedOkayBasic, usedOkayPromise, usedPlanned, usedSucceeded, usedValue];
 	});
 
-	const thrownRun = await attemptRun.async(async function* () {
-		yield* use.async(thrown);
+	const thrownRun = await attemptRun(async function* () {
+		yield* use(thrown);
 
 		return 'not thrown';
 	});
 
-	expect(isError(erroredRun)).toBe(true);
-	expect((erroredRun as Err<never, string>).error).toBe('errored');
+	expect(isError(erroredRunSync)).toBe(true);
+	expect((erroredRunSync as Err<never, string>).error).toBe('errored');
+
+	expect(isError(erroredRunAync)).toBe(true);
+	expect((erroredRunAync as Err<never, string>).error).toBe('errored');
 
 	expect(isError(failedRun)).toBe(true);
 	expect((failedRun as Err<never, string>).error).toBe('failed');
@@ -94,47 +103,23 @@ test('use, async', async () => {
 	expect((generatorsRun as Ok<string[]>).value).toEqual(['async generator', 'generator']);
 
 	expect(isOk(successfulRun)).toBe(true);
-	expect((successfulRun as Ok<string[]>).value).toEqual(['okay', 'planned', 'succeeded']);
+
+	expect((successfulRun as Ok<string[]>).value).toEqual([
+		'okay',
+		'okay',
+		'planned',
+		'succeeded',
+		'value',
+	]);
 
 	expect(isError(thrownRun)).toBe(true);
 	expect((thrownRun as Err<never, Error>).error).toBe(thrown);
 });
 
 test('use, error', async () => {
-	const invalidValues = [
-		new Promise(() => {}),
-		fail.async(null),
-		async function* () {},
-		(async function* () {})(),
-		plan(async function* () {}),
-		use.async(null),
-		succeed.async(null),
-	];
-
-	for (const invalidValue of invalidValues) {
-		expect(() => {
-			const fn = function* () {
-				yield* use(invalidValue as never);
-			};
-
-			fn().next();
-		}).toThrow();
-	}
-
-	const invalidCallbacks = invalidValues.map(value => () => value);
-
-	for (const invalidCallback of invalidCallbacks) {
-		expect(() => {
-			const fn = function* () {
-				yield* use(invalidCallback as never);
-			};
-
-			fn().next();
-		}).toThrow();
-	}
-
 	expect(() => {
 		const fn = function* () {
+			// @ts-expect-error Testing invalid callback
 			yield* use((() => () => {}) as never);
 		};
 
@@ -142,15 +127,15 @@ test('use, error', async () => {
 	}).toThrow();
 
 	const asyncFailingUse = async function* () {
-		yield* use.async((() => () => {}) as never);
+		yield* use((() => () => {}) as never);
 	};
 
 	const asyncFailingCallbackUse = async function* () {
-		yield* use.async((async () => () => {}) as never);
+		yield* use((async () => () => {}) as never);
 	};
 
-	await expect(run.async(asyncFailingUse)).rejects.toBeInstanceOf(Error);
-	await expect(run.async(asyncFailingCallbackUse)).rejects.toBeInstanceOf(Error);
+	await expect(run(asyncFailingUse)).rejects.toBeInstanceOf(Error);
+	await expect(run(asyncFailingCallbackUse)).rejects.toBeInstanceOf(Error);
 });
 
 test('use, manual iteration', async () => {
@@ -165,7 +150,7 @@ test('use, manual iteration', async () => {
 		expect(syncIterator.next()).toEqual({done: false, value: expected});
 		expect(syncIterator.next()).toEqual({done: true, value: undefined});
 
-		const asyncIterator = use.async(value)[Symbol.asyncIterator]();
+		const asyncIterator = use(async () => value)[Symbol.asyncIterator]();
 
 		expect(await asyncIterator.next()).toEqual({done: false, value: expected});
 		expect(await asyncIterator.next()).toEqual({done: true, value: undefined});
@@ -183,11 +168,11 @@ test('use, nested', async () => {
 		return 'not errored';
 	});
 
-	const asyncNestedRun = await attemptRun.async(async function* () {
-		const fromAsync = yield* use.async(use.async('async nested'));
-		const fromSync = yield* use.async(use('sync nested'));
+	const asyncNestedRun = await attemptRun(async function* () {
+		const fromAsync = yield* use(use('async nested'));
+		const fromSync = yield* use(use('sync nested'));
 
-		const fromPlan = yield* use.async(
+		const fromPlan = yield* use(
 			plan(function* () {
 				return 'sync planned';
 			}),
@@ -196,8 +181,8 @@ test('use, nested', async () => {
 		return [fromAsync, fromSync, fromPlan];
 	});
 
-	const asyncNestedErrorRun = await attemptRun.async(async function* () {
-		yield* use.async(use(error('nested error')));
+	const asyncNestedErrorRun = await attemptRun(async function* () {
+		yield* use(use(error('nested error')));
 
 		return 'not errored';
 	});
@@ -293,4 +278,12 @@ test('use, sync', () => {
 
 	expect(isError(thrownRun)).toBe(true);
 	expect((thrownRun as Err<never, Error>).error).toBe(thrown);
+
+	const asynchronousRun = attemptRun(function* () {
+		// @ts-expect-error Testing promise within sync
+		yield* use(() => new Promise(resolve => resolve(undefined)));
+	});
+
+	expect(isError(asynchronousRun)).toBe(true);
+	expect((asynchronousRun as Err<never, Error>).error.message).toBe(PLAN_MESSAGE_USE_SYNC_ASYNC);
 });

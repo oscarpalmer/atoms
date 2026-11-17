@@ -92,11 +92,16 @@ export type AsyncStepState = {
 	type: typeof PLAN_STEP_ASYNC;
 };
 
-export type AsyncStepValue<Input> = [
-	Extract<Awaited<Input>, InvalidAsyncStepValue<Awaited<Input>>>,
-] extends [never]
-	? unknown
-	: never;
+export type AsyncStepValue<Input> =
+	Input extends Promise<infer Value>
+		? [Value] extends [Result<infer _, infer __>]
+			? Input
+			: [Value] extends [SimpleAsyncPlan<Value>]
+				? Input
+				: [Extract<Value, InvalidAsyncStepValue>] extends [never]
+					? Input
+					: never
+		: never;
 
 type AsyncStepYielded<Input> = AsyncStepYieldedItem<Awaited<Input>>;
 
@@ -185,25 +190,9 @@ export type InternalStep = {
 	[PLAN_SYMBOL]: StepState;
 } & Step<never>;
 
-type InvalidAsyncStepValue<Input> = ((...args: any[]) => unknown) | ParameterizedPlan<Input>;
+type InvalidAsyncStepValue = (...args: any[]) => unknown;
 
-type InvalidStepValue<Input> =
-	| ((...args: any[]) => unknown)
-	| {[Symbol.asyncIterator]: unknown}
-	| ParameterizedPlan<Input>
-	| Promise<unknown>;
-
-type ParameterizedPlan<Input> = Input extends {
-	[Symbol.iterator]: (...parameters: infer Parameters) => unknown;
-}
-	? [] extends Parameters
-		? never
-		: Input
-	: Input extends {[Symbol.asyncIterator]: (...parameters: infer Parameters) => unknown}
-		? [] extends Parameters
-			? never
-			: Input
-		: never;
+type InvalidStepValue = ((...args: any[]) => unknown) | Promise<unknown>;
 
 /**
  * A plan of execution that can yield intermediate results and eventually return a result
@@ -276,6 +265,22 @@ export type PlannedReturned<Returned> = Returned extends Error
 		? never
 		: Returned;
 
+type SimpleAsyncPlan<Input> = Input extends {
+	[Symbol.asyncIterator]: (...parameters: infer Parameters) => unknown;
+}
+	? [] extends Parameters
+		? Input
+		: never
+	: never;
+
+type SimplePlan<Input> = Input extends {
+	[Symbol.iterator]: (...parameters: infer Parameters) => unknown;
+}
+	? [] extends Parameters
+		? Input
+		: never
+	: never;
+
 /**
  * A single step within a plan of execution
  */
@@ -305,9 +310,14 @@ export type StepState = {
 
 export type StepType = 'asyncStep' | 'step';
 
-export type StepValue<Input> = [Extract<Input, InvalidStepValue<Input>>] extends [never]
-	? unknown
-	: never;
+export type StepValue<Input> =
+	Input extends Result<infer _, infer __>
+		? Input
+		: Input extends SimplePlan<Input>
+			? Input
+			: [Extract<Input, InvalidStepValue>] extends [never]
+				? Input
+				: never;
 
 type StepYielded<Input> = Input extends Error
 	? Err<never, Input>
@@ -347,13 +357,17 @@ export const PLAN_FAILURE_ASYNC = 'asyncFailure' as const;
 
 export const PLAN_FAILURE_SYNC = 'failure' as const;
 
+export const PLAN_MESSAGE_FAIL_VALUE = `'fail' received a promise; if the callback is asynchronous, prefix it with 'async'`;
+
 export const PLAN_MESSAGE_PLAN_INPUT = `'plan' requires a generator function'`;
 
 export const PLAN_MESSAGE_RUN_INPUT = `'run' requires a plan or generator function`;
 
+export const PLAN_MESSAGE_SUCCEED_VALUE = `'succeed' received a promise; if the callback is asynchronous, prefix it with 'async'`;
+
 export const PLAN_MESSAGE_USE_NESTED_FN = `Cannot use nested functions with 'use'`;
 
-export const PLAN_MESSAGE_USE_SYNC_ASYNC = `Cannot use asynchronous values with 'use'`;
+export const PLAN_MESSAGE_USE_SYNC_ASYNC = `Cannot use asynchronous values with synchronous 'use'`;
 
 export const PLAN_STEP_ASYNC = 'asyncStep' as const;
 

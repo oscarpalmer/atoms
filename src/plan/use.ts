@@ -1,4 +1,4 @@
-import {isPromise} from '../internal/is';
+import {isAsyncFunction, isPromise} from '../internal/is';
 import {getGenerator} from '../internal/plan';
 import {isError, isOk} from '../internal/result/is';
 import {
@@ -49,27 +49,6 @@ Step.prototype[Symbol.iterator] = getGenerator;
 // #endregion
 
 // #region Functions
-
-/**
- * Create an asynchronous step from a callback
- *
- * @param callback Callback
- * @returns An asynchronous step
- */
-export function asyncUse<Value>(callback: () => Value & AsyncStepValue<Value>): AsyncStep<Value>;
-
-/**
- * Create an asynchronous step from a value
- *
- * @param value Value
- * @returns An asynchronous step
- */
-export function asyncUse<Value>(value: Value & AsyncStepValue<Value>): AsyncStep<Value>;
-
-export function asyncUse(value: unknown): AsyncStep<any> {
-	// @ts-expect-error Using old school function constructor, so all good, no worries :-)
-	return new AsyncStep(getAsyncUseStep(value));
-}
 
 function getAsyncUseStep(value: unknown): () => AsyncGenerator {
 	return async function* (): any {
@@ -155,6 +134,37 @@ function getUseStep(value: unknown): () => Generator {
 	};
 }
 
+function isAsynchronousInput(value: unknown): boolean {
+	return (
+		isAsyncFunction(value) ||
+		isPromise(value) ||
+		isAsyncFailure(value) ||
+		isAsyncGenerator(value) ||
+		isAsyncGeneratorFunction(value) ||
+		isAsyncPlan(value) ||
+		isAsyncStep(value) ||
+		isAsyncSuccess(value)
+	);
+}
+
+/**
+ * Create an asynchronous step from a callback
+ *
+ * @param callback Callback for value
+ * @returns An asynchronous step
+ */
+export function use<Value>(
+	callback: () => Value & AsyncStepValue<Value>,
+): AsyncStep<Awaited<Value>>;
+
+/**
+ * Create an asynchronous step from a value
+ *
+ * @param value Value
+ * @returns An asynchronous step
+ */
+export function use<Value>(value: Value & AsyncStepValue<Value>): AsyncStep<Awaited<Value>>;
+
 /**
  * Create a step from a callback
  *
@@ -173,7 +183,12 @@ export function use<Value>(callback: () => Value & StepValue<Value>): Step<Value
  */
 export function use<Value>(value: Value & StepValue<Value>): Step<Value>;
 
-export function use(value: unknown): Step<any> {
+export function use(value: unknown): unknown {
+	if (isAsynchronousInput(value)) {
+		// @ts-expect-error Using old school function constructor, so all good, no worries :-)
+		return new AsyncStep(getAsyncUseStep(value));
+	}
+
 	validateUseInput(value, false);
 
 	// @ts-expect-error Using old school function constructor, so all good, no worries :-)
@@ -181,15 +196,7 @@ export function use(value: unknown): Step<any> {
 }
 
 function validateUseInput(value: unknown, resolved: boolean): void {
-	if (
-		isPromise(value) ||
-		isAsyncFailure(value) ||
-		isAsyncGenerator(value) ||
-		isAsyncGeneratorFunction(value) ||
-		isAsyncPlan(value) ||
-		isAsyncStep(value) ||
-		isAsyncSuccess(value)
-	) {
+	if (isAsynchronousInput(value)) {
 		throw new Error(PLAN_MESSAGE_USE_SYNC_ASYNC);
 	}
 
@@ -197,19 +204,5 @@ function validateUseInput(value: unknown, resolved: boolean): void {
 		throw new Error(PLAN_MESSAGE_USE_NESTED_FN);
 	}
 }
-
-// #endregion
-
-// #region Namespaces
-
-export declare namespace use {
-	export var async: typeof asyncUse;
-}
-
-// #endregion
-
-// #region Initialization
-
-use.async = asyncUse;
 
 // #endregion

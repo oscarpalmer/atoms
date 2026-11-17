@@ -1,7 +1,9 @@
 import {assert} from '../internal/function/assert';
+import {isAsyncFunction, isPromise} from '../internal/is';
 import {
+	ONCE_MESSAGE_CALLBACK,
 	ONCE_MESSAGE_CLEARED,
-	ONCE_MESSAGE_EXPECTATION,
+	ONCE_MESSAGE_VALUE,
 	ONCE_NAME_ASYNC,
 	ONCE_NAME_SYNC,
 	ONCE_SYMBOL,
@@ -77,23 +79,6 @@ Object.defineProperties(Once.prototype, {
 // #endregion
 
 // #region Functions
-
-/**
- * Create an asynchronous function that can only be called once, rejecting or resolving the same result on subsequent calls
- *
- * _Available as `asyncOnce` and `once.async`_
- *
- * @param callback Callback to use once
- * @returns _Once_ callback
- */
-export function asyncOnce<Callback extends GenericAsyncCallback>(
-	callback: Callback,
-): AsyncOnce<Callback> {
-	assert(() => typeof callback === 'function', ONCE_MESSAGE_EXPECTATION);
-
-	// @ts-expect-error Using old school function constructor, so all good, no worries :-)
-	return new AsyncOnce(callback);
-}
 
 function clearOnce(this: InternalOnce | InternalAsyncOnce): void {
 	const state = this[ONCE_SYMBOL];
@@ -172,16 +157,32 @@ function isOnceInstance(type: string, value: unknown): boolean {
 }
 
 /**
+ * Create an asynchronous function that can only be called once, rejecting or resolving the same result on subsequent calls
+ *
+ * @param callback Callback to use once
+ * @returns _Once_ callback
+ */
+export function once<Callback extends GenericAsyncCallback>(
+	callback: Callback,
+): AsyncOnce<Callback>;
+
+/**
  * Create a function that can only be called once, returning the same value on subsequent calls
  *
  * @param callback Callback to use once
  * @returns _Once_ callback
  */
-export function once<Callback extends GenericCallback>(callback: Callback): Once<Callback> {
-	assert(() => typeof callback === 'function', ONCE_MESSAGE_EXPECTATION);
+export function once<Callback extends GenericCallback>(callback: Callback): Once<Callback>;
+
+export function once(
+	callback: GenericCallback | GenericAsyncCallback,
+): Once<GenericCallback> | AsyncOnce<GenericAsyncCallback> {
+	assert(() => typeof callback === 'function', ONCE_MESSAGE_CALLBACK);
+
+	const ctor = isAsyncFunction(callback) ? AsyncOnce : Once;
 
 	// @ts-expect-error Using old school function constructor, so all good, no worries :-)
-	return new Once(callback);
+	return new ctor(callback);
 }
 
 function runOnce(this: InternalOnce, ...parameters: unknown[]): unknown {
@@ -197,9 +198,15 @@ function runOnce(this: InternalOnce, ...parameters: unknown[]): unknown {
 
 	state.called = true;
 
-	state.value = state.callback(...parameters);
+	const value = state.callback(...parameters);
 
-	return state.value;
+	if (isPromise(value)) {
+		throw new Error(ONCE_MESSAGE_VALUE);
+	}
+
+	state.value = value;
+
+	return value;
 }
 
 function runOnceAsync(this: InternalAsyncOnce, ...parameters: unknown[]): Promise<unknown> {
@@ -239,12 +246,7 @@ function runOnceAsync(this: InternalAsyncOnce, ...parameters: unknown[]): Promis
 
 // #region Namespace
 
-export declare namespace asyncOnce {
-	export var is: typeof isAsyncOnce;
-}
-
 export declare namespace once {
-	export var async: typeof asyncOnce;
 	export var is: typeof isOnce;
 	export var isAsync: typeof isAsyncOnce;
 }
@@ -253,9 +255,6 @@ export declare namespace once {
 
 // #region Initialization
 
-asyncOnce.is = isAsyncOnce;
-
-once.async = asyncOnce;
 once.is = isOnce;
 once.isAsync = isAsyncOnce;
 

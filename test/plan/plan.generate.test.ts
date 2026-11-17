@@ -1,5 +1,5 @@
 import {expect, test} from 'vite-plus/test';
-import {asyncRun, error, run} from '../../src';
+import {error, run} from '../../src';
 import {getThrown} from '../.fixtures/plan.fixture';
 
 test('generate: error values that are nullish still throw', () => {
@@ -188,8 +188,8 @@ test('asyncGenerate: error values that are nullish still throw', async () => {
 		return 'unreachable';
 	}
 
-	await expect(asyncRun(undefinedError)).rejects.toBeUndefined();
-	await expect(asyncRun(recoveredUndefined)).resolves.toBe('recovered');
+	await expect(run(undefinedError)).rejects.toBeUndefined();
+	await expect(run(recoveredUndefined)).resolves.toBe('recovered');
 });
 
 test('asyncGenerate: recovery from yielded error', async () => {
@@ -231,17 +231,17 @@ test('asyncGenerate: recovery from yielded error', async () => {
 		return 'finished';
 	}
 
-	await expect(asyncRun(recoverAndReturn)).resolves.toBe('returned');
+	await expect(run(recoverAndReturn)).resolves.toBe('returned');
 	expect(steps).toEqual([new Error('first')]);
 
 	steps.length = 0;
 
-	await expect(asyncRun(recoverAndYield)).resolves.toBe('finished');
+	await expect(run(recoverAndYield)).resolves.toBe('finished');
 	expect(steps).toEqual([new Error('first'), 'recovery']);
 
 	steps.length = 0;
 
-	await expect(asyncRun(recoverFromResult)).resolves.toBe('finished');
+	await expect(run(recoverFromResult)).resolves.toBe('finished');
 	expect(steps).toEqual(['result error']);
 });
 
@@ -272,9 +272,9 @@ test('asyncGenerate: recovery then new failure', async () => {
 		}
 	}
 
-	await expect(asyncRun(recoverThenThrow)).rejects.toEqual(new Error('second'));
-	await expect(asyncRun(recoverThenYieldError)).rejects.toEqual(new Error('second'));
-	await expect(asyncRun(recoverThenReturnError)).rejects.toEqual(new Error('returned'));
+	await expect(run(recoverThenThrow)).rejects.toEqual(new Error('second'));
+	await expect(run(recoverThenYieldError)).rejects.toEqual(new Error('second'));
+	await expect(run(recoverThenReturnError)).rejects.toEqual(new Error('returned'));
 });
 
 test('asyncGenerate: cleanup after error', async () => {
@@ -292,7 +292,7 @@ test('asyncGenerate: cleanup after error', async () => {
 		}
 	}
 
-	await expect(asyncRun(finallyYields)).rejects.toEqual(new Error('failed'));
+	await expect(run(finallyYields)).rejects.toEqual(new Error('failed'));
 	expect(steps).toEqual(['cleanup start', 'cleanup end']);
 });
 
@@ -359,7 +359,7 @@ test('asyncGenerate: abort', async () => {
 		steps.length = 0;
 
 		const controller = new AbortController();
-		const promise = asyncRun(generator as never, controller.signal);
+		const promise = run(generator as never, [], controller.signal);
 
 		controller.abort(new Error('aborted'));
 
@@ -368,7 +368,7 @@ test('asyncGenerate: abort', async () => {
 	}
 
 	const controller = new AbortController();
-	const promise = asyncRun(slow, controller.signal);
+	const promise = run(slow, [], controller.signal);
 
 	setTimeout(() => controller.abort('late abort'), 10);
 
@@ -378,5 +378,5 @@ test('asyncGenerate: abort', async () => {
 
 	aborted.abort('already aborted');
 
-	await expect(asyncRun(slow, aborted.signal)).rejects.toBe('already aborted');
+	await expect(run(slow, [], aborted.signal)).rejects.toBe('already aborted');
 });

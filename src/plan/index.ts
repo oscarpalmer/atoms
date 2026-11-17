@@ -10,7 +10,7 @@ import {
 	PLAN_TYPE_SYNC,
 } from '../models/plan.model';
 import {isAsyncGeneratorFunction, isGeneratorFunction} from './is';
-import {asyncAttemptRun} from './result';
+import {attemptRun} from './result';
 
 // #region Instances
 
@@ -47,7 +47,7 @@ function attemptRunAsyncPlan(
 	first: never,
 	second: never,
 ): Promise<unknown> {
-	return asyncAttemptRun(this, first, second);
+	return attemptRun(this, first, second);
 }
 
 /**

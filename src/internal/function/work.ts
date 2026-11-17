@@ -3,133 +3,112 @@ import {
 	assertPipeFunctions,
 	type AsyncFlow,
 	type Flow,
+	type SyncFunctions,
+	type SyncInitial,
+	type SyncValue,
 	WORK_MESSAGE_FLOW_PROMISE,
 	WORK_MESSAGE_NESTING,
 	WORK_MESSAGE_PIPE_PROMISE,
 } from '../../models/function/work.model';
 import type {GenericCallback} from '../../models/index';
 import type {UnwrapValue} from '../../models/result.model';
-import {isPromise} from '../is';
+import {isAsyncFunction, isPromise} from '../is';
 import {unwrapWork} from './misc';
 
 // #region Functions
 
 // #region Flow
 
-// #region Asynchronous
-
 /**
- * Create an asynchronous _Flow_, a function that pipes values through a function
- *
- * _Available as `asyncFlow` and `flow.async`_
+ * Create a _Flow_, a function that pipes values through a function
  *
  * @returns _Flow_ function
  */
-export function asyncFlow<Fn extends GenericCallback>(fn: Fn): AsyncFlow<Fn, ReturnType<Fn>>;
+export function flow<Fn extends GenericCallback>(
+	fn: Fn & SyncValue<ReturnType<Fn>>,
+): Flow<Fn, ReturnType<Fn>>;
 
 /**
- * Create an asynchronous _Flow_, a function that pipes values through a series of functions
- *
- * _Available as `asyncFlow` and `flow.async`_
+ * Create a _Flow_, a function that pipes values through a series of functions
  *
  * @returns _Flow_ function
  */
-export function asyncFlow<First extends GenericCallback, Second>(
-	first: First,
-	second: (value: Awaited<UnwrapValue<ReturnType<First>>>) => Second,
-): AsyncFlow<First, Second>;
+export function flow<First extends GenericCallback, Second>(
+	first: First & SyncValue<ReturnType<First>>,
+	second: (value: UnwrapValue<ReturnType<First>>) => Second & SyncValue<Second>,
+): Flow<First, Second>;
 
 /**
- * Create an asynchronous _Flow_, a function that pipes values through a series of functions
- *
- * _Available as `asyncFlow` and `flow.async`_
+ * Create a _Flow_, a function that pipes values through a series of functions
  *
  * @returns _Flow_ function
  */
-export function asyncFlow<First extends GenericCallback, Second, Third>(
-	first: First,
-	second: (value: Awaited<UnwrapValue<ReturnType<First>>>) => Second,
-	third: (value: Awaited<UnwrapValue<Second>>) => Third,
-): AsyncFlow<First, Third>;
+export function flow<First extends GenericCallback, Second, Third>(
+	first: First & SyncValue<ReturnType<First>>,
+	second: (value: UnwrapValue<ReturnType<First>>) => Second & SyncValue<Second>,
+	third: (value: UnwrapValue<Second>) => Third & SyncValue<Third>,
+): Flow<First, Third>;
 
 /**
- * Create an asynchronous _Flow_, a function that pipes values through a series of functions
- *
- * _Available as `asyncFlow` and `flow.async`_
+ * Create a _Flow_, a function that pipes values through a series of functions
  *
  * @returns _Flow_ function
  */
-export function asyncFlow<First extends GenericCallback, Second, Third, Fourth>(
-	first: First,
-	second: (value: Awaited<UnwrapValue<ReturnType<First>>>) => Second,
-	third: (value: Awaited<UnwrapValue<Second>>) => Third,
-	fourth: (value: Awaited<UnwrapValue<Third>>) => Fourth,
-): AsyncFlow<First, Fourth>;
+export function flow<First extends GenericCallback, Second, Third, Fourth>(
+	first: First & SyncValue<ReturnType<First>>,
+	second: (value: UnwrapValue<ReturnType<First>>) => Second & SyncValue<Second>,
+	third: (value: UnwrapValue<Second>) => Third & SyncValue<Third>,
+	fourth: (value: UnwrapValue<Third>) => Fourth & SyncValue<Fourth>,
+): Flow<First, Fourth>;
 
 /**
- * Create an asynchronous _Flow_, a function that pipes values through a series of functions
- *
- * _Available as `asyncFlow` and `flow.async`_
+ * Create a _Flow_, a function that pipes values through a series of functions
  *
  * @returns _Flow_ function
  */
-export function asyncFlow<First extends GenericCallback, Second, Third, Fourth, Fifth>(
-	first: First,
-	second: (value: Awaited<UnwrapValue<ReturnType<First>>>) => Second,
-	third: (value: Awaited<UnwrapValue<Second>>) => Third,
-	fourth: (value: Awaited<UnwrapValue<Third>>) => Fourth,
-	fifth: (value: Awaited<UnwrapValue<Fourth>>) => Fifth,
-): AsyncFlow<First, Fifth>;
+export function flow<First extends GenericCallback, Second, Third, Fourth, Fifth>(
+	first: First & SyncValue<ReturnType<First>>,
+	second: (value: UnwrapValue<ReturnType<First>>) => Second & SyncValue<Second>,
+	third: (value: UnwrapValue<Second>) => Third & SyncValue<Third>,
+	fourth: (value: UnwrapValue<Third>) => Fourth & SyncValue<Fourth>,
+	fifth: (value: UnwrapValue<Fourth>) => Fifth & SyncValue<Fifth>,
+): Flow<First, Fifth>;
 
 /**
- * Create an asynchronous _Flow_, a function that pipes values through a series of functions
- *
- * _Available as `asyncFlow` and `flow.async`_
+ * Create a _Flow_, a function that pipes values through a series of functions
  *
  * @returns _Flow_ function
  */
-export function asyncFlow<First extends GenericCallback, Second, Third, Fourth, Fifth, Sixth>(
-	first: First,
-	second: (value: Awaited<UnwrapValue<ReturnType<First>>>) => Second,
-	third: (value: Awaited<UnwrapValue<Second>>) => Third,
-	fourth: (value: Awaited<UnwrapValue<Third>>) => Fourth,
-	fifth: (value: Awaited<UnwrapValue<Fourth>>) => Fifth,
-	sixth: (value: Awaited<UnwrapValue<Fifth>>) => Sixth,
-): AsyncFlow<First, Sixth>;
+export function flow<First extends GenericCallback, Second, Third, Fourth, Fifth, Sixth>(
+	first: First & SyncValue<ReturnType<First>>,
+	second: (value: UnwrapValue<ReturnType<First>>) => Second & SyncValue<Second>,
+	third: (value: UnwrapValue<Second>) => Third & SyncValue<Third>,
+	fourth: (value: UnwrapValue<Third>) => Fourth & SyncValue<Fourth>,
+	fifth: (value: UnwrapValue<Fourth>) => Fifth & SyncValue<Fifth>,
+	sixth: (value: UnwrapValue<Fifth>) => Sixth & SyncValue<Sixth>,
+): Flow<First, Sixth>;
 
 /**
- * Create an asynchronous _Flow_, a function that pipes values through a series of functions
- *
- * _Available as `asyncFlow` and `flow.async`_
+ * Create a _Flow_, a function that pipes values through a series of functions
  *
  * @returns _Flow_ function
  */
-export function asyncFlow<
-	First extends GenericCallback,
-	Second,
-	Third,
-	Fourth,
-	Fifth,
-	Sixth,
-	Seventh,
->(
-	first: First,
-	second: (value: Awaited<UnwrapValue<ReturnType<First>>>) => Second,
-	third: (value: Awaited<UnwrapValue<Second>>) => Third,
-	fourth: (value: Awaited<UnwrapValue<Third>>) => Fourth,
-	fifth: (value: Awaited<UnwrapValue<Fourth>>) => Fifth,
-	sixth: (value: Awaited<UnwrapValue<Fifth>>) => Sixth,
-	seventh: (value: Awaited<UnwrapValue<Sixth>>) => Seventh,
-): AsyncFlow<First, Seventh>;
+export function flow<First extends GenericCallback, Second, Third, Fourth, Fifth, Sixth, Seventh>(
+	first: First & SyncValue<ReturnType<First>>,
+	second: (value: UnwrapValue<ReturnType<First>>) => Second & SyncValue<Second>,
+	third: (value: UnwrapValue<Second>) => Third & SyncValue<Third>,
+	fourth: (value: UnwrapValue<Third>) => Fourth & SyncValue<Fourth>,
+	fifth: (value: UnwrapValue<Fourth>) => Fifth & SyncValue<Fifth>,
+	sixth: (value: UnwrapValue<Fifth>) => Sixth & SyncValue<Sixth>,
+	seventh: (value: UnwrapValue<Sixth>) => Seventh & SyncValue<Seventh>,
+): Flow<First, Seventh>;
 
 /**
- * Create an asynchronous _Flow_, a function that pipes values through a series of functions
- *
- * _Available as `asyncFlow` and `flow.async`_
+ * Create a _Flow_, a function that pipes values through a series of functions
  *
  * @returns _Flow_ function
  */
-export function asyncFlow<
+export function flow<
 	First extends GenericCallback,
 	Second,
 	Third,
@@ -139,24 +118,22 @@ export function asyncFlow<
 	Seventh,
 	Eighth,
 >(
-	first: First,
-	second: (value: Awaited<UnwrapValue<ReturnType<First>>>) => Second,
-	third: (value: Awaited<UnwrapValue<Second>>) => Third,
-	fourth: (value: Awaited<UnwrapValue<Third>>) => Fourth,
-	fifth: (value: Awaited<UnwrapValue<Fourth>>) => Fifth,
-	sixth: (value: Awaited<UnwrapValue<Fifth>>) => Sixth,
-	seventh: (value: Awaited<UnwrapValue<Sixth>>) => Seventh,
-	eighth: (value: Awaited<UnwrapValue<Seventh>>) => Eighth,
-): AsyncFlow<First, Eighth>;
+	first: First & SyncValue<ReturnType<First>>,
+	second: (value: UnwrapValue<ReturnType<First>>) => Second & SyncValue<Second>,
+	third: (value: UnwrapValue<Second>) => Third & SyncValue<Third>,
+	fourth: (value: UnwrapValue<Third>) => Fourth & SyncValue<Fourth>,
+	fifth: (value: UnwrapValue<Fourth>) => Fifth & SyncValue<Fifth>,
+	sixth: (value: UnwrapValue<Fifth>) => Sixth & SyncValue<Sixth>,
+	seventh: (value: UnwrapValue<Sixth>) => Seventh & SyncValue<Seventh>,
+	eighth: (value: UnwrapValue<Seventh>) => Eighth & SyncValue<Eighth>,
+): Flow<First, Eighth>;
 
 /**
- * Create an asynchronous _Flow_, a function that pipes values through a series of functions
- *
- * _Available as `asyncFlow` and `flow.async`_
+ * Create a _Flow_, a function that pipes values through a series of functions
  *
  * @returns _Flow_ function
  */
-export function asyncFlow<
+export function flow<
 	First extends GenericCallback,
 	Second,
 	Third,
@@ -167,25 +144,23 @@ export function asyncFlow<
 	Eighth,
 	Ninth,
 >(
-	first: First,
-	second: (value: Awaited<UnwrapValue<ReturnType<First>>>) => Second,
-	third: (value: Awaited<UnwrapValue<Second>>) => Third,
-	fourth: (value: Awaited<UnwrapValue<Third>>) => Fourth,
-	fifth: (value: Awaited<UnwrapValue<Fourth>>) => Fifth,
-	sixth: (value: Awaited<UnwrapValue<Fifth>>) => Sixth,
-	seventh: (value: Awaited<UnwrapValue<Sixth>>) => Seventh,
-	eighth: (value: Awaited<UnwrapValue<Seventh>>) => Eighth,
-	ninth: (value: Awaited<UnwrapValue<Eighth>>) => Ninth,
-): AsyncFlow<First, Ninth>;
+	first: First & SyncValue<ReturnType<First>>,
+	second: (value: UnwrapValue<ReturnType<First>>) => Second & SyncValue<Second>,
+	third: (value: UnwrapValue<Second>) => Third & SyncValue<Third>,
+	fourth: (value: UnwrapValue<Third>) => Fourth & SyncValue<Fourth>,
+	fifth: (value: UnwrapValue<Fourth>) => Fifth & SyncValue<Fifth>,
+	sixth: (value: UnwrapValue<Fifth>) => Sixth & SyncValue<Sixth>,
+	seventh: (value: UnwrapValue<Sixth>) => Seventh & SyncValue<Seventh>,
+	eighth: (value: UnwrapValue<Seventh>) => Eighth & SyncValue<Eighth>,
+	ninth: (value: UnwrapValue<Eighth>) => Ninth & SyncValue<Ninth>,
+): Flow<First, Ninth>;
 
 /**
- * Create an asynchronous _Flow_, a function that pipes values through a series of functions
- *
- * _Available as `asyncFlow` and `flow.async`_
+ * Create a _Flow_, a function that pipes values through a series of functions
  *
  * @returns _Flow_ function
  */
-export function asyncFlow<
+export function flow<
 	First extends GenericCallback,
 	Second,
 	Third,
@@ -197,68 +172,37 @@ export function asyncFlow<
 	Ninth,
 	Tenth,
 >(
-	first: First,
-	second: (value: Awaited<UnwrapValue<ReturnType<First>>>) => Second,
-	third: (value: Awaited<UnwrapValue<Second>>) => Third,
-	fourth: (value: Awaited<UnwrapValue<Third>>) => Fourth,
-	fifth: (value: Awaited<UnwrapValue<Fourth>>) => Fifth,
-	sixth: (value: Awaited<UnwrapValue<Fifth>>) => Sixth,
-	seventh: (value: Awaited<UnwrapValue<Sixth>>) => Seventh,
-	eighth: (value: Awaited<UnwrapValue<Seventh>>) => Eighth,
-	ninth: (value: Awaited<UnwrapValue<Eighth>>) => Ninth,
-	tenth: (value: Awaited<UnwrapValue<Ninth>>) => Tenth,
-): AsyncFlow<First, Tenth>;
+	first: First & SyncValue<ReturnType<First>>,
+	second: (value: UnwrapValue<ReturnType<First>>) => Second & SyncValue<Second>,
+	third: (value: UnwrapValue<Second>) => Third & SyncValue<Third>,
+	fourth: (value: UnwrapValue<Third>) => Fourth & SyncValue<Fourth>,
+	fifth: (value: UnwrapValue<Fourth>) => Fifth & SyncValue<Fifth>,
+	sixth: (value: UnwrapValue<Fifth>) => Sixth & SyncValue<Sixth>,
+	seventh: (value: UnwrapValue<Sixth>) => Seventh & SyncValue<Seventh>,
+	eighth: (value: UnwrapValue<Seventh>) => Eighth & SyncValue<Eighth>,
+	ninth: (value: UnwrapValue<Eighth>) => Ninth & SyncValue<Ninth>,
+	tenth: (value: UnwrapValue<Ninth>) => Tenth & SyncValue<Tenth>,
+): Flow<First, Tenth>;
+
+/**
+ * Create an asynchronous _Flow_, a function that pipes values through a function
+ *
+ * @returns _Flow_ function
+ */
+export function flow<Fn extends GenericCallback>(fn: Fn): AsyncFlow<Fn, ReturnType<Fn>>;
 
 /**
  * Create an asynchronous _Flow_, a function that pipes values through a series of functions
- *
- * _Available as `asyncFlow` and `flow.async`_
- *
- * @returns _Flow_ function
- */
-export function asyncFlow<Fn extends GenericCallback>(
-	fn: Fn,
-	...fns: Array<(value: Awaited<UnwrapValue<ReturnType<Fn>>>) => unknown>
-): AsyncFlow<Fn, ReturnType<Fn>>;
-
-/**
- * Create an asynchronous _Flow_, a function that pipes values through a series of functions
- *
- * _Available as `asyncFlow` and `flow.async`_
- *
- * @returns _Flow_ function
- */
-export function asyncFlow(...fns: GenericCallback[]): (...args: unknown[]) => Promise<unknown>;
-
-export function asyncFlow(...fns: GenericCallback[]): (...args: unknown[]) => Promise<unknown> {
-	assertFlowFunctions(fns);
-
-	return (...args: unknown[]): Promise<unknown> => asyncWork(args.map(unwrapWork), fns, true);
-}
-
-// #endregion
-
-// #region Synchronous
-
-/**
- * Create a _Flow_, a function that pipes values through a function
- *
- * @returns _Flow_ function
- */
-export function flow<Fn extends GenericCallback>(fn: Fn): Flow<Fn, ReturnType<Fn>>;
-
-/**
- * Create a _Flow_, a function that pipes values through a series of functions
  *
  * @returns _Flow_ function
  */
 export function flow<First extends GenericCallback, Second>(
 	first: First,
 	second: (value: UnwrapValue<ReturnType<First>>) => Second,
-): Flow<First, Second>;
+): AsyncFlow<First, Second>;
 
 /**
- * Create a _Flow_, a function that pipes values through a series of functions
+ * Create an asynchronous _Flow_, a function that pipes values through a series of functions
  *
  * @returns _Flow_ function
  */
@@ -266,10 +210,10 @@ export function flow<First extends GenericCallback, Second, Third>(
 	first: First,
 	second: (value: UnwrapValue<ReturnType<First>>) => Second,
 	third: (value: UnwrapValue<Second>) => Third,
-): Flow<First, Third>;
+): AsyncFlow<First, Third>;
 
 /**
- * Create a _Flow_, a function that pipes values through a series of functions
+ * Create an asynchronous _Flow_, a function that pipes values through a series of functions
  *
  * @returns _Flow_ function
  */
@@ -278,10 +222,10 @@ export function flow<First extends GenericCallback, Second, Third, Fourth>(
 	second: (value: UnwrapValue<ReturnType<First>>) => Second,
 	third: (value: UnwrapValue<Second>) => Third,
 	fourth: (value: UnwrapValue<Third>) => Fourth,
-): Flow<First, Fourth>;
+): AsyncFlow<First, Fourth>;
 
 /**
- * Create a _Flow_, a function that pipes values through a series of functions
+ * Create an asynchronous _Flow_, a function that pipes values through a series of functions
  *
  * @returns _Flow_ function
  */
@@ -291,10 +235,11 @@ export function flow<First extends GenericCallback, Second, Third, Fourth, Fifth
 	third: (value: UnwrapValue<Second>) => Third,
 	fourth: (value: UnwrapValue<Third>) => Fourth,
 	fifth: (value: UnwrapValue<Fourth>) => Fifth,
-): Flow<First, Fifth>;
+): AsyncFlow<First, Fifth>;
 
 /**
- * Create a _Flow_, a function that pipes values through a series of functions
+ * Create an asynchronous _Flow_, a function that pipes values through a series of functions
+
  *
  * @returns _Flow_ function
  */
@@ -305,10 +250,10 @@ export function flow<First extends GenericCallback, Second, Third, Fourth, Fifth
 	fourth: (value: UnwrapValue<Third>) => Fourth,
 	fifth: (value: UnwrapValue<Fourth>) => Fifth,
 	sixth: (value: UnwrapValue<Fifth>) => Sixth,
-): Flow<First, Sixth>;
+): AsyncFlow<First, Sixth>;
 
 /**
- * Create a _Flow_, a function that pipes values through a series of functions
+ * Create an asynchronous _Flow_, a function that pipes values through a series of functions
  *
  * @returns _Flow_ function
  */
@@ -320,10 +265,10 @@ export function flow<First extends GenericCallback, Second, Third, Fourth, Fifth
 	fifth: (value: UnwrapValue<Fourth>) => Fifth,
 	sixth: (value: UnwrapValue<Fifth>) => Sixth,
 	seventh: (value: UnwrapValue<Sixth>) => Seventh,
-): Flow<First, Seventh>;
+): AsyncFlow<First, Seventh>;
 
 /**
- * Create a _Flow_, a function that pipes values through a series of functions
+ * Create an asynchronous _Flow_, a function that pipes values through a series of functions
  *
  * @returns _Flow_ function
  */
@@ -345,10 +290,11 @@ export function flow<
 	sixth: (value: UnwrapValue<Fifth>) => Sixth,
 	seventh: (value: UnwrapValue<Sixth>) => Seventh,
 	eighth: (value: UnwrapValue<Seventh>) => Eighth,
-): Flow<First, Eighth>;
+): AsyncFlow<First, Eighth>;
 
 /**
- * Create a _Flow_, a function that pipes values through a series of functions
+ * Create an asynchronous _Flow_, a function that pipes values through a series of functions
+
  *
  * @returns _Flow_ function
  */
@@ -372,10 +318,10 @@ export function flow<
 	seventh: (value: UnwrapValue<Sixth>) => Seventh,
 	eighth: (value: UnwrapValue<Seventh>) => Eighth,
 	ninth: (value: UnwrapValue<Eighth>) => Ninth,
-): Flow<First, Ninth>;
+): AsyncFlow<First, Ninth>;
 
 /**
- * Create a _Flow_, a function that pipes values through a series of functions
+ * Create an asynchronous _Flow_, a function that pipes values through a series of functions
  *
  * @returns _Flow_ function
  */
@@ -401,48 +347,233 @@ export function flow<
 	eighth: (value: UnwrapValue<Seventh>) => Eighth,
 	ninth: (value: UnwrapValue<Eighth>) => Ninth,
 	tenth: (value: UnwrapValue<Ninth>) => Tenth,
-): Flow<First, Tenth>;
+): AsyncFlow<First, Tenth>;
 
 /**
  * Create a _Flow_, a function that pipes values through a series of functions
  *
  * @returns _Flow_ function
  */
-export function flow<First extends GenericCallback>(
-	first: First,
-	...fns: Array<(value: UnwrapValue<ReturnType<First>>) => unknown>
+export function flow<
+	First extends GenericCallback,
+	Fns extends Array<(value: UnwrapValue<ReturnType<First>>) => unknown>,
+>(
+	first: First & SyncValue<ReturnType<First>>,
+	...fns: Fns & SyncFunctions<Fns>
 ): Flow<First, ReturnType<First>>;
 
 /**
+ * Create an asynchronous _Flow_, a function that pipes values through a series of functions
+ *
+ * @returns _Flow_ function
+ */
+export function flow<Fn extends GenericCallback>(
+	fn: Fn,
+	...fns: Array<(value: UnwrapValue<ReturnType<Fn>>) => unknown>
+): AsyncFlow<Fn, ReturnType<Fn>>;
+
+/**
  * Create a _Flow_, a function that pipes values through a series of functions
  *
  * @returns _Flow_ function
  */
-export function flow(...fns: GenericCallback[]): (...args: unknown[]) => unknown;
+export function flow<Fns extends GenericCallback[]>(
+	...fns: Fns & SyncFunctions<Fns>
+): (...args: unknown[]) => unknown;
 
-export function flow(...fns: GenericCallback[]): (...args: unknown[]) => unknown {
+/**
+ * Create an asynchronous _Flow_, a function that pipes values through a series of functions
+ *
+ * @returns _Flow_ function
+ */
+export function flow(...fns: GenericCallback[]): (...args: unknown[]) => Promise<unknown>;
+
+export function flow(...fns: GenericCallback[]): unknown {
 	assertFlowFunctions(fns);
 
-	return (...args: unknown[]): unknown => work(args.map(unwrapWork), fns, true);
+	return fns.some(isAsyncFunction)
+		? (...args: unknown[]): Promise<unknown> => asyncWork(args.map(unwrapWork), fns, true)
+		: (...args: unknown[]): unknown => work(args.map(unwrapWork), fns, true);
 }
-
-// #endregion
 
 // #endregion
 
 // #region Pipe
 
-// #region Asynchronous
-
 /**
  * Pipe a value through a function
- *
- * _Available as `asyncPipe` and `pipe.async`_
  *
  * @param value Initial value
  * @returns _Piped_ result
  */
-export async function asyncPipe<Initial, Piped>(
+export function pipe<Initial, Piped>(
+	value: SyncInitial<Initial>,
+	pipe: (value: UnwrapValue<Initial>) => Piped & SyncValue<Piped>,
+): UnwrapValue<Piped>;
+
+/**
+ * Pipe a value through a series of functions
+ *
+ * @param value Initial value
+ * @returns _Piped_ result
+ */
+export function pipe<Initial, First, Second>(
+	value: SyncInitial<Initial>,
+	first: (value: UnwrapValue<Initial>) => First & SyncValue<First>,
+	second: (value: UnwrapValue<First>) => Second & SyncValue<Second>,
+): UnwrapValue<Second>;
+
+/**
+ * Pipe a value through a series of functions
+ *
+ * @param value Initial value
+ * @returns _Piped_ result
+ */
+export function pipe<Initial, First, Second, Third>(
+	value: SyncInitial<Initial>,
+	first: (value: UnwrapValue<Initial>) => First & SyncValue<First>,
+	second: (value: UnwrapValue<First>) => Second & SyncValue<Second>,
+	third: (value: UnwrapValue<Second>) => Third & SyncValue<Third>,
+): UnwrapValue<Third>;
+
+/**
+ * Pipe a value through a series of functions
+ *
+ * @param value Initial value
+ * @returns _Piped_ result
+ */
+export function pipe<Initial, First, Second, Third, Fourth>(
+	value: SyncInitial<Initial>,
+	first: (value: UnwrapValue<Initial>) => First & SyncValue<First>,
+	second: (value: UnwrapValue<First>) => Second & SyncValue<Second>,
+	third: (value: UnwrapValue<Second>) => Third & SyncValue<Third>,
+	fourth: (value: UnwrapValue<Third>) => Fourth & SyncValue<Fourth>,
+): UnwrapValue<Fourth>;
+
+/**
+ * Pipe a value through a series of functions
+ *
+ * @param value Initial value
+ * @returns _Piped_ result
+ */
+export function pipe<Initial, First, Second, Third, Fourth, Fifth>(
+	value: SyncInitial<Initial>,
+	first: (value: UnwrapValue<Initial>) => First & SyncValue<First>,
+	second: (value: UnwrapValue<First>) => Second & SyncValue<Second>,
+	third: (value: UnwrapValue<Second>) => Third & SyncValue<Third>,
+	fourth: (value: UnwrapValue<Third>) => Fourth & SyncValue<Fourth>,
+	fifth: (value: UnwrapValue<Fourth>) => Fifth & SyncValue<Fifth>,
+): UnwrapValue<Fifth>;
+
+/**
+ * Pipe a value through a series of functions
+ *
+ * @param value Initial value
+ * @returns _Piped_ result
+ */
+export function pipe<Initial, First, Second, Third, Fourth, Fifth, Sixth>(
+	value: SyncInitial<Initial>,
+	first: (value: UnwrapValue<Initial>) => First & SyncValue<First>,
+	second: (value: UnwrapValue<First>) => Second & SyncValue<Second>,
+	third: (value: UnwrapValue<Second>) => Third & SyncValue<Third>,
+	fourth: (value: UnwrapValue<Third>) => Fourth & SyncValue<Fourth>,
+	fifth: (value: UnwrapValue<Fourth>) => Fifth & SyncValue<Fifth>,
+	sixth: (value: UnwrapValue<Fifth>) => Sixth & SyncValue<Sixth>,
+): UnwrapValue<Sixth>;
+
+/**
+ * Pipe a value through a series of functions
+ *
+ * @param value Initial value
+ * @returns _Piped_ result
+ */
+export function pipe<Initial, First, Second, Third, Fourth, Fifth, Sixth, Seventh>(
+	value: SyncInitial<Initial>,
+	first: (value: UnwrapValue<Initial>) => First & SyncValue<First>,
+	second: (value: UnwrapValue<First>) => Second & SyncValue<Second>,
+	third: (value: UnwrapValue<Second>) => Third & SyncValue<Third>,
+	fourth: (value: UnwrapValue<Third>) => Fourth & SyncValue<Fourth>,
+	fifth: (value: UnwrapValue<Fourth>) => Fifth & SyncValue<Fifth>,
+	sixth: (value: UnwrapValue<Fifth>) => Sixth & SyncValue<Sixth>,
+	seventh: (value: UnwrapValue<Sixth>) => Seventh & SyncValue<Seventh>,
+): UnwrapValue<Seventh>;
+
+/**
+ * Pipe a value through a series of functions
+ *
+ * @param value Initial value
+ * @returns _Piped_ result
+ */
+export function pipe<Initial, First, Second, Third, Fourth, Fifth, Sixth, Seventh, Eighth>(
+	value: SyncInitial<Initial>,
+	first: (value: UnwrapValue<Initial>) => First & SyncValue<First>,
+	second: (value: UnwrapValue<First>) => Second & SyncValue<Second>,
+	third: (value: UnwrapValue<Second>) => Third & SyncValue<Third>,
+	fourth: (value: UnwrapValue<Third>) => Fourth & SyncValue<Fourth>,
+	fifth: (value: UnwrapValue<Fourth>) => Fifth & SyncValue<Fifth>,
+	sixth: (value: UnwrapValue<Fifth>) => Sixth & SyncValue<Sixth>,
+	seventh: (value: UnwrapValue<Sixth>) => Seventh & SyncValue<Seventh>,
+	eighth: (value: UnwrapValue<Seventh>) => Eighth & SyncValue<Eighth>,
+): UnwrapValue<Eighth>;
+
+/**
+ * Pipe a value through a series of functions
+ *
+ * @param value Initial value
+ * @returns _Piped_ result
+ */
+export function pipe<Initial, First, Second, Third, Fourth, Fifth, Sixth, Seventh, Eighth, Ninth>(
+	value: SyncInitial<Initial>,
+	first: (value: UnwrapValue<Initial>) => First & SyncValue<First>,
+	second: (value: UnwrapValue<First>) => Second & SyncValue<Second>,
+	third: (value: UnwrapValue<Second>) => Third & SyncValue<Third>,
+	fourth: (value: UnwrapValue<Third>) => Fourth & SyncValue<Fourth>,
+	fifth: (value: UnwrapValue<Fourth>) => Fifth & SyncValue<Fifth>,
+	sixth: (value: UnwrapValue<Fifth>) => Sixth & SyncValue<Sixth>,
+	seventh: (value: UnwrapValue<Sixth>) => Seventh & SyncValue<Seventh>,
+	eighth: (value: UnwrapValue<Seventh>) => Eighth & SyncValue<Eighth>,
+	ninth: (value: UnwrapValue<Eighth>) => Ninth & SyncValue<Ninth>,
+): UnwrapValue<Ninth>;
+
+/**
+ * Pipe a value through a series of functions
+ *
+ * @param value Initial value
+ * @returns _Piped_ result
+ */
+export function pipe<
+	Initial,
+	First,
+	Second,
+	Third,
+	Fourth,
+	Fifth,
+	Sixth,
+	Seventh,
+	Eighth,
+	Ninth,
+	Tenth,
+>(
+	value: SyncInitial<Initial>,
+	first: (value: UnwrapValue<Initial>) => First & SyncValue<First>,
+	second: (value: UnwrapValue<First>) => Second & SyncValue<Second>,
+	third: (value: UnwrapValue<Second>) => Third & SyncValue<Third>,
+	fourth: (value: UnwrapValue<Third>) => Fourth & SyncValue<Fourth>,
+	fifth: (value: UnwrapValue<Fourth>) => Fifth & SyncValue<Fifth>,
+	sixth: (value: UnwrapValue<Fifth>) => Sixth & SyncValue<Sixth>,
+	seventh: (value: UnwrapValue<Sixth>) => Seventh & SyncValue<Seventh>,
+	eighth: (value: UnwrapValue<Seventh>) => Eighth & SyncValue<Eighth>,
+	ninth: (value: UnwrapValue<Eighth>) => Ninth & SyncValue<Ninth>,
+	tenth: (value: UnwrapValue<Ninth>) => Tenth & SyncValue<Tenth>,
+): UnwrapValue<Tenth>;
+
+/**
+ * Pipe a value through a function
+ *
+ * @param value Initial value
+ * @returns _Piped_ result
+ */
+export async function pipe<Initial, Piped>(
 	value: Initial,
 	pipe: (value: UnwrapValue<Initial>) => Piped,
 ): Promise<UnwrapValue<Piped>>;
@@ -450,12 +581,10 @@ export async function asyncPipe<Initial, Piped>(
 /**
  * Pipe a value through a series of functions
  *
- * _Available as `asyncPipe` and `pipe.async`_
- *
  * @param value Initial value
  * @returns _Piped_ result
  */
-export async function asyncPipe<Initial, First, Second>(
+export async function pipe<Initial, First, Second>(
 	value: Initial,
 	first: (value: UnwrapValue<Initial>) => First,
 	second: (value: UnwrapValue<First>) => Second,
@@ -464,12 +593,10 @@ export async function asyncPipe<Initial, First, Second>(
 /**
  * Pipe a value through a series of functions
  *
- * _Available as `asyncPipe` and `pipe.async`_
- *
  * @param value Initial value
  * @returns _Piped_ result
  */
-export async function asyncPipe<Initial, First, Second, Third>(
+export async function pipe<Initial, First, Second, Third>(
 	value: Initial,
 	first: (value: UnwrapValue<Initial>) => First,
 	second: (value: UnwrapValue<First>) => Second,
@@ -478,13 +605,12 @@ export async function asyncPipe<Initial, First, Second, Third>(
 
 /**
  * Pipe a value through a series of functions
- *
- * _Available as `asyncPipe` and `pipe.async`_
+
  *
  * @param value Initial value
  * @returns _Piped_ result
  */
-export async function asyncPipe<Initial, First, Second, Third, Fourth>(
+export async function pipe<Initial, First, Second, Third, Fourth>(
 	value: Initial,
 	first: (value: UnwrapValue<Initial>) => First,
 	second: (value: UnwrapValue<First>) => Second,
@@ -495,12 +621,10 @@ export async function asyncPipe<Initial, First, Second, Third, Fourth>(
 /**
  * Pipe a value through a series of functions
  *
- * _Available as `asyncPipe` and `pipe.async`_
- *
  * @param value Initial value
  * @returns _Piped_ result
  */
-export async function asyncPipe<Initial, First, Second, Third, Fourth, Fifth>(
+export async function pipe<Initial, First, Second, Third, Fourth, Fifth>(
 	value: Initial,
 	first: (value: UnwrapValue<Initial>) => First,
 	second: (value: UnwrapValue<First>) => Second,
@@ -512,12 +636,10 @@ export async function asyncPipe<Initial, First, Second, Third, Fourth, Fifth>(
 /**
  * Pipe a value through a series of functions
  *
- * _Available as `asyncPipe` and `pipe.async`_
- *
  * @param value Initial value
  * @returns _Piped_ result
  */
-export async function asyncPipe<Initial, First, Second, Third, Fourth, Fifth, Sixth>(
+export async function pipe<Initial, First, Second, Third, Fourth, Fifth, Sixth>(
 	value: Initial,
 	first: (value: UnwrapValue<Initial>) => First,
 	second: (value: UnwrapValue<First>) => Second,
@@ -530,12 +652,10 @@ export async function asyncPipe<Initial, First, Second, Third, Fourth, Fifth, Si
 /**
  * Pipe a value through a series of functions
  *
- * _Available as `asyncPipe` and `pipe.async`_
- *
  * @param value Initial value
  * @returns _Piped_ result
  */
-export async function asyncPipe<Initial, First, Second, Third, Fourth, Fifth, Sixth, Seventh>(
+export async function pipe<Initial, First, Second, Third, Fourth, Fifth, Sixth, Seventh>(
 	value: Initial,
 	first: (value: UnwrapValue<Initial>) => First,
 	second: (value: UnwrapValue<First>) => Second,
@@ -549,22 +669,10 @@ export async function asyncPipe<Initial, First, Second, Third, Fourth, Fifth, Si
 /**
  * Pipe a value through a series of functions
  *
- * _Available as `asyncPipe` and `pipe.async`_
- *
  * @param value Initial value
  * @returns _Piped_ result
  */
-export async function asyncPipe<
-	Initial,
-	First,
-	Second,
-	Third,
-	Fourth,
-	Fifth,
-	Sixth,
-	Seventh,
-	Eighth,
->(
+export async function pipe<Initial, First, Second, Third, Fourth, Fifth, Sixth, Seventh, Eighth>(
 	value: Initial,
 	first: (value: UnwrapValue<Initial>) => First,
 	second: (value: UnwrapValue<First>) => Second,
@@ -579,12 +687,10 @@ export async function asyncPipe<
 /**
  * Pipe a value through a series of functions
  *
- * _Available as `asyncPipe` and `pipe.async`_
- *
  * @param value Initial value
  * @returns _Piped_ result
  */
-export async function asyncPipe<
+export async function pipe<
 	Initial,
 	First,
 	Second,
@@ -611,12 +717,10 @@ export async function asyncPipe<
 /**
  * Pipe a value through a series of functions
  *
- * _Available as `asyncPipe` and `pipe.async`_
- *
  * @param value Initial value
  * @returns _Piped_ result
  */
-export async function asyncPipe<
+export async function pipe<
 	Initial,
 	First,
 	Second,
@@ -645,217 +749,11 @@ export async function asyncPipe<
 /**
  * Pipe a value through a series of functions
  *
- * _Available as `asyncPipe` and `pipe.async`_
- *
- * @param value Initial value
- * @returns _Piped_ result
- */
-export async function asyncPipe<Value>(
-	value: Value,
-	...pipes: Array<(value: Value) => Value>
-): Promise<UnwrapValue<Value>>;
-
-/**
- * Pipe a value through a series of functions
- *
- * _Available as `asyncPipe` and `pipe.async`_
- *
- * @param value Initial value
- * @returns _Piped_ result
- */
-export async function asyncPipe(
-	value: unknown,
-	...pipes: Array<(value: unknown) => unknown>
-): Promise<unknown>;
-
-export async function asyncPipe(
-	value: unknown,
-	...pipes: Array<(value: unknown) => unknown>
-): Promise<unknown> {
-	assertPipeFunctions(pipes);
-
-	return asyncWork(value, pipes, false);
-}
-
-// #endregion
-
-// #region Synchronous
-
-/**
- * Pipe a value through a function
- *
- * @param value Initial value
- * @returns _Piped_ result
- */
-export function pipe<Initial, Piped>(
-	value: Initial,
-	pipe: (value: UnwrapValue<Initial>) => Piped,
-): UnwrapValue<Piped>;
-
-/**
- * Pipe a value through a series of functions
- *
- * @param value Initial value
- * @returns _Piped_ result
- */
-export function pipe<Initial, First, Second>(
-	value: Initial,
-	first: (value: UnwrapValue<Initial>) => First,
-	second: (value: UnwrapValue<First>) => Second,
-): UnwrapValue<Second>;
-
-/**
- * Pipe a value through a series of functions
- *
- * @param value Initial value
- * @returns _Piped_ result
- */
-export function pipe<Initial, First, Second, Third>(
-	value: Initial,
-	first: (value: UnwrapValue<Initial>) => First,
-	second: (value: UnwrapValue<First>) => Second,
-	third: (value: UnwrapValue<Second>) => Third,
-): UnwrapValue<Third>;
-
-/**
- * Pipe a value through a series of functions
- *
- * @param value Initial value
- * @returns _Piped_ result
- */
-export function pipe<Initial, First, Second, Third, Fourth>(
-	value: Initial,
-	first: (value: UnwrapValue<Initial>) => First,
-	second: (value: UnwrapValue<First>) => Second,
-	third: (value: UnwrapValue<Second>) => Third,
-	fourth: (value: UnwrapValue<Third>) => Fourth,
-): UnwrapValue<Fourth>;
-
-/**
- * Pipe a value through a series of functions
- *
- * @param value Initial value
- * @returns _Piped_ result
- */
-export function pipe<Initial, First, Second, Third, Fourth, Fifth>(
-	value: Initial,
-	first: (value: UnwrapValue<Initial>) => First,
-	second: (value: UnwrapValue<First>) => Second,
-	third: (value: UnwrapValue<Second>) => Third,
-	fourth: (value: UnwrapValue<Third>) => Fourth,
-	fifth: (value: UnwrapValue<Fourth>) => Fifth,
-): UnwrapValue<Fifth>;
-
-/**
- * Pipe a value through a series of functions
- *
- * @param value Initial value
- * @returns _Piped_ result
- */
-export function pipe<Initial, First, Second, Third, Fourth, Fifth, Sixth>(
-	value: Initial,
-	first: (value: UnwrapValue<Initial>) => First,
-	second: (value: UnwrapValue<First>) => Second,
-	third: (value: UnwrapValue<Second>) => Third,
-	fourth: (value: UnwrapValue<Third>) => Fourth,
-	fifth: (value: UnwrapValue<Fourth>) => Fifth,
-	sixth: (value: UnwrapValue<Fifth>) => Sixth,
-): UnwrapValue<Sixth>;
-
-/**
- * Pipe a value through a series of functions
- *
- * @param value Initial value
- * @returns _Piped_ result
- */
-export function pipe<Initial, First, Second, Third, Fourth, Fifth, Sixth, Seventh>(
-	value: Initial,
-	first: (value: UnwrapValue<Initial>) => First,
-	second: (value: UnwrapValue<First>) => Second,
-	third: (value: UnwrapValue<Second>) => Third,
-	fourth: (value: UnwrapValue<Third>) => Fourth,
-	fifth: (value: UnwrapValue<Fourth>) => Fifth,
-	sixth: (value: UnwrapValue<Fifth>) => Sixth,
-	seventh: (value: UnwrapValue<Sixth>) => Seventh,
-): UnwrapValue<Seventh>;
-
-/**
- * Pipe a value through a series of functions
- *
- * @param value Initial value
- * @returns _Piped_ result
- */
-export function pipe<Initial, First, Second, Third, Fourth, Fifth, Sixth, Seventh, Eighth>(
-	value: Initial,
-	first: (value: UnwrapValue<Initial>) => First,
-	second: (value: UnwrapValue<First>) => Second,
-	third: (value: UnwrapValue<Second>) => Third,
-	fourth: (value: UnwrapValue<Third>) => Fourth,
-	fifth: (value: UnwrapValue<Fourth>) => Fifth,
-	sixth: (value: UnwrapValue<Fifth>) => Sixth,
-	seventh: (value: UnwrapValue<Sixth>) => Seventh,
-	eighth: (value: UnwrapValue<Seventh>) => Eighth,
-): UnwrapValue<Eighth>;
-
-/**
- * Pipe a value through a series of functions
- *
- * @param value Initial value
- * @returns _Piped_ result
- */
-export function pipe<Initial, First, Second, Third, Fourth, Fifth, Sixth, Seventh, Eighth, Ninth>(
-	value: Initial,
-	first: (value: UnwrapValue<Initial>) => First,
-	second: (value: UnwrapValue<First>) => Second,
-	third: (value: UnwrapValue<Second>) => Third,
-	fourth: (value: UnwrapValue<Third>) => Fourth,
-	fifth: (value: UnwrapValue<Fourth>) => Fifth,
-	sixth: (value: UnwrapValue<Fifth>) => Sixth,
-	seventh: (value: UnwrapValue<Sixth>) => Seventh,
-	eighth: (value: UnwrapValue<Seventh>) => Eighth,
-	ninth: (value: UnwrapValue<Eighth>) => Ninth,
-): UnwrapValue<Ninth>;
-
-/**
- * Pipe a value through a series of functions
- *
- * @param value Initial value
- * @returns _Piped_ result
- */
-export function pipe<
-	Initial,
-	First,
-	Second,
-	Third,
-	Fourth,
-	Fifth,
-	Sixth,
-	Seventh,
-	Eighth,
-	Ninth,
-	Tenth,
->(
-	value: Initial,
-	first: (value: UnwrapValue<Initial>) => First,
-	second: (value: UnwrapValue<First>) => Second,
-	third: (value: UnwrapValue<Second>) => Third,
-	fourth: (value: UnwrapValue<Third>) => Fourth,
-	fifth: (value: UnwrapValue<Fourth>) => Fifth,
-	sixth: (value: UnwrapValue<Fifth>) => Sixth,
-	seventh: (value: UnwrapValue<Sixth>) => Seventh,
-	eighth: (value: UnwrapValue<Seventh>) => Eighth,
-	ninth: (value: UnwrapValue<Eighth>) => Ninth,
-	tenth: (value: UnwrapValue<Ninth>) => Tenth,
-): UnwrapValue<Tenth>;
-
-/**
- * Pipe a value through a series of functions
- *
  * @param value Initial value
  * @returns _Piped_ result
  */
 export function pipe<Value>(
-	value: Value,
+	value: SyncInitial<Value>,
 	...pipes: Array<(value: Value) => Value>
 ): UnwrapValue<Value>;
 
@@ -865,15 +763,40 @@ export function pipe<Value>(
  * @param value Initial value
  * @returns _Piped_ result
  */
-export function pipe(value: unknown, ...pipes: Array<(value: unknown) => unknown>): unknown;
+export async function pipe<Value>(
+	value: Value,
+	...pipes: Array<(value: Value) => Value>
+): Promise<UnwrapValue<Value>>;
 
-export function pipe(value: unknown, ...pipes: GenericCallback[]): unknown {
-	assertPipeFunctions(pipes);
+/**
+ * Pipe a value through a series of functions
+ *
+ * @param value Initial value
+ * @returns _Piped_ result
+ */
+export function pipe<Initial, Pipes extends Array<(value: any) => unknown>>(
+	value: SyncInitial<Initial>,
+	...pipes: Pipes & SyncFunctions<Pipes>
+): unknown;
 
-	return work(value, pipes, false);
+/**
+ * Pipe a value through a series of functions
+ *
+ * @param value Initial value
+ * @returns _Piped_ result
+ */
+export async function pipe(
+	value: unknown,
+	...pipes: Array<(value: any) => unknown>
+): Promise<unknown>;
+
+export function pipe(value: unknown, ...fns: GenericCallback[]): unknown {
+	assertPipeFunctions(fns);
+
+	return fns.some(isAsyncFunction) || isAsyncInitial(value)
+		? asyncWork(value, fns, false)
+		: work(value, fns, false);
 }
-
-// #endregion
 
 // #endregion
 
@@ -886,7 +809,9 @@ async function asyncWork(
 ): Promise<unknown> {
 	const {length} = functions;
 
-	let transformed = unwrapWork(await unwrapValue(initial));
+	initial = unwrapValue(initial);
+
+	let transformed = isPromise(initial) ? unwrapWork(await initial) : initial;
 
 	for (let index = 0; index < length; index += 1) {
 		const fn = functions[index];
@@ -894,10 +819,16 @@ async function asyncWork(
 		const value =
 			flow && index === 0 && Array.isArray(initial) ? await fn(...initial) : await fn(transformed);
 
-		transformed = unwrapValue(value);
+		const unwrapped = unwrapValue(value);
+
+		transformed = isPromise(unwrapped) ? unwrapWork(await unwrapped) : unwrapped;
 	}
 
 	return transformed;
+}
+
+function isAsyncInitial(value: unknown): boolean {
+	return isPromise(value) || isAsyncFunction(value);
 }
 
 function unwrapValue(value: unknown, flow?: boolean, nested?: boolean): unknown {
@@ -931,27 +862,6 @@ function work(initial: unknown, functions: GenericCallback[], flow: boolean): un
 
 	return transformed;
 }
-
-// #endregion
-
-// #endregion
-
-// #region Namespace
-
-export declare namespace flow {
-	export var async: typeof asyncFlow;
-}
-
-export declare namespace pipe {
-	export var async: typeof asyncPipe;
-}
-
-// #endregion
-
-// #region Initialization
-
-flow.async = asyncFlow;
-pipe.async = asyncPipe;
 
 // #endregion
 

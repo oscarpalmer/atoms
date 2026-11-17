@@ -1,6 +1,8 @@
+import {FUNCTION_NAME_ASYNC} from '../models/function/misc.model';
 import type {
 	ArrayOrPlainObject,
 	Constructor,
+	GenericAsyncCallback,
 	Key,
 	PlainObject,
 	Primitive,
@@ -17,6 +19,16 @@ import type {
  */
 export function isArrayOrPlainObject(value: unknown): value is ArrayOrPlainObject {
 	return Array.isArray(value) || isPlainObject(value);
+}
+
+/**
+ * Is the value an asynchronous function?
+ *
+ * @param value Value to check
+ * @returns `true` if the value is an asynchronous function, otherwise `false`
+ */
+export function isAsyncFunction(value: unknown): value is GenericAsyncCallback {
+	return typeof value === 'function' && value.constructor.name === FUNCTION_NAME_ASYNC;
 }
 
 /**
@@ -63,6 +75,18 @@ export function isNonArrayOrPlainObject<Value>(
 	value: Value,
 ): value is Exclude<Value, ArrayOrPlainObject> {
 	return !isArrayOrPlainObject(value);
+}
+
+/**
+ * Is the value not an asynchronous function?
+ *
+ * @param value Value to check
+ * @returns `true` if the value is not an asynchronous function, otherwise `false`
+ */
+export function isNonAsyncFunction<Value>(
+	value: Value,
+): value is Exclude<Value, GenericAsyncCallback> {
+	return !isAsyncFunction(value);
 }
 
 /**

@@ -26,7 +26,9 @@ export type RetryOptions = {
 
 export const RETRY_ERROR_NAME = 'RetryError';
 
-export const RETRY_MESSAGE_EXPECTATION = `'retry' expected a function`;
+export const RETRY_MESSAGE_CALLBACK = `'retry' expected a function`;
+
+export const RETRY_MESSAGE_VALUE = `'retry' received a promise; if the callback is asynchronous, prefix it with 'async'`;
 
 export const RETRY_MESSAGE_FAILED = 'Retry failed';
 

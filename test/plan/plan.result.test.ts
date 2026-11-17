@@ -1,5 +1,5 @@
 import {expect, test} from 'vite-plus/test';
-import {asyncAttemptRun, isAsyncPlan, isPlan, plan, attemptRun, isOk, Ok, ok} from '../../src';
+import {isAsyncPlan, isPlan, plan, attemptRun, isOk, Ok, ok} from '../../src';
 import {isFixture} from '../.fixtures/is.fixture';
 import {getABC, getMessage} from '../.fixtures/plan.fixture';
 
@@ -36,12 +36,12 @@ test('attempt, async', async () => {
 	expect(isAsyncPlan(planned)).toBe(true);
 	expect(isPlan(planned)).toBe(false);
 
-	const attemptedGenerator = await asyncAttemptRun(getMessage);
+	const attemptedGenerator = await attemptRun(getMessage);
 
 	expect(isOk(attemptedGenerator)).toBe(true);
 	expect((attemptedGenerator as Ok<string>).value).toBe('hello, world!');
 
-	let attemptedPlan = await asyncAttemptRun(planned);
+	let attemptedPlan = await attemptRun(planned);
 
 	expect(isOk(attemptedPlan)).toBe(true);
 	expect((attemptedPlan as Ok<string>).value).toBe('hello, world!');
@@ -52,7 +52,7 @@ test('attempt, async', async () => {
 	expect((attemptedPlan as Ok<string>).value).toBe('hello, world!');
 
 	for (let index = 0; index < length; index += 1) {
-		expect(() => asyncAttemptRun(values[index] as never)).toThrow();
+		expect(() => attemptRun(values[index] as never)).toThrow();
 	}
 });
 
@@ -65,7 +65,7 @@ test('attempt, unwrap', async () => {
 		return ok('I was also unwrapped, then again, also wrapped');
 	}
 
-	const ranAsynchronous = await asyncAttemptRun(asynchronous);
+	const ranAsynchronous = await attemptRun(asynchronous);
 	const ranSynchronous = attemptRun(synchronous);
 
 	expect(isOk(ranAsynchronous)).toBe(true);

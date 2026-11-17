@@ -1,8 +1,5 @@
 import {expect, test} from 'vite-plus/test';
 import {
-	asyncFail,
-	asyncSucceed,
-	asyncUse,
 	fail,
 	isAsyncFailure,
 	isAsyncGenerator,
@@ -29,10 +26,10 @@ test('isAsyncFailure', () => {
 		expect(isAsyncFailure(values[index])).toBe(false);
 	}
 
-	const failure = asyncFail('error');
+	const failure = fail('error');
 
-	expect(isAsyncFailure(failure)).toBe(true);
-	expect(isFailure(failure)).toBe(false);
+	expect(isAsyncFailure(failure)).toBe(false);
+	expect(isFailure(failure)).toBe(true);
 });
 
 test('isAsyncGenerator', () => {
@@ -67,10 +64,10 @@ test('isAsyncStep', () => {
 		expect(isAsyncStep(values[index])).toBe(false);
 	}
 
-	const step = asyncUse('step');
+	const step = use('step');
 
-	expect(isAsyncStep(step)).toBe(true);
-	expect(isStep(step)).toBe(false);
+	expect(isAsyncStep(step)).toBe(false);
+	expect(isStep(step)).toBe(true);
 });
 
 test('isAsyncSuccess', () => {
@@ -78,10 +75,10 @@ test('isAsyncSuccess', () => {
 		expect(isAsyncSuccess(values[index])).toBe(false);
 	}
 
-	const success = asyncSucceed('step');
+	const success = succeed('step');
 
-	expect(isAsyncSuccess(success)).toBe(true);
-	expect(isSuccess(success)).toBe(false);
+	expect(isAsyncSuccess(success)).toBe(false);
+	expect(isSuccess(success)).toBe(true);
 });
 
 test('isFailure', () => {

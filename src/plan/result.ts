@@ -1,12 +1,12 @@
 import {asyncGenerate, generate} from '../internal/plan/plan.generate';
 import {attempt} from '../internal/result/attempt';
 import {
+	PLAN_MESSAGE_RUN_INPUT,
+	PLAN_SYMBOL,
 	type AsyncPlan,
 	type AsyncPlanState,
 	type InternalAsyncPlan,
 	type InternalPlan,
-	PLAN_MESSAGE_RUN_INPUT,
-	PLAN_SYMBOL,
 	type Plan,
 	type PlannedError,
 	type PlannedOk,
@@ -27,7 +27,7 @@ import {isAsyncGeneratorFunction, isAsyncPlan, isGeneratorFunction, isPlan} from
  * @param signal Optional abort signal
  * @returns Promised result
  */
-export async function asyncAttemptRun<Yielded, Returned, Parameters extends unknown[]>(
+export async function attemptRun<Yielded, Returned, Parameters extends unknown[]>(
 	generator: (...parameters: Parameters) => AsyncGenerator<Yielded, Returned>,
 	parameters: Parameters,
 	signal?: AbortSignal,
@@ -42,7 +42,7 @@ export async function asyncAttemptRun<Yielded, Returned, Parameters extends unkn
  * @param signal Optional abort signal
  * @returns Promised result
  */
-export async function asyncAttemptRun<Yielded, Returned>(
+export async function attemptRun<Yielded, Returned>(
 	generator: () => AsyncGenerator<Yielded, Returned>,
 	signal?: AbortSignal,
 ): Promise<Result<PlannedOk<Returned>, PlannedError<Yielded, Returned>>>;
@@ -57,7 +57,7 @@ export async function asyncAttemptRun<Yielded, Returned>(
  * @param signal Optional abort signal
  * @returns Promised result
  */
-export async function asyncAttemptRun<Yielded, Returned, Parameters extends unknown[]>(
+export async function attemptRun<Yielded, Returned, Parameters extends unknown[]>(
 	plan: AsyncPlan<Yielded, Returned, Parameters>,
 	parameters: Parameters,
 	signal?: AbortSignal,
@@ -72,26 +72,10 @@ export async function asyncAttemptRun<Yielded, Returned, Parameters extends unkn
  * @param signal Optional abort signal
  * @returns Promised result
  */
-export async function asyncAttemptRun<Yielded, Returned>(
+export async function attemptRun<Yielded, Returned>(
 	plan: AsyncPlan<Yielded, Returned, []>,
 	signal?: AbortSignal,
 ): Promise<Result<PlannedOk<Returned>, PlannedError<Yielded, Returned>>>;
-
-export function asyncAttemptRun(input: unknown, first?: unknown, second?: unknown): unknown {
-	let generator: (() => AsyncGenerator) | AsyncPlanState | undefined;
-
-	if (isAsyncPlan(input)) {
-		generator = (input as InternalAsyncPlan)[PLAN_SYMBOL];
-	} else if (isAsyncGeneratorFunction(input)) {
-		generator = input;
-	}
-
-	if (generator == null) {
-		throw new Error(PLAN_MESSAGE_RUN_INPUT);
-	}
-
-	return attempt(() => asyncGenerate(generator, true, first, second));
-}
 
 /**
  * Attempt to run the generator to completion
@@ -122,9 +106,18 @@ export function attemptRun<Yielded, Returned, Parameters extends unknown[]>(
 ): Result<PlannedOk<Returned>, PlannedError<Yielded, Returned>>;
 
 export function attemptRun(input: unknown, ...parameters: unknown[]): unknown {
-	let generator: (() => Generator) | PlanState | undefined;
+	const asynchronous = isAsyncGeneratorFunction(input) || isAsyncPlan(input);
 
-	if (isPlan(input)) {
+	let generator:
+		| (() => AsyncGenerator)
+		| (() => Generator)
+		| AsyncPlanState
+		| PlanState
+		| undefined;
+
+	if (asynchronous) {
+		generator = isAsyncGeneratorFunction(input) ? input : (input as InternalAsyncPlan)[PLAN_SYMBOL];
+	} else if (isPlan(input)) {
 		generator = (input as InternalPlan)[PLAN_SYMBOL];
 	} else if (isGeneratorFunction(input)) {
 		generator = input;
@@ -134,21 +127,11 @@ export function attemptRun(input: unknown, ...parameters: unknown[]): unknown {
 		throw new Error(PLAN_MESSAGE_RUN_INPUT);
 	}
 
-	return attempt(() => generate(generator, parameters, true));
+	return attempt(() =>
+		asynchronous
+			? asyncGenerate(generator as never, true, ...parameters)
+			: generate(generator as never, parameters, true),
+	);
 }
-
-// #endregion
-
-// #region Namespace
-
-export declare namespace attemptRun {
-	export var async: typeof asyncAttemptRun;
-}
-
-// #endregion
-
-// #region Initialization
-
-attemptRun.async = asyncAttemptRun;
 
 // #endregion

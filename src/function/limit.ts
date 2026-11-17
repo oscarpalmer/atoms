@@ -1,4 +1,5 @@
 import {getAsyncLimiter, getLimiter} from '../internal/function/limit';
+import {isAsyncFunction} from '../internal/is';
 import {
 	LIMITER_DEBOUNCE,
 	LIMITER_MESSAGE_CALLBACK,
@@ -6,7 +7,6 @@ import {
 	type AsyncLimiter,
 	type Limiter,
 } from '../models/function/limiter.model';
-import {FUNCTION_NAME_ASYNC} from '../models/function/misc.model';
 import type {GenericAsyncCallback, GenericCallback} from '../models/index';
 
 // #region Functions
@@ -45,7 +45,7 @@ export function debounce(callback: GenericCallback, time?: number) {
 		throw new TypeError(LIMITER_MESSAGE_CALLBACK);
 	}
 
-	return callback.constructor.name === FUNCTION_NAME_ASYNC
+	return isAsyncFunction(callback)
 		? getAsyncLimiter(LIMITER_DEBOUNCE, callback, time)
 		: getLimiter(LIMITER_DEBOUNCE, callback, time);
 }
@@ -82,7 +82,7 @@ export function throttle(callback: GenericCallback, time?: number) {
 		throw new TypeError(LIMITER_MESSAGE_CALLBACK);
 	}
 
-	return callback.constructor.name === FUNCTION_NAME_ASYNC
+	return isAsyncFunction(callback)
 		? getAsyncLimiter(LIMITER_THROTTLE, callback, time)
 		: getLimiter(LIMITER_THROTTLE, callback, time);
 }

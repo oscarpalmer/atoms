@@ -11,7 +11,7 @@ import {error, ok} from './value';
  * @param promise Promise to execute
  * @returns Callback result
  */
-export function attempt<V, E = Error>(promise: Promise<V>): Promise<Result<V, E>>;
+export async function attempt<V, E = Error>(promise: Promise<V>): Promise<Result<V, E>>;
 
 /**
  * Executes a callback, catching any errors, and returns a result

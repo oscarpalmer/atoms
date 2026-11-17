@@ -157,10 +157,12 @@ export function isObject(value: unknown): value is object {
 
 export {
 	isArrayOrPlainObject,
+	isAsyncFunction,
 	isConstructor,
 	isInstanceOf,
 	isKey,
 	isNonArrayOrPlainObject,
+	isNonAsyncFunction,
 	isNonConstructor,
 	isNonInstanceOf,
 	isNonKey,

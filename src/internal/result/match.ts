@@ -44,7 +44,7 @@ function handleResult(result: Result<unknown, unknown>, first: unknown, second?:
  * @param matchers Match callbacks
  * @returns Matched result
  */
-export function match<V, Next, Nope, E = Error>(
+export async function match<V, Next, Nope, E = Error>(
 	result: Promise<Result<V, E>> | (() => Promise<Result<V, E>>),
 	handler: ResultMatch<V, E, Next, Nope>,
 ): Promise<Awaited<Next> | Awaited<Nope>>;
@@ -56,7 +56,7 @@ export function match<V, Next, Nope, E = Error>(
  * @param error Callback for the error result
  * @returns Matched result value
  */
-export function match<V, Next, Nope, E = Error>(
+export async function match<V, Next, Nope, E = Error>(
 	result: Promise<Result<V, E>> | (() => Promise<Result<V, E>>),
 	ok: ResultMatch<V, E, Next, Nope>['ok'],
 	error: ResultMatch<V, E, Next, Nope>['error'],

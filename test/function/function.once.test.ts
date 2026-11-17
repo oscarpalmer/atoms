@@ -1,6 +1,10 @@
 import {expect, test} from 'vite-plus/test';
-import {asyncOnce, delay, once} from '../../src';
-import {ONCE_MESSAGE_EXPECTATION} from '../../src/models/function/once.model';
+import {delay, once} from '../../src';
+import {
+	ONCE_MESSAGE_CALLBACK,
+	ONCE_MESSAGE_CLEARED,
+	ONCE_MESSAGE_VALUE,
+} from '../../src/models/function/once.model';
 import {TestFunctionItem} from '../.fixtures/function.fixture';
 import {isFixture} from '../.fixtures/is.fixture';
 
@@ -9,8 +13,8 @@ test('asynchronous: reject', async () => {
 
 	let error: unknown;
 
-	const fn = once.async(
-		() =>
+	const fn = once(
+		async () =>
 			new Promise<never>((_, reject) => {
 				setTimeout(() => {
 					reject(new Error('Test error'));
@@ -50,8 +54,8 @@ test('asynchronous: resolve', async () => {
 	let count = 0;
 	let value: TestFunctionItem | undefined;
 
-	const fn = once.async(
-		() =>
+	const fn = once(
+		async () =>
 			new Promise<TestFunctionItem>(resolve => {
 				count += 1;
 
@@ -114,7 +118,7 @@ test('asynchronous: resolve', async () => {
 	expect(fn.error).toBe(false);
 	expect(fn.finished).toBe(true);
 
-	await expect(() => fn.run()).rejects.toThrow('Once has been cleared');
+	await expect(() => fn.run()).rejects.toThrow(ONCE_MESSAGE_CLEARED);
 
 	expect(value).toBeInstanceOf(TestFunctionItem);
 	expect(values.length).toBe(10);
@@ -129,7 +133,7 @@ test('asynchronous: resolve', async () => {
 	expect(fn.error).toBe(false);
 	expect(fn.finished).toBe(true);
 
-	expect(() => once.async('not a function' as never)).toThrow(ONCE_MESSAGE_EXPECTATION);
+	expect(() => once('not a function' as never)).toThrow(ONCE_MESSAGE_CALLBACK);
 });
 
 test('is', () => {
@@ -138,22 +142,16 @@ test('is', () => {
 	for (let index = 0; index < length; index += 1) {
 		expect(once.is(values[index])).toBe(false);
 		expect(once.isAsync(values[index])).toBe(false);
-		expect(asyncOnce.is(values[index])).toBe(false);
-		expect(once.async.is(values[index])).toBe(false);
 	}
 
 	const sync = once(() => {});
-	const async = once.async(() => new Promise<void>(resolve => resolve()));
+	const async = once(async () => new Promise<void>(resolve => resolve()));
 
 	expect(once.is(sync)).toBe(true);
 	expect(once.isAsync(sync)).toBe(false);
-	expect(asyncOnce.is(sync)).toBe(false);
-	expect(once.async.is(sync)).toBe(false);
 
 	expect(once.is(async)).toBe(false);
 	expect(once.isAsync(async)).toBe(true);
-	expect(asyncOnce.is(async)).toBe(true);
-	expect(once.async.is(async)).toBe(true);
 });
 
 test('synchronous', () => {
@@ -203,11 +201,15 @@ test('synchronous', () => {
 	expect(fn.called).toBe(true);
 	expect(fn.cleared).toBe(true);
 
-	expect(() => fn.run()).toThrow('Once has been cleared');
+	expect(() => fn.run()).toThrow(ONCE_MESSAGE_CLEARED);
 
 	expect(count).toBe(1);
 	expect(fn.called).toBe(true);
 	expect(fn.cleared).toBe(true);
 
-	expect(() => once('not a function' as never)).toThrow(ONCE_MESSAGE_EXPECTATION);
+	const async = once(() => new Promise<void>(resolve => resolve()));
+
+	expect(() => async.run()).toThrow(ONCE_MESSAGE_VALUE);
+
+	expect(() => once('not a function' as never)).toThrow(ONCE_MESSAGE_CALLBACK);
 });

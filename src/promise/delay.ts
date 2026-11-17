@@ -13,7 +13,7 @@ import {type PromiseOptions} from '../models/promise.model';
  * @param options Options for the delay
  * @returns Delayed promise
  */
-export function delay(options?: PromiseOptions): Promise<void>;
+export async function delay(options?: PromiseOptions): Promise<void>;
 
 /**
  * Create a delayed promise that resolves after a certain amount of time
@@ -21,7 +21,7 @@ export function delay(options?: PromiseOptions): Promise<void>;
  * @param time How long to wait for _(in milliseconds; defaults to `0`)_
  * @returns Delayed promise
  */
-export function delay(time?: number): Promise<void>;
+export async function delay(time?: number): Promise<void>;
 
 export function delay(options?: unknown): Promise<void> {
 	const {signal, time} = createPromiseOptions(options);

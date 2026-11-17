@@ -3,12 +3,13 @@ import {attempt, attemptFlow, attemptPipe, Err, error, isError, isOk, ok, Ok} fr
 import {
 	WORK_MESSAGE_FLOW_ARRAY,
 	WORK_MESSAGE_FLOW_PROMISE,
+	WORK_MESSAGE_NESTING,
 	WORK_MESSAGE_PIPE_ARRAY,
 	WORK_MESSAGE_PIPE_PROMISE,
 } from '../../src/models/function/work.model';
 
 test('flow: asynchronous', async () => {
-	const nameTransformer = attemptFlow.async(
+	const nameTransformer = attemptFlow(
 		async (name: string) => name.trim(),
 		async name => name.split(' '),
 		async parts => parts.map(part => part[0].toUpperCase() + part.slice(1)),
@@ -25,14 +26,14 @@ test('flow: asynchronous', async () => {
 	expect(isError(invalidName)).toBe(true);
 	expect((invalidName as Err<never, Error>).error).toBeInstanceOf(Error);
 
-	const invalidFlow = await attemptFlow.async(() => {}, 'not a function' as never)();
+	const invalidFlow = await attemptFlow(async () => {}, 'not a function' as never)();
 
 	expect(isError(invalidFlow)).toBe(true);
 	expect((invalidFlow as Err<never, Error>).error.message).toBe(WORK_MESSAGE_FLOW_ARRAY);
 
-	const handleResult = attemptFlow.async(
-		(_: unknown) => {},
-		() => 'Test value!',
+	const handleResult = attemptFlow(
+		async (_: unknown) => {},
+		async () => 'Test value!',
 	);
 
 	const errorResult = await handleResult(error('Test error!'));
@@ -84,38 +85,38 @@ test('flow: synchronous', () => {
 });
 
 test('pipe: asynchronous', async () => {
-	const fn = await attemptPipe.async(
+	const fn = await attemptPipe(
 		() => 123,
 		x => x + 1,
 		x => x * 2,
 	);
 
-	const same = await attemptPipe.async(
+	const same = await attemptPipe(
 		123,
 		x => x + 1,
 		x => x * 2,
 	);
 
-	const diff = await attemptPipe.async(
+	const diff = await attemptPipe(
 		123,
 		x => x + 1,
 		x => String(x),
 		x => `${x} is a number`,
 	);
 
-	const resultOk = await attemptPipe.async(
+	const resultOk = await attemptPipe(
 		attempt(() => 123),
 		x => x + 1,
 		x => x * 2,
 	);
 
-	const resultErr = await attemptPipe.async(
+	const resultErr = await attemptPipe(
 		attempt(() => {
 			throw new Error('Test error');
 		}),
 	);
 
-	const simple = await attemptPipe.async(123);
+	const simple = await attemptPipe(123);
 
 	expect(isOk(fn)).toBe(true);
 	expect((fn as Ok<number>).value).toBe(248);
@@ -137,13 +138,13 @@ test('pipe: asynchronous', async () => {
 
 	//
 
-	const invalid = await attemptPipe.async(123, (x: number) => x + 1, 'not a function' as never);
+	const invalid = await attemptPipe(123, (x: number) => x + 1, 'not a function' as never);
 
 	expect(isError(invalid)).toBe(true);
 
 	expect((invalid as Err<never, Error>).error.message).toBe(WORK_MESSAGE_PIPE_ARRAY);
 
-	const failed = await attemptPipe.async(123 as never, (value: string) => value.trim());
+	const failed = await attemptPipe(123 as never, (value: string) => value.trim());
 
 	expect(isError(failed)).toBe(true);
 });
@@ -213,6 +214,37 @@ test('pipe: synchronous', () => {
 	expect(isError(failed)).toBe(true);
 });
 
+test('pipe: initial values', async () => {
+	const fromPromise = await attemptPipe(Promise.resolve(1), x => x + 1);
+	const fromAsyncThunk = await attemptPipe(
+		async () => 1,
+		x => x + 1,
+	);
+	const fromPromiseResult = await attemptPipe(Promise.resolve(ok(1)));
+	const fromThunkResult = attemptPipe(() => ok(1));
+	const fromFailedPromise = await attemptPipe(Promise.resolve(error('failed')), x => x);
+
+	expect(isOk(fromPromise)).toBe(true);
+	expect((fromPromise as Ok<number>).value).toBe(2);
+
+	expect(isOk(fromAsyncThunk)).toBe(true);
+	expect((fromAsyncThunk as Ok<number>).value).toBe(2);
+
+	expect(isOk(fromPromiseResult)).toBe(true);
+	expect((fromPromiseResult as Ok<number>).value).toBe(1);
+
+	expect(isOk(fromThunkResult)).toBe(true);
+	expect((fromThunkResult as Ok<number>).value).toBe(1);
+
+	expect(isError(fromFailedPromise)).toBe(true);
+	expect((fromFailedPromise as unknown as Err<never, string>).error).toBe('failed');
+
+	const promiseThunk = attemptPipe((() => Promise.resolve(1)) as never, (x: number) => x);
+
+	expect(isError(promiseThunk)).toBe(true);
+	expect((promiseThunk as Err<never, Error>).error.message).toBe(WORK_MESSAGE_PIPE_PROMISE);
+});
+
 test('return types', () => {
 	const basicFlow = attemptFlow(
 		() => 'Initial value!',
@@ -252,15 +284,9 @@ test('return types', () => {
 	expect((errorFlow as Err<never, Error>).error.message).toBe('Test error!');
 	expect((errorPipe as Err<never, Error>).error.message).toBe('Test error!');
 
-	const promiseFailFlow = attemptFlow(
-		() => {},
-		() => Promise.resolve(),
-	)();
+	const promiseFailFlow = attemptFlow(() => {}, (() => Promise.resolve()) as never)();
 
-	const promiseFailPipe = attemptPipe(
-		() => {},
-		() => Promise.resolve(),
-	);
+	const promiseFailPipe = attemptPipe(() => {}, (() => Promise.resolve()) as never);
 
 	expect(isError(promiseFailFlow)).toBe(true);
 	expect(isError(promiseFailPipe)).toBe(true);
@@ -282,11 +308,7 @@ test('return types', () => {
 	expect(isError(nestingFailFlow)).toBe(true);
 	expect(isError(nestingFailPipe)).toBe(true);
 
-	expect((nestingFailFlow as Err<never, Error>).error.message).toBe(
-		'Return values are too deeply nested.',
-	);
+	expect((nestingFailFlow as Err<never, Error>).error.message).toBe(WORK_MESSAGE_NESTING);
 
-	expect((nestingFailPipe as Err<never, Error>).error.message).toBe(
-		'Return values are too deeply nested.',
-	);
+	expect((nestingFailPipe as Err<never, Error>).error.message).toBe(WORK_MESSAGE_NESTING);
 });

@@ -9,7 +9,7 @@ import {
 } from '../../src/models/function/work.model';
 
 test('flow: asynchronous', async () => {
-	const nameTransformer = flow.async(
+	const nameTransformer = flow(
 		async (name: string) => name.trim(),
 		async name => name.split(' '),
 		async parts => parts.map(part => part[0].toUpperCase() + part.slice(1)),
@@ -20,11 +20,11 @@ test('flow: asynchronous', async () => {
 
 	await expect(nameTransformer(123 as never)).rejects.toThrow(Error);
 
-	expect(() => flow.async(() => {}, 'not a function' as never)).toThrow(WORK_MESSAGE_FLOW_ARRAY);
+	expect(() => flow(() => {}, 'not a function' as never)).toThrow(WORK_MESSAGE_FLOW_ARRAY);
 
-	const handleResult = flow.async(
-		(_: unknown) => {},
-		() => 'Test value!',
+	const handleResult = flow(
+		async (_: unknown) => {},
+		async () => 'Test value!',
 	);
 
 	try {
@@ -60,13 +60,13 @@ test('flow: synchronous', () => {
 });
 
 test('pipe: asynchronous', async () => {
-	const same = await pipe.async(
+	const same = await pipe(
 		123,
 		async x => x + 1,
 		async x => x * 2,
 	);
 
-	const diff = await pipe.async(
+	const diff = await pipe(
 		123,
 		async x => x + 1,
 		async x => String(x),
@@ -76,11 +76,11 @@ test('pipe: asynchronous', async () => {
 	expect(same).toBe(248);
 	expect(diff).toBe('124 is a number');
 
-	expect(await pipe.async(123)).toBe(123);
+	expect(await pipe(123)).toBe(123);
 
-	await expect(
-		pipe.async(123, async (x: number) => x + 1, 'not a function' as never),
-	).rejects.toThrow(WORK_MESSAGE_PIPE_ARRAY);
+	expect(() => pipe(123, async (x: number) => x + 1, 'not a function' as never)).toThrow(
+		WORK_MESSAGE_PIPE_ARRAY,
+	);
 });
 
 test('pipe: synchronous', () => {
@@ -104,6 +104,72 @@ test('pipe: synchronous', () => {
 
 	expect(() => pipe(123, (x: number) => x + 1, 'not a function' as never)).toThrow(
 		WORK_MESSAGE_PIPE_ARRAY,
+	);
+});
+
+test('pipe: asynchronous initial values', async () => {
+	expect(await pipe(Promise.resolve(1), x => x + 1)).toBe(2);
+	expect(
+		await pipe(
+			async () => 1,
+			x => x + 1,
+		),
+	).toBe(2);
+	expect(await pipe(Promise.resolve(ok(3)), x => x + 1)).toBe(4);
+
+	let received: unknown;
+
+	await pipe(Promise.resolve(ok(ok(1))), x => {
+		received = x;
+	});
+
+	expect(received).toEqual(ok(1));
+
+	await expect(pipe(Promise.resolve(error('failed')), x => x)).rejects.toBe('failed');
+});
+
+test('pipe: asynchronous thunks', async () => {
+	expect(
+		await pipe(
+			1,
+			async x => x,
+			x => () => Promise.resolve(x + 1),
+		),
+	).toBe(2);
+
+	expect(
+		await pipe(
+			1,
+			async x => x,
+			x => () => Promise.resolve(ok(x + 1)),
+		),
+	).toBe(2);
+
+	await expect(
+		pipe(
+			1,
+			async x => x,
+			() => () => Promise.resolve(error('failed')),
+		),
+	).rejects.toBe('failed');
+
+	let received: unknown;
+
+	await pipe(
+		1,
+		async x => x,
+		x => () => Promise.resolve(ok(ok(x))),
+		x => {
+			received = x;
+		},
+	);
+
+	expect(received).toEqual(ok(1));
+});
+
+test('pipe: synchronous promises', () => {
+	expect(() => pipe((() => Promise.resolve(1)) as never, (x: number) => x)).toThrow(
+		WORK_MESSAGE_PIPE_PROMISE,
 	);
 });
 
@@ -142,19 +208,13 @@ test('return types', async () => {
 		),
 	).toThrow('Test error!');
 
-	expect(() =>
-		flow(
-			() => {},
-			() => Promise.resolve(),
-		)(),
-	).toThrow(WORK_MESSAGE_FLOW_PROMISE);
+	expect(() => flow(() => {}, (() => Promise.resolve()) as never)()).toThrow(
+		WORK_MESSAGE_FLOW_PROMISE,
+	);
 
-	expect(() =>
-		pipe(
-			() => {},
-			() => Promise.resolve(),
-		),
-	).toThrow(WORK_MESSAGE_PIPE_PROMISE);
+	expect(() => pipe(() => {}, (() => Promise.resolve()) as never)).toThrow(
+		WORK_MESSAGE_PIPE_PROMISE,
+	);
 
 	expect(() =>
 		flow(

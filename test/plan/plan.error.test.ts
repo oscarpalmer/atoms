@@ -122,7 +122,7 @@ test('errors, async', async () => {
 	] as [() => AsyncGenerator, unknown][];
 
 	for (const [asyncGenerator, expectation] of items) {
-		await expect(run.async(asyncGenerator)).rejects.toEqual(expectation);
+		await expect(run(asyncGenerator)).rejects.toEqual(expectation);
 		await expect(plan(asyncGenerator).run()).rejects.toEqual(expectation);
 
 		const attempted = await plan(asyncGenerator).attempt();

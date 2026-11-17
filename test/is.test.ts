@@ -1,6 +1,7 @@
 import {expect, test} from 'vite-plus/test';
 import {
 	isArrayOrPlainObject,
+	isAsyncFunction,
 	isConstructor,
 	isEmpty,
 	isInstanceOf,
@@ -31,7 +32,11 @@ import {
 	isPromise,
 	isTypedArray,
 } from '../src';
-import {isNonTemplateStringsArray, isTemplateStringsArray} from '../src/internal/is';
+import {
+	isNonAsyncFunction,
+	isNonTemplateStringsArray,
+	isTemplateStringsArray,
+} from '../src/internal/is';
 import {isFixture} from './.fixtures/is.fixture';
 
 const {values, length} = isFixture;
@@ -44,6 +49,22 @@ test('isArrayOrPlainObject', () => {
 	for (; index < length; index += 1) {
 		expect(isArrayOrPlainObject(values[index])).toBe(expected[index]);
 		expect(isNonArrayOrPlainObject(values[index])).not.toBe(expected[index]);
+	}
+});
+
+test('isAsyncFunction', () => {
+	for (let index = 0; index < length; index += 1) {
+		const value = values[index];
+
+		expect(isAsyncFunction(value)).toBe(false);
+		expect(isNonAsyncFunction(value)).toBe(true);
+	}
+
+	const asyncFunctions = [async function () {}, async () => {}];
+
+	for (const fn of asyncFunctions) {
+		expect(isAsyncFunction(fn)).toBe(true);
+		expect(isNonAsyncFunction(fn)).toBe(false);
 	}
 });
 

@@ -1,5 +1,5 @@
-import {asyncPipe, pipe} from '../../internal/function/work';
-import {isError, isOk} from '../../internal/result/is';
+import {pipe} from '../../internal/function/work';
+import type {SyncFunctions, SyncInitial, SyncValue} from '../../models/function/work.model';
 import type {GenericCallback} from '../../models/index';
 import type {Result, UnwrapValue} from '../../models/result.model';
 import {attempt} from '../index';
@@ -14,36 +14,211 @@ type InitialAsyncPipeValue<Initial> =
 
 type InitialPipeValue<Initial> = GenericCallback | Initial | Result<Initial>;
 
+type SyncInitialValue<Initial> = SyncInitial<Initial, InitialPipeValue<Initial>>;
+
 type WrapValue<Value> = Result<UnwrapValue<Value>>;
 
 // #endregion
 
 // #region Functions
 
-// #region Asynchronous
-
 /**
  * Attempt to pipe a value through a function
- *
- * _Available as `attemptAsyncPipe` and `attemptPipe.async`_
  *
  * @param initial Initial value
  * @returns _Piped_ result
  */
-export async function attemptAsyncPipe<Initial, Piped>(
+export function attemptPipe<Initial, Pipe>(
+	initial: SyncInitialValue<Initial>,
+	pipe: (value: UnwrapValue<Initial>) => Pipe & SyncValue<Pipe>,
+): WrapValue<Pipe>;
+
+/**
+ * Attempt to pipe a value through a series of functions
+ *
+ * @param initial Initial value
+ * @returns _Piped_ result
+ */
+export function attemptPipe<Initial, First, Second>(
+	initial: SyncInitialValue<Initial>,
+	first: (value: UnwrapValue<Initial>) => First & SyncValue<First>,
+	second: (value: UnwrapValue<First>) => Second & SyncValue<Second>,
+): WrapValue<Second>;
+
+/**
+ * Attempt to pipe a value through a series of functions
+ *
+ * @param initial Initial value
+ * @returns _Piped_ result
+ */
+export function attemptPipe<Initial, First, Second, Third>(
+	initial: SyncInitialValue<Initial>,
+	first: (value: UnwrapValue<Initial>) => First & SyncValue<First>,
+	second: (value: UnwrapValue<First>) => Second & SyncValue<Second>,
+	third: (value: UnwrapValue<Second>) => Third & SyncValue<Third>,
+): WrapValue<Third>;
+
+/**
+ * Attempt to pipe a value through a series of functions
+ *
+ * @param initial Initial value
+ * @returns _Piped_ result
+ */
+export function attemptPipe<Initial, First, Second, Third, Fourth>(
+	initial: SyncInitialValue<Initial>,
+	first: (value: UnwrapValue<Initial>) => First & SyncValue<First>,
+	second: (value: UnwrapValue<First>) => Second & SyncValue<Second>,
+	third: (value: UnwrapValue<Second>) => Third & SyncValue<Third>,
+	fourth: (value: UnwrapValue<Third>) => Fourth & SyncValue<Fourth>,
+): WrapValue<Fourth>;
+
+/**
+ * Attempt to pipe a value through a series of functions
+ *
+ * @param initial Initial value
+ * @returns _Piped_ result
+ */
+export function attemptPipe<Initial, First, Second, Third, Fourth, Fifth>(
+	initial: SyncInitialValue<Initial>,
+	first: (value: UnwrapValue<Initial>) => First & SyncValue<First>,
+	second: (value: UnwrapValue<First>) => Second & SyncValue<Second>,
+	third: (value: UnwrapValue<Second>) => Third & SyncValue<Third>,
+	fourth: (value: UnwrapValue<Third>) => Fourth & SyncValue<Fourth>,
+	fifth: (value: UnwrapValue<Fourth>) => Fifth & SyncValue<Fifth>,
+): WrapValue<Fifth>;
+
+/**
+ * Attempt to pipe a value through a series of functions
+ *
+ * @param initial Initial value
+ * @returns _Piped_ result
+ */
+export function attemptPipe<Initial, First, Second, Third, Fourth, Fifth, Sixth>(
+	initial: SyncInitialValue<Initial>,
+	first: (value: UnwrapValue<Initial>) => First & SyncValue<First>,
+	second: (value: UnwrapValue<First>) => Second & SyncValue<Second>,
+	third: (value: UnwrapValue<Second>) => Third & SyncValue<Third>,
+	fourth: (value: UnwrapValue<Third>) => Fourth & SyncValue<Fourth>,
+	fifth: (value: UnwrapValue<Fourth>) => Fifth & SyncValue<Fifth>,
+	sixth: (value: UnwrapValue<Fifth>) => Sixth & SyncValue<Sixth>,
+): WrapValue<Sixth>;
+
+/**
+ * Attempt to pipe a value through a series of functions
+ *
+ * @param initial Initial value
+ * @returns _Piped_ result
+ */
+export function attemptPipe<Initial, First, Second, Third, Fourth, Fifth, Sixth, Seventh>(
+	initial: SyncInitialValue<Initial>,
+	first: (value: UnwrapValue<Initial>) => First & SyncValue<First>,
+	second: (value: UnwrapValue<First>) => Second & SyncValue<Second>,
+	third: (value: UnwrapValue<Second>) => Third & SyncValue<Third>,
+	fourth: (value: UnwrapValue<Third>) => Fourth & SyncValue<Fourth>,
+	fifth: (value: UnwrapValue<Fourth>) => Fifth & SyncValue<Fifth>,
+	sixth: (value: UnwrapValue<Fifth>) => Sixth & SyncValue<Sixth>,
+	seventh: (value: UnwrapValue<Sixth>) => Seventh & SyncValue<Seventh>,
+): WrapValue<Seventh>;
+
+/**
+ * Attempt to pipe a value through a series of functions
+ *
+ * @param initial Initial value
+ * @returns _Piped_ result
+ */
+export function attemptPipe<Initial, First, Second, Third, Fourth, Fifth, Sixth, Seventh, Eighth>(
+	initial: SyncInitialValue<Initial>,
+	first: (value: UnwrapValue<Initial>) => First & SyncValue<First>,
+	second: (value: UnwrapValue<First>) => Second & SyncValue<Second>,
+	third: (value: UnwrapValue<Second>) => Third & SyncValue<Third>,
+	fourth: (value: UnwrapValue<Third>) => Fourth & SyncValue<Fourth>,
+	fifth: (value: UnwrapValue<Fourth>) => Fifth & SyncValue<Fifth>,
+	sixth: (value: UnwrapValue<Fifth>) => Sixth & SyncValue<Sixth>,
+	seventh: (value: UnwrapValue<Sixth>) => Seventh & SyncValue<Seventh>,
+	eighth: (value: UnwrapValue<Seventh>) => Eighth & SyncValue<Eighth>,
+): WrapValue<Eighth>;
+
+/**
+ * Attempt to pipe a value through a series of functions
+ *
+ * @param initial Initial value
+ * @returns _Piped_ result
+ */
+export function attemptPipe<
+	Initial,
+	First,
+	Second,
+	Third,
+	Fourth,
+	Fifth,
+	Sixth,
+	Seventh,
+	Eighth,
+	Ninth,
+>(
+	initial: SyncInitialValue<Initial>,
+	first: (value: UnwrapValue<Initial>) => First & SyncValue<First>,
+	second: (value: UnwrapValue<First>) => Second & SyncValue<Second>,
+	third: (value: UnwrapValue<Second>) => Third & SyncValue<Third>,
+	fourth: (value: UnwrapValue<Third>) => Fourth & SyncValue<Fourth>,
+	fifth: (value: UnwrapValue<Fourth>) => Fifth & SyncValue<Fifth>,
+	sixth: (value: UnwrapValue<Fifth>) => Sixth & SyncValue<Sixth>,
+	seventh: (value: UnwrapValue<Sixth>) => Seventh & SyncValue<Seventh>,
+	eighth: (value: UnwrapValue<Seventh>) => Eighth & SyncValue<Eighth>,
+	ninth: (value: UnwrapValue<Eighth>) => Ninth & SyncValue<Ninth>,
+): WrapValue<Ninth>;
+
+/**
+ * Attempt to pipe a value through a series of functions
+ *
+ * @param initial Initial value
+ * @returns _Piped_ result
+ */
+export function attemptPipe<
+	Initial,
+	First,
+	Second,
+	Third,
+	Fourth,
+	Fifth,
+	Sixth,
+	Seventh,
+	Eighth,
+	Ninth,
+	Tenth,
+>(
+	initial: SyncInitialValue<Initial>,
+	first: (value: UnwrapValue<Initial>) => First & SyncValue<First>,
+	second: (value: UnwrapValue<First>) => Second & SyncValue<Second>,
+	third: (value: UnwrapValue<Second>) => Third & SyncValue<Third>,
+	fourth: (value: UnwrapValue<Third>) => Fourth & SyncValue<Fourth>,
+	fifth: (value: UnwrapValue<Fourth>) => Fifth & SyncValue<Fifth>,
+	sixth: (value: UnwrapValue<Fifth>) => Sixth & SyncValue<Sixth>,
+	seventh: (value: UnwrapValue<Sixth>) => Seventh & SyncValue<Seventh>,
+	eighth: (value: UnwrapValue<Seventh>) => Eighth & SyncValue<Eighth>,
+	ninth: (value: UnwrapValue<Eighth>) => Ninth & SyncValue<Ninth>,
+	tenth: (value: UnwrapValue<Ninth>) => Tenth & SyncValue<Tenth>,
+): WrapValue<Tenth>;
+
+/**
+ * Attempt to pipe a value through a function
+ *
+ * @param initial Initial value
+ * @returns _Piped_ result
+ */
+export async function attemptPipe<Initial, Piped>(
 	initial: InitialAsyncPipeValue<Initial>,
 	pipe: (value: UnwrapValue<Initial>) => Piped,
 ): Promise<WrapValue<Piped>>;
 
 /**
  * Attempt to pipe a value through a series of functions
- *
- * _Available as `attemptAsyncPipe` and `attemptPipe.async`_
+
  *
  * @param initial Initial value
  * @returns _Piped_ result
  */
-export async function attemptAsyncPipe<Initial, First, Second>(
+export async function attemptPipe<Initial, First, Second>(
 	initial: InitialAsyncPipeValue<Initial>,
 	first: (value: UnwrapValue<Initial>) => First,
 	second: (value: UnwrapValue<First>) => Second,
@@ -52,12 +227,10 @@ export async function attemptAsyncPipe<Initial, First, Second>(
 /**
  * Attempt to pipe a value through a series of functions
  *
- * _Available as `attemptAsyncPipe` and `attemptPipe.async`_
- *
  * @param initial Initial value
  * @returns _Piped_ result
  */
-export async function attemptAsyncPipe<Initial, First, Second, Third>(
+export async function attemptPipe<Initial, First, Second, Third>(
 	initial: InitialAsyncPipeValue<Initial>,
 	first: (value: UnwrapValue<Initial>) => First,
 	second: (value: UnwrapValue<First>) => Second,
@@ -67,12 +240,10 @@ export async function attemptAsyncPipe<Initial, First, Second, Third>(
 /**
  * Attempt to pipe a value through a series of functions
  *
- * _Available as `attemptAsyncPipe` and `attemptPipe.async`_
- *
  * @param initial Initial value
  * @returns _Piped_ result
  */
-export async function attemptAsyncPipe<Initial, First, Second, Third, Fourth>(
+export async function attemptPipe<Initial, First, Second, Third, Fourth>(
 	initial: InitialAsyncPipeValue<Initial>,
 	first: (value: UnwrapValue<Initial>) => First,
 	second: (value: UnwrapValue<First>) => Second,
@@ -83,12 +254,10 @@ export async function attemptAsyncPipe<Initial, First, Second, Third, Fourth>(
 /**
  * Attempt to pipe a value through a series of functions
  *
- * _Available as `attemptAsyncPipe` and `attemptPipe.async`_
- *
  * @param initial Initial value
  * @returns _Piped_ result
  */
-export async function attemptAsyncPipe<Initial, First, Second, Third, Fourth, Fifth>(
+export async function attemptPipe<Initial, First, Second, Third, Fourth, Fifth>(
 	initial: InitialAsyncPipeValue<Initial>,
 	first: (value: UnwrapValue<Initial>) => First,
 	second: (value: UnwrapValue<First>) => Second,
@@ -100,12 +269,10 @@ export async function attemptAsyncPipe<Initial, First, Second, Third, Fourth, Fi
 /**
  * Attempt to pipe a value through a series of functions
  *
- * _Available as `attemptAsyncPipe` and `attemptPipe.async`_
- *
  * @param initial Initial value
  * @returns _Piped_ result
  */
-export async function attemptAsyncPipe<Initial, First, Second, Third, Fourth, Fifth, Sixth>(
+export async function attemptPipe<Initial, First, Second, Third, Fourth, Fifth, Sixth>(
 	initial: InitialAsyncPipeValue<Initial>,
 	first: (value: UnwrapValue<Initial>) => First,
 	second: (value: UnwrapValue<First>) => Second,
@@ -118,21 +285,10 @@ export async function attemptAsyncPipe<Initial, First, Second, Third, Fourth, Fi
 /**
  * Attempt to pipe a value through a series of functions
  *
- * _Available as `attemptAsyncPipe` and `attemptPipe.async`_
- *
  * @param initial Initial value
  * @returns _Piped_ result
  */
-export async function attemptAsyncPipe<
-	Initial,
-	First,
-	Second,
-	Third,
-	Fourth,
-	Fifth,
-	Sixth,
-	Seventh,
->(
+export async function attemptPipe<Initial, First, Second, Third, Fourth, Fifth, Sixth, Seventh>(
 	initial: InitialAsyncPipeValue<Initial>,
 	first: (value: UnwrapValue<Initial>) => First,
 	second: (value: UnwrapValue<First>) => Second,
@@ -146,12 +302,10 @@ export async function attemptAsyncPipe<
 /**
  * Attempt to pipe a value through a series of functions
  *
- * _Available as `attemptAsyncPipe` and `attemptPipe.async`_
- *
  * @param initial Initial value
  * @returns _Piped_ result
  */
-export async function attemptAsyncPipe<
+export async function attemptPipe<
 	Initial,
 	First,
 	Second,
@@ -176,12 +330,10 @@ export async function attemptAsyncPipe<
 /**
  * Attempt to pipe a value through a series of functions
  *
- * _Available as `attemptAsyncPipe` and `attemptPipe.async`_
- *
  * @param initial Initial value
  * @returns _Piped_ result
  */
-export async function attemptAsyncPipe<
+export async function attemptPipe<
 	Initial,
 	First,
 	Second,
@@ -208,12 +360,10 @@ export async function attemptAsyncPipe<
 /**
  * Attempt to pipe a value through a series of functions
  *
- * _Available as `attemptAsyncPipe` and `attemptPipe.async`_
- *
  * @param initial Initial value
  * @returns _Piped_ result
  */
-export async function attemptAsyncPipe<
+export async function attemptPipe<
 	Initial,
 	First,
 	Second,
@@ -242,224 +392,13 @@ export async function attemptAsyncPipe<
 /**
  * Attempt to pipe a result through a series of functions
  *
- * _Available as `attemptAsyncPipe` and `attemptPipe.async`_
- *
  * @param initial Initial result
  * @returns _Piped_ result
  */
-export async function attemptAsyncPipe<Initial>(
-	initial: InitialAsyncPipeValue<Initial>,
-	first?: (value: UnwrapValue<Initial>) => unknown,
-	...seconds: Array<(value: unknown) => unknown>
-): Promise<WrapValue<Initial>>;
-
-export async function attemptAsyncPipe(
-	initial: unknown,
-	first?: (value: unknown) => unknown,
-	...seconds: Array<(value: unknown) => unknown>
-): Promise<Result<unknown>> {
-	return attempt(async () => {
-		if (isError(initial)) {
-			throw initial.error;
-		}
-
-		let value: unknown;
-
-		if (typeof initial === 'function') {
-			value = (initial as GenericCallback)();
-		} else {
-			value = isOk(initial) ? initial.value : initial;
-		}
-
-		if (first == null) {
-			return value;
-		}
-
-		return asyncPipe(value, ...([first, ...seconds] as GenericCallback[]));
-	});
-}
-
-// #endregion
-
-// #region Synchronous
-
-/**
- * Attempt to pipe a value through a function
- *
- * @param initial Initial value
- * @returns _Piped_ result
- */
-export function attemptPipe<Initial, Pipe>(
-	initial: InitialPipeValue<Initial>,
-	pipe: (value: UnwrapValue<Initial>) => Pipe,
-): WrapValue<Pipe>;
-
-/**
- * Attempt to pipe a value through a series of functions
- *
- * @param initial Initial value
- * @returns _Piped_ result
- */
-export function attemptPipe<Initial, First, Second>(
-	initial: InitialPipeValue<Initial>,
-	first: (value: UnwrapValue<Initial>) => First,
-	second: (value: UnwrapValue<First>) => Second,
-): WrapValue<Second>;
-
-/**
- * Attempt to pipe a value through a series of functions
- *
- * @param initial Initial value
- * @returns _Piped_ result
- */
-export function attemptPipe<Initial, First, Second, Third>(
-	initial: InitialPipeValue<Initial>,
-	first: (value: UnwrapValue<Initial>) => First,
-	second: (value: UnwrapValue<First>) => Second,
-	third: (value: UnwrapValue<Second>) => Third,
-): WrapValue<Third>;
-
-/**
- * Attempt to pipe a value through a series of functions
- *
- * @param initial Initial value
- * @returns _Piped_ result
- */
-export function attemptPipe<Initial, First, Second, Third, Fourth>(
-	initial: InitialPipeValue<Initial>,
-	first: (value: UnwrapValue<Initial>) => First,
-	second: (value: UnwrapValue<First>) => Second,
-	third: (value: UnwrapValue<Second>) => Third,
-	fourth: (value: UnwrapValue<Third>) => Fourth,
-): WrapValue<Fourth>;
-
-/**
- * Attempt to pipe a value through a series of functions
- *
- * @param initial Initial value
- * @returns _Piped_ result
- */
-export function attemptPipe<Initial, First, Second, Third, Fourth, Fifth>(
-	initial: InitialPipeValue<Initial>,
-	first: (value: UnwrapValue<Initial>) => First,
-	second: (value: UnwrapValue<First>) => Second,
-	third: (value: UnwrapValue<Second>) => Third,
-	fourth: (value: UnwrapValue<Third>) => Fourth,
-	fifth: (value: UnwrapValue<Fourth>) => Fifth,
-): WrapValue<Fifth>;
-
-/**
- * Attempt to pipe a value through a series of functions
- *
- * @param initial Initial value
- * @returns _Piped_ result
- */
-export function attemptPipe<Initial, First, Second, Third, Fourth, Fifth, Sixth>(
-	initial: InitialPipeValue<Initial>,
-	first: (value: UnwrapValue<Initial>) => First,
-	second: (value: UnwrapValue<First>) => Second,
-	third: (value: UnwrapValue<Second>) => Third,
-	fourth: (value: UnwrapValue<Third>) => Fourth,
-	fifth: (value: UnwrapValue<Fourth>) => Fifth,
-	sixth: (value: UnwrapValue<Fifth>) => Sixth,
-): WrapValue<Sixth>;
-
-/**
- * Attempt to pipe a value through a series of functions
- *
- * @param initial Initial value
- * @returns _Piped_ result
- */
-export function attemptPipe<Initial, First, Second, Third, Fourth, Fifth, Sixth, Seventh>(
-	initial: InitialPipeValue<Initial>,
-	first: (value: UnwrapValue<Initial>) => First,
-	second: (value: UnwrapValue<First>) => Second,
-	third: (value: UnwrapValue<Second>) => Third,
-	fourth: (value: UnwrapValue<Third>) => Fourth,
-	fifth: (value: UnwrapValue<Fourth>) => Fifth,
-	sixth: (value: UnwrapValue<Fifth>) => Sixth,
-	seventh: (value: UnwrapValue<Sixth>) => Seventh,
-): WrapValue<Seventh>;
-
-/**
- * Attempt to pipe a value through a series of functions
- *
- * @param initial Initial value
- * @returns _Piped_ result
- */
-export function attemptPipe<Initial, First, Second, Third, Fourth, Fifth, Sixth, Seventh, Eighth>(
-	initial: InitialPipeValue<Initial>,
-	first: (value: UnwrapValue<Initial>) => First,
-	second: (value: UnwrapValue<First>) => Second,
-	third: (value: UnwrapValue<Second>) => Third,
-	fourth: (value: UnwrapValue<Third>) => Fourth,
-	fifth: (value: UnwrapValue<Fourth>) => Fifth,
-	sixth: (value: UnwrapValue<Fifth>) => Sixth,
-	seventh: (value: UnwrapValue<Sixth>) => Seventh,
-	eighth: (value: UnwrapValue<Seventh>) => Eighth,
-): WrapValue<Eighth>;
-
-/**
- * Attempt to pipe a value through a series of functions
- *
- * @param initial Initial value
- * @returns _Piped_ result
- */
-export function attemptPipe<
-	Initial,
-	First,
-	Second,
-	Third,
-	Fourth,
-	Fifth,
-	Sixth,
-	Seventh,
-	Eighth,
-	Ninth,
->(
-	initial: InitialPipeValue<Initial>,
-	first: (value: UnwrapValue<Initial>) => First,
-	second: (value: UnwrapValue<First>) => Second,
-	third: (value: UnwrapValue<Second>) => Third,
-	fourth: (value: UnwrapValue<Third>) => Fourth,
-	fifth: (value: UnwrapValue<Fourth>) => Fifth,
-	sixth: (value: UnwrapValue<Fifth>) => Sixth,
-	seventh: (value: UnwrapValue<Sixth>) => Seventh,
-	eighth: (value: UnwrapValue<Seventh>) => Eighth,
-	ninth: (value: UnwrapValue<Eighth>) => Ninth,
-): WrapValue<Ninth>;
-
-/**
- * Attempt to pipe a value through a series of functions
- *
- * @param initial Initial value
- * @returns _Piped_ result
- */
-export function attemptPipe<
-	Initial,
-	First,
-	Second,
-	Third,
-	Fourth,
-	Fifth,
-	Sixth,
-	Seventh,
-	Eighth,
-	Ninth,
-	Tenth,
->(
-	initial: InitialPipeValue<Initial>,
-	first: (value: UnwrapValue<Initial>) => First,
-	second: (value: UnwrapValue<First>) => Second,
-	third: (value: UnwrapValue<Second>) => Third,
-	fourth: (value: UnwrapValue<Third>) => Fourth,
-	fifth: (value: UnwrapValue<Fourth>) => Fifth,
-	sixth: (value: UnwrapValue<Fifth>) => Sixth,
-	seventh: (value: UnwrapValue<Sixth>) => Seventh,
-	eighth: (value: UnwrapValue<Seventh>) => Eighth,
-	ninth: (value: UnwrapValue<Eighth>) => Ninth,
-	tenth: (value: UnwrapValue<Ninth>) => Tenth,
-): WrapValue<Tenth>;
+export function attemptPipe<Initial, Pipes extends Array<(value: any) => unknown>>(
+	initial: SyncInitialValue<Initial>,
+	...pipes: Pipes & SyncFunctions<Pipes>
+): WrapValue<Initial>;
 
 /**
  * Attempt to pipe a result through a series of functions
@@ -467,52 +406,26 @@ export function attemptPipe<
  * @param initial Initial result
  * @returns _Piped_ result
  */
-export function attemptPipe<Initial>(
-	initial: InitialPipeValue<Initial>,
+export async function attemptPipe<Initial>(
+	initial: InitialAsyncPipeValue<Initial>,
 	first?: (value: UnwrapValue<Initial>) => unknown,
-	...seconds: Array<(value: unknown) => unknown>
-): WrapValue<Initial>;
+	...seconds: Array<(value: any) => unknown>
+): Promise<WrapValue<Initial>>;
+
+export async function attemptPipe(
+	initial: unknown,
+	first?: (value: unknown) => unknown,
+	...seconds: Array<(value: any) => unknown>
+): Promise<Result<unknown>>;
 
 export function attemptPipe(
 	initial: unknown,
 	first?: (value: unknown) => unknown,
 	...seconds: Array<(value: unknown) => unknown>
-): WrapValue<unknown> {
-	return attempt(() => {
-		if (isError(initial)) {
-			throw initial.error;
-		}
+): unknown {
+	const fns = (first == null ? [] : [first, ...seconds]) as GenericCallback[];
 
-		let value: unknown;
-
-		if (typeof initial === 'function') {
-			value = (initial as GenericCallback)();
-		} else {
-			value = isOk(initial) ? initial.value : initial;
-		}
-
-		if (first == null) {
-			return value;
-		}
-
-		return pipe(value, ...([first, ...seconds] as GenericCallback[]));
-	}) as WrapValue<unknown>;
+	return attempt(() => pipe(initial, ...fns));
 }
-
-// #endregion
-
-// #endregion
-
-// #region Namespace
-
-export declare namespace attemptPipe {
-	export var async: typeof attemptAsyncPipe;
-}
-
-// #endregion
-
-// #region Initialization
-
-attemptPipe.async = attemptAsyncPipe;
 
 // #endregion

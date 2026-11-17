@@ -1,109 +1,88 @@
 import {unwrapWork} from '../../internal/function/misc';
-import {asyncFlow, flow} from '../../internal/function/work';
+import {flow} from '../../internal/function/work';
+import {isAsyncFunction} from '../../internal/is';
+import type {SyncFunctions, SyncValue} from '../../models/function/work.model';
 import type {GenericCallback} from '../../models/index';
 import type {AttemptAsyncFlow, AttemptFlow, Result, UnwrapValue} from '../../models/result.model';
 import {attempt} from '../index';
 
 // #region Functions
 
-// #region Asynchronous
-
 /**
- * Create an asynchronous _Flow_, a function that attempts to pipe a value through a series of functions
- *
- * _Available as `attemptAsyncFlow` and `attemptFlow.async`_
+ * Create a _Flow_, a function that attempts to pipe values through a function
  *
  * @returns _Flow_ function
  */
-export function attemptAsyncFlow<Fn extends GenericCallback>(
-	fn: Fn,
-): AttemptAsyncFlow<Fn, ReturnType<Fn>>;
+export function attemptFlow<Fn extends GenericCallback>(
+	fn: Fn & SyncValue<ReturnType<Fn>>,
+): AttemptFlow<Fn, ReturnType<Fn>>;
 
 /**
- * Create an asynchronous _Flow_, a function that pipes values through a series of functions
- *
- * _Available as `attemptAsyncFlow` and `attemptFlow.async`_
+ * Create a _Flow_, a function that attempts to pipe values through a series of functions
  *
  * @returns _Flow_ function
  */
-export function attemptAsyncFlow<First extends GenericCallback, Second>(
-	first: First,
-	second: (value: Awaited<UnwrapValue<ReturnType<First>>>) => Second,
-): AttemptAsyncFlow<First, Second>;
+export function attemptFlow<First extends GenericCallback, Second>(
+	first: First & SyncValue<ReturnType<First>>,
+	second: (value: UnwrapValue<ReturnType<First>>) => Second & SyncValue<Second>,
+): AttemptFlow<First, Second>;
 
 /**
- * Create an asynchronous _Flow_, a function that pipes values through a series of functions
- *
- * _Available as `attemptAsyncFlow` and `attemptFlow.async`_
+ * Create a _Flow_, a function that attempts to pipe values through a series of functions
  *
  * @returns _Flow_ function
  */
-export function attemptAsyncFlow<First extends GenericCallback, Second, Third>(
-	first: First,
-	second: (value: Awaited<UnwrapValue<ReturnType<First>>>) => Second,
-	third: (value: Awaited<UnwrapValue<Second>>) => Third,
-): AttemptAsyncFlow<First, Third>;
+export function attemptFlow<First extends GenericCallback, Second, Third>(
+	first: First & SyncValue<ReturnType<First>>,
+	second: (value: UnwrapValue<ReturnType<First>>) => Second & SyncValue<Second>,
+	third: (value: UnwrapValue<Second>) => Third & SyncValue<Third>,
+): AttemptFlow<First, Third>;
 
 /**
- * Create an asynchronous _Flow_, a function that pipes values through a series of functions
- *
- * _Available as `attemptAsyncFlow` and `attemptFlow.async`_
+ * Create a _Flow_, a function that attempts to pipe values through a series of functions
  *
  * @returns _Flow_ function
  */
-export function attemptAsyncFlow<First extends GenericCallback, Second, Third, Fourth>(
-	first: First,
-	second: (value: Awaited<UnwrapValue<ReturnType<First>>>) => Second,
-	third: (value: Awaited<UnwrapValue<Second>>) => Third,
-	fourth: (value: Awaited<UnwrapValue<Third>>) => Fourth,
-): AttemptAsyncFlow<First, Fourth>;
+export function attemptFlow<First extends GenericCallback, Second, Third, Fourth>(
+	first: First & SyncValue<ReturnType<First>>,
+	second: (value: UnwrapValue<ReturnType<First>>) => Second & SyncValue<Second>,
+	third: (value: UnwrapValue<Second>) => Third & SyncValue<Third>,
+	fourth: (value: UnwrapValue<Third>) => Fourth & SyncValue<Fourth>,
+): AttemptFlow<First, Fourth>;
 
 /**
- * Create an asynchronous _Flow_, a function that pipes values through a series of functions
- *
- * _Available as `attemptAsyncFlow` and `attemptFlow.async`_
+ * Create a _Flow_, a function that attempts to pipe values through a series of functions
  *
  * @returns _Flow_ function
  */
-export function attemptAsyncFlow<First extends GenericCallback, Second, Third, Fourth, Fifth>(
-	first: First,
-	second: (value: Awaited<UnwrapValue<ReturnType<First>>>) => Second,
-	third: (value: Awaited<UnwrapValue<Second>>) => Third,
-	fourth: (value: Awaited<UnwrapValue<Third>>) => Fourth,
-	fifth: (value: Awaited<UnwrapValue<Fourth>>) => Fifth,
-): AttemptAsyncFlow<First, Fifth>;
+export function attemptFlow<First extends GenericCallback, Second, Third, Fourth, Fifth>(
+	first: First & SyncValue<ReturnType<First>>,
+	second: (value: UnwrapValue<ReturnType<First>>) => Second & SyncValue<Second>,
+	third: (value: UnwrapValue<Second>) => Third & SyncValue<Third>,
+	fourth: (value: UnwrapValue<Third>) => Fourth & SyncValue<Fourth>,
+	fifth: (value: UnwrapValue<Fourth>) => Fifth & SyncValue<Fifth>,
+): AttemptFlow<First, Fifth>;
 
 /**
- * Create an asynchronous _Flow_, a function that pipes values through a series of functions
- *
- * _Available as `attemptAsyncFlow` and `attemptFlow.async`_
+ * Create a _Flow_, a function that attempts to pipe values through a series of functions
  *
  * @returns _Flow_ function
  */
-export function attemptAsyncFlow<
-	First extends GenericCallback,
-	Second,
-	Third,
-	Fourth,
-	Fifth,
-	Sixth,
->(
-	first: First,
-	second: (value: Awaited<UnwrapValue<ReturnType<First>>>) => Second,
-	third: (value: Awaited<UnwrapValue<Second>>) => Third,
-	fourth: (value: Awaited<UnwrapValue<Third>>) => Fourth,
-	fifth: (value: Awaited<UnwrapValue<Fourth>>) => Fifth,
-	sixth: (value: Awaited<UnwrapValue<Fifth>>) => Sixth,
-): AttemptAsyncFlow<First, Sixth>;
+export function attemptFlow<First extends GenericCallback, Second, Third, Fourth, Fifth, Sixth>(
+	first: First & SyncValue<ReturnType<First>>,
+	second: (value: UnwrapValue<ReturnType<First>>) => Second & SyncValue<Second>,
+	third: (value: UnwrapValue<Second>) => Third & SyncValue<Third>,
+	fourth: (value: UnwrapValue<Third>) => Fourth & SyncValue<Fourth>,
+	fifth: (value: UnwrapValue<Fourth>) => Fifth & SyncValue<Fifth>,
+	sixth: (value: UnwrapValue<Fifth>) => Sixth & SyncValue<Sixth>,
+): AttemptFlow<First, Sixth>;
 
 /**
- * Create an asynchronous _Flow_, a function that pipes values through a series of functions
- *
- * _Available as `attemptAsyncFlow` and `attemptFlow.async`_
+ * Create a _Flow_, a function that attempts to pipe values through a series of functions
  *
  * @returns _Flow_ function
  */
-export function attemptAsyncFlow<
+export function attemptFlow<
 	First extends GenericCallback,
 	Second,
 	Third,
@@ -112,23 +91,21 @@ export function attemptAsyncFlow<
 	Sixth,
 	Seventh,
 >(
-	first: First,
-	second: (value: Awaited<UnwrapValue<ReturnType<First>>>) => Second,
-	third: (value: Awaited<UnwrapValue<Second>>) => Third,
-	fourth: (value: Awaited<UnwrapValue<Third>>) => Fourth,
-	fifth: (value: Awaited<UnwrapValue<Fourth>>) => Fifth,
-	sixth: (value: Awaited<UnwrapValue<Fifth>>) => Sixth,
-	seventh: (value: Awaited<UnwrapValue<Sixth>>) => Seventh,
-): AttemptAsyncFlow<First, Seventh>;
+	first: First & SyncValue<ReturnType<First>>,
+	second: (value: UnwrapValue<ReturnType<First>>) => Second & SyncValue<Second>,
+	third: (value: UnwrapValue<Second>) => Third & SyncValue<Third>,
+	fourth: (value: UnwrapValue<Third>) => Fourth & SyncValue<Fourth>,
+	fifth: (value: UnwrapValue<Fourth>) => Fifth & SyncValue<Fifth>,
+	sixth: (value: UnwrapValue<Fifth>) => Sixth & SyncValue<Sixth>,
+	seventh: (value: UnwrapValue<Sixth>) => Seventh & SyncValue<Seventh>,
+): AttemptFlow<First, Seventh>;
 
 /**
- * Create an asynchronous _Flow_, a function that pipes values through a series of functions
- *
- * _Available as `attemptAsyncFlow` and `attemptFlow.async`_
+ * Create a _Flow_, a function that attempts to pipe values through a series of functions
  *
  * @returns _Flow_ function
  */
-export function attemptAsyncFlow<
+export function attemptFlow<
 	First extends GenericCallback,
 	Second,
 	Third,
@@ -138,24 +115,22 @@ export function attemptAsyncFlow<
 	Seventh,
 	Eighth,
 >(
-	first: First,
-	second: (value: Awaited<UnwrapValue<ReturnType<First>>>) => Second,
-	third: (value: Awaited<UnwrapValue<Second>>) => Third,
-	fourth: (value: Awaited<UnwrapValue<Third>>) => Fourth,
-	fifth: (value: Awaited<UnwrapValue<Fourth>>) => Fifth,
-	sixth: (value: Awaited<UnwrapValue<Fifth>>) => Sixth,
-	seventh: (value: Awaited<UnwrapValue<Sixth>>) => Seventh,
-	eighth: (value: Awaited<UnwrapValue<Seventh>>) => Eighth,
-): AttemptAsyncFlow<First, Eighth>;
+	first: First & SyncValue<ReturnType<First>>,
+	second: (value: UnwrapValue<ReturnType<First>>) => Second & SyncValue<Second>,
+	third: (value: UnwrapValue<Second>) => Third & SyncValue<Third>,
+	fourth: (value: UnwrapValue<Third>) => Fourth & SyncValue<Fourth>,
+	fifth: (value: UnwrapValue<Fourth>) => Fifth & SyncValue<Fifth>,
+	sixth: (value: UnwrapValue<Fifth>) => Sixth & SyncValue<Sixth>,
+	seventh: (value: UnwrapValue<Sixth>) => Seventh & SyncValue<Seventh>,
+	eighth: (value: UnwrapValue<Seventh>) => Eighth & SyncValue<Eighth>,
+): AttemptFlow<First, Eighth>;
 
 /**
- * Create an asynchronous _Flow_, a function that pipes values through a series of functions
- *
- * _Available as `attemptAsyncFlow` and `attemptFlow.async`_
+ * Create a _Flow_, a function that attempts to pipe values through a series of functions
  *
  * @returns _Flow_ function
  */
-export function attemptAsyncFlow<
+export function attemptFlow<
 	First extends GenericCallback,
 	Second,
 	Third,
@@ -166,25 +141,23 @@ export function attemptAsyncFlow<
 	Eighth,
 	Ninth,
 >(
-	first: First,
-	second: (value: Awaited<UnwrapValue<ReturnType<First>>>) => Second,
-	third: (value: Awaited<UnwrapValue<Second>>) => Third,
-	fourth: (value: Awaited<UnwrapValue<Third>>) => Fourth,
-	fifth: (value: Awaited<UnwrapValue<Fourth>>) => Fifth,
-	sixth: (value: Awaited<UnwrapValue<Fifth>>) => Sixth,
-	seventh: (value: Awaited<UnwrapValue<Sixth>>) => Seventh,
-	eighth: (value: Awaited<UnwrapValue<Seventh>>) => Eighth,
-	ninth: (value: Awaited<UnwrapValue<Eighth>>) => Ninth,
-): AttemptAsyncFlow<First, Ninth>;
+	first: First & SyncValue<ReturnType<First>>,
+	second: (value: UnwrapValue<ReturnType<First>>) => Second & SyncValue<Second>,
+	third: (value: UnwrapValue<Second>) => Third & SyncValue<Third>,
+	fourth: (value: UnwrapValue<Third>) => Fourth & SyncValue<Fourth>,
+	fifth: (value: UnwrapValue<Fourth>) => Fifth & SyncValue<Fifth>,
+	sixth: (value: UnwrapValue<Fifth>) => Sixth & SyncValue<Sixth>,
+	seventh: (value: UnwrapValue<Sixth>) => Seventh & SyncValue<Seventh>,
+	eighth: (value: UnwrapValue<Seventh>) => Eighth & SyncValue<Eighth>,
+	ninth: (value: UnwrapValue<Eighth>) => Ninth & SyncValue<Ninth>,
+): AttemptFlow<First, Ninth>;
 
 /**
- * Create an asynchronous _Flow_, a function that pipes values through a series of functions
- *
- * _Available as `attemptAsyncFlow` and `attemptFlow.async`_
+ * Create a _Flow_, a function that attempts to pipe values through a series of functions
  *
  * @returns _Flow_ function
  */
-export function attemptAsyncFlow<
+export function attemptFlow<
 	First extends GenericCallback,
 	Second,
 	Third,
@@ -196,77 +169,39 @@ export function attemptAsyncFlow<
 	Ninth,
 	Tenth,
 >(
-	first: First,
-	second: (value: Awaited<UnwrapValue<ReturnType<First>>>) => Second,
-	third: (value: Awaited<UnwrapValue<Second>>) => Third,
-	fourth: (value: Awaited<UnwrapValue<Third>>) => Fourth,
-	fifth: (value: Awaited<UnwrapValue<Fourth>>) => Fifth,
-	sixth: (value: Awaited<UnwrapValue<Fifth>>) => Sixth,
-	seventh: (value: Awaited<UnwrapValue<Sixth>>) => Seventh,
-	eighth: (value: Awaited<UnwrapValue<Seventh>>) => Eighth,
-	ninth: (value: Awaited<UnwrapValue<Eighth>>) => Ninth,
-	tenth: (value: Awaited<UnwrapValue<Ninth>>) => Tenth,
-): AttemptAsyncFlow<First, Tenth>;
+	first: First & SyncValue<ReturnType<First>>,
+	second: (value: UnwrapValue<ReturnType<First>>) => Second & SyncValue<Second>,
+	third: (value: UnwrapValue<Second>) => Third & SyncValue<Third>,
+	fourth: (value: UnwrapValue<Third>) => Fourth & SyncValue<Fourth>,
+	fifth: (value: UnwrapValue<Fourth>) => Fifth & SyncValue<Fifth>,
+	sixth: (value: UnwrapValue<Fifth>) => Sixth & SyncValue<Sixth>,
+	seventh: (value: UnwrapValue<Sixth>) => Seventh & SyncValue<Seventh>,
+	eighth: (value: UnwrapValue<Seventh>) => Eighth & SyncValue<Eighth>,
+	ninth: (value: UnwrapValue<Eighth>) => Ninth & SyncValue<Ninth>,
+	tenth: (value: UnwrapValue<Ninth>) => Tenth & SyncValue<Tenth>,
+): AttemptFlow<First, Tenth>;
 
 /**
- * Create an asynchronous _Flow_, a function that pipes values through a series of functions
- *
- * _Available as `attemptAsyncFlow` and `attemptFlow.async`_
+ * Create an asynchronous _Flow_, a function that attempts to pipe a value through a series of functions
  *
  * @returns _Flow_ function
  */
-export function attemptAsyncFlow<Fn extends GenericCallback>(
+export function attemptFlow<Fn extends GenericCallback>(
 	fn: Fn,
-	...fns: Array<(value: Awaited<UnwrapValue<ReturnType<Fn>>>) => unknown>
 ): AttemptAsyncFlow<Fn, ReturnType<Fn>>;
 
 /**
  * Create an asynchronous _Flow_, a function that pipes values through a series of functions
- *
- * _Available as `attemptAsyncFlow` and `attemptFlow.async`_
- *
- * @returns _Flow_ function
- */
-export function attemptAsyncFlow(
-	...fns: GenericCallback[]
-): (...args: unknown[]) => Promise<Result<unknown>>;
-
-export function attemptAsyncFlow(
-	...fns: GenericCallback[]
-): (...args: unknown[]) => Promise<Result<unknown>> {
-	let Flow: GenericCallback;
-
-	return (...args: unknown[]) =>
-		attempt(() => {
-			Flow ??= asyncFlow(...fns);
-
-			return Flow(...args.map(unwrapWork));
-		}) as Promise<Result<unknown>>;
-}
-
-// #endregion
-
-// #region Synchronous
-
-/**
- * Create a _Flow_, a function that attempts to pipe values through a function
- *
- * @returns _Flow_ function
- */
-export function attemptFlow<Fn extends GenericCallback>(fn: Fn): AttemptFlow<Fn, ReturnType<Fn>>;
-
-/**
- * Create a _Flow_, a function that attempts to pipe values through a series of functions
  *
  * @returns _Flow_ function
  */
 export function attemptFlow<First extends GenericCallback, Second>(
 	first: First,
 	second: (value: UnwrapValue<ReturnType<First>>) => Second,
-): AttemptFlow<First, Second>;
+): AttemptAsyncFlow<First, Second>;
 
 /**
- * Create a _Flow_, a function that attempts to pipe values through a series of functions
+ * Create an asynchronous _Flow_, a function that pipes values through a series of functions
  *
  * @returns _Flow_ function
  */
@@ -274,10 +209,10 @@ export function attemptFlow<First extends GenericCallback, Second, Third>(
 	first: First,
 	second: (value: UnwrapValue<ReturnType<First>>) => Second,
 	third: (value: UnwrapValue<Second>) => Third,
-): AttemptFlow<First, Third>;
+): AttemptAsyncFlow<First, Third>;
 
 /**
- * Create a _Flow_, a function that attempts to pipe values through a series of functions
+ * Create an asynchronous _Flow_, a function that pipes values through a series of functions
  *
  * @returns _Flow_ function
  */
@@ -286,10 +221,10 @@ export function attemptFlow<First extends GenericCallback, Second, Third, Fourth
 	second: (value: UnwrapValue<ReturnType<First>>) => Second,
 	third: (value: UnwrapValue<Second>) => Third,
 	fourth: (value: UnwrapValue<Third>) => Fourth,
-): AttemptFlow<First, Fourth>;
+): AttemptAsyncFlow<First, Fourth>;
 
 /**
- * Create a _Flow_, a function that attempts to pipe values through a series of functions
+ * Create an asynchronous _Flow_, a function that pipes values through a series of functions
  *
  * @returns _Flow_ function
  */
@@ -299,10 +234,10 @@ export function attemptFlow<First extends GenericCallback, Second, Third, Fourth
 	third: (value: UnwrapValue<Second>) => Third,
 	fourth: (value: UnwrapValue<Third>) => Fourth,
 	fifth: (value: UnwrapValue<Fourth>) => Fifth,
-): AttemptFlow<First, Fifth>;
+): AttemptAsyncFlow<First, Fifth>;
 
 /**
- * Create a _Flow_, a function that attempts to pipe values through a series of functions
+ * Create an asynchronous _Flow_, a function that pipes values through a series of functions
  *
  * @returns _Flow_ function
  */
@@ -313,10 +248,10 @@ export function attemptFlow<First extends GenericCallback, Second, Third, Fourth
 	fourth: (value: UnwrapValue<Third>) => Fourth,
 	fifth: (value: UnwrapValue<Fourth>) => Fifth,
 	sixth: (value: UnwrapValue<Fifth>) => Sixth,
-): AttemptFlow<First, Sixth>;
+): AttemptAsyncFlow<First, Sixth>;
 
 /**
- * Create a _Flow_, a function that attempts to pipe values through a series of functions
+ * Create an asynchronous _Flow_, a function that pipes values through a series of functions
  *
  * @returns _Flow_ function
  */
@@ -336,10 +271,10 @@ export function attemptFlow<
 	fifth: (value: UnwrapValue<Fourth>) => Fifth,
 	sixth: (value: UnwrapValue<Fifth>) => Sixth,
 	seventh: (value: UnwrapValue<Sixth>) => Seventh,
-): AttemptFlow<First, Seventh>;
+): AttemptAsyncFlow<First, Seventh>;
 
 /**
- * Create a _Flow_, a function that attempts to pipe values through a series of functions
+ * Create an asynchronous _Flow_, a function that pipes values through a series of functions
  *
  * @returns _Flow_ function
  */
@@ -361,10 +296,10 @@ export function attemptFlow<
 	sixth: (value: UnwrapValue<Fifth>) => Sixth,
 	seventh: (value: UnwrapValue<Sixth>) => Seventh,
 	eighth: (value: UnwrapValue<Seventh>) => Eighth,
-): AttemptFlow<First, Eighth>;
+): AttemptAsyncFlow<First, Eighth>;
 
 /**
- * Create a _Flow_, a function that attempts to pipe values through a series of functions
+ * Create an asynchronous _Flow_, a function that pipes values through a series of functions
  *
  * @returns _Flow_ function
  */
@@ -388,10 +323,10 @@ export function attemptFlow<
 	seventh: (value: UnwrapValue<Sixth>) => Seventh,
 	eighth: (value: UnwrapValue<Seventh>) => Eighth,
 	ninth: (value: UnwrapValue<Eighth>) => Ninth,
-): AttemptFlow<First, Ninth>;
+): AttemptAsyncFlow<First, Ninth>;
 
 /**
- * Create a _Flow_, a function that attempts to pipe values through a series of functions
+ * Create an asynchronous _Flow_, a function that pipes values through a series of functions
  *
  * @returns _Flow_ function
  */
@@ -417,27 +352,60 @@ export function attemptFlow<
 	eighth: (value: UnwrapValue<Seventh>) => Eighth,
 	ninth: (value: UnwrapValue<Eighth>) => Ninth,
 	tenth: (value: UnwrapValue<Ninth>) => Tenth,
-): AttemptFlow<First, Tenth>;
+): AttemptAsyncFlow<First, Tenth>;
 
 /**
  * Create a _Flow_, a function that attempts to pipe values through a series of functions
  *
  * @returns _Flow_ function
  */
-export function attemptFlow<First extends GenericCallback>(
-	first: First,
-	...fns: Array<(value: UnwrapValue<ReturnType<First>>) => unknown>
+export function attemptFlow<
+	First extends GenericCallback,
+	Fns extends Array<(value: UnwrapValue<ReturnType<First>>) => unknown>,
+>(
+	first: First & SyncValue<ReturnType<First>>,
+	...fns: Fns & SyncFunctions<Fns>
 ): AttemptFlow<First, ReturnType<First>>;
 
 /**
+ * Create an asynchronous _Flow_, a function that pipes values through a series of functions
+ *
+ * @returns _Flow_ function
+ */
+export function attemptFlow<Fn extends GenericCallback>(
+	fn: Fn,
+	...fns: Array<(value: UnwrapValue<ReturnType<Fn>>) => unknown>
+): AttemptAsyncFlow<Fn, ReturnType<Fn>>;
+
+/**
  * Create a _Flow_, a function that attempts to pipe values through a series of functions
  *
  * @returns _Flow_ function
  */
-export function attemptFlow(...fns: GenericCallback[]): (...args: unknown[]) => Result<unknown>;
+export function attemptFlow<Fns extends GenericCallback[]>(
+	...fns: Fns & SyncFunctions<Fns>
+): (...args: unknown[]) => Result<unknown>;
 
-export function attemptFlow(...fns: GenericCallback[]): (...args: unknown[]) => Result<unknown> {
+/**
+ * Create an asynchronous _Flow_, a function that pipes values through a series of functions
+ *
+ * @returns _Flow_ function
+ */
+export function attemptFlow(
+	...fns: GenericCallback[]
+): (...args: unknown[]) => Promise<Result<unknown>>;
+
+export function attemptFlow(...fns: GenericCallback[]): unknown {
 	let Flow: GenericCallback;
+
+	if (fns.some(isAsyncFunction)) {
+		return (...args: unknown[]) =>
+			attempt(() => {
+				Flow ??= flow(...fns);
+
+				return Flow(...args.map(unwrapWork));
+			}) as Promise<Result<unknown>>;
+	}
 
 	return (...args: unknown[]) =>
 		attempt(() => {
@@ -446,21 +414,5 @@ export function attemptFlow(...fns: GenericCallback[]): (...args: unknown[]) => 
 			return Flow(...args.map(unwrapWork));
 		}) as Result<unknown>;
 }
-
-// #endregion
-
-// #endregion
-
-// #region Namespace
-
-export declare namespace attemptFlow {
-	export var async: typeof attemptAsyncFlow;
-}
-
-// #endregion
-
-// #region Initialization
-
-attemptFlow.async = attemptAsyncFlow;
 
 // #endregion

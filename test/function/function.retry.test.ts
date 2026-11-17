@@ -1,16 +1,16 @@
 import {expect, test} from 'vite-plus/test';
 import {retry, RetryError} from '../../src';
-import {RETRY_MESSAGE_EXPECTATION} from '../../src/models/function/retry.model';
+import {RETRY_MESSAGE_CALLBACK, RETRY_MESSAGE_VALUE} from '../../src/models/function/retry.model';
 
 test('asynchronous', async () => {
-	const immediate = await retry.async(async () => 'Immediate value!');
+	const immediate = await retry(async () => 'Immediate value!');
 
 	expect(immediate).toBe('Immediate value!');
 
 	let attempts = 0;
 
-	const delayed = await retry.async(
-		() =>
+	const delayed = await retry(
+		async () =>
 			new Promise<string>((resolve, reject) => {
 				if (attempts < 2) {
 					attempts += 1;
@@ -20,7 +20,9 @@ test('asynchronous', async () => {
 					resolve('Delayed value!');
 				}
 			}),
-		{times: 3},
+		{
+			times: 3,
+		},
 	);
 
 	expect(delayed).toBe('Delayed value!');
@@ -28,36 +30,40 @@ test('asynchronous', async () => {
 	attempts = 0;
 
 	try {
-		await retry.async(
-			() => {
+		await retry(
+			async () => {
 				attempts += 1;
 				throw new Error('No when');
 			},
-			{times: 5, when: () => false},
+			{
+				times: 5,
+				when: () => false,
+			},
 		);
 	} catch {
 		expect(attempts).toBe(1);
 	}
 
-	await retry
-		.async(
-			() =>
-				new Promise<string>((_, reject) => {
-					reject(new Error('Failed attempt!'));
-				}),
-			{times: 2, when: error => error instanceof Error && error.message === 'Failed attempt!'},
-		)
-		.catch(error => {
-			expect(error).toBeInstanceOf(RetryError);
-			expect((error as RetryError).message).toBe('Retry failed');
+	await retry(
+		async () =>
+			new Promise<string>((_, reject) => {
+				reject(new Error('Failed attempt!'));
+			}),
+		{
+			times: 2,
+			when: error => error instanceof Error && error.message === 'Failed attempt!',
+		},
+	).catch(error => {
+		expect(error).toBeInstanceOf(RetryError);
+		expect((error as RetryError).message).toBe('Retry failed');
 
-			expect((error as RetryError).original).toBeInstanceOf(Error);
-			expect(((error as RetryError).original as Error).message).toBe('Failed attempt!');
-		});
+		expect((error as RetryError).original).toBeInstanceOf(Error);
+		expect(((error as RetryError).original as Error).message).toBe('Failed attempt!');
+	});
 
 	await expect(
-		retry.async(
-			() => {
+		retry(
+			async () => {
 				throw new Error('Failed attempt!');
 			},
 			{
@@ -69,7 +75,7 @@ test('asynchronous', async () => {
 		),
 	).rejects.toThrow('Failed when!');
 
-	await expect(retry.async('blah' as never)).rejects.toThrow(RETRY_MESSAGE_EXPECTATION);
+	expect(() => retry('blah' as never)).toThrow(RETRY_MESSAGE_CALLBACK);
 });
 
 test('synchronous', () => {
@@ -89,7 +95,9 @@ test('synchronous', () => {
 
 			return 'Delayed value!';
 		},
-		{times: 3},
+		{
+			times: 3,
+		},
 	);
 
 	expect(delayed).toBe('Delayed value!');
@@ -102,7 +110,10 @@ test('synchronous', () => {
 				attempts += 1;
 				throw new Error('No when');
 			},
-			{times: 5, when: () => false},
+			{
+				times: 5,
+				when: () => false,
+			},
 		);
 	} catch {
 		expect(attempts).toBe(1);
@@ -113,7 +124,10 @@ test('synchronous', () => {
 			() => {
 				throw new Error('Failed attempt!');
 			},
-			{times: 2, when: error => error instanceof Error && error.message === 'Failed attempt!'},
+			{
+				times: 2,
+				when: error => error instanceof Error && error.message === 'Failed attempt!',
+			},
 		);
 	} catch (error) {
 		expect(error).toBeInstanceOf(RetryError);
@@ -123,5 +137,11 @@ test('synchronous', () => {
 		expect(((error as RetryError).original as Error).message).toBe('Failed attempt!');
 	}
 
-	expect(() => retry('blah' as never)).toThrow(RETRY_MESSAGE_EXPECTATION);
+	expect(() =>
+		retry(() => new Promise(resolve => resolve(undefined)), {
+			times: 5,
+		}),
+	).toThrow(RETRY_MESSAGE_VALUE);
+
+	expect(() => retry('blah' as never)).toThrow(RETRY_MESSAGE_CALLBACK);
 });
