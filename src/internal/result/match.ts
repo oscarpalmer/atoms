@@ -44,10 +44,10 @@ function handleResult(result: Result<unknown, unknown>, first: unknown, second?:
  * @param matchers Match callbacks
  * @returns Matched result
  */
-export function match<Value, Returned, E = Error>(
-	result: Promise<Result<Value, E>> | (() => Promise<Result<Value, E>>),
-	handler: ResultMatch<Value, E, Returned, Returned>,
-): Promise<Awaited<Returned>>;
+export function match<V, Next, Nope, E = Error>(
+	result: Promise<Result<V, E>> | (() => Promise<Result<V, E>>),
+	handler: ResultMatch<V, E, Next, Nope>,
+): Promise<Awaited<Next> | Awaited<Nope>>;
 
 /**
  * Match the result with ok and error handlers, called based on the result type
@@ -56,11 +56,11 @@ export function match<Value, Returned, E = Error>(
  * @param error Callback for the error result
  * @returns Matched result value
  */
-export function match<Value, Returned, E = Error>(
-	result: Promise<Result<Value, E>> | (() => Promise<Result<Value, E>>),
-	ok: ResultMatch<Value, E, Returned, Returned>['ok'],
-	error: ResultMatch<Value, E, Returned, Returned>['error'],
-): Promise<Awaited<Returned>>;
+export function match<V, Next, Nope, E = Error>(
+	result: Promise<Result<V, E>> | (() => Promise<Result<V, E>>),
+	ok: ResultMatch<V, E, Next, Nope>['ok'],
+	error: ResultMatch<V, E, Next, Nope>['error'],
+): Promise<Awaited<Next> | Awaited<Nope>>;
 
 /**
  * Match the result with ok and error handlers, called based on the result type
@@ -68,10 +68,10 @@ export function match<Value, Returned, E = Error>(
  * @param matchers Match callbacks
  * @returns Matched result
  */
-export function match<Value, Returned, E = Error>(
-	result: Result<Value, E> | (() => Result<Value, E>),
-	handler: ResultMatch<Value, E, Returned, Returned>,
-): Returned;
+export function match<V, Next, Nope, E = Error>(
+	result: Result<V, E> | (() => Result<V, E>),
+	handler: ResultMatch<V, E, Next, Nope>,
+): Next | Nope;
 
 /**
  * Match the result with ok and error handlers, called based on the result type
@@ -80,11 +80,11 @@ export function match<Value, Returned, E = Error>(
  * @param error Callback for the error result
  * @returns Matched result
  */
-export function match<Value, Returned, E = Error>(
-	result: Result<Value, E> | (() => Result<Value, E>),
-	ok: ResultMatch<Value, E, Returned, Returned>['ok'],
-	error: ResultMatch<Value, E, Returned, Returned>['error'],
-): Returned;
+export function match<V, Next, Nope, E = Error>(
+	result: Result<V, E> | (() => Result<V, E>),
+	ok: ResultMatch<V, E, Next, Nope>['ok'],
+	error: ResultMatch<V, E, Next, Nope>['error'],
+): Next | Nope;
 
 export function match(result: unknown, first: unknown, second?: unknown): unknown {
 	const value = typeof result === 'function' ? result() : result;

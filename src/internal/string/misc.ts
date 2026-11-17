@@ -2,8 +2,6 @@ import {
 	STRING_EXPRESSION_IGNORED,
 	STRING_EXPRESSION_WORDS,
 } from '../../models/string/string.misc.model';
-import {unwrap} from '../../result/misc';
-import {attempt} from '../result/attempt';
 
 // #region Functions
 
@@ -112,10 +110,11 @@ export function join(array: unknown[], delimiter?: string): string {
 }
 
 function tryCallback<T, U>(value: T, callback: (value: T) => U): U {
-	return unwrap(
-		attempt(() => callback(value)),
-		value,
-	) as U;
+	try {
+		return callback(value);
+	} catch {
+		return value as unknown as U;
+	}
 }
 
 /**

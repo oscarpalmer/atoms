@@ -25,7 +25,7 @@ export type AsyncLimiter<Callback extends GenericAsyncCallback> = {
 	 * @param parameters Function parameters
 	 * @returns Function result
 	 */
-	run(...parameters: Parameters<Callback>): Promise<ReturnType<Callback>>;
+	run(...parameters: Parameters<Callback>): Promise<Awaited<ReturnType<Callback>>>;
 };
 
 export type AsyncLimiterState = {
@@ -88,6 +88,8 @@ export const LIMITER_DEBOUNCE: LimiterType = 'debounce';
 const LIMITER_MESSAGE_CANCELED = 'Call was canceled';
 
 const LIMITER_NAME_ERROR = 'LimiterError';
+
+export const LIMITER_MESSAGE_CALLBACK = 'Limiter callback must be a function';
 
 export const LIMITER_NAME_ASYNC = 'asyncLimiter';
 

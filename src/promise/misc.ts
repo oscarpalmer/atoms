@@ -1,9 +1,9 @@
 import {isPromise} from '../internal/is';
-import {error, ok} from '../internal/result/misc';
+import {error, ok} from '../internal/result/value';
 import type {Aborter} from '../models/aborter.model';
 import {
 	CancelablePromise,
-	PROMISE_MESSAGE_EXPECTATION_RESULT,
+	PROMISE_MESSAGE_RESULT,
 	PROMISE_TYPE_FULFILLED,
 	PROMISE_TYPE_REJECTED,
 	type PromiseParameters,
@@ -102,7 +102,7 @@ export async function toResult(
 	}
 
 	if (!isPromise(actual)) {
-		throw new TypeError(PROMISE_MESSAGE_EXPECTATION_RESULT);
+		throw new TypeError(PROMISE_MESSAGE_RESULT);
 	}
 
 	return actual.then(
@@ -115,7 +115,7 @@ export async function toResult(
 
 // #region Exports
 
-export {toPromise as fromResult} from '../result/misc';
+export {toPromise as fromResult} from '../internal/result/misc';
 export {isFulfilled, isRejected} from './helpers';
 
 // #endregion

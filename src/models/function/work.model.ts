@@ -23,17 +23,15 @@ export type Flow<Callback extends GenericCallback, Value> = (
 
 // #region Variables
 
-export const WORK_MESSAGE_FLOW_ARRAY = 'Flow expected to receive an array of functions';
+export const WORK_MESSAGE_FLOW_ARRAY = `'flow' expected to receive an array of functions`;
 
-export const WORK_MESSAGE_FLOW_PROMISE =
-	'Synchronous Flow received a promise. Use `flow.async` instead.';
+export const WORK_MESSAGE_FLOW_PROMISE = `Synchronous 'flow' received a promise. Use 'asyncFlow'/'flow.async' instead.`;
 
 export const WORK_MESSAGE_NESTING = 'Return values are too deeply nested.';
 
-export const WORK_MESSAGE_PIPE_ARRAY = 'Pipe expected to receive an array of functions';
+export const WORK_MESSAGE_PIPE_ARRAY = `'pipe' expected to receive an array of functions`;
 
-export const WORK_MESSAGE_PIPE_PROMISE =
-	'Synchronous Pipe received a promise. Use `pipe.async` instead.';
+export const WORK_MESSAGE_PIPE_PROMISE = `Synchronous 'pipe' received a promise. Use 'asyncPipe'/'pipe.async' instead.`;
 
 export const assertFlowFunctions: Asserter<Function[]> = assert.condition(
 	value => Array.isArray(value) && value.every(item => typeof item === 'function'),

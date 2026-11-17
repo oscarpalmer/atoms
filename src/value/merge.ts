@@ -6,6 +6,7 @@ import {
 	type InternalAssigner,
 	type InternalMerger,
 	type MergeOptions,
+	type MergeParameters,
 	type MergeReplaceableObjectsCallback,
 	type Merger,
 	type MergingOptions,
@@ -97,6 +98,19 @@ function getFullKey(
 	return full;
 }
 
+function getParameters(
+	values: ArrayOrPlainObject[],
+	destination?: ArrayOrPlainObject,
+): MergeParameters {
+	const isArray = Array.isArray(destination ?? values[0]);
+
+	return {
+		isArray,
+		merged: (destination ?? (isArray ? [] : {})) as PlainObject,
+		offset: destination == null ? 0 : 1,
+	};
+}
+
 function getReplaceableObjects(value: unknown): MergeReplaceableObjectsCallback | undefined {
 	const items = (Array.isArray(value) ? value : [value]).filter(
 		item => typeof item === 'string' || item instanceof RegExp,
@@ -173,12 +187,8 @@ function mergeObjects(
 	destination?: ArrayOrPlainObject,
 	prefix?: string,
 ): ArrayOrPlainObject {
+	const {isArray, merged, offset} = getParameters(values, destination);
 	const {length} = values;
-
-	const isArray = Array.isArray(destination ?? values[0]);
-	const merged = (destination ?? (isArray ? [] : {})) as PlainObject;
-
-	const offset = destination == null ? 0 : 1;
 
 	for (let outerIndex = offset; outerIndex < length; outerIndex += 1) {
 		const item = values[outerIndex] as PlainObject;

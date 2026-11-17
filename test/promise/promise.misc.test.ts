@@ -1,5 +1,6 @@
 import {expect, test} from 'vite-plus/test';
 import {Err, isFulfilled, isRejected, Ok, promises, toResult} from '../../src';
+import {PROMISE_MESSAGE_RESULT} from '../../src/models/promise.model';
 
 test('is', () =>
 	new Promise<void>(done => {
@@ -47,17 +48,17 @@ test('toResult', async () => {
 	expect((fulfilled as Ok<string>).value).toBe('Success!');
 
 	expect(rejected.ok).toBe(false);
-	expect((rejected as Err<Error>).error).toBeInstanceOf(Error);
-	expect((rejected as Err<Error>).error.message).toBe('Failure!');
+	expect((rejected as Err<never, Error>).error).toBeInstanceOf(Error);
+	expect((rejected as Err<never, Error>).error.message).toBe('Failure!');
 
 	const thrown = await toResult(() => {
 		throw new Error('Thrown!');
 	});
 
 	expect(thrown.ok).toBe(false);
-	expect((thrown as Err<Error>).error).toBeInstanceOf(Error);
-	expect((thrown as Err<Error>).error.message).toBe('Thrown!');
+	expect((thrown as Err<never, Error>).error).toBeInstanceOf(Error);
+	expect((thrown as Err<never, Error>).error.message).toBe('Thrown!');
 
-	await expect(toResult('blah' as never)).rejects.toThrow('toResult expected a Promise');
-	await expect(toResult(() => 'blah' as never)).rejects.toThrow('toResult expected a Promise');
+	await expect(toResult('blah' as never)).rejects.toThrow(PROMISE_MESSAGE_RESULT);
+	await expect(toResult(() => 'blah' as never)).rejects.toThrow(PROMISE_MESSAGE_RESULT);
 });

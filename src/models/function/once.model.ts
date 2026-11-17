@@ -91,7 +91,7 @@ export const ONCE_NAME_SYNC = 'once';
 
 export const ONCE_MESSAGE_CLEARED = 'Once has been cleared';
 
-export const ONCE_MESSAGE_EXPECTATION = 'Once expected a function';
+export const ONCE_MESSAGE_EXPECTATION = `'once' expected a function`;
 
 export const ONCE_SYMBOL: unique symbol = Symbol('once');
 

@@ -301,7 +301,7 @@ export const QUEUE_HANDLE_PAUSE: QueueHandleType = 'pause';
 
 export const QUEUE_HANDLE_RESUME: QueueHandleType = 'resume';
 
-export const QUEUE_MESSAGE_CALLBACK = 'A Queue requires a callback function';
+export const QUEUE_MESSAGE_CALLBACK = `'queue' requires a callback function`;
 
 export const QUEUE_MESSAGE_CLEAR = 'Queue was cleared';
 

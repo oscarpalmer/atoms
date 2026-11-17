@@ -1,6 +1,6 @@
 import {getNumberOrDefault} from '../internal/defaults';
 import {isPlainObject} from '../internal/is';
-import {error, ok} from '../internal/result/misc';
+import {error, ok} from '../internal/result/value';
 import type {PlainObject, RequiredKeys} from '../models/index';
 import {
 	PROMISE_STRATEGY_ALL,

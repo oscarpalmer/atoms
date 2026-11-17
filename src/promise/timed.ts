@@ -4,11 +4,7 @@ import {noop} from '../internal/function/misc';
 import {isPromise} from '../internal/is';
 import {LIMITER_WAIT} from '../models/function/limiter.model';
 import type {RequiredKeys} from '../models/index';
-import {
-	PROMISE_MESSAGE_EXPECTATION_TIMED,
-	TimedError,
-	type PromiseOptions,
-} from '../models/promise.model';
+import {PROMISE_MESSAGE_TIMED, TimedError, type PromiseOptions} from '../models/promise.model';
 import {createPromiseOptions} from './helpers';
 import {settlePromise} from './misc';
 
@@ -72,7 +68,7 @@ export async function timed<Value>(promise: Promise<Value>, time: number): Promi
 
 export async function timed<Value>(promise: Promise<Value>, options: unknown): Promise<Value> {
 	if (!isPromise(promise)) {
-		throw new TypeError(PROMISE_MESSAGE_EXPECTATION_TIMED);
+		throw new TypeError(PROMISE_MESSAGE_TIMED);
 	}
 
 	const {signal, time} = createPromiseOptions(options);

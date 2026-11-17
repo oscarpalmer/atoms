@@ -26,9 +26,15 @@ test('asynchronous', () =>
 			},
 		};
 
-		const first = debounce.async(() => {
-			result.first.count += 1;
-		}, 25);
+		const first = debounce(
+			async () =>
+				new Promise<void>(resolve => {
+					result.first.count += 1;
+
+					resolve();
+				}),
+			25,
+		);
 
 		for (let index = 0; index < 100; index += 1) {
 			void first
@@ -41,8 +47,8 @@ test('asynchronous', () =>
 				});
 		}
 
-		const second = debounce.async(
-			() =>
+		const second = debounce(
+			async () =>
 				new Promise<void>(resolve =>
 					setTimeout(() => {
 						result.second.count += 1;
@@ -64,9 +70,15 @@ test('asynchronous', () =>
 				});
 		}
 
-		const third = debounce.async(() => {
-			result.third.count += 1;
-		}, 25);
+		const third = debounce(
+			async () =>
+				new Promise<void>(resolve => {
+					result.third.count += 1;
+
+					resolve();
+				}),
+			25,
+		);
 
 		third
 			.run()
@@ -79,7 +91,7 @@ test('asynchronous', () =>
 
 		third.cancel();
 
-		const fourth = debounce.async(() => {
+		const fourth = debounce(async () => {
 			throw new Error('Error for debounce.async');
 		}, 25);
 
@@ -94,6 +106,8 @@ test('asynchronous', () =>
 				expect(error).toBeInstanceOf(Error);
 				expect(error.message).toBe('Error for debounce.async');
 			});
+
+		expect(() => debounce('blah' as never)).toThrow();
 
 		setTimeout(() => {
 			expect(result.first.count).toBe(1);

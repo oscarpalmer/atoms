@@ -18,7 +18,6 @@ import {
 } from '../../models/function/limiter.model';
 import type {GenericAsyncCallback, GenericCallback} from '../../models/index';
 import {getNumberOrDefault} from '../defaults';
-import {isPromise} from '../is';
 import {attempt} from '../result/attempt';
 import {noop} from './misc';
 
@@ -111,21 +110,10 @@ async function handleAsyncLimiter(state: AsyncLimiterState, item: AsyncLimiterIt
 
 		item.running = true;
 
-		const attempted = await attempt(async () => {
-			let value: unknown = state.callback(...item.parameters);
-
-			if (isPromise(value)) {
-				value = await value;
-			}
-
-			return value;
+		(await attempt(async () => await state.callback(...item.parameters))).match({
+			error: e => item.reject(e),
+			ok: v => item.resolve(v),
 		});
-
-		if (attempted.ok) {
-			item.resolve(attempted.value);
-		} else {
-			item.reject(attempted.error);
-		}
 
 		item.running = false;
 	} else {

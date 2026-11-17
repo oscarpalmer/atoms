@@ -26,7 +26,7 @@ export type RetryOptions = {
 
 export const RETRY_ERROR_NAME = 'RetryError';
 
-export const RETRY_MESSAGE_EXPECTATION = 'Retry expected a function';
+export const RETRY_MESSAGE_EXPECTATION = `'retry' expected a function`;
 
 export const RETRY_MESSAGE_FAILED = 'Retry failed';
 

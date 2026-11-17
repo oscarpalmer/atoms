@@ -48,8 +48,6 @@ export * from './promise/models';
 export * from './promise/timed';
 
 export * from './result/index';
-export * from './result/match';
-export * from './result/misc';
 export * from './result/work/flow';
 export * from './result/work/pipe';
 

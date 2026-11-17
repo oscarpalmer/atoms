@@ -28,7 +28,7 @@ test('asynchronous', () =>
 
 		const size = 100_000;
 
-		const first = throttle.async(() => {
+		const first = throttle(async () => {
 			result.first.count += 1;
 		}, 25);
 
@@ -43,8 +43,8 @@ test('asynchronous', () =>
 				});
 		}
 
-		const second = throttle.async(
-			() =>
+		const second = throttle(
+			async () =>
 				new Promise<void>(resolve => {
 					result.second.count += 1;
 
@@ -64,7 +64,7 @@ test('asynchronous', () =>
 				});
 		}
 
-		const third = throttle.async(() => {
+		const third = throttle(async () => {
 			result.third.count += 1;
 		}, 25);
 
@@ -79,7 +79,7 @@ test('asynchronous', () =>
 
 		third.cancel();
 
-		const fourth = throttle.async(() => {
+		const fourth = throttle(async () => {
 			throw new Error('Error for throttle.async');
 		}, 25);
 
@@ -94,6 +94,8 @@ test('asynchronous', () =>
 				expect(error).toBeInstanceOf(Error);
 				expect(error.message).toBe('Error for throttle.async');
 			});
+
+		expect(() => throttle('blah' as never)).toThrow();
 
 		setTimeout(() => {
 			expect(result.first.count).toBeGreaterThan(1);

@@ -1,6 +1,6 @@
 {
 	"name": "@oscarpalmer/atoms",
-	"version": "0.224.1",
+	"version": "0.225.0",
 	"description": "Atomic utilities for making your JavaScript better.",
 	"keywords": [
 		"array",
@@ -218,14 +218,6 @@
 			"types": "./dist/result/work/flow.d.mts",
 			"default": "./dist/result/work/flow.mjs"
 		},
-		"./result/match": {
-			"types": "./dist/result/match.d.mts",
-			"default": "./dist/result/match.mjs"
-		},
-		"./result/misc": {
-			"types": "./dist/result/misc.d.mts",
-			"default": "./dist/result/misc.mjs"
-		},
 		"./result/models": {
 			"default": "./dist/models/result.model.mjs"
 		},
@@ -324,6 +316,6 @@
 		"jsdom": "^31",
 		"tsdown": "^0.23",
 		"typescript": "^7",
-		"vite-plus": "^1.6"
+		"vite-plus": "^1.7"
 	}
 }

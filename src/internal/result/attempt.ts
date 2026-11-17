@@ -1,7 +1,7 @@
 import type {Result} from '../../models/result.model';
 import {RESULT_MESSAGE_ATTEMPT} from '../../models/result.model';
 import {isPromise} from '../is';
-import {error, ok} from './misc';
+import {error, ok} from './value';
 
 // #region Functions
 

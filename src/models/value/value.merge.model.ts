@@ -71,6 +71,12 @@ export type MergeOptions = {
 	assignValues?: boolean;
 } & BaseOptions;
 
+export type MergeParameters = {
+	isArray: boolean;
+	merged: PlainObject;
+	offset: number;
+};
+
 /**
  * A merger function for merging multiple arrays or objects into a single one
  */

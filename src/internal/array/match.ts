@@ -90,16 +90,10 @@ function evaluatePosition(
 
 	const limit = haystackLength - needleLength + 1;
 
-	let needleValues = callback == null ? needle : needle.slice();
-
-	if (callback != null) {
-		for (let needleIndex = 0; needleIndex < needleLength; needleIndex += 1) {
-			needleValues[needleIndex] = callback(needle[needleIndex], needleIndex, needle);
-		}
-	}
+	const needles = getNeedles(needle, callback);
 
 	for (let haystackIndex = 0; haystackIndex < limit; haystackIndex += 1) {
-		if (!inHaystack(haystack, haystackIndex, needleValues, 0, callback)) {
+		if (!inHaystack(haystack, haystackIndex, needles, 0, callback)) {
 			continue;
 		}
 
@@ -108,7 +102,7 @@ function evaluatePosition(
 		}
 
 		for (let needleIndex = 1; needleIndex < needleLength; needleIndex += 1) {
-			if (!inHaystack(haystack, haystackIndex, needleValues, needleIndex, callback)) {
+			if (!inHaystack(haystack, haystackIndex, needles, needleIndex, callback)) {
 				break;
 			}
 
@@ -195,6 +189,18 @@ function getName(start: number, haystack: number, needle: number): ArrayComparis
 	}
 
 	return start + needle === haystack ? ARRAY_MATCH_COMPARISON_END : ARRAY_MATCH_COMPARISON_INSIDE;
+}
+
+function getNeedles(needle: unknown[], callback?: GenericCallback): unknown[] {
+	const needles = callback == null ? needle : needle.slice();
+
+	if (callback != null) {
+		for (let needleIndex = 0; needleIndex < needles.length; needleIndex += 1) {
+			needles[needleIndex] = callback(needle[needleIndex], needleIndex, needle);
+		}
+	}
+
+	return needles;
 }
 
 function getPosition(

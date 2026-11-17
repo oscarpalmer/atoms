@@ -48,7 +48,7 @@ export type Err<V, E> = {
 	 * @param next Next result value, or a callback that returns it
 	 * @returns Same error result
 	 */
-	and<Next>(next: ((value: V) => Next) | Next): ErrAndResult<Awaited<Next>, E>;
+	and<Next>(next: ((value: V) => Next) | Next): ErrAnd<Awaited<Next>, E>;
 
 	isError: IsError<V, E>;
 
@@ -80,7 +80,7 @@ export type Err<V, E> = {
 	 * @param next Value to return as result, or a callback that returns it
 	 * @returns Next result
 	 */
-	or<Next>(next: ((error: E) => Next) | Next): ErrOrResult<Next>;
+	or<Next>(next: ((error: E) => Next) | Next): ErrOr<Next>;
 
 	/**
 	 * Unwrap the error result with a fallback
@@ -103,19 +103,13 @@ export type Err<V, E> = {
 	[Symbol.asyncIterator](): AsyncGenerator<Err<never, E>, never, unknown>;
 };
 
-type ErrAndResult<Next, E> = [Next] extends [Result<infer NV, infer NE>]
-	? Err<NV, E | NE>
-	: Err<Next, E>;
+type ErrAnd<Next, E> = [Next] extends [Result<infer NV, infer NE>] ? Err<NV, E | NE> : Err<Next, E>;
 
 type ErrMapped<V, M> = [M] extends [Promise<infer P>] ? Promise<Err<V, P>> : Err<V, M>;
 
-type ErrOrResult<Next> = [Next] extends [Promise<infer P>]
-	? Promise<ErrOrResultValue<P>>
-	: ErrOrResultValue<Next>;
+type ErrOr<Next> = [Next] extends [Promise<infer P>] ? Promise<ErrOrResult<P>> : ErrOrResult<Next>;
 
-type ErrOrResultValue<Next> = [Next] extends [Result<infer NV, infer NE>]
-	? Result<NV, NE>
-	: Ok<Next>;
+type ErrOrResult<Next> = [Next] extends [Result<infer NV, infer NE>] ? Result<NV, NE> : Ok<Next>;
 
 interface IsError<V, E> {
 	/**
@@ -208,7 +202,7 @@ export type Ok<V, E = never> = {
 	 * @param next Next result value, or a callback that returns it
 	 * @returns Next result
 	 */
-	and<Next>(next: ((value: V) => Next) | Next): OkAndResult<Next, E>;
+	and<Next>(next: ((value: V) => Next) | Next): OkAnd<Next, E>;
 
 	isError: IsError<V, E>;
 
@@ -265,11 +259,11 @@ export type Ok<V, E = never> = {
 	[Symbol.asyncIterator](): AsyncGenerator<Err<never, E>, never, unknown>;
 };
 
-type OkAndResult<Next, E> = [Next] extends [Promise<infer P>]
-	? Promise<OkAndResultValue<P, E>>
-	: OkAndResultValue<Next, E>;
+type OkAnd<Next, E> = [Next] extends [Promise<infer P>]
+	? Promise<OkAndResult<P, E>>
+	: OkAndResult<Next, E>;
 
-type OkAndResultValue<Next, E> = [Next] extends [Result<infer NV, infer NE>]
+type OkAndResult<Next, E> = [Next] extends [Result<infer NV, infer NE>]
 	? Result<NV, E | NE>
 	: Ok<Next, E>;
 
@@ -326,14 +320,17 @@ export type UnwrapValue<Original> = Original extends GenericCallback
 export const RESULT_MESSAGE_ATTEMPT =
 	'`attempt` expected a promise or a function that returns a value';
 
-export const RESULT_MESSAGE_MATCH_ERROR = '`result.match` expected an Error callback';
+export const RESULT_MESSAGE_MATCH_ERROR = '`match` expected an Error callback';
 
-export const RESULT_MESSAGE_MATCH_OK = '`result.match` expected an Ok callback';
+export const RESULT_MESSAGE_MATCH_OK = '`match` expected an Ok callback';
 
 export const RESULT_MESSAGE_MATCH_RESULT =
-	'`result.match` expected a Result or a function that returns a Result';
+	'`match` expected a Result or a function that returns a Result';
 
-export const RESULT_MESSAGE_UNWRAP = '`result.unwrap` expected an Ok result or a fallback';
+export const RESULT_MESSAGE_PROMISE = `'toPromise' expected to receive a Result`;
+
+export const RESULT_MESSAGE_UNWRAP =
+	'`unwrap` expected an Ok result, fallback callback, or fallback value';
 
 export const RESULT_NAME_ERR = 'error';
 

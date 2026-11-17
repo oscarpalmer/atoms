@@ -1,5 +1,6 @@
 import {expect, test} from 'vite-plus/test';
 import {TimedError, timed} from '../../src';
+import {PROMISE_MESSAGE_TIMED, PROMISE_MESSAGE_TIMEOUT} from '../../src/models/promise.model';
 
 test('promise, timed', () =>
 	new Promise<void>(done => {
@@ -48,10 +49,10 @@ test('promise, timed', () =>
 			expect(errors[2]).toBeUndefined();
 
 			expect(errors[3]).toBeInstanceOf(TimedError);
-			expect((errors[3] as TimedError).message).toBe('Promise timed out');
+			expect((errors[3] as TimedError).message).toBe(PROMISE_MESSAGE_TIMEOUT);
 
 			expect(errors[4]).toBeInstanceOf(TypeError);
-			expect((errors[4] as TypeError).message).toBe('Timed function expected a Promise');
+			expect((errors[4] as TypeError).message).toBe(PROMISE_MESSAGE_TIMED);
 
 			expect(values[0]).toBe(1);
 			expect(values[1]).toBe(2);

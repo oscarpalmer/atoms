@@ -347,13 +347,13 @@ export const PLAN_FAILURE_ASYNC = 'asyncFailure' as const;
 
 export const PLAN_FAILURE_SYNC = 'failure' as const;
 
-export const PLAN_MESSAGE_PLAN_INPUT = 'plan requires a generator function';
+export const PLAN_MESSAGE_PLAN_INPUT = `'plan' requires a generator function'`;
 
-export const PLAN_MESSAGE_RUN_INPUT = 'run requires a plan or a generator function';
+export const PLAN_MESSAGE_RUN_INPUT = `'run' requires a plan or generator function`;
 
-export const PLAN_MESSAGE_USE_NESTED_FN = "Cannot use nested functions with 'use'";
+export const PLAN_MESSAGE_USE_NESTED_FN = `Cannot use nested functions with 'use'`;
 
-export const PLAN_MESSAGE_USE_SYNC_ASYNC = "Cannot use asynchronous values with 'use'";
+export const PLAN_MESSAGE_USE_SYNC_ASYNC = `Cannot use asynchronous values with 'use'`;
 
 export const PLAN_STEP_ASYNC = 'asyncStep' as const;
 

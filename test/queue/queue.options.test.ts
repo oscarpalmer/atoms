@@ -1,5 +1,6 @@
 import {expect, test} from 'vite-plus/test';
 import {queue} from '../../src';
+import {QUEUE_MESSAGE_CALLBACK} from '../../src/models/queue.model';
 import {queueFixture} from '../.fixtures/queue.fixture';
 
 const {asynchronous, synchronous} = queueFixture;
@@ -45,7 +46,7 @@ test('autostart', () =>
 	}));
 
 test('callback', () => {
-	expect(() => queue('blah' as never)).toThrow('A Queue requires a callback function');
+	expect(() => queue('blah' as never)).toThrow(QUEUE_MESSAGE_CALLBACK);
 });
 
 test('concurrency', () =>

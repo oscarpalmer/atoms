@@ -1,5 +1,6 @@
 import {expect, test} from 'vite-plus/test';
 import {asyncOnce, delay, once} from '../../src';
+import {ONCE_MESSAGE_EXPECTATION} from '../../src/models/function/once.model';
 import {TestFunctionItem} from '../.fixtures/function.fixture';
 import {isFixture} from '../.fixtures/is.fixture';
 
@@ -128,7 +129,7 @@ test('asynchronous: resolve', async () => {
 	expect(fn.error).toBe(false);
 	expect(fn.finished).toBe(true);
 
-	expect(() => once.async('not a function' as never)).toThrow('Once expected a function');
+	expect(() => once.async('not a function' as never)).toThrow(ONCE_MESSAGE_EXPECTATION);
 });
 
 test('is', () => {
@@ -208,5 +209,5 @@ test('synchronous', () => {
 	expect(fn.called).toBe(true);
 	expect(fn.cleared).toBe(true);
 
-	expect(() => once('not a function' as never)).toThrow('Once expected a function');
+	expect(() => once('not a function' as never)).toThrow(ONCE_MESSAGE_EXPECTATION);
 });

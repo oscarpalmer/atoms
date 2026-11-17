@@ -107,9 +107,8 @@ type _NestedKeys<Value, Depth extends number = 5> = Depth extends 0
 				{
 					[ItemKey in keyof Value]-?: ItemKey extends `${number}`
 						? NonNullable<Value[ItemKey]> extends readonly any[] | PlainObject
-							?
-									| `${ItemKey}`
-									| `${ItemKey}.${_NestedKeys<NonNullable<Value[ItemKey]>, SubtractDepth<Depth>>}`
+							? | `${ItemKey}`
+								| `${ItemKey}.${_NestedKeys<NonNullable<Value[ItemKey]>, SubtractDepth<Depth>>}`
 							: `${ItemKey}`
 						: never;
 				}[number]
@@ -119,9 +118,8 @@ type _NestedKeys<Value, Depth extends number = 5> = Depth extends 0
 			? {
 					[ItemKey in keyof Value]-?: ItemKey extends number | string
 						? NonNullable<Value[ItemKey]> extends readonly any[] | PlainObject
-							?
-									| `${ItemKey}`
-									| `${ItemKey}.${_NestedKeys<NonNullable<Value[ItemKey]>, SubtractDepth<Depth>>}`
+							? | `${ItemKey}`
+								| `${ItemKey}.${_NestedKeys<NonNullable<Value[ItemKey]>, SubtractDepth<Depth>>}`
 							: `${ItemKey}`
 						: never;
 				}[keyof Value]

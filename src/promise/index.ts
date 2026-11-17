@@ -4,8 +4,8 @@ import {isArrayOrPlainObject, isPromise} from '../internal/is';
 import {attempt} from '../internal/result/attempt';
 import type {ArrayOrPlainObject, Key, PlainObject} from '../models/index';
 import {
-	PROMISE_MESSAGE_EXPECTATION_ATTEMPT,
-	PROMISE_MESSAGE_EXPECTATION_ITEMS_TYPE,
+	PROMISE_MESSAGE_ATTEMPT,
+	PROMISE_MESSAGE_ITEMS_TYPE,
 	PROMISE_STRATEGY_DEFAULT,
 	PROMISE_TYPE_FULFILLED,
 	PROMISE_TYPE_REJECTED,
@@ -75,7 +75,7 @@ export async function attemptPromise<Value>(
 	const isFunction = typeof value === 'function';
 
 	if (!isFunction && !isPromise(value)) {
-		throw new TypeError(PROMISE_MESSAGE_EXPECTATION_ATTEMPT);
+		throw new TypeError(PROMISE_MESSAGE_ATTEMPT);
 	}
 
 	const {signal, time} = createPromiseOptions(options);
@@ -216,7 +216,7 @@ export async function promises(items: ArrayOrPlainObject, options?: unknown): Pr
 	}
 
 	if (!isArrayOrPlainObject(items)) {
-		throw new TypeError(PROMISE_MESSAGE_EXPECTATION_ITEMS_TYPE);
+		throw new TypeError(PROMISE_MESSAGE_ITEMS_TYPE);
 	}
 
 	const isArray = Array.isArray(items);

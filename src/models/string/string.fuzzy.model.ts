@@ -163,9 +163,9 @@ export const FUZZY_BOUNDARY_SEPARATOR: RegExp = /[\s./:\\_-]/;
 
 export const FUZZY_LENGTH_DIVISOR = 3;
 
-export const FUZZY_MESSAGE_ARRAY = 'Fuzzy requires an array of items';
+export const FUZZY_MESSAGE_ARRAY = `'fuzzy' requires an array of items`;
 
-export const FUZZY_MESSAGE_HANDLER = 'Fuzzy requires a key or function to stringify items';
+export const FUZZY_MESSAGE_HANDLER = `'fuzzy' requires a key or function to stringify items`;
 
 export const FUZZY_PROXIMITY_THRESHOLD = 5;
 

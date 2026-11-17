@@ -1,5 +1,5 @@
 import {getGenerator} from '../internal/plan';
-import {error} from '../internal/result/misc';
+import {error} from '../internal/result/value';
 import {
 	PLAN_FAILURE_ASYNC,
 	PLAN_FAILURE_SYNC,

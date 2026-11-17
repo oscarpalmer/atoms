@@ -1,8 +1,9 @@
 import {expect, test} from 'vite-plus/test';
 import {retry, RetryError} from '../../src';
+import {RETRY_MESSAGE_EXPECTATION} from '../../src/models/function/retry.model';
 
 test('asynchronous', async () => {
-	const immediate = await retry.async(() => 'Immediate value!');
+	const immediate = await retry.async(async () => 'Immediate value!');
 
 	expect(immediate).toBe('Immediate value!');
 
@@ -68,7 +69,7 @@ test('asynchronous', async () => {
 		),
 	).rejects.toThrow('Failed when!');
 
-	await expect(retry.async('blah' as never)).rejects.toThrow('Retry expected a function');
+	await expect(retry.async('blah' as never)).rejects.toThrow(RETRY_MESSAGE_EXPECTATION);
 });
 
 test('synchronous', () => {
@@ -122,5 +123,5 @@ test('synchronous', () => {
 		expect(((error as RetryError).original as Error).message).toBe('Failed attempt!');
 	}
 
-	expect(() => retry('blah' as never)).toThrow('Retry expected a function');
+	expect(() => retry('blah' as never)).toThrow(RETRY_MESSAGE_EXPECTATION);
 });

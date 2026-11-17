@@ -45,12 +45,11 @@ export type ArrayKeySorters<Item extends PlainObject> = {
  * Sorter to use for sorting
  */
 export type ArraySorter<Item> = Item extends PlainObject
-	?
-			| keyof Item
-			| ArrayComparisonSorter<Item>
-			| ArrayKeySorters<Item>
-			| ArrayValueSorter<Item>
-			| ComparisonSorter<Item>
+	? | keyof Item
+		| ArrayComparisonSorter<Item>
+		| ArrayKeySorters<Item>
+		| ArrayValueSorter<Item>
+		| ComparisonSorter<Item>
 	: ArrayComparisonSorter<Item> | ArrayValueSorter<Item> | ComparisonSorter<Item>;
 
 /**

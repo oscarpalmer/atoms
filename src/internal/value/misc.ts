@@ -1,4 +1,4 @@
-import {error, ok} from '../../internal/result/misc';
+import {error, ok} from '../../internal/result/value';
 import type {PlainObject} from '../../models/index';
 import type {Result} from '../../models/result.model';
 import {

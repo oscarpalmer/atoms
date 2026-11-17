@@ -1,249 +1,112 @@
 import {
+	RESULT_MESSAGE_PROMISE,
 	RESULT_MESSAGE_UNWRAP,
-	RESULT_NAME_ERR,
-	RESULT_NAME_OK,
-	RESULT_SYMBOL,
 	type Err,
 	type Ok,
 	type Result,
 } from '../../models/result.model';
-import {noop} from '../function/misc';
-import {isPromise} from '../is';
 import {isError, isOk, isResult} from './is';
-import {match} from './match';
-
-// #region Instances
-
-function Err(this: any, error: unknown): void {
-	this[RESULT_SYMBOL] = RESULT_NAME_ERR;
-
-	this.error = error;
-	this.ok = false;
-}
-
-Err.prototype[Symbol.asyncIterator] = iterateResultAsync;
-Err.prototype[Symbol.iterator] = iterateResult;
-
-Err.prototype.and = andResult;
-Err.prototype.isError = isErrorResult;
-Err.prototype.isOk = isOkResult;
-Err.prototype.map = mapResult;
-Err.prototype.mapError = mapErrorResult;
-Err.prototype.match = matchResult;
-Err.prototype.or = orResult;
-Err.prototype.unwrap = unwrapResult;
-
-function Ok(this: any, value: unknown): void {
-	this[RESULT_SYMBOL] = RESULT_NAME_OK;
-
-	this.value = value;
-	this.ok = true;
-}
-
-Ok.prototype[Symbol.asyncIterator] = iterateResultAsync;
-Ok.prototype[Symbol.iterator] = iterateResult;
-
-Ok.prototype.and = andResult;
-Ok.prototype.isError = isErrorResult;
-Ok.prototype.isOk = isOkResult;
-Ok.prototype.map = mapResult;
-Ok.prototype.mapError = mapErrorResult;
-Ok.prototype.match = matchResult;
-Ok.prototype.or = orResult;
-Ok.prototype.unwrap = unwrapResult;
-
-// #endregion
 
 // #region Functions
 
-function andResult(this: Result<unknown, unknown>, next: unknown): unknown {
-	if (!this.ok) {
-		if (isPromise(next)) {
-			void next.then(noop, noop);
-		}
-
-		return this;
-	}
-
-	if (typeof next === 'function') {
-		next = next(this.value);
-	}
-
-	if (!isPromise(next)) {
-		return wrap(next);
-	}
-
-	return next.then(wrap);
-}
-
 /**
- * Creates an error result
+ * Converts a result to a _Promise_
  *
- * @param value Error value
- * @returns Error result
- */
-export function error<V = never, E = Error>(value: E): Err<V, E> {
-	// @ts-expect-error Using old school function constructor, so all good, no worries :-)
-	return new Err(value);
-}
-
-function isErrorResult(
-	this: Err<unknown, unknown>,
-	predicate?: (value: unknown) => boolean,
-): boolean {
-	return isError(this) && (typeof predicate === 'function' ? predicate(this.error) : true);
-}
-
-function isOkResult(this: Ok<unknown, unknown>, predicate?: (value: unknown) => boolean): boolean {
-	return isOk(this) && (typeof predicate === 'function' ? predicate(this.value) : true);
-}
-
-function* iterateResult(this: Result<unknown, unknown>): unknown {
-	if (this.ok) {
-		return this.value;
-	}
-
-	yield this;
-}
-
-async function* iterateResultAsync(this: Result<unknown, unknown>): unknown {
-	if (this.ok) {
-		return await this.value;
-	}
-
-	yield this;
-}
-
-function mapResult(this: Result<unknown, unknown>, mapper: unknown): unknown {
-	if (!this.ok) {
-		if (isPromise(mapper)) {
-			void mapper.then(noop, noop);
-		}
-
-		return this;
-	}
-
-	if (typeof mapper === 'function') {
-		mapper = mapper(this.value);
-	}
-
-	if (!isPromise(mapper)) {
-		return ok(mapper);
-	}
-
-	return mapper.then(ok);
-}
-
-function mapErrorResult(this: Result<unknown, unknown>, mapper: unknown): unknown {
-	if (this.ok) {
-		if (isPromise(mapper)) {
-			void mapper.then(noop, noop);
-		}
-
-		return this;
-	}
-
-	if (typeof mapper === 'function') {
-		mapper = mapper(this.error);
-	}
-
-	if (!isPromise(mapper)) {
-		return error(mapper);
-	}
-
-	return mapper.then(error);
-}
-
-function matchResult(this: Result<unknown, unknown>, first: unknown, second: unknown): unknown {
-	return match(this, first as never, second as never);
-}
-
-/**
- * Creates an ok result
+ * Resolves if ok, rejects for error
  *
- * @param value Value
- * @returns Ok result
+ * @param callback Callback to get the result
+ * @returns Promised result
  */
-export function ok<V, E = never>(value: V): Ok<V, E> {
-	// @ts-expect-error Using old school function constructor, so all good, no worries :-)
-	return new Ok(value) as Ok<V, E>;
-}
+export async function toPromise<Value, E = Error>(callback: () => Result<Value, E>): Promise<Value>;
 
-function orResult(this: Result<unknown, unknown>, next: unknown): unknown {
-	if (this.ok) {
-		if (isPromise(next)) {
-			void next.then(noop, noop);
-		}
+/**
+ * Converts a result to a _Promise_
+ *
+ * Resolves if ok, rejects for error
+ *
+ * @param result Result to convert
+ * @returns Promised result
+ */
+export async function toPromise<Value, E = Error>(result: Result<Value, E>): Promise<Value>;
 
-		return this;
+export function toPromise(result: unknown): Promise<unknown> {
+	const actual = typeof result === 'function' ? result() : result;
+
+	if (!isResult(actual)) {
+		return Promise.reject(new TypeError(RESULT_MESSAGE_PROMISE));
 	}
 
-	if (typeof next === 'function') {
-		next = next(this.error);
+	if (isOk(actual)) {
+		return Promise.resolve(actual.value);
 	}
 
-	if (!isPromise(next)) {
-		return wrap(next);
-	}
-
-	return next.then(wrap);
+	return Promise.reject(actual.error);
 }
 
 /**
- * Gets the value of an ok result _(or a default value)_
+ * Gets the value of an ok result _(or a fallback value from an error handler)_
  *
  * @param value Result to unwrap
- * @param defaultValue Default value
- * @returns Value of the result _(or the default value)_
+ * @param next Error handler to get the fallback value
+ * @returns Value of the ok result _(or the fallback value)_
  */
 export function unwrap<V = unknown, E = Error, Next = V>(
 	value: Result<V, E>,
-	defaultValue: Next,
-): V | Next {
-	return isOk(value) ? value.value : defaultValue;
+	next: (error: E) => Next,
+): V | Next;
+
+/**
+ * Gets the value of an ok result _(or a fallback value)_
+ *
+ * @param value Result to unwrap
+ * @param next Fallback value
+ * @returns Value of the ok result _(or the fallback value)_
+ */
+export function unwrap<V = unknown, E = Error, Next = V>(value: Result<V, E>, next: Next): V | Next;
+
+/**
+ * Gets the value of an ok result
+ *
+ * _Throws if the result is an error_
+ *
+ * @param value Result to unwrap
+ * @returns Value of the ok result
+ */
+export function unwrap<V = unknown, E = Error>(value: Result<V, E>): V;
+
+export function unwrap(value: unknown, ...args: unknown[]): unknown {
+	return unwrapValue(value, undefined, undefined, ...args);
 }
 
-function unwrapResult(this: Result<unknown, unknown>, ...args: unknown[]): unknown {
-	if (this.ok) {
-		return this.value;
+export function unwrapValue(
+	value: unknown,
+	ok: boolean | undefined,
+	error: boolean | undefined,
+	...args: unknown[]
+): unknown {
+	if (ok ?? isOk(value)) {
+		return (value as Ok<unknown, unknown>).value;
 	}
 
+	const valueAsError = value as Err<unknown, unknown>;
+
+	error ??= isError(value);
+
 	if (args.length === 0) {
-		throw this.error instanceof Error
-			? this.error
-			: new Error(RESULT_MESSAGE_UNWRAP, {cause: this.error});
+		if (error && valueAsError.error instanceof Error) {
+			throw valueAsError.error;
+		}
+
+		throw new Error(RESULT_MESSAGE_UNWRAP, error ? {cause: valueAsError.error} : undefined);
 	}
 
 	const [unwrapped] = args;
 
-	return typeof unwrapped === 'function' ? unwrapped(this.error) : unwrapped;
-}
-
-function wrap(value: unknown): Result<unknown, unknown> {
-	if (isResult(value)) {
-		return value;
+	if (typeof unwrapped === 'function') {
+		return unwrapped(error ? valueAsError.error : undefined);
 	}
 
-	return ok(value);
+	return unwrapped;
 }
-
-// #endregion
-
-// #region Namespace
-
-export declare namespace error {
-	export var is: typeof isError;
-}
-
-export declare namespace ok {
-	export var is: typeof isOk;
-}
-
-// #endregion
-
-// #region Initialization
-
-error.is = isError;
-ok.is = isOk;
 
 // #endregion

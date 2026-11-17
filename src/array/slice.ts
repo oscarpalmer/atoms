@@ -130,8 +130,17 @@ function extractSlice(
 		return take ? array.slice() : [];
 	}
 
-	const isBoolean = callbacks?.bool != null;
+	return extractValues(array, length, callbacks!, second, take, callbacks?.bool != null);
+}
 
+function extractValues(
+	array: unknown[],
+	length: number,
+	callbacks: ArrayGetCallbacks,
+	second: unknown,
+	take: boolean,
+	isBoolean: boolean,
+): unknown[] {
 	const extracted: unknown[] = [];
 
 	let push = false;

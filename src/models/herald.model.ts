@@ -85,11 +85,11 @@ export type InternalHeraldEvents = {
 
 // #region Variables
 
-export const HERALD_MESSAGE_ARRAY = 'Herald requires an array of event names.';
+export const HERALD_MESSAGE_ARRAY = `'Herald requires an array of event names`;
 
-export const HERALD_MESSAGE_ONCREATE = `Herald requires a valid onCreate callback for subscription creation`;
+export const HERALD_MESSAGE_ONCREATE = `'Herald' requires a valid onCreate callback for subscription creation`;
 
-export const HERALD_MESSAGE_PROPERTY = `Herald requires valid property information for subscription identification`;
+export const HERALD_MESSAGE_PROPERTY = `'Herald' requires valid property information for subscription identification`;
 
 export const HERALD_NAME_EVENTS = 'events';
 
