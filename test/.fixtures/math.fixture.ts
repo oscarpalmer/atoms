@@ -44,6 +44,60 @@ const array = {
 };
 
 const rounded = {
+	// [value, decimals, ceil, floor, round]
+	cases: [
+		// Exact values (issue #1)
+		[0, 2, 0, 0, 0],
+		[1, 2, 1, 1, 1],
+		[0.07, 2, 0.07, 0.07, 0.07],
+		[1.1, 2, 1.1, 1.1, 1.1],
+		[-1, 2, -1, -1, -1],
+		[4.35, 2, 4.35, 4.35, 4.35],
+		[-4.35, 2, -4.35, -4.35, -4.35],
+
+		// Values that need rounding
+		[1.234, 2, 1.24, 1.23, 1.23],
+		[10.567, 2, 10.57, 10.56, 10.57],
+		[-1.234, 2, -1.23, -1.24, -1.23],
+
+		// Halfway values (`Math.round` rounds halves towards positive infinity)
+		[1.005, 2, 1.01, 1, 1.01],
+		[-1.005, 2, -1, -1.01, -1],
+
+		// Exponent notation when stringified
+		[1e-7, 2, 0.01, 0, 0],
+		[1.5e-7, 7, 2e-7, 1e-7, 2e-7],
+		[1.5e-30, 30, 2e-30, 1e-30, 2e-30],
+		[1.5e21, 2, 1.5e21, 1.5e21, 1.5e21],
+
+		// Negative zero
+		[-0.001, 2, -0, -0.01, -0],
+
+		// Different numbers of decimals
+		[4.35, 0, 5, 4, 4],
+		[4.35, -1, 5, 4, 4],
+		[4.35, 1, 4.4, 4.3, 4.4],
+		[4.35, 3, 4.35, 4.35, 4.35],
+		[1.234, 2.5, 1.24, 1.23, 1.23],
+		[1.234, 25, 1.234, 1.234, 1.234],
+
+		// Non-finite values
+		[Number.NaN, 2, Number.NaN, Number.NaN, Number.NaN],
+		[
+			Number.POSITIVE_INFINITY,
+			2,
+			Number.POSITIVE_INFINITY,
+			Number.POSITIVE_INFINITY,
+			Number.POSITIVE_INFINITY,
+		],
+		[
+			Number.NEGATIVE_INFINITY,
+			2,
+			Number.NEGATIVE_INFINITY,
+			Number.NEGATIVE_INFINITY,
+			Number.NEGATIVE_INFINITY,
+		],
+	] as [number, number, number, number, number][],
 	value: 123.456789,
 	decimals: [null, -1, 0, 1, 2, 3, 4, 5],
 	length: 8,

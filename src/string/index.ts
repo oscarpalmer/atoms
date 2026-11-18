@@ -3,8 +3,10 @@ import {min} from '../internal/math/aggregate';
 import {interpolate} from '../internal/string/misc';
 import {EXPRESSION_NUMERICAL_PREFIX} from '../models/misc.model';
 import {
-	STRING_DELIMITER_UUID_DEFAULT,
-	STRING_DELIMITER_UUID_HTML,
+	STRING_DELIMITER_HYPHEN,
+	STRING_DELIMITER_UNDERSCORE,
+} from '../models/string/string.case.model';
+import {
 	STRING_EXPRESSION_WHITESPACE_PREFIX,
 	STRING_NEWLINE,
 	STRING_ZERO,
@@ -124,7 +126,7 @@ export function getUuid(html?: unknown): string {
 			hex.substring(12, 16),
 			hex.substring(16, 20),
 			hex.substring(20, 32),
-		].join(forHTML ? STRING_DELIMITER_UUID_HTML : STRING_DELIMITER_UUID_DEFAULT);
+		].join(forHTML ? STRING_DELIMITER_UNDERSCORE : STRING_DELIMITER_HYPHEN);
 	}
 }
 

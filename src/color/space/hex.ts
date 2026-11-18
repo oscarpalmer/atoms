@@ -1,16 +1,4 @@
 import {join} from '../../internal/string/misc';
-import {
-	COLOR_ALPHA,
-	COLOR_DEFAULTS,
-	COLOR_EXPRESSION,
-	COLOR_LENGTHS,
-	COLOR_MAX,
-	COLOR_SYMBOL,
-	COLOR_TYPE,
-} from '../constants';
-import {getHexValue, getPercentage} from '../misc/get';
-import {isHexColor} from '../misc/is';
-import {getStateValue, setStateValue} from '../misc/state';
 import type {
 	ColorState,
 	ColorType,
@@ -22,6 +10,19 @@ import type {
 	RGBAColor,
 	RGBColor,
 } from '../../models/color.model';
+import {
+	COLOR_ALPHA,
+	COLOR_DEFAULTS,
+	COLOR_EXPRESSION,
+	COLOR_HEX_RADIX,
+	COLOR_LENGTHS,
+	COLOR_MAX,
+	COLOR_SYMBOL,
+	COLOR_TYPE,
+} from '../constants';
+import {getHexValue, getPercentage} from '../misc/get';
+import {isHexColor} from '../misc/is';
+import {getStateValue, setStateValue} from '../misc/state';
 import {convertRgbToHsla, convertRgbToHwba} from './rgb';
 
 // #region Functions
@@ -34,11 +35,11 @@ function convertHexToRgba(value: string): RGBAColor {
 	const {length} = pairs;
 
 	for (let index = 1; index < length; index += 1) {
-		values.push(Number.parseInt(pairs[index], 16));
+		values.push(Number.parseInt(pairs[index], COLOR_HEX_RADIX));
 	}
 
 	return {
-		alpha: getPercentage((values[3] / COLOR_MAX.hex) * 100),
+		alpha: getPercentage((values[3] / COLOR_MAX.hex) * COLOR_MAX.percent),
 		blue: getHexValue(values[2]),
 		green: getHexValue(values[1]),
 		red: getHexValue(values[0]),

@@ -1,7 +1,14 @@
 import {round} from '../../internal/math/misc';
 import {clamp} from '../../internal/number';
-import {COLOR_ALPHA, COLOR_DEFAULTS, COLOR_EXPRESSION, COLOR_MAX, COLOR_SYMBOL} from '../constants';
 import type {Alpha, InternalColor} from '../../models/color.model';
+import {
+	COLOR_ALPHA,
+	COLOR_DEFAULTS,
+	COLOR_EXPRESSION,
+	COLOR_HEX_RADIX,
+	COLOR_MAX,
+	COLOR_SYMBOL,
+} from '../constants';
 
 // #region Functions
 
@@ -17,7 +24,7 @@ export function getAlpha(value: unknown, hex: boolean): Alpha {
 	if (hex && COLOR_EXPRESSION.alphaHex.test(value)) {
 		return {
 			hex: value,
-			value: Number.parseInt(value, 16) / COLOR_MAX.hex,
+			value: Number.parseInt(value, COLOR_HEX_RADIX) / COLOR_MAX.hex,
 		};
 	}
 

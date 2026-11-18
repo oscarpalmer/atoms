@@ -2,7 +2,7 @@ import {isNumber} from './internal/is';
 import {aggregate, getAggregateCallback, getAggregated} from './internal/math/aggregate';
 import {floor, roundNumber} from './internal/math/misc';
 import type {NumericalValues, PlainObject} from './models/index';
-import {AGGREGATION_AVERAGE, AGGREGATION_SUM} from './models/math.model';
+import {MATH_AGGREGATION_AVERAGE, MATH_AGGREGATION_SUM} from './models/math.model';
 
 // #region Functions
 
@@ -61,7 +61,7 @@ export function average<Item extends PlainObject>(
 export function average(numbers: number[]): number;
 
 export function average(array: unknown[], key?: unknown): number {
-	const aggregated = aggregate(AGGREGATION_AVERAGE, array, key);
+	const aggregated = aggregate(MATH_AGGREGATION_AVERAGE, array, key);
 
 	return aggregated.count > 0 ? aggregated.value / aggregated.count : Number.NaN;
 }
@@ -305,7 +305,7 @@ export function sum<Item extends PlainObject>(
 export function sum(values: number[]): number;
 
 export function sum(array: unknown[], key?: unknown): unknown {
-	return getAggregated(AGGREGATION_SUM, array, key);
+	return getAggregated(MATH_AGGREGATION_SUM, array, key);
 }
 
 // #endregion

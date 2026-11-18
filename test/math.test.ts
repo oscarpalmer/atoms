@@ -26,6 +26,10 @@ test('ceil', () => {
 		expect(ceil(rounded.value, rounded.decimals[index] as never)).toBe(rounded.result.ceil[index]);
 	}
 
+	for (const entry of rounded.cases) {
+		expect(ceil(entry[0], entry[1])).toBe(entry[2]);
+	}
+
 	expect(ceil('abc' as never)).toBeNaN();
 });
 
@@ -57,6 +61,10 @@ test('floor', () => {
 		expect(floor(rounded.value, rounded.decimals[index] as never)).toBe(
 			rounded.result.floor[index],
 		);
+	}
+
+	for (const entry of rounded.cases) {
+		expect(floor(entry[0], entry[1])).toBe(entry[3]);
 	}
 
 	expect(floor('abc' as never)).toBeNaN();
@@ -129,6 +137,10 @@ test('round', () => {
 		expect(round(rounded.value, rounded.decimals[index] as never)).toBe(
 			rounded.result.round[index],
 		);
+	}
+
+	for (const entry of rounded.cases) {
+		expect(round(entry[0], entry[1])).toBe(entry[4]);
 	}
 
 	expect(round('abc' as never)).toBeNaN();

@@ -49,17 +49,3 @@ export function attempt(input: unknown): unknown {
 }
 
 // #endregion
-
-// #region Namespace
-
-export declare namespace attempt {
-	export var async: typeof attempt;
-}
-
-// #endregion
-
-// #region Initialization
-
-attempt.async = attempt;
-
-// #endregion

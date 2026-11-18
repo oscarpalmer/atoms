@@ -173,10 +173,6 @@ export class TimedError extends Error {
 
 // #region Variables
 
-export const PROMISE_ABORT_EVENT = 'abort';
-
-export const PROMISE_ABORT_OPTIONS = {once: true};
-
 export const PROMISE_ERROR_NAME = 'TimedError';
 
 export const PROMISE_MESSAGE_ATTEMPT = 'Attempt expected a function or a promise';

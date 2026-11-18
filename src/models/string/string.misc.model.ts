@@ -6,10 +6,6 @@ export type StringMatch = 'endsWith' | 'includes' | 'startsWith';
 
 // #region Variables
 
-export const STRING_DELIMITER_UUID_DEFAULT = '-';
-
-export const STRING_DELIMITER_UUID_HTML = '_';
-
 export const STRING_EXPRESSION_IGNORED: RegExp = /(^|\.)(__proto__|constructor|prototype)(\.|$)/i;
 
 export const STRING_EXPRESSION_WORDS: RegExp = /[\dA-Za-z\P{ASCII}]+/gu;

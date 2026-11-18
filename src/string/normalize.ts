@@ -3,6 +3,7 @@ import {isPlainObject} from '../internal/is';
 import {lowerCase} from '../internal/string/case';
 import type {Memoized} from '../models/function/memoize.model';
 import {EXPRESSION_WHITESPACE_MULTIPLE} from '../models/misc.model';
+import {STRING_DELIMITER_EMPTY, STRING_DELIMITER_SPACE} from '../models/string/string.case.model';
 import {
 	NORMALIZE_DEBURR_CHARACTERS,
 	NORMALIZE_DEBURR_NORMALIZATION,
@@ -10,9 +11,7 @@ import {
 	NORMALIZE_DEBURR_PATTERN_SIMPLE,
 	NORMALIZE_NORMALIZATION_NORMALIZATION,
 	NORMALIZE_SPECIAL_PATTERN,
-	NORMALIZE_SPECIAL_REPLACEMENT,
 	NORMALIZE_SYMBOL,
-	NORMALIZE_WHITESPACE_REPLACEMENT,
 	type InternalNormalizer,
 	type NormalizeOptions,
 	type Normalizer,
@@ -114,7 +113,7 @@ function normalizeString(
 	}
 
 	if (options.whitespace) {
-		result = result.replace(EXPRESSION_WHITESPACE_MULTIPLE, NORMALIZE_WHITESPACE_REPLACEMENT);
+		result = result.replace(EXPRESSION_WHITESPACE_MULTIPLE, STRING_DELIMITER_SPACE);
 	}
 
 	if (options.deburr) {
@@ -126,7 +125,7 @@ function normalizeString(
 	}
 
 	if (options.special) {
-		result = result.replace(NORMALIZE_SPECIAL_PATTERN, NORMALIZE_SPECIAL_REPLACEMENT);
+		result = result.replace(NORMALIZE_SPECIAL_PATTERN, STRING_DELIMITER_EMPTY);
 	}
 
 	return result.normalize(NORMALIZE_NORMALIZATION_NORMALIZATION);

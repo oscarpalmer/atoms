@@ -97,10 +97,6 @@ export const NORMALIZE_NORMALIZATION_NORMALIZATION: string = 'NFC';
 
 export const NORMALIZE_SPECIAL_PATTERN: RegExp = /[\p{P}\p{S}]/gu;
 
-export const NORMALIZE_SPECIAL_REPLACEMENT = '';
-
 export const NORMALIZE_SYMBOL: unique symbol = Symbol('normalize');
-
-export const NORMALIZE_WHITESPACE_REPLACEMENT = ' ';
 
 // #endregion

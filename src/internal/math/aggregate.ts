@@ -1,25 +1,25 @@
 import type {NumericalValues, PlainObject} from '../../models/index';
 import {
-	AGGREGATION_MAX,
-	AGGREGATION_MIN,
-	type Aggregation,
-	type AggregationCallback,
-	type AggregationType,
-	type NonAverageAggregationType,
+	MATH_AGGREGATION_MAX,
+	MATH_AGGREGATION_MIN,
+	type MathAggregation,
+	type MathAggregationCallback,
+	type MathAggregationType,
+	type MathNonAverageAggregationType,
 } from '../../models/math.model';
 import {isNonNumber} from '../is';
 
 // #region Functions
 
 export function aggregate(
-	type: AggregationType,
+	type: MathAggregationType,
 	array: unknown[],
 	key: unknown,
 	first?: unknown,
-): Aggregation {
+): MathAggregation {
 	const length = Array.isArray(array) ? array.length : 0;
 
-	const aggregation: Aggregation = {
+	const aggregation: MathAggregation = {
 		array: false,
 		count: 0,
 		first: first === true,
@@ -33,7 +33,8 @@ export function aggregate(
 	const aggregator = aggregators[type];
 	const callback = getAggregateCallback(key);
 
-	aggregation.array = callback != null && (type === AGGREGATION_MAX || type === AGGREGATION_MIN);
+	aggregation.array =
+		callback != null && (type === MATH_AGGREGATION_MAX || type === MATH_AGGREGATION_MIN);
 
 	let notNumber = true;
 
@@ -55,13 +56,13 @@ export function aggregate(
 	return aggregation;
 }
 
-function calculateSum(aggregation: Aggregation, value: number, notNumber: boolean): number {
+function calculateSum(aggregation: MathAggregation, value: number, notNumber: boolean): number {
 	return notNumber ? value : aggregation.value + value;
 }
 
 function getAbsoluteValue(
-	condition: (aggregation: Aggregation, value: number) => boolean,
-	aggregation: Aggregation,
+	condition: (aggregation: MathAggregation, value: number) => boolean,
+	aggregation: MathAggregation,
 	value: number,
 	notNumber: boolean,
 	item?: unknown,
@@ -89,7 +90,7 @@ export function getAggregateCallback(key: unknown): Function | undefined {
 }
 
 export function getAggregated(
-	type: NonAverageAggregationType,
+	type: MathNonAverageAggregationType,
 	array: unknown[],
 	key?: unknown,
 	first?: unknown,
@@ -113,11 +114,11 @@ export function getAggregated(
 	return aggregation.value;
 }
 
-function isMaxValue(aggregation: Aggregation, value: number): boolean {
+function isMaxValue(aggregation: MathAggregation, value: number): boolean {
 	return aggregation.array ? value >= aggregation.value : value > aggregation.value;
 }
 
-function isMinValue(aggregation: Aggregation, value: number): boolean {
+function isMinValue(aggregation: MathAggregation, value: number): boolean {
 	return aggregation.array ? value <= aggregation.value : value < aggregation.value;
 }
 
@@ -228,7 +229,7 @@ export function max<Item extends PlainObject>(
 export function max(values: number[]): number;
 
 export function max(array: unknown[], key?: unknown, first?: unknown): unknown {
-	return getAggregated(AGGREGATION_MAX, array, key, first);
+	return getAggregated(MATH_AGGREGATION_MAX, array, key, first);
 }
 
 /**
@@ -340,14 +341,14 @@ export function min<Item extends PlainObject>(
 export function min(values: number[]): number;
 
 export function min(array: unknown[], key?: unknown, first?: unknown): unknown {
-	return getAggregated(AGGREGATION_MIN, array, key, first);
+	return getAggregated(MATH_AGGREGATION_MIN, array, key, first);
 }
 
 // #endregion
 
 // #region Variables
 
-const aggregators: Record<AggregationType, AggregationCallback> = {
+const aggregators: Record<MathAggregationType, MathAggregationCallback> = {
 	average: calculateSum,
 	max: getAbsoluteValue.bind(undefined, isMaxValue),
 	min: getAbsoluteValue.bind(undefined, isMinValue),

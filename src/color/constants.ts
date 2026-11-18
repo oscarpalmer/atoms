@@ -69,6 +69,8 @@ export const COLOR_EXPRESSION: ColorExpressions = {
 	prefix: /^#/,
 };
 
+export const COLOR_HEX_RADIX = 16;
+
 export const COLOR_LENGTHS = {
 	hexLong: 6,
 	hexShort: 3,

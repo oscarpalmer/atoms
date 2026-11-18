@@ -1,3 +1,4 @@
+import {SIZED_MAXIMUM_ABSOLUTE, SIZED_MAXIMUM_DEFAULT} from '../../models/sized.model';
 import {clamp} from '../number';
 
 // #region Functions
@@ -13,13 +14,5 @@ export function getSizedMaximum(first?: unknown, second?: unknown): number {
 
 	return clamp(actual, 1, SIZED_MAXIMUM_ABSOLUTE);
 }
-
-// #endregion
-
-// #region Variables
-
-const SIZED_MAXIMUM_ABSOLUTE = 16_777_216; // 2^24
-
-const SIZED_MAXIMUM_DEFAULT = 1_048_576; // 2^20
 
 // #endregion
