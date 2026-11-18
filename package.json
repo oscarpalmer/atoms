@@ -311,7 +311,7 @@
 	},
 	"devDependencies": {
 		"@types/node": "^26.6",
-		"@vitest/coverage-istanbul": "^5",
+		"@vitest/coverage-istanbul": "5.1.0",
 		"eslint": "^10.15",
 		"jsdom": "^31",
 		"tsdown": "^0.23",
