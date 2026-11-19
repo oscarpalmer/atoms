@@ -44,7 +44,7 @@ test('herald', () => {
 		values.bar.push(1);
 	});
 
-	const baz = harold.subscribe('baz', () => {
+	const baz = harold.events.baz(() => {
 		values.baz.push(1);
 	});
 

@@ -4,6 +4,9 @@ import {type Subscription, type Subscriptions} from './subscription.model';
 // #region Types
 
 export type Herald<Events extends Record<string, GenericCallback>> = {
+	/**
+	 * Named events
+	 */
 	readonly events: HeraldEvents<Events>;
 
 	/**
@@ -45,7 +48,7 @@ export type Herald<Events extends Record<string, GenericCallback>> = {
 export type HeraldEvents<Events extends Record<string, GenericCallback>> = {
 	[Key in keyof Events]: Key extends '*'
 		? never
-		: (callback: Events[Key], signal?: AbortSignal) => void;
+		: (callback: Events[Key], signal?: AbortSignal) => Subscription;
 };
 
 export type HeraldOnCreate<Events extends Record<string, GenericCallback>> = <
