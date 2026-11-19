@@ -33,7 +33,7 @@ export type Frozen<Value> = Value extends unknown[]
 				: Readonly<Value>;
 
 /**
- * A generic async callback function
+ * A generic asynchronous callback function
  */
 export type GenericAsyncCallback = (...args: any[]) => Promise<any>;
 
@@ -41,6 +41,11 @@ export type GenericAsyncCallback = (...args: any[]) => Promise<any>;
  * A generic callback function
  */
 export type GenericCallback = (...args: any[]) => any;
+
+/**
+ * A generic synchronous callback function
+ */
+export type GenericSyncCallback = (...args: any[]) => Exclude<any, Promise<any>>;
 
 /**
  * A generic key type
