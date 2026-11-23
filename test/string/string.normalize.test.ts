@@ -1,5 +1,5 @@
 import {expect, test} from 'vite-plus/test';
-import {deburr, normalize} from '../../src';
+import {deburr, initializeNormalizer, normalize} from '../../src';
 
 const original = 'Æ æ Ð ð Đ đ Ħ ħ Ĳ ĳ İ ı ĸ Ŀ ŀ Ł ł Ŋ ŋ ŉ Œ œ Ø ø ſ ß Þ þ Ŧ ŧ';
 
@@ -12,6 +12,8 @@ test('deburr', () => {
 });
 
 test('normalize', () => {
+	expect(normalize.initialize).toBe(initializeNormalizer);
+
 	const spaces = '     ';
 	const modified = `${spaces}${original.split(' ').join(spaces)}${spaces}`;
 
@@ -111,7 +113,7 @@ test('normalize', () => {
 
 	// Initializer
 
-	expect(normalize.initialize().normalize(modified)).toBe(
+	expect(initializeNormalizer().normalize(modified)).toBe(
 		"ae ae d d d d h h ij ij i i k l l l l n n 'n oe oe o o s ss th th t t",
 	);
 

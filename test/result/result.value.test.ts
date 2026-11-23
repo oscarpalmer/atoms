@@ -7,8 +7,6 @@ test('error', () => {
 	expect(isError(basic)).toBe(true);
 	expect(isOk(basic)).toBe(false);
 	expect(isResult(basic)).toBe(true);
-	expect(error.is(basic)).toBe(true);
-	expect(ok.is(basic)).toBe(false);
 	expect(basic.error).toBe('basic');
 	expect(basic.ok).toBe(false);
 	expect((basic as any).original).toBeUndefined();
@@ -73,6 +71,26 @@ test('error.and & ok.and', async () => {
 	expect(e.and(Promise.reject(new Error('ignored')))).toBe(e);
 
 	await expect(v.and(Promise.reject(new Error('rejected')))).rejects.toThrow('rejected');
+});
+
+test('error.clone && ok.clone', () => {
+	const firstError = error('first');
+	const firstOk = ok('first');
+
+	const clonedError = firstError.clone();
+	const clonedOk = firstOk.clone();
+
+	expect(clonedError).not.toBe(firstError);
+	expect(clonedError.error).toBe('first');
+	expect(clonedError.isError()).toBe(true);
+	expect(clonedError.isOk()).toBe(false);
+	expect(clonedError.ok).toBe(false);
+
+	expect(clonedOk).not.toBe(firstOk);
+	expect(clonedOk.isError()).toBe(false);
+	expect(clonedOk.isOk()).toBe(true);
+	expect(clonedOk.ok).toBe(true);
+	expect(clonedOk.value).toBe('first');
 });
 
 test('error.isError & ok.isError', () => {

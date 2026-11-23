@@ -31,16 +31,6 @@ export type Err<V, E> = {
 	[RESULT_SYMBOL]: typeof RESULT_NAME_ERR;
 
 	/**
-	 * Error value
-	 */
-	readonly error: E;
-
-	/**
-	 * Result is an error
-	 */
-	readonly ok: false;
-
-	/**
 	 * Get a new result based on the current value
 	 *
 	 * _As this is an error result, the error itself will be returned unchanged_
@@ -49,6 +39,13 @@ export type Err<V, E> = {
 	 * @returns Same error result
 	 */
 	and<Next>(next: ((value: V) => Next) | Next): ErrAnd<Awaited<Next>, E>;
+
+	/**
+	 * Clone the result
+	 *
+	 * @returns A new result with the same value or error
+	 */
+	clone(): Err<V, E>;
 
 	isError: IsError<V, E>;
 
@@ -101,9 +98,23 @@ export type Err<V, E> = {
 	 * Asynchronous iterator for the result
 	 */
 	[Symbol.asyncIterator](): AsyncGenerator<Err<never, E>, never, unknown>;
-};
+} & ErrLike<E>;
 
 type ErrAnd<Next, E> = [Next] extends [Result<infer NV, infer NE>] ? Err<NV, E | NE> : Err<Next, E>;
+
+/**
+ * An error-like result
+ */
+export type ErrLike<E> = {
+	/**
+	 * Error value
+	 */
+	readonly error: E;
+	/**
+	 * Result is an error
+	 */
+	readonly ok: false;
+};
 
 type ErrMapped<V, M> = [M] extends [Promise<infer P>] ? Promise<Err<V, P>> : Err<V, M>;
 
@@ -204,6 +215,13 @@ export type Ok<V, E = never> = {
 	 */
 	and<Next>(next: ((value: V) => Next) | Next): OkAnd<Next, E>;
 
+	/**
+	 * Clone the result
+	 *
+	 * @returns A new result with the same value or error
+	 */
+	clone(): Ok<V, E>;
+
 	isError: IsError<V, E>;
 
 	isOk: IsOk<V, E>;
@@ -257,7 +275,7 @@ export type Ok<V, E = never> = {
 	 * Asynchronous iterator for the result
 	 */
 	[Symbol.asyncIterator](): AsyncGenerator<Err<never, E>, never, unknown>;
-};
+} & OkLike<V>;
 
 type OkAnd<Next, E> = [Next] extends [Promise<infer P>]
 	? Promise<OkAndResult<P, E>>
@@ -267,12 +285,31 @@ type OkAndResult<Next, E> = [Next] extends [Result<infer NV, infer NE>]
 	? Result<NV, E | NE>
 	: Ok<Next, E>;
 
+/**
+ * An ok-like result
+ */
+export type OkLike<V> = {
+	/**
+	 * Result is ok
+	 */
+	readonly ok: true;
+	/**
+	 * Ok value
+	 */
+	readonly value: V;
+};
+
 type OkMapped<M, E> = [M] extends [Promise<infer P>] ? Promise<Ok<P, E>> : Ok<M, E>;
 
 /**
  * An unknown result
  */
 export type Result<V, E = Error> = Err<V, E> | Ok<V, E>;
+
+/**
+ * An result-like value
+ */
+export type ResultLike<V, E = Error> = ErrLike<E> | OkLike<V>;
 
 /**
  * Match callbacks for a result
@@ -321,6 +358,8 @@ type UnwrapReturned<Original> =
 
 // #region Variables
 
+export const RESULT_ERROR_PROPERTY = 'error';
+
 export const RESULT_MESSAGE_ATTEMPT =
 	'`attempt` expected a promise or a function that returns a value';
 
@@ -341,6 +380,8 @@ export const RESULT_NAME_ERR = 'error';
 export const RESULT_NAME_OK = 'ok';
 
 export const RESULT_NAMES_ALL: Set<string> = new Set([RESULT_NAME_ERR, RESULT_NAME_OK]);
+
+export const RESULT_OK_PROPERTY = 'value';
 
 export const RESULT_SYMBOL: unique symbol = Symbol('result');
 

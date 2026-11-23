@@ -2,7 +2,7 @@ import {expect, test} from 'vite-plus/test';
 import {getArray} from '../../src';
 import {arrayFixture} from '../.fixtures/array.fixture';
 
-test('array, getArray', () => {
+test('getArray', () => {
 	const {complex, simple} = arrayFixture;
 
 	const values = [null, undefined, '', 123, true, Symbol('test'), (): void => {}];

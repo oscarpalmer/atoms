@@ -1,8 +1,10 @@
 import {expect, test} from 'vite-plus/test';
-import {groupBy} from '../../src';
+import {groupArraysBy, groupBy} from '../../src';
 import {arrayFixture} from '../.fixtures/array.fixture';
 
-test('array, groupBy', () => {
+test('groupBy', () => {
+	expect(groupBy.arrays).toBe(groupArraysBy);
+
 	const {complex} = arrayFixture;
 
 	const keyed = groupBy(complex, 'id');
@@ -51,8 +53,8 @@ test('array, groupBy', () => {
 	expect(keyToValue).toEqual(valueToKey);
 	expect(valueToValue).toEqual(valueToKey);
 
-	const keyeds = groupBy.arrays(complex, 'id');
-	const callbackeds = groupBy.arrays(complex, item => item.name);
+	const keyeds = groupArraysBy(complex, 'id');
+	const callbackeds = groupArraysBy(complex, item => item.name);
 
 	expect(keyeds).toEqual({
 		1: [complex[0]],
@@ -69,11 +71,11 @@ test('array, groupBy', () => {
 		David: [complex[4]],
 	});
 
-	const keyToKeys = groupBy.arrays(complex, 'id', 'name');
-	const valueToKeys = groupBy.arrays(complex, item => item.name, 'age');
-	const keyToValues = groupBy.arrays(complex, 'name', item => item.age);
+	const keyToKeys = groupArraysBy(complex, 'id', 'name');
+	const valueToKeys = groupArraysBy(complex, item => item.name, 'age');
+	const keyToValues = groupArraysBy(complex, 'name', item => item.age);
 
-	const valueToValues = groupBy.arrays(
+	const valueToValues = groupArraysBy(
 		complex,
 		item => item.name,
 		item => item.age,

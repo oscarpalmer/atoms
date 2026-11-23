@@ -5,6 +5,9 @@ import {isFixture} from '../.fixtures/is.fixture';
 const {length, values} = isFixture;
 
 test('isKeyedQueue + isQueue', () => {
+	expect(isKeyedQueue).toBe(keyedQueue.is);
+	expect(isQueue).toBe(queue.is);
+
 	const k = keyedQueue(() => {});
 	const q = queue(() => {});
 

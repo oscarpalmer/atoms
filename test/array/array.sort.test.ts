@@ -1,6 +1,22 @@
 import {expect, test} from 'vite-plus/test';
-import {ArraySorters, diff, getRandomInteger, shuffle, sort, times} from '../../src';
+import {
+	ArraySorters,
+	diff,
+	getRandomInteger,
+	getSortedIndex,
+	initializeSorter,
+	isSorted,
+	shuffle,
+	sort,
+	times,
+} from '../../src';
 import {arrayFixture, TestArrayItem} from '../.fixtures/array.fixture';
+
+test('aliases', () => {
+	expect(sort.getIndex).toBe(getSortedIndex);
+	expect(sort.initialize).toBe(initializeSorter);
+	expect(sort.is).toBe(isSorted);
+});
 
 test('basic', () => {
 	expect(sort([1])).toEqual([1]);
@@ -166,8 +182,8 @@ test('getIndex', () => {
 	for (let index = 0; index < length; index += 1) {
 		const value = numbers[index];
 
-		expect(sort.getIndex(value, 3)).toBe(result[index][0]);
-		expect(sort.getIndex(value, 3, true)).toBe(result[index][1]);
+		expect(getSortedIndex(value, 3)).toBe(result[index][0]);
+		expect(getSortedIndex(value, 3, true)).toBe(result[index][1]);
 	}
 
 	const {alice, aliceAgain, bob, charlie, david} = arrayFixture.people;
@@ -186,13 +202,13 @@ test('getIndex', () => {
 
 	let sorters: ArraySorters<TestArrayItem> = [{key: 'age'}, {key: 'name'}];
 
-	let sorter = sort.initialize(sorters);
+	let sorter = initializeSorter(sorters);
 
 	for (let index = 0; index < length; index += 1) {
 		const person = people[index];
 
 		expect(sorter.index(person, aliceAgain)).toBe(result[index][0]);
-		expect(sort.getIndex(person, aliceAgain, sorters as never, true)).toBe(result[index][1]);
+		expect(getSortedIndex(person, aliceAgain, sorters as never, true)).toBe(result[index][1]);
 	}
 
 	result = [
@@ -202,17 +218,17 @@ test('getIndex', () => {
 	];
 
 	sorters = [{key: 'age'}, {direction: 'descending', key: 'name'}];
-	sorter = sort.initialize(sorters);
+	sorter = initializeSorter(sorters);
 
 	for (let index = 0; index < length; index += 1) {
 		const person = people[index];
 
 		expect(sorter.index(person, aliceAgain)).toBe(result[index][0]);
-		expect(sort.getIndex(person, aliceAgain, sorters as never, true)).toBe(result[index][1]);
+		expect(getSortedIndex(person, aliceAgain, sorters as never, true)).toBe(result[index][1]);
 	}
 
-	expect(sort.getIndex('blah' as never, 3)).toBe(-1);
-	expect(sort.getIndex([], 3)).toBe(0);
+	expect(getSortedIndex('blah' as never, 3)).toBe(-1);
+	expect(getSortedIndex([], 3)).toBe(0);
 });
 
 test('is', () => {
@@ -227,8 +243,8 @@ test('is', () => {
 	for (let index = 0; index < length; index += 1) {
 		const value = numbers[index];
 
-		expect(sort.is(value)).toBe(index === 0);
-		expect(sort.is(value, true)).toBe(index === length - 1);
+		expect(isSorted(value)).toBe(index === 0);
+		expect(isSorted(value, true)).toBe(index === length - 1);
 	}
 
 	const {alice, aliceAgain, bob, charlie, david} = arrayFixture.people;
@@ -242,37 +258,37 @@ test('is', () => {
 	let result = [true, false, false];
 	let sorters: unknown[] = [{key: 'age'}, {key: 'name'}];
 
-	let sorter = sort.initialize(sorters as never);
+	let sorter = initializeSorter(sorters as never);
 
 	length = people.length;
 
 	for (let index = 0; index < length; index += 1) {
 		const person = people[index];
 
-		expect(sort.is(person, sorters as never)).toBe(result[index]);
+		expect(isSorted(person, sorters as never)).toBe(result[index]);
 		expect(sorter.is(person)).toBe(result[index]);
 	}
 
 	result = [false, false, true];
 
-	sorter = sort.initialize(sorters as never, true);
+	sorter = initializeSorter(sorters as never, true);
 
 	for (let index = 0; index < length; index += 1) {
 		const person = people[index];
 
-		expect(sort.is(person, sorters as never, true)).toBe(result[index]);
+		expect(isSorted(person, sorters as never, true)).toBe(result[index]);
 		expect(sorter.is(person)).toBe(result[index]);
 	}
 
 	result = [false, true, false];
 	sorters = [{key: 'age'}, {direction: 'descending', key: 'name'}];
 
-	sorter = sort.initialize(sorters as never);
+	sorter = initializeSorter(sorters as never);
 
 	for (let index = 0; index < length; index += 1) {
 		const person = people[index];
 
-		expect(sort.is(person, sorters as never)).toBe(result[index]);
+		expect(isSorted(person, sorters as never)).toBe(result[index]);
 		expect(sorter.is(person)).toBe(result[index]);
 	}
 
@@ -283,8 +299,8 @@ test('is', () => {
 	for (let index = 0; index < length; index += 1) {
 		const value = large[index];
 
-		expect(sort.is(value)).toBe(index === 0);
-		expect(sort.is(value, true)).toBe(index === length - 1);
+		expect(isSorted(value)).toBe(index === 0);
+		expect(isSorted(value, true)).toBe(index === length - 1);
 	}
 
 	const larger = [times(10_000, index => index), times(10_000, index => 10_000 - index)];
@@ -294,14 +310,14 @@ test('is', () => {
 	for (let index = 0; index < length; index += 1) {
 		const value = larger[index];
 
-		expect(sort.is(value)).toBe(index === 0);
-		expect(sort.is(value, true)).toBe(index === length - 1);
+		expect(isSorted(value)).toBe(index === 0);
+		expect(isSorted(value, true)).toBe(index === length - 1);
 	}
 
-	expect(sort.is([])).toBe(true);
-	expect(sort.is([], true)).toBe(true);
-	expect(sort.is('blah' as never)).toBe(false);
-	expect(sort.is('blah' as never, true)).toBe(false);
+	expect(isSorted([])).toBe(true);
+	expect(isSorted([], true)).toBe(true);
+	expect(isSorted('blah' as never)).toBe(false);
+	expect(isSorted('blah' as never, true)).toBe(false);
 });
 
 test('large (with intializer)', () =>
@@ -334,7 +350,7 @@ test('large (with intializer)', () =>
 			return first.name.first.localeCompare(second.name.first);
 		});
 
-		const sorter = sort.initialize<(typeof large)[0]>([
+		const sorter = initializeSorter<(typeof large)[0]>([
 			'age',
 			{
 				comparison: (first, second) => first.name.last.localeCompare(second.name.last),

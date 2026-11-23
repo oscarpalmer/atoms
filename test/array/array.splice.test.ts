@@ -1,7 +1,7 @@
 import {expect, test} from 'vite-plus/test';
 import {splice} from '../../src';
 
-test('array, splice', () => {
+test('splice', () => {
 	const length = 100_000;
 
 	const values = Array.from({length}, (_, i) => `#${i + 1}`);

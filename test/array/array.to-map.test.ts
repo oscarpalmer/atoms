@@ -1,8 +1,10 @@
 import {expect, test} from 'vite-plus/test';
-import {toMap} from '../../src';
+import {toMap, toMapArrays} from '../../src';
 import {arrayFixture} from '../.fixtures/array.fixture';
 
-test('array, toMap', () => {
+test('toMap', () => {
+	expect(toMap.arrays).toBe(toMapArrays);
+
 	const {complex} = arrayFixture;
 
 	const indiced = toMap(complex);
@@ -72,8 +74,8 @@ test('array, toMap', () => {
 	expect(keyToValue).toEqual(valueToKey);
 	expect(valueToValue).toEqual(valueToKey);
 
-	const keyeds = toMap.arrays(complex, 'id');
-	const callbackeds = toMap.arrays(complex, item => item.name);
+	const keyeds = toMapArrays(complex, 'id');
+	const callbackeds = toMapArrays(complex, item => item.name);
 
 	expect(keyeds).toEqual(
 		new Map([
@@ -94,11 +96,11 @@ test('array, toMap', () => {
 		]),
 	);
 
-	const keyToKeys = toMap.arrays(complex, 'id', 'name');
-	const valueToKeys = toMap.arrays(complex, item => item.name, 'age');
-	const keyToValues = toMap.arrays(complex, 'name', item => item.age);
+	const keyToKeys = toMapArrays(complex, 'id', 'name');
+	const valueToKeys = toMapArrays(complex, item => item.name, 'age');
+	const keyToValues = toMapArrays(complex, 'name', item => item.age);
 
-	const valueToValues = toMap.arrays(
+	const valueToValues = toMapArrays(
 		complex,
 		item => item.name,
 		item => item.age,

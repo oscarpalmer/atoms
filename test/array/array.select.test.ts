@@ -1,5 +1,12 @@
 import {expect, test} from 'vite-plus/test';
-import {reverseSelect, select} from '../../src';
+import {
+	filterAndFlatMap,
+	flatMapAndFilter,
+	mapAndFilter,
+	filterAndMap,
+	select,
+	reverseSelect,
+} from '../../src';
 import {arrayFixture} from '../.fixtures/array.fixture';
 
 type Circle = {kind: 'circle'; radius: number};
@@ -16,9 +23,19 @@ const shapes: Shape[] = [
 
 const isCircle = (shape: Shape): shape is Circle => shape.kind === 'circle';
 
-test('select', () => {
+test('aliases', () => {
+	expect(select).toBe(filterAndMap);
+	expect(select.reverse).toBe(mapAndFilter);
+	expect(reverseSelect).toBe(mapAndFilter);
+
+	expect(select.flat).toBe(filterAndFlatMap);
+	expect(select.reverse.flat).toBe(flatMapAndFilter);
+	expect(reverseSelect.flat).toBe(flatMapAndFilter);
+});
+
+test('filterAndMap', () => {
 	expect(
-		select(
+		filterAndMap(
 			arrayFixture.simple,
 			item => item < 3,
 			item => item * 2,
@@ -26,7 +43,7 @@ test('select', () => {
 	).toEqual([2, 4]);
 
 	expect(
-		select(
+		filterAndMap(
 			arrayFixture.complex,
 			item => item.age === 30,
 			item => item.name,
@@ -34,7 +51,7 @@ test('select', () => {
 	).toEqual(['Bob', 'Alice']);
 
 	expect(
-		select(
+		filterAndMap(
 			arrayFixture.simple,
 			(_, index) => index % 2 === 0,
 			(item, index, array) => `${item}/${index}/${array.length}`,
@@ -42,7 +59,7 @@ test('select', () => {
 	).toEqual(['1/0/5', '3/2/5', '5/4/5']);
 
 	expect(
-		select(
+		filterAndMap(
 			arrayFixture.simple,
 			item => item > 3,
 			() => undefined,
@@ -50,7 +67,7 @@ test('select', () => {
 	).toEqual([undefined, undefined]);
 
 	expect(
-		select(
+		filterAndMap(
 			arrayFixture.simple,
 			() => false,
 			item => item,
@@ -58,19 +75,19 @@ test('select', () => {
 	).toEqual([]);
 
 	expect(
-		select(
+		filterAndMap(
 			'blah' as never,
 			() => true,
 			item => item,
 		),
 	).toEqual([]);
 
-	expect(select([], (() => {}) as never, (() => {}) as never)).toEqual([]);
+	expect(filterAndMap([], (() => {}) as never, (() => {}) as never)).toEqual([]);
 });
 
-test('select.flat', () => {
+test('filterAndFlatMap', () => {
 	expect(
-		select.flat(
+		filterAndFlatMap(
 			arrayFixture.complex,
 			item => item.age > 30,
 			item => [item.id, item.name],
@@ -78,7 +95,7 @@ test('select.flat', () => {
 	).toEqual([3, 'Charlie', 5, 'David']);
 
 	expect(
-		select.flat(
+		filterAndFlatMap(
 			arrayFixture.simple,
 			item => item < 4,
 			item => (item === 2 ? [item, item] : item),
@@ -86,7 +103,7 @@ test('select.flat', () => {
 	).toEqual([1, 2, 2, 3]);
 
 	expect(
-		select.flat(
+		filterAndFlatMap(
 			arrayFixture.simple,
 			item => item === 1,
 			() => [[1], [2]],
@@ -94,7 +111,7 @@ test('select.flat', () => {
 	).toEqual([[1], [2]]);
 
 	expect(
-		select.flat(
+		filterAndFlatMap(
 			'blah' as never,
 			() => true,
 			item => item,
@@ -102,9 +119,9 @@ test('select.flat', () => {
 	).toEqual([]);
 });
 
-test('reverse', () => {
+test('mapAndFilter', () => {
 	expect(
-		select.reverse(
+		mapAndFilter(
 			arrayFixture.simple,
 			item => item * 2,
 			value => value < 5,
@@ -112,7 +129,7 @@ test('reverse', () => {
 	).toEqual([2, 4]);
 
 	expect(
-		reverseSelect(
+		mapAndFilter(
 			arrayFixture.complex,
 			item => item.age,
 			value => value === 30,
@@ -120,7 +137,7 @@ test('reverse', () => {
 	).toEqual([30, 30]);
 
 	expect(
-		reverseSelect(
+		mapAndFilter(
 			arrayFixture.simple,
 			item => item * 10,
 			(_, index, array) => index === array.length - 1,
@@ -128,7 +145,7 @@ test('reverse', () => {
 	).toEqual([50]);
 
 	expect(
-		reverseSelect(
+		mapAndFilter(
 			arrayFixture.simple,
 			item => (item % 2 === 0 ? undefined : item),
 			value => value === undefined,
@@ -136,7 +153,7 @@ test('reverse', () => {
 	).toEqual([undefined, undefined]);
 
 	expect(
-		select.reverse(
+		mapAndFilter(
 			'blah' as never,
 			item => item,
 			() => true,
@@ -144,9 +161,9 @@ test('reverse', () => {
 	).toEqual([]);
 });
 
-test('reverse.flat', () => {
+test('flatMapAndFilter', () => {
 	expect(
-		reverseSelect.flat(
+		flatMapAndFilter(
 			arrayFixture.complex,
 			item => [item.name, item.age],
 			value => typeof value === 'string' && value.startsWith('A'),
@@ -154,7 +171,7 @@ test('reverse.flat', () => {
 	).toEqual(['Alice', 'Alice']);
 
 	expect(
-		reverseSelect.flat(
+		flatMapAndFilter(
 			arrayFixture.complex,
 			item => [item.id, item.age],
 			(_, index) => index === 1,
@@ -162,7 +179,7 @@ test('reverse.flat', () => {
 	).toEqual([2, 30]);
 
 	expect(
-		select.reverse.flat(
+		flatMapAndFilter(
 			arrayFixture.simple,
 			item => item * 2,
 			value => value > 6,
@@ -170,7 +187,7 @@ test('reverse.flat', () => {
 	).toEqual([8, 10]);
 
 	expect(
-		reverseSelect.flat(
+		flatMapAndFilter(
 			'blah' as never,
 			item => item,
 			() => true,
@@ -180,18 +197,18 @@ test('reverse.flat', () => {
 
 test('narrowing', () => {
 	// Mappers and annotations below only compile if the type guard narrows
-	const radii: number[] = select(shapes, isCircle, shape => shape.radius);
+	const radii: number[] = filterAndMap(shapes, isCircle, shape => shape.radius);
 
 	expect(radii).toEqual([1, 3]);
 
-	const flatRadii: number[] = select.flat(shapes, isCircle, shape => [
+	const flatRadii: number[] = filterAndFlatMap(shapes, isCircle, shape => [
 		shape.radius,
 		shape.radius * 2,
 	]);
 
 	expect(flatRadii).toEqual([1, 2, 3, 6]);
 
-	const sizes: number[] = select.reverse(
+	const sizes: number[] = mapAndFilter(
 		shapes,
 		shape => (shape.kind === 'square' ? shape.size : null),
 		(value): value is number => value != null,
@@ -199,7 +216,7 @@ test('narrowing', () => {
 
 	expect(sizes).toEqual([2]);
 
-	const values: number[] = reverseSelect.flat(
+	const values: number[] = flatMapAndFilter(
 		shapes,
 		shape => (shape.kind === 'circle' ? [shape.radius, null] : [shape.size]),
 		(value): value is number => value !== null,
@@ -207,7 +224,7 @@ test('narrowing', () => {
 
 	expect(values).toEqual([1, 2, 3]);
 
-	const evens: number[] = reverseSelect(
+	const evens: number[] = mapAndFilter(
 		arrayFixture.simple,
 		item => (item % 2 === 0 ? item : null),
 		value => value != null,

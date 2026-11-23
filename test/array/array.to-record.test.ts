@@ -1,8 +1,10 @@
 import {expect, test} from 'vite-plus/test';
-import {toRecord} from '../../src';
+import {toRecord, toRecordArrays} from '../../src';
 import {arrayFixture} from '../.fixtures/array.fixture';
 
-test('array, toRecord', () => {
+test('toRecord', () => {
+	expect(toRecord.arrays).toBe(toRecordArrays);
+
 	const {complex} = arrayFixture;
 
 	const indiced = toRecord(complex);
@@ -61,8 +63,8 @@ test('array, toRecord', () => {
 	expect(keyToValue).toEqual(valueToKey);
 	expect(valueToValue).toEqual(valueToKey);
 
-	const keyeds = toRecord.arrays(complex, 'id');
-	const callbackeds = toRecord.arrays(complex, item => item.name);
+	const keyeds = toRecordArrays(complex, 'id');
+	const callbackeds = toRecordArrays(complex, item => item.name);
 
 	expect(keyeds).toEqual({
 		[complex[0].id]: [complex[0]],
@@ -79,11 +81,11 @@ test('array, toRecord', () => {
 		[complex[4].name]: [complex[4]],
 	});
 
-	const keyToKeys = toRecord.arrays(complex, 'id', 'name');
-	const valueToKeys = toRecord.arrays(complex, item => item.name, 'age');
-	const keyToValues = toRecord.arrays(complex, 'name', item => item.age);
+	const keyToKeys = toRecordArrays(complex, 'id', 'name');
+	const valueToKeys = toRecordArrays(complex, item => item.name, 'age');
+	const keyToValues = toRecordArrays(complex, 'name', item => item.age);
 
-	const valueToValues = toRecord.arrays(
+	const valueToValues = toRecordArrays(
 		complex,
 		item => item.name,
 		item => item.age,

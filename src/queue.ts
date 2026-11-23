@@ -408,6 +408,8 @@ function identify(state: QueueState): number {
 /**
  * Is the value keyed queue?
  *
+ * _Available as `isKeyedQueue` and `keyedQueue.is`_
+ *
  * @param value Value to check
  * @returns `true` if the value is a keyed queue, otherwise `false`
  */
@@ -417,6 +419,8 @@ export function isKeyedQueue(value: unknown): value is KeyedQueue<GenericAsyncCa
 
 /**
  * Is the value a queue?
+ *
+ * _Available as `isQueue` and `queue.is`_
  *
  * @param value Value to check
  * @returns `true` if the value is a queue, otherwise `false`
@@ -631,7 +635,12 @@ async function run(state: QueueState): Promise<void> {
 
 // #region Namespace
 
+export declare namespace keyedQueue {
+	export var is: typeof isKeyedQueue;
+}
+
 export declare namespace queue {
+	export var is: typeof isQueue;
 	export var keyed: typeof keyedQueue;
 }
 
@@ -639,6 +648,9 @@ export declare namespace queue {
 
 // #region Initialization
 
+keyedQueue.is = isKeyedQueue;
+
+queue.is = isQueue;
 queue.keyed = keyedQueue;
 
 // #endregion

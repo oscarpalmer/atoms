@@ -2,6 +2,8 @@ import {expect, test} from 'vite-plus/test';
 import {clone, initializeCloner} from '../../src';
 
 test('clone, initialize', () => {
+	expect(clone.initialize).toBe(initializeCloner);
+
 	const cloner = initializeCloner({
 		copyFunctions: true,
 	});

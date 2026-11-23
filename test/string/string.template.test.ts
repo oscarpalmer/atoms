@@ -1,11 +1,13 @@
 import {expect, test} from 'vite-plus/test';
-import {template} from '../../src';
+import {initializeTemplater, template} from '../../src';
 
 test('template: string', () => {
+	expect(template.initialize).toBe(initializeTemplater);
+
 	const basic = '{{a.0.b.1.c}}, {{a.0.b.1.c}}!';
 	const custom = '<a.0.b.1.c>, <a.0.b.1.c>!';
 
-	const templater = template.initialize();
+	const templater = initializeTemplater();
 
 	const variables = {
 		a: [
@@ -54,7 +56,7 @@ test('template: tagged', () => {
 		}),
 	).toBe('Array: 123; boolean: true; object: {"foo":"bar"}; variable: Hello, world!');
 
-	const templater = template.initialize({
+	const templater = initializeTemplater({
 		ignoreCase: true,
 		pattern: /<([^>]+)>/g,
 	});

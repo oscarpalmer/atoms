@@ -2,6 +2,9 @@ import {expect, test} from 'vite-plus/test';
 import {freeze, flatFreeze, isFrozen} from '../../src/value/freeze';
 
 test('freeze', () => {
+	expect(freeze.flat).toBe(flatFreeze);
+	expect(freeze.is).toBe(isFrozen);
+
 	const ref = {
 		message: 'Hello, world!',
 	};
@@ -68,20 +71,16 @@ test('freeze', () => {
 	expect(() => freeze(new Uint8Array(1))).not.toThrow();
 });
 
-test('freeze: flat', () => {
-	const fns = [flatFreeze, freeze.flat];
+test('flatFreeze', () => {
+	const arr = flatFreeze([1, 2, 3]);
 
-	for (const fn of fns) {
-		const arr = fn([1, 2, 3]);
+	expect(arr).toEqual([1, 2, 3]);
 
-		expect(arr).toEqual([1, 2, 3]);
-
-		try {
-			// @ts-expect-error: Testing that the frozen value cannot be modified
-			arr[1] = 99;
-		} catch (error) {
-			expect(error).toBeInstanceOf(TypeError);
-		}
+	try {
+		// @ts-expect-error: Testing that the frozen value cannot be modified
+		arr[1] = 99;
+	} catch (error) {
+		expect(error).toBeInstanceOf(TypeError);
 	}
 
 	const obj = freeze(
@@ -120,7 +119,7 @@ test('freeze: flat', () => {
 	expect(obj.d).toEqual([1, 2, 3]);
 
 	const map = flatFreeze(new Map([['key', 'value']]));
-	const set = freeze.flat(new Set([1, 2, 3]));
+	const set = flatFreeze(new Set([1, 2, 3]));
 
 	expect(map).toEqual(new Map([['key', 'value']]));
 	expect(set).toEqual(new Set([1, 2, 3]));
@@ -134,7 +133,7 @@ test('freeze: flat', () => {
 	expect(set).toEqual(new Set([1, 2, 3]));
 });
 
-test('freeze.is', () => {
+test('isFrozen', () => {
 	const values = [
 		null,
 		undefined,
@@ -157,12 +156,10 @@ test('freeze.is', () => {
 		const value = values[index];
 
 		expect(isFrozen(value)).toBe(false);
-		expect(freeze.is(value)).toBe(false);
 
 		freeze(value);
 
 		expect(isFrozen(value)).toBe(index >= 7);
-		expect(freeze.is(value)).toBe(index >= 7);
 	}
 });
 

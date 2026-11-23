@@ -1,8 +1,17 @@
 import {expect, test} from 'vite-plus/test';
-import {assign, merge, PlainObject, type NestedPartial} from '../../src';
+import {
+	assign,
+	initializeAssigner,
+	initializeMerger,
+	merge,
+	PlainObject,
+	type NestedPartial,
+} from '../../src';
 import {TestValueMergeable} from '../.fixtures/value.fixture';
 
 test('assign', () => {
+	expect(assign.initialize).toBe(initializeAssigner);
+
 	const first = {a: 1, b: {c: 2}};
 
 	let assigned: PlainObject = assign(first, [
@@ -23,7 +32,7 @@ test('assign', () => {
 
 	expect(assigned).toBe(first);
 
-	const assigner = assign.initialize();
+	const assigner = initializeAssigner();
 
 	assigned = assigner.assign(first, [
 		{
@@ -66,6 +75,8 @@ test('assign', () => {
 });
 
 test('merge', () => {
+	expect(merge.initialize).toBe(initializeMerger);
+
 	const first: NestedPartial<TestValueMergeable> = {
 		age: 99,
 		cars: ['Alfa Romeo Spider', 'Lamborghini Miura'],
@@ -92,7 +103,7 @@ test('merge', () => {
 		hobbies: ['Wrestling'],
 	};
 
-	const merger = merge.initialize({
+	const merger = initializeMerger({
 		replaceableObjects: 'cars',
 	});
 

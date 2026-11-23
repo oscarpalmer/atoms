@@ -1,31 +1,34 @@
 import {expect, test} from 'vite-plus/test';
-import {deregisterEqualizer, equal} from '../../src';
+import {deregisterEqualizer, equal, registerEqualizer} from '../../src';
 import {TestEqualItem} from '../.fixtures/equal.fixture';
 
 test('instance', () => {
+	expect(deregisterEqualizer).toBe(equal.deregister);
+	expect(registerEqualizer).toBe(equal.register);
+
 	function compare(first: TestEqualItem, second: TestEqualItem): boolean {
 		return first.value === second.value;
 	}
 
 	expect(equal(new TestEqualItem(123), new TestEqualItem(123))).toBe(false);
 
-	equal.register(TestEqualItem, compare);
+	registerEqualizer(TestEqualItem, compare);
 
 	expect(equal(new TestEqualItem(123), new TestEqualItem(123))).toBe(true);
 	expect(equal(new TestEqualItem(123), new TestEqualItem(456))).toBe(false);
 
-	equal.deregister(TestEqualItem);
+	deregisterEqualizer(TestEqualItem);
 
 	expect(equal(new TestEqualItem(123), new TestEqualItem(123))).toBe(false);
 
-	equal.register(compare as never, compare);
-	equal.register('blah' as never, compare);
+	registerEqualizer(compare as never, compare);
+	registerEqualizer('blah' as never, compare);
 
-	equal.register(TestEqualItem, 'blah' as never);
+	registerEqualizer(TestEqualItem, 'blah' as never);
 
 	expect(equal(new TestEqualItem(123), new TestEqualItem(123))).toBe(false);
 
-	equal.deregister(compare as never);
+	deregisterEqualizer(compare as never);
 
 	deregisterEqualizer('blah' as never);
 });

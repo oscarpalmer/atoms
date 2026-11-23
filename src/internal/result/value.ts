@@ -8,7 +8,15 @@ import {
 } from '../../models/result.model';
 import {isThenable} from '../is';
 import {swallow} from '../promise';
-import {isError, isOk, isResult} from './is';
+import {
+	isError,
+	isErrorLike,
+	isErrorLikeValue,
+	isOk,
+	isOkLike,
+	isOkLikeValue,
+	isResult,
+} from './is';
 import {match} from './match';
 import {unwrapValue} from './misc';
 
@@ -25,6 +33,7 @@ Err.prototype[Symbol.asyncIterator] = iterateResultAsync;
 Err.prototype[Symbol.iterator] = iterateResult;
 
 Err.prototype.and = andResult;
+Err.prototype.clone = cloneResult;
 Err.prototype.isError = isErrorResult;
 Err.prototype.isOk = isOkResult;
 Err.prototype.map = mapResult;
@@ -44,6 +53,7 @@ Ok.prototype[Symbol.asyncIterator] = iterateResultAsync;
 Ok.prototype[Symbol.iterator] = iterateResult;
 
 Ok.prototype.and = andResult;
+Ok.prototype.clone = cloneResult;
 Ok.prototype.isError = isErrorResult;
 Ok.prototype.isOk = isOkResult;
 Ok.prototype.map = mapResult;
@@ -56,22 +66,12 @@ Ok.prototype.unwrap = unwrapResult;
 
 // #region Functions
 
-// #endregion
-
-// #region Namespace
-
-export declare namespace error {
-	export var is: typeof isError;
-}
-
-export declare namespace ok {
-	export var is: typeof isOk;
-}
-
-// #endregion
-
 function andResult(this: Result<unknown, unknown>, next: unknown): unknown {
-	return handleResult(this, next, false, !this.ok);
+	return handleResult(this, next, false, this[RESULT_SYMBOL] === RESULT_NAME_ERR);
+}
+
+function cloneResult(this: Result<unknown, unknown>): Result<unknown, unknown> {
+	return this[RESULT_SYMBOL] === RESULT_NAME_OK ? ok(this.value) : error(this.error);
 }
 
 /**
@@ -102,13 +102,13 @@ function handleResult(
 	let value = next;
 
 	if (typeof next === 'function') {
-		value = next(result.ok ? result.value : result.error);
+		value = next(result[RESULT_SYMBOL] === RESULT_NAME_OK ? result.value : result.error);
 	}
 
 	let wrapper: (value: unknown) => Result<unknown, unknown>;
 
 	if (map) {
-		wrapper = result.ok ? ok : error;
+		wrapper = result[RESULT_SYMBOL] === RESULT_NAME_OK ? ok : error;
 	} else {
 		wrapper = ok;
 	}
@@ -132,7 +132,7 @@ function isOkResult(this: Ok<unknown, unknown>, predicate?: (value: unknown) => 
 }
 
 function* iterateResult(this: Result<unknown, unknown>): unknown {
-	if (this.ok) {
+	if (this[RESULT_SYMBOL] === RESULT_NAME_OK) {
 		return this.value;
 	}
 
@@ -140,7 +140,7 @@ function* iterateResult(this: Result<unknown, unknown>): unknown {
 }
 
 async function* iterateResultAsync(this: Result<unknown, unknown>): unknown {
-	if (this.ok) {
+	if (this[RESULT_SYMBOL] === RESULT_NAME_OK) {
 		return await this.value;
 	}
 
@@ -148,11 +148,11 @@ async function* iterateResultAsync(this: Result<unknown, unknown>): unknown {
 }
 
 function mapErrorResult(this: Result<unknown, unknown>, next: unknown): unknown {
-	return handleResult(this, next, true, this.ok);
+	return handleResult(this, next, true, this[RESULT_SYMBOL] === RESULT_NAME_OK);
 }
 
 function mapResult(this: Result<unknown, unknown>, next: unknown): unknown {
-	return handleResult(this, next, true, !this.ok);
+	return handleResult(this, next, true, this[RESULT_SYMBOL] === RESULT_NAME_ERR);
 }
 
 function matchResult(this: Result<unknown, unknown>, first: unknown, second: unknown): unknown {
@@ -171,11 +171,75 @@ export function ok<V, E = never>(value: V): Ok<V, E> {
 }
 
 function orResult(this: Result<unknown, unknown>, next: unknown): unknown {
-	return handleResult(this, next, false, this.ok);
+	return handleResult(this, next, false, this[RESULT_SYMBOL] === RESULT_NAME_OK);
+}
+
+/**
+ * Parse a value as an error result
+ *
+ * @param value Value to parse
+ * @returns Error result if the value is parseable, otherwise `undefined`
+ */
+export function parseError<E = unknown>(value: unknown): Err<never, E> | undefined {
+	return parseResultValue(value, true, false) as Err<never, E> | undefined;
+}
+
+/**
+ * Parse a value as an ok result
+ *
+ * @param value Value to parse
+ * @returns Ok result if the value is parseable, otherwise `undefined`
+ */
+export function parseOk<V>(value: unknown): Ok<V, never> | undefined {
+	return parseResultValue(value, false, true) as Ok<V, never> | undefined;
+}
+
+/**
+ * Parse a value as a result
+ *
+ * @param value Value to parse
+ * @returns Result if the value is parseable, otherwise `undefined`
+ */
+export function parseResult<V = unknown, E = unknown>(value: unknown): Result<V, E> | undefined {
+	return parseResultValue(value, true, true) as Result<V, E> | undefined;
+}
+
+function parseResultValue(
+	value: unknown,
+	allowError: boolean,
+	allowOk: boolean,
+): Result<unknown, unknown> | undefined {
+	if (typeof value !== 'object' || value === null) {
+		return undefined;
+	}
+
+	if (RESULT_SYMBOL in value) {
+		const valueAsResult = value as Result<unknown, unknown>;
+
+		if (
+			(allowError && valueAsResult[RESULT_SYMBOL] === RESULT_NAME_ERR) ||
+			(allowOk && valueAsResult[RESULT_SYMBOL] === RESULT_NAME_OK)
+		) {
+			return valueAsResult;
+		}
+
+		return undefined;
+	}
+
+	if (allowError && isErrorLikeValue(value)) {
+		return error(value.error);
+	}
+
+	return allowOk && isOkLikeValue(value) ? ok(value.value) : undefined;
 }
 
 function unwrapResult(this: Result<unknown, unknown>, ...args: unknown[]): unknown {
-	return unwrapValue(this, this.ok, !this.ok, ...args);
+	return unwrapValue(
+		this,
+		this[RESULT_SYMBOL] === RESULT_NAME_OK,
+		this[RESULT_SYMBOL] === RESULT_NAME_ERR,
+		...args,
+	);
 }
 
 function wrapResult(
@@ -185,9 +249,30 @@ function wrapResult(
 	return isResult(value) ? value : wrapper(value);
 }
 
+// #region Namespace
+
+export declare namespace error {
+	export var is: typeof isError;
+	export var like: typeof isErrorLike;
+	export var parse: typeof parseError;
+}
+
+export declare namespace ok {
+	export var is: typeof isOk;
+	export var like: typeof isOkLike;
+	export var parse: typeof parseOk;
+}
+
+// #endregion
+
 // #region Initialization
 
 error.is = isError;
+error.like = isErrorLike;
+error.parse = parseError;
+
 ok.is = isOk;
+ok.like = isOkLike;
+ok.parse = parseOk;
 
 // #endregion

@@ -1,9 +1,11 @@
 import {expect, test} from 'vite-plus/test';
-import {keyedQueue} from '../../src';
+import {keyedQueue, queue} from '../../src';
 
 test('queue, keyed', () =>
 	new Promise<void>(done => {
-		const queue = keyedQueue(
+		expect(queue.keyed).toBe(keyedQueue);
+
+		const keyed = keyedQueue(
 			(key: string, value: number) =>
 				new Promise<void>(resolve => {
 					setTimeout(() => {
@@ -25,100 +27,100 @@ test('queue, keyed', () =>
 
 		const result: Record<string, number[]> = {};
 
-		expect(queue.active).toEqual([]);
-		expect(queue.autostart).toBe(false);
-		expect(queue.concurrency).toBe(1);
-		expect(queue.empty).toEqual([]);
-		expect(queue.full).toEqual([]);
-		expect(queue.items).toEqual({});
-		expect(queue.keys).toEqual([]);
-		expect(queue.maximum).toBe(3);
-		expect(queue.paused).toEqual([]);
-		expect(queue.queues).toBe(0);
+		expect(keyed.active).toEqual([]);
+		expect(keyed.autostart).toBe(false);
+		expect(keyed.concurrency).toBe(1);
+		expect(keyed.empty).toEqual([]);
+		expect(keyed.full).toEqual([]);
+		expect(keyed.items).toEqual({});
+		expect(keyed.keys).toEqual([]);
+		expect(keyed.maximum).toBe(3);
+		expect(keyed.paused).toEqual([]);
+		expect(keyed.queues).toBe(0);
 
-		queue.add('a', [1]).promise.catch(() => {});
-		queue.add('a', [2]).promise.catch(() => {});
-		queue.add('a', [3]).promise.catch(() => {});
+		keyed.add('a', [1]).promise.catch(() => {});
+		keyed.add('a', [2]).promise.catch(() => {});
+		keyed.add('a', [3]).promise.catch(() => {});
 
-		queue.add('b', [1]).promise.catch(() => {});
-		queue.add('b', [2]).promise.catch(() => {});
-		queue.add('b', [3]).promise.catch(() => {});
+		keyed.add('b', [1]).promise.catch(() => {});
+		keyed.add('b', [2]).promise.catch(() => {});
+		keyed.add('b', [3]).promise.catch(() => {});
 
-		expect(() => queue.add('a', [4])).toThrow();
-		expect(() => queue.add('b', [4])).toThrow();
+		expect(() => keyed.add('a', [4])).toThrow();
+		expect(() => keyed.add('b', [4])).toThrow();
 
-		expect(queue.active).toEqual([]);
-		expect(queue.autostart).toBe(false);
-		expect(queue.concurrency).toBe(1);
-		expect(queue.empty).toEqual([]);
-		expect(queue.items).toEqual({a: 3, b: 3});
-		expect(queue.full).toEqual(['a', 'b']);
-		expect(queue.keys).toEqual(['a', 'b']);
-		expect(queue.maximum).toBe(3);
-		expect(queue.paused).toEqual(['a', 'b']);
-		expect(queue.queues).toBe(2);
+		expect(keyed.active).toEqual([]);
+		expect(keyed.autostart).toBe(false);
+		expect(keyed.concurrency).toBe(1);
+		expect(keyed.empty).toEqual([]);
+		expect(keyed.items).toEqual({a: 3, b: 3});
+		expect(keyed.full).toEqual(['a', 'b']);
+		expect(keyed.keys).toEqual(['a', 'b']);
+		expect(keyed.maximum).toBe(3);
+		expect(keyed.paused).toEqual(['a', 'b']);
+		expect(keyed.queues).toBe(2);
 
 		expect(result).toEqual({});
 
-		queue.resume();
+		keyed.resume();
 
 		setTimeout(() => {
-			queue.pause('a');
-			queue.pause();
+			keyed.pause('a');
+			keyed.pause();
 		}, 75);
 
 		setTimeout(() => {
-			expect(queue.active).toEqual([]);
-			expect(queue.autostart).toBe(false);
-			expect(queue.concurrency).toBe(1);
-			expect(queue.empty).toEqual([]);
-			expect(queue.items).toEqual({a: 2, b: 2});
-			expect(queue.full).toEqual([]);
-			expect(queue.keys).toEqual(['a', 'b']);
-			expect(queue.maximum).toBe(3);
-			expect(queue.paused).toEqual(['a', 'b']);
-			expect(queue.queues).toBe(2);
+			expect(keyed.active).toEqual([]);
+			expect(keyed.autostart).toBe(false);
+			expect(keyed.concurrency).toBe(1);
+			expect(keyed.empty).toEqual([]);
+			expect(keyed.items).toEqual({a: 2, b: 2});
+			expect(keyed.full).toEqual([]);
+			expect(keyed.keys).toEqual(['a', 'b']);
+			expect(keyed.maximum).toBe(3);
+			expect(keyed.paused).toEqual(['a', 'b']);
+			expect(keyed.queues).toBe(2);
 
 			expect(result).toEqual({
 				a: [1],
 				b: [1],
 			});
 
-			queue.remove('a', 3);
-			queue.remove('b');
-			queue.remove('c');
+			keyed.remove('a', 3);
+			keyed.remove('b');
+			keyed.remove('c');
 
-			queue.resume('a');
-			queue.resume('b');
+			keyed.resume('a');
+			keyed.resume('b');
 
-			expect(() => queue.get(123 as never)).toThrow();
+			expect(() => keyed.get(123 as never)).toThrow();
 		}, 125);
 
 		setTimeout(() => {
-			expect(queue.active).toEqual([]);
-			expect(queue.autostart).toBe(false);
-			expect(queue.concurrency).toBe(1);
-			expect(queue.empty).toEqual(['a']);
-			expect(queue.items).toEqual({a: 0});
-			expect(queue.full).toEqual([]);
-			expect(queue.keys).toEqual(['a']);
-			expect(queue.maximum).toBe(3);
-			expect(queue.paused).toEqual([]);
-			expect(queue.queues).toBe(1);
+			expect(keyed.active).toEqual([]);
+			expect(keyed.autostart).toBe(false);
+			expect(keyed.concurrency).toBe(1);
+			expect(keyed.empty).toEqual(['a']);
+			expect(keyed.items).toEqual({a: 0});
+			expect(keyed.full).toEqual([]);
+			expect(keyed.keys).toEqual(['a']);
+			expect(keyed.maximum).toBe(3);
+			expect(keyed.paused).toEqual([]);
+			expect(keyed.queues).toBe(1);
 
-			queue.clear();
-			queue.remove();
+			keyed.clear();
+			keyed.remove();
 
-			expect(queue.active).toEqual([]);
-			expect(queue.autostart).toBe(false);
-			expect(queue.concurrency).toBe(1);
-			expect(queue.empty).toEqual([]);
-			expect(queue.items).toEqual({});
-			expect(queue.full).toEqual([]);
-			expect(queue.keys).toEqual([]);
-			expect(queue.maximum).toBe(3);
-			expect(queue.paused).toEqual([]);
-			expect(queue.queues).toBe(0);
+			expect(keyed.active).toEqual([]);
+			expect(keyed.autostart).toBe(false);
+			expect(keyed.concurrency).toBe(1);
+			expect(keyed.empty).toEqual([]);
+			expect(keyed.items).toEqual({});
+			expect(keyed.full).toEqual([]);
+			expect(keyed.keys).toEqual([]);
+			expect(keyed.maximum).toBe(3);
+			expect(keyed.paused).toEqual([]);
+			expect(keyed.queues).toBe(0);
 
 			expect(result).toEqual({
 				a: [1, 2],

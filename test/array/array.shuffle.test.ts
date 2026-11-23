@@ -2,7 +2,7 @@ import {expect, test} from 'vite-plus/test';
 import {equal, shuffle} from '../../src';
 import {TestArrayItem, arrayFixture} from '../.fixtures/array.fixture';
 
-test('array, shuffle', () => {
+test('shuffle', () => {
 	const {complex} = arrayFixture;
 
 	let first: TestArrayItem[] | null = null;

@@ -1,5 +1,5 @@
 import {expect, test} from 'vite-plus/test';
-import {delay, once} from '../../src';
+import {delay, isAsyncOnce, isOnce, once} from '../../src';
 import {
 	ONCE_MESSAGE_CALLBACK,
 	ONCE_MESSAGE_CLEARED,
@@ -137,21 +137,24 @@ test('asynchronous: resolve', async () => {
 });
 
 test('is', () => {
+	expect(once.is).toBe(isOnce);
+	expect(once.isAsync).toBe(isAsyncOnce);
+
 	const {length, values} = isFixture;
 
 	for (let index = 0; index < length; index += 1) {
-		expect(once.is(values[index])).toBe(false);
-		expect(once.isAsync(values[index])).toBe(false);
+		expect(isOnce(values[index])).toBe(false);
+		expect(isAsyncOnce(values[index])).toBe(false);
 	}
 
 	const sync = once(() => {});
 	const async = once(async () => new Promise<void>(resolve => resolve()));
 
-	expect(once.is(sync)).toBe(true);
-	expect(once.isAsync(sync)).toBe(false);
+	expect(isOnce(sync)).toBe(true);
+	expect(isAsyncOnce(sync)).toBe(false);
 
-	expect(once.is(async)).toBe(false);
-	expect(once.isAsync(async)).toBe(true);
+	expect(isOnce(async)).toBe(false);
+	expect(isAsyncOnce(async)).toBe(true);
 });
 
 test('synchronous', () => {

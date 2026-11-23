@@ -1,7 +1,9 @@
 import {expect, test} from 'vite-plus/test';
-import {push} from '../../src';
+import {append, push} from '../../src';
 
-test('array, push', () => {
+test('push', () => {
+	expect(append).toBe(push);
+
 	const length = 100_000;
 
 	const values = Array.from({length}, (_, i) => i + 1);

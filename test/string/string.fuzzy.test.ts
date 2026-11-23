@@ -258,14 +258,16 @@ test('greetings', () => {
 	});
 });
 
-test('is', () => {
+test('isFuzzy', () => {
+	expect(isFuzzy).toBe(fuzzy.is);
+
 	const {length, values} = isFixture;
 
 	for (let index = 0; index < length; index += 1) {
 		expect(isFuzzy(values[index])).toBe(false);
 	}
 
-	expect(fuzzy.is(fuzzy(greek))).toBe(true);
+	expect(isFuzzy(fuzzy(greek))).toBe(true);
 });
 
 test('keys', () => {
@@ -284,7 +286,9 @@ test('keys', () => {
 	});
 });
 
-test('match', () => {
+test('fuzzyMatch', () => {
+	expect(fuzzy.match).toBe(fuzzyMatch);
+
 	const aResults = [true, true, true, true, false];
 	const aaResults = [true, false, true, false, false];
 	const eaResults = [false, true, false, true, false];
@@ -292,9 +296,9 @@ test('match', () => {
 	for (let index = 0; index < greek.length; index += 1) {
 		const item = greek[index];
 
-		expect(fuzzy.match(item, 'a')).toBe(aResults[index]);
-		expect(fuzzy.match(item, 'aa')).toBe(aaResults[index]);
-		expect(fuzzy.match(item, 'ea')).toBe(eaResults[index]);
+		expect(fuzzyMatch(item, 'a')).toBe(aResults[index]);
+		expect(fuzzyMatch(item, 'aa')).toBe(aaResults[index]);
+		expect(fuzzyMatch(item, 'ea')).toBe(eaResults[index]);
 	}
 
 	expect(fuzzyMatch(123 as never, 'a')).toBe(false);

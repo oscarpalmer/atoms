@@ -1,5 +1,5 @@
 import {expect, test} from 'vite-plus/test';
-import {omit, pick, shake, smush, transform, unsmush} from '../../src';
+import {initializeTransformer, omit, pick, shake, smush, transform, unsmush} from '../../src';
 
 test('omit', () => {
 	expect(
@@ -138,6 +138,8 @@ test('smush & unsmush', () => {
 });
 
 test('transform', () => {
+	expect(transform.initialize).toBe(initializeTransformer);
+
 	const withFn = transform(
 		{
 			a: 123,
@@ -197,14 +199,12 @@ test('transform', () => {
 	});
 
 	expect(
-		transform
-			.initialize(() => 'blah' as never)
-			.transform({
-				a: 123,
-				b: 'abc',
-				c: true,
-				d: [1, 2, 3],
-			}),
+		initializeTransformer(() => 'blah' as never).transform({
+			a: 123,
+			b: 'abc',
+			c: true,
+			d: [1, 2, 3],
+		}),
 	).toEqual({
 		a: 'blah',
 		b: 'blah',

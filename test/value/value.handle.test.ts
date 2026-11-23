@@ -1,6 +1,7 @@
 import {expect, test} from 'vite-plus/test';
 import {getValue, hasValue, Result, setValue} from '../../src';
 import {valueFixture} from '../.fixtures/value.fixture';
+import {hasValueResult} from '../../src/internal/value/has';
 
 const {nested} = valueFixture;
 
@@ -18,6 +19,8 @@ test('getValue', () => {
 });
 
 test('hasValue', () => {
+	expect(hasValue.get).toBe(hasValueResult);
+
 	expect(hasValue(nested, 'a.c.d')).toBe(true);
 	expect(hasValue(nested, 'a.C.d', true)).toBe(true);
 	expect(hasValue(nested, 'a.C.d', false)).toBe(false);
@@ -31,39 +34,39 @@ test('hasValue', () => {
 	expect(hasValue(nested, 'constructor')).toBe(false);
 	expect(hasValue(nested, 'prototype')).toBe(false);
 
-	let result: Result<unknown, unknown> = hasValue.get(nested, 'a.c.d');
+	let result: Result<unknown, unknown> = hasValueResult(nested, 'a.c.d');
 
 	expect(result.ok && result.value === 123).toBe(true);
 
-	result = hasValue.get(nested, '');
+	result = hasValueResult(nested, '');
 
 	expect(result.ok === false && result.error === 'Expected path to be a string').toBe(true);
 
-	result = hasValue.get(nested, 'a.B.1.C.1', true);
+	result = hasValueResult(nested, 'a.B.1.C.1', true);
 
 	expect(result.ok === false && result.error === 'Expected property to exist in object').toBe(true);
 
-	result = hasValue.get(nested, 'a.b.99.c');
+	result = hasValueResult(nested, 'a.b.99.c');
 
 	expect(result.ok === false && result.error === 'Expected property to exist in object').toBe(true);
 
-	result = hasValue.get(nested, 'a.c.d.e');
+	result = hasValueResult(nested, 'a.c.d.e');
 
 	expect(result.ok === false && result.error === 'Expected property to exist in object').toBe(true);
 
-	result = hasValue.get(nested, '__proto__');
+	result = hasValueResult(nested, '__proto__');
 
 	expect(result.ok === false && result.error === 'Access to this property is not allowed').toBe(
 		true,
 	);
 
-	result = hasValue.get(nested, 'constructor');
+	result = hasValueResult(nested, 'constructor');
 
 	expect(result.ok === false && result.error === 'Access to this property is not allowed').toBe(
 		true,
 	);
 
-	result = hasValue.get('blah' as never, 'a.b.c.d');
+	result = hasValueResult('blah' as never, 'a.b.c.d');
 
 	expect(result.ok === false && result.error === 'Expected data to be an object').toBe(true);
 });

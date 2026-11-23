@@ -1,7 +1,22 @@
 import {expect, test} from 'vite-plus/test';
-import {assert} from '../../src';
+import {
+	assert,
+	assertCondition,
+	assertDefined,
+	assertInstanceOf,
+	assertIs,
+	assertProperty,
+} from '../../src';
 import {AssertProperty} from '../../src/models/function/assert.model';
 import {TestFunctionItem, testIsString} from '../.fixtures/function.fixture';
+
+test('aliases', () => {
+	expect(assertCondition).toBe(assert.condition);
+	expect(assertDefined).toBe(assert.defined);
+	expect(assertInstanceOf).toBe(assert.instanceOf);
+	expect(assertIs).toBe(assert.is);
+	expect(assertProperty).toBe(assert.property);
+});
 
 test('assert', () => {
 	expect(() => assert(() => testIsString('test'), 'Value is not a string!')).not.toThrow();
@@ -15,29 +30,29 @@ test('assert', () => {
 	);
 });
 
-test('assert.condition', () => {
-	const assertString = assert.condition(testIsString, 'Value is not a string!');
+test('assertCondition', () => {
+	const assertString = assertCondition(testIsString, 'Value is not a string!');
 
 	expect(() => assertString('test')).not.toThrow();
 	expect(() => assertString(123)).toThrow('Value is not a string!');
 
-	const assertStringWithType = assert.condition(testIsString, 'Value is not a string!', TypeError);
+	const assertStringWithType = assertCondition(testIsString, 'Value is not a string!', TypeError);
 
 	expect(() => assertStringWithType('test')).not.toThrow();
 	expect(() => assertStringWithType(123)).toThrow(TypeError);
 });
 
-test('assert.defined', () => {
-	expect(() => assert.defined('test')).not.toThrow();
-	expect(() => assert.defined(null)).toThrow('Expected value to be defined');
-	expect(() => assert.defined(undefined)).toThrow('Expected value to be defined');
+test('assertDefined', () => {
+	expect(() => assertDefined('test')).not.toThrow();
+	expect(() => assertDefined(null)).toThrow('Expected value to be defined');
+	expect(() => assertDefined(undefined)).toThrow('Expected value to be defined');
 
-	expect(() => assert.defined(null, 'Value is null!')).toThrow('Value is null!');
-	expect(() => assert.defined(undefined, 'Value is undefined!')).toThrow('Value is undefined!');
+	expect(() => assertDefined(null, 'Value is null!')).toThrow('Value is null!');
+	expect(() => assertDefined(undefined, 'Value is undefined!')).toThrow('Value is undefined!');
 });
 
-test('assert.instanceOf', () => {
-	const assertItem = assert.instanceOf(
+test('assertInstanceOf', () => {
+	const assertItem = assertInstanceOf(
 		TestFunctionItem,
 		'Value is not an instance of TestFunctionItem!',
 	);
@@ -45,7 +60,7 @@ test('assert.instanceOf', () => {
 	expect(() => assertItem(new TestFunctionItem())).not.toThrow();
 	expect(() => assertItem({})).toThrow('Value is not an instance of TestFunctionItem!');
 
-	const assertItemWithType = assert.instanceOf(
+	const assertItemWithType = assertInstanceOf(
 		TestFunctionItem,
 		'Value is not an instance of TestFunctionItem!',
 		TypeError,
@@ -55,19 +70,19 @@ test('assert.instanceOf', () => {
 	expect(() => assertItemWithType({})).toThrow(TypeError);
 });
 
-test('assert.is', () => {
-	const assertString = assert.is(testIsString, 'Value is not a string!');
+test('assertIs', () => {
+	const assertString = assertIs(testIsString, 'Value is not a string!');
 
 	expect(() => assertString('test')).not.toThrow();
 	expect(() => assertString(123)).toThrow('Value is not a string!');
 
-	const assertStringWithType = assert.is(testIsString, 'Value is not a string!', TypeError);
+	const assertStringWithType = assertIs(testIsString, 'Value is not a string!', TypeError);
 
 	expect(() => assertStringWithType('test')).not.toThrow();
 	expect(() => assertStringWithType(123)).toThrow(TypeError);
 });
 
-test('assert.property', () => {
+test('assertProperty', () => {
 	type Data = {
 		a: {
 			b: {
@@ -86,7 +101,7 @@ test('assert.property', () => {
 		};
 	};
 
-	const hasD: AssertProperty<Data, 'a.b.d', HasD> = assert.property(
+	const hasD: AssertProperty<Data, 'a.b.d', HasD> = assertProperty(
 		'a.b.d',
 		value => value === undefined || typeof value === 'string',
 		'bad',

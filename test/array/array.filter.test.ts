@@ -1,5 +1,5 @@
 import {expect, test} from 'vite-plus/test';
-import {filter} from '../../src';
+import {exclude, filter} from '../../src';
 import {arrayFixture} from '../.fixtures/array.fixture';
 
 const {complex, simple} = arrayFixture;
@@ -27,23 +27,25 @@ test('filter', () => {
 });
 
 test('remove', () => {
-	expect(filter.remove(simple, 2)).toEqual([1, 3, 4, 5]);
-	expect(filter.remove(simple, 10)).toEqual(simple);
+	expect(filter.remove).toBe(exclude);
 
-	const removeByKeyValue = filter.remove(complex, 'id', 3);
-	const removeByKeyCallback = filter.remove(complex, item => item.id, 3);
+	expect(exclude(simple, 2)).toEqual([1, 3, 4, 5]);
+	expect(exclude(simple, 10)).toEqual(simple);
+
+	const removeByKeyValue = exclude(complex, 'id', 3);
+	const removeByKeyCallback = exclude(complex, item => item.id, 3);
 
 	expect(removeByKeyValue).toEqual([complex[0], complex[1], complex[3], complex[4]]);
 
 	expect(removeByKeyCallback).toEqual([complex[0], complex[1], complex[3], complex[4]]);
 
-	const removeByValueCallback = filter.remove(complex, item => item.id === 3);
-	const removeByInvalidKey = filter.remove(complex, 'name.length' as never);
+	const removeByValueCallback = exclude(complex, item => item.id === 3);
+	const removeByInvalidKey = exclude(complex, 'name.length' as never);
 
 	expect(removeByValueCallback).toEqual([complex[0], complex[1], complex[3], complex[4]]);
 
 	expect(removeByInvalidKey).toEqual(complex);
 
-	expect(filter.remove('blah' as never, 99)).toEqual([]);
-	expect(filter.remove([], 99)).toEqual([]);
+	expect(exclude('blah' as never, 99)).toEqual([]);
+	expect(exclude([], 99)).toEqual([]);
 });

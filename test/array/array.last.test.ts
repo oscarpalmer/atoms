@@ -1,5 +1,5 @@
 import {expect, test} from 'vite-plus/test';
-import {last} from '../../src';
+import {last, lastOrDefault} from '../../src';
 import {arrayFixture, TestArrayItem} from '../.fixtures/array.fixture';
 
 const {complex, people, simple} = arrayFixture;
@@ -23,7 +23,9 @@ test('last', () => {
 	expect(last([], 99 as never)).toBeUndefined();
 });
 
-test('last.default', () => {
+test('lastOrDefault', () => {
+	expect(last.defaulted).toBe(lastOrDefault);
+
 	const defaultItem: TestArrayItem = {
 		age: 123,
 		id: 99,
@@ -32,23 +34,23 @@ test('last.default', () => {
 
 	const defaultNumber = 99;
 
-	expect(last.defaulted(simple, defaultNumber)).toBe(5);
+	expect(lastOrDefault(simple, defaultNumber)).toBe(5);
 
-	const lastByKeyCallback = last.defaulted(
+	const lastByKeyCallback = lastOrDefault(
 		complex,
 		defaultItem,
 		item => item.id === people.charlie.id,
 	);
-	const lastByKeyValue = last.defaulted(complex, defaultItem, 'id', people.charlie.id);
+	const lastByKeyValue = lastOrDefault(complex, defaultItem, 'id', people.charlie.id);
 
 	expect(lastByKeyCallback).toEqual(people.charlie);
 	expect(lastByKeyValue).toEqual(people.charlie);
 
-	const lastByFilter = last.defaulted(complex, defaultItem, item => item.id === people.charlie.id);
+	const lastByFilter = lastOrDefault(complex, defaultItem, item => item.id === people.charlie.id);
 
 	expect(lastByFilter).toEqual(people.charlie);
 
-	expect(last.defaulted('blah' as never, defaultNumber)).toBe(defaultNumber);
-	expect(last.defaulted(complex, defaultItem, 'id', 99)).toEqual(defaultItem);
-	expect(last.defaulted([], defaultNumber)).toBe(defaultNumber);
+	expect(lastOrDefault('blah' as never, defaultNumber)).toBe(defaultNumber);
+	expect(lastOrDefault(complex, defaultItem, 'id', 99)).toEqual(defaultItem);
+	expect(lastOrDefault([], defaultNumber)).toBe(defaultNumber);
 });

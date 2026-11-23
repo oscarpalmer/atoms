@@ -1,5 +1,5 @@
 import {expect, test} from 'vite-plus/test';
-import {equal} from '../../src';
+import {equal, initializeEqualizer} from '../../src';
 import {equalFixture} from '../.fixtures/equal.fixture';
 
 const {
@@ -15,7 +15,9 @@ const {
 } = equalFixture;
 
 test('any', () => {
-	const equalizer = equal.initialize({
+	expect(equal.initialize).toBe(initializeEqualizer);
+
+	const equalizer = initializeEqualizer({
 		relaxedNullish: true,
 	});
 

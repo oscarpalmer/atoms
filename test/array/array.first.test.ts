@@ -1,5 +1,5 @@
 import {expect, test} from 'vite-plus/test';
-import {first} from '../../src';
+import {first, firstOrDefault} from '../../src';
 import {arrayFixture, TestArrayItem} from '../.fixtures/array.fixture';
 
 const {complex, people, simple} = arrayFixture;
@@ -25,7 +25,9 @@ test('first', () => {
 	expect(first([1, 2, 3], [] as never)).toBeUndefined();
 });
 
-test('first.default', () => {
+test('firstOrDefault', () => {
+	expect(first.defaulted).toBe(firstOrDefault);
+
 	const defaultItem: TestArrayItem = {
 		age: 123,
 		id: 99,
@@ -34,27 +36,23 @@ test('first.default', () => {
 
 	const defaultNumber = 99;
 
-	expect(first.defaulted(simple, defaultNumber)).toBe(1);
+	expect(firstOrDefault(simple, defaultNumber)).toBe(1);
 
-	const firstByKeyCallback = first.defaulted(
+	const firstByKeyCallback = firstOrDefault(
 		complex,
 		defaultItem,
 		item => item.id === people.charlie.id,
 	);
-	const firstByKeyValue = first.defaulted(complex, defaultItem, 'id', people.charlie.id);
+	const firstByKeyValue = firstOrDefault(complex, defaultItem, 'id', people.charlie.id);
 
 	expect(firstByKeyCallback).toEqual(people.charlie);
 	expect(firstByKeyValue).toEqual(people.charlie);
 
-	const firstByFilter = first.defaulted(
-		complex,
-		defaultItem,
-		item => item.id === people.charlie.id,
-	);
+	const firstByFilter = firstOrDefault(complex, defaultItem, item => item.id === people.charlie.id);
 
 	expect(firstByFilter).toEqual(people.charlie);
 
-	expect(first.defaulted('blah' as never, defaultNumber)).toBe(defaultNumber);
-	expect(first.defaulted(complex, defaultItem, 'id', 99)).toEqual(defaultItem);
-	expect(first.defaulted([], defaultNumber)).toBe(defaultNumber);
+	expect(firstOrDefault('blah' as never, defaultNumber)).toBe(defaultNumber);
+	expect(firstOrDefault(complex, defaultItem, 'id', 99)).toEqual(defaultItem);
+	expect(firstOrDefault([], defaultNumber)).toBe(defaultNumber);
 });
