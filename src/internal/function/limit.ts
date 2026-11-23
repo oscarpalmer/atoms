@@ -18,6 +18,8 @@ import {
 } from '../../models/function/limiter.model';
 import type {GenericAsyncCallback, GenericCallback} from '../../models/index';
 import {getNumberOrDefault} from '../defaults';
+import {isThenable} from '../is';
+import {swallow} from '../promise';
 import {attempt} from '../result/attempt';
 import {noop} from './misc';
 
@@ -111,8 +113,8 @@ async function handleAsyncLimiter(state: AsyncLimiterState, item: AsyncLimiterIt
 		item.running = true;
 
 		(await attempt(async () => await state.callback(...item.parameters))).match({
-			error: e => item.reject(e),
-			ok: v => item.resolve(v),
+			error: item.reject,
+			ok: item.resolve,
 		});
 
 		item.running = false;
@@ -129,7 +131,11 @@ function handleLimiter(state: LimiterState): void {
 	if (state.interval === 0 || now - state.start >= state.interval - LIMITER_OFFSET) {
 		state.start = state.throttle ? now : undefined;
 
-		state.callback(...state.parameters);
+		const result = state.callback(...state.parameters);
+
+		if (isThenable(result)) {
+			swallow(result);
+		}
 	} else {
 		state.timer = startTimer(() => handleLimiter(state));
 	}

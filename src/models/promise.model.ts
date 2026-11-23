@@ -179,7 +179,7 @@ export const PROMISE_MESSAGE_ATTEMPT = 'Attempt expected a function or a promise
 
 export const PROMISE_MESSAGE_ITEMS_TYPE = `'promises' expected an array or object holding promise-functions or promises`;
 
-export const PROMISE_MESSAGE_RESULT = `'toResult' expected a Promise`;
+export const PROMISE_MESSAGE_RESULT = `'toResult' expected a Promise or Promise-like object`;
 
 export const PROMISE_MESSAGE_TIMED = `'timed' expected a Promise`;
 

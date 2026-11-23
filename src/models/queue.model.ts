@@ -15,7 +15,7 @@ export type InternalQueue = {
  * A queue that can be used to manage (a)synchronous tasks with a specific key
  */
 export type KeyedQueue<
-	Callback extends GenericCallback | GenericAsyncCallback,
+	Callback extends GenericCallback,
 	CallbackParameters extends unknown[] = Parameters<Callback>,
 > = {
 	/**
@@ -135,16 +135,16 @@ export type KeyedQueue<
 };
 
 export type KeyedQueueState = {
-	callback: GenericCallback | GenericAsyncCallback;
+	callback: GenericCallback;
 	options: Required<QueueOptions>;
-	queues: Map<string, Queue<GenericAsyncCallback, Tail<unknown[]>>>;
+	queues: Map<string, Queue<GenericCallback, Tail<unknown[]>>>;
 };
 
 /**
  * A queue that can be used to manage (a)synchronous tasks
  */
 export type Queue<
-	Callback extends GenericCallback | GenericAsyncCallback,
+	Callback extends GenericCallback,
 	CallbackParameters extends unknown[] = Parameters<Callback>,
 > = {
 	/**
@@ -225,7 +225,7 @@ export type Queue<
 export type QueueHandleType = 'clear' | 'pause' | 'resume';
 
 export type QueueState = {
-	callback: GenericCallback | GenericAsyncCallback;
+	callback: GenericCallback;
 	handled: GenericCallback[];
 	id: number;
 	items: Array<QueuedItem>;

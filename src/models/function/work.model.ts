@@ -56,13 +56,13 @@ export type SyncValue<Value> = 0 extends 1 & Value
 
 export const WORK_MESSAGE_FLOW_ARRAY = `'flow' expected to receive an array of functions`;
 
-export const WORK_MESSAGE_FLOW_PROMISE = `'flow' received a promise; if the callback is asynchronous, prefix it with 'async'`;
+export const WORK_MESSAGE_FLOW_PROMISE = `Synchronous 'flow' received a promise; if the callback is asynchronous, prefix it with 'async'`;
 
 export const WORK_MESSAGE_NESTING = 'Return values are too deeply nested';
 
 export const WORK_MESSAGE_PIPE_ARRAY = `'pipe' expected to receive an array of functions`;
 
-export const WORK_MESSAGE_PIPE_PROMISE = `'pipe' received a promise; if the callback is asynchronous, prefix it with 'async'`;
+export const WORK_MESSAGE_PIPE_PROMISE = `Synchronous 'pipe' received a promise; if the callback is asynchronous, prefix it with 'async'`;
 
 export const assertFlowFunctions: Asserter<Function[]> = assert.condition(
 	value => Array.isArray(value) && value.every(item => typeof item === 'function'),

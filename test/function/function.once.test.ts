@@ -3,7 +3,7 @@ import {delay, once} from '../../src';
 import {
 	ONCE_MESSAGE_CALLBACK,
 	ONCE_MESSAGE_CLEARED,
-	ONCE_MESSAGE_VALUE,
+	ONCE_MESSAGE_PROMISE,
 } from '../../src/models/function/once.model';
 import {TestFunctionItem} from '../.fixtures/function.fixture';
 import {isFixture} from '../.fixtures/is.fixture';
@@ -209,7 +209,54 @@ test('synchronous', () => {
 
 	const async = once(() => new Promise<void>(resolve => resolve()));
 
-	expect(() => async.run()).toThrow(ONCE_MESSAGE_VALUE);
+	expect(() => async.run()).toThrow(ONCE_MESSAGE_PROMISE);
 
 	expect(() => once('not a function' as never)).toThrow(ONCE_MESSAGE_CALLBACK);
+});
+
+test('synchronous: failures can be retried', () => {
+	let count = 0;
+
+	const throwing = once(() => {
+		count += 1;
+
+		if (count < 3) {
+			throw new Error('Test error');
+		}
+
+		return count;
+	});
+
+	expect(() => throwing.run()).toThrow('Test error');
+	expect(throwing.called).toBe(false);
+
+	expect(() => throwing.run()).toThrow('Test error');
+	expect(throwing.called).toBe(false);
+
+	expect(throwing.run()).toBe(3);
+	expect(throwing.called).toBe(true);
+
+	expect(throwing.run()).toBe(3);
+	expect(count).toBe(3);
+
+	let promised = 0;
+
+	const promising = once((() => {
+		promised += 1;
+
+		return Promise.resolve(promised);
+	}) as never);
+
+	expect(() => promising.run()).toThrow(ONCE_MESSAGE_PROMISE);
+	expect(() => promising.run()).toThrow(ONCE_MESSAGE_PROMISE);
+	expect(promising.called).toBe(false);
+	expect(promised).toBe(2);
+});
+
+test('synchronous: rejected promises are not unhandled', async () => {
+	const fn = once((() => Promise.reject(new Error('Test error'))) as never);
+
+	expect(() => fn.run()).toThrow(ONCE_MESSAGE_PROMISE);
+
+	await delay(10);
 });

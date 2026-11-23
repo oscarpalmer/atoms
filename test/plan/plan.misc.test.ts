@@ -12,7 +12,7 @@ import {
 	run,
 	succeed,
 } from '../../src';
-import {PLAN_MESSAGE_FAIL_VALUE, PLAN_MESSAGE_SUCCEED_VALUE} from '../../src/models/plan.model';
+import {PLAN_MESSAGE_FAIL_PROMISE, PLAN_MESSAGE_SUCCEED_PROMISE} from '../../src/models/plan.model';
 import {getABC, getMessage, getThrown} from '../.fixtures/plan.fixture';
 
 test('abort', async () => {
@@ -79,7 +79,7 @@ test('fail', async () => {
 	const thrown = getThrown(() => run(syncFailingPromise));
 
 	expect(thrown).toBeInstanceOf(Error);
-	expect((thrown as Error).message).toBe(PLAN_MESSAGE_FAIL_VALUE);
+	expect((thrown as Error).message).toBe(PLAN_MESSAGE_FAIL_PROMISE);
 
 	async function* asyncFailingBasic() {
 		yield* fail('error');
@@ -174,7 +174,7 @@ test('succeed', async () => {
 	const thrown = getThrown(() => run(syncSucceedingPromise));
 
 	expect(thrown).toBeInstanceOf(Error);
-	expect((thrown as Error).message).toBe(PLAN_MESSAGE_SUCCEED_VALUE);
+	expect((thrown as Error).message).toBe(PLAN_MESSAGE_SUCCEED_PROMISE);
 
 	async function* asyncSucceedingBasic() {
 		const result = yield* succeed(123);
@@ -215,4 +215,21 @@ test('succeed', async () => {
 	await run(asyncSucceedingPromiseFn).then(result => {
 		expect(result).toBe('result: 123');
 	});
+});
+
+test('rejected promises in synchronous plans are not unhandled', async () => {
+	function* failing() {
+		// @ts-expect-error Testing promise in sync
+		yield* fail(() => Promise.reject(new Error('Test error')));
+	}
+
+	function* succeeding() {
+		// @ts-expect-error Testing promise in sync
+		yield* succeed(() => Promise.reject(new Error('Test error')));
+	}
+
+	expect(getThrown(() => run(failing))).toBeInstanceOf(Error);
+	expect(getThrown(() => run(succeeding))).toBeInstanceOf(Error);
+
+	await new Promise(resolve => setTimeout(resolve, 10));
 });

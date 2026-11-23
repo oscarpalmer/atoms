@@ -6,7 +6,7 @@ import {
 	type Result,
 	type ResultMatch,
 } from '../../models/result.model';
-import {isPlainObject, isPromise} from '../is';
+import {isPlainObject, isThenable} from '../is';
 import {isOk, isResult} from '../result/is';
 
 // #region Functions
@@ -89,8 +89,8 @@ export function match<V, Next, Nope, E = Error>(
 export function match(result: unknown, first: unknown, second?: unknown): unknown {
 	const value = typeof result === 'function' ? result() : result;
 
-	if (isPromise(value)) {
-		return value.then(resolved => {
+	if (isThenable(value)) {
+		return Promise.resolve(value).then(resolved => {
 			if (!isResult(resolved)) {
 				throw new Error(RESULT_MESSAGE_MATCH_RESULT);
 			}

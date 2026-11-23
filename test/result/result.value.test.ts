@@ -398,3 +398,39 @@ test('ok', () => {
 	expect(item.ok).toBe(true);
 	expect(item.value).toBe('success');
 });
+
+test('thenables', async () => {
+	// Foreign thenable: `then` returns nothing, so the result must be wrapped
+	function thenable<Value>(value: Value): PromiseLike<Value> {
+		return {
+			then(resolve: (value: Value) => void): never {
+				resolve(value);
+
+				return undefined as never;
+			},
+		} as never;
+	}
+
+	const mapped = await ok(1).map(() => thenable(2));
+
+	expect(mapped).toEqual(ok(2));
+
+	const chained = await ok(1).and(() => thenable(3));
+
+	expect(chained).toEqual(ok(3));
+
+	const recovered = await error('nope').or(() => thenable(4));
+
+	expect(recovered).toEqual(ok(4));
+
+	const mappedError = await error('nope').mapError(() => thenable('mapped'));
+
+	expect(mappedError).toEqual(error('mapped'));
+
+	// Ignored thenables are swallowed
+	const ignored = error('nope').map(() => Promise.reject(new Error('Test error')));
+
+	expect(ignored).toEqual(error('nope'));
+
+	await new Promise(resolve => setTimeout(resolve, 10));
+});

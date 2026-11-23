@@ -2,7 +2,12 @@ import {createAborter} from './internal/aborter';
 import {getBooleanOrDefault, getNumberOrDefault} from './internal/defaults';
 import {min} from './internal/math/aggregate';
 import {attempt} from './internal/result/attempt';
-import type {GenericAsyncCallback, GenericCallback, PlainObject} from './models/index';
+import type {
+	GenericAsyncCallback,
+	GenericCallback,
+	GenericSyncCallback,
+	PlainObject,
+} from './models/index';
 import {
 	type InternalKeyedQueue,
 	type InternalQueue,
@@ -232,7 +237,7 @@ function clearQueues(this: InternalKeyedQueue, key?: string): void {
 }
 
 function createQueue(
-	callback: GenericAsyncCallback,
+	callback: GenericCallback,
 	options?: QueueOptions,
 	key?: string,
 ): Queue<never, never> {
@@ -416,7 +421,7 @@ export function isKeyedQueue(value: unknown): value is KeyedQueue<GenericAsyncCa
  * @param value Value to check
  * @returns `true` if the value is a queue, otherwise `false`
  */
-export function isQueue(value: unknown): value is Queue<GenericCallback | GenericAsyncCallback> {
+export function isQueue(value: unknown): value is Queue<GenericCallback> {
 	return isQueueInstance(QUEUE_NAME_QUEUE, value);
 }
 
@@ -494,12 +499,12 @@ export function queue<Callback extends GenericAsyncCallback>(
  * @param options Queue options
  * @returns Queue instance
  */
-export function queue<Callback extends GenericCallback>(
+export function queue<Callback extends GenericSyncCallback>(
 	callback: Callback,
 	options?: QueueOptions,
 ): Queue<Callback, Parameters<Callback>>;
 
-export function queue<Callback extends GenericCallback | GenericAsyncCallback>(
+export function queue<Callback extends GenericCallback>(
 	callback: Callback,
 	options?: QueueOptions,
 ): Queue<Callback, Parameters<Callback>> {
@@ -596,7 +601,7 @@ async function run(state: QueueState): Promise<void> {
 
 			const parameters = next.key == null ? next.parameters : [next.key, ...next.parameters];
 
-			return await state.callback(...parameters);
+			return state.callback(...parameters);
 		});
 
 		if (attempted.ok) {

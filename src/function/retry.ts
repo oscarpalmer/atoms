@@ -1,16 +1,17 @@
 import {getNumberOrDefault} from '../internal/defaults';
 import {getLimiter} from '../internal/function/limit';
-import {isAsyncFunction, isPlainObject, isPromise} from '../internal/is';
+import {isAsyncFunction, isPlainObject, isThenable} from '../internal/is';
+import {swallow} from '../internal/promise';
 import {attempt} from '../internal/result/attempt';
 import {LIMITER_WAIT} from '../models/function/limiter.model';
 import {
 	RETRY_MESSAGE_CALLBACK,
 	RETRY_MESSAGE_FAILED,
-	RETRY_MESSAGE_VALUE,
+	RETRY_MESSAGE_PROMISE,
 	RetryError,
 	type RetryOptions,
 } from '../models/function/retry.model';
-import type {GenericAsyncCallback, GenericCallback} from '../models/index';
+import type {GenericAsyncCallback, GenericSyncCallback} from '../models/index';
 
 // #region Functions
 
@@ -50,25 +51,26 @@ async function asyncRetry<Callback extends GenericAsyncCallback>(
 	options?: RetryOptions,
 ): Promise<ReturnType<Callback>> {
 	async function handle(): Promise<void> {
-		const attempted = await attempt(async () => callback());
+		await attempt(async () => callback()).then(attempted =>
+			attempted.match({
+				error: onError,
+				ok(value) {
+					resolver(value);
+				},
+			}),
+		);
+	}
 
-		if (attempted.ok) {
-			resolver(attempted.value);
-
-			return;
-		}
-
-		try {
-			if (attempts >= times || !when(attempted.error)) {
-				rejector(new RetryError(RETRY_MESSAGE_FAILED, attempted.error));
+	function onError(error: unknown): void {
+		attempt(() => {
+			if (attempts >= times || !when(error)) {
+				rejector(new RetryError(RETRY_MESSAGE_FAILED, error));
 			} else {
 				attempts += 1;
 
 				void limiter.run();
 			}
-		} catch (error) {
-			rejector(error);
-		}
+		}).or(rejector);
 	}
 
 	const {delay, times, when} = createRetryOptions(options);
@@ -141,12 +143,12 @@ export async function retry<Callback extends GenericAsyncCallback>(
  * @param options Retry options
  * @returns Callback result
  */
-export function retry<Callback extends GenericCallback>(
+export function retry<Callback extends GenericSyncCallback>(
 	callback: Callback,
 	options?: Omit<RetryOptions, 'delay'>,
 ): ReturnType<Callback>;
 
-export function retry<Callback extends GenericCallback>(
+export function retry<Callback extends GenericSyncCallback>(
 	callback: Callback,
 	options?: RetryOptions,
 ): unknown {
@@ -161,7 +163,7 @@ function shouldRetry(): boolean {
 	return true;
 }
 
-function syncRetry<Callback extends GenericCallback>(
+function syncRetry<Callback extends GenericSyncCallback>(
 	callback: Callback,
 	options?: RetryOptions,
 ): ReturnType<Callback> {
@@ -174,13 +176,15 @@ function syncRetry<Callback extends GenericCallback>(
 		try {
 			const value = callback();
 
-			if (isPromise(value)) {
+			if (isThenable(value)) {
+				swallow(value);
+
 				promised = true;
 
-				throw new TypeError(RETRY_MESSAGE_VALUE);
+				throw new TypeError(RETRY_MESSAGE_PROMISE);
 			}
 
-			return value;
+			return value as ReturnType<Callback>;
 		} catch (error) {
 			if (promised) {
 				throw error;

@@ -1,7 +1,55 @@
 import {expect, test} from 'vite-plus/test';
 import {memoize, noop} from '../../src';
 
-test('function, memoize', () => {
+test('function, memoize: asynchronous', async () => {
+	const memoized = memoize(async (value: number) => {
+		if (value === 99) {
+			throw new Error();
+		}
+
+		return value * 2;
+	});
+
+	expect(memoized.maximum).toBe(1024);
+	expect(memoized.size).toBe(0);
+
+	expect(await memoized.run(2)).toBe(4);
+	expect(await memoized.run(3)).toBe(6);
+
+	expect(memoized.size).toBe(2);
+
+	expect(await memoized.run(2)).toBe(4);
+	expect(await memoized.run(3)).toBe(6);
+
+	expect(memoized.size).toBe(2);
+
+	await expect(memoized.run(99)).rejects.toThrow();
+
+	memoized.clear();
+
+	expect(memoized.size).toBe(0);
+});
+
+test('function, memoize: defaults', () => {
+	expect(memoize(noop).maximum).toBe(1024);
+	expect(memoize(noop, {cacheSize: 128}).maximum).toBe(128);
+	expect(memoize(noop, 0 as never).maximum).toBe(1024);
+	expect(memoize(noop, {cacheSize: -1}).maximum).toBe(1024);
+	expect(memoize(noop, {cacheSize: 'blah' as never}).maximum).toBe(1024);
+	expect(memoize(noop, {}).maximum).toBe(1024);
+});
+
+test('function, memoize: error', () => {
+	expect(() => memoize('blah' as never)).toThrow();
+});
+
+test('function, memoize: promise in synchronous', () => {
+	const memoized = memoize((value: number) => Promise.resolve(value * 2));
+
+	expect(() => memoized.run(2)).toThrow();
+});
+
+test('function, memoize: synchronous', () => {
 	const memoized = memoize((value: number) => value * 2);
 
 	expect(memoized.maximum).toBe(1024);
@@ -105,17 +153,99 @@ test('function, memoize', () => {
 
 	expect(callbacked.get(true)).toBeUndefined();
 	expect(callbacked.get(false)).toBeUndefined();
+});
 
-	// Defaults
+test('function, memoize: asynchronous deduplication', async () => {
+	let count = 0;
 
-	expect(memoize(noop).maximum).toBe(1024);
-	expect(memoize(noop, {cacheSize: 128}).maximum).toBe(128);
-	expect(memoize(noop, 0 as never).maximum).toBe(1024);
-	expect(memoize(noop, {cacheSize: -1}).maximum).toBe(1024);
-	expect(memoize(noop, {cacheSize: 'blah' as never}).maximum).toBe(1024);
-	expect(memoize(noop, {}).maximum).toBe(1024);
+	const memoized = memoize(async (value: number) => {
+		count += 1;
 
-	// Error
+		await new Promise(resolve => setTimeout(resolve, 10));
 
-	expect(() => memoize('blah' as never)).toThrow();
+		return value * 2;
+	});
+
+	const results = await Promise.all([memoized.run(2), memoized.run(2), memoized.run(2)]);
+
+	expect(results).toEqual([4, 4, 4]);
+	expect(count).toBe(1);
+	expect(memoized.size).toBe(1);
+	expect(memoized.get(2)).toBeInstanceOf(Promise);
+
+	expect(await memoized.run(2)).toBe(4);
+	expect(count).toBe(1);
+});
+
+test('function, memoize: asynchronous rejection', async () => {
+	let count = 0;
+
+	const memoized = memoize(async (value: number) => {
+		count += 1;
+
+		if (count < 3) {
+			throw new Error('Test error');
+		}
+
+		return value;
+	});
+
+	await expect(memoized.run(1)).rejects.toThrow('Test error');
+	await Promise.resolve();
+
+	expect(memoized.has(1)).toBe(false);
+	expect(memoized.size).toBe(0);
+
+	await expect(memoized.run(1)).rejects.toThrow('Test error');
+	await expect(memoized.run(1)).resolves.toBe(1);
+
+	expect(memoized.has(1)).toBe(true);
+	expect(count).toBe(3);
+});
+
+test('function, memoize: asynchronous rejection after replacement', async () => {
+	const rejectors: Array<(reason: unknown) => void> = [];
+	const resolvers: Array<(value: number) => void> = [];
+
+	let count = 0;
+
+	const memoized = memoize(
+		async () =>
+			new Promise<number>((resolve, reject) => {
+				count += 1;
+
+				if (count === 1) {
+					rejectors.push(reject);
+				} else {
+					resolvers.push(resolve);
+				}
+			}),
+		{cacheKey: () => 'key'},
+	);
+
+	const first = memoized.run();
+
+	memoized.clear();
+
+	const second = memoized.run();
+
+	rejectors[0](new Error('Test error'));
+
+	await expect(first).rejects.toThrow('Test error');
+
+	expect(memoized.has('key')).toBe(true);
+
+	resolvers[0](123);
+
+	expect(await second).toBe(123);
+	expect(await memoized.run()).toBe(123);
+	expect(count).toBe(2);
+});
+
+test('function, memoize: synchronous rejected promises are not unhandled', async () => {
+	const memoized = memoize(() => Promise.reject(new Error('Test error')));
+
+	expect(() => memoized.run()).toThrow();
+
+	await new Promise(resolve => setTimeout(resolve, 10));
 });

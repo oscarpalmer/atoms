@@ -145,3 +145,11 @@ test('synchronous', () => {
 
 	expect(() => retry('blah' as never)).toThrow(RETRY_MESSAGE_CALLBACK);
 });
+
+test('synchronous: rejected promises are not unhandled', async () => {
+	expect(() => retry((() => Promise.reject(new Error('Test error'))) as never)).toThrow(
+		RETRY_MESSAGE_VALUE,
+	);
+
+	await new Promise(resolve => setTimeout(resolve, 10));
+});

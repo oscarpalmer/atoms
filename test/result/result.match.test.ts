@@ -140,3 +140,18 @@ test('match: synchronous', () => {
 	expect(() => match(errorResult, 'blah' as never, 'blah' as never)).toThrow(Error);
 	expect(() => match(okResult, 'blah' as never, 'blah' as never)).toThrow(Error);
 });
+
+test('match: thenables', async () => {
+	const thenable = {
+		then(resolve: (value: unknown) => void): never {
+			resolve(ok(1));
+
+			return undefined as never;
+		},
+	};
+
+	const matched = match(thenable as never, {error: () => 'error', ok: value => `ok: ${value}`});
+
+	expect(matched).toBeInstanceOf(Promise);
+	expect(await matched).toBe('ok: 1');
+});

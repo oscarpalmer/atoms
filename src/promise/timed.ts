@@ -1,7 +1,7 @@
 import {createAborter} from '../internal/aborter';
 import {getLimiter} from '../internal/function/limit';
-import {noop} from '../internal/function/misc';
 import {isPromise} from '../internal/is';
+import {swallow} from '../internal/promise';
 import {LIMITER_WAIT} from '../models/function/limiter.model';
 import type {RequiredKeys} from '../models/index';
 import {PROMISE_MESSAGE_TIMED, TimedError, type PromiseOptions} from '../models/promise.model';
@@ -74,7 +74,7 @@ export async function timed<Value>(promise: Promise<Value>, options: unknown): P
 	const {signal, time} = createPromiseOptions(options);
 
 	if (signal?.aborted ?? false) {
-		void promise.catch(noop);
+		swallow(promise);
 
 		throw signal?.reason;
 	}

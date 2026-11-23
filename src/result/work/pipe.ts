@@ -1,6 +1,6 @@
 import {pipe} from '../../internal/function/work';
 import type {SyncFunctions, SyncInitial, SyncValue} from '../../models/function/work.model';
-import type {GenericCallback} from '../../models/index';
+import type {GenericCallback, GenericSyncCallback} from '../../models/index';
 import type {Result, UnwrapValue} from '../../models/result.model';
 import {attempt} from '../index';
 
@@ -12,7 +12,7 @@ type InitialAsyncPipeValue<Initial> =
 	| Promise<Initial>
 	| Result<Initial>;
 
-type InitialPipeValue<Initial> = GenericCallback | Initial | Result<Initial>;
+type InitialPipeValue<Initial> = GenericSyncCallback | Initial | Result<Initial>;
 
 type SyncInitialValue<Initial> = SyncInitial<Initial, InitialPipeValue<Initial>>;
 

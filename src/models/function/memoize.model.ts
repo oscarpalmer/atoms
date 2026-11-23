@@ -101,7 +101,9 @@ export type MemoizedStateOptions = {
 
 export const MEMOIZED_CACHE_SIZE_DEFAULT = 1024;
 
-export const MEMOIZED_CALLBACK = 'Memoized requires a callback function';
+export const MEMOIZED_MESSAGE_CALLBACK = 'Memoized requires a callback function';
+
+export const MEMOIZED_MESSAGE_PROMISE = `Synchronous 'memoize' received a promise; if the callback is asynchronous, prefix it with 'async'`;
 
 export const MEMOIZED_KEY_SEPARATOR = '_';
 

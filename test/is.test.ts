@@ -7,6 +7,7 @@ import {
 	isInstanceOf,
 	isKey,
 	isNonArrayOrPlainObject,
+	isNonAsyncFunction,
 	isNonConstructor,
 	isNonEmpty,
 	isNonInstanceOf,
@@ -20,6 +21,7 @@ import {
 	isNonPlainObject,
 	isNonPrimitive,
 	isNonPromise,
+	isNonTemplateStringsArray,
 	isNonTypedArray,
 	isNullable,
 	isNullableOrEmpty,
@@ -30,13 +32,10 @@ import {
 	isPlainObject,
 	isPrimitive,
 	isPromise,
+	isTemplateStringsArray,
 	isTypedArray,
 } from '../src';
-import {
-	isNonAsyncFunction,
-	isNonTemplateStringsArray,
-	isTemplateStringsArray,
-} from '../src/internal/is';
+import {isNonThenable, isThenable} from '../src/internal/is';
 import {isFixture} from './.fixtures/is.fixture';
 
 const {values, length} = isFixture;
@@ -293,6 +292,27 @@ test('isTemplateStringsArray', () => {
 
 	// oxlint-disable-next-line no-unused-expressions Actually used, so no worries
 	tester``;
+});
+
+test('isThenable', () => {
+	for (let index = 0; index < length; index += 1) {
+		const value = values[index];
+
+		expect(isThenable(value)).toBe(false);
+		expect(isNonThenable(value)).toBe(true);
+	}
+
+	const thenables = [
+		Promise.resolve(123),
+		new Promise(() => {}),
+		(async () => {})(),
+		{then: () => {}},
+	];
+
+	for (const thenable of thenables) {
+		expect(isThenable(thenable)).toBe(true);
+		expect(isNonThenable(thenable)).toBe(false);
+	}
 });
 
 test('isTypedArray', () => {

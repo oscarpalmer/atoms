@@ -357,13 +357,13 @@ export const PLAN_FAILURE_ASYNC = 'asyncFailure' as const;
 
 export const PLAN_FAILURE_SYNC = 'failure' as const;
 
-export const PLAN_MESSAGE_FAIL_VALUE = `'fail' received a promise; if the callback is asynchronous, prefix it with 'async'`;
+export const PLAN_MESSAGE_FAIL_PROMISE = `Synchronous 'fail' received a promise; if the callback is asynchronous, prefix it with 'async'`;
 
 export const PLAN_MESSAGE_PLAN_INPUT = `'plan' requires a generator function'`;
 
 export const PLAN_MESSAGE_RUN_INPUT = `'run' requires a plan or generator function`;
 
-export const PLAN_MESSAGE_SUCCEED_VALUE = `'succeed' received a promise; if the callback is asynchronous, prefix it with 'async'`;
+export const PLAN_MESSAGE_SUCCEED_PROMISE = `Synchronous 'succeed' received a promise; if the callback is asynchronous, prefix it with 'async'`;
 
 export const PLAN_MESSAGE_USE_NESTED_FN = `Cannot use nested functions with 'use'`;
 

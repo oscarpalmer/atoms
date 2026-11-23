@@ -1,9 +1,10 @@
 import {assert} from '../internal/function/assert';
-import {isAsyncFunction, isPromise} from '../internal/is';
+import {isAsyncFunction, isThenable} from '../internal/is';
+import {swallow} from '../internal/promise';
 import {
 	ONCE_MESSAGE_CALLBACK,
 	ONCE_MESSAGE_CLEARED,
-	ONCE_MESSAGE_VALUE,
+	ONCE_MESSAGE_PROMISE,
 	ONCE_NAME_ASYNC,
 	ONCE_NAME_SYNC,
 	ONCE_SYMBOL,
@@ -13,7 +14,12 @@ import {
 	type InternalOnce,
 	type Once,
 } from '../models/function/once.model';
-import type {GenericAsyncCallback, GenericCallback, PlainObject} from '../models/index';
+import type {
+	GenericAsyncCallback,
+	GenericCallback,
+	GenericSyncCallback,
+	PlainObject,
+} from '../models/index';
 
 // #region Instances
 
@@ -172,10 +178,10 @@ export function once<Callback extends GenericAsyncCallback>(
  * @param callback Callback to use once
  * @returns _Once_ callback
  */
-export function once<Callback extends GenericCallback>(callback: Callback): Once<Callback>;
+export function once<Callback extends GenericSyncCallback>(callback: Callback): Once<Callback>;
 
 export function once(
-	callback: GenericCallback | GenericAsyncCallback,
+	callback: GenericCallback,
 ): Once<GenericCallback> | AsyncOnce<GenericAsyncCallback> {
 	assert(() => typeof callback === 'function', ONCE_MESSAGE_CALLBACK);
 
@@ -196,14 +202,15 @@ function runOnce(this: InternalOnce, ...parameters: unknown[]): unknown {
 		return state.value;
 	}
 
-	state.called = true;
-
 	const value = state.callback(...parameters);
 
-	if (isPromise(value)) {
-		throw new Error(ONCE_MESSAGE_VALUE);
+	if (isThenable(value)) {
+		swallow(value);
+
+		throw new Error(ONCE_MESSAGE_PROMISE);
 	}
 
+	state.called = true;
 	state.value = value;
 
 	return value;

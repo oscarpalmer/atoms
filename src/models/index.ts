@@ -44,8 +44,10 @@ export type GenericCallback = (...args: any[]) => any;
 
 /**
  * A generic synchronous callback function
+ *
+ * _(Rejects callbacks that return a promise, or may return one)_
  */
-export type GenericSyncCallback = (...args: any[]) => Exclude<any, Promise<any>>;
+export type GenericSyncCallback = (...args: any[]) => SyncReturn;
 
 /**
  * A generic key type
@@ -224,6 +226,26 @@ type SubtractDepth<Value extends number> = Value extends 5
 				: Value extends 1
 					? 0
 					: never;
+
+/**
+ * A value that is not a promise _(or other thenable)_
+ *
+ * _(An index signature is needed, as a weak type would reject most objects)_
+ */
+type SyncReturn =
+	| {[key: PropertyKey]: any; then?: never}
+	| bigint
+	| boolean
+	| number
+	| string
+	| symbol
+	| null
+	| undefined;
+
+/**
+ * A promise-like object that implements a `then`-method
+ */
+export type Thenable<Value = unknown> = PromiseLike<Value>;
 
 /**
  * Get the value's type as a string

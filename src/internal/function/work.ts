@@ -10,9 +10,10 @@ import {
 	WORK_MESSAGE_NESTING,
 	WORK_MESSAGE_PIPE_PROMISE,
 } from '../../models/function/work.model';
-import type {GenericCallback} from '../../models/index';
+import type {GenericCallback, GenericSyncCallback} from '../../models/index';
 import type {UnwrapValue} from '../../models/result.model';
-import {isAsyncFunction, isPromise} from '../is';
+import {isAsyncFunction, isThenable} from '../is';
+import {swallow} from '../promise';
 import {unwrapWork} from './misc';
 
 // #region Functions
@@ -24,7 +25,7 @@ import {unwrapWork} from './misc';
  *
  * @returns _Flow_ function
  */
-export function flow<Fn extends GenericCallback>(
+export function flow<Fn extends GenericSyncCallback>(
 	fn: Fn & SyncValue<ReturnType<Fn>>,
 ): Flow<Fn, ReturnType<Fn>>;
 
@@ -33,7 +34,7 @@ export function flow<Fn extends GenericCallback>(
  *
  * @returns _Flow_ function
  */
-export function flow<First extends GenericCallback, Second>(
+export function flow<First extends GenericSyncCallback, Second>(
 	first: First & SyncValue<ReturnType<First>>,
 	second: (value: UnwrapValue<ReturnType<First>>) => Second & SyncValue<Second>,
 ): Flow<First, Second>;
@@ -43,7 +44,7 @@ export function flow<First extends GenericCallback, Second>(
  *
  * @returns _Flow_ function
  */
-export function flow<First extends GenericCallback, Second, Third>(
+export function flow<First extends GenericSyncCallback, Second, Third>(
 	first: First & SyncValue<ReturnType<First>>,
 	second: (value: UnwrapValue<ReturnType<First>>) => Second & SyncValue<Second>,
 	third: (value: UnwrapValue<Second>) => Third & SyncValue<Third>,
@@ -54,7 +55,7 @@ export function flow<First extends GenericCallback, Second, Third>(
  *
  * @returns _Flow_ function
  */
-export function flow<First extends GenericCallback, Second, Third, Fourth>(
+export function flow<First extends GenericSyncCallback, Second, Third, Fourth>(
 	first: First & SyncValue<ReturnType<First>>,
 	second: (value: UnwrapValue<ReturnType<First>>) => Second & SyncValue<Second>,
 	third: (value: UnwrapValue<Second>) => Third & SyncValue<Third>,
@@ -66,7 +67,7 @@ export function flow<First extends GenericCallback, Second, Third, Fourth>(
  *
  * @returns _Flow_ function
  */
-export function flow<First extends GenericCallback, Second, Third, Fourth, Fifth>(
+export function flow<First extends GenericSyncCallback, Second, Third, Fourth, Fifth>(
 	first: First & SyncValue<ReturnType<First>>,
 	second: (value: UnwrapValue<ReturnType<First>>) => Second & SyncValue<Second>,
 	third: (value: UnwrapValue<Second>) => Third & SyncValue<Third>,
@@ -79,7 +80,7 @@ export function flow<First extends GenericCallback, Second, Third, Fourth, Fifth
  *
  * @returns _Flow_ function
  */
-export function flow<First extends GenericCallback, Second, Third, Fourth, Fifth, Sixth>(
+export function flow<First extends GenericSyncCallback, Second, Third, Fourth, Fifth, Sixth>(
 	first: First & SyncValue<ReturnType<First>>,
 	second: (value: UnwrapValue<ReturnType<First>>) => Second & SyncValue<Second>,
 	third: (value: UnwrapValue<Second>) => Third & SyncValue<Third>,
@@ -93,7 +94,15 @@ export function flow<First extends GenericCallback, Second, Third, Fourth, Fifth
  *
  * @returns _Flow_ function
  */
-export function flow<First extends GenericCallback, Second, Third, Fourth, Fifth, Sixth, Seventh>(
+export function flow<
+	First extends GenericSyncCallback,
+	Second,
+	Third,
+	Fourth,
+	Fifth,
+	Sixth,
+	Seventh,
+>(
 	first: First & SyncValue<ReturnType<First>>,
 	second: (value: UnwrapValue<ReturnType<First>>) => Second & SyncValue<Second>,
 	third: (value: UnwrapValue<Second>) => Third & SyncValue<Third>,
@@ -109,7 +118,7 @@ export function flow<First extends GenericCallback, Second, Third, Fourth, Fifth
  * @returns _Flow_ function
  */
 export function flow<
-	First extends GenericCallback,
+	First extends GenericSyncCallback,
 	Second,
 	Third,
 	Fourth,
@@ -134,7 +143,7 @@ export function flow<
  * @returns _Flow_ function
  */
 export function flow<
-	First extends GenericCallback,
+	First extends GenericSyncCallback,
 	Second,
 	Third,
 	Fourth,
@@ -161,7 +170,7 @@ export function flow<
  * @returns _Flow_ function
  */
 export function flow<
-	First extends GenericCallback,
+	First extends GenericSyncCallback,
 	Second,
 	Third,
 	Fourth,
@@ -355,7 +364,7 @@ export function flow<
  * @returns _Flow_ function
  */
 export function flow<
-	First extends GenericCallback,
+	First extends GenericSyncCallback,
 	Fns extends Array<(value: UnwrapValue<ReturnType<First>>) => unknown>,
 >(
 	first: First & SyncValue<ReturnType<First>>,
@@ -377,7 +386,7 @@ export function flow<Fn extends GenericCallback>(
  *
  * @returns _Flow_ function
  */
-export function flow<Fns extends GenericCallback[]>(
+export function flow<Fns extends GenericSyncCallback[]>(
 	...fns: Fns & SyncFunctions<Fns>
 ): (...args: unknown[]) => unknown;
 
@@ -811,7 +820,7 @@ async function asyncWork(
 
 	initial = unwrapValue(initial);
 
-	let transformed = isPromise(initial) ? unwrapWork(await initial) : initial;
+	let transformed = isThenable(initial) ? unwrapWork(await initial) : initial;
 
 	for (let index = 0; index < length; index += 1) {
 		const fn = functions[index];
@@ -821,14 +830,14 @@ async function asyncWork(
 
 		const unwrapped = unwrapValue(value);
 
-		transformed = isPromise(unwrapped) ? unwrapWork(await unwrapped) : unwrapped;
+		transformed = isThenable(unwrapped) ? unwrapWork(await unwrapped) : unwrapped;
 	}
 
 	return transformed;
 }
 
 function isAsyncInitial(value: unknown): boolean {
-	return isPromise(value) || isAsyncFunction(value);
+	return isThenable(value) || isAsyncFunction(value);
 }
 
 function unwrapValue(value: unknown, flow?: boolean, nested?: boolean): unknown {
@@ -840,7 +849,9 @@ function unwrapValue(value: unknown, flow?: boolean, nested?: boolean): unknown 
 		return unwrapValue(value(), flow, true);
 	}
 
-	if (flow != null && isPromise(value)) {
+	if (flow != null && isThenable(value)) {
+		swallow(value);
+
 		throw new TypeError(flow ? WORK_MESSAGE_FLOW_PROMISE : WORK_MESSAGE_PIPE_PROMISE);
 	}
 

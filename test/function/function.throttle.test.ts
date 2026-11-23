@@ -186,3 +186,11 @@ test('synchronous', () =>
 			done();
 		}, 500);
 	}));
+
+test('synchronous: returned promises are ignored', async () => {
+	const throttled = throttle((() => Promise.reject(new Error('Test error'))) as never, 10);
+
+	throttled.run();
+
+	await new Promise(resolve => setTimeout(resolve, 50));
+});

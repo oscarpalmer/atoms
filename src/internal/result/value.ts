@@ -6,8 +6,8 @@ import {
 	RESULT_NAME_OK,
 	RESULT_SYMBOL,
 } from '../../models/result.model';
-import {noop} from '../function/misc';
-import {isPromise} from '../is';
+import {isThenable} from '../is';
+import {swallow} from '../promise';
 import {isError, isOk, isResult} from './is';
 import {match} from './match';
 import {unwrapValue} from './misc';
@@ -92,8 +92,8 @@ function handleResult(
 	ignore: boolean,
 ): unknown {
 	if (ignore) {
-		if (isPromise(next)) {
-			void next.then(noop, noop);
+		if (isThenable(next)) {
+			swallow(next);
 		}
 
 		return result;
@@ -113,8 +113,8 @@ function handleResult(
 		wrapper = ok;
 	}
 
-	if (isPromise(value)) {
-		return value.then(v => (map ? wrapper(v) : wrapResult(v, wrapper)));
+	if (isThenable(value)) {
+		return Promise.resolve(value).then(v => (map ? wrapper(v) : wrapResult(v, wrapper)));
 	}
 
 	return map ? wrapper(value) : wrapResult(value, wrapper);

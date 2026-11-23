@@ -1,5 +1,5 @@
 import {expect, test} from 'vite-plus/test';
-import {Err, isFulfilled, isRejected, Ok, promises, toResult} from '../../src';
+import {Err, isFulfilled, isRejected, Ok, ok, promises, toResult} from '../../src';
 import {PROMISE_MESSAGE_RESULT} from '../../src/models/promise.model';
 
 test('is', () =>
@@ -61,4 +61,19 @@ test('toResult', async () => {
 
 	await expect(toResult('blah' as never)).rejects.toThrow(PROMISE_MESSAGE_RESULT);
 	await expect(toResult(() => 'blah' as never)).rejects.toThrow(PROMISE_MESSAGE_RESULT);
+});
+
+test('toResult: thenables', async () => {
+	const thenable = {
+		then(resolve: (value: unknown) => void): never {
+			resolve(1);
+
+			return undefined as never;
+		},
+	};
+
+	const result = toResult(thenable as never);
+
+	expect(result).toBeInstanceOf(Promise);
+	expect(await result).toEqual(ok(1));
 });

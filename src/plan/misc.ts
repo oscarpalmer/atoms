@@ -1,11 +1,12 @@
-import {isAsyncFunction, isPromise} from '../internal/is';
+import {isAsyncFunction, isThenable} from '../internal/is';
 import {getGenerator} from '../internal/plan';
+import {swallow} from '../internal/promise';
 import {error} from '../internal/result/value';
 import {
 	PLAN_FAILURE_ASYNC,
 	PLAN_FAILURE_SYNC,
-	PLAN_MESSAGE_FAIL_VALUE,
-	PLAN_MESSAGE_SUCCEED_VALUE,
+	PLAN_MESSAGE_FAIL_PROMISE,
+	PLAN_MESSAGE_SUCCEED_PROMISE,
 	PLAN_SUCCESS_ASYNC,
 	PLAN_SUCCESS_SYNC,
 	PLAN_SYMBOL,
@@ -94,7 +95,7 @@ export function fail<Value>(callback: () => Value): Failure<Value>;
 export function fail<Value>(value: Value): Failure<Value>;
 
 export function fail(value: unknown): unknown {
-	if (isAsyncFunction(value) || isPromise(value)) {
+	if (isAsyncFunction(value) || isThenable(value)) {
 		// @ts-expect-error Using old school function constructor, so all good, no worries :-)
 		return new AsyncFailure(async function* () {
 			yield error(await (typeof value === 'function' ? value() : value));
@@ -105,8 +106,10 @@ export function fail(value: unknown): unknown {
 	return new Failure(function* () {
 		value = typeof value === 'function' ? value() : value;
 
-		if (isPromise(value)) {
-			throw new Error(PLAN_MESSAGE_FAIL_VALUE);
+		if (isThenable(value)) {
+			swallow(value);
+
+			throw new Error(PLAN_MESSAGE_FAIL_PROMISE);
 		}
 
 		yield error(value);
@@ -146,7 +149,7 @@ export function succeed<Value>(callback: () => Value): Success<Value>;
 export function succeed<Value>(value: Value): Success<Value>;
 
 export function succeed(value: unknown): unknown {
-	if (isAsyncFunction(value) || isPromise(value)) {
+	if (isAsyncFunction(value) || isThenable(value)) {
 		// @ts-expect-error Using old school function constructor, so all good, no worries :-)
 		return new AsyncSuccess(async function* () {
 			return typeof value === 'function' ? value() : value;
@@ -157,8 +160,10 @@ export function succeed(value: unknown): unknown {
 	return new Success(function* () {
 		value = typeof value === 'function' ? value() : value;
 
-		if (isPromise(value)) {
-			throw new Error(PLAN_MESSAGE_SUCCEED_VALUE);
+		if (isThenable(value)) {
+			swallow(value);
+
+			throw new Error(PLAN_MESSAGE_SUCCEED_PROMISE);
 		}
 
 		return value;

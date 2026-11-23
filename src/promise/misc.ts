@@ -1,4 +1,4 @@
-import {isPromise} from '../internal/is';
+import {isThenable} from '../internal/is';
 import {error, ok} from '../internal/result/value';
 import type {Aborter} from '../models/aborter.model';
 import {
@@ -101,14 +101,11 @@ export async function toResult(
 		return error(reason) as never;
 	}
 
-	if (!isPromise(actual)) {
+	if (!isThenable(actual)) {
 		throw new TypeError(PROMISE_MESSAGE_RESULT);
 	}
 
-	return actual.then(
-		result => ok(result),
-		reason => error(reason),
-	);
+	return Promise.resolve(actual).then(ok, error);
 }
 
 // #endregion

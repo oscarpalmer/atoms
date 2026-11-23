@@ -2,7 +2,7 @@ import {unwrapWork} from '../../internal/function/misc';
 import {flow} from '../../internal/function/work';
 import {isAsyncFunction} from '../../internal/is';
 import type {SyncFunctions, SyncValue} from '../../models/function/work.model';
-import type {GenericCallback} from '../../models/index';
+import type {GenericCallback, GenericSyncCallback} from '../../models/index';
 import type {AttemptAsyncFlow, AttemptFlow, Result, UnwrapValue} from '../../models/result.model';
 import {attempt} from '../index';
 
@@ -13,7 +13,7 @@ import {attempt} from '../index';
  *
  * @returns _Flow_ function
  */
-export function attemptFlow<Fn extends GenericCallback>(
+export function attemptFlow<Fn extends GenericSyncCallback>(
 	fn: Fn & SyncValue<ReturnType<Fn>>,
 ): AttemptFlow<Fn, ReturnType<Fn>>;
 
@@ -22,7 +22,7 @@ export function attemptFlow<Fn extends GenericCallback>(
  *
  * @returns _Flow_ function
  */
-export function attemptFlow<First extends GenericCallback, Second>(
+export function attemptFlow<First extends GenericSyncCallback, Second>(
 	first: First & SyncValue<ReturnType<First>>,
 	second: (value: UnwrapValue<ReturnType<First>>) => Second & SyncValue<Second>,
 ): AttemptFlow<First, Second>;
@@ -32,7 +32,7 @@ export function attemptFlow<First extends GenericCallback, Second>(
  *
  * @returns _Flow_ function
  */
-export function attemptFlow<First extends GenericCallback, Second, Third>(
+export function attemptFlow<First extends GenericSyncCallback, Second, Third>(
 	first: First & SyncValue<ReturnType<First>>,
 	second: (value: UnwrapValue<ReturnType<First>>) => Second & SyncValue<Second>,
 	third: (value: UnwrapValue<Second>) => Third & SyncValue<Third>,
@@ -43,7 +43,7 @@ export function attemptFlow<First extends GenericCallback, Second, Third>(
  *
  * @returns _Flow_ function
  */
-export function attemptFlow<First extends GenericCallback, Second, Third, Fourth>(
+export function attemptFlow<First extends GenericSyncCallback, Second, Third, Fourth>(
 	first: First & SyncValue<ReturnType<First>>,
 	second: (value: UnwrapValue<ReturnType<First>>) => Second & SyncValue<Second>,
 	third: (value: UnwrapValue<Second>) => Third & SyncValue<Third>,
@@ -55,7 +55,7 @@ export function attemptFlow<First extends GenericCallback, Second, Third, Fourth
  *
  * @returns _Flow_ function
  */
-export function attemptFlow<First extends GenericCallback, Second, Third, Fourth, Fifth>(
+export function attemptFlow<First extends GenericSyncCallback, Second, Third, Fourth, Fifth>(
 	first: First & SyncValue<ReturnType<First>>,
 	second: (value: UnwrapValue<ReturnType<First>>) => Second & SyncValue<Second>,
 	third: (value: UnwrapValue<Second>) => Third & SyncValue<Third>,
@@ -68,7 +68,7 @@ export function attemptFlow<First extends GenericCallback, Second, Third, Fourth
  *
  * @returns _Flow_ function
  */
-export function attemptFlow<First extends GenericCallback, Second, Third, Fourth, Fifth, Sixth>(
+export function attemptFlow<First extends GenericSyncCallback, Second, Third, Fourth, Fifth, Sixth>(
 	first: First & SyncValue<ReturnType<First>>,
 	second: (value: UnwrapValue<ReturnType<First>>) => Second & SyncValue<Second>,
 	third: (value: UnwrapValue<Second>) => Third & SyncValue<Third>,
@@ -83,7 +83,7 @@ export function attemptFlow<First extends GenericCallback, Second, Third, Fourth
  * @returns _Flow_ function
  */
 export function attemptFlow<
-	First extends GenericCallback,
+	First extends GenericSyncCallback,
 	Second,
 	Third,
 	Fourth,
@@ -106,7 +106,7 @@ export function attemptFlow<
  * @returns _Flow_ function
  */
 export function attemptFlow<
-	First extends GenericCallback,
+	First extends GenericSyncCallback,
 	Second,
 	Third,
 	Fourth,
@@ -131,7 +131,7 @@ export function attemptFlow<
  * @returns _Flow_ function
  */
 export function attemptFlow<
-	First extends GenericCallback,
+	First extends GenericSyncCallback,
 	Second,
 	Third,
 	Fourth,
@@ -158,7 +158,7 @@ export function attemptFlow<
  * @returns _Flow_ function
  */
 export function attemptFlow<
-	First extends GenericCallback,
+	First extends GenericSyncCallback,
 	Second,
 	Third,
 	Fourth,
@@ -360,7 +360,7 @@ export function attemptFlow<
  * @returns _Flow_ function
  */
 export function attemptFlow<
-	First extends GenericCallback,
+	First extends GenericSyncCallback,
 	Fns extends Array<(value: UnwrapValue<ReturnType<First>>) => unknown>,
 >(
 	first: First & SyncValue<ReturnType<First>>,
@@ -382,7 +382,7 @@ export function attemptFlow<Fn extends GenericCallback>(
  *
  * @returns _Flow_ function
  */
-export function attemptFlow<Fns extends GenericCallback[]>(
+export function attemptFlow<Fns extends GenericSyncCallback[]>(
 	...fns: Fns & SyncFunctions<Fns>
 ): (...args: unknown[]) => Result<unknown>;
 

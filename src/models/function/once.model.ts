@@ -93,7 +93,7 @@ export const ONCE_MESSAGE_CLEARED = 'Once has been cleared';
 
 export const ONCE_MESSAGE_CALLBACK = `'once' expected a function`;
 
-export const ONCE_MESSAGE_VALUE = `'once' received a promise; if the callback is asynchronous, prefix it with 'async'`;
+export const ONCE_MESSAGE_PROMISE = `Synchronous 'once' received a promise; if the callback is asynchronous, prefix it with 'async'`;
 
 export const ONCE_SYMBOL: unique symbol = Symbol('once');
 

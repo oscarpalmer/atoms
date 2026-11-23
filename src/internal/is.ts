@@ -6,6 +6,7 @@ import type {
 	Key,
 	PlainObject,
 	Primitive,
+	Thenable,
 	TypedArray,
 } from '../models/index';
 
@@ -23,6 +24,8 @@ export function isArrayOrPlainObject(value: unknown): value is ArrayOrPlainObjec
 
 /**
  * Is the value an asynchronous function?
+ *
+ * The function must be declared with the `async` keyword to be considered asynchronous; to more properly detect asynchronicity, use this helper together with `isPromise`/`isThenable`
  *
  * @param value Value to check
  * @returns `true` if the value is an asynchronous function, otherwise `false`
@@ -176,6 +179,16 @@ export function isNonTemplateStringsArray<Value>(
 }
 
 /**
+ * Is the value not _"thenable"_, i.e., not like a promise?
+ *
+ * @param value Value to check
+ * @returns `true` if the value is not thenable, otherwise `false`
+ */
+export function isNonThenable<Value>(value: Value): value is Exclude<Value, Thenable> {
+	return !isThenable(value);
+}
+
+/**
  * Is the value not a typed array?
  *
  * @param value Value to check
@@ -259,6 +272,21 @@ export function isPromise(value: unknown): value is Promise<unknown> {
  */
 export function isTemplateStringsArray(value: unknown): value is TemplateStringsArray {
 	return Array.isArray(value) && Array.isArray((value as unknown as TemplateStringsArray).raw);
+}
+
+/**
+ * Is the value _"thenable"_, i.e., like a promise?
+ *
+ * @param value Value to check
+ * @returns `true` if the value is thenable, otherwise `false`
+ */
+export function isThenable(value: unknown): value is Thenable {
+	return (
+		typeof value === 'object' &&
+		value !== null &&
+		'then' in value &&
+		typeof (value as PlainObject).then === 'function'
+	);
 }
 
 /**

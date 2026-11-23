@@ -24,14 +24,14 @@ export function attempt<V, E = Error>(
 ): V extends Promise<infer U> ? Promise<Result<U, E>> : Result<V, E>;
 
 export function attempt(input: unknown): unknown {
-	const inputIsPromise = isPromise(input);
+	const promised = isPromise(input);
 
-	if (!inputIsPromise && typeof input !== 'function') {
+	if (!promised && typeof input !== 'function') {
 		throw new TypeError(RESULT_MESSAGE_ATTEMPT);
 	}
 
 	try {
-		const value = inputIsPromise ? input : input();
+		const value = promised ? input : input();
 
 		if (isPromise(value)) {
 			return new Promise(resolve => {

@@ -230,3 +230,15 @@ test('return types', async () => {
 		),
 	).toThrow(WORK_MESSAGE_NESTING);
 });
+
+test('synchronous: rejected promises are not unhandled', async () => {
+	expect(() => flow((() => Promise.reject(new Error('Test error'))) as never)()).toThrow(
+		WORK_MESSAGE_FLOW_PROMISE,
+	);
+
+	expect(() =>
+		pipe((() => Promise.reject(new Error('Test error'))) as never, (x: number) => x),
+	).toThrow(WORK_MESSAGE_PIPE_PROMISE);
+
+	await new Promise(resolve => setTimeout(resolve, 10));
+});

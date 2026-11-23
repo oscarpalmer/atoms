@@ -7,7 +7,7 @@ import {
 	type AsyncLimiter,
 	type Limiter,
 } from '../models/function/limiter.model';
-import type {GenericAsyncCallback, GenericCallback} from '../models/index';
+import type {GenericAsyncCallback, GenericCallback, GenericSyncCallback} from '../models/index';
 
 // #region Functions
 
@@ -29,13 +29,14 @@ export function debounce<Callback extends GenericAsyncCallback>(
 /**
  * Debounce a function, ensuring it is only called after `time` milliseconds have passed
  *
- * On subsequent calls, the timer is reset and will wait another `time` milliseconds _(and so on...)_
+ * - On subsequent calls, the timer is reset and will wait another `time` milliseconds _(and so on...)_
+ * - If the function returns a promise, it will be swallowed to prevent unhandled rejections; to prevent this, prefix the function with `async` to enable proper promise-handling
  *
  * @param callback Callback to debounce
  * @param time Time in milliseconds to wait before calling the callback _(defaults to `0`; e.g., as soon as possible)_
  * @returns Debounced callback handler with a `cancel` method
  */
-export function debounce<Callback extends GenericCallback>(
+export function debounce<Callback extends GenericSyncCallback>(
 	callback: Callback,
 	time?: number,
 ): Limiter<Callback>;
@@ -68,11 +69,13 @@ export function throttle<Callback extends GenericAsyncCallback>(
 /**
  * Throttle a function, ensuring it is only called once every `time` milliseconds
  *
+ * If the function returns a promise, it will be swallowed to prevent unhandled rejections; to prevent this, prefix the function with `async` to enable proper promise-handling
+ *
  * @param callback Callback to throttle
  * @param time Time in milliseconds to wait before calling the callback again _(defaults to `0`; e.g., as soon as possible)_
  * @returns Throttled callback handler with a `cancel` method
  */
-export function throttle<Callback extends GenericCallback>(
+export function throttle<Callback extends GenericSyncCallback>(
 	callback: Callback,
 	time?: number,
 ): Limiter<Callback>;

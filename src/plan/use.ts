@@ -1,4 +1,4 @@
-import {isAsyncFunction, isPromise} from '../internal/is';
+import {isAsyncFunction, isThenable} from '../internal/is';
 import {getGenerator} from '../internal/plan';
 import {isError, isOk} from '../internal/result/is';
 import {
@@ -137,7 +137,7 @@ function getUseStep(value: unknown): () => Generator {
 function isAsynchronousInput(value: unknown): boolean {
 	return (
 		isAsyncFunction(value) ||
-		isPromise(value) ||
+		isThenable(value) ||
 		isAsyncFailure(value) ||
 		isAsyncGenerator(value) ||
 		isAsyncGeneratorFunction(value) ||

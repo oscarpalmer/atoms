@@ -188,3 +188,11 @@ test('synchronous', () =>
 			}, 25);
 		}, 1000);
 	}));
+
+test('synchronous: returned promises are ignored', async () => {
+	const debounced = debounce((() => Promise.reject(new Error('Test error'))) as never, 10);
+
+	debounced.run();
+
+	await new Promise(resolve => setTimeout(resolve, 50));
+});

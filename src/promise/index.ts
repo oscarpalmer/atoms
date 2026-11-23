@@ -1,6 +1,6 @@
 import {createAborter} from '../internal/aborter';
-import {noop} from '../internal/function/misc';
-import {isArrayOrPlainObject, isPromise} from '../internal/is';
+import {isArrayOrPlainObject, isThenable} from '../internal/is';
+import {swallow} from '../internal/promise';
 import {attempt} from '../internal/result/attempt';
 import type {ArrayOrPlainObject, Key, PlainObject} from '../models/index';
 import {
@@ -74,7 +74,7 @@ export async function attemptPromise<Value>(
 ): Promise<Value> {
 	const isFunction = typeof value === 'function';
 
-	if (!isFunction && !isPromise(value)) {
+	if (!isFunction && !isThenable(value)) {
 		throw new TypeError(PROMISE_MESSAGE_ATTEMPT);
 	}
 
@@ -82,7 +82,7 @@ export async function attemptPromise<Value>(
 
 	if (signal?.aborted ?? false) {
 		if (!isFunction) {
-			void value.catch(noop);
+			swallow(value);
 		}
 
 		throw signal?.reason;
@@ -91,26 +91,17 @@ export async function attemptPromise<Value>(
 	const aborter = createAborter(signal, () => {
 		rejector(signal?.reason);
 	});
-
-	async function handler(
-		resolve: (value: Value) => void,
-		reject: (reason: unknown) => void,
-	): Promise<void> {
-		const attempted = await attempt(value as never);
-
-		if (attempted.ok) {
-			settlePromise(resolve, attempted.value, aborter);
-		} else {
-			settlePromise(reject, attempted.error, aborter);
-		}
-	}
-
 	let rejector: (reason: unknown) => void;
 
 	const promise = new Promise<Value>((resolve, reject) => {
 		rejector = reject;
 
-		void handler(resolve, reject);
+		void attempt(async () => (isFunction ? value() : value)).then(attempted =>
+			attempted.match({
+				error: error => settlePromise(reject, error, aborter),
+				ok: value => settlePromise(resolve, value, aborter),
+			}),
+		);
 	});
 
 	return time > 0 ? getTimedPromise(promise, time, signal) : promise;
