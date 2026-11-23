@@ -11,7 +11,7 @@ import {
 	RetryError,
 	type RetryOptions,
 } from '../models/function/retry.model';
-import type {GenericAsyncCallback, GenericSyncCallback} from '../models/index';
+import type {GenericAsyncCallback, GenericSyncCallback} from '../models/misc.model';
 
 // #region Functions
 

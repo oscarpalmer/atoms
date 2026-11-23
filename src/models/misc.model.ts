@@ -1,19 +1,296 @@
-// #region Variables
+// #region Types
 
-export const EXPRESSION_INTEGER: RegExp = /^\d+$/;
+/**
+ * A generic array or object
+ */
+export type ArrayOrPlainObject = unknown[] | Record<PropertyKey, unknown>;
 
-export const EXPRESSION_NUMBER_BINARY: RegExp = /^0b[01]+$/i;
+/**
+ * For matching any `void`, `Date`, primitive, or `RegExp` values
+ *
+ * _(Thanks, type-fest!)_
+ */
+export type BuiltIns = void | Date | Primitive | RegExp;
 
-export const EXPRESSION_NUMBER_OCTAL: RegExp = /^0o[0-7]+$/i;
+/**
+ * A generic class constructor
+ */
+export type Constructor<Instance = unknown> = new (...args: any[]) => Instance;
 
-export const EXPRESSION_NUMBER_ZEROISH: RegExp = /^\s*0+\s*$/;
+/**
+ * A frozen value with readonly properties _(going as deep as possible)_
+ */
+export type Frozen<Value> = Value extends unknown[]
+	? Readonly<Value>
+	: Value extends PlainObject
+		? {
+				readonly [Key in keyof Value]: Frozen<Value[Key]>;
+			}
+		: Value extends Map<infer Key, infer Value>
+			? ReadonlyMap<Key, Frozen<Value>>
+			: Value extends Set<infer Item>
+				? ReadonlySet<Frozen<Item>>
+				: Readonly<Value>;
 
-export const EXPRESSION_NUMERICAL_PREFIX: RegExp = /^\d/;
+/**
+ * A generic asynchronous callback function
+ */
+export type GenericAsyncCallback = (...args: any[]) => Promise<any>;
 
-export const EXPRESSION_WHITESPACE_MULTIPLE: RegExp = /\s+/g;
+/**
+ * A generic callback function
+ */
+export type GenericCallback = (...args: any[]) => any;
 
-export const EXPRESSION_WHITESPACE_ONLY: RegExp = /^\s*$/;
+/**
+ * A generic synchronous callback function
+ *
+ * _(Rejects callbacks that return a promise, or may return one)_
+ */
+export type GenericSyncCallback = (...args: any[]) => SyncReturn;
 
-export const NUMBER_OCTAL_VALUE = 8;
+/**
+ * A generic key type
+ */
+export type Key = number | string;
+
+/**
+ * The `PropertyKey`-safe value of `Item`'s `ItemKey` property
+ */
+export type KeyedValue<Item, ItemKey extends keyof Item> = Item[ItemKey] extends PropertyKey
+	? Item[ItemKey]
+	: never;
+
+/**
+ * A key of `Item`, or a callback returning `Return`, used to derive a value from an item
+ */
+export type KeyOrCallback<Item, Return = unknown> =
+	| ((item: Item, index: number, array: Item[]) => Return)
+	| (Item extends PlainObject ? keyof Item : never);
+
+/**
+ * The `PropertyKey`-safe value resolved from a `KeyOrCallback<Item, Key>` argument, for use as a
+ * `Record` or `Map` key
+ */
+export type KeyOrCallbackKey<Item, Arg extends KeyOrCallback<Item, Key>> = Arg extends (
+	item: Item,
+	index: number,
+	array: Item[],
+) => Key
+	? ReturnType<Arg>
+	: Arg extends keyof Item
+		? KeyedValue<Item, Arg>
+		: never;
+
+/**
+ * The value resolved from a `KeyOrCallback` argument against `Item`
+ */
+export type KeyOrCallbackValue<Item, Arg extends KeyOrCallback<Item>> = Arg extends (
+	item: Item,
+	index: number,
+	array: Item[],
+) => unknown
+	? ReturnType<Arg>
+	: Arg extends keyof Item
+		? Item[Arg]
+		: never;
+
+/**
+ * A nested array
+ */
+export type NestedArray<Value> =
+	Value extends ReadonlyArray<infer NestedValue> ? NestedArray<NestedValue> : Value;
+
+/**
+ * All nested keys of an object as dot notation strings _(up to 5 levels deep)_
+ */
+export type NestedKeys<Value extends PlainObject> = _NestedKeys<Value>;
+
+type _NestedKeys<Value, Depth extends number = 5> = Depth extends 0
+	? never
+	: Value extends readonly any[]
+		? Value extends readonly [any, ...any]
+			? // Tuple: extract actual indices
+				{
+					[ItemKey in keyof Value]-?: ItemKey extends `${number}`
+						? NonNullable<Value[ItemKey]> extends readonly any[] | PlainObject
+							? | `${ItemKey}`
+								| `${ItemKey}.${_NestedKeys<NonNullable<Value[ItemKey]>, SubtractDepth<Depth>>}`
+							: `${ItemKey}`
+						: never;
+				}[number]
+			: // Array: use no indices
+				never
+		: Value extends PlainObject
+			? {
+					[ItemKey in keyof Value]-?: ItemKey extends number | string
+						? NonNullable<Value[ItemKey]> extends readonly any[] | PlainObject
+							? | `${ItemKey}`
+								| `${ItemKey}.${_NestedKeys<NonNullable<Value[ItemKey]>, SubtractDepth<Depth>>}`
+							: `${ItemKey}`
+						: never;
+				}[keyof Value]
+			: never;
+
+/**
+ * An extended version of `Partial` that allows for nested properties to be optional
+ */
+export type NestedPartial<Value> = {
+	[ItemKey in keyof Value]?: Value[ItemKey] extends object
+		? NestedPartial<Value[ItemKey]>
+		: Value[ItemKey];
+};
+
+/**
+ * The value for a nested key of an object
+ */
+export type NestedValue<Value extends PlainObject, Path extends string> = _NestedValue<Value, Path>;
+
+type _NestedValue<Value, Path extends string> = Path extends `${infer ItemKey}.${infer Rest}`
+	? ItemKey extends keyof Value
+		? undefined extends Value[ItemKey]
+			? _NestedValue<Exclude<Value[ItemKey], undefined>, Rest> | undefined
+			: _NestedValue<Value[ItemKey], Rest>
+		: ItemKey extends `${number}`
+			? Value extends readonly any[]
+				? _NestedValue<Value[number], Rest>
+				: never
+			: never
+	: Path extends `${number}`
+		? Value extends readonly any[]
+			? Value[number]
+			: never
+		: Path extends keyof Value
+			? Value[Path]
+			: never;
+
+/**
+ * The nested _(keyed)_ values of an object _(up to 5 levels deep)_
+ */
+export type NestedValues<Value extends PlainObject> = Simplify<{
+	[Path in NestedKeys<Value>]: NestedValue<Value, Path>;
+}>;
+
+/**
+ * The numerical keys of an object
+ */
+export type NumericalKeys<Value> = {
+	[ItemKey in keyof Value]: ItemKey extends number
+		? ItemKey
+		: ItemKey extends `${number}`
+			? ItemKey
+			: never;
+}[keyof Value];
+
+/**
+ * The numerical values of an object
+ */
+export type NumericalValues<Item extends PlainObject> = Simplify<{
+	[ItemKey in keyof Item as Item[ItemKey] extends number ? ItemKey : never]: Item[ItemKey];
+}>;
+
+/**
+ * A generic object
+ */
+export type PlainObject = Record<PropertyKey, unknown>;
+
+/**
+ * A primitive value
+ *
+ * _(Thanks, type-fest!)_
+ */
+export type Primitive = null | undefined | string | number | boolean | symbol | bigint;
+
+/**
+ * Set required keys for a type
+ */
+export type RequiredKeys<Model extends object, Keys extends keyof Model> = Simplify<
+	Required<Pick<Model, Keys>> & Omit<Model, Keys>
+>;
+
+/**
+ * Flattens the type to improve type hints in IDEs
+ *
+ * _(Thanks, type-fest!)_
+ */
+export type Simplify<Value> = {[ValueKey in keyof Value]: Value[ValueKey]} & {};
+
+type SubtractDepth<Value extends number> = Value extends 5
+	? 4
+	: Value extends 4
+		? 3
+		: Value extends 3
+			? 2
+			: Value extends 2
+				? 1
+				: Value extends 1
+					? 0
+					: never;
+
+/**
+ * A value that is not a promise _(or other thenable)_
+ *
+ * _(An index signature is needed, as a weak type would reject most objects)_
+ */
+type SyncReturn =
+	| {[key: PropertyKey]: any; then?: never}
+	| bigint
+	| boolean
+	| number
+	| string
+	| symbol
+	| null
+	| undefined;
+
+/**
+ * A promise-like object that implements a `then`-method
+ */
+export type Thenable<Value = unknown> = PromiseLike<Value>;
+
+/**
+ * Get the value's type as a string
+ *
+ * _(Thanks, type-fest!)_
+ */
+export type ToString<Value> = Value extends string | number ? `${Value}` : never;
+
+/**
+ * A union type of all typed arrays
+ */
+export type TypedArray =
+	| Int8Array
+	| Uint8Array
+	| Uint8ClampedArray
+	| Int16Array
+	| Uint16Array
+	| Int32Array
+	| Uint32Array
+	| Float32Array
+	| Float64Array
+	| BigInt64Array
+	| BigUint64Array;
+
+/**
+ * Converts a union type to an intersection type
+ *
+ * @example
+ * ```typescript
+ * type A = {a: string};
+ * type B = {b: number};
+ * type C = UnionToIntersection<A | B>; // => {a: string} & {b: number}
+ * ```
+ *
+ * Thanks, type-fest!
+ */
+export type UnionToIntersection<Union> = (
+	Union extends unknown ? (distributedUnion: Union) => void : never
+) extends (mergedIntersection: infer Intersection) => void
+	? Intersection & Union
+	: never;
+
+/**
+ * A function that unsubscribes from a subscription
+ */
+export type Unsubscriber = () => void;
 
 // #endregion

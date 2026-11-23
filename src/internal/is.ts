@@ -8,7 +8,7 @@ import type {
 	Primitive,
 	Thenable,
 	TypedArray,
-} from '../models/index';
+} from '../models/misc.model';
 
 // #region Functions
 

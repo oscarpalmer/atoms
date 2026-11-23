@@ -11,8 +11,8 @@ import {
 	type HeraldState,
 	type InternalHerald,
 } from '../models/herald.model';
-import type {GenericCallback, PlainObject} from '../models/index';
-import type {Subscription} from '../subscription';
+import type {GenericCallback, PlainObject} from '../models/misc.model';
+import type {Subscription} from '../models/subscription.model';
 import {isPlainObject} from './is';
 import {subscriptions} from './subscription';
 

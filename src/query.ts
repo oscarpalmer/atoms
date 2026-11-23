@@ -2,7 +2,7 @@ import {isPlainObject} from './internal/is';
 import {getNumber} from './internal/number';
 import {getString, ignoreKey, join, tryDecode, tryEncode} from './internal/string/misc';
 import {setValue} from './internal/value/set';
-import type {ArrayOrPlainObject, PlainObject} from './models/index';
+import type {ArrayOrPlainObject, PlainObject} from './models/misc.model';
 import {
 	QUERY_AMPERSAND,
 	QUERY_DOT,

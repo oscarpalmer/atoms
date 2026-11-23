@@ -16,7 +16,7 @@ import {
 	type LimiterState,
 	type LimiterType,
 } from '../../models/function/limiter.model';
-import type {GenericAsyncCallback, GenericCallback} from '../../models/index';
+import type {GenericAsyncCallback, GenericCallback} from '../../models/misc.model';
 import {getNumberOrDefault} from '../defaults';
 import {isThenable} from '../is';
 import {swallow} from '../promise';

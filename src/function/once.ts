@@ -19,7 +19,7 @@ import type {
 	GenericCallback,
 	GenericSyncCallback,
 	PlainObject,
-} from '../models/index';
+} from '../models/misc.model';
 
 // #region Instances
 

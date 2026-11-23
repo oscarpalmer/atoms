@@ -1,7 +1,5 @@
-import {assert} from '../../internal/function/assert';
-import type {GenericCallback} from '../index';
+import type {GenericCallback} from '../misc.model';
 import type {UnwrapValue} from '../result.model';
-import type {Asserter} from './assert.model';
 
 // #region Types
 
@@ -63,17 +61,5 @@ export const WORK_MESSAGE_NESTING = 'Return values are too deeply nested';
 export const WORK_MESSAGE_PIPE_ARRAY = `'pipe' expected to receive an array of functions`;
 
 export const WORK_MESSAGE_PIPE_PROMISE = `Synchronous 'pipe' received a promise; if the callback is asynchronous, prefix it with 'async'`;
-
-export const assertFlowFunctions: Asserter<Function[]> = assert.condition(
-	value => Array.isArray(value) && value.every(item => typeof item === 'function'),
-	WORK_MESSAGE_FLOW_ARRAY,
-	TypeError,
-);
-
-export const assertPipeFunctions: Asserter<Function[]> = assert.condition(
-	value => Array.isArray(value) && value.every(item => typeof item === 'function'),
-	WORK_MESSAGE_PIPE_ARRAY,
-	TypeError,
-);
 
 // #endregion

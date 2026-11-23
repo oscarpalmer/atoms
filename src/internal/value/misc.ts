@@ -1,5 +1,4 @@
-import {error, ok} from '../../internal/result/value';
-import type {PlainObject} from '../../models/index';
+import type {PlainObject} from '../../models/misc.model';
 import type {Result} from '../../models/result.model';
 import {
 	VALUE_MISC_EXPRESSION_BRACKET,
@@ -10,6 +9,7 @@ import {
 	VALUE_MISC_NESTED_MESSAGE_PATH,
 	VALUE_MISC_NESTED_MESSAGE_UNSAFE,
 } from '../../models/value/value.misc.model';
+import {error, ok} from '../result/value';
 import {ignoreKey} from '../string/misc';
 
 // #region Functions

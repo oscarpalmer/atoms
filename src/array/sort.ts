@@ -22,7 +22,7 @@ import {
 	type Sorter,
 	type SortHandler,
 } from '../models/array/array.sort.model';
-import type {PlainObject} from '../models/index';
+import type {PlainObject} from '../models/misc.model';
 
 // #region Instances
 

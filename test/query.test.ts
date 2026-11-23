@@ -1,5 +1,6 @@
 import {expect, test} from 'vite-plus/test';
-import {fromQuery, toQuery, tryDecode, tryEncode} from '../src';
+import {fromQuery, toQuery} from '../src';
+import {tryDecode, tryEncode} from '../src/internal/string/misc.ts';
 import {queryFixture} from './.fixtures/query.fixture';
 
 const {query, parameters} = queryFixture;

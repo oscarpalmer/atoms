@@ -22,6 +22,7 @@ import {
 	isNonPrimitive,
 	isNonPromise,
 	isNonTemplateStringsArray,
+	isNonThenable,
 	isNonTypedArray,
 	isNullable,
 	isNullableOrEmpty,
@@ -33,9 +34,9 @@ import {
 	isPrimitive,
 	isPromise,
 	isTemplateStringsArray,
+	isThenable,
 	isTypedArray,
 } from '../src';
-import {isNonThenable, isThenable} from '../src/internal/is';
 import {isFixture} from './.fixtures/is.fixture';
 
 const {values, length} = isFixture;

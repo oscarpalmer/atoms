@@ -1,10 +1,10 @@
 import {unwrapWork} from '../../internal/function/misc';
 import {flow} from '../../internal/function/work';
 import {isAsyncFunction} from '../../internal/is';
+import {attempt} from '../../internal/result/attempt';
 import type {SyncFunctions, SyncValue} from '../../models/function/work.model';
-import type {GenericCallback, GenericSyncCallback} from '../../models/index';
+import type {GenericCallback, GenericSyncCallback} from '../../models/misc.model';
 import type {AttemptAsyncFlow, AttemptFlow, Result, UnwrapValue} from '../../models/result.model';
-import {attempt} from '../index';
 
 // #region Functions
 

@@ -1,6 +1,6 @@
 import {noop} from '../internal/function/misc';
 import {isPlainObject} from '../internal/is';
-import type {Frozen, PlainObject} from '../models/index';
+import type {Frozen, PlainObject} from '../models/misc.model';
 
 // #region Functions
 

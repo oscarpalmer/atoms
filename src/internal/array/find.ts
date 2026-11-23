@@ -1,4 +1,4 @@
-import type {GenericCallback, PlainObject} from '../../models';
+import type {GenericCallback, PlainObject} from '../../models/misc.model';
 import type {ArrayFindParameters, ArrayFindResult} from '../../models/array/array.misc.model';
 
 // #region Functions

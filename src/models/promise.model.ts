@@ -1,4 +1,4 @@
-import type {ArrayOrPlainObject, GenericCallback, Key} from '.';
+import type {ArrayOrPlainObject, GenericCallback, Key} from './misc.model';
 import type {Aborter} from './aborter.model';
 import type {Result} from './result.model';
 

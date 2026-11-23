@@ -1,4 +1,4 @@
-import type {Constructor, GenericCallback} from '../index';
+import type {Constructor, GenericCallback} from '../misc.model';
 
 // #region Types
 

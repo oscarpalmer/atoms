@@ -1,7 +1,7 @@
 import {isTemplateStringsArray} from '../internal/is';
 import {min} from '../internal/math/aggregate';
 import {interpolate} from '../internal/string/misc';
-import {EXPRESSION_NUMERICAL_PREFIX} from '../models/misc.model';
+import {EXPRESSION_NUMERICAL_PREFIX} from '../internal/constants';
 import {
 	STRING_DELIMITER_HYPHEN,
 	STRING_DELIMITER_UNDERSCORE,

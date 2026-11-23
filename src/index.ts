@@ -3,6 +3,7 @@ export * from './array/find';
 export * from './array/first';
 export * from './array/group-by';
 export * from './array/index';
+export * from './array/index-of';
 export * from './array/last';
 export * from './array/move';
 export * from './array/select';
@@ -12,24 +13,18 @@ export * from './array/to-map';
 export * from './array/to-record';
 export * from './array/unique';
 
+export * from './function/assert';
 export * from './function/index';
 export * from './function/limit';
+export * from './function/memoize';
 export * from './function/once';
 export * from './function/retry';
+export * from './function/work';
 
-export * from './internal/array/index-of';
-export * from './internal/function/assert';
-export * from './internal/function/memoize';
-export * from './internal/function/misc';
-export * from './internal/function/work';
-export * from './internal/sized/map';
-export * from './internal/string/case';
-export * from './internal/string/misc';
-export * from './internal/value/compare';
-export * from './internal/value/equal';
-export * from './internal/value/get';
-export * from './internal/value/has';
-export * from './internal/value/set';
+export * from './sized/map';
+export * from './value/compare';
+export * from './value/equal';
+export * from './value/handle';
 
 export * from './models/result.model';
 
@@ -51,6 +46,7 @@ export * from './result/index';
 export * from './result/work/flow';
 export * from './result/work/pipe';
 
+export * from './string/case';
 export * from './string/fuzzy';
 export * from './string/index';
 export * from './string/match';
@@ -71,7 +67,7 @@ export * from './herald';
 export * from './is';
 export * from './logger';
 export * from './math';
-export * from './models/index';
+export * from './models/misc.model';
 export * from './number';
 export * from './query';
 export * from './queue';

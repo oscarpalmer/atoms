@@ -1,4 +1,4 @@
-import type {Thenable} from '../models';
+import type {Thenable} from '../models/misc.model';
 import {noop} from './function/misc';
 
 // #region Functions

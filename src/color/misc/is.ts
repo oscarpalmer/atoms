@@ -8,7 +8,7 @@ import type {
 	RGBAColor,
 	RGBColor,
 } from '../../models/color.model';
-import type {PlainObject} from '../../models/index';
+import type {PlainObject} from '../../models/misc.model';
 import {
 	COLOR_ALPHA,
 	COLOR_EXPRESSION,

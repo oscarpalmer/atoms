@@ -1,4 +1,4 @@
-import type {Constructor} from '../index';
+import type {Constructor} from '../misc.model';
 
 // #region Types
 

@@ -7,7 +7,11 @@ import {
 	type AsyncLimiter,
 	type Limiter,
 } from '../models/function/limiter.model';
-import type {GenericAsyncCallback, GenericCallback, GenericSyncCallback} from '../models/index';
+import type {
+	GenericAsyncCallback,
+	GenericCallback,
+	GenericSyncCallback,
+} from '../models/misc.model';
 
 // #region Functions
 

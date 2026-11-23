@@ -1,5 +1,5 @@
 import {getArrayCallbacks} from '../internal/array/callbacks';
-import type {PlainObject} from '../models/index';
+import type {PlainObject} from '../models/misc.model';
 
 // #region Functions
 

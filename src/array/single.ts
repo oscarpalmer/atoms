@@ -1,5 +1,5 @@
 import {findValue} from '../internal/array/find';
-import type {PlainObject} from '../models/index';
+import type {PlainObject} from '../models/misc.model';
 
 // #region Functions
 

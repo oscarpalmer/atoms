@@ -3,7 +3,7 @@ import {max} from '../internal/math/aggregate';
 import {floor} from '../internal/math/misc';
 import {lowerCase} from '../internal/string/case';
 import {getString} from '../internal/string/misc';
-import type {PlainObject} from '../models/index';
+import type {PlainObject} from '../models/misc.model';
 import {
 	FUZZY_BOUNDARY_BONUS,
 	FUZZY_BOUNDARY_SEPARATOR,

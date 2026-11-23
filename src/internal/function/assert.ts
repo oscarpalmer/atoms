@@ -3,7 +3,7 @@ import {
 	type Asserter,
 	type AssertNestedPick,
 } from '../../models/function/assert.model';
-import type {Constructor, NestedKeys, NestedValue, PlainObject} from '../../models/index';
+import type {Constructor, NestedKeys, NestedValue, PlainObject} from '../../models/misc.model';
 import {hasValueResult} from '../value/has';
 
 // #region Functions
@@ -151,11 +151,5 @@ assert.defined = assertDefined;
 assert.instanceOf = assertInstanceOf;
 assert.is = assertIs;
 assert.property = assertProperty;
-
-// #endregion
-
-// #region Exports
-
-export type {Asserter};
 
 // #endregion

@@ -10,7 +10,11 @@ import {
 	type MemoizedState,
 	type MemoizedStateOptions,
 } from '../../models/function/memoize.model';
-import type {GenericAsyncCallback, GenericCallback, GenericSyncCallback} from '../../models/index';
+import type {
+	GenericAsyncCallback,
+	GenericCallback,
+	GenericSyncCallback,
+} from '../../models/misc.model';
 import {getNumberOrDefault} from '../defaults';
 import {isAsyncFunction, isPlainObject, isThenable} from '../is';
 import {swallow} from '../promise';

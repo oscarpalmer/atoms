@@ -1,7 +1,7 @@
 import {getArray} from './internal/array/get';
 import {isNumber} from './internal/is';
 import {getString} from './internal/string/misc';
-import {EXPRESSION_WHITESPACE_ONLY} from './models/misc.model';
+import {EXPRESSION_WHITESPACE_ONLY} from './internal/constants';
 
 // #region Functions
 
@@ -171,12 +171,14 @@ export {
 	isNonPrimitive,
 	isNonPromise,
 	isNonTemplateStringsArray,
+	isNonThenable,
 	isNonTypedArray,
 	isNumber,
 	isPlainObject,
 	isPrimitive,
 	isPromise,
 	isTemplateStringsArray,
+	isThenable,
 	isTypedArray,
 } from './internal/is';
 

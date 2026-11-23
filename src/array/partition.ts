@@ -1,4 +1,4 @@
-import type {GenericCallback, PlainObject} from '../models/index';
+import type {GenericCallback, PlainObject} from '../models/misc.model';
 
 // #region Functions
 

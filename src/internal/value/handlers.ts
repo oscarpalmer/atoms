@@ -1,4 +1,4 @@
-import type {Constructor, GenericCallback} from '../../models/index';
+import type {Constructor, GenericCallback} from '../../models/misc.model';
 import type {
 	BaseHandler,
 	BaseHandlerOptions,

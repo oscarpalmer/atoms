@@ -3,7 +3,7 @@ import {getLimiter} from '../internal/function/limit';
 import {isPromise} from '../internal/is';
 import {swallow} from '../internal/promise';
 import {LIMITER_WAIT} from '../models/function/limiter.model';
-import type {RequiredKeys} from '../models/index';
+import type {RequiredKeys} from '../models/misc.model';
 import {PROMISE_MESSAGE_TIMED, TimedError, type PromiseOptions} from '../models/promise.model';
 import {createPromiseOptions} from './helpers';
 import {settlePromise} from './misc';

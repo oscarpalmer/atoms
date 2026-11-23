@@ -1,4 +1,4 @@
-import {isPlainObject} from '../../internal/is';
+import {isPlainObject} from '../is';
 
 // #region Functions
 

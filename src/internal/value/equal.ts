@@ -1,4 +1,4 @@
-import type {ArrayOrPlainObject, Constructor, TypedArray} from '../../models/index';
+import type {ArrayOrPlainObject, Constructor, TypedArray} from '../../models/misc.model';
 import {
 	EQUAL_ARRAY_PEEK_PERCENTAGE,
 	EQUAL_ARRAY_THRESHOLD,

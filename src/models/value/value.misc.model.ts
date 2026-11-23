@@ -5,7 +5,7 @@ import type {
 	Simplify,
 	ToString,
 	UnionToIntersection,
-} from '../index';
+} from '../misc.model';
 
 // #region Types
 

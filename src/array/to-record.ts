@@ -5,7 +5,7 @@ import type {
 	KeyOrCallbackKey,
 	KeyOrCallbackValue,
 	Simplify,
-} from '../models/index';
+} from '../models/misc.model';
 
 // #region Functions
 

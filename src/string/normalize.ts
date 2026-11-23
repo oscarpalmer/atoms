@@ -2,7 +2,7 @@ import {memoize} from '../internal/function/memoize';
 import {isPlainObject} from '../internal/is';
 import {lowerCase} from '../internal/string/case';
 import type {Memoized} from '../models/function/memoize.model';
-import {EXPRESSION_WHITESPACE_MULTIPLE} from '../models/misc.model';
+import {EXPRESSION_WHITESPACE_MULTIPLE} from '../internal/constants';
 import {STRING_DELIMITER_EMPTY, STRING_DELIMITER_SPACE} from '../models/string/string.case.model';
 import {
 	NORMALIZE_DEBURR_CHARACTERS,

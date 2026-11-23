@@ -1,6 +1,6 @@
 {
 	"name": "@oscarpalmer/atoms",
-	"version": "0.228.0",
+	"version": "0.229.0",
 	"description": "Atomic utilities for making your JavaScript better.",
 	"keywords": [
 		"array",
@@ -60,8 +60,8 @@
 			"default": "./dist/array/group-by.mjs"
 		},
 		"./array/index-of": {
-			"types": "./dist/internal/array/index-of.d.mts",
-			"default": "./dist/internal/array/index-of.mjs"
+			"types": "./dist/array/index-of.d.mts",
+			"default": "./dist/array/index-of.mjs"
 		},
 		"./array/last": {
 			"types": "./dist/array/last.d.mts",
@@ -106,16 +106,16 @@
 			"default": "./dist/function/index.mjs"
 		},
 		"./function/assert": {
-			"types": "./dist/internal/function/assert.d.mts",
-			"default": "./dist/internal/function/assert.mjs"
+			"types": "./dist/function/assert.d.mts",
+			"default": "./dist/function/assert.mjs"
 		},
 		"./function/limit": {
 			"types": "./dist/function/limit.d.mts",
 			"default": "./dist/function/limit.mjs"
 		},
 		"./function/memoize": {
-			"types": "./dist/internal/function/memoize.d.mts",
-			"default": "./dist/internal/function/memoize.mjs"
+			"types": "./dist/function/memoize.d.mts",
+			"default": "./dist/function/memoize.mjs"
 		},
 		"./function/once": {
 			"types": "./dist/function/once.d.mts",
@@ -126,8 +126,8 @@
 			"default": "./dist/function/retry.mjs"
 		},
 		"./function/work": {
-			"types": "./dist/internal/function/work.d.mts",
-			"default": "./dist/internal/function/work.mjs"
+			"types": "./dist/function/work.d.mts",
+			"default": "./dist/function/work.mjs"
 		},
 		"./herald": {
 			"types": "./dist/herald.d.mts",
@@ -146,7 +146,8 @@
 			"default": "./dist/math.mjs"
 		},
 		"./models": {
-			"types": "./dist/models/index.d.mts"
+			"types": "./dist/models/misc.model.d.mts",
+			"default": "./dist/models/misc.model.mjs"
 		},
 		"./number": {
 			"types": "./dist/number.d.mts",
@@ -165,6 +166,7 @@
 			"default": "./dist/plan/misc.mjs"
 		},
 		"./plan/models": {
+			"types": "./dist/plan/models.d.mts",
 			"default": "./dist/plan/models.mjs"
 		},
 		"./plan/result": {
@@ -192,6 +194,7 @@
 			"default": "./dist/promise/misc.mjs"
 		},
 		"./promise/models": {
+			"types": "./dist/promise/models.d.mts",
 			"default": "./dist/promise/models.mjs"
 		},
 		"./promise/timed": {
@@ -219,6 +222,7 @@
 			"default": "./dist/result/work/flow.mjs"
 		},
 		"./result/models": {
+			"types": "./dist/models/result.model.d.mts",
 			"default": "./dist/models/result.model.mjs"
 		},
 		"./result/pipe": {
@@ -226,8 +230,8 @@
 			"default": "./dist/result/work/pipe.mjs"
 		},
 		"./sized/map": {
-			"types": "./dist/internal/sized/map.d.mts",
-			"default": "./dist/internal/sized/map.mjs"
+			"types": "./dist/sized/map.d.mts",
+			"default": "./dist/sized/map.mjs"
 		},
 		"./sized/set": {
 			"types": "./dist/sized/set.d.mts",
@@ -238,8 +242,8 @@
 			"default": "./dist/string/index.mjs"
 		},
 		"./string/case": {
-			"types": "./dist/internal/string/case.d.mts",
-			"default": "./dist/internal/string/case.mjs"
+			"types": "./dist/string/case.d.mts",
+			"default": "./dist/string/case.mjs"
 		},
 		"./string/fuzzy": {
 			"types": "./dist/string/fuzzy.d.mts",
@@ -274,20 +278,20 @@
 			"default": "./dist/value/collection.mjs"
 		},
 		"./value/compare": {
-			"types": "./dist/internal/value/compare.d.mts",
-			"default": "./dist/internal/value/compare.mjs"
+			"types": "./dist/value/compare.d.mts",
+			"default": "./dist/value/compare.mjs"
 		},
 		"./value/diff": {
 			"types": "./dist/value/diff.d.mts",
 			"default": "./dist/value/diff.mjs"
 		},
+		"./value/equal": {
+			"types": "./dist/value/equal.d.mts",
+			"default": "./dist/value/equal.mjs"
+		},
 		"./value/freeze": {
 			"types": "./dist/value/freeze.d.mts",
 			"default": "./dist/value/freeze.mjs"
-		},
-		"./value/equal": {
-			"types": "./dist/internal/value/equal.d.mts",
-			"default": "./dist/internal/value/equal.mjs"
 		},
 		"./value/handle": {
 			"types": "./dist/value/handle.d.mts",

@@ -1,6 +1,6 @@
 import {indexOfArray} from '../internal/array/match';
 import {arraysOverlap} from '../internal/array/overlap';
-import type {PlainObject} from '../models/index';
+import type {PlainObject} from '../models/misc.model';
 
 // #region Functions
 

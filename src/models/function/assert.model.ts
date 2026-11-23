@@ -1,4 +1,4 @@
-import type {NestedKeys, PlainObject} from '../index';
+import type {NestedKeys, PlainObject} from '../misc.model';
 
 // #region Types
 

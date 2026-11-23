@@ -1,7 +1,7 @@
 import {isNumber} from './internal/is';
 import {aggregate, getAggregateCallback, getAggregated} from './internal/math/aggregate';
 import {floor, roundNumber} from './internal/math/misc';
-import type {NumericalValues, PlainObject} from './models/index';
+import type {NumericalValues, PlainObject} from './models/misc.model';
 import {MATH_AGGREGATION_AVERAGE, MATH_AGGREGATION_SUM} from './models/math.model';
 
 // #region Functions

@@ -17,7 +17,7 @@ import {
 	type Observable,
 	type Observer,
 } from './models/beacon.model';
-import type {GenericCallback, PlainObject} from './models/index';
+import type {GenericCallback, PlainObject} from './models/misc.model';
 import type {Subscription} from './subscription';
 
 // #region Instances

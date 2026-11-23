@@ -1,8 +1,8 @@
 import {pipe} from '../../internal/function/work';
+import {attempt} from '../../internal/result/attempt';
 import type {SyncFunctions, SyncInitial, SyncValue} from '../../models/function/work.model';
-import type {GenericCallback, GenericSyncCallback} from '../../models/index';
+import type {GenericCallback, GenericSyncCallback} from '../../models/misc.model';
 import type {Result, UnwrapValue} from '../../models/result.model';
-import {attempt} from '../index';
 
 // #region Types
 

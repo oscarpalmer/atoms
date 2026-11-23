@@ -1,4 +1,4 @@
-import type {NestedKeys, NestedValue, PlainObject, ToString} from '../../models/index';
+import type {NestedKeys, NestedValue, PlainObject, ToString} from '../../models/misc.model';
 import type {Result} from '../../models/result.model';
 import {getNestedValue} from './misc';
 

@@ -1,4 +1,4 @@
-import type {GenericCallback} from '../../models/index';
+import type {GenericCallback} from '../../models/misc.model';
 import {
 	RESULT_MESSAGE_MATCH_ERROR,
 	RESULT_MESSAGE_MATCH_OK,

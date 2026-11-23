@@ -1,4 +1,4 @@
-import type {GenericCallback} from './index';
+import type {GenericCallback} from './misc.model';
 import {type Subscription, type Subscriptions} from './subscription.model';
 
 // #region Types

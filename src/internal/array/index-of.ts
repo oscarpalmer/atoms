@@ -1,4 +1,4 @@
-import type {PlainObject} from '../../models/index';
+import type {PlainObject} from '../../models/misc.model';
 import {findValue} from './find';
 
 // #region Functions

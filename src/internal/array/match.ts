@@ -10,7 +10,7 @@ import {
 	arrayMatchStarts,
 } from '../../models/array/array.match.model';
 import type {ArrayComparison} from '../../models/array/array.misc.model';
-import type {GenericCallback, PlainObject} from '../../models/index';
+import type {GenericCallback, PlainObject} from '../../models/misc.model';
 import {getArrayCallback} from './callbacks';
 
 // #region Functions

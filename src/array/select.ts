@@ -1,5 +1,5 @@
 import type {ArrayFlattened} from '../models/array/array.misc.model';
-import type {GenericCallback} from '../models/index';
+import type {GenericCallback} from '../models/misc.model';
 
 // #region Functions
 

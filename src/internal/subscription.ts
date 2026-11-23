@@ -1,4 +1,4 @@
-import type {Key, PlainObject} from '../models/index';
+import type {Key, PlainObject} from '../models/misc.model';
 import {
 	SUBSCRIPTION_DISALLOWED_KEY,
 	SUBSCRIPTION_INVALID_KEY,

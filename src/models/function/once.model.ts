@@ -1,4 +1,4 @@
-import type {GenericAsyncCallback, GenericCallback} from '../index';
+import type {GenericAsyncCallback, GenericCallback} from '../misc.model';
 
 // #region Types
 

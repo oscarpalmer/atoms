@@ -1,4 +1,4 @@
-import type {NumericalValues, PlainObject} from '../../models/index';
+import type {NumericalValues, PlainObject} from '../../models/misc.model';
 import {
 	MATH_AGGREGATION_MAX,
 	MATH_AGGREGATION_MIN,

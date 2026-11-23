@@ -7,7 +7,7 @@ import type {
 	GenericCallback,
 	GenericSyncCallback,
 	PlainObject,
-} from './models/index';
+} from './models/misc.model';
 import {
 	type InternalKeyedQueue,
 	type InternalQueue,

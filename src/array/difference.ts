@@ -1,6 +1,6 @@
 import {compareSets} from '../internal/array/sets';
 import {ARRAY_SETS_COMPARE_DIFFERENCE} from '../models/array/array.misc.model';
-import type {PlainObject} from '../models/index';
+import type {PlainObject} from '../models/misc.model';
 
 // #region Functions
 

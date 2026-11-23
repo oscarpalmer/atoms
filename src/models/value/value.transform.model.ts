@@ -1,4 +1,4 @@
-import type {PlainObject} from '../index';
+import type {PlainObject} from '../misc.model';
 
 // #region Types
 

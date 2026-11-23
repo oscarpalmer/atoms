@@ -1,5 +1,6 @@
 import {expect, test} from 'vite-plus/test';
-import {assert, AssertProperty} from '../../src/internal/function/assert';
+import {assert} from '../../src';
+import {AssertProperty} from '../../src/models/function/assert.model';
 import {TestFunctionItem, testIsString} from '../.fixtures/function.fixture';
 
 test('assert', () => {

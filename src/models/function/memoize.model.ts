@@ -1,5 +1,5 @@
 import type {SizedMap} from '../../internal/sized/map';
-import type {GenericCallback} from '../index';
+import type {GenericCallback} from '../misc.model';
 
 // #region Types
 

@@ -1,4 +1,9 @@
-import type {ArrayOrPlainObject, NestedPartial, PlainObject, UnionToIntersection} from '../index';
+import type {
+	ArrayOrPlainObject,
+	NestedPartial,
+	PlainObject,
+	UnionToIntersection,
+} from '../misc.model';
 
 // #region Types
 

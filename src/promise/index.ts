@@ -2,7 +2,7 @@ import {createAborter} from '../internal/aborter';
 import {isArrayOrPlainObject, isThenable} from '../internal/is';
 import {swallow} from '../internal/promise';
 import {attempt} from '../internal/result/attempt';
-import type {ArrayOrPlainObject, Key, PlainObject} from '../models/index';
+import type {ArrayOrPlainObject, Key, PlainObject} from '../models/misc.model';
 import {
 	PROMISE_MESSAGE_ATTEMPT,
 	PROMISE_MESSAGE_ITEMS_TYPE,

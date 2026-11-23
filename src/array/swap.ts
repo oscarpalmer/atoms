@@ -2,7 +2,7 @@ import {getArrayCallback} from '../internal/array/callbacks';
 import {indexOf} from '../internal/array/index-of';
 import {indexOfArray} from '../internal/array/match';
 import {arraysOverlap} from '../internal/array/overlap';
-import type {PlainObject} from '../models/index';
+import type {PlainObject} from '../models/misc.model';
 
 // #region Functions
 

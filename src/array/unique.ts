@@ -1,6 +1,6 @@
 import {getArrayCallback} from '../internal/array/callbacks';
 import {ARRAY_UNIQUE_THRESHOLD} from '../models/array/array.misc.model';
-import type {PlainObject} from '../models/index';
+import type {PlainObject} from '../models/misc.model';
 
 // #region Functions
 

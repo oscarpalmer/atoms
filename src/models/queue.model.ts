@@ -1,4 +1,4 @@
-import type {GenericAsyncCallback, GenericCallback} from '.';
+import type {GenericAsyncCallback, GenericCallback} from './misc.model';
 import type {Aborter} from './aborter.model';
 
 // #region Types

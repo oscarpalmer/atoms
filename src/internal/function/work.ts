@@ -1,17 +1,19 @@
+import type {Asserter} from '../../models/function/assert.model';
 import {
-	assertFlowFunctions,
-	assertPipeFunctions,
 	type AsyncFlow,
 	type Flow,
 	type SyncFunctions,
 	type SyncInitial,
 	type SyncValue,
+	WORK_MESSAGE_FLOW_ARRAY,
 	WORK_MESSAGE_FLOW_PROMISE,
 	WORK_MESSAGE_NESTING,
+	WORK_MESSAGE_PIPE_ARRAY,
 	WORK_MESSAGE_PIPE_PROMISE,
 } from '../../models/function/work.model';
-import type {GenericCallback, GenericSyncCallback} from '../../models/index';
+import type {GenericCallback, GenericSyncCallback} from '../../models/misc.model';
 import type {UnwrapValue} from '../../models/result.model';
+import {assert} from '../function/assert';
 import {isAsyncFunction, isThenable} from '../is';
 import {swallow} from '../promise';
 import {unwrapWork} from './misc';
@@ -876,8 +878,20 @@ function work(initial: unknown, functions: GenericCallback[], flow: boolean): un
 
 // #endregion
 
-// #region Exports
+// #endregion
 
-export type {AsyncFlow, Flow};
+// #region Variables
+
+export const assertFlowFunctions: Asserter<Function[]> = assert.condition(
+	value => Array.isArray(value) && value.every(item => typeof item === 'function'),
+	WORK_MESSAGE_FLOW_ARRAY,
+	TypeError,
+);
+
+export const assertPipeFunctions: Asserter<Function[]> = assert.condition(
+	value => Array.isArray(value) && value.every(item => typeof item === 'function'),
+	WORK_MESSAGE_PIPE_ARRAY,
+	TypeError,
+);
 
 // #endregion

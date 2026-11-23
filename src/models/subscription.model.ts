@@ -1,5 +1,5 @@
 import type {Aborter} from './aborter.model';
-import type {Key} from './index';
+import type {Key} from './misc.model';
 
 // #region Types
 
