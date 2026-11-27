@@ -110,8 +110,7 @@ function getHeraldEvents(this: InternalHerald): HeraldEvents<Record<string, Gene
 /**
  * Create a _Herald_ for announcing named events
  *
- * @param names Event names
- * @param property Optional property for subscription identification _(defaults to `$herald`)_
+ * @param options _Herald_ options
  * @returns _Herald_ instance
  */
 export function herald<Events extends Record<string, GenericCallback>>(

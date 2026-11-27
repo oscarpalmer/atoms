@@ -40,14 +40,14 @@ function getMapValues(
 }
 
 /**
- * Create a _Map_ from an array of items using a specific key
+ * Create a Map from an array of items using a specific key
  *
  * If multiple items have the same key, the latest item's value will be used
  *
  * @param array Array to convert
  * @param key Callback or key to use for grouping
  * @param value Callback or key to use for value, defaulting to the item itself
- * @returns _Map_ of keyed values
+ * @returns Map of keyed values
  *
  * @example
  * ```typescript
@@ -69,13 +69,13 @@ export function toMap<
 ): Map<KeyOrCallbackKey<Item, KeyArg>, KeyOrCallbackValue<Item, ValueArg>>;
 
 /**
- * Create a _Map_ from an array of items using a specific key
+ * Create a Map from an array of items using a specific key
  *
  * If multiple items have the same key, the latest item will be used
  *
  * @param array Array to convert
  * @param key Callback or key to use for grouping
- * @returns _Map_ of keyed items
+ * @returns Map of keyed items
  *
  * @example
  * ```typescript
@@ -91,10 +91,10 @@ export function toMap<Item, KeyArg extends KeyOrCallback<Item, Key>>(
 ): Map<KeyOrCallbackKey<Item, KeyArg>, Item>;
 
 /**
- * Create a _Map_ from an array of items _(using indices as keys)_
+ * Create a Map from an array of items _(using indices as keys)_
  *
  * @param array Array to convert
- * @returns _Map_ of indiced items
+ * @returns Map of indiced items
  *
  * @example
  * ```typescript
@@ -110,14 +110,14 @@ export function toMap(array: unknown[], first?: unknown, second?: unknown): unkn
 }
 
 /**
- * Create a _Map_ from an array of items using a specific key, grouping values into arrays
+ * Create a Map from an array of items using a specific key, grouping values into arrays
  *
  * _Available as `toMapArrays` and `toMap.arrays`_
  *
  * @param array Array to convert
  * @param key Callback or key to use for grouping
  * @param value Callback or key to use for value, defaulting to the item itself
- * @returns _Map_ of keyed arrays of values
+ * @returns Map of keyed arrays of values
  *
  * @example
  * ```typescript
@@ -139,13 +139,13 @@ export function toMapArrays<
 ): Map<KeyOrCallbackKey<Item, KeyArg>, Array<KeyOrCallbackValue<Item, ValueArg>>>;
 
 /**
- * Create a _Map_ from an array of items using a specific key, grouping items into arrays
+ * Create a Map from an array of items using a specific key, grouping items into arrays
  *
  * _Available as `toMapArrays` and `toMap.arrays`_
  *
  * @param array Array to convert
  * @param key Callback or key to use for grouping
- * @returns _Map_ of keyed arrays of items
+ * @returns Map of keyed arrays of items
  *
  * @example
  * ```typescript

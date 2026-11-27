@@ -46,7 +46,7 @@ function handleResult(result: Result<unknown, unknown>, first: unknown, second?:
  */
 export async function match<V, Next, Nope, E = Error>(
 	result: Promise<Result<V, E>> | (() => Promise<Result<V, E>>),
-	handler: ResultMatch<V, E, Next, Nope>,
+	matchers: ResultMatch<V, E, Next, Nope>,
 ): Promise<Awaited<Next> | Awaited<Nope>>;
 
 /**
@@ -70,7 +70,7 @@ export async function match<V, Next, Nope, E = Error>(
  */
 export function match<V, Next, Nope, E = Error>(
 	result: Result<V, E> | (() => Result<V, E>),
-	handler: ResultMatch<V, E, Next, Nope>,
+	matchers: ResultMatch<V, E, Next, Nope>,
 ): Next | Nope;
 
 /**

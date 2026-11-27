@@ -1,4 +1,4 @@
-import {isPlainObject} from './internal/is';
+import {isInstanceOfConstructor, isPlainObject} from './internal/is';
 import {getNumber} from './internal/number';
 import {getString, ignoreKey, join, tryDecode, tryEncode} from './internal/string/misc';
 import {setValue} from './internal/value/set';
@@ -86,7 +86,7 @@ function getParts(value: ArrayOrPlainObject, fromArray: boolean, prefix?: string
 			parts.push(...getParts(val, false, fullKey));
 		} else if (isDecodable(val)) {
 			parts.push(`${prefixedKey}=${getString(tryEncode(val))}`);
-		} else if (val instanceof Date) {
+		} else if (isInstanceOfConstructor(Date, val)) {
 			parts.push(`${prefixedKey}=${val.toJSON()}`);
 		}
 	}

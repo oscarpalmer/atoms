@@ -1,5 +1,5 @@
 import type {NumericalKeys, PlainObject} from '../../models/misc.model';
-import {isNonPlainObject} from '../is';
+import {isInstanceOfConstructor, isNonPlainObject} from '../is';
 
 // #region Functions
 
@@ -23,7 +23,7 @@ export function getArray<Value extends PlainObject>(
 /**
  * Get an array from a map
  *
- * @param value Map to convert to an array
+ * @param map Map to convert to an array
  * @returns Array holding the entries of the map
  *
  * @example
@@ -54,7 +54,7 @@ export function getArray<Value extends PlainObject>(
 /**
  * Get an array from a set
  *
- * @param value Set to convert to an array
+ * @param set Set to convert to an array
  * @returns Array holding the values of the set
  *
  * @example
@@ -95,11 +95,11 @@ export function getArray(value: unknown, indiced?: unknown): unknown[] {
 		return value;
 	}
 
-	if (value instanceof Map) {
+	if (isInstanceOfConstructor(Map, value)) {
 		return [...value.entries()];
 	}
 
-	if (value instanceof Set) {
+	if (isInstanceOfConstructor(Set, value)) {
 		return [...value.values()];
 	}
 

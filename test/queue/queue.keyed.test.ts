@@ -130,3 +130,33 @@ test('queue, keyed', () =>
 			done();
 		}, 500);
 	}));
+
+test('keyedQueue.toJSON', () => {
+	function roundTrip(value: unknown): unknown {
+		return JSON.parse(JSON.stringify(value));
+	}
+
+	const keyed = keyedQueue(async (_: string) => {}, {autostart: false, maximum: 1});
+
+	expect(roundTrip(keyed)).toStrictEqual({
+		active: [],
+		empty: [],
+		full: [],
+		items: {},
+		keys: [],
+		paused: [],
+		queues: 0,
+	});
+
+	void keyed.add('first', []);
+
+	expect(roundTrip(keyed)).toStrictEqual({
+		active: [],
+		empty: [],
+		full: ['first'],
+		items: {first: 1},
+		keys: ['first'],
+		paused: ['first'],
+		queues: 1,
+	});
+});

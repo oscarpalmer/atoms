@@ -1,5 +1,6 @@
 import {expect, test} from 'vite-plus/test';
-import {retry, RetryError} from '../../src';
+import {error, retry, RetryError} from '../../src';
+import {QueueError} from '../../src/models/queue.model';
 import {RETRY_MESSAGE_CALLBACK, RETRY_MESSAGE_VALUE} from '../../src/models/function/retry.model';
 
 test('asynchronous', async () => {
@@ -152,4 +153,35 @@ test('synchronous: rejected promises are not unhandled', async () => {
 	);
 
 	await new Promise(resolve => setTimeout(resolve, 10));
+});
+
+test('RetryError.toJSON', () => {
+	function roundTrip(value: unknown): unknown {
+		return JSON.parse(JSON.stringify(value));
+	}
+
+	const base = {message: 'failure', name: 'RetryError'};
+
+	expect(roundTrip(new RetryError('failure', new TypeError('inner')))).toStrictEqual({
+		...base,
+		original: {message: 'inner', name: 'TypeError'},
+	});
+
+	expect(roundTrip(new RetryError('failure', 'plain'))).toStrictEqual({
+		...base,
+		original: 'plain',
+	});
+
+	expect(roundTrip(new RetryError('failure', new QueueError('inner')))).toStrictEqual({
+		...base,
+		original: {message: 'inner', name: 'QueueError'},
+	});
+
+	// An `undefined` original is dropped when serialized
+	expect(roundTrip(new RetryError('failure', undefined))).toStrictEqual(base);
+
+	expect(roundTrip(error(new RetryError('failure', 'plain')))).toStrictEqual({
+		ok: false,
+		error: {...base, original: 'plain'},
+	});
 });

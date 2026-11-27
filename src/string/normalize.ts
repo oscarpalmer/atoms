@@ -76,7 +76,7 @@ export function deburr(value: string): string {
  * _Available as `initializeNormalizer` and `normalize.initialize`_
  *
  * @param options Normalization options
- * @returns Normalizer function
+ * @returns _Normalizer_ instance
  */
 export function initializeNormalizer(options?: NormalizeOptions): Normalizer {
 	// @ts-expect-error Using old school function constructor, so all good, no worries :-)

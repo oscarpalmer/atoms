@@ -46,6 +46,22 @@ export type Beacon<Value> = {
 	 * Finish the beacon
 	 */
 	finish(): void;
+
+	/**
+	 * Get the _JSON_ representation of the beacon
+	 *
+	 * @returns _JSON_ representation
+	 *
+	 */
+	toJSON(): BeaconJson;
+};
+
+/**
+ * _JSON_ representation of a beacon
+ */
+export type BeaconJson = {
+	active: boolean;
+	value: unknown;
 };
 
 export type BeaconOptions<Value> = {
@@ -109,6 +125,20 @@ export type Observable<Value> = {
 	 * @returns Subscription to the observable
 	 */
 	subscribe(observer: Observer<Value>): Subscription;
+
+	/**
+	 * Get the _JSON_ representation of the observable
+	 *
+	 * @returns _JSON_ representation
+	 */
+	toJSON(): ObservableJson;
+};
+
+/**
+ * _JSON_ representation of an observable
+ */
+export type ObservableJson = {
+	active: boolean;
 };
 
 export type ObservableState<Value> = {

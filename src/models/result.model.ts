@@ -80,6 +80,13 @@ export type Err<V, E> = {
 	or<Next>(next: ((error: E) => Next) | Next): ErrOr<Next>;
 
 	/**
+	 * Get the _JSON_ representation of the error result
+	 *
+	 * @returns _JSON_ representation
+	 */
+	toJSON(): ErrLike<unknown>;
+
+	/**
 	 * Unwrap the error result with a fallback
 	 *
 	 * _Throws if no fallback is given_
@@ -255,6 +262,13 @@ export type Ok<V, E = never> = {
 	 * @returns Same ok result
 	 */
 	or<Next>(next: ((error: E) => Next) | Next): Ok<V, E>;
+
+	/**
+	 * Get the _JSON_ representation of the result
+	 *
+	 * @returns _JSON_ representation
+	 */
+	toJSON(): OkLike<V | null>;
 
 	/**
 	 * Unwrap the ok result, returning its value

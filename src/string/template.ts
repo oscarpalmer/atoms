@@ -1,4 +1,4 @@
-import {isPlainObject, isTemplateStringsArray} from '../internal/is';
+import {isInstanceOfConstructor, isPlainObject, isTemplateStringsArray} from '../internal/is';
 import {getString, interpolate} from '../internal/string/misc';
 import {getValue} from '../internal/value/get';
 import type {PlainObject} from '../models/misc.model';
@@ -30,7 +30,9 @@ function createTemplateOptions(input?: Partial<TemplateOptions>): Required<Templ
 
 	return {
 		ignoreCase: options.ignoreCase === true,
-		pattern: options.pattern instanceof RegExp ? options.pattern : TEMPLATE_EXPRESSION_VARIABLE,
+		pattern: isInstanceOfConstructor(RegExp, options.pattern)
+			? options.pattern
+			: TEMPLATE_EXPRESSION_VARIABLE,
 	};
 }
 

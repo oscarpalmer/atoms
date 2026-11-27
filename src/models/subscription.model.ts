@@ -81,7 +81,7 @@ export type Subscriptions<Value = unknown> = {
 	 * Create _(or retrieve)_ a subscription
 	 *
 	 * @param parameters Subscription parameters
-	 * @returns Tuple holding subsccription and existing boolean
+	 * @returns Tuple holding subscription and existing boolean
 	 */
 	create(parameters: SubscriptionParameters): [Subscription, boolean];
 };

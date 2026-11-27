@@ -1,3 +1,4 @@
+import {round} from '../../internal/math/misc';
 import {join} from '../../internal/string/misc';
 import type {
 	ColorState,
@@ -39,7 +40,7 @@ function convertHexToRgba(value: string): RGBAColor {
 	}
 
 	return {
-		alpha: getPercentage((values[3] / COLOR_MAX.hex) * COLOR_MAX.percent),
+		alpha: round(getPercentage((values[3] / COLOR_MAX.hex) * COLOR_MAX.percent), 2),
 		blue: getHexValue(values[2]),
 		green: getHexValue(values[1]),
 		red: getHexValue(values[0]),

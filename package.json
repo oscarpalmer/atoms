@@ -1,6 +1,6 @@
 {
 	"name": "@oscarpalmer/atoms",
-	"version": "0.230.0",
+	"version": "0.231.0",
 	"description": "Atomic utilities for making your JavaScript better.",
 	"keywords": [
 		"array",
@@ -315,11 +315,11 @@
 	},
 	"devDependencies": {
 		"@types/node": "^26.6",
-		"@vitest/coverage-istanbul": "5.1.0",
+		"@vitest/coverage-istanbul": "5.1.1",
 		"eslint": "^10.15",
 		"jsdom": "^31",
 		"tsdown": "^0.23",
 		"typescript": "^7",
-		"vite-plus": "^1.7"
+		"vite-plus": "^1.8"
 	}
 }

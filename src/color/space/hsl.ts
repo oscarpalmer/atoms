@@ -123,7 +123,7 @@ export function hslToHex(hsl: HSLAColor | HSLColor, alpha?: boolean): string {
  *
  * _If the value is unable to be converted, a black _HWB_ color will be returned_
  *
- * @param hsl HSL(A) color
+ * @param hsl _HSL(A)_ color
  * @returns _HWB_ color
  */
 export function hslToHwb(hsl: HSLAColor | HSLColor): HWBColor {
@@ -141,7 +141,7 @@ export function hslToHwb(hsl: HSLAColor | HSLColor): HWBColor {
  *
  * _If the value is unable to be converted, a black _HWBA_ color will be returned_
  *
- * @param hsl HSL(A) color
+ * @param hsl _HSL(A)_ color
  * @returns _HWBA_ color
  */
 export function hslToHwba(hsl: HSLAColor | HSLColor): HWBAColor {
@@ -155,7 +155,7 @@ export function hslToHwba(hsl: HSLAColor | HSLColor): HWBAColor {
  *
  * _Thanks, https://github.com/color-js/color.js/blob/main/src/spaces/hsl.js#L61_
  *
- * @param hsl HSL(A) color
+ * @param hsl _HSL(A)_ color
  * @returns _RGB_ color
  */
 export function hslToRgb(hsl: HSLAColor | HSLColor): RGBColor {
@@ -175,7 +175,7 @@ export function hslToRgb(hsl: HSLAColor | HSLColor): RGBColor {
  *
  * _Thanks, https://github.com/color-js/color.js/blob/main/src/spaces/hsl.js#L61_
  *
- * @param hsl HSL(A) color
+ * @param hsl _HSL(A)_ color
  * @returns _RGBA_ color
  */
 export function hslToRgba(hsl: HSLAColor | HSLColor): RGBAColor {

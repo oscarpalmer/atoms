@@ -73,3 +73,43 @@ test('properties', () =>
 			done();
 		}, 300);
 	}));
+
+test('queue.toJSON', () => {
+	function roundTrip(value: unknown): unknown {
+		return JSON.parse(JSON.stringify(value));
+	}
+
+	const paused = queue(asynchronous, {autostart: false, maximum: 2});
+
+	expect(roundTrip(paused)).toStrictEqual({
+		active: false,
+		empty: true,
+		full: false,
+		paused: true,
+		size: 0,
+	});
+
+	void paused.add(['First']);
+	void paused.add(['Second']);
+
+	expect(roundTrip(paused)).toStrictEqual({
+		active: false,
+		empty: false,
+		full: true,
+		paused: true,
+		size: 2,
+	});
+
+	// A never-settling callback keeps the queue active
+	const running = queue(() => new Promise<void>(() => {}));
+
+	void running.add([]);
+
+	expect(roundTrip(running)).toStrictEqual({
+		active: true,
+		empty: true,
+		full: false,
+		paused: false,
+		size: 0,
+	});
+});

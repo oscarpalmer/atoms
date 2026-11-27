@@ -1,5 +1,6 @@
 import {expect, test} from 'vite-plus/test';
 import {debounce} from '../../src';
+import {LimiterError} from '../../src/models/function/limiter.model';
 
 test('asynchronous', () =>
 	new Promise<void>(done => {
@@ -195,4 +196,11 @@ test('synchronous: returned promises are ignored', async () => {
 	debounced.run();
 
 	await new Promise(resolve => setTimeout(resolve, 50));
+});
+
+test('LimiterError.toJSON', () => {
+	expect(JSON.parse(JSON.stringify(new LimiterError()))).toStrictEqual({
+		message: 'Call was canceled',
+		name: 'LimiterError',
+	});
 });

@@ -1,6 +1,7 @@
 import type {AsyncPlanState, PlanState} from '../../models/plan.model';
 import {createAborter} from '../aborter';
 import {noop} from '../function/misc';
+import {isInstanceOfConstructor} from '../is';
 import {isError, isOk} from '../result/is';
 
 // #region Functions
@@ -77,8 +78,10 @@ export async function asyncGenerate(
 				throwing,
 			);
 
-			if (value instanceof Error || isError(value)) {
-				const errorValue = value instanceof Error ? value : value.error;
+			const isInstanceOfError = isInstanceOfConstructor(Error, value);
+
+			if (isInstanceOfError || isError(value)) {
+				const errorValue = isInstanceOfError ? value : value.error;
 
 				if (done) {
 					throw errorValue;
@@ -152,8 +155,10 @@ export function generate(
 		while (true) {
 			const {done, value} = resume(generator, throwing ? lastError : lastValue, throwing);
 
-			if (value instanceof Error || isError(value)) {
-				const errorValue = value instanceof Error ? value : value.error;
+			const isInstanceOfError = isInstanceOfConstructor(Error, value);
+
+			if (isInstanceOfError || isError(value)) {
+				const errorValue = isInstanceOfError ? value : value.error;
 
 				if (done) {
 					throw errorValue;

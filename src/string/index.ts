@@ -81,24 +81,24 @@ export function dedent(value: string | TemplateStringsArray, ...values: unknown[
 }
 
 /**
- * Get a new UUID string _(version 4)_ for use in _HTML_
+ * Get a new _UUID_ string _(version 4)_ for use in _HTML_
  *
  * @param html Use _HTML_-friendly format
- * @returns UUID string
+ * @returns _UUID_ string
  */
 export function getUuid(html: true): string;
 
 /**
- * Get a new UUID string _(version 4)_
+ * Get a new _UUID_ string _(version 4)_
  *
- * @returns UUID string
+ * @returns _UUID_ string
  */
 export function getUuid(): string;
 
 /**
- * Get a new UUID string _(version 4)_
+ * Get a new _UUID_ string _(version 4)_
  *
- * @returns UUID string
+ * @returns _UUID_ string
  */
 export function getUuid(html?: unknown): string {
 	const forHTML = html === true;
@@ -131,9 +131,9 @@ export function getUuid(html?: unknown): string {
 }
 
 /**
- * Parse a JSON string into its proper value _(or `undefined` if it fails)_
+ * Parse a _JSON_ string into its proper value _(or `undefined` if it fails)_
  *
- * @param value JSON string to parse
+ * @param value _JSON_ string to parse
  * @param reviver Reviver function to transform the parsed values
  * @returns Parsed value, or `undefined` if parsing fails
  */

@@ -1,3 +1,6 @@
+import type {ErrorJson} from '../misc.model';
+import {toJsonError, toPojoError} from '../../internal/json';
+
 // #region Types
 
 /**
@@ -12,7 +15,23 @@ export class RetryError extends Error {
 
 		this.name = RETRY_ERROR_NAME;
 	}
+
+	/**
+	 * Get the _JSON_ representation of the error
+	 *
+	 * @returns _JSON_ representation
+	 */
+	toJSON(): RetryErrorJson {
+		return {
+			...toPojoError(this),
+			original: toJsonError(this.original),
+		};
+	}
 }
+
+export type RetryErrorJson = {
+	original: unknown;
+} & ErrorJson;
 
 export type RetryOptions = {
 	delay?: number;

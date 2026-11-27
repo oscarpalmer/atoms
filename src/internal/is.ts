@@ -55,7 +55,26 @@ export function isInstanceOf<Instance>(
 	constructor: Constructor<Instance>,
 	value: unknown,
 ): value is Instance {
-	return isConstructor(constructor) && value instanceof constructor;
+	return (
+		value != null &&
+		(typeof value === 'function' || typeof value === 'object') &&
+		isConstructor(constructor) &&
+		value instanceof constructor
+	);
+}
+
+/**
+ * @internal
+ */
+export function isInstanceOfConstructor<Instance>(
+	constructor: Constructor<Instance>,
+	value: unknown,
+): value is Instance {
+	return (
+		value != null &&
+		(typeof value === 'function' || typeof value === 'object') &&
+		value instanceof constructor
+	);
 }
 
 /**
@@ -261,7 +280,7 @@ export function isPrimitive(value: unknown): value is Primitive {
  * @returns `true` if the value is a `Promise`, otherwise `false`
  */
 export function isPromise(value: unknown): value is Promise<unknown> {
-	return typeof value === 'object' && value !== null && value instanceof Promise;
+	return isInstanceOfConstructor(Promise, value);
 }
 
 /**

@@ -3,25 +3,25 @@ import {getSizedMaximum} from './misc';
 // #region Types and classes
 
 /**
- * A _Map_ with a maximum size
+ * A Map with a maximum size
  *
  * Behavior is similar to a _LRU_ cache, where the least recently used entries are removed
  */
 export class SizedMap<SizedKey = unknown, SizedValue = unknown> extends Map<SizedKey, SizedValue> {
 	/**
-	 * The maximum size of the _Map_
+	 * The maximum size of the Map
 	 */
 	readonly #maximumSize: number;
 
 	/**
-	 * Is the _Map_ full?
+	 * Is the Map full?
 	 */
 	get full(): boolean {
 		return super.size >= this.#maximumSize;
 	}
 
 	/**
-	 * The maximum size of the _Map_
+	 * The maximum size of the Map
 	 */
 	get maximum(): number {
 		return this.#maximumSize;

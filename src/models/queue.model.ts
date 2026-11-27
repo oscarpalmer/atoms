@@ -1,5 +1,6 @@
-import type {GenericAsyncCallback, GenericCallback} from './misc.model';
+import {toPojoError} from '../internal/json';
 import type {Aborter} from './aborter.model';
+import type {ErrorJson, GenericAsyncCallback, GenericCallback} from './misc.model';
 
 // #region Types
 
@@ -93,7 +94,7 @@ export type KeyedQueue<
 	 * Get the queue for a specific key
 	 *
 	 * @param key Key to get the queue for
-	 * @returns Queue for the key, or `undefined` if it doesn't exist
+	 * @returns _Queue_ for the key, or `undefined` if it doesn't exist
 	 */
 	get(key: string): Queue<Callback, Tail<CallbackParameters>> | undefined;
 
@@ -132,6 +133,16 @@ export type KeyedQueue<
 	 * @param key Optional key to resume the queue for
 	 */
 	resume(key?: string): void;
+};
+
+export type KeyedQueueJson = {
+	active: string[];
+	empty: string[];
+	full: string[];
+	items: Record<string, number>;
+	keys: string[];
+	paused: string[];
+	queues: number;
 };
 
 export type KeyedQueueState = {
@@ -224,6 +235,17 @@ export type Queue<
 
 export type QueueHandleType = 'clear' | 'pause' | 'resume';
 
+/**
+ * _JSON_ representation of a queue's state
+ */
+export type QueueJson = {
+	active: boolean;
+	empty: boolean;
+	full: boolean;
+	paused: boolean;
+	size: number;
+};
+
 export type QueueState = {
 	callback: GenericCallback;
 	handled: GenericCallback[];
@@ -236,13 +258,22 @@ export type QueueState = {
 };
 
 /**
- * An error thrown by the Queue when an operation fails
+ * An error thrown by the _Queue_ when an operation fails
  */
 export class QueueError extends Error {
 	constructor(message: string) {
 		super(message);
 
 		this.name = QUEUE_ERROR_NAME;
+	}
+
+	/**
+	 * Get the _JSON_ representation of the error
+	 *
+	 * @returns _JSON_ representation
+	 */
+	toJSON(): ErrorJson {
+		return toPojoError(this);
 	}
 }
 

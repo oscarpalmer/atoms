@@ -1,4 +1,4 @@
-import {isAsyncFunction, isThenable} from '../internal/is';
+import {isAsyncFunction, isInstanceOfConstructor, isThenable} from '../internal/is';
 import {getGenerator} from '../internal/plan';
 import {isError, isOk} from '../internal/result/is';
 import {
@@ -84,7 +84,7 @@ function getAsyncUseStep(value: unknown): () => AsyncGenerator {
 			return actual.value;
 		}
 
-		if (actual instanceof Error) {
+		if (isInstanceOfConstructor(Error, actual)) {
 			yield* fail(actual);
 
 			return;
@@ -124,7 +124,7 @@ function getUseStep(value: unknown): () => Generator {
 			return actual.value;
 		}
 
-		if (actual instanceof Error) {
+		if (isInstanceOfConstructor(Error, actual)) {
 			yield* fail(actual);
 
 			return;

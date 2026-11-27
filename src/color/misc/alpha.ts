@@ -9,6 +9,7 @@ import {
 	COLOR_MAX,
 	COLOR_SYMBOL,
 } from '../constants';
+import {setStateValue} from './state';
 
 // #region Functions
 
@@ -24,7 +25,10 @@ export function getAlpha(value: unknown, hex: boolean): Alpha {
 	if (hex && COLOR_EXPRESSION.alphaHex.test(value)) {
 		return {
 			hex: value,
-			value: Number.parseInt(value, COLOR_HEX_RADIX) / COLOR_MAX.hex,
+			value: round(
+				(Number.parseInt(value, COLOR_HEX_RADIX) / COLOR_MAX.hex) * COLOR_MAX.percent,
+				2,
+			),
 		};
 	}
 
@@ -44,7 +48,9 @@ export function getAlphaHexadecimal(value: number): string {
 		return COLOR_ALPHA.fullHexLong;
 	}
 
-	return round((value / COLOR_MAX.percent) * COLOR_MAX.hex).toString(16);
+	return round((value / COLOR_MAX.percent) * COLOR_MAX.hex)
+		.toString(16)
+		.padStart(2, '0');
 }
 
 function getAlphaFromValue(value: number): Alpha {
@@ -61,12 +67,14 @@ export function getAlphaValue(original: number): number {
 		return COLOR_MAX.percent;
 	}
 
-	return clamp(original, COLOR_ALPHA.noneValue, COLOR_MAX.percent);
+	return round(clamp(original, COLOR_ALPHA.noneValue, COLOR_MAX.percent), 2);
 }
 
 export function setColorAlpha(this: InternalColor, value: unknown): void {
 	if (typeof value === 'number' && !Number.isNaN(value)) {
-		this[COLOR_SYMBOL].values.alpha = getAlpha(value, false);
+		const {values} = this[COLOR_SYMBOL];
+
+		setStateValue(this, values.origin, values[values.origin], value);
 	}
 }
 

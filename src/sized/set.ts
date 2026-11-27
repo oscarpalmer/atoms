@@ -3,25 +3,25 @@ import {getSizedMaximum} from '../internal/sized/misc';
 // #region Types
 
 /**
- * A _Set_ with a maximum size
+ * A Set with a maximum size
  *
  * Behavior is similar to a _LRU_ cache, where the oldest values are removed
  */
 export class SizedSet<Value = unknown> extends Set<Value> {
 	/**
-	 * The maximum size of the _Set_
+	 * The maximum size of the Set
 	 */
 	readonly #maximumSize: number;
 
 	/**
-	 * Is the _Set_ full?
+	 * Is the Set full?
 	 */
 	get full(): boolean {
 		return this.size >= this.#maximumSize;
 	}
 
 	/**
-	 * The maximum size of the _Set_
+	 * The maximum size of the Set
 	 */
 	get maximum(): number {
 		return this.#maximumSize;

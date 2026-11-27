@@ -5,7 +5,10 @@ test('color', () => {
 	const color = getColor('hello, world!');
 
 	expect(color.hex).toEqual('000000');
+	expect(color.hexa).toEqual('000000ff');
 	expect(color.alpha).toEqual(100);
+
+	expect(JSON.stringify(color)).toEqual('"#000000"');
 
 	color.hex = 'ffffff';
 
@@ -13,23 +16,31 @@ test('color', () => {
 	expect(color.hexa).toEqual('ffffffff');
 	expect(color.alpha).toEqual(100);
 
+	expect(JSON.stringify(color)).toEqual('"#ffffff"');
+
 	color.hexa = 'ffffff00';
 
 	expect(color.hex).toEqual('ffffff');
 	expect(color.hexa).toEqual('ffffff00');
 	expect(color.alpha).toEqual(0);
 
+	expect(JSON.stringify(color)).toEqual('"#ffffff00"');
+
 	color.hexa = 'ffffffdd';
 
 	expect(color.hex).toEqual('ffffff');
 	expect(color.hexa).toEqual('ffffffdd');
-	expect(color.alpha).toEqual(221 / 255);
+	expect(color.alpha).toEqual(86.67);
+
+	expect(JSON.stringify(color)).toEqual('"#ffffffdd"');
 
 	color.hexa = 'ffffff';
 
 	expect(color.hex).toEqual('ffffff');
 	expect(color.hexa).toEqual('ffffffff');
 	expect(color.alpha).toEqual(100);
+
+	expect(JSON.stringify(color)).toEqual('"#ffffff"');
 
 	color.hex = 'hello, world!';
 

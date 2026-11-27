@@ -281,7 +281,7 @@ export async function promises(items: ArrayOrPlainObject, options?: unknown): Pr
  * _Available as `resultPromises` and `promises.result`_
  *
  * @param items List of _Promises_
- * @param signal AbortSignal for aborting all _Promises_
+ * @param signal _AbortSignal_ for aborting all _Promises_
  * @returns List of results
  */
 export async function resultPromises<Items extends unknown[]>(
@@ -295,7 +295,7 @@ export async function resultPromises<Items extends unknown[]>(
  * _Available as `resultPromises` and `promises.result`_
  *
  * @param items Keyed _Promises_
- * @param signal AbortSignal for aborting all _Promises_
+ * @param signal _AbortSignal_ for aborting all _Promises_
  * @returns Keyed object of results
  */
 export async function resultPromises<Items extends PlainObject>(

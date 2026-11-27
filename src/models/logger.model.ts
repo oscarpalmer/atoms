@@ -59,7 +59,7 @@ export type Lumberjack = {
 	 * Start a timed logger with a label
 	 *
 	 * @param label Label for the logger
-	 * @returns _TimedLogger_ instance
+	 * @returns _TimeLogger_ instance
 	 */
 	time(label: string): TimeLogger;
 };

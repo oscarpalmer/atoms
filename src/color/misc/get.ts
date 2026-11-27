@@ -37,6 +37,7 @@ function getClampedValue(
  * - If the value cannot be parsed, a white foreground color will be returned
  *
  * @param value Original value
+ * @param hex Get the foreground color as a hex string
  * @returns Foreground color
  */
 export function getForegroundColor(value: unknown, hex: true): string;

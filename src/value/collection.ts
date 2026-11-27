@@ -1,31 +1,31 @@
-import {isPrimitive} from '../internal/is';
+import {isInstanceOfConstructor, isPrimitive} from '../internal/is';
 import {equal} from '../internal/value/equal';
 
 // #region Functions
 
 /**
- * Does the value exist for a key in a _Map_?
+ * Does the value exist for a key in a Map?
  *
- * @param map _Map_ to check in
+ * @param map Map to check in
  * @param value Value to check for
  * @returns `true` if the value exists, otherwise `false`
  */
 export function inMap<Value>(map: Map<unknown, Value>, value: Value): boolean;
 
 /**
- * Does the value exist for a key in a _Map_?
+ * Does the value exist for a key in a Map?
  *
- * @param map _Map_ to check in
+ * @param map Map to check in
  * @param value Value to check for
- * @param key To return the key for the value
- * @returns The key for the value if it exists, otherwise `undefined`
+ * @param key Return the key instead of the value
+ * @returns Key for the value if it exists, otherwise `undefined`
  */
 export function inMap<Key, Value>(map: Map<Key, Value>, value: Value, key: true): Key;
 
 export function inMap<Key, Value>(map: Map<Key, Value>, value: Value, key?: unknown): unknown {
 	const getKey = key === true;
 
-	if (!(map instanceof Map)) {
+	if (!isInstanceOfConstructor(Map, map)) {
 		return getKey ? undefined : false;
 	}
 
@@ -45,14 +45,14 @@ export function inMap<Key, Value>(map: Map<Key, Value>, value: Value, key?: unkn
 }
 
 /**
- * Does the value exist in a _Set_?
+ * Does the value exist in a Set?
  *
- * @param set _Set_ to check in
+ * @param set Set to check in
  * @param value Value to check for
  * @returns `true` if the value exists, otherwise `false`
  */
 export function inSet<Value>(set: Set<Value>, value: Value): boolean {
-	if (!(set instanceof Set)) {
+	if (!isInstanceOfConstructor(Set, set)) {
 		return false;
 	}
 

@@ -1,5 +1,6 @@
 import {expect, test} from 'vite-plus/test';
 import {queue} from '../../src';
+import {QueueError} from '../../src/models/queue.model';
 import {queueFixture} from '../.fixtures/queue.fixture';
 
 const {asynchronous, synchronous} = queueFixture;
@@ -174,3 +175,21 @@ test('remove', () =>
 			done();
 		}, 100);
 	}));
+
+test('QueueError.toJSON', () => {
+	function roundTrip(value: unknown): unknown {
+		return JSON.parse(JSON.stringify(value));
+	}
+
+	const instance = new QueueError('failure');
+
+	expect(roundTrip(instance)).toStrictEqual({message: 'failure', name: 'QueueError'});
+
+	instance.cause = new Error('cause');
+
+	expect(roundTrip(instance)).toStrictEqual({
+		cause: {message: 'cause', name: 'Error'},
+		message: 'failure',
+		name: 'QueueError',
+	});
+});

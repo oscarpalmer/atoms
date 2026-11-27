@@ -18,7 +18,7 @@ import {
 	type SubscriptionsValues,
 } from '../models/subscription.model';
 import {createAborter} from './aborter';
-import {isKey, isPlainObject} from './is';
+import {isInstanceOfConstructor, isKey, isPlainObject} from './is';
 
 // #region Instances
 
@@ -206,7 +206,7 @@ function createSubscriptionParameters(input: unknown): SubscriptionParameters {
 	return {
 		isActive: typeof values.isActive === 'function' ? values.isActive : undefined,
 		key: isKey(values.key) ? values.key : undefined,
-		signal: values.signal instanceof AbortSignal ? values.signal : undefined,
+		signal: isInstanceOfConstructor(AbortSignal, values.signal) ? values.signal : undefined,
 		value: values.value,
 	};
 }
@@ -216,7 +216,7 @@ function createSubscriptionsParameters(input: unknown): Required<SubscriptionsPa
 
 	let keys: boolean | Set<Key>;
 
-	if (values.keys instanceof Set) {
+	if (isInstanceOfConstructor(Set, values.keys)) {
 		keys = values.keys;
 	} else {
 		keys = typeof values.keys === 'boolean' ? values.keys : false;

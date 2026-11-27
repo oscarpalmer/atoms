@@ -30,7 +30,7 @@ export function isError<V = unknown, E = Error>(result: Result<V, E>): result is
  *
  * _Available as `isError` and `error.is`_
  *
- * @param result Value to check
+ * @param value Value to check
  * @returns `true` if the value is a result error, otherwise `false`
  */
 export function isError<V = unknown, E = Error>(value: unknown): value is Err<V, E>;
@@ -54,7 +54,7 @@ export function isErrorLike<V = unknown, E = Error>(result: Result<V, E>): resul
  *
  * _Available as `isErrorLike` and `error.like`_
  *
- * @param result Value to check
+ * @param value Value to check
  * @returns `true` if the value is similar to an error result, otherwise `false`
  */
 export function isErrorLike<E = Error>(value: unknown): value is ErrLike<E>;

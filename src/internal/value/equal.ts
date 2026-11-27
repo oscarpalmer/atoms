@@ -12,7 +12,13 @@ import {
 	type InternalEqualizer,
 } from '../../models/value/value.equal.model';
 import type {CompareHandler} from '../../models/value/value.handler.model';
-import {isNonPlainObject, isPlainObject, isPrimitive, isTypedArray} from '../is';
+import {
+	isInstanceOfConstructor,
+	isNonPlainObject,
+	isPlainObject,
+	isPrimitive,
+	isTypedArray,
+} from '../is';
 import {min} from '../math/aggregate';
 import {round} from '../math/misc';
 import {createCompareHandler} from './handlers';
@@ -63,7 +69,7 @@ function createEqualOptions(input?: boolean | EqualOptions): EqualizerOptions {
 
 	options.ignoreExpressions.values = (
 		Array.isArray(input.ignoreKeys) ? input.ignoreKeys : [input.ignoreKeys]
-	).filter(key => key instanceof RegExp);
+	).filter(key => isInstanceOfConstructor(RegExp, key));
 
 	options.ignoreKeys.values = new Set(
 		(Array.isArray(input.ignoreKeys) ? input.ignoreKeys : [input.ignoreKeys]).filter(
@@ -334,25 +340,29 @@ function equalValue(first: unknown, second: unknown, options: EqualizerOptions):
 		case typeof first === 'string' && options.ignoreCase === true:
 			return Object.is(first.toLocaleLowerCase(), (second as string).toLocaleLowerCase());
 
-		case first instanceof ArrayBuffer && second instanceof ArrayBuffer:
+		case typeof first !== 'function' && typeof first !== 'object':
+			return false;
+
+		case isInstanceOfConstructor(ArrayBuffer, first) &&
+			isInstanceOfConstructor(ArrayBuffer, second):
 			return equalArrayBuffer(first, second, options);
 
-		case first instanceof Date && second instanceof Date:
+		case isInstanceOfConstructor(Date, first) && isInstanceOfConstructor(Date, second):
 			return Object.is(first.getTime(), (second as Date).getTime());
 
-		case first instanceof DataView && second instanceof DataView:
+		case isInstanceOfConstructor(DataView, first) && isInstanceOfConstructor(DataView, second):
 			return equalDataView(first, second, options);
 
-		case first instanceof Error && second instanceof Error:
+		case isInstanceOfConstructor(Error, first) && isInstanceOfConstructor(Error, second):
 			return equalProperties(first, second, EQUAL_ERROR_PROPERTIES, options);
 
-		case first instanceof Map && second instanceof Map:
+		case isInstanceOfConstructor(Map, first) && isInstanceOfConstructor(Map, second):
 			return equalMap(first, second, options);
 
-		case first instanceof RegExp && second instanceof RegExp:
+		case isInstanceOfConstructor(RegExp, first) && isInstanceOfConstructor(RegExp, second):
 			return equalProperties(first, second, EQUAL_EXPRESSION_PROPERTIES, options);
 
-		case first instanceof Set && second instanceof Set:
+		case isInstanceOfConstructor(Set, first) && isInstanceOfConstructor(Set, second):
 			return equalSet(first, second, options);
 
 		case Array.isArray(first) && Array.isArray(second):
@@ -375,7 +385,7 @@ function equalValue(first: unknown, second: unknown, options: EqualizerOptions):
  * _Available as `initializeEqualizer` and `equal.initialize`_
  *
  * @param options Comparison options
- * @returns Equalizer function
+ * @returns _Equalizer_ instance
  */
 export function initializeEqualizer(options?: EqualOptions): Equalizer {
 	// @ts-expect-error Using old school function constructor, so all good, no worries :-)

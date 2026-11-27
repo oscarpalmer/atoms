@@ -1,5 +1,5 @@
 import {noop} from '../internal/function/misc';
-import {isPlainObject} from '../internal/is';
+import {isInstanceOfConstructor, isPlainObject} from '../internal/is';
 import type {Frozen, PlainObject} from '../models/misc.model';
 
 // #region Functions
@@ -260,10 +260,10 @@ function freezeValue(value: unknown, references: WeakSet<any>, flat: boolean): u
 		case isFrozen(value):
 			return value;
 
-		case value instanceof Map:
+		case isInstanceOfConstructor(Map, value):
 			return freezeMap(value, references, flat);
 
-		case value instanceof Set:
+		case isInstanceOfConstructor(Set, value):
 			return freezeSet(value, references, flat);
 
 		case Array.isArray(value):
@@ -286,7 +286,7 @@ function freezeValue(value: unknown, references: WeakSet<any>, flat: boolean): u
  * @returns `true` if the value is frozen, otherwise `false`
  */
 export function isFrozen(value: unknown): boolean {
-	if (value instanceof Map || value instanceof Set) {
+	if (isInstanceOfConstructor(Map, value) || isInstanceOfConstructor(Set, value)) {
 		return frozenValues.has(value);
 	}
 

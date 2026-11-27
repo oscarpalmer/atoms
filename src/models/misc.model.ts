@@ -18,6 +18,15 @@ export type BuiltIns = void | Date | Primitive | RegExp;
 export type Constructor<Instance = unknown> = new (...args: any[]) => Instance;
 
 /**
+ * _JSON_ representation of an error instance
+ */
+export type ErrorJson = {
+	cause?: unknown;
+	message: string;
+	name: string;
+};
+
+/**
  * A frozen value with readonly properties _(going as deep as possible)_
  */
 export type Frozen<Value> = Value extends unknown[]

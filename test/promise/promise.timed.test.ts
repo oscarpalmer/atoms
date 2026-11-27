@@ -1,5 +1,5 @@
 import {expect, test} from 'vite-plus/test';
-import {TimedError, timed} from '../../src';
+import {error, TimedError, timed} from '../../src';
 import {PROMISE_MESSAGE_TIMED, PROMISE_MESSAGE_TIMEOUT} from '../../src/models/promise.model';
 
 test('promise, timed', () =>
@@ -126,3 +126,18 @@ test('abort', () =>
 			done();
 		}, 500);
 	}));
+
+test('TimedError.toJSON', () => {
+	function roundTrip(value: unknown): unknown {
+		return JSON.parse(JSON.stringify(value));
+	}
+
+	const json = {message: PROMISE_MESSAGE_TIMEOUT, name: 'TimedError'};
+
+	expect(roundTrip(new TimedError())).toStrictEqual(json);
+
+	expect(roundTrip(error(new Error('outer', {cause: new TimedError()})))).toStrictEqual({
+		ok: false,
+		error: {cause: json, message: 'outer', name: 'Error'},
+	});
+});

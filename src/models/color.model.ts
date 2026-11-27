@@ -194,6 +194,13 @@ export type Color = {
 	toHwbString(alpha?: boolean): string;
 
 	/**
+	 * Get the color as a _JSON_ string
+	 *
+	 * @returns _JSON_ color string
+	 */
+	toJSON(): string;
+
+	/**
 	 * Get the color as an _RGB(A)_ string
 	 *
 	 * @param alpha Include alpha channel _(opacity)_? _(defaults to `false`)_

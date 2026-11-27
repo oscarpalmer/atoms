@@ -58,7 +58,7 @@ function getTransformHandler<Value extends PlainObject, Key extends keyof Value>
  * _Available as `initializeTransformer` and `transform.initialize`_
  *
  * @param transform Transformer function
- * @returns Transformer
+ * @returns _Transformer_ instance
  */
 export function initializeTransformer<Value extends PlainObject>(
 	transform: TransformCallback<Value, keyof Value>,
@@ -70,7 +70,7 @@ export function initializeTransformer<Value extends PlainObject>(
  * _Available as `initializeTransformer` and `transform.initialize`_
  *
  * @param transformers Keyed transformer functions
- * @returns Transformer
+ * @returns _Transformer_ instance
  */
 export function initializeTransformer<Value extends PlainObject>(
 	transformers: TransformCallbacks<Value>,

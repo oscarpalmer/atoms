@@ -1,12 +1,15 @@
 import {
 	type Err,
+	type ErrLike,
 	type Ok,
+	type OkLike,
 	type Result,
 	RESULT_NAME_ERR,
 	RESULT_NAME_OK,
 	RESULT_SYMBOL,
 } from '../../models/result.model';
 import {isThenable} from '../is';
+import {toJsonError} from '../json';
 import {swallow} from '../promise';
 import {
 	isError,
@@ -40,6 +43,7 @@ Err.prototype.map = mapResult;
 Err.prototype.mapError = mapErrorResult;
 Err.prototype.match = matchResult;
 Err.prototype.or = orResult;
+Err.prototype.toJSON = toJsonResult;
 Err.prototype.unwrap = unwrapResult;
 
 function Ok(this: any, value: unknown): void {
@@ -60,6 +64,7 @@ Ok.prototype.map = mapResult;
 Ok.prototype.mapError = mapErrorResult;
 Ok.prototype.match = matchResult;
 Ok.prototype.or = orResult;
+Ok.prototype.toJSON = toJsonResult;
 Ok.prototype.unwrap = unwrapResult;
 
 // #endregion
@@ -231,6 +236,22 @@ function parseResultValue(
 	}
 
 	return allowOk && isOkLikeValue(value) ? ok(value.value) : undefined;
+}
+
+function toJsonResult(this: Result<unknown, unknown>): ErrLike<unknown> | OkLike<unknown> {
+	if (this[RESULT_SYMBOL] === RESULT_NAME_OK) {
+		const value = (this as Ok<unknown, unknown>).value;
+
+		return {
+			ok: true,
+			value: value ?? null,
+		};
+	}
+
+	return {
+		ok: false,
+		error: toJsonError((this as Err<unknown, unknown>).error) ?? null,
+	};
 }
 
 function unwrapResult(this: Result<unknown, unknown>, ...args: unknown[]): unknown {

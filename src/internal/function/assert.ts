@@ -4,6 +4,7 @@ import {
 	type AssertNestedPick,
 } from '../../models/function/assert.model';
 import type {Constructor, NestedKeys, NestedValue, PlainObject} from '../../models/misc.model';
+import {isInstanceOf} from '../is';
 import {hasValueResult} from '../value/has';
 
 // #region Functions
@@ -78,7 +79,7 @@ export function assertInstanceOf<Value>(
 	error?: ErrorConstructor,
 ): Asserter<Value> {
 	return value => {
-		assert(() => value instanceof constructor, message, error);
+		assert(() => isInstanceOf(constructor, value), message, error);
 	};
 }
 

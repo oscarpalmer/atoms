@@ -35,8 +35,8 @@ export type Herald<Events extends Record<string, GenericCallback>> = {
 	 *
 	 * @param event Event name
 	 * @param callback Callback function
-	 * @param signal Optional abort signal to cancel the subscription
-	 * @returns Subscription instance
+	 * @param signal Optional abort signal to cancel the _Subscription_
+	 * @returns _Subscription_ instance
 	 */
 	subscribe<Event extends keyof Events>(
 		event: Event,

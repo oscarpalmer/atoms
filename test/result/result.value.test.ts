@@ -1,5 +1,5 @@
 import {expect, test} from 'vite-plus/test';
-import {error, isError, isOk, isResult, ok, run} from '../../src';
+import {error, isError, isOk, isResult, ok, parseResult, run} from '../../src';
 
 test('error', () => {
 	const basic = error('basic');
@@ -367,6 +367,70 @@ test('error.or & ok.or', async () => {
 	expect(v.or(Promise.reject(new Error('ignored')))).toBe(v);
 
 	await expect(e.or(Promise.reject(new Error('rejected')))).rejects.toThrow('rejected');
+});
+
+test('error.toJSON & ok.toJSON', () => {
+	function roundTrip(result: unknown): unknown {
+		return JSON.parse(JSON.stringify(result));
+	}
+
+	expect(ok(123).toJSON()).toEqual({ok: true, value: 123});
+	expect(error('failure').toJSON()).toEqual({ok: false, error: 'failure'});
+
+	// `undefined` becomes `null`, so the property survives serialization
+	expect(roundTrip(ok(undefined))).toStrictEqual({ok: true, value: null});
+	expect(roundTrip(error(undefined))).toStrictEqual({ok: false, error: null});
+
+	expect(roundTrip(ok(error('nested')))).toStrictEqual({
+		ok: true,
+		value: {ok: false, error: 'nested'},
+	});
+
+	expect(parseResult(roundTrip(ok(123)))).toEqual(ok(123));
+	expect(parseResult(roundTrip(error('failure')))).toEqual(error('failure'));
+	expect(parseResult(roundTrip(ok(undefined)))).toEqual(ok(null));
+	expect(parseResult(roundTrip(error(undefined)))).toEqual(error(null));
+
+	expect(roundTrip(error(new TypeError('failure')))).toStrictEqual({
+		ok: false,
+		error: {message: 'failure', name: 'TypeError'},
+	});
+
+	expect(roundTrip(error(new Error('outer', {cause: new Error('inner')})))).toStrictEqual({
+		ok: false,
+		error: {cause: {message: 'inner', name: 'Error'}, message: 'outer', name: 'Error'},
+	});
+
+	// Circular causes are cut off
+	const first = new Error('first');
+	const second = new Error('second', {cause: first});
+
+	first.cause = second;
+
+	expect(roundTrip(error(first))).toStrictEqual({
+		ok: false,
+		error: {cause: {message: 'second', name: 'Error'}, message: 'first', name: 'Error'},
+	});
+
+	// A non-error with `toJSON` is converted too, without needing `JSON.stringify`
+	expect(error({toJSON: () => 'converted'}).toJSON()).toEqual({ok: false, error: 'converted'});
+
+	// An error's own `toJSON` takes precedence
+	class CustomError extends Error {
+		toJSON() {
+			return {custom: this.message};
+		}
+	}
+
+	expect(error(new CustomError('failure')).toJSON()).toEqual({
+		ok: false,
+		error: {custom: 'failure'},
+	});
+
+	expect(roundTrip(error(new Error('outer', {cause: new CustomError('inner')})))).toStrictEqual({
+		ok: false,
+		error: {cause: {custom: 'inner'}, message: 'outer', name: 'Error'},
+	});
 });
 
 test('error.unwrap & ok.unwrap', () => {

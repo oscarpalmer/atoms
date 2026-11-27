@@ -1,4 +1,4 @@
-import {isArrayOrPlainObject} from '../internal/is';
+import {isArrayOrPlainObject, isInstanceOfConstructor} from '../internal/is';
 import type {ArrayOrPlainObject, PlainObject, UnionToIntersection} from '../models/misc.model';
 import {
 	type AssignOptions,
@@ -113,7 +113,7 @@ function getParameters(
 
 function getReplaceableObjects(value: unknown): MergeReplaceableObjectsCallback | undefined {
 	const items = (Array.isArray(value) ? value : [value]).filter(
-		item => typeof item === 'string' || item instanceof RegExp,
+		item => typeof item === 'string' || isInstanceOfConstructor(RegExp, item),
 	);
 
 	if (items.length === 0) {
@@ -130,7 +130,7 @@ function getReplaceableObjects(value: unknown): MergeReplaceableObjectsCallback 
  * _Available as `initializeAssigner` and `assign.initialize`_
  *
  * @param options Assigning options
- * @returns Assigner function
+ * @returns _Assigner_ instance
  */
 export function initializeAssigner(options?: AssignOptions): Assigner {
 	// @ts-expect-error Using old school function constructor, so all good, no worries :-)
@@ -143,7 +143,7 @@ export function initializeAssigner(options?: AssignOptions): Assigner {
  * _Available as `initializeMerger` and `merge.initialize`_
  *
  * @param options Merging options
- * @returns Merger function
+ * @returns _Merger_ instance
  */
 export function initializeMerger(options?: MergeOptions): Merger {
 	// @ts-expect-error Using old school function constructor, so all good, no worries :-)

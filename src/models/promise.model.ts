@@ -1,5 +1,6 @@
-import type {ArrayOrPlainObject, GenericCallback, Key} from './misc.model';
+import {toPojoError} from '../internal/json';
 import type {Aborter} from './aborter.model';
+import type {ArrayOrPlainObject, ErrorJson, GenericCallback, Key} from './misc.model';
 import type {Result} from './result.model';
 
 // #region Types
@@ -66,7 +67,7 @@ export type PromiseHandlers = {
  */
 export type PromiseOptions = {
 	/**
-	 * AbortSignal for aborting the _Promise_; when aborted, the _Promise_ will reject with the reason of the signal
+	 * _AbortSignal_ for aborting the _Promise_; when aborted, the _Promise_ will reject with the reason of the signal
 	 */
 	signal?: AbortSignal;
 	/**
@@ -107,7 +108,7 @@ export type PromisesItems<Items extends ArrayOrPlainObject> = {
  */
 export type PromisesOptions = {
 	/**
-	 * AbortSignal for aborting the _Promises_; when aborted, the _Promises_ will reject with the reason of the signal
+	 * _AbortSignal_ for aborting the _Promises_; when aborted, the _Promises_ will reject with the reason of the signal
 	 */
 	signal?: AbortSignal;
 	/**
@@ -166,6 +167,15 @@ export class TimedError extends Error {
 		super(PROMISE_MESSAGE_TIMEOUT);
 
 		this.name = PROMISE_ERROR_NAME;
+	}
+
+	/**
+	 * Get the _JSON_ representation of the error
+	 *
+	 * @returns _JSON_ representation
+	 */
+	toJSON(): ErrorJson {
+		return toPojoError(this);
 	}
 }
 

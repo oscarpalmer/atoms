@@ -12,7 +12,7 @@ import {
  *
  * @param value Number to round down
  * @param decimals Number of decimal places to round to _(defaults to `0`)_
- * @returns Rounded number, or `Number.NaN` if the value if unable to be rounded
+ * @returns Rounded number, or `Number.NaN` if the value is unable to be rounded
  *
  * @example
  * ```typescript
@@ -30,7 +30,7 @@ export function floor(value: number, decimals?: number): number {
  *
  * @param value Number to round
  * @param decimals Number of decimal places to round to _(defaults to `0`)_
- * @returns Rounded number, or `Number.NaN` if the value if unable to be rounded
+ * @returns Rounded number, or `Number.NaN` if the value is unable to be rounded
  *
  * @example
  * ```typescript

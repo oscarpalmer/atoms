@@ -27,6 +27,7 @@ Color.prototype.subscribe = subscribeToColor;
 Color.prototype.toHexString = formatHexColor;
 Color.prototype.toHslString = formatHslColor;
 Color.prototype.toHwbString = formatHwbColor;
+Color.prototype.toJSON = toJsonColor;
 Color.prototype.toRgbString = formatRgbColor;
 Color.prototype.toString = formatHexColor;
 Color.prototype.unsubscribe = unsubscribeFromColor;
@@ -128,6 +129,10 @@ function subscribeToColor(
 	const {changes} = this[COLOR_SYMBOL];
 
 	return changes.subscribe(COLOR_TYPE.wildcard, callback, signal);
+}
+
+function toJsonColor(this: InternalColor): string {
+	return formatHexColor.call(this, this[COLOR_SYMBOL].values.alpha.value < 100);
 }
 
 function unsubscribeFromColor(this: InternalColor): void {

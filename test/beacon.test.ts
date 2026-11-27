@@ -215,3 +215,39 @@ test('options', () => {
 	expect(counts.first).toBe(3);
 	expect(counts.second).toBe(2);
 });
+
+test('beacon.toJSON + observable.toJSON', () => {
+	function roundTrip(value: unknown): unknown {
+		return JSON.parse(JSON.stringify(value));
+	}
+
+	const instance = beacon(123);
+	const {observable} = instance;
+
+	expect(roundTrip(instance)).toStrictEqual({active: true, value: 123});
+	expect(roundTrip(observable)).toStrictEqual({active: true});
+
+	instance.emit(456);
+
+	expect(roundTrip(instance)).toStrictEqual({active: true, value: 456});
+
+	// `undefined` becomes `null`, so the property survives serialization
+	instance.emit(undefined as never);
+
+	expect(roundTrip(instance)).toStrictEqual({active: true, value: null});
+
+	instance.emit(456);
+
+	observable.deactivate();
+
+	expect(roundTrip(instance)).toStrictEqual({active: true, value: 456});
+	expect(roundTrip(observable)).toStrictEqual({active: false});
+
+	const other = beacon('value');
+	const {observable: otherObservable} = other;
+
+	other.deactivate();
+
+	expect(roundTrip(other)).toStrictEqual({active: false, value: 'value'});
+	expect(roundTrip(otherObservable)).toStrictEqual({active: false});
+});

@@ -1,4 +1,4 @@
-import {isArrayOrPlainObject, isTypedArray} from '../internal/is';
+import {isArrayOrPlainObject, isInstanceOfConstructor, isTypedArray} from '../internal/is';
 import {attempt} from '../internal/result/attempt';
 import {unwrap} from '../internal/result/misc';
 import {createValueHandler} from '../internal/value/handlers';
@@ -54,7 +54,7 @@ function cloneAny(
 		case value === null || CLONE_PRIMITIVES[typeof value as string]:
 			return value;
 
-		case value instanceof Date:
+		case isInstanceOfConstructor(Date, value):
 			return new Date(value);
 
 		case typeof value === 'function': {
@@ -80,22 +80,22 @@ function cloneAny(
 		case parameters.references.has(value as object):
 			return parameters.references!.get(value as object);
 
-		case value instanceof ArrayBuffer:
+		case isInstanceOfConstructor(ArrayBuffer, value):
 			return cloneArrayBuffer(value, parameters, depth);
 
-		case value instanceof DataView:
+		case isInstanceOfConstructor(DataView, value):
 			return cloneDataView(value, parameters, depth);
 
-		case value instanceof RegExp:
+		case isInstanceOfConstructor(RegExp, value):
 			return cloneRegularExpression(value, parameters, depth);
 
-		case value instanceof Map:
+		case isInstanceOfConstructor(Map, value):
 			return cloneMap(value, parameters, depth);
 
-		case typeof Node !== 'undefined' && value instanceof Node:
+		case typeof Node !== 'undefined' && isInstanceOfConstructor(Node, value):
 			return cloneNode(value, parameters, depth);
 
-		case value instanceof Set:
+		case isInstanceOfConstructor(Set, value):
 			return cloneSet(value, parameters, depth);
 
 		case isArrayOrPlainObject(value):
@@ -319,7 +319,7 @@ export function deregisterCloner<Instance>(constructor: Constructor<Instance>): 
  * _Available as `initializeCloner` and `clone.initialize`_
  *
  * @param options Clone options
- * @returns Cloner function
+ * @returns _Cloner_ instance
  */
 export function initializeCloner(options?: CloneOptions): Cloner {
 	// @ts-expect-error Using old school function constructor, so all good, no worries :-)

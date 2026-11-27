@@ -1,5 +1,5 @@
 import {getNumberOrDefault} from '../internal/defaults';
-import {isPlainObject} from '../internal/is';
+import {isInstanceOfConstructor, isPlainObject} from '../internal/is';
 import {error, ok} from '../internal/result/value';
 import type {PlainObject, RequiredKeys} from '../models/misc.model';
 import {
@@ -24,14 +24,14 @@ export function createPromiseOptions(input: unknown): RequiredKeys<PromiseOption
 		};
 	}
 
-	if (input instanceof AbortSignal) {
+	if (isInstanceOfConstructor(AbortSignal, input)) {
 		return {signal: input, time: 0};
 	}
 
 	const options = isPlainObject(input) ? input : {};
 
 	return {
-		signal: options.signal instanceof AbortSignal ? options.signal : undefined,
+		signal: isInstanceOfConstructor(AbortSignal, options.signal) ? options.signal : undefined,
 		time: getNumberOrDefault(options.time, 0),
 	};
 }
@@ -43,14 +43,14 @@ export function createPromisesOptions(input: unknown): RequiredKeys<PromisesOpti
 		};
 	}
 
-	if (input instanceof AbortSignal) {
+	if (isInstanceOfConstructor(AbortSignal, input)) {
 		return {signal: input, strategy: PROMISE_STRATEGY_DEFAULT};
 	}
 
 	const options = isPlainObject(input) ? input : {};
 
 	return {
-		signal: options.signal instanceof AbortSignal ? options.signal : undefined,
+		signal: isInstanceOfConstructor(AbortSignal, options.signal) ? options.signal : undefined,
 		strategy: getStrategyOrDefault(options.strategy),
 	};
 }

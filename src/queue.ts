@@ -1,5 +1,6 @@
 import {createAborter} from './internal/aborter';
 import {getBooleanOrDefault, getNumberOrDefault} from './internal/defaults';
+import {isInstanceOfConstructor} from './internal/is';
 import {min} from './internal/math/aggregate';
 import {attempt} from './internal/result/attempt';
 import type {
@@ -12,6 +13,7 @@ import {
 	type InternalKeyedQueue,
 	type InternalQueue,
 	type KeyedQueue,
+	type KeyedQueueJson,
 	type KeyedQueueState,
 	type Queue,
 	QUEUE_HANDLE_CLEAR,
@@ -33,6 +35,7 @@ import {
 	type QueuedItem,
 	QueueError,
 	type QueueHandleType,
+	type QueueJson,
 	type QueueOptions,
 	type QueueState,
 	type QueueStatusKey,
@@ -59,6 +62,7 @@ KeyedQueue.prototype.get = getQueue;
 KeyedQueue.prototype.pause = pauseQueues;
 KeyedQueue.prototype.remove = removeQueue;
 KeyedQueue.prototype.resume = resumeQueues;
+KeyedQueue.prototype.toJSON = getKeyedQueueJson;
 
 Object.defineProperties(KeyedQueue.prototype, {
 	active: {
@@ -127,6 +131,7 @@ Queue.prototype.clear = clearQueue;
 Queue.prototype.pause = pauseQueue;
 Queue.prototype.remove = removeQueued;
 Queue.prototype.resume = resumeQueue;
+Queue.prototype.toJSON = getQueueJson;
 
 Object.defineProperties(Queue.prototype, {
 	active: {
@@ -181,7 +186,7 @@ function addToQueue(this: InternalQueue, parameters: unknown[], signal?: unknown
 		throw new QueueError(QUEUE_MESSAGE_MAXIMUM);
 	}
 
-	const abortSignal = signal instanceof AbortSignal ? signal : undefined;
+	const abortSignal = isInstanceOfConstructor(AbortSignal, signal) ? signal : undefined;
 
 	if (abortSignal?.aborted ?? false) {
 		throw abortSignal?.reason;
@@ -271,10 +276,6 @@ function getFullQueues(this: InternalKeyedQueue): string[] {
 	return getStatus(this[QUEUE_SYMBOL], QUEUE_STATUS_FULL);
 }
 
-function getPausedQueues(this: InternalKeyedQueue): string[] {
-	return getStatus(this[QUEUE_SYMBOL], QUEUE_STATUS_PAUSED);
-}
-
 function getKeyedQueueItems(this: InternalKeyedQueue): Record<string, number> {
 	const state = this[QUEUE_SYMBOL];
 
@@ -289,8 +290,24 @@ function getKeyedQueueItems(this: InternalKeyedQueue): Record<string, number> {
 	return size;
 }
 
+function getKeyedQueueJson(this: InternalKeyedQueue): KeyedQueueJson {
+	return {
+		active: this.active,
+		empty: this.empty,
+		full: this.full,
+		items: this.items,
+		keys: this.keys,
+		paused: this.paused,
+		queues: this.queues,
+	};
+}
+
 function getKeyedQueueSize(this: InternalKeyedQueue): number {
 	return this[QUEUE_SYMBOL].queues.size;
+}
+
+function getPausedQueues(this: InternalKeyedQueue): string[] {
+	return getStatus(this[QUEUE_SYMBOL], QUEUE_STATUS_PAUSED);
 }
 
 function getQueue(
@@ -335,6 +352,16 @@ function getQueueFull(this: InternalQueue): boolean {
 	const state = this[QUEUE_SYMBOL];
 
 	return state.options.maximum > 0 && state.items.length >= state.options.maximum;
+}
+
+function getQueueJson(this: InternalQueue): QueueJson {
+	return {
+		active: this.active,
+		empty: this.empty,
+		full: this.full,
+		paused: this.paused,
+		size: this.size,
+	};
 }
 
 function getQueueKeys(this: InternalKeyedQueue): string[] {
@@ -439,12 +466,13 @@ function isQueueInstance<Instance>(name: string, value: unknown): value is Insta
 }
 
 /**
- * Create a keyed queue for an asynchronous callback function, where each key has its own queue
+ * Create a keyed _Queue_ for an asynchronous callback function, where each key has its own queue
  *
  * _Available as `keyedQueue` and `queue.keyed`_
  *
  * @param callback Callback function for queued items
- * @param options Queue options
+ * @param options _Queue_ options
+ * @returns _KeyedQueue_ instance
  */
 export function keyedQueue<Callback extends (key: string, ...parameters: any[]) => Promise<void>>(
 	callback: Callback,
@@ -452,12 +480,13 @@ export function keyedQueue<Callback extends (key: string, ...parameters: any[]) 
 ): KeyedQueue<Callback, Parameters<Callback>>;
 
 /**
- * Create a keyed queue for an asynchronous callback function, where each key has its own queue
+ * Create a keyed _Queue_ for an asynchronous callback function, where each key has its own queue
  *
  * _Available as `keyedQueue` and `queue.keyed`_
  *
  * @param callback Callback function for queued items
- * @param options Queue options
+ * @param options _Queue_ options
+ * @returns _KeyedQueue_ instance
  */
 export function keyedQueue<Callback extends (key: string, ...parameters: any[]) => void>(
 	callback: Callback,
@@ -485,11 +514,11 @@ function pauseQueues(this: InternalKeyedQueue, key?: string): void {
 }
 
 /**
- * Create a queue for an asynchronous callback function
+ * Create a _Queue_ for an asynchronous callback function
  *
  * @param callback Callback function for queued items
- * @param options Queue options
- * @returns Queue instance
+ * @param options _Queue_ options
+ * @returns _Queue_ instance
  */
 export function queue<Callback extends GenericAsyncCallback>(
 	callback: Callback,
@@ -497,11 +526,11 @@ export function queue<Callback extends GenericAsyncCallback>(
 ): Queue<Callback, Parameters<Callback>>;
 
 /**
- * Create a queue for a synchronous callback function
+ * Create a _Queue_ for a synchronous callback function
  *
  * @param callback Callback function for queued items
- * @param options Queue options
- * @returns Queue instance
+ * @param options _Queue_ options
+ * @returns _Queue_ instance
  */
 export function queue<Callback extends GenericSyncCallback>(
 	callback: Callback,

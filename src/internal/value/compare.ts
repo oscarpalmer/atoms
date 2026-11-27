@@ -1,6 +1,7 @@
 import type {Constructor} from '../../models/misc.model';
 import type {CompareHandler} from '../../models/value/value.handler.model';
 import {COMPARE_NAME, type ComparisonHandler} from '../../models/value/value.misc.model';
+import {isInstanceOfConstructor} from '../is';
 import {max} from '../math/aggregate';
 import {getString, words} from '../string/misc';
 import {createCompareHandler} from './handlers';
@@ -12,7 +13,7 @@ import {createCompareHandler} from './handlers';
  *
  * @param first First value
  * @param second Second value
- * @returns `0` if equal; `-1` first comes before second; `1` first comes after second
+ * @returns `0` if equal; `-1` if first comes before second; `1` if first comes after second
  */
 export function compare(first: unknown, second: unknown): number {
 	if (Object.is(first, second)) {
@@ -93,7 +94,7 @@ function compareValue(
 		return comparators[firstType](first, second);
 	}
 
-	if (first instanceof Date && second instanceof Date) {
+	if (isInstanceOfConstructor(Date, first) && isInstanceOfConstructor(Date, second)) {
 		return compareNumbers(first.getTime(), second.getTime());
 	}
 

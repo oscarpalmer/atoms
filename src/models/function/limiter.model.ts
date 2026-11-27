@@ -1,4 +1,5 @@
-import type {GenericAsyncCallback, GenericCallback} from '../misc.model';
+import {toPojoError} from '../../internal/json';
+import type {ErrorJson, GenericAsyncCallback, GenericCallback} from '../misc.model';
 
 // #region Types
 
@@ -63,6 +64,15 @@ export class LimiterError extends Error {
 		super(LIMITER_MESSAGE_CANCELED);
 
 		this.name = LIMITER_NAME_ERROR;
+	}
+
+	/**
+	 * Get the _JSON_ representation of the error
+	 *
+	 * @returns _JSON_ representation
+	 */
+	toJSON(): ErrorJson {
+		return toPojoError(this);
 	}
 }
 

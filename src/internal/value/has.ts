@@ -61,7 +61,6 @@ export function hasValue(data: PlainObject, path: string, ignoreCase?: boolean):
  *
  * @param data Object to check in
  * @param path Path for property, e.g., `foo.bar.baz`
- * @param ignoreCase If `true`, the path matching is case-insensitive
  * @returns Result object
  *
  * @example

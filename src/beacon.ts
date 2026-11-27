@@ -10,11 +10,13 @@ import {
 	BEACON_TYPE_ERROR,
 	BEACON_TYPE_NEXT,
 	type Beacon,
+	type BeaconJson,
 	type BeaconOptions,
 	type BeaconState,
 	type InternalBeacon,
 	type InternalObservable,
 	type Observable,
+	type ObservableJson,
 	type Observer,
 } from './models/beacon.model';
 import type {GenericCallback, PlainObject} from './models/misc.model';
@@ -35,6 +37,7 @@ Beacon.prototype.deactivate = deactivateBeacon;
 Beacon.prototype.emit = emitBeaconValue;
 Beacon.prototype.error = emitBeaconError;
 Beacon.prototype.finish = finishBeacon;
+Beacon.prototype.toJSON = getBeaconJson;
 
 Object.defineProperties(Beacon.prototype, {
 	active: {
@@ -61,6 +64,7 @@ function Observable(this: InternalObservable, beacon: BeaconState<unknown>): voi
 
 Observable.prototype.deactivate = deactivateObservable;
 Observable.prototype.subscribe = subscribeToObservable;
+Observable.prototype.toJSON = getObservableJson;
 
 Object.defineProperty(Observable.prototype, 'active', {
 	enumerable: true,
@@ -72,11 +76,11 @@ Object.defineProperty(Observable.prototype, 'active', {
 // #region Functions
 
 /**
- * Create a new beacon
+ * Create a _Beacon_
  *
  * @param value Initial value
- * @param options Beacon options
- * @returns Beacon instance
+ * @param options _Beacon_ options
+ * @returns _Beacon_ instance
  */
 export function beacon<Value>(value: Value, options?: BeaconOptions<Value>): Beacon<Value> {
 	// @ts-expect-error Using old school function constructor, so all good, no worries :-)
@@ -161,6 +165,15 @@ function getBeaconActive(this: InternalBeacon): boolean {
 	return this[BEACON_SYMBOL].active;
 }
 
+function getBeaconJson(this: InternalBeacon): BeaconJson {
+	const state = this[BEACON_SYMBOL];
+
+	return {
+		active: state.active,
+		value: state.value ?? null,
+	};
+}
+
 function getBeaconObservable(this: InternalBeacon): Observable<unknown> {
 	const state = this[BEACON_SYMBOL];
 
@@ -186,6 +199,12 @@ function getObservableActive(this: InternalObservable): boolean {
 
 function getObservableCallback(value: unknown): GenericCallback {
 	return typeof value === 'function' ? (value as GenericCallback) : noop;
+}
+
+function getObservableJson(this: InternalObservable): ObservableJson {
+	return {
+		active: this[BEACON_SYMBOL].active,
+	};
 }
 
 /**

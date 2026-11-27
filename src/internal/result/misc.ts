@@ -5,6 +5,7 @@ import {
 	type Ok,
 	type Result,
 } from '../../models/result.model';
+import {isInstanceOfConstructor} from '../is';
 import {isError, isOk, isResult} from './is';
 
 // #region Functions
@@ -93,7 +94,7 @@ export function unwrapValue(
 	error ??= isError(value);
 
 	if (args.length === 0) {
-		if (error && valueAsError.error instanceof Error) {
+		if (error && isInstanceOfConstructor(Error, valueAsError.error)) {
 			throw valueAsError.error;
 		}
 

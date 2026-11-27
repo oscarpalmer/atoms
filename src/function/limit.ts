@@ -22,7 +22,7 @@ import type {
  * - On subsequent calls, existing calls will be canceled _(rejected)_, the timer reset, and will wait another `time` milliseconds before the new call is made _(and so on...)_
  *
  * @param callback Callback to debounce
- * @param time Time in milliseconds to wait before calling the callback _(defaults to `0`; e.g., as soon as possible)_
+ * @param time Time in milliseconds to wait before calling the callback _(defaults to `0`; i.e., as soon as possible)_
  * @returns Debounced callback handler with a `cancel` method
  */
 export function debounce<Callback extends GenericAsyncCallback>(

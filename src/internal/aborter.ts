@@ -1,9 +1,10 @@
 import {ABORTER_EVENT, ABORTER_OPTIONS, type Aborter} from '../models/aborter.model';
+import {isInstanceOfConstructor} from './is';
 
 // #region Functions
 
 export function createAborter(value: unknown, onAbort: () => void): Aborter | undefined {
-	if (!(value instanceof AbortSignal)) {
+	if (!isInstanceOfConstructor(AbortSignal, value)) {
 		return;
 	}
 
